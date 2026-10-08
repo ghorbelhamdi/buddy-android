@@ -1,0 +1,19 @@
+# build output
+build/
+app/build/
+dist/
+.gradle/
+.kotlin/
+
+# local machine config
+local.properties
+.idea/
+*.iml
+
+# signing keys — never commit
+*.jks
+*.keystore
+.buddy-keys/
+
+# design exports (kept locally)
+design/

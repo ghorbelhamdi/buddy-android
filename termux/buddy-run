@@ -1,0 +1,356 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# Called by the Buddy app through Termux's RUN_COMMAND service.
+#   buddy-run <token> ask <session> <claude|codex> <dev:0|1> <message> [model] [attachment-ids]
+#                                    run the agent on the message in that session, streaming events to the bubble
+#   buddy-run <token> stop <session>       stop that session's running request
+#   buddy-run <token> delete <session>     forget that session
+#   buddy-run <token> ping                 answer the app's setup check
+#   buddy-run <token> procs                list running Claude Code / Codex processes (buddy_procs)
+#   buddy-run <token> kill <pid>           stop a running Claude Code / Codex process and its children
+#   buddy-run <token> recent               list recent Claude Code / Codex sessions from their history (buddy_recent)
+#   buddy-run <token> transcript <claude|codex> <file>   last messages of a session (buddy_transcript)
+#   buddy-run <token> adopt <session> <claude|codex> <agent-session-id>  continue that session as a Buddy chat
+#   buddy-run <token> handoff <session>    (run in a Termux tab) reopen a Buddy chat with remote control (that session only)
+# Every event sent to the bubble carries "buddy_session" so the app can route it.
+HELPER_VERSION=9
+set -u
+export PATH=$HOME/bin:/data/data/com.termux/files/usr/bin:$PATH
+# The claude launcher sets BUN_OPTIONS with a path relative to its folder; never inherit a stale one.
+unset BUN_OPTIONS
+D=$HOME/.buddy
+W=$D/work
+mkdir -p "$W" "$D/sessions"
+TOKEN=${1:-}
+CMD=${2:-}
+URL=http://127.0.0.1:8765
+
+post() { # post one JSON event to the bubble
+  curl -s -m 5 -o /dev/null -X POST -H "Authorization: Bearer $TOKEN" \
+    -H 'Content-Type: application/json' --data-binary @- "$URL/event"
+}
+have() { command -v "$1" >/dev/null 2>&1; }
+valid_sid() { [[ "$1" =~ ^[A-Za-z0-9_-]{1,64}$ ]]; }
+
+# Kill a process and everything it started (claude/codex run a few levels below buddy-run).
+kill_tree() {
+  local p=$1 c
+  for c in $(pgrep -P "$p" 2>/dev/null); do kill_tree "$c"; done
+  kill -TERM "$p" 2>/dev/null
+}
+
+descendants() { # print a pid and all its descendants
+  local p=$1 c
+  echo "$p"
+  for c in $(pgrep -P "$p" 2>/dev/null); do descendants "$c"; done
+}
+
+# Claude Code updates itself, and on Termux each new binary needs its ELF interpreter pointed at
+# Termux's glibc. If the launcher missed that, every `claude` start fails ("cannot execute").
+ensure_claude() {
+  local G=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1
+  local PE=/data/data/com.termux/files/usr/glibc/bin/patchelf
+  local V=$HOME/.local/share/claude/versions f
+  [ -x "$PE" ] && [ -f "$G" ] || return 0
+  for f in $(ls -1 "$V" 2>/dev/null | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$'); do
+    [ "$(LD_PRELOAD= "$PE" --print-interpreter "$V/$f" 2>/dev/null)" = "$G" ] || LD_PRELOAD= "$PE" --set-interpreter "$G" "$V/$f" 2>/dev/null
+  done
+}
+
+# Is this pid an agent process (the real claude / codex program)?
+agent_of() {
+  local cmd
+  cmd=$(tr '\0' ' ' < "/proc/$1/cmdline" 2>/dev/null) || return 1
+  case "${cmd%% *}" in
+    */claude/versions/*) echo claude ;;
+    */bin/codex) echo codex ;;
+    *) return 1 ;;
+  esac
+}
+
+case "$CMD" in
+  ping) # setup check: proves RUN_COMMAND, the helper and the callback all work
+    agents=$({ have claude && echo claude; have codex && echo codex; } | paste -sd, -)
+    # signed in = the agent's saved login exists
+    signed=$({ [ -s "$HOME/.claude/.credentials.json" ] && echo claude; [ -s "$HOME/.codex/auth.json" ] && echo codex; } | paste -sd, -)
+    cm=$(jq -c '[.models[] | select(.visibility == "list") | [.slug, .display_name]]' "$HOME/.codex/models_cache.json" 2>/dev/null)
+    jq -cn --arg s "${agents:-none}" --arg g "${signed:-none}" --argjson v "$HELPER_VERSION" --argjson cm "${cm:-[]}" \
+      '{type:"buddy_pong",text:$s,signed:$g,helper:$v,codex_models:$cm}' | post
+    exit 0 ;;
+  procs)
+    # map every process started by a Buddy chat to that chat
+    declare -A owner=()
+    for f in "$D"/sessions/*/pid; do
+      [ -f "$f" ] || continue
+      sid=$(basename "$(dirname "$f")")
+      for q in $(descendants "$(cat "$f")"); do owner[$q]=$sid; done
+    done
+    {
+      for p in $(pgrep -f 'claude/versions/|/bin/codex' 2>/dev/null); do
+        a=$(agent_of "$p") || continue
+        [ "$p" = "$$" ] && continue
+        cwd=$(readlink "/proc/$p/cwd" 2>/dev/null)
+        et=$(ps -o etimes= -p "$p" 2>/dev/null | tr -d ' ')
+        args=$(tr '\0' ' ' < "/proc/$p/cmdline" 2>/dev/null | cut -c1-300)
+        # what kind of process: Claude Code's background service, a session it hosts, or a terminal session
+        pargs=$(tr '\0' ' ' < "/proc/$(ps -o ppid= -p "$p" | tr -d ' ')/cmdline" 2>/dev/null)
+        kind=terminal
+        case "$args" in *" daemon run"*) kind=daemon ;; esac
+        [ "$kind" = terminal ] && case "$pargs" in *bg-pty-host*) kind=background ;; esac
+        # its conversation: --session-id wins (a fork gets a new id), else --resume <id>
+        ses=$(printf '%s' "$args" | grep -oE -- '--session-id [0-9a-f-]{36}' | head -1 | cut -d' ' -f2)
+        [ -z "$ses" ] && ses=$(printf '%s' "$args" | grep -oE -- '--resume [0-9a-f-]{36}' | head -1 | cut -d' ' -f2)
+        title=""
+        if [ -n "$ses" ] && [ "$a" = claude ]; then
+          f=$(ls "$HOME"/.claude/projects/*/"$ses".jsonl 2>/dev/null | head -1)
+          [ -n "$f" ] && title=$(head -n 400 "$f" | jq -r 'select(.type=="user") | .message.content
+            | if type=="string" then . else ([.[]? | select(.type=="text") | .text] | join(" ")) end
+            | select(. != "" and (startswith("<") | not) and (startswith("This session is being continued") | not)
+                and (startswith("Caveat:") | not))' 2>/dev/null | head -1 | tr '\n' ' ' | cut -c1-80)
+        fi
+        jq -cn --argjson pid "$p" --arg agent "$a" --arg cwd "$cwd" --arg et "${et:-0}" \
+          --arg args "$args" --arg buddy "${owner[$p]:-}" --arg kind "$kind" --arg ses "$ses" --arg title "$title" \
+          '{pid:$pid, agent:$agent, cwd:$cwd, seconds:($et|tonumber), args:$args, buddy:$buddy,
+            kind:$kind, session:$ses, title:$title}'
+      done
+    } | jq -cs '{type:"buddy_procs", procs:.}' | post
+    exit 0 ;;
+  kill)
+    P=${3:-}
+    [[ "$P" =~ ^[0-9]+$ ]] && agent_of "$P" >/dev/null || exit 2   # only ever kill claude/codex
+    kill_tree "$P"
+    exit 0 ;;
+  recent)
+    {
+      for f in $(ls -t "$HOME"/.claude/projects/*/*.jsonl 2>/dev/null | head -15); do
+        head -n 300 "$f" | jq -c --arg f "$f" --arg m "$(stat -c %Y "$f")" -s '
+          ([.[] | select(.type=="user") | .message.content
+                | if type=="string" then . else ([.[]? | select(.type=="text") | .text] | join(" ")) end
+                | select(. != "" and (startswith("<")|not) and (startswith("This session is being continued")|not)
+                    and (startswith("Caveat:")|not))] | first // "") as $t
+          | {agent:"claude", file:$f, id:($f|split("/")|last|rtrimstr(".jsonl")),
+             cwd:([.[]|.cwd//empty]|first//""), title:($t|.[0:120]), mtime:($m|tonumber)}' 2>/dev/null
+      done
+      for f in $(find "$HOME/.codex/sessions" -name '*.jsonl' 2>/dev/null | xargs -r ls -t 2>/dev/null | head -15); do
+        head -n 80 "$f" | jq -c --arg f "$f" --arg m "$(stat -c %Y "$f")" -s '
+          ([.[] | select(.type=="session_meta") | .payload] | first // {}) as $meta
+          | ([.[] | select(.type=="response_item" and .payload.type=="message" and .payload.role=="user")
+                | .payload.content[]? | .text // empty
+                | select(startswith("<")|not)
+                | (if contains("User message from the Buddy bubble:\n") then split("User message from the Buddy bubble:\n")|last else . end)]
+             | last // "") as $t
+          | {agent:"codex", file:$f, id:($meta.id//""), cwd:($meta.cwd//""), title:($t|.[0:120]),
+             mtime:($m|tonumber)}' 2>/dev/null
+      done
+    } | jq -cs --argjson own "$(for f in "$D"/sessions/*/claude-session "$D"/sessions/*/codex-thread; do
+          [ -f "$f" ] && jq -cn --arg k "$(cat "$f")" --arg v "$(basename "$(dirname "$f")")" '{($k):$v}'
+        done | jq -cs 'add // {}')" \
+      '{type:"buddy_recent", sessions:(sort_by(-.mtime)|.[0:25]|map(. + {buddy:($own[.id] // "")}))}' | post
+    exit 0 ;;
+  transcript)
+    A=${3:-}; F=${4:-}
+    case "$F" in "$HOME"/.claude/projects/*.jsonl|"$HOME"/.codex/sessions/*.jsonl) ;; *) exit 2 ;; esac
+    [ -f "$F" ] || exit 2
+    if [ "$A" = claude ]; then
+      tail -n 600 "$F" | jq -c 'select(.type=="user" or .type=="assistant")
+        | {role:.message.role, text:(if (.message.content|type)=="string" then .message.content
+            else ([.message.content[]? | select(.type=="text") | .text] | join("\n")) end)}
+        | select(.text != "" and (.text|startswith("<")|not))' 2>/dev/null
+    else
+      tail -n 600 "$F" | jq -c 'select(.type=="response_item" and .payload.type=="message"
+          and (.payload.role=="user" or .payload.role=="assistant"))
+        | {role:.payload.role, text:([.payload.content[]? | .text // empty] | join("\n"))}
+        | select(.text != "" and (.text|startswith("<")|not))' 2>/dev/null
+    fi | tail -n 40 | jq -cs --arg f "$F" '{type:"buddy_transcript", file:$f, messages:map(.text |= .[0:2000])}' | post
+    exit 0 ;;
+  handoff)
+    SID=${3:-}; valid_sid "$SID" || exit 2
+    CS=$(cat "$D/sessions/$SID/claude-session" 2>/dev/null)
+    if [ -z "$CS" ]; then echo "This chat has no Claude Code conversation yet. Send it a message first."; read -r -t 15 _; exit 1; fi
+    if [ -f "$D/sessions/$SID/pid" ] && kill -0 "$(cat "$D/sessions/$SID/pid")" 2>/dev/null; then
+      echo "This chat is still working in Buddy. Stop it there first."; read -r -t 15 _; exit 1
+    fi
+    echo "Opening this Buddy chat with Remote Control for this session only."
+    echo "It appears in the Claude app (Code). Type /exit when done; this tab then closes."
+    echo "Exit with /exit when you're done; you can keep using the chat in Buddy afterwards."
+    ensure_claude
+    cd "$W" && claude --resume "$CS" --remote-control "Buddy chat $SID"
+    exit 0 ;; # a clean exit makes Termux close this tab
+  adopt)
+    SID=${3:-}; A=${4:-}; AID=${5:-}
+    valid_sid "$SID" && [[ "$AID" =~ ^[A-Za-z0-9-]{8,64}$ ]] || exit 2
+    mkdir -p "$D/sessions/$SID"
+    if [ "$A" = codex ]; then printf '%s' "$AID" > "$D/sessions/$SID/codex-thread"
+    else printf '%s' "$AID" > "$D/sessions/$SID/claude-session"; fi
+    exit 0 ;;
+  stop)
+    SID=${3:-}; valid_sid "$SID" || exit 2
+    P=$D/sessions/$SID/pid
+    if [ -f "$P" ]; then
+      kill_tree "$(cat "$P")"
+      rm -f "$P"
+      jq -cn --arg s "$SID" '{type:"buddy_stopped",buddy_session:$s}' | post
+    fi
+    exit 0 ;;
+  delete)
+    SID=${3:-}; valid_sid "$SID" || exit 2
+    S=$D/sessions/$SID
+    [ -f "$S/pid" ] && kill_tree "$(cat "$S/pid")"
+    rm -rf "${S:?}"
+    exit 0 ;;
+  ask) SID=${3:-}; BACKEND=${4:-claude}; DEV=${5:-0}; MSG=${6:-}; MODEL=${7:-}; FILES=${8:-} ;;
+  *) echo "usage: buddy-run <token> ask|stop|delete|ping ..." >&2; exit 2 ;;
+esac
+
+valid_sid "$SID" || exit 2
+[ -z "$MSG" ] && exit 0
+S=$D/sessions/$SID
+mkdir -p "$S"
+event() { jq -cn --arg type "$1" --arg text "${2:-}" --arg s "$SID" '{type:$type,text:$text,buddy_session:$s}' | post; }
+tag() { jq -c --arg s "$SID" '. + {buddy_session:$s}' 2>/dev/null; }
+
+if [ -f "$S/pid" ] && kill -0 "$(cat "$S/pid")" 2>/dev/null; then
+  event buddy_error "This session is still working. Tap Stop first, or start another session."
+  exit 0
+fi
+
+# Attachments: fetch them from the app (comma-separated ids) into this session's files folder.
+ATT=()
+IMGS=()
+if [ -n "${FILES:-}" ]; then
+  mkdir -p "$S/files"
+  IFS=, read -ra ids <<< "$FILES"
+  for id in "${ids[@]}"; do
+    [[ "$id" =~ ^[A-Za-z0-9._-]{1,120}$ && "$id" != *..* ]] || continue
+    if curl -s -f -m 120 -H "Authorization: Bearer $TOKEN" "$URL/file/$id" -o "$S/files/$id"; then
+      ATT+=("$S/files/$id")
+      case "${id,,}" in *.jpg|*.jpeg|*.png|*.webp|*.gif) IMGS+=("$S/files/$id") ;; esac
+    else
+      event buddy_error "Couldn't get the attachment ${id#*_} from Buddy."
+    fi
+  done
+  if [ ${#ATT[@]} -gt 0 ]; then
+    MSG="$MSG
+
+[The user attached $( [ ${#ATT[@]} -eq 1 ] && echo "a file" || echo "${#ATT[@]} files" ), saved on this phone. Open them with your Read tool (images show as pictures):
+$(printf -- '- %s\n' "${ATT[@]}")]"
+  fi
+fi
+
+SYSTEM=$(cat "$D/system-prompt.md" 2>/dev/null)
+if [ "$DEV" = 1 ]; then
+  SYSTEM="$SYSTEM
+
+Developer mode is ON: you may run shell commands and create or edit files. Work inside $W (one folder per project).
+Before building an Android app, read the android-app skill (Claude Code) or AGENTS.md (Codex) in $W and follow it."
+fi
+
+# ---------------------------------------------------------------- Claude Code
+run_claude() {
+  local mcp tools
+  mcp=$(jq -cn --arg url "$URL/mcp" --arg auth "Bearer $TOKEN" \
+    '{mcpServers:{phone:{type:"http",url:$url,headers:{Authorization:$auth}}}}')
+  tools=("mcp__phone" "WebSearch" "WebFetch" "Read(/$S/files/**)")
+  [ "$DEV" = 1 ] && tools+=("Bash" "Read" "Write" "Edit" "Glob" "Grep" "Skill")
+  local args=(-p "$MSG" --output-format stream-json --verbose
+    --mcp-config "$mcp" --strict-mcp-config
+    --allowedTools "${tools[@]}"
+    --append-system-prompt "$SYSTEM")
+  [ -s "$S/claude-session" ] && args+=(--resume "$(cat "$S/claude-session")")
+  [ -n "${MODEL:-}" ] && args+=(--model "$MODEL")
+  cd "$W" && claude "${args[@]}" 2>"$S/last-error.log"
+}
+
+stream_claude() {
+  while IFS= read -r line; do
+    [ -z "$line" ] && continue
+    printf '%s' "$line" | tag | post
+    sid=$(printf '%s' "$line" | jq -r 'select(.session_id != null) | .session_id' 2>/dev/null)
+    [ -n "$sid" ] && printf '%s' "$sid" > "$S/claude-session"
+  done
+}
+
+# ---------------------------------------------------------------------- Codex
+# The phone server is passed with -c (no config file needed). Only the phone tools are
+# pre-approved. Normal mode keeps Codex's shell read-only; developer mode lets it write in $W.
+run_codex() {
+  local prompt=$MSG
+  local cfg=(-c 'mcp_servers.phone.url="'"$URL"'/mcp"'
+    -c 'mcp_servers.phone.bearer_token_env_var="BUDDY_TOKEN"'
+    -c 'mcp_servers.phone.default_tools_approval_mode="approve"')
+  local sandbox=(--sandbox read-only)
+  [ "$DEV" = 1 ] && sandbox=(--sandbox workspace-write -c 'sandbox_workspace_write.network_access=true')
+  [ -n "${MODEL:-}" ] && cfg+=(-m "$MODEL")
+  local img=() f
+  for f in "${IMGS[@]}"; do img+=("--image=$f"); done
+  cd "$W" || return 1
+  if [ -s "$S/codex-thread" ]; then
+    BUDDY_TOKEN=$TOKEN codex exec "${cfg[@]}" "${sandbox[@]}" --json --skip-git-repo-check \
+      resume "${img[@]}" -- "$(cat "$S/codex-thread")" "$prompt" </dev/null 2>"$S/last-error.log"
+  else
+    # codex exec has no system-prompt flag, so Buddy's instructions lead the first message.
+    prompt="$SYSTEM"$'\n\n---\n\nUser message from the Buddy bubble:\n'"$MSG"
+    BUDDY_TOKEN=$TOKEN codex exec "${cfg[@]}" "${sandbox[@]}" "${img[@]}" --json --skip-git-repo-check \
+      -- "$prompt" </dev/null 2>"$S/last-error.log"
+  fi
+}
+
+# Translate Codex's JSONL events into the Claude Code stream format the bubble understands.
+stream_codex() {
+  while IFS= read -r line; do
+    [ -z "$line" ] && continue
+    tid=$(printf '%s' "$line" | jq -r 'select(.type=="thread.started") | .thread_id // empty' 2>/dev/null)
+    [ -n "$tid" ] && printf '%s' "$tid" > "$S/codex-thread"
+    printf '%s' "$line" | jq -c --arg s "$SID" '
+      (if .type == "item.started" and .item.type == "mcp_tool_call" then
+        {type:"assistant", message:{content:[{type:"tool_use",
+          name:("mcp__" + (.item.server // "phone") + "__" + (.item.tool // "")),
+          input:(.item.arguments // {})}]}}
+      elif .type == "item.started" and .item.type == "command_execution" then
+        {type:"assistant", message:{content:[{type:"tool_use", name:"Bash",
+          input:{command:(.item.command // "")}}]}}
+      elif .type == "item.completed" and .item.type == "file_change" then
+        {type:"assistant", message:{content:[{type:"tool_use", name:"Edit", input:{}}]}}
+      elif .type == "item.completed" and .item.type == "agent_message" then
+        {type:"assistant", message:{content:[{type:"text", text:(.item.text // "")}]}}
+      elif .type == "turn.completed" then
+        {type:"result", subtype:"success", result:""}
+      elif .type == "turn.failed" then
+        {type:"result", subtype:"error", is_error:true, result:("Codex: " + (.error.message // "turn failed"))}
+      elif .type == "error" then
+        {type:"buddy_error", text:("Codex: " + (.message // "error"))}
+      else empty end) | . + {buddy_session:$s}' 2>/dev/null | while IFS= read -r ev; do printf '%s' "$ev" | post; done
+  done
+}
+
+# ------------------------------------------------------------------------ run
+(
+  if [ "$BACKEND" = codex ]; then
+    if ! have codex; then event buddy_error "Codex isn't installed in Termux."; exit 0; fi
+    run_codex | stream_codex
+    status=${PIPESTATUS[0]}
+    if [ "$status" -ne 0 ] && [ -s "$S/codex-thread" ] && grep -q -i -E 'not found|no such|unknown (thread|session)' "$S/last-error.log" 2>/dev/null; then
+      rm -f "$S/codex-thread"   # old thread is gone; retry as a new conversation
+      run_codex | stream_codex
+      status=${PIPESTATUS[0]}
+    fi
+    name=Codex
+  else
+    if ! have claude; then event buddy_error "Claude Code isn't installed in Termux."; exit 0; fi
+    ensure_claude
+    run_claude | stream_claude
+    status=${PIPESTATUS[0]}
+    if [ "$status" -ne 0 ] && grep -q -i 'no conversation found' "$S/last-error.log" 2>/dev/null; then
+      rm -f "$S/claude-session"   # old session is gone; retry as a new conversation
+      run_claude | stream_claude
+      status=${PIPESTATUS[0]}
+    fi
+    name="Claude Code"
+  fi
+  if [ "$status" -ne 0 ] && [ "$status" -ne 143 ] && [ -s "$S/last-error.log" ]; then
+    event buddy_error "$name failed: $(tail -c 400 "$S/last-error.log")"
+  fi
+) &
+echo $! > "$S/pid"
+wait $! 2>/dev/null
+rm -f "$S/pid"
+event buddy_done
