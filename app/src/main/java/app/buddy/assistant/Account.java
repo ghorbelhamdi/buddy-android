@@ -205,7 +205,17 @@ final class Account {
                         }
                     }
                 }
-                p.waitFor();
+                if (p.waitFor() == 0) {
+                    // signed in: bring Buddy back from the browser
+                    main.post(() -> {
+                        try {
+                            app.startActivity(new android.content.Intent(app, SignInActivity.class).putExtra("agent", agent)
+                                    .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                                            | android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                        } catch (Exception ignored) {
+                        }
+                    });
+                }
             } catch (Exception e) {
                 out.append("\n").append(e.getMessage());
             } finally {
