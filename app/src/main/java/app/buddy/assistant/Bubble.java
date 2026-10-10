@@ -30,6 +30,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -310,8 +311,11 @@ final class Bubble implements ChatHub.Listener {
         clp.bottomMargin = dp(8);
         panel.addView(confirmCard, clp);
 
+        // composer: one pill with the text field, a mic and a round send button (like the chat screen)
         LinearLayout inputRow = new LinearLayout(svc);
         inputRow.setGravity(Gravity.CENTER_VERTICAL);
+        inputRow.setPadding(dp(14), dp(3), dp(4), dp(3));
+        inputRow.setBackground(rounded(Ui.CARD, 24, Ui.OUTLINE, 1));
         input = new EditText(svc);
         input.setHint("Ask Buddy…");
         input.setHintTextColor(Ui.MUTED);
@@ -322,24 +326,47 @@ final class Bubble implements ChatHub.Listener {
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE
                 | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
         input.setImeOptions(EditorInfo.IME_ACTION_SEND);
-        input.setPadding(dp(12), dp(10), dp(12), dp(10));
-        input.setBackground(rounded(Ui.CARD, 16, 0, 0));
+        input.setPadding(0, dp(10), 0, dp(10));
+        input.setBackground(null);
         inputRow.addView(input, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-        mic = actionButton("", Ui.CARD);
-        mic.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_mic, 0, 0, 0);
+        mic = new ImageButton(svc);
+        mic.setImageResource(R.drawable.ms_mic);
+        mic.setContentDescription("Talk");
+        mic.setScaleType(ImageView.ScaleType.CENTER);
         mic.setOnClickListener(v -> toggleMic());
-        LinearLayout.LayoutParams mlp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        mlp.leftMargin = dp(8);
-        inputRow.addView(mic, mlp);
-        Button send = actionButton("Send", Ui.ACCENT);
-        send.setTextColor(Ui.ON_ACCENT);
+        inputRow.addView(mic, new LinearLayout.LayoutParams(dp(40), dp(40)));
+        mic.setBackground(null); // idle look; micIdle() needs the current chat, which isn't loaded yet
+        mic.setImageTintList(android.content.res.ColorStateList.valueOf(Ui.MUTED));
+        final ImageButton send = new ImageButton(svc);
+        send.setImageResource(R.drawable.ms_arrow_upward);
+        send.setContentDescription("Send");
+        send.setScaleType(ImageView.ScaleType.CENTER);
         send.setOnClickListener(v -> send());
-        LinearLayout.LayoutParams slp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        slp.leftMargin = dp(8);
+        LinearLayout.LayoutParams slp = new LinearLayout.LayoutParams(dp(40), dp(40));
+        slp.leftMargin = dp(4);
         inputRow.addView(send, slp);
-        panel.addView(inputRow);
+        Runnable paintSend = () -> {
+            boolean has = input.getText().toString().trim().length() > 0;
+            send.setBackground(circle(has ? Ui.ACCENT : Ui.CARD2, 0, 0));
+            send.setImageTintList(android.content.res.ColorStateList.valueOf(has ? Ui.ON_ACCENT : Ui.MUTED));
+        };
+        paintSend.run();
+        input.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence x, int a, int b, int c) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence x, int a, int b, int c) {
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable e) {
+                paintSend.run();
+            }
+        });
+        panel.addView(inputRow, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
     }
 
     private void applyCollapsedParams() {
@@ -451,6 +478,11 @@ final class Bubble implements ChatHub.Listener {
         renderedFor = null;
         if (showingList) renderSessionList();
         renderCurrent();
+    }
+
+    /** Recents or Home opened (the launcher came to the front): fold the panel back into the bubble. */
+    void onLauncherShown() {
+        if (expanded && pendingConfirm == null) collapse();
     }
 
     /** The bubble can be turned off in the app; it then only appears for approval cards. */
@@ -767,7 +799,7 @@ final class Bubble implements ChatHub.Listener {
         collapse();
     }
 
-    private Button mic;
+    private ImageButton mic;
 
     /** Talk in the bubble: tap, speak, it sends when you stop. Tap again to send right away. */
     private void toggleMic() {
@@ -809,18 +841,14 @@ final class Bubble implements ChatHub.Listener {
             return;
         }
         hideKeyboard();
-        mic.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-        mic.setText("● Listening");
-        mic.setBackground(rounded(Ui.ACCENT, 16, 0, 0));
-        mic.setTextColor(Ui.ON_ACCENT);
+        mic.setBackground(circle(Ui.ACCENT, 0, 0));
+        mic.setImageTintList(android.content.res.ColorStateList.valueOf(Ui.ON_ACCENT));
         input.setHint("Listening… speak now");
     }
 
     private void micIdle() {
-        mic.setText("");
-        mic.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_mic, 0, 0, 0);
-        mic.setBackground(rounded(Ui.CARD, 16, 0, 0));
-        mic.setTextColor(Ui.TEXT);
+        mic.setBackground(null);
+        mic.setImageTintList(android.content.res.ColorStateList.valueOf(Ui.MUTED));
         input.setHint("Ask " + sessions.current.brainName() + "…");
     }
 

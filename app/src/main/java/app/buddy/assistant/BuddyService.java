@@ -75,7 +75,13 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        if (bubble == null || event.getEventType() != AccessibilityEvent.TYPE_WINDOWS_CHANGED) return;
+        if (bubble == null) return;
+        if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+            CharSequence pkg = event.getPackageName();
+            if (pkg != null && isLauncher(pkg.toString())) bubble.onLauncherShown();
+            return;
+        }
+        if (event.getEventType() != AccessibilityEvent.TYPE_WINDOWS_CHANGED) return;
         int top = 0;
         for (AccessibilityWindowInfo w : getWindows()) {
             if (w.getType() == AccessibilityWindowInfo.TYPE_INPUT_METHOD) {
@@ -85,6 +91,27 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             }
         }
         bubble.onKeyboardTop(top);
+    }
+
+    private java.util.Set<String> launchers;
+
+    /**
+     * Every installed home app. Recents is often shown by the phone's built-in launcher even when
+     * another one (e.g. Nova) handles Home, so all of them count.
+     */
+    private boolean isLauncher(String pkg) {
+        if (launchers == null) {
+            launchers = new java.util.HashSet<>();
+            try {
+                for (android.content.pm.ResolveInfo r : getPackageManager().queryIntentActivities(
+                        new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME), 0)) {
+                    String p = r.activityInfo.packageName;
+                    if (!"com.android.settings".equals(p)) launchers.add(p); // Settings' fallback home
+                }
+            } catch (Exception ignored) {
+            }
+        }
+        return launchers.contains(pkg);
     }
 
     @Override
