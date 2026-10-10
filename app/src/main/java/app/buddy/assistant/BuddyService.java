@@ -61,6 +61,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         registerReceiver(lockReceiver, f);
         bubble.setLocked(getSystemService(KeyguardManager.class).isKeyguardLocked());
         if (!Prefs.onboarded(this)) main.postDelayed(this::showGuide, 600);
+        main.postDelayed(() -> RemoteSession.ensure(this), 4000);
     }
 
     private final BroadcastReceiver lockReceiver = new BroadcastReceiver() {
@@ -124,6 +125,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             unregisterReceiver(lockReceiver);
         } catch (Exception ignored) {
         }
+        RemoteSession.stop();
         if (server != null) server.stop();
         if (bubble != null) bubble.remove();
         if (control != null) control.end();

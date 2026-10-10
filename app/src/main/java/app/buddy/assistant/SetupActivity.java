@@ -25,7 +25,7 @@ import android.widget.Toast;
 import static app.buddy.assistant.Ui.*;
 
 /** Settings: setup checklist, appearance, agents and experience. */
-public class SetupActivity extends Screen implements Account.Listener {
+public class SetupActivity extends Screen implements Account.Listener, RemoteSession.Listener {
     private ScrollView scroll;
     private LinearLayout list;
     /** Setup card open state; null = automatic (open until all steps are done). */
@@ -55,6 +55,7 @@ public class SetupActivity extends Screen implements Account.Listener {
         super.onResume();
         if (isFinishing()) return;
         Account.addListener(this);
+        RemoteSession.addListener(this);
         Account.CLAUDE.refresh(this);
         Account.CODEX.refresh(this);
         render();
@@ -63,7 +64,13 @@ public class SetupActivity extends Screen implements Account.Listener {
     @Override
     protected void onPause() {
         Account.removeListener(this);
+        RemoteSession.removeListener(this);
         super.onPause();
+    }
+
+    @Override
+    public void onRemoteChanged() {
+        if (!isFinishing() && !isDestroyed()) render();
     }
 
     @Override
@@ -182,6 +189,50 @@ public class SetupActivity extends Screen implements Account.Listener {
         }), topGap(12));
         for (String a : new String[]{"claude", "codex"}) ag.addView(agentRow(a), topGap(a.equals("claude") ? 12 : 4));
         addCard(ag);
+
+        // ------------------------------------------------------- remote control
+        list.addView(sectionLabel(this, "Remote Control"));
+        LinearLayout rcc = card();
+        boolean claudeIn = SetupState.signedIn(this, "claude");
+        rcc.addView(switchRow(this, "Claude Code session", "A Claude Code session that runs inside Buddy, with the phone tools. "
+                + "Continue it from the Claude app (Code) on this phone or anywhere.", Prefs.remoteSession(this), on -> {
+            if (on && !claudeIn) {
+                Toast.makeText(this, "Sign in to Claude Code first.", Toast.LENGTH_LONG).show();
+                render();
+                return;
+            }
+            Prefs.setRemoteSession(this, on);
+            if (on) RemoteSession.ensure(this);
+            else RemoteSession.stop();
+            render();
+        }), full());
+        if (Prefs.remoteSession(this)) {
+            LinearLayout st = row(this);
+            st.setPadding(dp(this, 16), 0, dp(this, 16), dp(this, 14));
+            RemoteSession.State rs = RemoteSession.state;
+            st.addView(dot(this, rs == RemoteSession.State.ACTIVE ? OK : rs == RemoteSession.State.ERROR ? ERR : ACCENT, 8));
+            TextView stt = monoText(this, rs == RemoteSession.State.ACTIVE ? "active · \"" + Prefs.remoteName(this) + "\" in the Claude app"
+                    : rs == RemoteSession.State.ERROR ? RemoteSession.detail
+                    : rs == RemoteSession.State.STARTING ? "starting…" : "stopped", 12,
+                    rs == RemoteSession.State.ERROR ? ERR : MUTED);
+            stt.setPadding(dp(this, 8), 0, 0, 0);
+            st.addView(stt, weight1());
+            rcc.addView(st, full());
+            if (rs == RemoteSession.State.ACTIVE && RemoteSession.url != null) {
+                Button open = button(this, "Open in the Claude app", false);
+                open.setOnClickListener(v -> {
+                    try {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(RemoteSession.url)));
+                    } catch (Exception e) {
+                        Toast.makeText(this, "Couldn't open it.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                LinearLayout.LayoutParams op = wrap();
+                op.setMargins(dp(this, 16), 0, dp(this, 16), dp(this, 14));
+                rcc.addView(open, op);
+            }
+        }
+        addCard(rcc);
 
         // chats from the Termux days: their conversations stayed in Termux, so agents can't continue them
         final java.util.List<Sessions.Session> old = termuxChats();

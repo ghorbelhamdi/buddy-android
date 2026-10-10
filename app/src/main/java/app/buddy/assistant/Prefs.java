@@ -185,6 +185,20 @@ final class Prefs {
         sp(c).edit().putString("agent_" + agent, state).apply();
     }
 
+    /** Keep a Claude Code session with Remote Control running inside Buddy's Linux. */
+    static boolean remoteSession(Context c) {
+        return sp(c).getBoolean("remote_session", false);
+    }
+
+    static void setRemoteSession(Context c, boolean on) {
+        sp(c).edit().putBoolean("remote_session", on).apply();
+    }
+
+    /** Its name in the Claude app. */
+    static String remoteName(Context c) {
+        return sp(c).getString("remote_name", "Buddy");
+    }
+
     static void saveBubblePos(Context c, int x, int y) {
         sp(c).edit().putInt("bx", x).putInt("by", y).apply();
     }
