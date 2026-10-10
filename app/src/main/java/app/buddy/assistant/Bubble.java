@@ -102,6 +102,7 @@ final class Bubble implements ChatHub.Listener {
         };
         buildCollapsed();
         buildPanel();
+        followKeyboard();
         root.setOnTouchListener((v, e) -> {
             if (e.getAction() == MotionEvent.ACTION_OUTSIDE && expanded && pendingConfirm == null) {
                 // An edge swipe for Back also lands outside the panel; wait briefly so Back can cancel this.
@@ -386,7 +387,42 @@ final class Bubble implements ChatHub.Listener {
     }
 
     /** Called when windows change; keeps the expanded panel above the on-screen keyboard. */
+    /**
+     * Keep the panel above the keyboard frame by frame: the window gets the keyboard's height as it
+     * slides (insets animation), so the panel shrinks with it instead of jumping afterwards.
+     */
+    private void followKeyboard() {
+        root.setWindowInsetsAnimationCallback(new android.view.WindowInsetsAnimation.Callback(
+                android.view.WindowInsetsAnimation.Callback.DISPATCH_MODE_STOP) {
+            @Override
+            public android.view.WindowInsets onProgress(android.view.WindowInsets insets,
+                                                         java.util.List<android.view.WindowInsetsAnimation> running) {
+                applyIme(insets);
+                return insets;
+            }
+        });
+        root.setOnApplyWindowInsetsListener((v, insets) -> {
+            applyIme(insets);
+            return insets;
+        });
+    }
+
+    /** True once the window has reported the keyboard itself; then the slower accessibility path is ignored. */
+    private boolean imeInsetsWork;
+
+    private void applyIme(android.view.WindowInsets insets) {
+        int ime = insets.getInsets(android.view.WindowInsets.Type.ime()).bottom;
+        if (ime > 0) imeInsetsWork = true;
+        if (!expanded || !imeInsetsWork) return;
+        int pad = ime > 0 ? ime + dp(8) : 0;
+        if (root.getPaddingBottom() != pad) {
+            root.setPadding(0, 0, 0, pad);
+            scrollToEnd();
+        }
+    }
+
     void onKeyboardTop(int top) {
+        if (imeInsetsWork) return; // the window follows the keyboard itself (see followKeyboard)
         if (top == imeTop) return;
         imeTop = top;
         if (expanded && !passThrough) {
@@ -402,15 +438,16 @@ final class Bubble implements ChatHub.Listener {
     private void applyExpandedParams() {
         Rect screen = screen();
         lp.width = screen.width() - dp(20);
-        int bottom = imeTop > 0 ? imeTop : screen.height() - dp(24);
-        lp.height = Math.max(dp(220), bottom - dp(44) - dp(10));
+        int bottom = imeTop > 0 && !imeInsetsWork ? imeTop : screen.height() - dp(24);
+        lp.height = Math.max(dp(220), bottom - dp(8) - dp(10));
         lp.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
         lp.x = 0;
-        lp.y = dp(44);
+        lp.y = dp(8); // just under the status bar, so no strip of the app behind shows above the panel
         lp.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
                 | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
                 | (passThrough ? WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE : 0);
-        lp.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE;
+        // Buddy moves the panel itself (followKeyboard), so the system must not resize the window too
+        lp.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING;
     }
 
     void expand() {
@@ -450,6 +487,7 @@ final class Bubble implements ChatHub.Listener {
         unregisterBack();
         hideKeyboard();
         root.removeAllViews();
+        root.setPadding(0, 0, 0, 0);
         root.addView(collapsed);
         applyCollapsedParams();
         wm.updateViewLayout(root, lp);
