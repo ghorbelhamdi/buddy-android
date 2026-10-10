@@ -694,7 +694,7 @@ final class Bubble implements ChatHub.Listener {
                     head.setScaleY(1f);
                     head.setRotation(0f);
                     head.setAlpha(1f);
-                    setWorking(running, true);
+                    setWorking(running || controlling, true);
                 }).start();
         dismissCircle.animate().scaleX(1.45f).scaleY(1.45f).setDuration(110)
                 .setInterpolator(new DecelerateInterpolator())
@@ -1327,7 +1327,7 @@ final class Bubble implements ChatHub.Listener {
                         }
                         endArcs(false);
                         showDismissTarget(false);
-                        setWorking(running, true);
+                        setWorking(running || controlling, true);
                         // fling to the nearest edge with a little bounce
                         final boolean right = lp.x + faceOffX > screen().width() / 2;
                         int edgeX = right ? screen().width() - root.getWidth() - dp(6) : dp(6);
@@ -1344,7 +1344,7 @@ final class Bubble implements ChatHub.Listener {
                 case MotionEvent.ACTION_CANCEL:
                     endArcs(false);
                     showDismissTarget(false);
-                    setWorking(running, true);
+                    setWorking(running || controlling, true);
                     return true;
                 default:
                     return false;
