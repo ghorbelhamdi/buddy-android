@@ -5,14 +5,14 @@ description: Create, build, install and update a small Android app (APK) directl
 
 # Building Android apps on this phone
 
-Everything runs in Termux on the phone. There is no Gradle and no Android Studio. Use plain Java and the Android framework only (no AndroidX, no Kotlin, no external libraries).
+Everything runs in Buddy's built-in Linux (Alpine) on the phone. There is no Gradle and no Android Studio. Use plain Java and the Android framework only (no AndroidX, no Kotlin, no external libraries).
 
 The scripts live next to this file. `SKILL_DIR` below means this skill's folder:
 `$HOME/.buddy/work/.claude/skills/android-app`.
 
 ## 1. Toolchain (first time only)
 
-Run `bash $SKILL_DIR/setup-toolchain.sh`. It installs `openjdk-17 aapt2 d8 apksigner` and puts the Android platform at `~/android-sdk/android-36/android.jar`. Check before reinstalling: it is fast when everything exists.
+Run `bash $SKILL_DIR/setup-toolchain.sh` (downloads about 400 MB the first time; allow up to 10 minutes). It installs OpenJDK 17, `aapt2`, `d8` and `apksigner`, and puts the Android platform at `~/android-sdk/android-36/android.jar`. It is fast when everything already exists, so just run it before the first build in a conversation.
 
 ## 2. Project layout
 
@@ -43,16 +43,15 @@ If compilation fails, read the error, fix the Java, and build again. Each update
 Android's installer and Play Protect dialogs ignore taps from accessibility apps, so you can open
 the installer but **the user has to tap Install/Update and confirm (often with a fingerprint)**.
 
-1. `open_app` → `com.termux` (Android only shows the installer if Termux is in front).
-2. Run: `termux-open --view --content-type application/vnd.android.package-archive <path>/build/app.apk`
-3. `read_screen`. If an "Open with" chooser appears, tap **Package installer** by its name (the order changes).
-4. Call `wait_for_install` with the package name (and `min_version_code` for an update). It tells the user
+1. Call the phone tool `install_apk` with the APK's full path, e.g. `/root/.buddy/work/<appname>/build/app.apk`.
+   Buddy opens Android's installer for it.
+2. If it says Buddy isn't allowed to install apps yet, Android's settings page is open: ask the user to turn on
+   **Allow from this source** for Buddy, wait for them to say so, then call `install_apk` again. Don't change that
+   setting yourself.
+3. Call `wait_for_install` with the package name (and `min_version_code` for an update). It tells the user
    "Tap Install/Update, then confirm", vibrates, and returns as soon as the app is installed. Do not tap
-   Install yourself, never claim you did, and never write your own shell loop to wait (Termux has no
-   `dumpsys`, and loops can't see whether the installer is still on screen).
-5. If it says the installer is no longer on screen, repeat steps 1–3 once and call it again. If it times out,
-   ask the user whether they want to install it.
-6. If Android says Termux isn't allowed to install apps, tell the user: Settings → Apps → Special app access →
-   Install unknown apps → Termux. Don't change that setting yourself.
-7. Open the new app with `open_app` and `read_screen` to check it works, then report what you built,
+   Install yourself, never claim you did, and never write your own shell loop to wait.
+4. If it says the installer is no longer on screen, call `install_apk` once more and then `wait_for_install`.
+   If it times out, ask the user whether they want to install it.
+5. Open the new app with `open_app` and `read_screen` to check it works, then report what you built,
    including that the user confirmed the install.

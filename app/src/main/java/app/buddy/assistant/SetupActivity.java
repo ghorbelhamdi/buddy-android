@@ -183,6 +183,30 @@ public class SetupActivity extends Screen implements Account.Listener {
         for (String a : new String[]{"claude", "codex"}) ag.addView(agentRow(a), topGap(a.equals("claude") ? 12 : 4));
         addCard(ag);
 
+        // chats from the Termux days: their conversations stayed in Termux, so agents can't continue them
+        final java.util.List<Sessions.Session> old = termuxChats();
+        if (!old.isEmpty()) {
+            LinearLayout oc = card();
+            LinearLayout r = listRow(this);
+            r.setGravity(Gravity.CENTER_VERTICAL);
+            r.setPadding(dp(this, 16), dp(this, 14), dp(this, 12), dp(this, 14));
+            LinearLayout t = column(this);
+            t.addView(title(this, "Remove old Termux chats", 15));
+            t.addView(text(this, old.size() + (old.size() == 1 ? " chat" : " chats")
+                    + " from before Buddy had its own Linux. Agents can't continue them.", 13, MUTED));
+            r.addView(t, weight1());
+            r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
+            r.setOnClickListener(v -> confirmSheet(this, "Remove " + old.size() + (old.size() == 1 ? " old chat?" : " old chats?"),
+                    "Removes them from Buddy's chat list. This can't be undone.", "Remove", true, () -> {
+                        ChatHub hub = ChatHub.get(this);
+                        for (Sessions.Session s : old) hub.delete(s);
+                        Toast.makeText(this, "Removed.", Toast.LENGTH_SHORT).show();
+                        render();
+                    }));
+            oc.addView(r, full());
+            addCard(oc);
+        }
+
         // ----------------------------------------------------------- experience
         list.addView(sectionLabel(this, "Experience"));
         LinearLayout ex = card();
@@ -487,6 +511,17 @@ public class SetupActivity extends Screen implements Account.Listener {
         LinearLayout.LayoutParams p = full();
         p.topMargin = dp(this, dpv);
         return p;
+    }
+
+    /** Chats with messages but no conversation folder in Buddy's Linux: they ran in Termux. */
+    private java.util.List<Sessions.Session> termuxChats() {
+        java.util.List<Sessions.Session> out = new java.util.ArrayList<>();
+        if (!Linux.installed(this)) return out;
+        java.io.File dir = new java.io.File(Linux.root(this), "root/.buddy/sessions");
+        for (Sessions.Session s : ChatHub.get(this).sessions.all) {
+            if (!s.messages.isEmpty() && !s.running && !new java.io.File(dir, s.id).isDirectory()) out.add(s);
+        }
+        return out;
     }
 
     private void openAgent(String agent) {

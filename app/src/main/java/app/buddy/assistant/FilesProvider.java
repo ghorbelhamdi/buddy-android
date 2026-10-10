@@ -26,6 +26,15 @@ public class FilesProvider extends ContentProvider {
         return Uri.parse("content://" + AUTHORITY + "/a/" + id);
     }
 
+    static Uri apkUri() {
+        return Uri.parse("content://" + AUTHORITY + "/apk/app.apk");
+    }
+
+    /** An app built in Buddy's Linux, copied here for Android's installer (install_apk). */
+    static File apkFile(android.content.Context c) {
+        return new File(c.getCacheDir(), "install.apk");
+    }
+
     static File captureFile(android.content.Context c) {
         return new File(c.getCacheDir(), "capture.jpg");
     }
@@ -34,6 +43,7 @@ public class FilesProvider extends ContentProvider {
         java.util.List<String> p = uri.getPathSegments();
         if (p.size() == 1 && "capture".equals(p.get(0))) return captureFile(getContext());
         if (p.size() == 2 && "a".equals(p.get(0))) return Attachments.file(getContext(), p.get(1));
+        if (p.size() == 2 && "apk".equals(p.get(0))) return apkFile(getContext());
         return null;
     }
 
@@ -61,6 +71,7 @@ public class FilesProvider extends ContentProvider {
         if (n.endsWith(".webp")) return "image/webp";
         if (n.endsWith(".gif")) return "image/gif";
         if (n.endsWith(".pdf")) return "application/pdf";
+        if (n.endsWith(".apk")) return "application/vnd.android.package-archive";
         if (n.endsWith(".txt") || n.endsWith(".md") || n.endsWith(".csv")) return "text/plain";
         return "application/octet-stream";
     }
@@ -70,7 +81,8 @@ public class FilesProvider extends ContentProvider {
         File f = fileFor(uri);
         if (f == null) return null;
         MatrixCursor c = new MatrixCursor(new String[]{OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE});
-        String name = f.getParentFile() != null && "attachments".equals(f.getParentFile().getName())
+        String name = f.equals(apkFile(getContext())) ? "app.apk"
+                : f.getParentFile() != null && "attachments".equals(f.getParentFile().getName())
                 ? Attachments.name(f.getName()) : "photo.jpg";
         c.addRow(new Object[]{name, f.length()});
         return c;

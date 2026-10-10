@@ -1,4 +1,4 @@
-#!/data/data/com.termux/files/usr/bin/bash
+#!/bin/bash
 # Build a signed APK from a plain-Java Android project, on the phone, without Gradle.
 #   build-apk.sh <project-dir>
 # Project layout:

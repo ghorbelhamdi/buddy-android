@@ -103,6 +103,10 @@ final class Tools {
         t.put(tool("linux_exec",
                 "(Experimental, developer mode) Run a shell command in Buddy's built-in Alpine Linux, installing it first if needed.",
                 props().put("cmd", strProp("Shell command")).put("timeout_s", intProp("Default 60, max 600")), "cmd"));
+        t.put(tool("install_apk",
+                "(Developer mode) Open Android's installer for an APK built in Buddy's Linux, e.g. "
+                        + "/root/.buddy/work/myapp/build/app.apk. The user taps Install/Update themselves; call wait_for_install next.",
+                props().put("path", strProp("Full path of the .apk inside Buddy's Linux")), "path"));
         t.put(tool("wait_for_install",
                 "After opening the Android installer for an APK, wait until the user has tapped Install/Update and confirmed. "
                         + "Returns as soon as the package is installed (at least min_version_code if given), or early if the "
@@ -175,6 +179,8 @@ final class Tools {
                 Linux.install(svc);
                 return text(Linux.exec(svc, a.getString("cmd"), Math.max(5, Math.min(600, a.optInt("timeout_s", 60)))));
             }
+            case "install_apk":
+                return text(installApk(a.getString("path")));
             case "wait_for_install":
                 return text(waitForInstall(a.getString("package"), a.optLong("min_version_code", 0),
                         Math.max(10, Math.min(300, a.optInt("timeout_s", 120)))));
@@ -547,12 +553,37 @@ final class Tools {
             if (installerOnScreen()) lastSeen = System.currentTimeMillis();
             else if (System.currentTimeMillis() - lastSeen > 12000) {
                 return "Not installed yet, and the installer is no longer on screen (the user may have closed it or "
-                        + "switched apps). Bring Termux to the front and open the installer again, then call wait_for_install again.";
+                        + "switched apps). Call install_apk again, then wait_for_install again.";
             }
             Thread.sleep(1000);
         }
         return "Timed out after " + timeoutS + " s: the user hasn't confirmed the install. Ask them whether they want to "
                 + "install it, instead of waiting longer.";
+    }
+
+    /** Copies an APK out of Buddy's Linux and opens Android's installer for it. */
+    private String installApk(String path) throws Exception {
+        if (!Prefs.devMode(svc)) return "Installing apps needs developer mode. Ask the user to turn it on in Buddy's Settings.";
+        if (path == null || !path.startsWith("/") || !path.endsWith(".apk")) return "Give the full path of an .apk file.";
+        java.io.File root = Linux.root(svc).getCanonicalFile();
+        java.io.File f = new java.io.File(root, path.substring(1)).getCanonicalFile();
+        if (!f.getPath().startsWith(root.getPath() + "/") || !f.isFile()) return "No APK at " + path + ".";
+        java.io.File out = FilesProvider.apkFile(svc);
+        try (java.io.InputStream in = new java.io.FileInputStream(f); java.io.OutputStream o = new java.io.FileOutputStream(out)) {
+            byte[] buf = new byte[64 * 1024];
+            int n;
+            while ((n = in.read(buf)) > 0) o.write(buf, 0, n);
+        }
+        if (!svc.getPackageManager().canRequestPackageInstalls()) {
+            svc.startActivity(new Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                    android.net.Uri.parse("package:" + svc.getPackageName())).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            return "Buddy isn't allowed to install apps yet. Android's settings page for that is open now: ask the user to "
+                    + "turn on 'Allow from this source' for Buddy, wait until they say it's done, then call install_apk again.";
+        }
+        svc.startActivity(new Intent(Intent.ACTION_VIEW)
+                .setDataAndType(FilesProvider.apkUri(), "application/vnd.android.package-archive")
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION));
+        return "The installer is open. The user must tap Install/Update and confirm (you can't). Call wait_for_install now.";
     }
 
     private String listApps() {

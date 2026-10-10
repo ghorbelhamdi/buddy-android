@@ -7,6 +7,8 @@
     <!-- Android 16 Live Updates: the "Buddy is using your phone" chip in the status bar -->
     <uses-permission android:name="android.permission.POST_PROMOTED_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Developer mode: open the installer for apps the agent builds (install_apk) -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <!-- Lets the setup screen ask Android to stop battery optimization for Buddy -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
