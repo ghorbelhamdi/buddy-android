@@ -259,6 +259,23 @@ public class SetupActivity extends Screen {
         }
         addCard(ex);
 
+        // ---------------------------------------------- built-in Linux (experimental)
+        list.addView(sectionLabel(this, "Built-in Linux (experimental)"));
+        LinearLayout lx = card();
+        LinearLayout lr = listRow(this);
+        lr.setGravity(Gravity.CENTER_VERTICAL);
+        lr.setPadding(dp(this, 16), dp(this, 14), dp(this, 12), dp(this, 14));
+        lr.addView(agentTile(this, "claude"));
+        LinearLayout lt = column(this);
+        lt.setPadding(dp(this, 14), 0, dp(this, 8), 0);
+        lt.addView(title(this, "Claude Code in Buddy", 15));
+        lt.addView(text(this, "Install and sign in without Termux", 13, MUTED));
+        lr.addView(lt, weight1());
+        lr.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
+        lr.setOnClickListener(v -> startActivity(new Intent(this, ClaudeSignInActivity.class)));
+        lx.addView(lr, full());
+        addCard(lx);
+
         // ------------------------------------------------------- remote control
         list.addView(sectionLabel(this, "Remote control"));
         LinearLayout rc = card();

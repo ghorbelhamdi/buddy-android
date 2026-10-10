@@ -128,6 +128,47 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         if (Theme.load(this)) applyTheme();
     }
 
+    // ---------------------------------------- Claude sign-in (built-in Linux)
+
+    private final Runnable codeWatch = new Runnable() {
+        @Override
+        public void run() {
+            if (!ClaudeAccount.waitingForCode()) return;
+            String code = null;
+            try {
+                for (android.view.accessibility.AccessibilityWindowInfo w : getWindows()) {
+                    android.view.accessibility.AccessibilityNodeInfo r = w.getRoot();
+                    if (r != null && (code = scanForCode(r, new int[]{0})) != null) break;
+                }
+            } catch (Exception ignored) {
+            }
+            if (code != null && ClaudeAccount.submit(code)) {
+                startActivity(new Intent(BuddyService.this, ClaudeSignInActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                return;
+            }
+            main.postDelayed(this, 700);
+        }
+    };
+
+    /** While a Claude sign-in waits for its code, look for it on screen (the browser's confirmation page). */
+    void watchForLoginCode() {
+        main.removeCallbacks(codeWatch);
+        main.postDelayed(codeWatch, 1500);
+    }
+
+    private static String scanForCode(android.view.accessibility.AccessibilityNodeInfo n, int[] seen) {
+        if (n == null || ++seen[0] > 4000) return null;
+        String c = ClaudeAccount.findCode(n.getText());
+        if (c == null) c = ClaudeAccount.findCode(n.getContentDescription());
+        if (c != null) return c;
+        for (int i = 0; i < n.getChildCount(); i++) {
+            c = scanForCode(n.getChild(i), seen);
+            if (c != null) return c;
+        }
+        return null;
+    }
+
     // ------------------------------------------------- first-run guide
 
     private final Runnable setupWatch = new Runnable() {

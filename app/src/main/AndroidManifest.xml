@@ -65,6 +65,10 @@
             android:exported="false" />
 
         <activity
+            android:name=".ClaudeSignInActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".OnboardingActivity"
             android:exported="false" />
 
