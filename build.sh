@@ -36,10 +36,16 @@ d8 --release --min-api 30 --lib "$SDK_JAR" --output "$OUT/dex" $(find "$OUT/clas
 
 echo "5/6 Packaging and aligning"
 cp "$OUT/base.apk" "$OUT/unaligned.apk"
-python3 - "$OUT/unaligned.apk" "$OUT/dex/classes.dex" <<'EOF'
-import sys, zipfile
+python3 - "$OUT/unaligned.apk" "$OUT/dex/classes.dex" "$SRC/jniLibs" <<'EOF'
+import os, sys, zipfile
 with zipfile.ZipFile(sys.argv[1], "a", zipfile.ZIP_DEFLATED) as z:
     z.write(sys.argv[2], "classes.dex")
+    # native libraries (proot for the built-in Linux): lib/<abi>/lib*.so
+    jni = sys.argv[3]
+    if os.path.isdir(jni):
+        for abi in sorted(os.listdir(jni)):
+            for name in sorted(os.listdir(os.path.join(jni, abi))):
+                z.write(os.path.join(jni, abi, name), "lib/%s/%s" % (abi, name))
 EOF
 python3 tools/zipalign.py "$OUT/unaligned.apk" "$OUT/aligned.apk"
 

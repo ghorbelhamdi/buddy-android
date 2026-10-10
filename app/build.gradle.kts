@@ -8,6 +8,12 @@ val appVersionName = Regex("""VERSION = "([^"]+)"""").find(buildInfo)!!.groupVal
 val appVersionCode = Regex("""VERSION_CODE = (\d+)""").find(buildInfo)!!.groupValues[1].toInt()
 
 android {
+    // proot for the built-in Linux ships as native libraries and must be extracted to disk to run
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
     namespace = "app.buddy.assistant"
     compileSdk = 36
 

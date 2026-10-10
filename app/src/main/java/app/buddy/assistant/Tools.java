@@ -100,6 +100,9 @@ final class Tools {
                 "summary"));
         t.put(tool("notify", "Show a short status line in the Buddy bubble without stopping.",
                 props().put("text", strProp("Status text")), "text"));
+        t.put(tool("linux_exec",
+                "(Experimental, developer mode) Run a shell command in Buddy's built-in Alpine Linux, installing it first if needed.",
+                props().put("cmd", strProp("Shell command")).put("timeout_s", intProp("Default 60, max 600")), "cmd"));
         t.put(tool("wait_for_install",
                 "After opening the Android installer for an APK, wait until the user has tapped Install/Update and confirmed. "
                         + "Returns as soon as the package is installed (at least min_version_code if given), or early if the "
@@ -167,6 +170,11 @@ final class Tools {
                 return text("Waited " + ms + " ms.");
             }
             case "confirm": return text(svc.askConfirm(a.getString("summary")));
+            case "linux_exec": {
+                if (!Prefs.devMode(svc)) return text("Turn on developer mode in Buddy first.");
+                Linux.install(svc);
+                return text(Linux.exec(svc, a.getString("cmd"), Math.max(5, Math.min(600, a.optInt("timeout_s", 60)))));
+            }
             case "wait_for_install":
                 return text(waitForInstall(a.getString("package"), a.optLong("min_version_code", 0),
                         Math.max(10, Math.min(300, a.optInt("timeout_s", 120)))));
