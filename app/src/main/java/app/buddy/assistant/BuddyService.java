@@ -133,7 +133,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     private final Runnable codeWatch = new Runnable() {
         @Override
         public void run() {
-            if (!ClaudeAccount.waitingForCode()) return;
+            if (!Account.CLAUDE.waitingForCode()) return;
             String code = null;
             try {
                 for (android.view.accessibility.AccessibilityWindowInfo w : getWindows()) {
@@ -142,8 +142,8 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
                 }
             } catch (Exception ignored) {
             }
-            if (code != null && ClaudeAccount.submit(code)) {
-                startActivity(new Intent(BuddyService.this, ClaudeSignInActivity.class)
+            if (code != null && Account.CLAUDE.submit(code)) {
+                startActivity(new Intent(BuddyService.this, SignInActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
                 return;
             }
@@ -159,8 +159,8 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
 
     private static String scanForCode(android.view.accessibility.AccessibilityNodeInfo n, int[] seen) {
         if (n == null || ++seen[0] > 4000) return null;
-        String c = ClaudeAccount.findCode(n.getText());
-        if (c == null) c = ClaudeAccount.findCode(n.getContentDescription());
+        String c = Account.CLAUDE.findCode(n.getText());
+        if (c == null) c = Account.CLAUDE.findCode(n.getContentDescription());
         if (c != null) return c;
         for (int i = 0; i < n.getChildCount(); i++) {
             c = scanForCode(n.getChild(i), seen);
@@ -170,32 +170,6 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     }
 
     // ------------------------------------------------- first-run guide
-
-    private final Runnable setupWatch = new Runnable() {
-        @Override
-        public void run() {
-            if (System.currentTimeMillis() > Prefs.setupWatchUntil(BuddyService.this)) return;
-            try {
-                Termux.run(BuddyService.this, "ping");
-            } catch (Exception ignored) {
-            }
-            main.postDelayed(this, 3000);
-        }
-    };
-
-    /** While the user works in Termux during setup, keep checking and bring the guide back when the step is done. */
-    void watchSetup() {
-        main.removeCallbacks(setupWatch);
-        main.postDelayed(setupWatch, 2000);
-    }
-
-    private void onSetupPong() {
-        if (System.currentTimeMillis() > Prefs.setupWatchUntil(this)) return;
-        if (!OnboardingActivity.currentStepDone(this)) return;
-        Prefs.setSetupWatchUntil(this, 0);
-        main.removeCallbacks(setupWatch);
-        showGuide();
-    }
 
     void showGuide() {
         try {
@@ -237,7 +211,6 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
                 Prefs.setCodexModels(this, cm.toString());
                 Models.setCodex(cm.toString());
             }
-            main.post(this::onSetupPong);
             return;
         }
         String t = event.optString("type");

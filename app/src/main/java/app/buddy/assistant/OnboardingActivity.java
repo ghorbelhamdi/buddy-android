@@ -22,12 +22,11 @@ import android.widget.Toast;
 import static app.buddy.assistant.Ui.*;
 
 /**
- * First-run guide: one step per screen. Steps that happen elsewhere (Termux, Android settings) are
- * detected when the user comes back; while they're in Termux, the service checks and brings this back.
+ * First-run guide: one step per screen. Steps that happen elsewhere (Android settings, the browser for
+ * sign-in) are detected when the user comes back.
  */
-public class OnboardingActivity extends Screen {
-    static final int WELCOME = 0, BRAIN = 1, TERMUX = 2, ACCESS = 3, PERMISSION = 4, CONNECT = 5, AGENTS = 6,
-            BACKGROUND = 7, TRY = 8;
+public class OnboardingActivity extends Screen implements Account.Listener {
+    static final int WELCOME = 0, BRAIN = 1, ACCESS = 2, AGENTS = 3, BACKGROUND = 4, TRY = 5;
     private static final int LAST = TRY;
 
     private ScrollView scroll;
@@ -76,8 +75,22 @@ public class OnboardingActivity extends Screen {
     protected void onResume() {
         super.onResume();
         if (isFinishing()) return;
+        Account.addListener(this);
+        for (String a : wanted(this)) Account.of(a).refresh(this);
         render();
-        if (step == CONNECT || step == AGENTS) ping();
+        checkAdvance();
+    }
+
+    @Override
+    protected void onPause() {
+        Account.removeListener(this);
+        super.onPause();
+    }
+
+    @Override
+    public void onAccountChanged() {
+        if (isFinishing() || isDestroyed()) return;
+        render();
         checkAdvance();
     }
 
@@ -93,30 +106,15 @@ public class OnboardingActivity extends Screen {
 
     // ------------------------------------------------------------- state
 
-    /** Whether the step the guide is on is done (the service asks this after each helper answer). */
-    static boolean currentStepDone(Context c) {
-        return done(c, Prefs.onboardStep(c));
-    }
-
     static boolean done(Context c, int step) {
         switch (step) {
-            case TERMUX:
-                return Termux.installed(c);
             case ACCESS:
                 return SetupState.accessibilityEnabled(c);
-            case PERMISSION:
-                return Termux.permitted(c);
-            case CONNECT:
-                return SetupState.helperCurrent(c);
             case AGENTS:
-                if (Prefs.signedAgents(c) == null) return false;
-                for (String a : wanted(c)) if (!SetupState.agentReady(c, a)) return false;
+                for (String a : wanted(c)) if (!SetupState.signedIn(c, a)) return false;
                 return true;
-            case BACKGROUND: {
-                PowerManager pm = c.getSystemService(PowerManager.class);
-                return pm.isIgnoringBatteryOptimizations(c.getPackageName())
-                        && pm.isIgnoringBatteryOptimizations(Termux.PACKAGE);
-            }
+            case BACKGROUND:
+                return c.getSystemService(PowerManager.class).isIgnoringBatteryOptimizations(c.getPackageName());
             default:
                 return false;
         }
@@ -135,7 +133,6 @@ public class OnboardingActivity extends Screen {
         stuckOpen = false;
         render();
         scroll.scrollTo(0, 0);
-        if (step == CONNECT || step == AGENTS) ping();
         checkAdvance();
     }
 
@@ -148,33 +145,8 @@ public class OnboardingActivity extends Screen {
         }, 900);
     }
 
-    private void ping() {
-        if (BuddyService.get() == null || !Termux.permitted(this) || !Termux.installed(this)) return;
-        try {
-            Termux.run(this, "ping");
-        } catch (Exception ignored) {
-            return;
-        }
-        body.postDelayed(this::refreshIfDone, 1500);
-        body.postDelayed(this::refreshIfDone, 4000);
-    }
-
-    private void refreshIfDone() {
-        if (isFinishing() || isDestroyed()) return;
-        render();
-        checkAdvance();
-    }
-
-    /** The user is going to Termux: keep checking from the service and come back when the step is done. */
-    private void watchTermux() {
-        Prefs.setSetupWatchUntil(this, System.currentTimeMillis() + 15 * 60_000L);
-        BuddyService svc = BuddyService.get();
-        if (svc != null) svc.watchSetup();
-    }
-
     private void finishGuide() {
         Prefs.setOnboarded(this, true);
-        Prefs.setSetupWatchUntil(this, 0);
         startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
         finish();
     }
@@ -192,17 +164,6 @@ public class OnboardingActivity extends Screen {
                 break;
             case BRAIN:
                 brain();
-                break;
-            case TERMUX:
-                header(R.drawable.ms_terminal, "Install Termux", ok ? "Termux is installed." :
-                        "Termux is a free terminal app. Buddy runs " + agentNames() + " inside it, on your phone.", ok);
-                if (!ok) {
-                    note("Get it from F-Droid or GitHub. The Play Store version is outdated and won't work.");
-                    primary("Get Termux from F-Droid", v -> openUrl("https://f-droid.org/packages/com.termux/"));
-                    secondary("GitHub releases instead", v -> openUrl("https://github.com/termux/termux-app/releases"));
-                    stuck("Termux from the Play Store?", "Uninstall it first (its files are removed), then install the F-Droid or GitHub build.",
-                            "Can't install the APK?", "Your browser asks to allow installing unknown apps. Allow it for this one install.");
-                }
                 break;
             case ACCESS:
                 header(R.drawable.ms_shield_person, "Let Buddy see and tap", ok ? "Accessibility is on." :
@@ -223,33 +184,6 @@ public class OnboardingActivity extends Screen {
                                 + "(below), then ⋮ in the top right → Allow restricted settings, and try again.", null, null);
                         secondary("App info", v -> openAppInfo(getPackageName()));
                     }
-                }
-                break;
-            case PERMISSION:
-                header(R.drawable.ms_terminal, "Allow Buddy to use Termux", ok ? "Allowed." :
-                        "Buddy sends your messages to " + agentNames() + " by starting commands in Termux.", ok);
-                if (!ok) {
-                    primary("Allow", v -> requestPermissions(new String[]{Termux.PERMISSION}, 1));
-                    stuck("No prompt appeared?", "App info → Permissions → Additional permissions → "
-                            + "Run commands in Termux environment → Allow.", null, null);
-                    secondary("App info", v -> openAppInfo(getPackageName()));
-                }
-                break;
-            case CONNECT:
-                header(R.drawable.ms_content_copy, "Connect Termux", ok ? "Termux answered. Connected." :
-                        "One command installs Buddy's helper in Termux. Buddy copies it for you.", ok);
-                if (!ok) {
-                    numbered(new String[]{"Tap the button: Termux opens.", "Long-press an empty spot → Paste.",
-                            "Press Enter and wait for \"Done\". Buddy comes back by itself."});
-                    primary("Copy command and open Termux", v -> {
-                        copy(this::setupCommand, "Copied. Long-press in Termux → Paste, then Enter.");
-                        watchTermux();
-                        openTermux();
-                    });
-                    secondary("Check again", v -> ping());
-                    stuck("Termux mentions allow-external-apps?", "Close Termux fully (its notification → Exit), "
-                            + "open it again and paste the command once more.",
-                            "Nothing happens after Done?", "Come back to Buddy yourself and tap Check again.");
                 }
                 break;
             case AGENTS:
@@ -364,18 +298,18 @@ public class OnboardingActivity extends Screen {
             p.topMargin = dp(this, 10);
             body.addView(r, p);
         }
-        primary("Continue", v -> go(TERMUX));
+        primary("Continue", v -> go(ACCESS));
     }
 
     private void agents(boolean ok) {
         header(R.drawable.ms_terminal, ok ? "Ready" : "Install and sign in",
-                ok ? agentNames() + " is set up and signed in." : "Install " + agentNames()
-                        + " in Termux and sign in once. Buddy notices when you're done.", ok);
+                ok ? agentNames() + " is installed and signed in." : "Buddy installs " + agentNames()
+                        + " inside the app, then you sign in once. No Termux needed.", ok);
         boolean first = true;
         for (String a : wanted(this)) {
-            boolean installed = SetupState.agentInstalled(this, a), ready = SetupState.agentReady(this, a)
-                    && Prefs.signedAgents(this) != null;
-            boolean claude = "claude".equals(a);
+            Account acc = Account.of(a);
+            boolean installed = SetupState.installed(this, a), signed = SetupState.signedIn(this, a);
+            boolean installing = acc.step == Account.Step.INSTALLING;
             LinearLayout card = column(this);
             card.setPadding(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));
             card.setBackground(rounded(this, CARD, 16));
@@ -383,60 +317,53 @@ public class OnboardingActivity extends Screen {
             r.addView(agentTile(this, a));
             LinearLayout t = column(this);
             t.setPadding(dp(this, 12), 0, 0, 0);
-            t.addView(title(this, claude ? "Claude Code" : "Codex", 15));
-            t.addView(monoText(this, ready ? "installed · signed in" : installed ? "installed · not signed in" : "not installed",
-                    12, ready ? OK : MUTED));
+            t.addView(title(this, acc.name(), 15));
+            t.addView(single(monoText(this, signed ? "signed in" + (acc.email.isEmpty() ? "" : " · " + acc.email)
+                    : installing ? "installing…" : installed ? "installed · not signed in" : "not installed", 12,
+                    signed ? OK : MUTED)));
             r.addView(t, weight1());
-            if (ready) r.addView(icon(this, R.drawable.ms_check, OK, 22));
+            if (signed) r.addView(icon(this, R.drawable.ms_check, OK, 22));
+            else if (installing) r.addView(spinner(this, 20));
             card.addView(r, full());
-            if (!ready) {
-                TextView how = text(this, installed
-                        ? (claude ? "Run claude in Termux and log in with your Claude account (it opens your browser)."
-                        : "Run codex login in Termux and sign in with your ChatGPT account.")
-                        : (claude ? "The installer asks two yes/no questions and downloads about 230 MB. "
-                        + "When it's done, Claude Code starts: log in with your Claude account."
-                        : "Installs Codex with npm, then opens sign-in with your ChatGPT account."), 14, MUTED);
-                how.setPadding(0, dp(this, 10), 0, dp(this, 10));
+            if (!signed) {
+                TextView how = text(this, installing ? acc.detail
+                        : acc.step == Account.Step.ERROR ? acc.detail
+                        : installed ? (acc.claude() ? "Sign in with your Claude account. Your browser opens; tap Authorize "
+                        + "and Buddy comes back by itself." : "Sign in with your ChatGPT account in the browser, then come back.")
+                        : (acc.claude() ? "Downloads about 235 MB once (Buddy's Linux and Claude Code from Anthropic)."
+                        : "Downloads about 150 MB once (Buddy's Linux, Node.js and Codex from OpenAI)."), 14,
+                        acc.step == Account.Step.ERROR ? ERR : MUTED);
+                how.setPadding(0, dp(this, 10), 0, installing ? 0 : dp(this, 10));
                 card.addView(how);
-                Button b = button(this, installed ? "Copy sign-in command" : "Copy install command", first);
-                b.setOnClickListener(v -> {
-                    copy(() -> installed ? (claude ? TermuxSetup.signInClaude() : TermuxSetup.signInCodex())
-                            : (claude ? TermuxSetup.installClaude() : TermuxSetup.installCodex(this)),
-                            "Copied. Long-press in Termux → Paste, then Enter.");
-                    watchTermux();
-                    openTermux();
-                });
-                card.addView(b, wrap());
-                first = false;
+                if (!installing) {
+                    Button b = button(this, installed ? (acc.claude() ? "Sign in with Claude" : "Sign in with ChatGPT")
+                            : "Install " + acc.name(), first);
+                    b.setOnClickListener(v -> {
+                        if (installed) startActivity(new Intent(this, SignInActivity.class).putExtra("agent", a));
+                        else acc.install(this);
+                    });
+                    card.addView(b, wrap());
+                    first = false;
+                }
             }
             LinearLayout.LayoutParams p = full();
             p.topMargin = dp(this, 12);
             body.addView(card, p);
         }
         if (!ok) {
-            secondary("Check again", v -> ping());
-            stuck("Sign-in page doesn't come back to Termux?", "Claude Code: copy the code shown in the browser and paste it into Termux. "
-                            + "Codex: run ~/bin/codex login --device-auth and enter the code at the address it shows.",
-                    "Install stopped or Termux closed?", "Open Termux and paste the same command again; it's safe to repeat.");
+            note("Use Wi-Fi if you can. You can leave this screen while it installs.");
+            stuck("Sign-in didn't come back?", "Claude: on the Claude page tap Copy Code, then come back to Buddy; "
+                            + "it picks the code up from the clipboard.",
+                    "Install failed?", "Check your connection and tap Install again; it continues where it stopped.");
         }
     }
 
     private void background(boolean ok) {
-        PowerManager pm = getSystemService(PowerManager.class);
-        boolean buddyBg = pm.isIgnoringBatteryOptimizations(getPackageName());
-        boolean termuxBg = pm.isIgnoringBatteryOptimizations(Termux.PACKAGE);
-        header(R.drawable.ms_build_circle, "Keep it running", ok ? "Buddy and Termux can run in the background." :
-                "So your phone doesn't stop Buddy or Termux to save battery while the agent works.", ok);
-        statusLine("Buddy", buddyBg);
-        statusLine("Termux", termuxBg);
+        header(R.drawable.ms_build_circle, "Keep it running", ok ? "Buddy can run in the background." :
+                "So your phone doesn't stop Buddy to save battery while the agent works.", ok);
         if (!ok) {
-            if (!buddyBg) {
-                primary("Allow for Buddy", v -> startActivity(new Intent(
-                        Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + getPackageName()))));
-            } else {
-                note("For Termux: App info → Battery → Unrestricted (the name differs a little per phone).");
-                primary("Open Termux app info", v -> openAppInfo(Termux.PACKAGE));
-            }
+            primary("Allow", v -> startActivity(new Intent(
+                    Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + getPackageName()))));
             secondary("Skip for now", v -> go(TRY));
         }
     }
@@ -613,28 +540,6 @@ public class OnboardingActivity extends Screen {
     private String agentNames() {
         String a = Prefs.agents(this);
         return "both".equals(a) ? "Claude Code and Codex" : "codex".equals(a) ? "Codex" : "Claude Code";
-    }
-
-    interface Cmd {
-        String get() throws Exception;
-    }
-
-    private void copy(Cmd cmd, String toast) {
-        try {
-            getSystemService(ClipboardManager.class).setPrimaryClip(ClipData.newPlainText("Buddy setup", cmd.get()));
-            Toast.makeText(this, toast, Toast.LENGTH_LONG).show();
-        } catch (Exception e) {
-            Toast.makeText(this, "Couldn't build the command: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private String setupCommand() throws Exception {
-        return TermuxSetup.command(this);
-    }
-
-    private void openTermux() {
-        Intent t = getPackageManager().getLaunchIntentForPackage(Termux.PACKAGE);
-        if (t != null) startActivity(t);
     }
 
     private void openAppInfo(String pkg) {

@@ -1,5 +1,5 @@
-#!/data/data/com.termux/files/usr/bin/bash
-# Called by the Buddy app through Termux's RUN_COMMAND service.
+#!/bin/bash
+# Run by the Buddy app inside its built-in Linux (Alpine, through proot).
 #   buddy-run <token> ask <session> <claude|codex> <dev:0|1> <message> [model] [attachment-ids]
 #                                    run the agent on the message in that session, streaming events to the bubble
 #   buddy-run <token> stop <session>       stop that session's running request
@@ -10,11 +10,10 @@
 #   buddy-run <token> recent               list recent Claude Code / Codex sessions from their history (buddy_recent)
 #   buddy-run <token> transcript <claude|codex> <file>   last messages of a session (buddy_transcript)
 #   buddy-run <token> adopt <session> <claude|codex> <agent-session-id>  continue that session as a Buddy chat
-#   buddy-run <token> handoff <session>    (run in a Termux tab) reopen a Buddy chat with remote control (that session only)
 # Every event sent to the bubble carries "buddy_session" so the app can route it.
-HELPER_VERSION=9
+HELPER_VERSION=10
 set -u
-export PATH=$HOME/bin:/data/data/com.termux/files/usr/bin:$PATH
+export PATH=$HOME/.local/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # The claude launcher sets BUN_OPTIONS with a path relative to its folder; never inherit a stale one.
 unset BUN_OPTIONS
 D=$HOME/.buddy
@@ -44,17 +43,6 @@ descendants() { # print a pid and all its descendants
   for c in $(pgrep -P "$p" 2>/dev/null); do descendants "$c"; done
 }
 
-# Claude Code updates itself, and on Termux each new binary needs its ELF interpreter pointed at
-# Termux's glibc. If the launcher missed that, every `claude` start fails ("cannot execute").
-ensure_claude() {
-  local G=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1
-  local PE=/data/data/com.termux/files/usr/glibc/bin/patchelf
-  local V=$HOME/.local/share/claude/versions f
-  [ -x "$PE" ] && [ -f "$G" ] || return 0
-  for f in $(ls -1 "$V" 2>/dev/null | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$'); do
-    [ "$(LD_PRELOAD= "$PE" --print-interpreter "$V/$f" 2>/dev/null)" = "$G" ] || LD_PRELOAD= "$PE" --set-interpreter "$G" "$V/$f" 2>/dev/null
-  done
-}
 
 # Is this pid an agent process (the real claude / codex program)?
 agent_of() {
@@ -62,7 +50,7 @@ agent_of() {
   cmd=$(tr '\0' ' ' < "/proc/$1/cmdline" 2>/dev/null) || return 1
   case "${cmd%% *}" in
     */claude/versions/*) echo claude ;;
-    */bin/codex) echo codex ;;
+    */codex-linux-*/*|*/bin/codex) echo codex ;;
     *) return 1 ;;
   esac
 }
@@ -85,7 +73,7 @@ case "$CMD" in
       for q in $(descendants "$(cat "$f")"); do owner[$q]=$sid; done
     done
     {
-      for p in $(pgrep -f 'claude/versions/|/bin/codex' 2>/dev/null); do
+      for p in $(pgrep -f 'claude/versions/|codex-linux-|/bin/codex' 2>/dev/null); do
         a=$(agent_of "$p") || continue
         [ "$p" = "$$" ] && continue
         cwd=$(readlink "/proc/$p/cwd" 2>/dev/null)
@@ -162,19 +150,6 @@ case "$CMD" in
         | select(.text != "" and (.text|startswith("<")|not))' 2>/dev/null
     fi | tail -n 40 | jq -cs --arg f "$F" '{type:"buddy_transcript", file:$f, messages:map(.text |= .[0:2000])}' | post
     exit 0 ;;
-  handoff)
-    SID=${3:-}; valid_sid "$SID" || exit 2
-    CS=$(cat "$D/sessions/$SID/claude-session" 2>/dev/null)
-    if [ -z "$CS" ]; then echo "This chat has no Claude Code conversation yet. Send it a message first."; read -r -t 15 _; exit 1; fi
-    if [ -f "$D/sessions/$SID/pid" ] && kill -0 "$(cat "$D/sessions/$SID/pid")" 2>/dev/null; then
-      echo "This chat is still working in Buddy. Stop it there first."; read -r -t 15 _; exit 1
-    fi
-    echo "Opening this Buddy chat with Remote Control for this session only."
-    echo "It appears in the Claude app (Code). Type /exit when done; this tab then closes."
-    echo "Exit with /exit when you're done; you can keep using the chat in Buddy afterwards."
-    ensure_claude
-    cd "$W" && claude --resume "$CS" --remote-control "Buddy chat $SID"
-    exit 0 ;; # a clean exit makes Termux close this tab
   adopt)
     SID=${3:-}; A=${4:-}; AID=${5:-}
     valid_sid "$SID" && [[ "$AID" =~ ^[A-Za-z0-9-]{8,64}$ ]] || exit 2
@@ -325,7 +300,7 @@ stream_codex() {
 # ------------------------------------------------------------------------ run
 (
   if [ "$BACKEND" = codex ]; then
-    if ! have codex; then event buddy_error "Codex isn't installed in Termux."; exit 0; fi
+    if ! have codex; then event buddy_error "Codex isn't installed yet. Install it in Buddy's Settings."; exit 0; fi
     run_codex | stream_codex
     status=${PIPESTATUS[0]}
     if [ "$status" -ne 0 ] && [ -s "$S/codex-thread" ] && grep -q -i -E 'not found|no such|unknown (thread|session)' "$S/last-error.log" 2>/dev/null; then
@@ -335,8 +310,7 @@ stream_codex() {
     fi
     name=Codex
   else
-    if ! have claude; then event buddy_error "Claude Code isn't installed in Termux."; exit 0; fi
-    ensure_claude
+    if ! have claude; then event buddy_error "Claude Code isn't installed yet. Install it in Buddy's Settings."; exit 0; fi
     run_claude | stream_claude
     status=${PIPESTATUS[0]}
     if [ "$status" -ne 0 ] && grep -q -i 'no conversation found' "$S/last-error.log" 2>/dev/null; then

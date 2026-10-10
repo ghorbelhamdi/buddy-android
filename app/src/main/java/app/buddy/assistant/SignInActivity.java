@@ -18,15 +18,17 @@ import android.widget.Toast;
 
 import static app.buddy.assistant.Ui.*;
 
-/** Install Claude Code in Buddy's built-in Linux and sign in: one button, approve in the browser, done. */
-public class ClaudeSignInActivity extends Screen implements ClaudeAccount.Listener {
+/** Install an agent (Claude Code or Codex) in Buddy's built-in Linux and sign in: one button, approve in the browser, done. */
+public class SignInActivity extends Screen implements Account.Listener {
     private LinearLayout body, bottom;
+    private Account acc;
     private String openedUrl;
     private boolean pasteOpen;
 
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
+        acc = Account.of(getIntent().getStringExtra("agent"));
         LinearLayout root = column(this);
         root.setBackgroundColor(BG);
         root.setFitsSystemWindows(true);
@@ -51,17 +53,17 @@ public class ClaudeSignInActivity extends Screen implements ClaudeAccount.Listen
     protected void onResume() {
         super.onResume();
         if (isFinishing()) return;
-        ClaudeAccount.addListener(this);
-        if (ClaudeAccount.step == ClaudeAccount.Step.CHECKING || ClaudeAccount.step == ClaudeAccount.Step.SIGNED_OUT
-                || ClaudeAccount.step == ClaudeAccount.Step.SIGNED_IN || ClaudeAccount.step == ClaudeAccount.Step.NEED_INSTALL) {
-            ClaudeAccount.refresh(this);
+        Account.addListener(this);
+        if (acc.step == Account.Step.CHECKING || acc.step == Account.Step.SIGNED_OUT
+                || acc.step == Account.Step.SIGNED_IN || acc.step == Account.Step.NEED_INSTALL) {
+            acc.refresh(this);
         }
         render();
     }
 
     @Override
     protected void onPause() {
-        ClaudeAccount.removeListener(this);
+        Account.removeListener(this);
         super.onPause();
     }
 
@@ -75,12 +77,12 @@ public class ClaudeSignInActivity extends Screen implements ClaudeAccount.Listen
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (!hasFocus || !ClaudeAccount.waitingForCode()) return;
+        if (!hasFocus || !acc.waitingForCode()) return;
         try {
             ClipData clip = getSystemService(ClipboardManager.class).getPrimaryClip();
             if (clip != null && clip.getItemCount() > 0) {
-                String code = ClaudeAccount.findCode(clip.getItemAt(0).coerceToText(this));
-                if (code != null) ClaudeAccount.submit(code);
+                String code = acc.findCode(clip.getItemAt(0).coerceToText(this));
+                if (code != null) acc.submit(code);
             }
         } catch (Exception ignored) {
         }
@@ -89,66 +91,63 @@ public class ClaudeSignInActivity extends Screen implements ClaudeAccount.Listen
     private void render() {
         body.removeAllViews();
         bottom.removeAllViews();
-        switch (ClaudeAccount.step) {
+        switch (acc.step) {
             case CHECKING:
-                header(R.drawable.ms_terminal, "Claude Code in Buddy", "Checking…", false);
+                header(R.drawable.ms_terminal, acc.name(), "Checking…", false);
                 spinnerRow();
                 break;
             case NEED_INSTALL:
-                header(R.drawable.ms_terminal, "Claude Code in Buddy",
-                        "Runs Claude Code inside Buddy on your Claude subscription. No Termux needed.", false);
-                note("Downloads about 235 MB once: a small Linux (4 MB) and Claude Code from Anthropic. Use Wi-Fi if you can.");
-                primary("Install Claude Code", v -> ClaudeAccount.install(this));
+                header(R.drawable.ms_terminal, "Install " + acc.name(), acc.claude()
+                        ? "Runs Claude Code inside Buddy on your Claude subscription."
+                        : "Runs Codex inside Buddy on your ChatGPT plan.", false);
+                note(acc.claude() ? "Downloads about 235 MB once: Buddy's Linux and Claude Code from Anthropic. Use Wi-Fi if you can."
+                        : "Downloads about 150 MB once: Buddy's Linux, Node.js and Codex from OpenAI. Use Wi-Fi if you can.");
+                primary("Install " + acc.name(), v -> acc.install(this));
                 break;
             case INSTALLING:
-                header(R.drawable.ms_terminal, "Installing", ClaudeAccount.detail, false);
+                header(R.drawable.ms_terminal, "Installing", acc.detail, false);
                 spinnerRow();
                 note("This takes a few minutes. You can leave this screen; it keeps going.");
                 break;
             case SIGNED_OUT:
-                header(R.drawable.ms_shield_person, "Sign in to Claude",
-                        "Use your Claude account (Pro or Max). Your browser opens; approve there and Buddy comes back by itself.", false);
-                primary("Sign in with Claude", v -> ClaudeAccount.startLogin(this));
+                header(R.drawable.ms_shield_person, acc.claude() ? "Sign in to Claude" : "Sign in to ChatGPT",
+                        (acc.claude() ? "Use your Claude account (Pro or Max)." : "Use your ChatGPT account (Plus, Pro or Business).")
+                                + " Your browser opens; approve there and Buddy comes back by itself.", false);
+                primary(acc.claude() ? "Sign in with Claude" : "Sign in with ChatGPT", v -> acc.startLogin(this));
                 break;
             case WAITING_BROWSER:
-                if (ClaudeAccount.url == null) {
-                    header(R.drawable.ms_shield_person, "Sign in to Claude", "Starting sign-in…", false);
+                if (acc.url == null) {
+                    header(R.drawable.ms_shield_person, "Sign in", "Starting sign-in…", false);
                     spinnerRow();
                     break;
                 }
                 openBrowserOnce();
-                header(R.drawable.ms_shield_person, "Approve in your browser",
-                        "Tap Authorize on the Claude page. Buddy picks up the code and comes back by itself.", false);
+                header(R.drawable.ms_shield_person, "Approve in your browser", acc.claude()
+                        ? "Tap Authorize on the Claude page. Buddy picks up the code and comes back by itself."
+                        : "Sign in and allow Codex. Then come back to Buddy; it finishes by itself.", false);
                 primary("Open the sign-in page again", v -> {
                     openedUrl = null;
                     openBrowserOnce();
                 });
-                pasteBox();
-                secondary("Cancel", v -> ClaudeAccount.cancelLogin());
+                if (acc.claude()) pasteBox();
+                secondary("Cancel", v -> acc.cancelLogin());
                 break;
             case FINISHING:
                 header(R.drawable.ms_shield_person, "Signing in", "Finishing sign-in…", false);
                 spinnerRow();
                 break;
             case SIGNED_IN:
-                header(R.drawable.ms_check, "Signed in", (ClaudeAccount.email.isEmpty() ? "Claude Code is ready."
-                        : ClaudeAccount.email) + (ClaudeAccount.plan.isEmpty() ? "" : " · " + ClaudeAccount.plan), true);
+                header(R.drawable.ms_check, "Signed in", (acc.email.isEmpty() ? acc.name() + " is ready."
+                        : acc.email) + (acc.plan.isEmpty() ? "" : " · " + acc.plan), true);
                 primary("Done", v -> finish());
-                secondary("Sign out", v -> confirmSheet(this, "Sign out of Claude?",
-                        "Claude Code in Buddy stops working until you sign in again.", "Sign out", true, () ->
-                                new Thread(() -> {
-                                    try {
-                                        Linux.exec(this, "claude auth logout", 60);
-                                    } catch (Exception ignored) {
-                                    }
-                                    ClaudeAccount.refresh(this);
-                                }).start()));
+                secondary("Sign out", v -> confirmSheet(this, "Sign out of " + acc.name() + "?",
+                        acc.name() + " in Buddy stops working until you sign in again.", "Sign out", true, () -> acc.logout(this)));
                 break;
             case ERROR:
-                header(R.drawable.ms_error, "Something went wrong", ClaudeAccount.detail, false);
+                header(R.drawable.ms_error, "Something went wrong", acc.detail, false);
                 primary("Try again", v -> {
-                    ClaudeAccount.step = ClaudeAccount.Step.CHECKING;
-                    ClaudeAccount.refresh(this);
+                    acc.step = Account.Step.CHECKING;
+                    acc.refresh(this);
                     render();
                 });
                 break;
@@ -156,7 +155,7 @@ public class ClaudeSignInActivity extends Screen implements ClaudeAccount.Listen
     }
 
     private void openBrowserOnce() {
-        String u = ClaudeAccount.url;
+        String u = acc.url;
         if (u == null || u.equals(openedUrl)) return;
         openedUrl = u;
         BuddyService svc = BuddyService.get();
@@ -202,7 +201,7 @@ public class ClaudeSignInActivity extends Screen implements ClaudeAccount.Listen
             gp.leftMargin = dp(this, 8);
             r.addView(go, gp);
             go.setOnClickListener(v -> {
-                if (!ClaudeAccount.submit(et.getText().toString())) {
+                if (!acc.submit(et.getText().toString())) {
                     Toast.makeText(this, "Start the sign-in again first.", Toast.LENGTH_SHORT).show();
                 }
             });

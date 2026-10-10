@@ -74,12 +74,6 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         cp.topMargin = dp(this, 3);
         titles.addView(chip, cp);
         top.addView(titles, weight1());
-        if ("claude".equals(ses.backend)) {
-            ImageButton rc = iconButton(this, R.drawable.ic_remote, "Continue in the Claude app", MUTED);
-            rc.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 44), dp(this, 44)));
-            rc.setOnClickListener(v -> handoff());
-            top.addView(rc);
-        }
         speaker = iconButton(this, R.drawable.ms_volume_off, "Read replies aloud", MUTED);
         speaker.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 44), dp(this, 44)));
         speaker.setOnClickListener(v -> {
@@ -275,30 +269,6 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             show(msg);
             scrollToEnd();
         }
-    }
-
-    /** Opens this chat in a Termux tab with Remote Control on for this session only. */
-    private void handoff() {
-        confirmSheet(this, "Continue in the Claude app?",
-                "Opens this chat in a Termux tab with Remote Control on for this session only, so you can "
-                        + "continue it from the Claude app (Code). Type /exit there when done; the tab closes.",
-                "Open", false, () -> {
-                    if (ses.running) {
-                        Toast.makeText(this, "This chat is still working. Stop it first.", Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                    // Bring Termux to the front first: it may only open a terminal tab from the background
-                    // with "Display over other apps", so starting it from the foreground avoids that.
-                    android.content.Intent t = getPackageManager().getLaunchIntentForPackage(Termux.PACKAGE);
-                    if (t != null) startActivity(t);
-                    messages.postDelayed(() -> {
-                        try {
-                            Termux.runInTerminal(this, "handoff", ses.id);
-                        } catch (Exception e) {
-                            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    }, 700);
-                });
     }
 
     /** Pick this chat's model; the conversation continues with the new one. */

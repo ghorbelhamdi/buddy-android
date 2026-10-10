@@ -176,6 +176,15 @@ final class Prefs {
         sp(c).edit().putLong("watch_until", t).apply();
     }
 
+    /** Last known state of an agent in Buddy's Linux: NEED_INSTALL, SIGNED_OUT or SIGNED_IN (null = never checked). */
+    static String agentState(Context c, String agent) {
+        return sp(c).getString("agent_" + agent, null);
+    }
+
+    static void setAgentState(Context c, String agent, String state) {
+        sp(c).edit().putString("agent_" + agent, state).apply();
+    }
+
     static void saveBubblePos(Context c, int x, int y) {
         sp(c).edit().putInt("bx", x).putInt("by", y).apply();
     }

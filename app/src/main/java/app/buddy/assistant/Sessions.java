@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/** Bubble conversations. Each has its own brain (claude/codex), history and agent session in Termux. */
+/** Bubble conversations. Each has its own brain (claude/codex), history and agent session in Buddy's Linux. */
 final class Sessions {
     static final int MAX_SESSIONS = 20, MAX_MESSAGES = 150;
 

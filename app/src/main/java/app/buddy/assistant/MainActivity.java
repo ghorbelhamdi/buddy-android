@@ -20,7 +20,7 @@ import java.util.Locale;
 import static app.buddy.assistant.Ui.*;
 
 /** Home screen: the list of chats. */
-public class MainActivity extends Screen implements ChatHub.Listener {
+public class MainActivity extends Screen implements ChatHub.Listener, Account.Listener {
     private ChatHub hub;
     private LinearLayout list;
     private FrameLayout navSlot;
@@ -79,22 +79,20 @@ public class MainActivity extends Screen implements ChatHub.Listener {
         if (isFinishing()) return;
         hub.addListener(this);
         render();
-        // After an app update the helper may report an old version: re-check quietly instead of nagging.
-        if (Prefs.helperStatus(this) != null && !SetupState.helperCurrent(this) && BuddyService.get() != null
-                && Termux.permitted(this)) {
-            try {
-                Termux.run(this, "ping");
-                list.postDelayed(() -> {
-                    if (!isFinishing()) render();
-                }, 1500);
-            } catch (Exception ignored) {
-            }
-        }
+        Account.addListener(this);
+        Account.CLAUDE.refresh(this);
+        Account.CODEX.refresh(this);
+    }
+
+    @Override
+    public void onAccountChanged() {
+        if (!isFinishing() && !isDestroyed()) render();
     }
 
     @Override
     protected void onPause() {
         hub.removeListener(this);
+        Account.removeListener(this);
         super.onPause();
     }
 

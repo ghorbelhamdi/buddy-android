@@ -6,40 +6,30 @@ import android.os.PowerManager;
 import android.provider.Settings;
 import android.text.TextUtils;
 
-/** Quick setup progress from saved state (no ping): used for the Chats header and the Settings card. */
+/** Setup progress from saved state: used for the Chats header, the Settings card and the guide. */
 final class SetupState {
     static final String[] STEPS = {
-            "Turn on the accessibility service", "Allow commands in Termux", "Set up the Termux helper",
-            "Allow background running", "Try it",
+            "Turn on the accessibility service", "Install your agent", "Sign in", "Allow background running", "Try it",
     };
-    /** Must match HELPER_VERSION in termux/buddy-run. */
-    static final int HELPER_VERSION = 9;
 
     final boolean[] done = new boolean[5];
 
     SetupState(Context c) {
+        String agent = Prefs.backend(c);
         done[0] = accessibilityEnabled(c);
-        done[1] = Termux.installed(c) && Termux.permitted(c);
-        done[2] = helperCurrent(c) && agentReady(c, Prefs.backend(c));
-        PowerManager pm = c.getSystemService(PowerManager.class);
-        done[3] = pm.isIgnoringBatteryOptimizations(c.getPackageName())
-                && Termux.installed(c) && pm.isIgnoringBatteryOptimizations(Termux.PACKAGE);
+        done[1] = installed(c, agent);
+        done[2] = signedIn(c, agent);
+        done[3] = c.getSystemService(PowerManager.class).isIgnoringBatteryOptimizations(c.getPackageName());
         done[4] = Prefs.hadReply(c);
     }
 
-    static boolean helperCurrent(Context c) {
-        return Prefs.helperStatus(c) != null && Prefs.helperVersion(c) >= HELPER_VERSION;
+    static boolean installed(Context c, String agent) {
+        String s = Prefs.agentState(c, agent);
+        return Linux.installed(c) && s != null && !"NEED_INSTALL".equals(s);
     }
 
-    static boolean agentInstalled(Context c, String agent) {
-        String h = Prefs.helperStatus(c);
-        return h != null && h.contains(agent);
-    }
-
-    /** Installed and signed in. */
-    static boolean agentReady(Context c, String agent) {
-        String s = Prefs.signedAgents(c);
-        return agentInstalled(c, agent) && s != null && s.contains(agent);
+    static boolean signedIn(Context c, String agent) {
+        return Linux.installed(c) && "SIGNED_IN".equals(Prefs.agentState(c, agent));
     }
 
     int count() {
@@ -54,9 +44,9 @@ final class SetupState {
         return -1;
     }
 
-    /** Chats can run once the service, Termux permission and helper are in place. */
+    /** Chats can run once the service is on and the default agent is installed and signed in. */
     boolean canRun() {
-        return done[0] && done[1] && BuddyService.get() != null;
+        return done[0] && done[2] && BuddyService.get() != null;
     }
 
     static boolean accessibilityEnabled(Context c) {

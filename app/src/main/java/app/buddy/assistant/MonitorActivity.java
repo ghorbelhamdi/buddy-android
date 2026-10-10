@@ -129,7 +129,7 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
 
     private void request(String... args) {
         try {
-            Termux.run(this, args);
+            Helper.run(this, args);
         } catch (Exception e) {
             runningEmpty.setText(e.getMessage());
         }

@@ -102,7 +102,7 @@ public class TranscriptActivity extends Screen implements ChatHub.MonitorListene
         if (isFinishing()) return;
         hub.monitor = this;
         try {
-            Termux.run(this, "transcript", agent, file);
+            Helper.run(this, "transcript", agent, file);
         } catch (Exception e) {
             messages.removeAllViews();
             messages.addView(text(this, e.getMessage(), 14, ERR));

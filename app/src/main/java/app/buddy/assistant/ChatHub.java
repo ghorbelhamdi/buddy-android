@@ -45,7 +45,7 @@ final class ChatHub {
         Sessions.Session s = sessions.create(backend);
         s.title = title == null ? "" : title;
         try {
-            Termux.run(app, "adopt", s.id, backend, agentSessionId);
+            Helper.run(app, "adopt", s.id, backend, agentSessionId);
         } catch (Exception e) {
             add(s, Bubble.Kind.ERROR, e.getMessage());
         }
@@ -95,7 +95,7 @@ final class ChatHub {
 
     void delete(Sessions.Session s) {
         try {
-            Termux.run(app, "delete", s.id);
+            Helper.run(app, "delete", s.id);
         } catch (Exception ignored) {
         }
         viewing.remove(s);
@@ -117,7 +117,7 @@ final class ChatHub {
         BuddyService svc = BuddyService.get();
         if (svc != null) svc.allowControl();
         try {
-            Termux.run(app, "ask", ses.id, ses.backend, Prefs.devMode(app) ? "1" : "0", forAgent, ses.model,
+            Helper.run(app, "ask", ses.id, ses.backend, Prefs.devMode(app) ? "1" : "0", forAgent, ses.model,
                     hasFiles ? android.text.TextUtils.join(",", files) : "");
         } catch (Exception e) {
             return e.getMessage();
@@ -132,7 +132,7 @@ final class ChatHub {
         main.postDelayed(() -> {
             if (ses.running && id == ses.runId && SystemClock.elapsedRealtime() - ses.lastEventAt >= NO_RESPONSE_MS - 100) {
                 ses.running = false;
-                add(ses, Bubble.Kind.ERROR, "No response from Termux. Open Buddy's settings and check the Termux helper step.");
+                add(ses, Bubble.Kind.ERROR, "No response from the agent. Open Buddy's Settings and check that it's installed and signed in.");
                 changed();
             }
         }, NO_RESPONSE_MS);
@@ -154,7 +154,7 @@ final class ChatHub {
     void stop(Sessions.Session ses) {
         if (!ses.running) return;
         try {
-            Termux.run(app, "stop", ses.id);
+            Helper.run(app, "stop", ses.id);
             ses.status = "Stopping…";
         } catch (Exception e) {
             add(ses, Bubble.Kind.ERROR, e.getMessage());

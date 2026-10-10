@@ -24,13 +24,12 @@ import android.widget.Toast;
 
 import static app.buddy.assistant.Ui.*;
 
-/** Settings: setup checklist, appearance, agent, experience and the optional MCP command. */
-public class SetupActivity extends Screen {
+/** Settings: setup checklist, appearance, agents and experience. */
+public class SetupActivity extends Screen implements Account.Listener {
     private ScrollView scroll;
     private LinearLayout list;
     /** Setup card open state; null = automatic (open until all steps are done). */
     private Boolean setupOpen;
-    private String mcpAgent = "claude";
 
     @Override
     protected void onCreate(Bundle state) {
@@ -55,24 +54,21 @@ public class SetupActivity extends Screen {
     protected void onResume() {
         super.onResume();
         if (isFinishing()) return;
-        if (SetupState.accessibilityEnabled(this) && Termux.installed(this) && Termux.permitted(this)) ping();
-        else render();
+        Account.addListener(this);
+        Account.CLAUDE.refresh(this);
+        Account.CODEX.refresh(this);
+        render();
     }
 
-    private static final long PING_WAIT_MS = 4000;
-    private long pingSentAt;
+    @Override
+    protected void onPause() {
+        Account.removeListener(this);
+        super.onPause();
+    }
 
-    /** Ask the Termux helper to answer; re-render as the answer arrives (or doesn't). */
-    private void ping() {
-        pingSentAt = System.currentTimeMillis();
-        try {
-            Termux.run(this, "ping");
-        } catch (Exception e) {
-            pingSentAt = 0;
-        }
-        render();
-        list.postDelayed(this::render, 1200);
-        list.postDelayed(this::render, PING_WAIT_MS + 100);
+    @Override
+    public void onAccountChanged() {
+        if (!isFinishing() && !isDestroyed()) render();
     }
 
     /** Appearance changed on this screen: restyle everything in place, keeping the scroll position. */
@@ -98,15 +94,15 @@ public class SetupActivity extends Screen {
         LinearLayout head = column(this);
         head.setPadding(dp(this, 20), dp(this, 8), dp(this, 20), dp(this, 4));
         head.addView(title(this, "Settings", 28));
-        TextView sub = text(this, "Buddy runs on your own Claude subscription through Claude Code in Termux.", 14, MUTED);
+        TextView sub = text(this, "Buddy runs Claude Code (or Codex) on your own subscription, inside the app.", 14, MUTED);
         sub.setPadding(0, dp(this, 4), 0, 0);
         head.addView(sub);
         list.addView(head, full());
 
         // ---------------------------------------------------------------- setup
         boolean a11y = SetupState.accessibilityEnabled(this);
-        boolean termux = Termux.installed(this);
-        boolean perm = Termux.permitted(this);
+        String backend = Prefs.backend(this);
+        Account acc = Account.of(backend);
         Step[] steps = new Step[5];
 
         String a11yText = "This shows the bubble and lets Buddy read the screen, tap and type for you.";
@@ -118,63 +114,32 @@ public class SetupActivity extends Screen {
                 a11y ? null : "Open settings", v -> startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)),
                 a11y || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ? null : "App info", v -> openAppInfo(getPackageName()));
 
-        steps[1] = step("Allow Buddy to run commands in Termux",
-                termux ? "Buddy sends your messages to Claude Code in Termux."
-                        : "Install Termux first, from GitHub or F-Droid, then install and sign in to Claude Code in it.",
-                termux ? perm : null,
-                termux ? (perm ? null : "Allow") : "Get Termux",
-                termux ? v -> requestPermissions(new String[]{Termux.PERMISSION}, 1)
-                        : v -> openUrl("https://github.com/termux/termux-app/releases"),
+        boolean installed = SetupState.installed(this, backend);
+        steps[1] = step("Install " + acc.name(), installed ? acc.name() + " is installed in Buddy."
+                        : acc.step == Account.Step.INSTALLING ? acc.detail
+                        : "Buddy downloads its own small Linux and " + acc.name() + (acc.claude()
+                        ? " from Anthropic (about 235 MB)." : " from OpenAI (about 150 MB)."),
+                installed, installed || acc.step == Account.Step.INSTALLING ? null : "Install", v -> openAgent(backend),
                 null, null);
 
-        // Step 3 is checked by pinging the helper through Termux (see onResume); it answers via the bubble's server.
-        String helper = Prefs.helperStatus(this);
-        // While a re-check is on its way, keep trusting the last answer (no flicker); if Termux doesn't
-        // answer within PING_WAIT_MS, the old answer no longer counts.
-        boolean fresh = Prefs.helperCheckedAt(this) >= pingSentAt;
-        boolean waiting = pingSentAt > 0 && System.currentTimeMillis() - pingSentAt < PING_WAIT_MS;
-        boolean answered = helper != null && (fresh || waiting);
-        boolean hasClaude = answered && helper.contains("claude");
-        boolean hasCodex = answered && helper.contains("codex");
-        String backend = Prefs.backend(this);
-        boolean helperCurrent = Prefs.helperVersion(this) >= SetupState.HELPER_VERSION;
-        boolean helperOk = ("codex".equals(backend) ? hasCodex : hasClaude) && helperCurrent
-                && SetupState.agentReady(this, backend);
-        String howTo = "Tap Copy setup command: Termux opens. Paste with a long-press and press Enter. "
-                + "It installs Buddy's helper and lets Buddy talk to Termux.";
-        String helperText;
-        String agent = "codex".equals(backend) ? "Codex" : "Claude Code";
-        if (helperOk) helperText = "Termux answered and " + agent + " is installed.";
-        else if (answered && !helperCurrent) helperText = "Buddy's Termux helper is out of date. " + howTo;
-        else if (answered) helperText = "Termux answered, but " + agent + " isn't installed there yet. Install it in Termux "
-                + "and sign in (see the Buddy README), or choose the other brain below.";
-        else if (!a11y || !perm) helperText = "Finish steps 1 and 2 first. Then: " + howTo;
-        else if (pingSentAt > 0 && System.currentTimeMillis() - pingSentAt < PING_WAIT_MS) helperText = "Checking Termux…";
-        else helperText = howTo + " Come back here when it says Done.";
-        if (helperCurrent && answered && !SetupState.agentReady(this, backend)) helperText = agent
-                + " is installed but not signed in. Run " + ("codex".equals(backend) ? "codex login" : "claude")
-                + " in Termux once and sign in.";
-        boolean canSetup = a11y && perm;
-        steps[2] = step("Set up the Termux helper", helperText, canSetup ? helperOk : null,
-                canSetup && !helperOk ? "Copy setup command" : null, v -> copySetupCommand(),
-                canSetup && !helperOk ? "Check again" : null, v -> ping());
+        boolean signed = SetupState.signedIn(this, backend);
+        steps[2] = step("Sign in", signed ? "Signed in" + (acc.email.isEmpty() ? "." : " as " + acc.email + ".")
+                        : (acc.claude() ? "With your Claude account (Pro or Max)." : "With your ChatGPT account.")
+                        + " Your browser opens; approve there and Buddy comes back by itself.",
+                installed ? signed : null, installed && !signed ? "Sign in" : null, v -> openAgent(backend), null, null);
 
         PowerManager pm = getSystemService(PowerManager.class);
         boolean buddyBg = pm.isIgnoringBatteryOptimizations(getPackageName());
-        boolean termuxBg = termux && pm.isIgnoringBatteryOptimizations(Termux.PACKAGE);
-        steps[3] = step("Let Buddy and Termux run in the background",
-                "So your phone doesn't stop them to save battery. Buddy: " + (buddyBg ? "allowed" : "not yet")
-                        + " · Termux: " + (termuxBg ? "allowed" : "not yet")
-                        + (termuxBg ? "" : ". For Termux, open its settings → Battery → Unrestricted."),
-                buddyBg && termuxBg,
-                buddyBg ? null : "Allow for Buddy", v -> startActivity(new Intent(
+        steps[3] = step("Let Buddy run in the background", buddyBg ? "Allowed."
+                        : "So your phone doesn't stop Buddy to save battery while the agent works.",
+                buddyBg, buddyBg ? null : "Allow", v -> startActivity(new Intent(
                         Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + getPackageName()))),
-                termuxBg || !termux ? null : "Termux settings", v -> openAppInfo(Termux.PACKAGE));
+                null, null);
 
         boolean replied = Prefs.hadReply(this);
         steps[4] = step("Try it", replied
                         ? "Buddy has answered you. Tap the bubble anytime to ask for more."
-                        : a11y && perm && helperOk
+                        : a11y && signed
                         ? "Tap the bubble on the edge of your screen and ask something like \"open Messenger\", or start a chat here."
                         : "Finish the steps above first.",
                 replied ? Boolean.TRUE : null, null, null, null, null);
@@ -205,10 +170,8 @@ public class SetupActivity extends Screen {
         LinearLayout ag = card();
         ag.setPadding(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
         ag.addView(title(this, "Default brain", 15));
-        TextView brainInfo = text(this, "Who answers new chats from the bubble or the New chat button. Claude Code uses your Claude plan; "
-                + "Codex uses your ChatGPT plan."
-                + (answered ? " Installed in Termux: " + (hasClaude && hasCodex ? "both" : hasClaude ? "Claude Code"
-                : hasCodex ? "Codex" : "neither") + "." : ""), 13, MUTED);
+        TextView brainInfo = text(this, "Who answers new chats from the bubble or the New chat button. Claude Code uses "
+                + "your Claude plan; Codex uses your ChatGPT plan.", 13, MUTED);
         brainInfo.setPadding(0, dp(this, 2), 0, 0);
         ag.addView(brainInfo);
         ag.addView(segmented(this, new String[][]{{"claude", "Claude Code"}, {"codex", "Codex"}}, backend, false, v -> {
@@ -217,6 +180,7 @@ public class SetupActivity extends Screen {
                     + ". You can pick per chat with the New chat button.", Toast.LENGTH_LONG).show();
             render();
         }), topGap(12));
+        for (String a : new String[]{"claude", "codex"}) ag.addView(agentRow(a), topGap(a.equals("claude") ? 12 : 4));
         addCard(ag);
 
         // ----------------------------------------------------------- experience
@@ -237,7 +201,7 @@ public class SetupActivity extends Screen {
                 }), full());
         ex.addView(divider(), lineParams());
         final boolean dev = Prefs.devMode(this);
-        ex.addView(switchRow(this, "Developer mode", "The bubble's agent may run Termux commands and edit files in "
+        ex.addView(switchRow(this, "Developer mode", "The bubble's agent may run commands and edit files in "
                 + "~/.buddy/work, so it can build and install apps.", dev, on -> {
             Prefs.setDevMode(this, on);
             render();
@@ -258,66 +222,6 @@ public class SetupActivity extends Screen {
             ex.addView(warn, wp);
         }
         addCard(ex);
-
-        // ---------------------------------------------- built-in Linux (experimental)
-        list.addView(sectionLabel(this, "Built-in Linux (experimental)"));
-        LinearLayout lx = card();
-        LinearLayout lr = listRow(this);
-        lr.setGravity(Gravity.CENTER_VERTICAL);
-        lr.setPadding(dp(this, 16), dp(this, 14), dp(this, 12), dp(this, 14));
-        lr.addView(agentTile(this, "claude"));
-        LinearLayout lt = column(this);
-        lt.setPadding(dp(this, 14), 0, dp(this, 8), 0);
-        lt.addView(title(this, "Claude Code in Buddy", 15));
-        lt.addView(text(this, "Install and sign in without Termux", 13, MUTED));
-        lr.addView(lt, weight1());
-        lr.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
-        lr.setOnClickListener(v -> startActivity(new Intent(this, ClaudeSignInActivity.class)));
-        lx.addView(lr, full());
-        addCard(lx);
-
-        // ------------------------------------------------------- remote control
-        list.addView(sectionLabel(this, "Remote control"));
-        LinearLayout rc = card();
-        rc.setPadding(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));
-        rc.addView(text(this, "Per session, never global: in a Claude Code chat, tap the phone button to reopen that chat "
-                + "in a Termux tab with Remote Control on for that session only, so you can continue it from the Claude app. "
-                + "Type /exit there when done; the tab closes.", 14, MUTED));
-        addCard(rc);
-
-        // ---------------------------------------------------------- phone tools
-        list.addView(sectionLabel(this, "Phone tools in your own sessions"));
-        LinearLayout pt = card();
-        pt.setPadding(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
-        pt.addView(text(this, "Run this in Termux once. Then that agent gets the phone tools in every session, "
-                + "even without the bubble.", 14, MUTED));
-        pt.addView(segmented(this, new String[][]{{"claude", "claude"}, {"codex", "codex"}}, mcpAgent, true, v -> {
-            mcpAgent = v;
-            render();
-        }), topGap(12));
-        String token = Prefs.token(this);
-        String url = "http://127.0.0.1:" + McpServer.PORT + "/mcp";
-        final String cmd = "codex".equals(mcpAgent)
-                // Codex reads the bearer token from an environment variable, so save it in ~/.bashrc too.
-                ? "codex mcp add phone --url " + url + " --bearer-token-env-var BUDDY_TOKEN"
-                + " && echo 'export BUDDY_TOKEN=" + token + "' >> ~/.bashrc && export BUDDY_TOKEN=" + token
-                : "claude mcp add --transport http -s user phone " + url
-                + " --header \"Authorization: Bearer " + token + "\"";
-        // the token is masked on screen so screenshots never leak it
-        pt.addView(codeBlock(this, cmd.replace(token, token.substring(0, 4) + "••••••••")), topGap(12));
-        Button copy = button(this, "Copy command", false);
-        copy.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ms_content_copy, 0, 0, 0);
-        copy.setCompoundDrawableTintList(android.content.res.ColorStateList.valueOf(TEXT));
-        copy.setCompoundDrawablePadding(dp(this, 8));
-        copy.setOnClickListener(v -> {
-            ClipboardManager cm = getSystemService(ClipboardManager.class);
-            cm.setPrimaryClip(ClipData.newPlainText("Buddy MCP", cmd));
-            Toast.makeText(this, "Copied. Paste it in Termux.", Toast.LENGTH_SHORT).show();
-        });
-        LinearLayout.LayoutParams cpp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 44));
-        cpp.topMargin = dp(this, 12);
-        pt.addView(copy, cpp);
-        addCard(pt);
 
         TextView ver = monoText(this, "buddy " + BuildInfo.VERSION + " · " + getPackageName(), 12, MUTED);
         ver.setGravity(Gravity.CENTER);
@@ -585,18 +489,29 @@ public class SetupActivity extends Screen {
         return p;
     }
 
-    /** Copies the Termux setup one-liner and opens Termux so the user can paste it. */
-    private void copySetupCommand() {
-        try {
-            ClipboardManager cm = getSystemService(ClipboardManager.class);
-            cm.setPrimaryClip(ClipData.newPlainText("Buddy setup", TermuxSetup.command(this)));
-        } catch (Exception e) {
-            Toast.makeText(this, "Couldn't build the setup command: " + e.getMessage(), Toast.LENGTH_LONG).show();
-            return;
-        }
-        Toast.makeText(this, "Copied. In Termux: long-press → Paste, then Enter.", Toast.LENGTH_LONG).show();
-        Intent termux = getPackageManager().getLaunchIntentForPackage(Termux.PACKAGE);
-        if (termux != null) startActivity(termux);
+    private void openAgent(String agent) {
+        startActivity(new Intent(this, SignInActivity.class).putExtra("agent", agent));
+    }
+
+    /** An agent with its state (not installed / signed out / signed in); tap to install or sign in. */
+    private View agentRow(String agent) {
+        Account a = Account.of(agent);
+        String st = Prefs.agentState(this, agent);
+        boolean busy = a.step == Account.Step.INSTALLING;
+        String state = busy ? "installing…" : !Linux.installed(this) || st == null || "NEED_INSTALL".equals(st) ? "not installed"
+                : "SIGNED_IN".equals(st) ? "signed in" + (a.email.isEmpty() ? "" : " · " + a.email) : "not signed in";
+        LinearLayout r = row(this);
+        r.setPadding(0, dp(this, 10), 0, dp(this, 10));
+        r.setBackgroundResource(ripple(this, false));
+        r.addView(agentTile(this, agent));
+        LinearLayout t = column(this);
+        t.setPadding(dp(this, 12), 0, dp(this, 8), 0);
+        t.addView(title(this, a.name(), 15));
+        t.addView(single(monoText(this, state, 12, "SIGNED_IN".equals(st) && !busy ? OK : MUTED)));
+        r.addView(t, weight1());
+        r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
+        r.setOnClickListener(v -> openAgent(agent));
+        return r;
     }
 
     private void openAppInfo(String pkg) {
