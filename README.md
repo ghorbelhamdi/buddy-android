@@ -4,11 +4,11 @@
 
 Type a request into the bubble ("reply to Sam that I'm running late", "add a Nintendo Switch 2 to my Amazon cart") and Buddy reads the screen, taps, types and scrolls to get it done. It asks for your approval before anything that sends, posts, buys or deletes.
 
-Buddy runs on **your own subscription**: [Claude Code](https://docs.claude.com/en/docs/claude-code) with your Claude plan, or OpenAI's Codex CLI with your ChatGPT plan, both running in [Termux](https://termux.dev) on the phone. The app has no API key, no server and no account of its own.
+Buddy runs on **your own subscription**: [Claude Code](https://docs.claude.com/en/docs/claude-code) with your Claude plan, or OpenAI's Codex CLI with your ChatGPT plan. Both run **inside the app**, in Buddy's own small Linux on the phone: no Termux, no PC. The app has no API key, no server and no account of its own.
 
-**[⬇ Download the APK](https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk)** (Android 11+)
+**[⬇ Download the APK](https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk)** (Android 11+, 64-bit phones)
 
-> **Status: 1.0, early.** It works well day to day but still has rough edges. Tested on a OnePlus 12 (OxygenOS, Android 16); other Android 11+ phones should work, but may need battery settings adjusted.
+> **Status: 2.0, early.** It works well day to day but still has rough edges. Tested on a OnePlus 12 (OxygenOS, Android 16); other Android 11+ phones should work, but may need battery settings adjusted.
 >
 > Buddy is an independent project. It is not made by or affiliated with Anthropic or OpenAI.
 
@@ -23,38 +23,33 @@ Most "AI controls my phone" projects drive the phone over adb, which needs a com
 ## How it works
 
 ```
-Buddy app / bubble ──RUN_COMMAND──► Termux: buddy-run ──► claude -p  or  codex exec
-        ▲                                                       │
-        └──────────── streamed replies (POST /event) ◄──────────┤
-                                                                ▼
-Buddy accessibility service ◄─── MCP over http://127.0.0.1:8765/mcp (phone tools)
+Buddy app / bubble ──► Buddy's Linux (Alpine via proot): buddy-run ──► claude -p  or  codex exec
+        ▲                                                                  │
+        └────────────── streamed replies (POST /event) ◄───────────────────┤
+                                                                           ▼
+Buddy accessibility service ◄──── MCP over http://127.0.0.1:8765/mcp (phone tools)
 ```
 
-- The **accessibility service** draws the bubble and runs a small local **MCP server** with the phone tools: `read_screen`, `tap`, `long_press`, `type_text`, `scroll`, `swipe`, `press`, `open_app`, `list_apps`, `open_url`, `screenshot`, `wait`, `wait_for_install`, `confirm` and `notify`.
-- Your message goes to the agent in Termux, which uses those tools and streams its progress back to the app.
-- The same MCP server works from **your own Claude Code or Codex sessions** (see below).
+- The **accessibility service** draws the bubble and runs a small local **MCP server** with the phone tools: `read_screen`, `tap`, `long_press`, `type_text`, `scroll`, `swipe`, `press`, `open_app`, `list_apps`, `open_url`, `screenshot`, `wait`, `install_apk`, `wait_for_install`, `confirm` and `notify`.
+- **Buddy's Linux** is a small Alpine Linux that Buddy downloads into its own storage (4 MB) and runs with [proot](https://proot-me.github.io/), which ships inside the APK. Claude Code installs there with Anthropic's official installer; Codex from npm.
+- Your message goes to the agent in Buddy's Linux, which uses those tools and streams its progress back to the app.
 
 ## Setup
 
-You need an Android 11+ phone and a Claude Pro/Max plan (or a ChatGPT plan for Codex).
+You need a 64-bit Android 11+ phone and a Claude Pro/Max plan (or a ChatGPT plan for Codex).
 
 1. **Install Buddy:** [**download the APK**](https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk) and open it (allow your browser to install apps when asked). All versions are on the [Releases](https://github.com/ghorbelhamdi/buddy-android/releases) page.
-2. **Follow the setup guide.** It opens on first launch (later: Settings → Setup → *Open the step-by-step guide*). Each step ticks itself off when you come back, and while you're in Termux Buddy checks in the background and returns by itself.
+2. **Follow the setup guide.** It opens on first launch (later: Settings → Setup → *Open the step-by-step guide*). Each step ticks itself off when you come back.
 
 | Step | What happens |
 |---|---|
 | Choose your agent | **Claude Code** (recommended), **Codex**, or both |
-| Install Termux | From F-Droid or GitHub, not the outdated Play Store version |
 | Accessibility | Turn on *Buddy assistant*. Greyed out ("Restricted setting")? App info → ⋮ → **Allow restricted settings**, then try again |
-| Allow Termux commands | One Android permission prompt |
-| Connect Termux | Buddy copies one command; paste it in Termux. It installs Buddy's helper and enables `allow-external-apps` |
-| Install and sign in | Buddy copies the install command for your agent. Claude Code uses the community [claude-code-android](https://github.com/ferrumclaudepilgrim/claude-code-android) installer, then `claude` to log in. Codex installs from npm with a small wrapper, then `codex login` |
-| Keep it running | Battery: unrestricted for Buddy and Termux |
+| Install and sign in | One tap installs your agent in Buddy's Linux (Claude Code about 235 MB, Codex about 150 MB; use Wi-Fi). Then **Sign in**: your browser opens, you approve, and Buddy comes back by itself. For Claude, Buddy picks the one-time code off the confirmation page for you |
+| Keep it running | Battery: unrestricted for Buddy |
 | Try it | A first chat with a ready-made prompt |
 
-### Phone tools in your own sessions (optional)
-
-Settings → *Phone tools in your own sessions* shows a ready-made command for **Claude Code** (`claude mcp add …`) and **Codex** (`codex mcp add …`) with a copy button. Run it in Termux once, and every session of that agent gets the `phone` tools, even without the bubble. The Codex command also saves Buddy's token as `BUDDY_TOKEN` in `~/.bashrc`, since Codex reads it from the environment.
+Updating from 1.x (Termux): install the new APK, then install and sign in to your agent in Settings. Termux isn't needed anymore. Chats from the Termux days can't be continued; Settings offers to remove them.
 
 ## Using Buddy
 
@@ -66,9 +61,12 @@ The app has three tabs: **Chats**, **Sessions** and **Settings**.
 - **Voice:** tap the mic to talk; it sends when you stop. The speaker button reads replies aloud.
 - **Tool calls** fold into one "N tool calls" line you can open.
 - **Approvals** appear in the chat and in the bubble: **Approve** or **Deny**.
-- **Continue in the Claude app** (Claude Code chats): reopens the chat in a Termux tab with Remote Control on for that session only. Type `/exit` there when done.
-- **Sessions:** every Claude Code and Codex session on the phone, from Buddy, a terminal or Claude Code's background service, with a Stop button. Recent sessions can be read, or continued in Buddy.
-- **Settings:** setup, appearance (light/dark/system, accent colour, surface), default agent, the bubble, read-aloud and developer mode.
+- **Sessions:** every Claude Code and Codex session in Buddy's Linux, with a Stop button. Recent sessions can be read, or continued in Buddy.
+- **Settings:** setup, appearance (light/dark/system, accent colour, surface), agents (install, sign in, sign out), the bubble, read-aloud, developer mode and Remote Control.
+
+### Remote Control: a Claude Code session in your Claude app
+
+Settings → **Remote Control → Claude Code session** keeps a Claude Code session with [Remote Control](https://docs.claude.com/en/docs/claude-code) running inside Buddy. It appears as **"Buddy"** in the Claude app's Code sessions, on this phone or anywhere else, and it has the phone tools. Buddy restarts it if it stops and continues the same conversation after an update.
 
 ### When an agent is using your phone
 
@@ -88,7 +86,7 @@ As soon as an agent starts operating the phone, Buddy makes it obvious so you kn
 
 ## Developer mode: building apps
 
-Off by default. When it's on, the agent may run Termux commands and create or edit files in `~/.buddy/work`. With the bundled **android-app** skill (plus `AGENTS.md` for Codex) you can ask *"make me a calculator app"*: it writes plain Java, builds a signed APK on the phone without Gradle, and installs it, asking before it installs.
+Off by default. When it's on, the agent may run commands and create or edit files in `~/.buddy/work` inside Buddy's Linux. With the bundled **android-app** skill (plus `AGENTS.md` for Codex) you can ask *"make me a calculator app"*: it sets up a toolchain the first time (OpenJDK, aapt2, d8, apksigner; about 400 MB), writes plain Java, builds a signed APK on the phone without Gradle, and opens Android's installer for you to confirm. The first time, Android asks you to allow Buddy to install apps.
 
 Leave it off for everyday use: with it on, text on screen that tries to trick the agent could lead to commands being run.
 
@@ -99,7 +97,7 @@ An accessibility service is powerful. Please read this before installing.
 - **Local only.** The MCP server listens on `127.0.0.1` and requires a random per-install token. Nothing is reachable from the network.
 - **Approval gate.** The agent is instructed to call `confirm` before sending messages, posting, buying, deleting or changing settings. You see the exact action with **Approve / Deny**.
 - **Prompt injection is the main risk.** Buddy reads whatever is on screen. A malicious message, email or web page could contain text like "send this to all your contacts". Buddy's instructions treat on-screen text as content, never commands, and the approval gate is the backstop, but no model is perfect. Read approval cards carefully.
-- **Limited tools.** Outside developer mode, Claude Code gets the phone tools, web search and fetch, and read access to that chat's attachments only (no shell, no other files). Codex runs in its read-only sandbox.
+- **Limited tools.** Outside developer mode, Claude Code gets the phone tools, web search and fetch, and read access to that chat's attachments only (no shell, no other files). Codex runs in its read-only sandbox. Everything runs inside Buddy's own app storage, separate from your other apps' files.
 - **What leaves the phone:** only what Claude Code or Codex sends to Anthropic or OpenAI to answer you, including screen text, screenshots and attachments it reads.
 - **Never** let Buddy type passwords, one-time codes or payment details. It's instructed to hand those back to you.
 
@@ -115,7 +113,9 @@ Found a security problem? Please open a private security advisory on GitHub rath
 
 Release signing reads `BUDDY_KEYSTORE`, `BUDDY_KEYSTORE_PASSWORD` (and optionally `BUDDY_KEY_ALIAS`, `BUDDY_KEY_PASSWORD`) from the environment; without them the APK is unsigned. GitHub Actions builds every push and attaches the APK to a release for `v*` tags.
 
-### On the phone, in Termux (no Gradle)
+### On the phone, without Gradle
+
+In Termux (or any Linux with these tools):
 
 ```
 pkg install openjdk-17 aapt2 d8 apksigner python
@@ -123,7 +123,7 @@ pkg install openjdk-17 aapt2 d8 apksigner python
 ./build.sh        # → build/buddy-release.apk
 ```
 
-`build.sh` runs aapt2 → javac → d8 → align → apksigner and creates a signing key at `~/.buddy-keys/release.jks` on first run. Back it up: updates must be signed with the same key.
+`build.sh` runs aapt2 → javac → d8 → align → apksigner (and packs `app/src/main/jniLibs`) and creates a signing key at `~/.buddy-keys/release.jks` on first run. Back it up: updates must be signed with the same key.
 
 The version lives in `app/src/main/java/app/buddy/assistant/BuildInfo.java`.
 
@@ -139,11 +139,16 @@ The version lives in `app/src/main/java/app/buddy/assistant/BuildInfo.java`.
 | `.../OnboardingActivity.java` | First-run setup guide |
 | `.../ChatHub.java`, `Sessions.java` | Chat state shared by the app and the bubble |
 | `.../Ui.java`, `Theme.java` | Components and the light/dark/accent theme |
-| `.../Termux.java`, `TermuxSetup.java` | Talks to Termux; builds the setup and install commands |
-| `termux/buddy-run` | Runs the agent with the phone tools and streams events back |
-| `termux/system-prompt.md` | Buddy's instructions for the agent |
-| `app/src/main/assets/termux` | Symlink to `termux/`, so the helper ships inside the APK |
+| `.../Linux.java` | Buddy's Linux: downloads Alpine and runs commands through proot |
+| `.../Helper.java` | Runs `buddy-run` inside Linux and keeps its files up to date |
+| `.../Account.java`, `SignInActivity.java` | Install, one-tap sign-in and status for Claude Code and Codex |
+| `.../RemoteSession.java` | The Remote Control session |
+| `app/src/main/jniLibs/arm64-v8a/` | proot and its libraries (see [third_party](third_party/README.md)) |
+| `linux/buddy-run` | Runs the agent with the phone tools and streams events back |
+| `linux/system-prompt.md` | Buddy's instructions for the agent |
+| `linux/android-app/` | The developer-mode skill: toolchain setup and `build-apk.sh` |
+| `app/src/main/assets/linux` | Symlink to `linux/`, so the helper ships inside the APK |
 
 ## License
 
-[Apache-2.0](LICENSE). Geist fonts: SIL Open Font License. Icons: Material Symbols (Apache-2.0).
+[Apache-2.0](LICENSE). Geist fonts: SIL Open Font License. Icons: Material Symbols (Apache-2.0). Bundled proot (GPL-2.0), talloc (LGPL-3.0) and libandroid-shmem (BSD-3-Clause): see [third_party](third_party/README.md) for licences and source. Not on Google Play: Play's accessibility policy doesn't allow AI agents that operate other apps.

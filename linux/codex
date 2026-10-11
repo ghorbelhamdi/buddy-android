@@ -1,6 +1,0 @@
-#!/data/data/com.termux/files/usr/bin/bash
-# Codex's linux-arm64 (musl) binary looks for /etc/resolv.conf and /etc/ssl, which Android
-# doesn't have. proot maps Termux's copies there so DNS and TLS work.
-P=/data/data/com.termux/files/usr
-BIN=$(npm root -g 2>/dev/null)/@openai/codex/node_modules/@openai/codex-linux-arm64/vendor/aarch64-unknown-linux-musl/bin/codex
-exec proot -b "$P/etc/resolv.conf:/etc/resolv.conf" -b "$P/etc/tls:/etc/ssl" "$BIN" "$@"

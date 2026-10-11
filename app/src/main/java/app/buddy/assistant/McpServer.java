@@ -24,7 +24,7 @@ import java.util.concurrent.Executors;
 
 /**
  * Minimal MCP server (Streamable HTTP, JSON responses only) bound to 127.0.0.1.
- * Also accepts POST /event from the Termux helper to stream Claude Code output to the bubble.
+ * Also accepts POST /event from the helper in Buddy's Linux to stream Claude Code output to the bubble.
  * Every request must carry "Authorization: Bearer <token>".
  */
 final class McpServer {
@@ -152,7 +152,7 @@ final class McpServer {
                 // No server-initiated SSE stream.
                 send(out, 405, null, null);
             } else if (path.startsWith("/file/") && "GET".equals(method)) {
-                // an attachment, fetched by the Termux helper before the agent runs
+                // an attachment, fetched by the helper before the agent runs
                 java.io.File f = handler.attachment(path.substring(6));
                 if (f == null || !f.isFile()) send(out, 404, null, null);
                 else sendFile(out, f);

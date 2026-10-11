@@ -31,7 +31,7 @@ final class Prefs {
         return new int[]{sp(c).getInt("bx", -1), sp(c).getInt("by", 400)};
     }
 
-    /** Agents installed in Termux from the last helper ping ("claude,codex", "none"), or null if never answered. */
+    /** Agents installed in Buddy's Linux from the last helper ping ("claude,codex", "none"), or null if never answered. */
     static String helperStatus(Context c) {
         return sp(c).getString("helper", null);
     }
@@ -132,7 +132,7 @@ final class Prefs {
         sp(c).edit().putString("signed", s).apply();
     }
 
-    /** Codex's model list from its cache in Termux, as JSON [[slug, name], …]. */
+    /** Codex's model list from its cache in Buddy's Linux, as JSON [[slug, name], …]. */
     static String codexModels(Context c) {
         return sp(c).getString("codex_models", "[]");
     }
@@ -167,7 +167,7 @@ final class Prefs {
         sp(c).edit().putString("agents", a).apply();
     }
 
-    /** Until when the service keeps checking Termux while the user is there during setup (ms epoch). */
+    /** Unused since Buddy has its own Linux (was: Termux setup watch). */
     static long setupWatchUntil(Context c) {
         return sp(c).getLong("watch_until", 0);
     }

@@ -321,6 +321,6 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
     }
 
     static String shortPath(String p) {
-        return p.replace("/data/data/com.termux/files/home", "~");
+        return p.replaceFirst("^/root(?=/|$)", "~");
     }
 }

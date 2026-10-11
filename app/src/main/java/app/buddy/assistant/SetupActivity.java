@@ -302,6 +302,11 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         ver.setGravity(Gravity.CENTER);
         ver.setPadding(0, dp(this, 24), 0, 0);
         list.addView(ver, full());
+        TextView lic = text(this, "Open-source licences", 13, ACCENT_TEXT);
+        lic.setGravity(Gravity.CENTER);
+        lic.setPadding(0, dp(this, 8), 0, dp(this, 8));
+        lic.setOnClickListener(v -> licences());
+        list.addView(lic, full());
     }
 
     // ------------------------------------------------------------- setup card
@@ -573,6 +578,33 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             if (!s.messages.isEmpty() && !s.running && !new java.io.File(dir, s.id).isDirectory()) out.add(s);
         }
         return out;
+    }
+
+    /** The bundled components (third_party/ in the repo, packed into the APK) and their licence texts. */
+    private void licences() {
+        StringBuilder sb = new StringBuilder();
+        for (String f : new String[]{"README.md", "proot-LICENSE.txt", "talloc-LICENSE.txt", "libandroid-shmem-LICENSE.txt"}) {
+            try (java.io.InputStream in = getAssets().open("third_party/" + f)) {
+                java.io.ByteArrayOutputStream o = new java.io.ByteArrayOutputStream();
+                byte[] buf = new byte[8192];
+                int n;
+                while ((n = in.read(buf)) > 0) o.write(buf, 0, n);
+                if (sb.length() > 0) sb.append("\n\n──────── ").append(f).append(" ────────\n\n");
+                sb.append(o.toString("UTF-8"));
+            } catch (Exception ignored) {
+            }
+        }
+        ScrollView sv = new ScrollView(this);
+        TextView t = monoText(this, sb.toString(), 11, TEXT);
+        t.setTextIsSelectable(true);
+        sv.addView(t);
+        LinearLayout c = column(this);
+        c.addView(title(this, "Open-source licences", 18));
+        LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                (int) (getResources().getDisplayMetrics().heightPixels * 0.6f));
+        sp.topMargin = dp(this, 10);
+        c.addView(sv, sp);
+        bottomSheet(this, c).show();
     }
 
     private void openAgent(String agent) {

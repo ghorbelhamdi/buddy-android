@@ -18,7 +18,7 @@ import java.security.SecureRandom;
 import java.util.Locale;
 
 /**
- * Photos and files attached to chat messages. They live in the app's own storage; the Termux helper
+ * Photos and files attached to chat messages. They live in the app's own storage; the helper in Buddy's Linux
  * fetches them over the local server (GET /file/&lt;id&gt;) right before the agent runs.
  */
 final class Attachments {
