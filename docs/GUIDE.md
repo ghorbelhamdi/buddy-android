@@ -73,6 +73,15 @@ Settings → **Remote Control → SSH from Termux** runs an SSH server (OpenSSH)
 
 As soon as an agent starts operating the phone, Buddy makes it obvious so you know not to touch it: the bubble turns into a solid **"Using your phone"** pill (hold the bubble for **Pause** or **Stop task**; it shows even if you've hidden the bubble), and a status-bar notification appears (a Live Update chip on Android 16 where supported). **Stop** ends Buddy's chats and refuses phone actions from any session for a minute. **Pause** lets you use the phone in the middle of a task: the agent's next phone action waits until you tap the **Paused** pill next to the bubble (or hold the bubble and tap **Resume**), then it re-reads the screen before going on. Buddy also pauses on its own when you take the phone back: you touch the screen outside the bubble, or a call rings or starts (a phone call, or one in an app like WhatsApp or Messenger). The bubble's face shows it's paused, and after a call a notification offers **Resume** too; nothing resumes by itself. Touches while a question or approval card waits don't pause (the agent re-reads the screen after your answer), and neither do touches while only notification rules are running. Stop while paused ends the task without that action running, and a pause longer than 5 minutes stops the task.
 
+### Background browser
+
+*GitHub version only, for now.* Turn on **Settings → Background browser**: the first time, Buddy downloads Chromium into its Linux (about 300 MB). Agents then use this browser for web pages (looking things up, comparing prices, checking a page) without taking over your screen, also while the phone is locked; for your own accounts and apps they still use the phone. It starts when an agent needs it and stops after 10 minutes unused.
+
+- **Live view.** A chat that uses it shows the page live above the messages; tap it full screen to use it yourself, with an address bar. Touching it while the agent works pauses the agent until you tap **Continue** or write to it.
+- **The same approvals.** Buttons like Post, Send, Buy, Pay and Delete get Buddy's approval card, as on the phone. Agents never type into password, code or card fields.
+- **Your part, marked.** When a page needs you (a sign-in, a captcha, your details), the agent asks, and Buddy opens the browser full screen with the fields and buttons marked; it closes again when you tap **Done**.
+- **Sign-ins.** To let agents use a site with your account, open the browser and sign in yourself. **Signed-in sites** lists the sites you signed in to, each with **Log out**; **Wipe browser data** clears everything. "Continue with Google" often fails in automated browsers: use email and password.
+
 ### The bubble
 
 | | |

@@ -44,6 +44,7 @@ https://github.com/user-attachments/assets/d07936fc-4788-4ab5-a105-31b3e9aeba4f
 | **Shows you how** | "Show me how to turn on dark mode": it points at each step and waits for your tap. |
 | **Acts on notifications** | "When a customer asks on WhatsApp, reply with our opening hours", with your OK or a countdown you can stop. |
 | **Voice** | Talk to it and have replies read aloud. |
+| **Background browser** | Web pages in a browser inside Buddy, without taking over your screen, even while the phone is locked. Watch and use it live in the chat; it marks what you need to do (sign in, a captcha) and never types your passwords. GitHub version. |
 | **Builds apps** | In developer mode, "make me a calculator app" builds and installs a real APK on the phone. |
 | **Phone tools anywhere** | The same tools as a local MCP server for your own Claude Code, Codex, OpenCode or Antigravity sessions. |
 
