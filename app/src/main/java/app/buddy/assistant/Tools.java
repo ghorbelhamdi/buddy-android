@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.ViewConfiguration;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.AccessibilityWindowInfo;
 
@@ -38,9 +39,11 @@ final class Tools {
     private final BuddyService svc;
     private final Object lock = new Object();
     private final List<AccessibilityNodeInfo> lastNodes = new ArrayList<>();
+    private final BrowserTools browser;
 
     Tools(BuddyService svc) {
         this.svc = svc;
+        browser = new BrowserTools(svc);
     }
 
     // ---------------------------------------------------------------- schema
@@ -118,6 +121,16 @@ final class Tools {
                                 + "every mark is a button or a switch, Buddy closes the question itself once it sees "
                                 + "them done (the result starts with DONE).")),
                 "question", "options"));
+        if (!Flavor.PLAY) { // the background browser's items, for a step the user does there (see BrowserTools)
+            JSONObject item = new JSONObject().put("type", "object").put("properties", props()
+                    .put("ref", intProp("The item's number from browser_read"))
+                    .put("label", strProp("A few words shown next to it, e.g. \"Your password\"")));
+            t.getJSONObject(t.length() - 1).getJSONObject("inputSchema").getJSONObject("properties").put("browser_highlight",
+                    new JSONObject().put("type", "array").put("maxItems", 6).put("items", item).put("description",
+                            "Optional, instead of highlight: items in the background browser the user has to use (a "
+                                    + "sign-in, a captcha, their details). Buddy opens the browser full screen with them "
+                                    + "marked, and closes it once the user answers."));
+        }
         t.put(tool("point_out",
                 "Show the user where to look or what to do on the screen: a box, circle or arrow with a short label "
                         + "around up to 6 elements, drawn over the app without blocking their touches. When the user does "
@@ -162,6 +175,7 @@ final class Tools {
                             .put("timeout_s", intProp("Default 120, max 300")),
                     "package"));
         }
+        if (Browser.available(svc)) BrowserTools.list(t); // the background browser (Settings)
         return t;
     }
 
@@ -225,6 +239,18 @@ final class Tools {
     private JSONObject call0(String name, JSONObject a) throws Exception {
         String revoked = svc.controlRevoked();
         if (revoked != null && !"notify".equals(name)) return text(revoked);
+        if (name.startsWith("browser_")) { // the background browser: it doesn't need the phone's screen
+            svc.onToolActivity(name);
+            return browser.call(name, a);
+        }
+        // locked or dark, the screen shows nothing to read or tap: say so instead of acting blind
+        if (SCREEN.contains(name) && Triggers.locked(svc)) {
+            return text(Browser.available(svc) && !ruleRun()
+                    ? "Phone is locked: only notification replies and the background browser work until the user unlocks. "
+                    + "For web pages use the browser_* tools; for anything else, tell the user to unlock the phone."
+                    : "Phone is locked: only notification replies work until the user unlocks. Tell the user to unlock "
+                    + "the phone, or stop here.");
+        }
         // asking the user, posting a note, pointing something out and answering in a notification go on while paused;
         // operating the phone waits
         if (!"confirm".equals(name) && !"ask".equals(name) && !"notify".equals(name) && !"reply_notification".equals(name)
@@ -277,6 +303,8 @@ final class Tools {
                     if (!v.isEmpty() && !options.contains(v)) options.add(v);
                 }
                 if (options.size() < 2) return text("Give 2 to 4 options. The user can always type their own answer.");
+                JSONArray inBrowser = a.optJSONArray("browser_highlight");
+                if (inBrowser != null && inBrowser.length() > 0) return text(askInBrowser(a.getString("question"), options, inBrowser));
                 List<Marks.Mark> marks = marks(a.optJSONArray("highlight"));
                 // when every mark is a tap or a switch, seeing them all done answers the question; typing has no clear
                 // end, so a question with a field waits for the user's answer
@@ -309,6 +337,41 @@ final class Tools {
             default:
                 throw new IllegalArgumentException("Unknown tool " + name);
         }
+    }
+
+    /**
+     * ask with browser_highlight: the background browser opens full screen with the items marked, the question waits
+     * next to the bubble, and the browser closes again once the user answers.
+     */
+    private String askInBrowser(String question, List<String> options, JSONArray items) throws Exception {
+        String key = Browser.key(McpServer.CALLER_CHAT.get());
+        if (Flavor.PLAY || !Browser.available(svc) || !Browser.running() || !Browser.hasTab(key)) {
+            return "The background browser has no page open for you: use browser_open first, or highlight instead.";
+        }
+        JSONArray m = new JSONArray();
+        for (int i = 0; i < items.length() && m.length() < 6; i++) {
+            JSONObject it = items.optJSONObject(i);
+            if (it != null && it.has("ref")) m.put(new JSONObject().put("ref", it.getInt("ref")).put("label", it.optString("label")));
+        }
+        if (m.length() == 0) return "Give browser_highlight as [{\"ref\": 12, \"label\": \"Your password\"}].";
+        Browser.setMarks(key, m);
+        JSONArray boxes = Browser.markBoxes(key, true);
+        for (int i = 0; boxes != null && i < boxes.length(); i++) {
+            if (boxes.isNull(i)) {
+                Browser.setMarks(key, null);
+                return "There's no item [" + m.getJSONObject(i).getInt("ref") + "] on the page now. Call browser_read again.";
+            }
+        }
+        svc.runOnMain(() -> svc.startActivity(new Intent(svc, BrowserActivity.class).putExtra("key", key)
+                .putExtra("guided", true).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)));
+        String answer;
+        try {
+            answer = svc.askQuestion(question, options, true, null);
+        } finally {
+            Browser.setMarks(key, null); // closes the browser Buddy opened for it
+        }
+        Browser.touched(key);
+        return answer.replace("call read_screen before going on", "call browser_read before going on");
     }
 
     /** update_buddy, install_apk and wait_for_install. */
@@ -385,6 +448,11 @@ final class Tools {
         }
         for (int i = 0; depth > 0 && i < n.getChildCount(); i++) findCheckable(n.getChild(i), depth - 1, out);
     }
+
+    /** Tools that need the screen: they can't work while the phone is locked or its screen is off. */
+    private static final java.util.Set<String> SCREEN = new java.util.HashSet<>(java.util.Arrays.asList(
+            "read_screen", "tap", "long_press", "type_text", "scroll", "swipe", "press", "open_app", "open_url",
+            "screenshot", "point_out"));
 
     /** Tools that act on the screen: the point_out marks go first, as the screen is about to change. */
     private static final java.util.Set<String> ACTIONS = new java.util.HashSet<>(java.util.Arrays.asList(
@@ -463,6 +531,8 @@ final class Tools {
             }
             if (answer.startsWith("CHANGES")) return "Not sent: the user wants changes first. " + answer;
             if (!answer.startsWith("APPROVED")) return "Not sent. " + answer;
+            String revoked = svc.controlRevoked(); // Stop while the card was up
+            if (revoked != null) return "Not sent. " + revoked;
         }
         if (Triggers.userAnswered(chat)) return answeredItself(n); // they may have, while the card waited
         if (Triggers.wroteAgain(chat)) return wroteAgain(chat, n);
@@ -821,26 +891,51 @@ final class Tools {
         }
         int cx = r.centerX(), cy = r.centerY();
         int dy = (int) (r.height() * 0.35), dx = (int) (r.width() * 0.35);
-        Path p = new Path();
+        int[] xy; // from x, y to x, y
         switch (dir) {
-            case "down": p.moveTo(cx, cy + dy); p.lineTo(cx, cy - dy); break;
-            case "up": p.moveTo(cx, cy - dy); p.lineTo(cx, cy + dy); break;
-            case "right": p.moveTo(cx + dx, cy); p.lineTo(cx - dx, cy); break;
-            case "left": p.moveTo(cx - dx, cy); p.lineTo(cx + dx, cy); break;
+            case "down": xy = new int[]{cx, cy + dy, cx, cy - dy}; break;
+            case "up": xy = new int[]{cx, cy - dy, cx, cy + dy}; break;
+            case "right": xy = new int[]{cx + dx, cy, cx - dx, cy}; break;
+            case "left": xy = new int[]{cx - dx, cy, cx + dx, cy}; break;
             default: throw new IllegalArgumentException("direction must be up, down, left or right");
         }
-        gesture(p, 350);
+        String blocked = guardStroke(n, xy);
+        if (blocked != null) return blocked;
+        Path p = new Path();
+        p.moveTo(xy[0], xy[1]);
+        p.lineTo(xy[2], xy[3]);
+        boolean ok = gesture(p, 350);
         Thread.sleep(400);
-        return "Scrolled " + dir + ". Call read_screen to see the new content.";
+        return ok ? "Scrolled " + dir + ". Call read_screen to see the new content." : "Scroll was cancelled.";
     }
 
     private String swipe(JSONObject a) throws Exception {
+        int x1 = a.getInt("x1"), y1 = a.getInt("y1"), x2 = a.getInt("x2"), y2 = a.getInt("y2");
+        // A stroke too short to scroll anything lands as a tap, so it gets every check a tap gets
+        int slop = ViewConfiguration.get(svc).getScaledTouchSlop();
+        boolean tap = Math.hypot(x2 - x1, y2 - y1) <= slop;
+        String blocked = tap ? guard(null, Guard.nodeAt(svc.getWindows(), x1, y1)) : guardStroke(null, x1, y1, x2, y2);
+        if (blocked != null) return blocked;
         Path p = new Path();
-        p.moveTo(a.getInt("x1"), a.getInt("y1"));
-        p.lineTo(a.getInt("x2"), a.getInt("y2"));
+        p.moveTo(x1, y1);
+        p.lineTo(x2, y2);
         long d = Math.max(50, Math.min(3000, a.optLong("duration_ms", 300)));
         boolean ok = gesture(p, d);
         return ok ? "Swiped." : "Swipe was cancelled.";
+    }
+
+    /**
+     * The checks every touch gets, for a scroll or swipe (element: what it was aimed at, may be null; then the
+     * points it touches): no touching while a card waits, and never on Buddy's own screens. null when it may go.
+     */
+    private String guardStroke(AccessibilityNodeInfo element, int... xy) {
+        if (svc.bubble() != null && svc.bubble().confirming()) {
+            return "BLOCKED: a card is waiting for the user's answer. Wait for it; don't touch the screen.";
+        }
+        boolean off = element != null && Guard.offLimits(svc, element);
+        List<AccessibilityWindowInfo> windows = svc.getWindows();
+        for (int i = 0; !off && i + 1 < xy.length; i += 2) off = Guard.offLimits(svc, Guard.nodeAt(windows, xy[i], xy[i + 1]));
+        return off ? "BLOCKED: that's one of Buddy's own screens. Only the user touches those." : null;
     }
 
     private boolean gesture(Path path, long durationMs) throws InterruptedException {
@@ -924,6 +1019,9 @@ final class Tools {
         }
         String best = top.get(0)[0];
         String bestLabel = top.get(0)[1];
+        // Buddy's own screens hold the safety settings: only the user opens them (unless they let agents in)
+        if (best.equals(svc.getPackageName()) && !Prefs.agentsTapBuddy(svc))
+            return "BLOCKED: agents can't open Buddy itself. Only the user uses Buddy's screens.";
         Intent launch = pm.getLaunchIntentForPackage(best);
         if (launch == null) return "App " + bestLabel + " cannot be launched.";
         launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
@@ -1062,6 +1160,10 @@ final class Tools {
 
     private String openUrl(String url) throws InterruptedException {
         Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        ResolveInfo to = svc.getPackageManager().resolveActivity(i, 0);
+        if (to != null && to.activityInfo != null && svc.getPackageName().equals(to.activityInfo.packageName)
+                && !Prefs.agentsTapBuddy(svc))
+            return "BLOCKED: that link opens Buddy itself. Only the user uses Buddy's screens.";
         svc.startActivity(i);
         Thread.sleep(1500);
         return "Opened " + url + ". Call read_screen to see it.";

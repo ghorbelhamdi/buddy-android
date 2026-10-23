@@ -134,7 +134,8 @@ final class ChatHub {
         if (text.isEmpty() && !hasFiles) return null;
         String forAgent = prompt != null ? prompt : text.isEmpty() && hasFiles ? "Have a look at what I attached." : text;
         BuddyService svc = BuddyService.get();
-        if (svc != null) svc.allowControl();
+        // only the user's own message lifts a Stop: a queued rule run must not undo it
+        if (svc != null && prompt == null) svc.allowControl();
         try {
             // a rule's run works for someone else's message: no shell, files or web, even in developer mode
             Helper.run(app, "ask", ses.id, ses.backend, prompt != null ? "rule" : Prefs.devMode(app) ? "1" : "0", forAgent,
@@ -358,6 +359,9 @@ final class ChatHub {
         text = text == null ? "" : text.trim();
         if (text.isEmpty()) return null;
         if (!ses.running) return send(ses, text, null);
+        // writing to the agent while paused in the browser's live view: the user is done there
+        BuddyService svc = BuddyService.get();
+        if (svc != null && svc.pausedForBrowser()) svc.resume();
         synchronized (ses.notes) {
             ses.notes.add(text);
         }
@@ -561,6 +565,14 @@ final class ChatHub {
             case "update_buddy": return BuddyApp.str(in.optBoolean("install") ? R.string.hub_tool_update_download : R.string.hub_tool_update_check);
             case "notify": return in.optString("text");
             case "reply_notification": return BuddyApp.str(R.string.hub_tool_reply_notification, clip(in.optString("text"), 40));
+            case "browser_open": return BuddyApp.str(R.string.hub_tool_browser_open, clip(in.optString("url"), 40));
+            case "browser_read": return BuddyApp.str(R.string.hub_tool_browser_read);
+            case "browser_click": return BuddyApp.str(R.string.hub_tool_browser_click, in.optInt("ref"));
+            case "browser_type": return BuddyApp.str(R.string.hub_tool_browser_type, clip(in.optString("text"), 40));
+            case "browser_scroll": return BuddyApp.str(R.string.hub_tool_browser_scroll);
+            case "browser_screenshot": return BuddyApp.str(R.string.hub_tool_browser_screenshot);
+            case "browser_back": return BuddyApp.str(R.string.hub_tool_browser_back);
+            case "browser_tabs": return BuddyApp.str(R.string.hub_tool_browser_tabs);
             case "WebSearch": return BuddyApp.str(R.string.hub_tool_web_search, clip(in.optString("query"), 40));
             case "WebFetch": return BuddyApp.str(R.string.hub_tool_web_fetch, clip(in.optString("url"), 40));
             case "Bash": return in.has("command") ? BuddyApp.str(R.string.hub_tool_command, clip(in.optString("command"), 40))

@@ -238,6 +238,12 @@ PERMS=$(cat "$D/permissions.md" 2>/dev/null)
 [ -n "$PERMS" ] && SYSTEM="$SYSTEM
 
 $PERMS"
+# the background browser (Settings): its tools and when to use them, while it is on; never in a rule run
+BROWSER=0
+[ -e "$D/browser-on" ] && [ "$DEV" != rule ] && BROWSER=1
+[ "$BROWSER" = 1 ] && SYSTEM="$SYSTEM
+
+$(cat "$D/browser-prompt.md" 2>/dev/null)"
 if [ "$DEV" = 1 ]; then
   SYSTEM="$SYSTEM
 
@@ -345,7 +351,9 @@ run_opencode() {
   # OpenCode names MCP tools <server>_<tool>; small models otherwise call "read_screen" and give up
   printf '%s\n\n%s\n' "$SYSTEM" "In this app the phone tools are named with a phone_ prefix: phone_read_screen, phone_tap, \
 phone_long_press, phone_type_text, phone_scroll, phone_swipe, phone_press, phone_open_app, phone_list_apps, phone_open_url, \
-phone_screenshot, phone_wait, phone_confirm, phone_ask, phone_notify, phone_reply_notification, phone_update_buddy, phone_install_apk and phone_wait_for_install. Always call them by \
+phone_screenshot, phone_wait, phone_confirm, phone_ask, phone_notify, phone_reply_notification, phone_update_buddy, phone_install_apk and phone_wait_for_install\
+$([ "$BROWSER" = 1 ] && printf '%s' ", and for the background browser phone_browser_open, phone_browser_read, phone_browser_click, \
+phone_browser_type, phone_browser_scroll, phone_browser_screenshot, phone_browser_back and phone_browser_tabs"). Always call them by \
 these exact names; they are available in every message of this chat." > "$S/system.md"
   local cfg v2=0
   oc2 && v2=1

@@ -1,0 +1,48 @@
+#!/bin/sh
+# Run by the Buddy app inside its built-in Linux (Settings > Background browser): one headless Chromium for the
+# agents' browser tools, with its own profile in /root/.buddy/browser (sign-ins stay between runs).
+#   buddy-browser install   install Chromium if it isn't yet (progress on stderr), then print BUDDY_INSTALLED
+#   buddy-browser run       the same, then run Chromium until the app closes this script's input
+# Buddy speaks Chromium's DevTools protocol through this script's stdin and stdout (--remote-debugging-pipe):
+# messages are JSON, each ended by a NUL byte. There is no debugging port on purpose: any app or agent on the
+# phone can reach a 127.0.0.1 port, and could then drive the browser (and its sign-ins) around Buddy's approvals.
+# Chromium comes from Alpine (musl); Playwright's own downloads are glibc builds and don't run here.
+PROFILE=/root/.buddy/browser
+LOG=/root/.buddy/browser.log
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+install() {
+  [ -x /usr/bin/chromium ] && return 0
+  echo "BUDDY_STATUS installing" >&2
+  # Chromium needs a newer webrtc-audio-processing than the release has: from edge, tagged so nothing else moves
+  grep -q '^@edge .*/edge/main' /etc/apk/repositories ||
+    echo '@edge https://dl-cdn.alpinelinux.org/alpine/edge/main' >>/etc/apk/repositories
+  grep -q '^@edge .*/edge/community' /etc/apk/repositories ||
+    echo '@edge https://dl-cdn.alpinelinux.org/alpine/edge/community' >>/etc/apk/repositories
+  apk update -q >&2 && apk add -q webrtc-audio-processing-2@edge chromium >&2 || return 1
+  [ -x /usr/bin/chromium ]
+}
+
+case "${1:-}" in
+  install)
+    install || { echo "BUDDY_FAILED" >&2; exit 1; }
+    echo BUDDY_INSTALLED
+    exit 0 ;;
+  run) ;;
+  *) echo "usage: buddy-browser install|run" >&2; exit 2 ;;
+esac
+
+install || { echo "BUDDY_FAILED" >&2; exit 1; }
+mkdir -p "$PROFILE"
+# one left over from before (the app was killed) holds the profile: stop it first
+pkill -f -- "--user-data-dir=$PROFILE" 2>/dev/null && sleep 1
+rm -f "$PROFILE/SingletonLock" "$PROFILE/SingletonSocket" "$PROFILE/SingletonCookie"
+[ -f "$LOG" ] && [ "$(wc -c <"$LOG")" -gt 1000000 ] && : >"$LOG"
+echo "BUDDY_STATUS starting" >&2
+# A phone's Chrome user agent: "HeadlessChrome" gets many sites to refuse the page. GPU and EGL errors in the log
+# are harmless (there is no GPU here). fd 3 is the protocol's input, fd 4 its output.
+exec chromium --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --no-zygote \
+  --user-data-dir="$PROFILE" --remote-debugging-pipe --no-first-run --no-default-browser-check \
+  --disable-features=Translate,MediaRouter,OptimizationHints --password-store=basic --lang="${BUDDY_LANG:-en-US}" \
+  --user-agent="Mozilla/5.0 (Linux; Android 14; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36" \
+  --window-size=400,820 about:blank 3<&0 4>&1 >>"$LOG" 2>&1

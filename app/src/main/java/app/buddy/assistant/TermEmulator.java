@@ -185,12 +185,12 @@ final class TermEmulator {
         for (Line l : main) l.resize(newCols);
         for (Line l : alt) l.resize(newCols);
         for (Line l : history) l.resize(newCols);
+        cols = newCols; // before resizeRows, which sizes its lines by it
         // rows: keep the cursor on screen by moving lines into history (main) or dropping them (alt)
         main = resizeRows(main, newRows, true);
         alt = resizeRows(alt, newRows, false);
         screen = onAlt ? alt : main;
         rows = newRows;
-        cols = newCols;
         top = 0;
         bottom = rows - 1;
         cx = Math.min(cx, cols - 1);
@@ -251,7 +251,7 @@ final class TermEmulator {
     private boolean paramStarted;
     private char privateMark, intermediate, escInter;
     private final StringBuilder osc = new StringBuilder();
-    private int utf8Need, utf8Cp;
+    private int utf8Need, utf8Cp, utf8Min;
 
     synchronized void append(byte[] b, int len) {
         for (int i = 0; i < len; i++) {
@@ -259,16 +259,18 @@ final class TermEmulator {
             if (utf8Need > 0) {
                 if ((x & 0xC0) == 0x80) {
                     utf8Cp = (utf8Cp << 6) | (x & 0x3F);
-                    if (--utf8Need == 0) process(utf8Cp);
+                    // past U+10FFFF, a surrogate or an overlong form: not a character (Java would throw on it)
+                    if (--utf8Need == 0) process(utf8Cp < utf8Min || utf8Cp > 0x10FFFF
+                            || (utf8Cp >= 0xD800 && utf8Cp <= 0xDFFF) ? 0xFFFD : utf8Cp);
                     continue;
                 }
                 utf8Need = 0;
                 process(0xFFFD);
             }
             if (x < 0x80) process(x);
-            else if ((x & 0xE0) == 0xC0) { utf8Cp = x & 0x1F; utf8Need = 1; }
-            else if ((x & 0xF0) == 0xE0) { utf8Cp = x & 0x0F; utf8Need = 2; }
-            else if ((x & 0xF8) == 0xF0) { utf8Cp = x & 0x07; utf8Need = 3; }
+            else if ((x & 0xE0) == 0xC0) { utf8Cp = x & 0x1F; utf8Need = 1; utf8Min = 0x80; }
+            else if ((x & 0xF0) == 0xE0) { utf8Cp = x & 0x0F; utf8Need = 2; utf8Min = 0x800; }
+            else if ((x & 0xF8) == 0xF0) { utf8Cp = x & 0x07; utf8Need = 3; utf8Min = 0x10000; }
             else process(0xFFFD);
         }
         version++;

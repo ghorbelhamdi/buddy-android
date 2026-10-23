@@ -106,8 +106,13 @@ final class TermSession implements TermEmulator.Host {
             try {
                 int n;
                 while ((n = in.read(buf)) > 0) {
-                    s.emulator.append(buf, n);
-                    s.changed();
+                    try {
+                        s.emulator.append(buf, n);
+                        s.changed();
+                    } catch (RuntimeException e) {
+                        // a bug on odd output must not take down the whole app (bubble, phone tools, agents)
+                        android.util.Log.e("Buddy", "terminal output", e);
+                    }
                 }
             } catch (IOException ignored) {
                 // the pty closes (EIO) when the shell and everything it started have exited

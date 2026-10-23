@@ -362,7 +362,8 @@ final class Triggers implements ChatHub.Listener {
             while (!queue.isEmpty()) log(queue.poll(), "error", app.getString(R.string.rules_log_no_service));
             return;
         }
-        if (ChatHub.get(app).runningCount() > 0 || svc.paused() || (svc.bubble() != null && svc.bubble().confirming())) {
+        if (ChatHub.get(app).runningCount() > 0 || svc.paused() || (svc.bubble() != null && svc.bubble().confirming())
+                || svc.controlRevoked() != null) { // after Stop the queue waits out the minute
             // that can end without a word to the rules (a pause that ran out, say): look again soon
             main.removeCallbacks(pumpLater);
             main.postDelayed(pumpLater, 5000);

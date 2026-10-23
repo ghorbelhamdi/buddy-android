@@ -20,11 +20,13 @@ final class Helper {
             // asset, path inside Linux, mode
             {"linux/buddy-run", "/root/bin/buddy-run", "700"},
             {"linux/codex-remote", "/root/bin/codex-remote", "700"}, // the Codex session (CodexRemote)
+            {"linux/buddy-browser", "/root/bin/buddy-browser", "700"}, // the background browser (Browser)
             {"linux/profile.sh", "/etc/profile.d/buddy.sh", "644"},
             {"linux/arecord", "/usr/local/bin/arecord", "755"},
             {"linux/asound-cards", "/etc/buddy/asound-cards", "644"},
             {"linux/arecord", "/usr/local/bin/rec", "755"}, // SoX's recorder, same arguments that matter (-r, -c)
             {"linux/system-prompt.md", "/root/.buddy/system-prompt.md", "600"},
+            {"linux/browser-prompt.md", "/root/.buddy/browser-prompt.md", "600"},
             {"linux/AGENTS.md", "/root/.buddy/work/AGENTS.md", "600"},
             {"linux/android-app/SKILL.md", "/root/.buddy/work/.claude/skills/android-app/SKILL.md", "600"},
             {"linux/android-app/build-apk.sh", "/root/.buddy/work/.claude/skills/android-app/build-apk.sh", "700"},
@@ -74,6 +76,13 @@ final class Helper {
 
     /** The user's App permissions choices, which buddy-run appends to the agent's instructions. */
     static void writePermissions(Context c) {
+        // the background browser's instructions go along only while it's on (buddy-run looks for this file)
+        File on = new File(Linux.root(c), "root/.buddy/browser-on");
+        try {
+            if (Browser.available(c)) on.createNewFile();
+            else on.delete();
+        } catch (IOException ignored) {
+        }
         StringBuilder trusted = new StringBuilder();
         for (java.util.Map.Entry<String, String> e : Prefs.appSafetyAll(c).entrySet()) {
             if ("trust".equals(e.getValue())) trusted.append("- ").append(appName(c, e.getKey())).append(" (").append(e.getKey()).append(")\n");

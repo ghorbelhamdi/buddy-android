@@ -420,7 +420,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             // asking for approval, asking a question, posting a note, pointing something out or answering in a
             // notification isn't operating the phone
             if (!"confirm".equals(tool) && !"ask".equals(tool) && !"notify".equals(tool) && !"reply_notification".equals(tool)
-                    && !"point_out".equals(tool)) {
+                    && !"point_out".equals(tool) && !tool.startsWith("browser_")) { // the background browser isn't the phone
                 control.onActivity();
             }
         });
@@ -465,14 +465,40 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
      * Only while a task is under way: a Buddy chat running, or another session that just acted. True if it paused.
      */
     boolean autoPause(int why) {
-        if (paused || (ChatHub.get(this).runningCount() == 0 && !control.recent(10_000))) return false;
+        if (paused) {
+            pausedForBrowser = false; // paused for the browser, and now the phone too: the screen may have changed
+            return false;
+        }
+        if (ChatHub.get(this).runningCount() == 0 && !control.recent(10_000)) return false;
         pause(why, why);
         return true;
+    }
+
+    /** The pause is the user using the background browser in a chat's live view (see pauseForBrowser). */
+    private volatile boolean pausedForBrowser;
+
+    /**
+     * The user touched the background browser's live view while a chat works (main thread): pause like AutoPause does
+     * for the phone, until they tap Continue or write. Not while a card waits: then the touch is them doing their part.
+     */
+    void pauseForBrowser(String key) {
+        // not while they do what a question asks there (ask with browser_highlight): that's their part
+        if (paused || (bubble != null && bubble.confirming()) || marks.waiting() || Browser.marks(key) != null) return;
+        // only when an agent works in this very tab: signing in from Settings mustn't hold up another chat
+        Sessions.Session ses = Browser.USER.equals(key) ? null : ChatHub.get(this).sessions.find(key);
+        if (!Browser.agentBusy(key) || (ses != null && !ses.running)) return;
+        pause(R.string.browser_paused_note, R.string.browser_paused_toast);
+        pausedForBrowser = true;
+    }
+
+    boolean pausedForBrowser() {
+        return paused && pausedForBrowser;
     }
 
     private void pause(int note, int toast) {
         if (paused) return;
         paused = true;
+        pausedForBrowser = false;
         heldInPause = false;
         control.end();
         main.postDelayed(pauseExpired, PAUSE_MAX_MS);
@@ -521,7 +547,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     /** Resume (main thread): waiting phone actions go on, after the agent re-reads the screen. */
     void resume() {
         if (!paused) return;
-        rereadNeeded = true;
+        if (!pausedForBrowser) rereadNeeded = true; // the phone wasn't touched when the pause was the browser's
         endPause();
         ChatHub hub = ChatHub.get(this);
         Sessions.Session ses = hub.latestRunning();
@@ -553,6 +579,14 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
      * with a short tool timeout (Codex) don't fail the call. Null to go ahead, else the tool's answer.
      */
     String awaitResume(String tool) throws InterruptedException {
+        return awaitResume(tool, true);
+    }
+
+    /**
+     * As above; phone: a phone tool, which re-reads the screen first after the user used it. The background browser's
+     * tools (phone false) have their own check for that (see Browser.takeTouched).
+     */
+    String awaitResume(String tool, boolean phone) throws InterruptedException {
         long until = android.os.SystemClock.elapsedRealtime() + PAUSE_WAIT_MS;
         if (paused) heldInPause = true;
         synchronized (pauseLock) {
@@ -564,13 +598,17 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
                 waiters--;
             }
         }
+        if (paused && pausedForBrowser) {
+            return "PAUSED: the user is using the background browser in the live view. Nothing was done. Don't use other "
+                    + "tools; call " + tool + " again to keep waiting until they tap Continue.";
+        }
         if (paused) {
             return "PAUSED: the user paused you to use the phone themselves. Nothing was done. Don't use other phone "
                     + "tools; call " + tool + " again to keep waiting until they resume.";
         }
         String revoked = controlRevoked();
         if (revoked != null) return revoked;
-        if (rereadNeeded) {
+        if (rereadNeeded && phone) {
             if ("read_screen".equals(tool) || "screenshot".equals(tool)) rereadNeeded = false;
             else if (!"wait".equals(tool) && !"list_apps".equals(tool)) {
                 return "SCREEN CHANGED: the user used the phone themselves (they paused you, or did something on the "

@@ -96,6 +96,11 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
+            android:name=".BrowserActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".SignInActivity"
             android:exported="false" />
 

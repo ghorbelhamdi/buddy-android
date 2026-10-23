@@ -26,7 +26,7 @@ import static app.buddy.assistant.Ui.*;
 
 /** Settings: setup checklist, appearance, agents and experience. */
 public class SetupActivity extends Screen implements Account.Listener, RemoteSession.Listener, SshServer.Listener,
-        CodexRemote.Listener {
+        CodexRemote.Listener, Browser.Listener {
     private ScrollView scroll;
     private LinearLayout list;
     /** Setup card open state; null = automatic (open until all steps are done). */
@@ -59,6 +59,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         RemoteSession.addListener(this);
         SshServer.addListener(this);
         CodexRemote.addListener(this);
+        Browser.addListener(this);
         Account.CLAUDE.refresh(this);
         Account.CODEX.refresh(this);
         Account.OPENCODE.refresh(this);
@@ -72,6 +73,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         RemoteSession.removeListener(this);
         SshServer.removeListener(this);
         CodexRemote.removeListener(this);
+        Browser.removeListener(this);
         super.onPause();
     }
 
@@ -83,6 +85,16 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
     @Override
     public void onCodexRemoteChanged() {
         if (!isFinishing() && !isDestroyed()) render();
+    }
+
+    /** The browser's state as last shown: its tabs change often, and only the state matters here. */
+    private String browserShown;
+
+    @Override
+    public void onBrowserChanged() {
+        String now = Browser.state + Browser.detail;
+        if (now.equals(browserShown) || isFinishing() || isDestroyed()) return;
+        render();
     }
 
     @Override
@@ -344,6 +356,9 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         }
         while (chipRow != null && inRow++ < 3) chipRow.addView(new View(this), new LinearLayout.LayoutParams(0, 1, 1));
         addCard(vc);
+
+        // --------------------------------------------------- background browser
+        if (!Flavor.PLAY) browserSection(); // not in the Play build for now (see Prefs.browser)
 
         // ------------------------------------------------------- remote control
         list.addView(sectionLabel(this, getString(R.string.setup_remote_control)));
@@ -884,6 +899,122 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
 
     /** Chats with messages but no conversation folder in Buddy's Linux: they ran in Termux. */
     /** A fresh pairing code for the Codex session, to enter in ChatGPT on a phone or a computer. */
+    /** The background browser (Browser): the switch, its state, the user's own tab and the sites it's signed in to. */
+    private void browserSection() {
+        browserShown = Browser.state + Browser.detail;
+        list.addView(sectionLabel(this, getString(R.string.browser_section)));
+        LinearLayout bc = card();
+        bc.addView(switchRow(this, getString(R.string.browser_switch), getString(R.string.browser_switch_info),
+                Prefs.browser(this), on -> {
+            Prefs.setBrowser(this, on);
+            if (on) Browser.install(this); // the download, now rather than in the middle of a task
+            else new Thread(Browser::stop).start();
+            render();
+        }), full());
+        if (Prefs.browser(this)) {
+            LinearLayout st = row(this);
+            st.setPaddingRelative(dp(this, 16), 0, dp(this, 16), dp(this, 12));
+            Browser.State bs = Browser.state;
+            boolean busy = bs == Browser.State.INSTALLING || bs == Browser.State.STARTING;
+            st.addView(dot(this, bs == Browser.State.READY ? OK : bs == Browser.State.ERROR ? ERR : busy ? ACCENT : MUTED, 8));
+            TextView stt = monoText(this, bs == Browser.State.ERROR ? Browser.detail
+                    : getString(bs == Browser.State.INSTALLING ? R.string.browser_state_installing
+                    : bs == Browser.State.STARTING ? R.string.browser_state_starting
+                    : bs == Browser.State.READY ? R.string.browser_state_running
+                    : Browser.installed(this) ? R.string.browser_state_idle : R.string.browser_state_not_installed),
+                    12, bs == Browser.State.ERROR ? ERR : MUTED);
+            stt.setPaddingRelative(dp(this, 8), 0, 0, 0);
+            st.addView(stt, weight1());
+            bc.addView(st, full());
+            LinearLayout how = column(this);
+            how.setPaddingRelative(dp(this, 16), 0, dp(this, 16), dp(this, 16));
+            how.addView(text(this, getString(R.string.browser_sign_in_help), 13, MUTED));
+            LinearLayout btns = row(this);
+            Button open = button(this, getString(R.string.browser_open), false);
+            open.setOnClickListener(v -> startActivity(new Intent(this, BrowserActivity.class).putExtra("key", Browser.USER)));
+            btns.addView(open, new LinearLayout.LayoutParams(0, dp(this, 44), 1));
+            Button sites = button(this, getString(R.string.browser_sites), false);
+            sites.setOnClickListener(v -> sitesSheet());
+            LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(0, dp(this, 44), 1);
+            sp.setMarginStart(dp(this, 10));
+            btns.addView(sites, sp);
+            how.addView(btns, topGap(12));
+            Button wipe = button(this, getString(R.string.browser_wipe), false);
+            wipe.setTextColor(ERR);
+            wipe.setOnClickListener(v -> confirmSheet(this, getString(R.string.browser_wipe_title),
+                    getString(R.string.browser_wipe_body), getString(R.string.browser_wipe_action), true, () -> new Thread(() -> {
+                        Browser.wipe(this);
+                        runOnUiThread(() -> Toast.makeText(this, R.string.browser_wiped, Toast.LENGTH_SHORT).show());
+                    }).start()));
+            LinearLayout.LayoutParams wp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 44));
+            wp.topMargin = dp(this, 8);
+            how.addView(wipe, wp);
+            bc.addView(how, full());
+        }
+        addCard(bc);
+    }
+
+    /** The sites the background browser has cookies for (its sign-ins), each with Log out. */
+    private void sitesSheet() {
+        LinearLayout c = column(this);
+        c.addView(title(this, getString(R.string.browser_sites), 18));
+        TextView sub = text(this, getString(R.string.browser_sites_help), 13, MUTED);
+        sub.setPaddingRelative(0, dp(this, 2), 0, dp(this, 8));
+        c.addView(sub);
+        LinearLayout rows = column(this);
+        rows.addView(text(this, getString(R.string.browser_sites_loading), 14, MUTED));
+        c.addView(rows, full());
+        final Dialog d = bottomSheet(this, c);
+        d.show();
+        new Thread(() -> {
+            // only sites the user signed in to; the rest of the cookies (ads, pages agents opened) just get counted
+            java.util.List<String> all = Browser.sites(this), sites = new java.util.ArrayList<>();
+            java.util.Set<String> signIns = Browser.signIns(this);
+            for (String site : all) if (signIns.contains(site)) sites.add(site);
+            int others = all.size() - sites.size();
+            runOnUiThread(() -> {
+                if (!d.isShowing()) return;
+                rows.removeAllViews();
+                if (sites.isEmpty()) rows.addView(text(this, getString(R.string.browser_sites_none), 14, MUTED));
+                if (others > 0) {
+                    TextView o = text(this, getString(R.string.browser_sites_others, others), 13, MUTED);
+                    o.setPaddingRelative(0, dp(this, 4), 0, dp(this, 8));
+                    rows.addView(o);
+                }
+                for (String site : sites) {
+                    LinearLayout r = row(this);
+                    r.setGravity(Gravity.CENTER_VERTICAL);
+                    r.setPaddingRelative(0, dp(this, 6), 0, dp(this, 6));
+                    r.addView(single(title(this, site, 15)), weight1());
+                    Button out = button(this, getString(R.string.browser_log_out), false);
+                    out.setOnClickListener(v -> {
+                        out.setEnabled(false);
+                        new Thread(() -> {
+                            String err = null;
+                            try {
+                                Browser.logOut(this, site);
+                            } catch (Exception e) {
+                                err = e.getMessage();
+                            }
+                            final String error = err;
+                            runOnUiThread(() -> {
+                                if (error == null) {
+                                    rows.removeView(r);
+                                    Toast.makeText(this, getString(R.string.browser_logged_out, site), Toast.LENGTH_SHORT).show();
+                                } else {
+                                    out.setEnabled(true);
+                                    Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }).start();
+                    });
+                    r.addView(out, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 40)));
+                    rows.addView(r, full());
+                }
+            });
+        }).start();
+    }
+
     private void codexPairSheet() {
         LinearLayout c = column(this);
         c.addView(title(this, getString(R.string.setup_codex_pair), 18));

@@ -80,8 +80,11 @@ final class Linux {
                 // one sound card, "Buddy microphone" (Android hides its own): programs then try to record, and
                 // recording goes through Buddy's stand-in arecord/rec (MicServer)
                 "-b", root(c).getAbsolutePath() + "/etc/buddy/asound-cards:/proc/asound/cards",
-                "-w", "/root",
-                "/usr/bin/env", "-i", "HOME=/root", "LANG=C.UTF-8", "TERM=xterm-256color", "COLORTERM=truecolor",
+                "-w", "/root"));
+        // the phone's own fonts, for every script and emoji: the background browser shows pages in any language
+        // without a big font download (Alpine's Chromium only brings a Latin one)
+        if (new File("/system/fonts").isDirectory()) a.addAll(Arrays.asList("-b", "/system/fonts:/usr/share/fonts/android"));
+        a.addAll(Arrays.asList("/usr/bin/env", "-i", "HOME=/root", "LANG=C.UTF-8", "TERM=xterm-256color", "COLORTERM=truecolor",
                 "PATH=/root/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"));
         a.addAll(Arrays.asList(cmd));
         return a;

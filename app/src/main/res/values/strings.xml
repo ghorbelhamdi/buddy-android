@@ -1580,4 +1580,89 @@
     <string name="card_locked_title">Needs your OK: %1$s</string>
     <!-- Its text, with a countdown. %1$s = the countdown length, e.g. 30 s; %2$s = what it would do. -->
     <string name="rules_approval_auto">Approves itself in %1$s unless you stop it.\n%2$s</string>
+
+    <!-- ===== The background browser: its live view in a chat, its cards and Settings (Browser, BrowserTools, BrowserPanel, BrowserActivity) ===== -->
+
+    <!-- Settings screen: the background browser, a separate browser inside Buddy that agents use for web pages. Section label and switch. -->
+    <string name="browser_section">Background browser</string>
+    <string name="browser_switch">Background browser</string>
+    <!-- Chromium is the open-source browser Chrome is built on: keep the name. -->
+    <string name="browser_switch_info">A browser inside Buddy that agents use for web pages, without taking over your phone. You can watch and use it in the chat. The first time, Buddy downloads Chromium (about 300 MB).</string>
+    <!-- Status lines under the switch, lowercase. -->
+    <string name="browser_state_installing">installing Chromium…</string>
+    <string name="browser_state_starting">starting…</string>
+    <string name="browser_state_running">running</string>
+    <string name="browser_state_idle">ready · starts when an agent needs it</string>
+    <string name="browser_state_not_installed">not installed yet</string>
+    <string name="browser_install_failed">Couldn\'t install Chromium. Check the connection and try again.</string>
+    <!-- “Continue with Google” is the button many sites show to sign in with a Google account: use the wording sites use in your language. -->
+    <string name="browser_sign_in_help">Agents never type passwords. To let them use a site with your account, open the browser and sign in yourself. “Continue with Google” often fails in automated browsers: use email and password instead.</string>
+    <!-- Button: opens the background browser full screen. -->
+    <string name="browser_open">Open browser</string>
+    <!-- Button and sheet title: the sites the browser is signed in to (it keeps their cookies). -->
+    <string name="browser_sites">Signed-in sites</string>
+    <string name="browser_sites_help">Sites you signed in to yourself in the background browser. Log out of one to remove its sign-in.</string>
+    <string name="browser_sites_loading">Loading…</string>
+    <string name="browser_sites_none">None yet. Sign in to a site yourself in the browser and it shows here.</string>
+    <string name="browser_sites_others">Other sites with cookies (ads, pages agents opened): %1$d. Wipe browser data clears them.</string>
+    <!-- Button next to a site. -->
+    <string name="browser_log_out">Log out</string>
+    <!-- %1$s = a site, e.g. amazon.com. -->
+    <string name="browser_logged_out">Logged out of %1$s</string>
+    <string name="browser_wipe">Wipe browser data</string>
+    <string name="browser_wipe_title">Wipe browser data?</string>
+    <string name="browser_wipe_body">Removes every sign-in, cookie and history of the background browser. Chromium stays installed.</string>
+    <!-- Verb. Confirm button of the sheet above. -->
+    <string name="browser_wipe_action">Wipe</string>
+    <string name="browser_wiped">Browser data wiped</string>
+
+    <!-- The live view: the browser's page in the chat (or full screen), which the user can tap, scroll and type into. -->
+    <!-- Small label in capitals at the top of the view. -->
+    <string name="browser_live_title">BACKGROUND BROWSER</string>
+    <!-- In place of the page's address when no page is open. -->
+    <string name="browser_no_page">no page open</string>
+    <!-- Button shown while the agent is paused because the user uses the browser: the agent goes on. -->
+    <string name="browser_continue">Continue</string>
+    <!-- Descriptions of icon buttons (for screen readers). -->
+    <string name="browser_back">Previous page</string>
+    <string name="browser_keyboard">Type on the page</string>
+    <string name="browser_full_screen">Full screen</string>
+    <string name="browser_fold">Show or hide the page</string>
+    <string name="browser_backspace">Delete a character</string>
+    <!-- Hint of the text field under the page: what the user types goes into the page. -->
+    <string name="browser_type_hint">Type into the page</string>
+    <!-- Button: the keyboard's Enter key, for the page. -->
+    <string name="browser_enter">Enter</string>
+    <!-- The page shows a dialog (e.g. "Leave this page?"). %1$s = its message. -->
+    <string name="browser_dialog">The page asks: %1$s</string>
+    <!-- Sheet to open another address in the browser. -->
+    <string name="browser_go_title">Go to</string>
+    <string name="browser_go">Go</string>
+    <string name="browser_address_hint">Search or type a web address</string>
+    <!-- Shown in the view until the first picture of the page comes. -->
+    <string name="browser_installing">Installing the browser…</string>
+    <string name="browser_starting">Starting the browser…</string>
+    <!-- A line in the chat and a short message when the agent pauses because the user touched the live view. -->
+    <string name="browser_paused_note">Paused while you use the browser. Tap Continue when you\'re done.</string>
+    <string name="browser_paused_toast">Paused while you use the browser</string>
+
+    <!-- Approval cards for the background browser. %1$s = the button's label, e.g. Post; %2$s = the site, e.g. reddit.com. -->
+    <string name="browser_card_tap">Tap “%1$s” on %2$s (background browser)</string>
+    <!-- %1$s = the site. -->
+    <string name="browser_card_enter">Press Enter to send on %1$s (background browser)</string>
+    <!-- The page itself asks a question (e.g. "Delete this item?"); approving answers OK. %1$s = the site; %2$s = its question. -->
+    <string name="browser_card_dialog">Answer OK on %1$s:\n“%2$s”</string>
+
+    <!-- Progress lines in the chat for the background browser's tools. "Browser" names the background browser. -->
+    <!-- %1$s = web address. -->
+    <string name="hub_tool_browser_open">Browser: opening %1$s</string>
+    <string name="hub_tool_browser_read">Browser: reading the page</string>
+    <!-- %1$d = the number of an item on the page. -->
+    <string name="hub_tool_browser_click">Browser: tapping item %1$d</string>
+    <!-- %1$s = the text being typed. -->
+    <string name="hub_tool_browser_type">Browser: typing \"%1$s\"</string>
+    <string name="hub_tool_browser_scroll">Browser: scrolling</string>
+    <string name="hub_tool_browser_screenshot">Browser: looking at the page</string>
+    <string name="hub_tool_browser_back">Browser: going back</string>
+    <string name="hub_tool_browser_tabs">Browser: tabs</string>
 </resources>

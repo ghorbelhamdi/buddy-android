@@ -25,7 +25,7 @@ import android.widget.Toast;
 import static app.buddy.assistant.Ui.*;
 
 /** One chat, full screen. */
-public class ChatActivity extends Screen implements ChatHub.Listener {
+public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Listener {
     private ChatHub hub;
     private Sessions.Session ses;
     private LinearLayout messages, strip, approval;
@@ -42,6 +42,9 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
     private android.widget.HorizontalScrollView trayScroll;
     private LinearLayout tray;
     private static final int REQ_CAMERA = 21, REQ_PHOTOS = 22, REQ_FILES = 23;
+    /** The background browser's live card, while this chat has a tab there. */
+    private BrowserPanel browser;
+    private boolean resumed;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -110,6 +113,13 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         stp.leftMargin = stp.rightMargin = dp(this, 12);
         stp.topMargin = dp(this, 8);
         root.addView(strip, stp);
+
+        browser = new BrowserPanel(this, ses.id, false);
+        browser.setVisibility(View.GONE);
+        LinearLayout.LayoutParams bwp = full();
+        bwp.leftMargin = bwp.rightMargin = dp(this, 12);
+        bwp.topMargin = dp(this, 8);
+        root.addView(browser, bwp);
 
         scroll = new ScrollView(this);
         messages = column(this);
@@ -255,6 +265,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
         super.onResume();
         if (ses == null || isFinishing()) return;
         hub.addListener(this);
+        resumed = true;
+        Browser.addListener(this);
         Waiting.listener = waitingChanged;
         hub.setViewing(ses, true);
         hub.select(ses);
@@ -271,6 +283,9 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             hub.setViewing(ses, false);
             hub.removeListener(this);
         }
+        resumed = false;
+        Browser.removeListener(this);
+        if (browser != null) browser.setShown(false);
         if (Waiting.listener == waitingChanged) Waiting.listener = null;
         super.onPause();
     }
@@ -541,6 +556,17 @@ public class ChatActivity extends Screen implements ChatHub.Listener {
             else log.finish();
         }
         renderApproval();
+        onBrowserChanged();
+    }
+
+    /** The live card shows while the background browser runs and this chat has a tab in it. */
+    @Override
+    public void onBrowserChanged() {
+        if (browser == null) return;
+        boolean on = Browser.available(this) && Browser.running() && Browser.hasTab(ses.id);
+        browser.setVisibility(on ? View.VISIBLE : View.GONE);
+        browser.setShown(on && resumed);
+        if (on) browser.refresh();
     }
 
     private String shownApproval;

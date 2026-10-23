@@ -470,6 +470,29 @@ final class Guard {
         return null;
     }
 
+    /** A web page's button label (the background browser, see BrowserTools), when it's a risky one; else null. */
+    static String riskyText(String label) {
+        if (label == null) return null;
+        String s = label.trim();
+        // as for a button on the phone: starts with the word and is short
+        if (s.isEmpty() || s.length() > 30 || s.split("\\s+").length > 4) return null;
+        return RISKY.matcher(s).find() ? s : null;
+    }
+
+    /** A web page button's id, name or test id says it sends, pays, buys or deletes ("add-to-cart-button"). */
+    static boolean riskyId(String ids) {
+        if (ids == null) return false;
+        java.util.regex.Matcher m = RISKY_ID.matcher("_" + ids.toLowerCase(Locale.ROOT).replace(' ', '_'));
+        while (m.find()) if (!"submit".equals(m.group(1))) return true; // on the web, every form's button is "submit"
+        return false;
+    }
+
+    /** A web page button that sends or posts a message (see sends). */
+    static boolean sendsText(String label) {
+        String l = riskyText(label);
+        return l != null && SEND.matcher(l).find();
+    }
+
     private static String risky(AccessibilityNodeInfo n) {
         for (CharSequence cs : new CharSequence[]{n.getText(), n.getContentDescription(), n.getTooltipText()}) {
             if (cs == null) continue;

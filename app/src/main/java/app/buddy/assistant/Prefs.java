@@ -333,6 +333,18 @@ final class Prefs {
         sp(c).edit().putBoolean("ssh_server", on).apply();
     }
 
+    /**
+     * The background browser (Browser): off until the user turns it on. Never in the Play build for now: it downloads
+     * and runs a whole browser (Chromium from Alpine), which Play's policies on downloaded executable code may not allow.
+     */
+    static boolean browser(Context c) {
+        return !Flavor.PLAY && sp(c).getBoolean("browser", false);
+    }
+
+    static void setBrowser(Context c, boolean on) {
+        sp(c).edit().putBoolean("browser", on).apply();
+    }
+
     /** Terminal text size in sp (pinch to zoom). */
     static float termFont(Context c) {
         return sp(c).getFloat("term_font", 13f);
