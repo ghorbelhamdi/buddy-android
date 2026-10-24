@@ -265,6 +265,16 @@
     <string name="bubble_using_phone">Menggunakan ponsel Anda</string>
     <!-- %1$s: what the agent is doing right now (its own status text). -->
     <string name="bubble_using_phone_status">Menggunakan ponsel Anda · %1$s</string>
+    <string name="activity_reading">Membaca layar</string>
+    <string name="activity_typing">Mengetik</string>
+    <string name="activity_scrolling">Menggulir</string>
+    <string name="activity_swiping">Menggeser</string>
+    <string name="activity_opening">Membuka %1$s</string>
+    <string name="activity_tapping">Mengetuk “%1$s”</string>
+    <string name="activity_tapping_plain">Mengetuk</string>
+    <string name="activity_browsing">Menjelajah %1$s · %2$s</string>
+    <string name="activity_browser_opening">Membuka halaman</string>
+    <string name="activity_browser_reading">Membaca halaman</string>
     <!-- Shown until the user has opened the hold menu once; this one when there is no status text, otherwise the
          next string. "Stop" is the hold menu's Stop task action. -->
     <string name="bubble_pill_hold_hint">tekan lama balon untuk Akhiri tugas dan lainnya</string>
@@ -973,6 +983,12 @@
     <string name="setup_surface">Latar</string>
     <!-- "Warm" and "Black" are options of the Surface picker: use the same words as those options. -->
     <string name="setup_surface_note">Hangat adalah nuansa asli Buddy. Hitam (hitam pekat) hanya berlaku dalam mode gelap.</string>
+    <string name="setup_face">Tampilan Buddy</string>
+    <string name="setup_face_buddy">Asli</string>
+    <string name="setup_face_picture">Gambar Anda</string>
+    <string name="setup_face_note">PNG atau WebP dengan latar transparan paling cocok. Gambar muncul di balon dan di samping balasan Buddy.</string>
+    <string name="setup_face_change">Pilih gambar lain</string>
+    <string name="setup_face_unreadable">Gambar itu tidak bisa dibaca. Coba PNG atau WebP.</string>
     <!-- Read by TalkBack: the swatch that opens the custom colour sheet. -->
     <string name="setup_custom_colour">Warna kustom</string>
     <string name="setup_custom_accent_title">Aksen kustom</string>

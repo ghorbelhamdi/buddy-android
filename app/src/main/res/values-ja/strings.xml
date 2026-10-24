@@ -191,6 +191,16 @@
     <string name="bubble_pill_hands_on">%1$s · ここをタップして回答</string>
     <string name="bubble_using_phone">スマートフォンを操作中</string>
     <string name="bubble_using_phone_status">スマートフォンを操作中 · %1$s</string>
+    <string name="activity_reading">画面を読み取り中</string>
+    <string name="activity_typing">入力中</string>
+    <string name="activity_scrolling">スクロール中</string>
+    <string name="activity_swiping">スワイプ中</string>
+    <string name="activity_opening">%1$s を開いています</string>
+    <string name="activity_tapping">「%1$s」をタップ中</string>
+    <string name="activity_tapping_plain">タップ中</string>
+    <string name="activity_browsing">%1$s を閲覧中 · %2$s</string>
+    <string name="activity_browser_opening">ページを開いています</string>
+    <string name="activity_browser_reading">ページを読み取り中</string>
     <string name="bubble_pill_hold_hint">バブルを長押しで「タスク停止」など</string>
     <string name="bubble_pill_status_hold_hint">%1$s · バブルを長押しで「タスク停止」など</string>
 
@@ -674,6 +684,12 @@
     <string name="setup_accent">アクセントカラー</string>
     <string name="setup_surface">背景</string>
     <string name="setup_surface_note">「ウォーム」は Buddy 本来のトーンです。「ブラック」（完全な黒）はダークモードでのみ適用されます。</string>
+    <string name="setup_face">Buddy の見た目</string>
+    <string name="setup_face_buddy">オリジナル</string>
+    <string name="setup_face_picture">自分の画像</string>
+    <string name="setup_face_note">背景が透明な PNG か WebP がおすすめです。バブルと Buddy の返信の横に表示されます。</string>
+    <string name="setup_face_change">別の画像を選ぶ</string>
+    <string name="setup_face_unreadable">この画像を読み込めませんでした。PNG か WebP を試してください。</string>
     <string name="setup_custom_colour">カスタムカラー</string>
     <string name="setup_custom_accent_title">カスタムのアクセントカラー</string>
     <string name="setup_custom_accent_hint">#4F8BFF のような 16 進数のカラーコードで、好きな色を指定できます。</string>

@@ -268,6 +268,16 @@
     <string name="bubble_using_phone">Sta usando il telefono</string>
     <!-- %1$s: what the agent is doing right now (its own status text). -->
     <string name="bubble_using_phone_status">Sta usando il telefono · %1$s</string>
+    <string name="activity_reading">Legge lo schermo</string>
+    <string name="activity_typing">Scrive</string>
+    <string name="activity_scrolling">Scorre</string>
+    <string name="activity_swiping">Scorre col dito</string>
+    <string name="activity_opening">Apre %1$s</string>
+    <string name="activity_tapping">Tocca «%1$s»</string>
+    <string name="activity_tapping_plain">Tocca</string>
+    <string name="activity_browsing">Naviga su %1$s · %2$s</string>
+    <string name="activity_browser_opening">Apre la pagina</string>
+    <string name="activity_browser_reading">Legge la pagina</string>
     <!-- Shown until the user has opened the hold menu once; this one when there is no status text, otherwise the
          next string. "Stop" is the hold menu's Stop task action. -->
     <string name="bubble_pill_hold_hint">tieni premuta la bolla: Interrompi e altro</string>
@@ -982,6 +992,12 @@
     <string name="setup_surface">Sfondo</string>
     <!-- "Warm" and "Black" are options of the Surface picker: use the same words as those options. -->
     <string name="setup_surface_note">Caldo è il tono originale di Buddy. Nero (nero puro) vale solo con il tema scuro.</string>
+    <string name="setup_face">Aspetto di Buddy</string>
+    <string name="setup_face_buddy">Originale</string>
+    <string name="setup_face_picture">La tua immagine</string>
+    <string name="setup_face_note">Funziona meglio un PNG o WebP con sfondo trasparente. Appare sulla bolla e accanto alle risposte di Buddy.</string>
+    <string name="setup_face_change">Scegli un\'altra immagine</string>
+    <string name="setup_face_unreadable">Impossibile leggere questa immagine. Prova con un PNG o WebP.</string>
     <!-- Read by TalkBack: the swatch that opens the custom colour sheet. -->
     <string name="setup_custom_colour">Colore personalizzato</string>
     <string name="setup_custom_accent_title">Colore personalizzato</string>

@@ -204,6 +204,16 @@
     <string name="bubble_pill_hands_on">%1$s · اضغط هنا للإجابة</string>
     <string name="bubble_using_phone">يستخدم هاتفك</string>
     <string name="bubble_using_phone_status">يستخدم هاتفك · %1$s</string>
+    <string name="activity_reading">يقرأ الشاشة</string>
+    <string name="activity_typing">يكتب</string>
+    <string name="activity_scrolling">يمرّر</string>
+    <string name="activity_swiping">يسحب</string>
+    <string name="activity_opening">يفتح %1$s</string>
+    <string name="activity_tapping">ينقر على «%1$s»</string>
+    <string name="activity_tapping_plain">ينقر</string>
+    <string name="activity_browsing">يتصفح %1$s · %2$s</string>
+    <string name="activity_browser_opening">يفتح الصفحة</string>
+    <string name="activity_browser_reading">يقرأ الصفحة</string>
     <string name="bubble_pill_hold_hint">اضغط مطولًا على الفقاعة للإيقاف وخيارات أخرى</string>
     <string name="bubble_pill_status_hold_hint">%1$s · اضغط مطولًا على الفقاعة للإيقاف وخيارات أخرى</string>
 
@@ -715,6 +725,12 @@
     <string name="setup_accent">لون التمييز</string>
     <string name="setup_surface">الخلفية</string>
     <string name="setup_surface_note">«دافئ» هو اللون الأصلي لـ Buddy. ويُطبَّق «أسود» (أسود حقيقي) في الوضع الداكن فقط.</string>
+    <string name="setup_face">مظهر Buddy</string>
+    <string name="setup_face_buddy">الأصلي</string>
+    <string name="setup_face_picture">صورتك</string>
+    <string name="setup_face_note">يفضَّل ملف PNG أو WebP بخلفية شفافة. تظهر الصورة على الفقاعة وبجانب ردود Buddy.</string>
+    <string name="setup_face_change">اختر صورة أخرى</string>
+    <string name="setup_face_unreadable">تعذّرت قراءة هذه الصورة. جرّب ملف PNG أو WebP.</string>
     <string name="setup_custom_colour">لون مخصص</string>
     <string name="setup_custom_accent_title">لون تمييز مخصص</string>
     <string name="setup_custom_accent_hint">أي لون برمز سداسي عشري، مثل #4F8BFF.</string>

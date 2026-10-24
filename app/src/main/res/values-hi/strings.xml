@@ -192,6 +192,16 @@
     <string name="bubble_pill_hands_on">%1$s · जवाब देने के लिए यहां टैप करें</string>
     <string name="bubble_using_phone">आपका फ़ोन इस्तेमाल कर रहा है</string>
     <string name="bubble_using_phone_status">आपका फ़ोन इस्तेमाल कर रहा है · %1$s</string>
+    <string name="activity_reading">स्क्रीन पढ़ रहा है</string>
+    <string name="activity_typing">टाइप कर रहा है</string>
+    <string name="activity_scrolling">स्क्रॉल कर रहा है</string>
+    <string name="activity_swiping">स्वाइप कर रहा है</string>
+    <string name="activity_opening">%1$s खोल रहा है</string>
+    <string name="activity_tapping">“%1$s” पर टैप कर रहा है</string>
+    <string name="activity_tapping_plain">टैप कर रहा है</string>
+    <string name="activity_browsing">%1$s ब्राउज़ कर रहा है · %2$s</string>
+    <string name="activity_browser_opening">पेज खोल रहा है</string>
+    <string name="activity_browser_reading">पेज पढ़ रहा है</string>
     <string name="bubble_pill_hold_hint">रोकने और दूसरे विकल्पों के लिए बबल को दबाकर रखें</string>
     <string name="bubble_pill_status_hold_hint">%1$s · रोकने और दूसरे विकल्पों के लिए बबल को दबाकर रखें</string>
 
@@ -679,6 +689,12 @@
     <string name="setup_accent">ऐक्सेंट रंग</string>
     <string name="setup_surface">बैकग्राउंड</string>
     <string name="setup_surface_note">“गर्म”, Buddy का ओरिजनल टोन है. “काला” (बिल्कुल काला) सिर्फ़ डार्क मोड में लागू होता है.</string>
+    <string name="setup_face">Buddy का रूप</string>
+    <string name="setup_face_buddy">मूल</string>
+    <string name="setup_face_picture">आपकी तस्वीर</string>
+    <string name="setup_face_note">पारदर्शी बैकग्राउंड वाली PNG या WebP सबसे अच्छी लगती है। यह बबल पर और Buddy के जवाबों के पास दिखती है।</string>
+    <string name="setup_face_change">दूसरी तस्वीर चुनें</string>
+    <string name="setup_face_unreadable">यह तस्वीर पढ़ी नहीं जा सकी। PNG या WebP आज़माएँ।</string>
     <string name="setup_custom_colour">कस्टम रंग</string>
     <string name="setup_custom_accent_title">कस्टम ऐक्सेंट रंग</string>
     <string name="setup_custom_accent_hint">हेक्स कोड के रूप में कोई भी रंग, जैसे #4F8BFF.</string>

@@ -259,6 +259,8 @@ final class Tools {
             if (held != null) return text(held);
         }
         svc.onToolActivity(name);
+        String step = activity(name, a);
+        if (step != null) svc.showActivity(step, false);
         if (ACTIONS.contains(name)) svc.runOnMain(() -> svc.marks().clear()); // the screen is about to change
         switch (name) {
             case "read_screen": return text(readScreen());
@@ -694,6 +696,23 @@ final class Tools {
         }
     }
 
+    /** The bubble's line for a phone tool's step (taps say theirs once their target is known), or null. */
+    private String activity(String name, JSONObject a) {
+        switch (name) {
+            case "read_screen":
+            case "screenshot": return svc.getString(R.string.activity_reading);
+            case "type_text": return svc.getString(R.string.activity_typing);
+            case "scroll": return svc.getString(R.string.activity_scrolling);
+            case "swipe": return svc.getString(R.string.activity_swiping);
+            case "open_app": return svc.getString(R.string.activity_opening, a.optString("app"));
+            case "open_url": {
+                String h = Uri.parse(a.optString("url")).getHost();
+                return svc.getString(R.string.activity_opening, h == null ? a.optString("url") : h);
+            }
+            default: return null;
+        }
+    }
+
     // ------------------------------------------------------------- actions
 
     private String tap(JSONObject a, boolean longPress) throws Exception {
@@ -718,8 +737,12 @@ final class Tools {
             x = a.getInt("x");
             y = a.getInt("y");
         }
-        String blocked = guard(n, Guard.nodeAt(svc.getWindows(), x, y));
+        AccessibilityNodeInfo hit = Guard.nodeAt(svc.getWindows(), x, y);
+        String blocked = guard(n, hit);
         if (blocked != null) return blocked;
+        String label = Guard.buttonLabel(n != null ? n : hit);
+        svc.showActivity(label == null ? svc.getString(R.string.activity_tapping_plain)
+                : svc.getString(R.string.activity_tapping, label), false);
         Path p = new Path();
         p.moveTo(x, y);
         boolean ok = gesture(p, longPress ? 700 : 60);

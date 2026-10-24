@@ -195,6 +195,16 @@
     <string name="bubble_pill_hands_on">%1$s · hier tippen zum Antworten</string>
     <string name="bubble_using_phone">Bedient dein Smartphone</string>
     <string name="bubble_using_phone_status">Bedient dein Smartphone · %1$s</string>
+    <string name="activity_reading">Liest den Bildschirm</string>
+    <string name="activity_typing">Tippt</string>
+    <string name="activity_scrolling">Scrollt</string>
+    <string name="activity_swiping">Wischt</string>
+    <string name="activity_opening">Öffnet %1$s</string>
+    <string name="activity_tapping">Tippt auf „%1$s“</string>
+    <string name="activity_tapping_plain">Tippt</string>
+    <string name="activity_browsing">Surft auf %1$s · %2$s</string>
+    <string name="activity_browser_opening">Öffnet die Seite</string>
+    <string name="activity_browser_reading">Liest die Seite</string>
     <string name="bubble_pill_hold_hint">Stoppen und mehr: Bubble gedrückt halten</string>
     <string name="bubble_pill_status_hold_hint">%1$s · Stoppen und mehr: Bubble gedrückt halten</string>
 
@@ -684,6 +694,12 @@
     <string name="setup_accent">Akzentfarbe</string>
     <string name="setup_surface">Hintergrund</string>
     <string name="setup_surface_note">Warm ist der ursprüngliche Farbton von Buddy. Schwarz (echtes Schwarz) gilt nur im dunklen Modus.</string>
+    <string name="setup_face">Buddys Aussehen</string>
+    <string name="setup_face_buddy">Original</string>
+    <string name="setup_face_picture">Eigenes Bild</string>
+    <string name="setup_face_note">Am besten passt ein PNG oder WebP mit transparentem Hintergrund. Es erscheint auf der Bubble und neben Buddys Antworten.</string>
+    <string name="setup_face_change">Anderes Bild wählen</string>
+    <string name="setup_face_unreadable">Das Bild konnte nicht gelesen werden. Versuche ein PNG oder WebP.</string>
     <string name="setup_custom_colour">Eigene Farbe</string>
     <string name="setup_custom_accent_title">Eigene Akzentfarbe</string>
     <string name="setup_custom_accent_hint">Beliebige Farbe als Hex-Code, z. B. #4F8BFF.</string>

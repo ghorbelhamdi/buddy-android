@@ -204,6 +204,16 @@
     <string name="bubble_pill_hands_on">%1$s · dotknij tutaj, by odpowiedzieć</string>
     <string name="bubble_using_phone">Używam twojego telefonu</string>
     <string name="bubble_using_phone_status">Używam twojego telefonu · %1$s</string>
+    <string name="activity_reading">Czyta ekran</string>
+    <string name="activity_typing">Pisze</string>
+    <string name="activity_scrolling">Przewija</string>
+    <string name="activity_swiping">Przesuwa</string>
+    <string name="activity_opening">Otwiera %1$s</string>
+    <string name="activity_tapping">Dotyka „%1$s”</string>
+    <string name="activity_tapping_plain">Dotyka</string>
+    <string name="activity_browsing">Przegląda %1$s · %2$s</string>
+    <string name="activity_browser_opening">Otwiera stronę</string>
+    <string name="activity_browser_reading">Czyta stronę</string>
     <string name="bubble_pill_hold_hint">przytrzymaj dymek, by zatrzymać i nie tylko</string>
     <string name="bubble_pill_status_hold_hint">%1$s · przytrzymaj dymek, by zatrzymać i nie tylko</string>
 
@@ -705,6 +715,12 @@
     <string name="setup_accent">Kolor akcentu</string>
     <string name="setup_surface">Tło</string>
     <string name="setup_surface_note">Ciepły to oryginalny odcień Buddy. Czarny (czysta czerń) działa tylko w trybie ciemnym.</string>
+    <string name="setup_face">Wygląd Buddy\'ego</string>
+    <string name="setup_face_buddy">Oryginalny</string>
+    <string name="setup_face_picture">Twój obrazek</string>
+    <string name="setup_face_note">Najlepiej sprawdzi się PNG lub WebP z przezroczystym tłem. Pojawia się na dymku i obok odpowiedzi Buddy\'ego.</string>
+    <string name="setup_face_change">Wybierz inny obrazek</string>
+    <string name="setup_face_unreadable">Nie udało się odczytać tego obrazka. Spróbuj PNG lub WebP.</string>
     <string name="setup_custom_colour">Własny kolor</string>
     <string name="setup_custom_accent_title">Własny kolor akcentu</string>
     <string name="setup_custom_accent_hint">Dowolny kolor jako kod szesnastkowy, np. #4F8BFF.</string>

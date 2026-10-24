@@ -112,6 +112,14 @@ final class BrowserTools {
         Browser.agentUsed(key);
         String dialog = pendingDialog(key, false);
         if (dialog != null && !"browser_read".equals(name)) return text(dialog);
+        switch (name) { // the bubble says what's going on (a tap says its button once it's known)
+            case "browser_open": step(key, svc.getString(R.string.activity_browser_opening), a.optString("url")); break;
+            case "browser_read":
+            case "browser_screenshot": step(key, svc.getString(R.string.activity_browser_reading)); break;
+            case "browser_type": step(key, svc.getString(R.string.activity_typing)); break;
+            case "browser_scroll": step(key, svc.getString(R.string.activity_scrolling)); break;
+            default: break;
+        }
         switch (name) {
             case "browser_open": return text(open(key, a.getString("url"), a.optBoolean("new_tab")));
             case "browser_read": return text((dialog == null ? "" : dialog + "\n\n") + read(key, Math.max(0, a.optInt("from", 0))));
@@ -223,6 +231,8 @@ final class BrowserTools {
             if (blocked != null) return blocked;
             approved = true;
         }
+        step(key, label.isEmpty() ? svc.getString(R.string.activity_tapping_plain)
+                : svc.getString(R.string.activity_tapping, label));
         Browser.click(key, t.getDouble("x"), t.getDouble("y"));
         Thread.sleep(500);
         String dialog = pendingDialog(key, approved);
@@ -359,6 +369,20 @@ final class BrowserTools {
 
     private static String clip(String s, int max) {
         return s.length() <= max ? s : s.substring(0, max - 1) + "…";
+    }
+
+    /** Shows the step in the bubble: "Browsing reddit.com · Typing" (url: where it's going, when not there yet). */
+    private void step(String key, String what) {
+        step(key, what, null);
+    }
+
+    private void step(String key, String what, String url) {
+        String site = host(key);
+        if (url != null) {
+            String h = android.net.Uri.parse(url.contains("://") ? url : "https://" + url).getHost();
+            if (h != null) site = h.startsWith("www.") ? h.substring(4) : h;
+        }
+        svc.showActivity("?".equals(site) ? what : svc.getString(R.string.activity_browsing, site, what), true);
     }
 
     private static String stale(int ref) {

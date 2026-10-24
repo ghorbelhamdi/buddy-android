@@ -265,6 +265,16 @@
     <string name="bubble_using_phone">正在操作你的手机</string>
     <!-- %1$s: what the agent is doing right now (its own status text). -->
     <string name="bubble_using_phone_status">正在操作你的手机 · %1$s</string>
+    <string name="activity_reading">正在读取屏幕</string>
+    <string name="activity_typing">正在输入</string>
+    <string name="activity_scrolling">正在滚动</string>
+    <string name="activity_swiping">正在滑动</string>
+    <string name="activity_opening">正在打开 %1$s</string>
+    <string name="activity_tapping">正在点按“%1$s”</string>
+    <string name="activity_tapping_plain">正在点按</string>
+    <string name="activity_browsing">正在浏览 %1$s · %2$s</string>
+    <string name="activity_browser_opening">正在打开页面</string>
+    <string name="activity_browser_reading">正在读取页面</string>
     <!-- Shown until the user has opened the hold menu once; this one when there is no status text, otherwise the
          next string. "Stop" is the hold menu's Stop task action. -->
     <string name="bubble_pill_hold_hint">长按气泡可停止任务等</string>
@@ -973,6 +983,12 @@
     <string name="setup_surface">背景色调</string>
     <!-- "Warm" and "Black" are options of the Surface picker: use the same words as those options. -->
     <string name="setup_surface_note">“暖色”是 Buddy 的原始色调。“纯黑”仅在深色模式下生效。</string>
+    <string name="setup_face">Buddy 的形象</string>
+    <string name="setup_face_buddy">原版</string>
+    <string name="setup_face_picture">你的图片</string>
+    <string name="setup_face_note">背景透明的 PNG 或 WebP 效果最好。它会显示在气泡上和 Buddy 的回复旁边。</string>
+    <string name="setup_face_change">选择其他图片</string>
+    <string name="setup_face_unreadable">无法读取这张图片。请试试 PNG 或 WebP。</string>
     <!-- Read by TalkBack: the swatch that opens the custom colour sheet. -->
     <string name="setup_custom_colour">自定义颜色</string>
     <string name="setup_custom_accent_title">自定义强调色</string>

@@ -179,18 +179,10 @@ final class Bubble implements ChatHub.Listener {
 
         FrameLayout bubbleFrame = new FrameLayout(svc);
         face = new ImageView(svc);
-        face.setImageResource(R.drawable.bubble_face);
         face.setScaleType(ImageView.ScaleType.FIT_CENTER);
         face.setBackground(null);
-        // shadow follows Buddy's rounded speech-bubble body (drawable spans 2..54 of 56 units wide, 3..42 tall)
-        face.setOutlineProvider(new android.view.ViewOutlineProvider() {
-            @Override
-            public void getOutline(View v, android.graphics.Outline o) {
-                float u = v.getWidth() / 56f;
-                o.setRoundRect(Math.round(2 * u), Math.round(3 * u), Math.round(54 * u), Math.round(42 * u), 13 * u);
-            }
-        });
         face.setElevation(dp(5));
+        showFace(R.drawable.bubble_face);
         face.setContentDescription("Buddy");
         // room around the face for the working ring
         bubbleFrame.setPaddingRelative(dp(4), dp(4), dp(4), dp(4));
@@ -736,7 +728,7 @@ final class Bubble implements ChatHub.Listener {
         LinearLayout col = new LinearLayout(svc);
         col.setOrientation(LinearLayout.VERTICAL);
         ImageView head = new ImageView(svc);
-        head.setImageResource(R.drawable.bubble_face);
+        Face.set(head, R.drawable.bubble_face);
         head.setContentDescription(svc.getString(R.string.bubble_close));
         head.setOnClickListener(v -> collapse());
         LinearLayout.LayoutParams hp = new LinearLayout.LayoutParams(dp(52), dp(52));
@@ -1049,7 +1041,7 @@ final class Bubble implements ChatHub.Listener {
                     .setInterpolator(new OvershootInterpolator(3f)).setDuration(220).start();
             dismissCircle.setBackground(electrode(over));
             dismissCircle.setColorFilter(over ? 0xFF16305C : 0xFFFFFFFF); // dark ✕ on white-blue, light ✕ on the electrode
-            face.setImageResource(over ? R.drawable.bubble_face_brace : R.drawable.bubble_face_fired);
+            showFace(over ? R.drawable.bubble_face_brace : R.drawable.bubble_face_fired);
             if (over) vibrate(15);
         }
         return over;
@@ -2198,6 +2190,23 @@ final class Bubble implements ChatHub.Listener {
 
     enum Kind { USER, BUDDY, STEP, ERROR }
 
+    /** What a tool is doing right now (see setActivity), shown in the pill for a few seconds. */
+    private String activity;
+    private boolean activityBrowser;
+    private long activityAt;
+    private static final long ACTIVITY_MS = 8_000;
+    private final Runnable activityExpired = this::refreshStatus;
+
+    /** A tool's step ("Tapping “Send”"); browser: in the background browser, which isn't using the phone. */
+    void setActivity(String text, boolean browser) {
+        activity = text;
+        activityBrowser = browser;
+        activityAt = android.os.SystemClock.elapsedRealtime();
+        svc.mainHandler().removeCallbacks(activityExpired);
+        svc.mainHandler().postDelayed(activityExpired, ACTIVITY_MS + 100);
+        refreshStatus();
+    }
+
     /** External status (the notify tool): shown on the current chat until its next step. */
     void setStatus(String text) {
         if (text != null && !text.isEmpty()) sessions.current.status = text;
@@ -2214,13 +2223,18 @@ final class Bubble implements ChatHub.Listener {
         String text = pendingConfirm == null ? hub.pillText()
                 : handsOn ? svc.getString(R.string.bubble_pill_hands_on, clip(confirmText.getText().toString(), 90))
                 : svc.getString(asking ? R.string.bubble_pill_waiting_answer : R.string.bubble_pill_waiting_approval);
+        boolean fresh = activity != null && android.os.SystemClock.elapsedRealtime() - activityAt < ACTIVITY_MS;
+        boolean browsing = fresh && activityBrowser && !controlling; // only the background browser: the phone is free
         if (paused && pendingConfirm == null) {
             text = svc.getString(R.string.bubble_pill_paused);
         } else if (controlling && pendingConfirm == null) {
-            text = text == null || text.isEmpty() ? svc.getString(R.string.bubble_using_phone)
-                    : svc.getString(R.string.bubble_using_phone_status, text);
+            String step = fresh && !activityBrowser ? activity : text; // the tool's own step is the most precise
+            text = step == null || step.isEmpty() ? svc.getString(R.string.bubble_using_phone)
+                    : svc.getString(R.string.bubble_using_phone_status, step);
+        } else if (browsing && pendingConfirm == null) {
+            text = activity;
         }
-        if (!paused && (controlling || hub.runningCount() > 0) && pendingConfirm == null && !Prefs.menuHinted(svc)) {
+        if (!paused && (controlling || browsing || hub.runningCount() > 0) && pendingConfirm == null && !Prefs.menuHinted(svc)) {
             text = text == null ? svc.getString(R.string.bubble_pill_hold_hint)
                     : svc.getString(R.string.bubble_pill_status_hold_hint, text);
         }
@@ -2232,7 +2246,7 @@ final class Bubble implements ChatHub.Listener {
         pill.setTextColor(controlling ? Ui.ON_ACCENT : Ui.TEXT);
         pill.setBackground(rounded(controlling ? Ui.ACCENT : Ui.BG, 18, Ui.ACCENT, 1));
         badge.setVisibility(!expanded && hub.anyUnread() ? View.VISIBLE : View.GONE);
-        setWorking(!paused && (running || controlling));
+        setWorking(!paused && (running || controlling || browsing));
         updateHeader();
         if (!expanded) {
             try {
@@ -2251,10 +2265,38 @@ final class Bubble implements ChatHub.Listener {
         return dismissWindow != null && dismissWindow.getVisibility() == View.VISIBLE;
     }
 
+    /** The drawing on the floating face now (thinking, paused, fired up…). */
+    private int faceRes;
+
+    // the drawn face's shadow follows its rounded speech-bubble body (drawable spans 2..54 of 56 units wide, 3..42 tall)
+    private static final android.view.ViewOutlineProvider BODY = new android.view.ViewOutlineProvider() {
+        @Override
+        public void getOutline(View v, android.graphics.Outline o) {
+            float u = v.getWidth() / 56f;
+            o.setRoundRect(Math.round(2 * u), Math.round(3 * u), Math.round(54 * u), Math.round(42 * u), 13 * u);
+        }
+    };
+
+    /** Shows the drawing for this state, or the user's picture (issue #10) in every state: it has its shadow drawn in. */
+    private void showFace(int res) {
+        faceRes = res;
+        android.graphics.Bitmap own = Face.bubble(svc);
+        if (own != null) face.setImageBitmap(own);
+        else face.setImageResource(res);
+        android.view.ViewOutlineProvider outline = own != null ? null : BODY;
+        if (face.getOutlineProvider() != outline) face.setOutlineProvider(outline);
+    }
+
+    /** Buddy's look changed in Settings: the new face now, and in the chat panel's replies. */
+    void applyFace() {
+        showFace(faceRes);
+        if (!expanded && !showingList) renderCurrent();
+    }
+
     private void setWorking(boolean on, boolean force) {
         ring.setSpinning(on);
         // keep the fired-up / bracing face while the bubble is being dragged
-        if (force || !faceDragging()) face.setImageResource(on ? R.drawable.bubble_face_thinking
+        if (force || !faceDragging()) showFace(on ? R.drawable.bubble_face_thinking
                 : svc.paused() ? R.drawable.bubble_face_paused : R.drawable.bubble_face);
         if (on && breathing == null) {
             breathing = ValueAnimator.ofFloat(1f, 0.9f);
@@ -2320,7 +2362,7 @@ final class Bubble implements ChatHub.Listener {
                 FrameLayout av = new FrameLayout(svc);
                 av.setBackground(Ui.oval(Ui.ACCENT_SOFT));
                 ImageView f = new ImageView(svc);
-                f.setImageResource(R.drawable.bubble_face);
+                Face.set(f, R.drawable.bubble_face);
                 av.addView(f, new FrameLayout.LayoutParams(dp(20), dp(20), Gravity.CENTER));
                 LinearLayout.LayoutParams avp = new LinearLayout.LayoutParams(dp(24), dp(24));
                 avp.setMarginEnd(dp(8));
@@ -2680,7 +2722,7 @@ final class Bubble implements ChatHub.Listener {
                         startX = rootLoc[0];
                         lpToScreenY = rootLoc[1] - startY; // window y vs screen y (status bar, insets)
                         if (windowAnim != null) windowAnim.cancel();
-                        face.setImageResource(R.drawable.bubble_face_fired);
+                        showFace(R.drawable.bubble_face_fired);
                         ((View) face.getParent()).animate().scaleX(1.14f).scaleY(1.14f)
                                 .setInterpolator(new OvershootInterpolator(3f)).setDuration(220).start();
                     }

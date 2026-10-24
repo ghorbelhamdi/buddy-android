@@ -168,6 +168,15 @@ final class Prefs {
         sp(c).edit().putString("panel_size", size).apply();
     }
 
+    /** Buddy's face on the bubble and in the chats: "buddy" (the drawn one) or "picture" (one the user picked). */
+    static String face(Context c) {
+        return sp(c).getString("face", "buddy");
+    }
+
+    static void setFace(Context c, String face) {
+        sp(c).edit().putString("face", face).apply();
+    }
+
     /** Read replies aloud with text-to-speech. */
     static boolean speakReplies(Context c) {
         return sp(c).getBoolean("speak", false);

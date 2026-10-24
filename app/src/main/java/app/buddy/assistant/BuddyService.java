@@ -220,6 +220,13 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         });
     }
 
+    /** Buddy's look changed in Settings: the bubble shows the new face. */
+    void applyFace() {
+        main.post(() -> {
+            if (bubble != null) bubble.applyFace();
+        });
+    }
+
     /** Restyle the bubble after the appearance settings (or the system dark mode) change. */
     void applyTheme() {
         main.post(() -> {
@@ -419,8 +426,10 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             bubble.onToolActivity(tool);
             // asking for approval, asking a question, posting a note, pointing something out or answering in a
             // notification isn't operating the phone
+            // nor is waiting or listing apps
             if (!"confirm".equals(tool) && !"ask".equals(tool) && !"notify".equals(tool) && !"reply_notification".equals(tool)
-                    && !"point_out".equals(tool) && !tool.startsWith("browser_")) { // the background browser isn't the phone
+                    && !"point_out".equals(tool) && !"wait".equals(tool) && !"list_apps".equals(tool)
+                    && !tool.startsWith("browser_")) { // the background browser isn't the phone
                 control.onActivity();
             }
         });
@@ -588,12 +597,15 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
      */
     String awaitResume(String tool, boolean phone) throws InterruptedException {
         long until = android.os.SystemClock.elapsedRealtime() + PAUSE_WAIT_MS;
-        if (paused) heldInPause = true;
+        if (paused && (phone || pausedForBrowser)) heldInPause = true;
         synchronized (pauseLock) {
             long left;
             waiters++;
             try {
-                while (paused && (left = until - android.os.SystemClock.elapsedRealtime()) > 0) pauseLock.wait(left);
+                // the background browser doesn't use the screen: a pause for the phone doesn't hold it up
+                while (paused && (phone || pausedForBrowser) && (left = until - android.os.SystemClock.elapsedRealtime()) > 0) {
+                    pauseLock.wait(left);
+                }
             } finally {
                 waiters--;
             }
@@ -602,7 +614,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             return "PAUSED: the user is using the background browser in the live view. Nothing was done. Don't use other "
                     + "tools; call " + tool + " again to keep waiting until they tap Continue.";
         }
-        if (paused) {
+        if (paused && phone) {
             return "PAUSED: the user paused you to use the phone themselves. Nothing was done. Don't use other phone "
                     + "tools; call " + tool + " again to keep waiting until they resume.";
         }
@@ -626,6 +638,13 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             if (v != null) v.vibrate(android.os.VibrationEffect.createWaveform(new long[]{0, 60, 80, 60}, -1));
         } catch (Exception ignored) {
         }
+    }
+
+    /** What a tool is doing right now, for the bubble's pill (see Bubble.setActivity); browser: the background browser. */
+    void showActivity(final String text, final boolean browser) {
+        main.post(() -> {
+            if (bubble != null) bubble.setActivity(text, browser);
+        });
     }
 
     void showStatus(final String text) {

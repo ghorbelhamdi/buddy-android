@@ -80,8 +80,18 @@
     return r;
   }
 
+  // read() numbers items inside shadow roots too (web components, e.g. Reddit's forms): look there as well
   B.find = function (ref) {
-    return document.querySelector('[data-buddy-ref="' + String(ref).replace(/[^0-9]/g, '') + '"]');
+    var sel = '[data-buddy-ref="' + String(ref).replace(/[^0-9]/g, '') + '"]';
+    return (function deep(root) {
+      var el = root.querySelector(sel);
+      if (el) return el;
+      var all = root.querySelectorAll('*');
+      for (var i = 0; i < all.length; i++) {
+        if (all[i].shadowRoot && (el = deep(all[i].shadowRoot))) return el;
+      }
+      return null;
+    })(document);
   };
 
   // Where items are on screen (CSS pixels of the viewport), for the marks the user sees; the first scrolled into view
@@ -203,16 +213,30 @@
   B.signals = function () {
     var pw = false, f = document.querySelectorAll('input[type=password]');
     for (var i = 0; i < f.length; i++) if (shown(f[i]) && f[i].getBoundingClientRect().width > 0) pw = true;
-    var frames = Array.prototype.map.call(document.querySelectorAll('iframe'), function (x) { return x.src || ''; }).join(' ');
+    // only a challenge the user can see: many sign-in pages load an invisible reCAPTCHA that never asks anything
+    function visible(x) {
+      var r = x.getBoundingClientRect();
+      return shown(x) && r.width >= 60 && r.height >= 40;
+    }
+    var frames = Array.prototype.filter.call(document.querySelectorAll('iframe'), function (x) {
+      return visible(x) && !/size=invisible/i.test(x.src || '');
+    }).map(function (x) { return x.src || ''; }).join(' ');
+    var widget = Array.prototype.some.call(document.querySelectorAll('#challenge-form,#cf-challenge-running,.g-recaptcha,.h-captcha,#px-captcha'), visible);
     var text = clean(document.body ? document.body.innerText : '', 3000);
     var bot = /recaptcha|hcaptcha|challenges\.cloudflare|turnstile|arkoselabs|funcaptcha|captcha-delivery|px-captcha|geo\.captcha/i.test(frames)
-      || /^just a moment/i.test(document.title) || !!document.querySelector('#challenge-form,#cf-challenge-running,.g-recaptcha,.h-captcha,#px-captcha')
+      || /^just a moment/i.test(document.title) || widget
       || /verify (that )?you are (a )?human|are you a robot|unusual traffic|pardon our interruption|press (&|and) hold|checking your browser|confirm you are not a robot|bot detection/i.test(text);
     var blocked = /^(access denied|forbidden|403)/i.test(document.title) || /you don't have permission to access|request blocked|access to this page has been denied/i.test(text.slice(0, 600));
     return {login: pw, bot: bot, blocked: blocked};
   };
 
   // An item for a tap: where it is now (scrolled into view) and what it does
+  // is a inside b, counting a web component's inner elements as inside it
+  function within(a, b) {
+    for (var n = a; n; n = n.parentNode || n.host) if (n === b) return true;
+    return false;
+  }
+
   B.target = function (ref) {
     var el = B.find(ref);
     if (!el) return {missing: true};
@@ -220,8 +244,14 @@
     var rs = el.getClientRects(), r = rs.length ? rs[0] : el.getBoundingClientRect();
     var x = r.left + Math.min(r.width / 2, 40 + r.width / 4), y = r.top + r.height / 2;
     if (r.width < 80) x = r.left + r.width / 2;
+    // the topmost element there, inside web components too (elementFromPoint stops at their outer element)
     var hit = document.elementFromPoint(x, y), covered = null;
-    if (hit && hit !== el && !el.contains(hit) && !hit.contains(el)) {
+    while (hit && hit.shadowRoot) {
+      var inner = hit.shadowRoot.elementFromPoint(x, y);
+      if (!inner || inner === hit) break;
+      hit = inner;
+    }
+    if (hit && hit !== el && !within(hit, el) && !within(el, hit)) {
       var h = hit;
       while (h && !role(h)) h = h.parentElement;
       covered = h ? describe(h, role(h)) : clean(hit.innerText || hit.tagName, 60);

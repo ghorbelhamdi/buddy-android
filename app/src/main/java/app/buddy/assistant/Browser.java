@@ -55,7 +55,7 @@ final class Browser {
     static final int WIDTH = 400, HEIGHT = 820;
     /** The chat key of the tab the user opens from Settings (signing in to sites), and of agents outside Buddy's chats. */
     static final String USER = "user";
-    private static final long IDLE_STOP_MS = 10 * 60_000L, FRAME_GAP_MS = 280;
+    private static final long IDLE_STOP_MS = 3 * 60_000L, FRAME_GAP_MS = 280;
 
     static volatile State state = State.OFF;
     static volatile String detail = "";

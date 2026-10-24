@@ -268,6 +268,16 @@
     <string name="bubble_using_phone">Utilisation du téléphone</string>
     <!-- %1$s: what the agent is doing right now (its own status text). -->
     <string name="bubble_using_phone_status">Utilisation du téléphone · %1$s</string>
+    <string name="activity_reading">Lit l\'écran</string>
+    <string name="activity_typing">Saisit du texte</string>
+    <string name="activity_scrolling">Fait défiler</string>
+    <string name="activity_swiping">Balaie l\'écran</string>
+    <string name="activity_opening">Ouvre %1$s</string>
+    <string name="activity_tapping">Appuie sur « %1$s »</string>
+    <string name="activity_tapping_plain">Appuie</string>
+    <string name="activity_browsing">Navigue sur %1$s · %2$s</string>
+    <string name="activity_browser_opening">Ouvre la page</string>
+    <string name="activity_browser_reading">Lit la page</string>
     <!-- Shown until the user has opened the hold menu once; this one when there is no status text, otherwise the
          next string. "Stop" is the hold menu's Stop task action. -->
     <string name="bubble_pill_hold_hint">appui long sur la bulle : Arrêter et plus encore</string>
@@ -982,6 +992,12 @@
     <string name="setup_surface">Fond</string>
     <!-- "Warm" and "Black" are options of the Surface picker: use the same words as those options. -->
     <string name="setup_surface_note">Chaud est la teinte d\'origine de Buddy. Noir (noir pur) ne s\'applique qu\'avec le thème sombre.</string>
+    <string name="setup_face">Apparence de Buddy</string>
+    <string name="setup_face_buddy">Original</string>
+    <string name="setup_face_picture">Votre image</string>
+    <string name="setup_face_note">Un PNG ou WebP à fond transparent donne le meilleur résultat. Elle s\'affiche sur la bulle et à côté des réponses de Buddy.</string>
+    <string name="setup_face_change">Choisir une autre image</string>
+    <string name="setup_face_unreadable">Impossible de lire cette image. Essayez un PNG ou un WebP.</string>
     <!-- Read by TalkBack: the swatch that opens the custom colour sheet. -->
     <string name="setup_custom_colour">Couleur personnalisée</string>
     <string name="setup_custom_accent_title">Couleur personnalisée</string>

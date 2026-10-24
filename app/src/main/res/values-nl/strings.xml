@@ -195,6 +195,16 @@
     <string name="bubble_pill_hands_on">%1$s · tik hier om te antwoorden</string>
     <string name="bubble_using_phone">Bedient je telefoon</string>
     <string name="bubble_using_phone_status">Bedient je telefoon · %1$s</string>
+    <string name="activity_reading">Leest het scherm</string>
+    <string name="activity_typing">Typt</string>
+    <string name="activity_scrolling">Scrolt</string>
+    <string name="activity_swiping">Veegt</string>
+    <string name="activity_opening">Opent %1$s</string>
+    <string name="activity_tapping">Tikt op ‘%1$s’</string>
+    <string name="activity_tapping_plain">Tikt</string>
+    <string name="activity_browsing">Surft op %1$s · %2$s</string>
+    <string name="activity_browser_opening">Opent de pagina</string>
+    <string name="activity_browser_reading">Leest de pagina</string>
     <string name="bubble_pill_hold_hint">houd de bubbel ingedrukt voor Stoppen en meer</string>
     <string name="bubble_pill_status_hold_hint">%1$s · houd de bubbel ingedrukt voor Stoppen en meer</string>
 
@@ -684,6 +694,12 @@
     <string name="setup_accent">Accentkleur</string>
     <string name="setup_surface">Achtergrond</string>
     <string name="setup_surface_note">Warm is de oorspronkelijke tint van Buddy. Zwart (echt zwart) geldt alleen in de donkere modus.</string>
+    <string name="setup_face">Uiterlijk van Buddy</string>
+    <string name="setup_face_buddy">Origineel</string>
+    <string name="setup_face_picture">Eigen afbeelding</string>
+    <string name="setup_face_note">Een PNG of WebP met een transparante achtergrond werkt het best. Hij staat op de bubbel en naast de antwoorden van Buddy.</string>
+    <string name="setup_face_change">Andere afbeelding kiezen</string>
+    <string name="setup_face_unreadable">Die afbeelding kan niet worden gelezen. Probeer een PNG of WebP.</string>
     <string name="setup_custom_colour">Eigen kleur</string>
     <string name="setup_custom_accent_title">Eigen accentkleur</string>
     <string name="setup_custom_accent_hint">Elke kleur als hexcode, bijvoorbeeld #4F8BFF.</string>

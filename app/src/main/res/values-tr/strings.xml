@@ -198,6 +198,16 @@
     <string name="bubble_pill_hands_on">%1$s · yanıtlamak için buraya dokunun</string>
     <string name="bubble_using_phone">Telefonunuz kullanılıyor</string>
     <string name="bubble_using_phone_status">Telefonunuz kullanılıyor · %1$s</string>
+    <string name="activity_reading">Ekranı okuyor</string>
+    <string name="activity_typing">Yazıyor</string>
+    <string name="activity_scrolling">Kaydırıyor</string>
+    <string name="activity_swiping">Kaydırıyor</string>
+    <string name="activity_opening">%1$s açılıyor</string>
+    <string name="activity_tapping">“%1$s” öğesine dokunuyor</string>
+    <string name="activity_tapping_plain">Dokunuyor</string>
+    <string name="activity_browsing">%1$s geziniyor · %2$s</string>
+    <string name="activity_browser_opening">Sayfa açılıyor</string>
+    <string name="activity_browser_reading">Sayfayı okuyor</string>
     <string name="bubble_pill_hold_hint">durdurmak ve diğer seçenekler için baloncuğa uzun basın</string>
     <string name="bubble_pill_status_hold_hint">%1$s · durdurmak ve diğer seçenekler için baloncuğa uzun basın</string>
 
@@ -687,6 +697,12 @@
     <string name="setup_accent">Vurgu rengi</string>
     <string name="setup_surface">Yüzey</string>
     <string name="setup_surface_note">Sıcak, Buddy\'nin orijinal tonudur. Siyah (tam siyah) yalnızca koyu modda uygulanır.</string>
+    <string name="setup_face">Buddy\'nin görünümü</string>
+    <string name="setup_face_buddy">Orijinal</string>
+    <string name="setup_face_picture">Kendi resmin</string>
+    <string name="setup_face_note">En iyi sonucu şeffaf arka planlı bir PNG veya WebP verir. Baloncukta ve Buddy\'nin yanıtlarının yanında görünür.</string>
+    <string name="setup_face_change">Başka bir resim seç</string>
+    <string name="setup_face_unreadable">Bu resim okunamadı. Bir PNG veya WebP dene.</string>
     <string name="setup_custom_colour">Özel renk</string>
     <string name="setup_custom_accent_title">Özel vurgu rengi</string>
     <string name="setup_custom_accent_hint">Herhangi bir rengin hex kodu, örneğin #4F8BFF.</string>

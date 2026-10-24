@@ -191,6 +191,16 @@
     <string name="bubble_pill_hands_on">%1$s · 여기를 탭해 답하세요</string>
     <string name="bubble_using_phone">휴대전화 사용 중</string>
     <string name="bubble_using_phone_status">휴대전화 사용 중 · %1$s</string>
+    <string name="activity_reading">화면 읽는 중</string>
+    <string name="activity_typing">입력 중</string>
+    <string name="activity_scrolling">스크롤 중</string>
+    <string name="activity_swiping">스와이프 중</string>
+    <string name="activity_opening">%1$s 여는 중</string>
+    <string name="activity_tapping">“%1$s” 탭하는 중</string>
+    <string name="activity_tapping_plain">탭하는 중</string>
+    <string name="activity_browsing">%1$s 탐색 중 · %2$s</string>
+    <string name="activity_browser_opening">페이지 여는 중</string>
+    <string name="activity_browser_reading">페이지 읽는 중</string>
     <string name="bubble_pill_hold_hint">‘작업 중지’ 등은 버블을 길게 누르세요</string>
     <string name="bubble_pill_status_hold_hint">%1$s · ‘작업 중지’ 등은 버블을 길게 누르세요</string>
 
@@ -674,6 +684,12 @@
     <string name="setup_accent">강조 색상</string>
     <string name="setup_surface">배경 톤</string>
     <string name="setup_surface_note">‘웜’은 Buddy 고유의 톤이에요. ‘블랙’(완전한 검정)은 다크 모드에서만 적용돼요.</string>
+    <string name="setup_face">Buddy 모습</string>
+    <string name="setup_face_buddy">기본</string>
+    <string name="setup_face_picture">내 이미지</string>
+    <string name="setup_face_note">배경이 투명한 PNG나 WebP가 가장 잘 어울려요. 버블과 Buddy 답장 옆에 표시돼요.</string>
+    <string name="setup_face_change">다른 이미지 선택</string>
+    <string name="setup_face_unreadable">이 이미지를 읽을 수 없어요. PNG나 WebP로 시도해 보세요.</string>
     <string name="setup_custom_colour">맞춤 색상</string>
     <string name="setup_custom_accent_title">맞춤 강조 색상</string>
     <string name="setup_custom_accent_hint">#4F8BFF처럼 16진수 코드로 원하는 색상을 입력하세요.</string>

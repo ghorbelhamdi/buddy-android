@@ -75,11 +75,12 @@ As soon as an agent starts operating the phone, Buddy makes it obvious so you kn
 
 ### Background browser
 
-*GitHub version only, for now.* Turn on **Settings → Background browser**: the first time, Buddy downloads Chromium into its Linux (about 300 MB). Agents then use this browser for web pages (looking things up, comparing prices, checking a page) without taking over your screen, also while the phone is locked; for your own accounts and apps they still use the phone. It starts when an agent needs it and stops after 10 minutes unused.
+*GitHub version only, for now.* Turn on **Settings → Background browser**: the first time, Buddy downloads Chromium into its Linux (about 300 MB). Agents then use this browser for web pages (looking things up, comparing prices, checking a page) without taking over your screen, also while the phone is locked; for your own accounts and apps they still use the phone. It starts when an agent needs it and stops after 3 minutes unused.
 
 - **Live view.** A chat that uses it shows the page live above the messages; tap it full screen to use it yourself, with an address bar. Touching it while the agent works pauses the agent until you tap **Continue** or write to it.
 - **The same approvals.** Buttons like Post, Send, Buy, Pay and Delete get Buddy's approval card, as on the phone. Agents never type into password, code or card fields.
 - **Your part, marked.** When a page needs you (a sign-in, a captcha, your details), the agent asks, and Buddy opens the browser full screen with the fields and buttons marked; it closes again when you tap **Done**.
+- **Apps closing by themselves?** Android 12+ kills apps' child processes once all apps together run more than about 32, and the browser, Remote Control sessions and Termux all count. If Termux or Buddy's sessions get closed ("signal 9"), turn on **Developer options → Disable child process restrictions**.
 - **Sign-ins.** To let agents use a site with your account, open the browser and sign in yourself. **Signed-in sites** lists the sites you signed in to, each with **Log out**; **Wipe browser data** clears everything. "Continue with Google" often fails in automated browsers: use email and password.
 
 ### The bubble

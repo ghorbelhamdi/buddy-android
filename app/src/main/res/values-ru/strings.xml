@@ -274,6 +274,16 @@
     <string name="bubble_using_phone">Управляет телефоном</string>
     <!-- %1$s: what the agent is doing right now (its own status text). -->
     <string name="bubble_using_phone_status">Управляет телефоном · %1$s</string>
+    <string name="activity_reading">Читает экран</string>
+    <string name="activity_typing">Печатает</string>
+    <string name="activity_scrolling">Прокручивает</string>
+    <string name="activity_swiping">Проводит по экрану</string>
+    <string name="activity_opening">Открывает %1$s</string>
+    <string name="activity_tapping">Нажимает «%1$s»</string>
+    <string name="activity_tapping_plain">Нажимает</string>
+    <string name="activity_browsing">Просматривает %1$s · %2$s</string>
+    <string name="activity_browser_opening">Открывает страницу</string>
+    <string name="activity_browser_reading">Читает страницу</string>
     <!-- Shown until the user has opened the hold menu once; this one when there is no status text, otherwise the
          next string. "Stop" is the hold menu's Stop task action. -->
     <string name="bubble_pill_hold_hint">удерживайте пузырёк, чтобы остановить и не только</string>
@@ -1000,6 +1010,12 @@
     <string name="setup_surface">Фон</string>
     <!-- "Warm" and "Black" are options of the Surface picker: use the same words as those options. -->
     <string name="setup_surface_note">«Тёплый» — исходный оттенок Buddy. «Чёрный» (настоящий чёрный) действует только в тёмной теме.</string>
+    <string name="setup_face">Внешний вид Buddy</string>
+    <string name="setup_face_buddy">Оригинал</string>
+    <string name="setup_face_picture">Своё изображение</string>
+    <string name="setup_face_note">Лучше всего подойдёт PNG или WebP с прозрачным фоном. Он появится на пузырьке и рядом с ответами Buddy.</string>
+    <string name="setup_face_change">Выбрать другое изображение</string>
+    <string name="setup_face_unreadable">Не удалось прочитать изображение. Попробуйте PNG или WebP.</string>
     <!-- Read by TalkBack: the swatch that opens the custom colour sheet. -->
     <string name="setup_custom_colour">Свой цвет</string>
     <string name="setup_custom_accent_title">Свой акцентный цвет</string>

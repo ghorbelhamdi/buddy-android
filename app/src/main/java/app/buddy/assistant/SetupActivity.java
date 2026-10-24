@@ -108,6 +108,49 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
     }
 
     /** Appearance changed on this screen: restyle everything in place, keeping the scroll position. */
+    private static final int REQ_FACE = 1;
+
+    private void pickFace() {
+        try {
+            startActivityForResult(new Intent(Intent.ACTION_GET_CONTENT).setType("image/*")
+                    .addCategory(Intent.CATEGORY_OPENABLE), REQ_FACE);
+        } catch (android.content.ActivityNotFoundException e) {
+            Toast.makeText(this, R.string.chat_no_app_for_action, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int code, int result, Intent data) {
+        super.onActivityResult(code, result, data);
+        if (code != REQ_FACE || result != RESULT_OK || data == null || data.getData() == null) return;
+        Uri uri = data.getData();
+        new Thread(() -> {
+            boolean ok;
+            try {
+                Face.save(this, uri);
+                ok = true;
+            } catch (Exception e) {
+                ok = false;
+            }
+            final boolean saved = ok;
+            runOnUiThread(() -> {
+                if (!saved) {
+                    Toast.makeText(this, R.string.setup_face_unreadable, Toast.LENGTH_LONG).show();
+                    return;
+                }
+                Prefs.setFace(this, "picture");
+                faceChanged();
+            });
+        }).start();
+    }
+
+    /** The bubble, and these settings, show the face just picked. */
+    private void faceChanged() {
+        BuddyService svc = BuddyService.get();
+        if (svc != null) svc.applyFace();
+        if (!isFinishing() && !isDestroyed()) render();
+    }
+
     private void themeChanged() {
         Theme.changed(this);
         rethemed();
@@ -200,6 +243,37 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         }), topGap(8));
         TextView sn = text(this, getString(R.string.setup_surface_note), 13, MUTED);
         ap.addView(sn, topGap(8));
+        // Buddy's look: the drawn face, or a picture the user picks (issue #10)
+        boolean own = Face.picture(this) != null;
+        ap.addView(fieldLabel(getString(R.string.setup_face), null), topGap(18));
+        LinearLayout fr = row(this);
+        fr.setGravity(Gravity.CENTER_VERTICAL);
+        FrameLayout ft = new FrameLayout(this);
+        ft.setBackground(oval(ACCENT_SOFT));
+        ImageView fv = new ImageView(this);
+        Face.set(fv, R.drawable.bubble_face);
+        ft.addView(fv, new FrameLayout.LayoutParams(dp(this, 30), dp(this, 30), Gravity.CENTER));
+        fr.addView(ft, new LinearLayout.LayoutParams(dp(this, 38), dp(this, 38)));
+        LinearLayout.LayoutParams fp = weight1();
+        fp.setMarginStart(dp(this, 12));
+        fr.addView(segmented(this, new String[][]{{"buddy", getString(R.string.setup_face_buddy)},
+                {"picture", getString(R.string.setup_face_picture)}}, own ? "picture" : "buddy", false, v -> {
+            Prefs.setFace(this, v);
+            if ("picture".equals(v) && Face.picture(this) == null) { // none saved yet, or it can't be read
+                Prefs.setFace(this, "buddy");
+                pickFace();
+            } else {
+                faceChanged();
+            }
+        }), fp);
+        ap.addView(fr, topGap(10));
+        ap.addView(text(this, getString(R.string.setup_face_note), 13, MUTED), topGap(8));
+        if (own) {
+            TextView change = text(this, getString(R.string.setup_face_change), 14, ACCENT_TEXT);
+            change.setPaddingRelative(0, dp(this, 4), 0, dp(this, 4));
+            change.setOnClickListener(v -> pickFace());
+            ap.addView(change, topGap(6));
+        }
         addCard(ap);
 
         // ---------------------------------------------------------------- agent

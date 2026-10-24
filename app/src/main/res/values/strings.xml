@@ -271,6 +271,16 @@
     <string name="bubble_using_phone">Using your phone</string>
     <!-- %1$s: what the agent is doing right now (its own status text). -->
     <string name="bubble_using_phone_status">Using your phone · %1$s</string>
+    <string name="activity_reading">Reading the screen</string>
+    <string name="activity_typing">Typing</string>
+    <string name="activity_scrolling">Scrolling</string>
+    <string name="activity_swiping">Swiping</string>
+    <string name="activity_opening">Opening %1$s</string>
+    <string name="activity_tapping">Tapping “%1$s”</string>
+    <string name="activity_tapping_plain">Tapping</string>
+    <string name="activity_browsing">Browsing %1$s · %2$s</string>
+    <string name="activity_browser_opening">Opening the page</string>
+    <string name="activity_browser_reading">Reading the page</string>
     <!-- Shown until the user has opened the hold menu once; this one when there is no status text, otherwise the
          next string. "Stop" is the hold menu's Stop task action. -->
     <string name="bubble_pill_hold_hint">hold the bubble for Stop and more</string>
@@ -1002,6 +1012,15 @@
     <string name="setup_surface">Surface</string>
     <!-- "Warm" and "Black" are options of the Surface picker: use the same words as those options. -->
     <string name="setup_surface_note">Warm is Buddy\'s original tone. Black (true black) applies in dark mode only.</string>
+    <!-- Setting: Buddy's face on the floating bubble and next to its replies. Title above two short choices. -->
+    <string name="setup_face">Buddy\'s look</string>
+    <!-- Choice: Buddy's own drawn face. Keep it short. -->
+    <string name="setup_face_buddy">Original</string>
+    <!-- Choice: a picture the user picks from the phone. Keep it short. -->
+    <string name="setup_face_picture">Your picture</string>
+    <string name="setup_face_note">A PNG or WebP with a transparent background works best. It shows on the bubble and next to Buddy\'s replies.</string>
+    <string name="setup_face_change">Choose another picture</string>
+    <string name="setup_face_unreadable">Couldn\'t read that picture. Try a PNG or WebP.</string>
     <!-- Read by TalkBack: the swatch that opens the custom colour sheet. -->
     <string name="setup_custom_colour">Custom colour</string>
     <string name="setup_custom_accent_title">Custom accent</string>
