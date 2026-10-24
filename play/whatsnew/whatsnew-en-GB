@@ -1,1 +1,1 @@
-Stop now holds for its full minute, even while notification rules are waiting. Swipes and scrolls get the same safety checks as taps. The terminal no longer crashes after rotating the phone or on unusual characters.
+Give Buddy your own look: Settings > Appearance > Buddy's look, then pick a picture (a PNG or WebP with a transparent background works best). It shows on the bubble and next to Buddy's replies. The bubble now says what the agent is doing, like "Using your phone · Tapping Send". Waiting and listing apps no longer count as using your phone.
