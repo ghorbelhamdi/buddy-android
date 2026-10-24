@@ -2277,12 +2277,12 @@ final class Bubble implements ChatHub.Listener {
         }
     };
 
-    /** Shows the drawing for this state, or the user's picture (issue #10) in every state: it has its shadow drawn in. */
+    /** Shows the drawing for this state, or the user's picture (issue #10) in every state, with its own shadow. */
     private void showFace(int res) {
         faceRes = res;
-        android.graphics.Bitmap own = Face.bubble(svc);
-        if (own != null) face.setImageBitmap(own);
-        else face.setImageResource(res);
+        android.graphics.drawable.Drawable own = Face.bubble(svc);
+        if (own == null) face.setImageResource(res);
+        else if (face.getDrawable() != own) face.setImageDrawable(own);
         android.view.ViewOutlineProvider outline = own != null ? null : BODY;
         if (face.getOutlineProvider() != outline) face.setOutlineProvider(outline);
     }
@@ -2363,7 +2363,8 @@ final class Bubble implements ChatHub.Listener {
                 av.setBackground(Ui.oval(Ui.ACCENT_SOFT));
                 ImageView f = new ImageView(svc);
                 Face.set(f, R.drawable.bubble_face);
-                av.addView(f, new FrameLayout.LayoutParams(dp(20), dp(20), Gravity.CENTER));
+                int fs = dp(Face.size(svc, 20, 24));
+                av.addView(f, new FrameLayout.LayoutParams(fs, fs, Gravity.CENTER));
                 LinearLayout.LayoutParams avp = new LinearLayout.LayoutParams(dp(24), dp(24));
                 avp.setMarginEnd(dp(8));
                 r.addView(av, avp);

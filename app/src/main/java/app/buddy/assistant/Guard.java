@@ -207,6 +207,7 @@ final class Guard {
     /** A short name for what a tap would press. A generic one ("Submit") is replaced by the button's id
      * ("add-to-cart-button" → "add to cart") or the visible text next to it, so the card says what it does. */
     static String buttonLabel(AccessibilityNodeInfo n) {
+        if (n == null) return null; // nothing under a tap's point (a screen changing)
         String l = rawButtonLabel(n);
         if (l != null && !GENERIC.matcher(l.trim()).matches()) return l;
         AccessibilityNodeInfo cur = n;

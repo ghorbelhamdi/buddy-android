@@ -252,7 +252,8 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         ft.setBackground(oval(ACCENT_SOFT));
         ImageView fv = new ImageView(this);
         Face.set(fv, R.drawable.bubble_face);
-        ft.addView(fv, new FrameLayout.LayoutParams(dp(this, 30), dp(this, 30), Gravity.CENTER));
+        int fs = dp(this, Face.size(this, 30, 36));
+        ft.addView(fv, new FrameLayout.LayoutParams(fs, fs, Gravity.CENTER));
         fr.addView(ft, new LinearLayout.LayoutParams(dp(this, 38), dp(this, 38)));
         LinearLayout.LayoutParams fp = weight1();
         fp.setMarginStart(dp(this, 12));

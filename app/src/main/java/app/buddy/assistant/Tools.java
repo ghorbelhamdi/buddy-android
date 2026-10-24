@@ -704,7 +704,15 @@ final class Tools {
             case "type_text": return svc.getString(R.string.activity_typing);
             case "scroll": return svc.getString(R.string.activity_scrolling);
             case "swipe": return svc.getString(R.string.activity_swiping);
-            case "open_app": return svc.getString(R.string.activity_opening, a.optString("app"));
+            case "open_app": {
+                String app = a.optString("app");
+                try { // a package name reads as the app's name
+                    PackageManager pm = svc.getPackageManager();
+                    app = pm.getApplicationLabel(pm.getApplicationInfo(app, 0)).toString();
+                } catch (Exception ignored) {
+                }
+                return svc.getString(R.string.activity_opening, app);
+            }
             case "open_url": {
                 String h = Uri.parse(a.optString("url")).getHost();
                 return svc.getString(R.string.activity_opening, h == null ? a.optString("url") : h);

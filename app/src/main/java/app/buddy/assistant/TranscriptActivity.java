@@ -147,7 +147,8 @@ public class TranscriptActivity extends Screen implements ChatHub.MonitorListene
                 av.setBackground(oval(ACCENT_SOFT));
                 ImageView face = new ImageView(this);
                 Face.set(face, R.drawable.bubble_face);
-                av.addView(face, new FrameLayout.LayoutParams(dp(this, 20), dp(this, 20), Gravity.CENTER));
+                int fs = dp(this, Face.size(this, 20, 24));
+                av.addView(face, new FrameLayout.LayoutParams(fs, fs, Gravity.CENTER));
                 LinearLayout.LayoutParams avp = new LinearLayout.LayoutParams(dp(this, 24), dp(this, 24));
                 avp.setMarginEnd(dp(this, 8));
                 r.addView(av, avp);
