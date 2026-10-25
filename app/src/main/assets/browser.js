@@ -43,7 +43,45 @@
     }
     if (el.isContentEditable && !(el.parentElement && el.parentElement.isContentEditable)) return 'textbox';
     if (el.hasAttribute('onclick') || (el.tabIndex >= 0 && getComputedStyle(el).cursor === 'pointer' && t !== 'BODY')) return 'button';
+    if (iconButton(el)) return 'button';
     return null;
+  }
+
+  // A small thing that's clicked but can't be focused (a banner's ✕, an icon with a click handler): it shows the
+  // hand pointer, its parent doesn't (or it's just a part of a bigger clickable thing), it has few words and nothing
+  // usable inside
+  function iconButton(el) {
+    if (el === document.body || el === document.documentElement || getComputedStyle(el).cursor !== 'pointer') return false;
+    var p = el.parentElement || (el.parentNode && el.parentNode.host);
+    if (p && getComputedStyle(p).cursor === 'pointer') return false;
+    if (clean(el.innerText || el.textContent).length > 30) return false;
+    if (el.querySelector('a[href],button,input,select,textarea,[onclick],[tabindex]:not([tabindex="-1"]),'
+      + '[role=button],[role=link],[role=checkbox],[role=menuitem],[role=tab],[role=switch]')) return false;
+    var r = el.getBoundingClientRect();
+    return r.width >= 4 && r.height >= 4 && r.width <= 480 && r.height <= 160;
+  }
+
+  // What an icon with no words is, from its class, id or icon name ("icon-close", <use href="#trash">, CloseIcon)
+  var HINTS = [['close', 'close|dismiss|cancel|x-?(?:btn|button|icon)'], ['delete', 'delete|trash|bin|remove'], ['send', 'send'],
+    ['menu', 'menu|hamburger|burger'], ['search', 'search|magnif\\w*'], ['more options', 'more|kebab|ellipsis|overflow|dots'],
+    ['back', 'back|prev|previous|arrow-left|chevron-left'], ['next', 'next|forward|arrow-right|chevron-right'],
+    ['share', 'share'], ['settings', 'settings|gear|cog'], ['play', 'play'], ['pause', 'pause'],
+    ['expand', 'expand|chevron-down|caret-down'], ['collapse', 'collapse|chevron-up|caret-up'], ['like', 'like|heart|thumbs?-?up'],
+    ['copy', 'copy'], ['edit', 'edit|pencil'], ['add', 'add|plus']].map(function (h) {
+    return [h[0], new RegExp('(?:^|[^a-z])(?:' + h[1] + ')(?:[^a-z]|$)')];
+  });
+
+  function hint(el) {
+    var parts = [el].concat(Array.prototype.slice.call(el.querySelectorAll('svg,use,i,span,img'), 0, 6)), w = [];
+    parts.forEach(function (e) {
+      ['id', 'class', 'data-testid', 'data-icon', 'icon', 'icon-name', 'name', 'href', 'xlink:href', 'src'].forEach(function (a) {
+        var v = e.getAttribute(a);
+        if (v) w.push(v);
+      });
+    });
+    var words = w.join(' ').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+    for (var i = 0; i < HINTS.length; i++) if (HINTS[i][1].test(words)) return HINTS[i][0] + ' (icon)';
+    return '';
   }
 
   function labelled(el) {
@@ -67,6 +105,7 @@
       if (img) l = img.getAttribute('alt') || img.getAttribute('aria-label') || img.textContent;
     }
     if (!l && el.tagName === 'INPUT' && el.type === 'image') l = el.alt;
+    if ((!l || /^[×✕✖⨯]$/.test(clean(l))) && !/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)) l = hint(el) || (l ? 'close' : '');
     if (!l) l = el.getAttribute('name') || el.id || '';
     return clean(l, 80);
   }
@@ -163,7 +202,12 @@
         cur += n.nodeValue;
         return;
       }
-      if (n.nodeType !== 1 || SKIP[n.tagName.toUpperCase()]) return;
+      if (n.nodeType !== 1) return;
+      if (SKIP[n.tagName.toUpperCase()]) {
+        // a bare icon that's clicked (an <svg> with a handler) is an item; other drawings say nothing
+        if (n.tagName.toUpperCase() === 'SVG' && shown(n) && role(n)) cur += ' ' + describe(n, role(n)) + ' ';
+        return;
+      }
       if (!shown(n)) return;
       var t = n.tagName;
       if (t === 'IFRAME') {
@@ -270,12 +314,51 @@
       title: clean(el.getAttribute('title') || el.getAttribute('aria-label') || el.value || '', 60),
       submits: submits, payForm: pay, form: form ? clean((form.getAttribute('action') || '') + ' ' + (form.id || '') + ' ' + (form.getAttribute('name') || ''), 200) : '',
       href: el.getAttribute('href') || '',
+      disabled: !!(el.disabled || el.getAttribute('aria-disabled') === 'true' || el.getAttribute('aria-busy') === 'true'),
       // what's typed in the field that has the focus (a comment about to be posted), for the approval card
       draft: (function (a) {
         if (!a || a === document.body || a === el) return '';
         return clean(a.isContentEditable ? a.innerText : /^(INPUT|TEXTAREA)$/.test(a.tagName) && !B.sensitive(a) ? a.value : '', 300);
       })(document.activeElement)
     };
+  };
+
+  // Did the next click reach the item? A page that re-draws under the pointer between the press and the release (a
+  // text box losing its focus re-renders the form) loses the click: no click event reaches the item.
+  B.armClick = function (ref) {
+    var el = B.find(ref);
+    if (B.clickWatch) window.removeEventListener('click', B.clickWatch, true);
+    B.clickHit = false;
+    B.clickWatch = function (e) {
+      if (el && e.composedPath().indexOf(el) >= 0) B.clickHit = true;
+    };
+    window.addEventListener('click', B.clickWatch, true);
+  };
+
+  // An item the page drew again (a new element, without its number): the one shown with the same role and label
+  // gets the number back. False when there's none, or more than one.
+  B.adopt = function (ref, r, l) {
+    if (B.find(ref)) return true;
+    var found = [];
+    (function deep(root) {
+      var all = root.querySelectorAll('*');
+      for (var i = 0; i < all.length && found.length < 2; i++) {
+        var e = all[i];
+        if (!e.hasAttribute('data-buddy-ref') && role(e) === r && label(e) === l && shown(e) && e.getClientRects().length) found.push(e);
+        if (e.shadowRoot) deep(e.shadowRoot);
+      }
+    })(document);
+    if (found.length !== 1) return false;
+    found[0].setAttribute('data-buddy-ref', String(ref));
+    return true;
+  };
+
+  // true or false once armed on this page; null when it's a new page (the click went somewhere)
+  B.clickReached = function () {
+    if (!B.clickWatch) return null;
+    window.removeEventListener('click', B.clickWatch, true);
+    B.clickWatch = null;
+    return B.clickHit;
   };
 
   // Ready an item for typing: focused, its text selected (to be replaced) or the cursor at its end

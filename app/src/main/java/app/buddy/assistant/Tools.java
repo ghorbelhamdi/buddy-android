@@ -2,6 +2,8 @@ package app.buddy.assistant;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.GestureDescription;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -578,6 +580,7 @@ final class Tools {
             lastNodes.clear();
             List<AccessibilityWindowInfo> windows = svc.getWindows();
             boolean keyboard = false;
+            String app = null; // the app in front, for its tips
             for (AccessibilityWindowInfo w : windows) {
                 if (w.getType() == AccessibilityWindowInfo.TYPE_ACCESSIBILITY_OVERLAY) continue;
                 if (w.getType() == AccessibilityWindowInfo.TYPE_INPUT_METHOD) {
@@ -602,10 +605,14 @@ final class Tools {
                         .append(" window").append(root.getPackageName() != null ? " [" + root.getPackageName() + "]" : "")
                         .append(title != null ? " \"" + title + "\"" : "")
                         .append(w.isActive() ? " (active)" : "").append('\n');
+                if (w.getType() == AccessibilityWindowInfo.TYPE_APPLICATION && root.getPackageName() != null
+                        && !svc.getPackageName().contentEquals(root.getPackageName())
+                        && (app == null || w.isActive())) app = root.getPackageName().toString();
                 walk(root, sb, 0);
             }
             if (keyboard) sb.append("\n(The on-screen keyboard is open.)\n");
             if (lastNodes.size() >= MAX_NODES) sb.append("\n(Truncated at ").append(MAX_NODES).append(" elements; scroll for more.)\n");
+            sb.append(Tips.once(svc, McpServer.CALLER_CHAT.get(), app));
         }
         return sb.toString();
     }
@@ -865,15 +872,25 @@ final class Tools {
         if (Guard.offLimits(svc, target)) return "BLOCKED: that's Buddy's own screen. Only the user types there.";
         if (!target.isFocused()) target.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
         String value = text;
-        if (a.optBoolean("append")) {
-            CharSequence cur = target.isShowingHintText() ? null : target.getText();
-            value = (cur == null ? "" : cur.toString()) + text;
+        CharSequence cur = target.isShowingHintText() ? null : target.getText();
+        if (a.optBoolean("append")) value = (cur == null ? "" : cur.toString()) + text;
+        String result;
+        if (!text.isEmpty() && !target.isPassword() && inWeb(target) && paste(target, cur, text, a.optBoolean("append"))) {
+            result = "Typed " + text.length() + " characters (pasted, as this is a web page; the clipboard now holds them).";
+            Thread.sleep(300);
+            target.refresh();
+            CharSequence now = target.isShowingHintText() ? "" : target.getText();
+            String got = now == null ? "" : now.toString();
+            if (!got.replaceAll("\\s+", " ").trim().equals(value.replaceAll("\\s+", " ").trim())) {
+                result += " The field now reads “" + ChatHub.clip(got, 200) + "”: check it with read_screen.";
+            }
+        } else {
+            Bundle args = new Bundle();
+            args.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, value);
+            boolean ok = target.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, args);
+            if (!ok) throw new IllegalStateException("This field did not accept text.");
+            result = "Typed " + text.length() + " characters.";
         }
-        Bundle args = new Bundle();
-        args.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, value);
-        boolean ok = target.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, args);
-        if (!ok) throw new IllegalStateException("This field did not accept text.");
-        String result = "Typed " + text.length() + " characters.";
         if (a.optBoolean("submit")) {
             String mode = mode(str(target.getPackageName()));
             java.util.function.Function<String, String> card = in -> in == null ? svc.getString(R.string.tools_card_enter)
@@ -887,6 +904,33 @@ final class Tools {
             result += sent ? " Pressed enter." : " Enter action not supported here; tap the send button instead.";
         }
         return result;
+    }
+
+    /** Is the node part of a web page (Chrome, an app's WebView)? */
+    private static boolean inWeb(AccessibilityNodeInfo n) {
+        AccessibilityNodeInfo p = n;
+        for (int i = 0; p != null && i < 60; i++, p = p.getParent()) {
+            if ("android.webkit.WebView".equals(String.valueOf(p.getClassName()))) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Types into a web page's field as a paste: the page gets a real paste, as from the keyboard's clipboard. Setting
+     * the text changes the field under the page's feet, and editors that keep their own copy (YouTube Studio) put theirs
+     * back. The field's text is selected first so the paste replaces it (or the cursor goes to its end, to append).
+     * False when the field won't paste; the caller then sets the text.
+     */
+    private boolean paste(AccessibilityNodeInfo target, CharSequence cur, String text, boolean append) {
+        ClipboardManager cm = svc.getSystemService(ClipboardManager.class);
+        if (cm == null) return false;
+        int len = cur == null ? 0 : cur.length();
+        Bundle sel = new Bundle();
+        sel.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, append ? len : 0);
+        sel.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, len);
+        target.performAction(AccessibilityNodeInfo.ACTION_SET_SELECTION, sel);
+        cm.setPrimaryClip(ClipData.newPlainText("Buddy", text));
+        return target.performAction(AccessibilityNodeInfo.ACTION_PASTE);
     }
 
     /** The focused text field, or the only visible text field when nothing has focus. */

@@ -1,11 +1,15 @@
 package app.buddy.assistant;
 
+import android.os.SystemClock;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 /**
@@ -25,6 +29,8 @@ final class BrowserTools {
             + "unsubscribe|cancel|transfer|erase|supprimer|payer|envoyer|löschen|bezahlen|senden|eliminar|pagar|enviar)\\b");
 
     private final BuddyService svc;
+    /** When the agent was told a page warns that leaving loses what's typed, by chat: going again within 5 min leaves. */
+    private final Map<String, Long> leaveWarned = new ConcurrentHashMap<>();
 
     BrowserTools(BuddyService svc) {
         this.svc = svc;
@@ -127,7 +133,11 @@ final class BrowserTools {
             case "browser_type": return text(type(key, a.getInt("ref"), a.optString("text", ""), a.optBoolean("append"), a.optBoolean("submit")));
             case "browser_scroll": return text(scroll(key, "up".equals(a.optString("direction"))));
             case "browser_screenshot": return screenshot(key);
-            case "browser_back": return text(Browser.back(key) ? after(key, "Went back.", null) : "There's no previous page in this tab.");
+            case "browser_back": {
+                if (!Browser.back(key)) return text("There's no previous page in this tab.");
+                String d = pendingDialog(key, false);
+                return text(d != null ? d : after(key, "Went back.", null));
+            }
             case "browser_tabs": return text(tabs(key, a));
             default: throw new IllegalArgumentException("Unknown tool " + name);
         }
@@ -165,6 +175,8 @@ final class BrowserTools {
         sb.append("Page: ").append(title instanceof String && !((String) title).isEmpty() ? title : page == null ? "" : page[1]).append("\nURL: ").append(page == null ? "" : page[0]).append('\n');
         String sig = signals(key);
         if (sig != null) sb.append('\n').append(sig).append('\n');
+        String tips = Tips.once(svc, McpServer.CALLER_CHAT.get(), host(key));
+        if (!tips.isEmpty()) sb.append(tips);
         if (from >= all.length() && from > 0) return sb.append("\n(The page has no more text after character ").append(from).append(".)").toString();
         int end = Math.min(all.length(), from + PAGE_CHARS);
         if (end < all.length()) { // end on a line
@@ -233,12 +245,44 @@ final class BrowserTools {
         }
         step(key, label.isEmpty() ? svc.getString(R.string.activity_tapping_plain)
                 : svc.getString(R.string.activity_tapping, label));
+        Browser.eval(key, "__buddy.armClick(" + ref + ")");
         Browser.click(key, t.getDouble("x"), t.getDouble("y"));
         Thread.sleep(500);
-        String dialog = pendingDialog(key, approved);
+        String dialog = pendingDialog(key, approved), again = "";
+        if (dialog == null && lostClick(key, before)) {
+            // the page re-drew under the pointer (a text box losing its focus re-renders the form), so the item never
+            // got the click: once more where it is now (drawn again as a new element, it's the one with the same role
+            // and label), unless it changed (disabled, busy, gone or covered)
+            Browser.eval(key, "__buddy.adopt(" + ref + ", " + JSONObject.quote(t.optString("role")) + ", " + JSONObject.quote(label) + ")");
+            Object o2 = Browser.eval(key, "__buddy.target(" + ref + ")");
+            JSONObject t2 = o2 instanceof JSONObject ? (JSONObject) o2 : null;
+            if (t2 != null && !t2.optBoolean("missing") && !t2.optBoolean("disabled")
+                    && (t2.isNull("covered") || t2.optString("covered").isEmpty())) {
+                Browser.eval(key, "__buddy.armClick(" + ref + ")");
+                Browser.click(key, t2.getDouble("x"), t2.getDouble("y"));
+                Thread.sleep(500);
+                dialog = pendingDialog(key, approved);
+                again = dialog == null && lostClick(key, before)
+                        ? " The tap didn't reach it, twice (the page moved under it); take a browser_screenshot to see why."
+                        : " (The first tap didn't reach it, as the page moved under it, so Buddy tapped once more.)";
+            } else {
+                again = " The tap may not have reached it (the page changed under it): check with browser_read before trying again.";
+            }
+        }
         if (dialog == null) Browser.settle(key, 10_000);
-        return after(key, "Tapped [" + ref + "]" + (label.isEmpty() ? "" : " “" + label + "”") + ".", before)
+        return after(key, "Tapped [" + ref + "]" + (label.isEmpty() ? "" : " “" + label + "”") + "." + again, before)
                 + (dialog == null ? "" : "\n" + dialog);
+    }
+
+    /** No click event reached the item armed with armClick, and the tab is still on the same page. */
+    private static boolean lostClick(String key, String[] before) {
+        try {
+            String[] now = Browser.page(key);
+            if (before == null || now == null || !now[0].equals(before[0])) return false;
+            return Boolean.FALSE.equals(Browser.eval(key, "__buddy.clickReached()"));
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /** Why a tap on this item needs the user's OK (the label that makes it risky), or null. */
@@ -416,8 +460,9 @@ final class BrowserTools {
     }
 
     /**
-     * A JavaScript dialog the page opened (alert, confirm, leave-page): an alert is just closed, an "Are you sure?" about
-     * something risky goes to the user unless the tap that opened it was approved. What happened, or null for none.
+     * A JavaScript dialog the page opened (alert, confirm, leave-page): an alert is just closed, a leave-page warning keeps
+     * the page the first time, an "Are you sure?" about something risky goes to the user unless the tap that opened it was
+     * approved. What happened, or null for none.
      */
     private String pendingDialog(String key, boolean approved) throws Exception {
         JSONObject d = Browser.dialog(key);
@@ -426,6 +471,21 @@ final class BrowserTools {
         if ("alert".equals(type)) {
             Browser.answerDialog(key, true);
             return "The page showed a message (Buddy closed it): “" + msg + "”";
+        }
+        if ("beforeunload".equals(type)) {
+            // leaving loses what's typed on the page (an unsent post, a form): stay, unless the agent was told and goes again
+            Long told = leaveWarned.remove(key);
+            boolean leave = told != null && SystemClock.elapsedRealtime() - told < 5 * 60_000;
+            Browser.answerDialog(key, leave);
+            if (leave) {
+                Thread.sleep(800);
+                Browser.settle(key, 20_000);
+                return "The page warned that leaving loses unsaved changes; this was the second try, so Buddy left.";
+            }
+            leaveWarned.put(key, SystemClock.elapsedRealtime());
+            return "NOT LEFT: the page warns that leaving now loses unsaved changes (an unsent draft or a filled-in form), "
+                    + "so Buddy stayed on it. Finish or send it first, or use another tab (browser_open with new_tab). To "
+                    + "leave anyway and lose it, do the same again.";
         }
         if ("prompt".equals(type)) {
             Browser.answerDialog(key, false);

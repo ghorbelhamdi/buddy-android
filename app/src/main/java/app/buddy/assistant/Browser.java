@@ -725,7 +725,8 @@ final class Browser {
 
     /** Opens url in the chat's tab and waits for it. Null when it loaded, else Chromium's error. */
     static String navigate(String key, String url) throws Exception {
-        JSONObject r = call("Page.navigate", new JSONObject().put("url", url), sessionFor(key), 30_000);
+        JSONObject r = callUnlessDialog(key, "Page.navigate", new JSONObject().put("url", url), 30_000);
+        if (r == null) return null; // the page asks first ("Leave site?"): the caller answers it
         String err = r.optString("errorText", "");
         settle(key, 20_000);
         return err.isEmpty() ? null : err;
@@ -737,10 +738,43 @@ final class Browser {
         JSONObject h = call("Page.getNavigationHistory", null, s, 5000);
         int i = h.getInt("currentIndex");
         if (i <= 0) return false;
-        call("Page.navigateToHistoryEntry", new JSONObject().put("entryId",
-                h.getJSONArray("entries").getJSONObject(i - 1).getInt("id")), s, 10_000);
+        if (callUnlessDialog(key, "Page.navigateToHistoryEntry", new JSONObject().put("entryId",
+                h.getJSONArray("entries").getJSONObject(i - 1).getInt("id")), 10_000) == null) return true; // it asks first
         settle(key, 15_000);
         return true;
+    }
+
+    /**
+     * As call on the chat's tab, but null as soon as the tab opens a JavaScript dialog: a page's "Leave site?" holds a
+     * navigation until it's answered, so waiting for the navigation would only time out.
+     */
+    private static JSONObject callUnlessDialog(String key, String method, JSONObject params, long timeoutMs) throws Exception {
+        String s = sessionFor(key);
+        AtomicReference<Object> out = new AtomicReference<>();
+        work.execute(() -> {
+            Object r;
+            try {
+                r = call(method, params, s, timeoutMs);
+            } catch (Exception e) {
+                r = e;
+            }
+            synchronized (out) {
+                out.set(r);
+                out.notifyAll();
+            }
+        });
+        long end = SystemClock.elapsedRealtime() + timeoutMs + 1000;
+        synchronized (out) {
+            while (out.get() == null) {
+                if (dialog(key) != null) return null;
+                long left = end - SystemClock.elapsedRealtime();
+                if (left <= 0) throw new IllegalStateException(method + " timed out");
+                out.wait(Math.min(left, 100));
+            }
+        }
+        Object r = out.get();
+        if (r instanceof Exception) throw (Exception) r;
+        return (JSONObject) r;
     }
 
     /** A click at a point of the chat's tab, in CSS pixels of its viewport. */
