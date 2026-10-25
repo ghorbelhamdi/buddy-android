@@ -79,6 +79,7 @@ As soon as an agent starts operating the phone, Buddy makes it obvious so you kn
 
 - **Live view.** A chat that uses it shows the page live above the messages; tap it full screen to use it yourself, with an address bar. Touching it while the agent works pauses the agent until you tap **Continue** or write to it; using the rest of the phone doesn't hold it up. The bubble says what it's doing ("Browsing reddit.com · Typing").
 - **The same approvals.** Buttons like Post, Send, Buy, Pay and Delete get Buddy's approval card, as on the phone. Agents never type into password, code or card fields.
+- **Unsaved work stays.** When a page warns that leaving loses what's typed (an unsent post, a form), Buddy stays on it and tells the agent; only a second try leaves.
 - **Your part, marked.** When a page needs you (a sign-in, a captcha, your details), the agent asks, and Buddy opens the browser full screen with the fields and buttons marked; it closes again when you tap **Done**.
 - **Apps closing by themselves?** Android 12+ kills apps' child processes once all apps together run more than about 32, and the browser, Remote Control sessions and Termux all count. If Termux or Buddy's sessions get closed ("signal 9"), turn on **Developer options → Disable child process restrictions**.
 - **Sign-ins.** To let agents use a site with your account, open the browser and sign in yourself. **Signed-in sites** lists the sites you signed in to, each with **Log out**; **Wipe browser data** clears everything. "Continue with Google" often fails in automated browsers: use email and password.
@@ -129,5 +130,7 @@ Buddy accessibility service ◄──── MCP over http://127.0.0.1:8765/mcp (
 ```
 
 - The **accessibility service** draws the bubble and runs a small local **MCP server** with the phone tools: `read_screen`, `tap`, `long_press`, `type_text`, `scroll`, `swipe`, `press`, `open_app`, `list_apps`, `open_url`, `screenshot`, `wait`, `install_apk`, `wait_for_install`, `confirm`, `ask`, `point_out`, `notify`, `reply_notification` and `update_buddy`.
+- **Typing on web pages** (Chrome, apps' web views) goes in as a paste, so page editors keep it; your clipboard then holds that text.
+- **Tips per app.** When an app or site costs an agent time (a button that needs a second tap, a field that only takes a paste), it can note that in `~/.buddy/tips/<app or site>.md` in Buddy's Linux. Buddy shows the note the first time that app or site comes up in a chat. The notes stay on your phone; delete them there if you like.
 - **Buddy's Linux** is a small Alpine Linux that Buddy downloads into its own storage (4 MB) and runs with [proot](https://proot-me.github.io/), which ships inside the APK. Claude Code installs there with Anthropic's official installer, Antigravity with Google's; Codex and OpenCode from npm.
 - Your message goes to the agent in Buddy's Linux, which uses those tools and streams its progress back to the app.

@@ -1,1 +1,1 @@
-Your own picture now fills the bubble, with its soft shadow around it instead of shrinking it, and it's bigger next to Buddy's replies and on the home screen. Fixed: a tap could fail with an error while the screen was changing. The bubble now names the app an agent opens.
+Typing on web pages now sticks: Buddy pastes the text, so page editors (YouTube Studio, for one) keep it instead of putting their old text back. Agents can now keep short notes about an app that cost them time, and Buddy shows them the next time that app comes up.
