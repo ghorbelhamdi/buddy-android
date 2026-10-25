@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/banner.png" alt="Buddy: Claude Code, Codex, OpenCode and Antigravity in a bubble on your Android phone" width="100%">
+  <img src="docs/banner.png" alt="Buddy: Claude Code, Codex, OpenCode, Antigravity and Grok in a bubble on your Android phone" width="100%">
 </p>
 
 <p align="center">
@@ -17,7 +17,7 @@
 
 Type or say what you want, like "reply to Sam that I'm running late" or "add a Switch 2 to my Amazon cart". Buddy reads the screen, taps and types to get it done, and asks you before anything is sent, posted, bought or deleted.
 
-It runs inside the app, on your own plan: [Claude Code](https://docs.claude.com/en/docs/claude-code) with your Claude plan, Codex with your ChatGPT plan, Google's [Antigravity CLI](https://antigravity.google) with your Google account, xAI's [Grok Build](https://x.ai/cli) with your Google or X account, or [OpenCode](https://opencode.ai) with its free models and no account at all. No PC, no adb, no root, no API key.
+It runs inside the app, on your own plan: [Claude Code](https://docs.claude.com/en/docs/claude-code) with your Claude plan, Codex with your ChatGPT plan, Google's [Antigravity CLI](https://antigravity.google) with your Google account, xAI's [Grok Build](https://x.ai/build) with your Google or X account, or [OpenCode](https://opencode.ai) with its free models and no account at all. No PC, no adb, no root, no API key.
 
 <p align="center"><a href="#setup"><b>Get it on Google Play</b></a> (closed testing) · <a href="https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk"><b>Download the APK</b></a> · <a href="https://ghorbelhamdi.github.io/buddy-android/">Website</a> · Android 11+, 64-bit</p>
 
