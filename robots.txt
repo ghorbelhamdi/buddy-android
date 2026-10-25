@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://ghorbelhamdi.github.io/buddy-android/sitemap.xml

@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buddy – an AI assistant that uses your Android phone (Claude Code, Codex, Gemini)</title>
+<meta name="description" content="Buddy is a free, open-source Android app: a floating chat bubble where Claude Code, Codex, OpenCode or Gemini (Antigravity CLI) read your screen, tap and type to get things done. Runs on your own plan. No root, no adb, no PC.">
+<link rel="canonical" href="https://ghorbelhamdi.github.io/buddy-android/">
+<meta name="theme-color" content="#16161d">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Buddy – let Claude Code, Codex or Gemini use your Android phone">
+<meta property="og:description" content="A floating chat bubble: tell it what you want and an AI agent reads the screen, taps and types. Asks before anything is sent, posted, bought or deleted. Open source, no root, no adb.">
+<meta property="og:url" content="https://ghorbelhamdi.github.io/buddy-android/">
+<meta property="og:image" content="https://ghorbelhamdi.github.io/buddy-android/img/banner.png">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Buddy",
+  "alternateName": "Buddy for Android",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Android 11+",
+  "description": "An open-source Android app where AI coding agents (Claude Code, Codex, OpenCode, Antigravity CLI) use your phone through a floating chat bubble: they read the screen, tap, type and open apps, and ask before anything is sent, posted, bought or deleted.",
+  "url": "https://ghorbelhamdi.github.io/buddy-android/",
+  "downloadUrl": "https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk",
+  "softwareHelp": "https://github.com/ghorbelhamdi/buddy-android/blob/main/docs/GUIDE.md",
+  "license": "https://www.apache.org/licenses/LICENSE-2.0",
+  "image": "https://ghorbelhamdi.github.io/buddy-android/img/banner.png",
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+  "sameAs": ["https://github.com/ghorbelhamdi/buddy-android", "https://www.producthunt.com/products/buddy-20"]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "Can Claude Code control my Android phone?",
+     "acceptedAnswer": {"@type": "Answer", "text": "Yes, with Buddy. Buddy runs Claude Code inside the app, in a small Linux, and gives it phone tools (read the screen, tap, type, scroll, open apps) through a local MCP server. You use your own Claude plan; no PC, adb or root is needed."}},
+    {"@type": "Question", "name": "Does it need root, adb or a computer?",
+     "acceptedAnswer": {"@type": "Answer", "text": "No. Buddy is a normal app with an accessibility service, the permission screen readers use. The agents run inside the app, so there is no adb, Wireless debugging, Shizuku or PC involved."}},
+    {"@type": "Question", "name": "Do I need an API key?",
+     "acceptedAnswer": {"@type": "Answer", "text": "No. Claude Code uses your Claude plan, Codex your ChatGPT plan and the Antigravity CLI your Google account. OpenCode's free models need no account at all."}},
+    {"@type": "Question", "name": "Can the AI send messages or buy things without asking?",
+     "acceptedAnswer": {"@type": "Answer", "text": "Buddy itself stops on buttons like Send, Post, Pay and Delete and shows an approval card. The agent never types passwords, one-time codes or payment details; it hands those steps to you."}},
+    {"@type": "Question", "name": "Can I use Buddy's phone tools from my own agent?",
+     "acceptedAnswer": {"@type": "Answer", "text": "Yes. The same phone tools are a local MCP server on the phone, which your own Claude Code, Codex, OpenCode or Antigravity sessions (for example in Termux) can connect to."}},
+    {"@type": "Question", "name": "Is Buddy free and open source?",
+     "acceptedAnswer": {"@type": "Answer", "text": "Yes. Buddy is free and open source under the Apache 2.0 license, with no Buddy servers and no paid tiers."}}
+  ]
+}
+</script>
+<style>
+:root{--bg:#f7f7fa;--card:#fff;--text:#16161d;--muted:#5d5d6e;--line:#e3e3ea;--accent:#d97757;--accent-ink:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#121218;--card:#1c1c24;--text:#ececf1;--muted:#a3a3b3;--line:#2c2c37;--accent:#e38a6b;--accent-ink:#16161d}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:17px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--accent)}
+.wrap{max-width:960px;margin:0 auto;padding:0 16px}
+header{padding:48px 0 24px;text-align:center}
+h1{font-size:clamp(28px,6vw,44px);line-height:1.15;margin:0 0 12px}
+.lead{font-size:clamp(17px,2.6vw,20px);color:var(--muted);max-width:720px;margin:0 auto 24px}
+.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-block;padding:12px 20px;border-radius:12px;text-decoration:none;font-weight:600;border:1px solid var(--line);color:var(--text);background:var(--card)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.small{font-size:14px;color:var(--muted);margin-top:10px}
+.hero{width:100%;height:auto;border-radius:16px;margin:24px 0 8px;display:block}
+video{width:100%;max-width:420px;border-radius:16px;display:block;margin:0 auto}
+section{padding:32px 0;border-top:1px solid var(--line)}
+h2{font-size:26px;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.card h3{margin:0 0 6px;font-size:17px}
+.card p{margin:0;color:var(--muted);font-size:15px}
+.shots{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.shots img{width:100%;border-radius:12px;border:1px solid var(--line)}
+.shots figcaption{font-size:13px;color:var(--muted);text-align:center}
+@media (max-width:560px){.shots{grid-template-columns:1fr 1fr}}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:10px}
+summary{cursor:pointer;font-weight:600}
+details p{margin:8px 0 0;color:var(--muted)}
+pre{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;overflow-x:auto;font-size:13px}
+footer{padding:32px 0 48px;color:var(--muted);font-size:14px;text-align:center;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Let Claude Code, Codex or Gemini use your Android phone</h1>
+  <p class="lead">Buddy is a floating chat bubble. Type or say what you want, like “reply to Sam that I'm running late”, and an AI agent reads the screen, taps and types to get it done. It asks you before anything is sent, posted, bought or deleted.</p>
+  <div class="cta">
+    <a class="btn primary" href="https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk">Download the APK</a>
+    <a class="btn" href="https://play.google.com/apps/testing/app.buddy.assistant">Google Play (testing)</a>
+    <a class="btn" href="https://github.com/ghorbelhamdi/buddy-android">Source on GitHub</a>
+  </div>
+  <p class="small">Free and open source (Apache 2.0) · Android 11+, 64-bit · No root, no adb, no PC, no API key</p>
+  <img class="hero" src="img/banner.png" alt="Buddy: Claude Code, Codex, OpenCode and Antigravity in a bubble on your Android phone" width="1600" height="560">
+</header>
+
+<section>
+  <h2>See it work</h2>
+  <video src="img/buddy-demo.mp4" controls muted playsinline preload="metadata" poster="img/chats.jpg"></video>
+  <p class="small" style="text-align:center">Codex turns on the lights while OpenCode's free model adds a Switch 2 to the Amazon cart (real recordings, waiting sped up).</p>
+</section>
+
+<section>
+  <h2>Your own AI agent, on the phone</h2>
+  <p>Buddy runs the agent inside the app, in a small Linux, on the plan you already have: <strong>Claude Code</strong> with your Claude plan, <strong>Codex</strong> with your ChatGPT plan, Google's <strong>Antigravity CLI</strong> (Gemini) with your Google account, or <strong>OpenCode</strong> with its free models and no account at all.</p>
+  <div class="grid">
+    <div class="card"><h3>Uses your apps</h3><p>Messages, shopping, smart home, settings: anything on screen. Add instructions while it works.</p></div>
+    <div class="card"><h3>Asks first</h3><p>Approve, Deny or Change before anything is sent, posted, bought or deleted. Buddy enforces it, not the agent.</p></div>
+    <div class="card"><h3>Shows you how</h3><p>“Show me how to turn on dark mode”: it points at each step and waits for your tap.</p></div>
+    <div class="card"><h3>Acts on notifications</h3><p>“When a customer asks on WhatsApp, reply with our opening hours”, with your OK or a countdown you can stop.</p></div>
+    <div class="card"><h3>Voice</h3><p>Talk to it and have replies read aloud.</p></div>
+    <div class="card"><h3>Background browser</h3><p>Web pages in a browser inside Buddy, without taking over your screen, even while the phone is locked.</p></div>
+    <div class="card"><h3>Builds apps</h3><p>In developer mode, “make me a calculator app” builds and installs a real APK on the phone.</p></div>
+    <div class="card"><h3>Phone tools as MCP</h3><p>The same tools as a local MCP server for your own Claude Code, Codex, OpenCode or Antigravity sessions.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Screens</h2>
+  <div class="shots">
+    <figure style="margin:0"><img src="img/chats.jpg" alt="Buddy's chats with different AI agents" loading="lazy"><figcaption>Chats with any agent</figcaption></figure>
+    <figure style="margin:0"><img src="img/chat.jpg" alt="A Buddy chat with grouped phone tool calls" loading="lazy"><figcaption>Tool calls fold into one line</figcaption></figure>
+    <figure style="margin:0"><img src="img/settings.jpg" alt="Buddy's settings and setup guide" loading="lazy"><figcaption>Setup guide and themes</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2>How it works</h2>
+  <p>Buddy is a normal Android app with an accessibility service, the kind of permission screen readers use. The agent runs in a small Alpine Linux inside the app and uses Buddy's phone tools (read the screen, tap, type, scroll, open apps) over a local MCP server on 127.0.0.1. No adb or Wireless debugging, and it works without Wi-Fi.</p>
+<pre>Buddy app / bubble ──► Buddy's Linux (Alpine via proot): claude, codex, opencode or agy
+        ▲                                                     │
+        └──────────── streamed replies ◄──────────────────────┤
+                                                              ▼
+Buddy accessibility service ◄──── MCP on 127.0.0.1 (phone tools)</pre>
+</section>
+
+<section>
+  <h2>Questions</h2>
+  <details><summary>Can Claude Code control my Android phone?</summary><p>Yes, with Buddy. Buddy runs Claude Code inside the app and gives it phone tools (read the screen, tap, type, scroll, open apps) through a local MCP server. You use your own Claude plan; no PC, adb or root is needed.</p></details>
+  <details><summary>Does it need root, adb or a computer?</summary><p>No. Buddy is a normal app with an accessibility service. The agents run inside the app, so there is no adb, Wireless debugging, Shizuku or PC involved.</p></details>
+  <details><summary>Do I need an API key?</summary><p>No. Claude Code uses your Claude plan, Codex your ChatGPT plan and the Antigravity CLI your Google account. OpenCode's free models need no account at all.</p></details>
+  <details><summary>Can the AI send messages or buy things without asking?</summary><p>Buddy itself stops on buttons like Send, Post, Pay and Delete and shows an approval card. The agent never types passwords, one-time codes or payment details; it hands those steps to you.</p></details>
+  <details><summary>Can I use Buddy's phone tools from my own agent?</summary><p>Yes. The same phone tools are a local MCP server on the phone, which your own Claude Code, Codex, OpenCode or Antigravity sessions (for example in Termux) can connect to.</p></details>
+  <details><summary>Is Buddy free and open source?</summary><p>Yes. Apache 2.0, with no Buddy servers and no paid tiers. Buddy is an independent project, not made by or affiliated with Anthropic, OpenAI or Google.</p></details>
+</section>
+
+<footer>
+  <p><a href="https://github.com/ghorbelhamdi/buddy-android">GitHub</a> · <a href="https://github.com/ghorbelhamdi/buddy-android/blob/main/docs/GUIDE.md">Guide</a> · <a href="https://github.com/ghorbelhamdi/buddy-android/releases">Releases</a> · <a href="https://github.com/ghorbelhamdi/buddy-android/blob/main/docs/PRIVACY.md">Privacy</a></p>
+  <p>Buddy is an independent open-source project, not affiliated with Anthropic, OpenAI or Google.</p>
+</footer>
+</div>
+</body>
+</html>
