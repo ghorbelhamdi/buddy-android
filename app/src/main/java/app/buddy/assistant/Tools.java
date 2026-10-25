@@ -61,9 +61,13 @@ final class Tools {
                 props().put("element", intProp("Element id from read_screen"))
                         .put("x", intProp("X in screen pixels")).put("y", intProp("Y in screen pixels"))));
         t.put(tool("long_press",
-                "Long-press an element or coordinate.",
-                props().put("element", intProp("Element id from read_screen"))
-                        .put("x", intProp("X in screen pixels")).put("y", intProp("Y in screen pixels"))));
+                "Press and hold an element (by id from the last read_screen) or a screen coordinate in pixels, for "
+                        + "about 0.7 s. Use it for what apps put behind a long press: a message's or item's menu (reply, "
+                        + "copy, delete, react), selecting items or text, moving icons. Use tap for normal taps. Returns "
+                        + "\"Long-pressed\" and where; call read_screen to see the menu or selection it opened.",
+                props().put("element", intProp("Element id from read_screen (give this, or x and y)"))
+                        .put("x", intProp("X in screen pixels, when there's no element id"))
+                        .put("y", intProp("Y in screen pixels, when there's no element id"))));
         t.put(tool("type_text",
                 "Type into the focused text field (or the given element). Replaces its content unless append is true. "
                         + "Set submit to press the keyboard's enter/send action afterwards.",
@@ -73,25 +77,43 @@ final class Tools {
                         .put("submit", boolProp("Press the IME enter/send action after typing")),
                 "text"));
         t.put(tool("scroll",
-                "Scroll the screen (or a scrollable element) in a direction. 'down' reveals content further down.",
+                "Scroll a list or page by about a third of its height or width, to reach content that isn't on "
+                        + "screen yet: 'down' shows what's further down (like reading on), 'up' goes back, 'left'/'right' "
+                        + "for carousels and tabs. Without element it scrolls the middle of the screen; give the id of a "
+                        + "scrollable element (marked scroll in read_screen) to scroll just that list. Returns "
+                        + "\"Scrolled\"; call read_screen to see what came into view. For a precise drag, use swipe.",
                 props().put("direction", enumProp("up", "down", "left", "right"))
-                        .put("element", intProp("Optional scrollable element id")),
+                        .put("element", intProp("Optional: id of the scrollable element from read_screen")),
                 "direction"));
         t.put(tool("swipe",
-                "Swipe from one point to another, in screen pixels.",
-                props().put("x1", intProp("")).put("y1", intProp("")).put("x2", intProp("")).put("y2", intProp(""))
-                        .put("duration_ms", intProp("Default 300")),
+                "Drag a finger in a straight line from (x1, y1) to (x2, y2), in screen pixels. Use it for gestures "
+                        + "scroll doesn't cover: moving a slider, swiping a card or a message aside, pulling down to "
+                        + "refresh, dragging on a map. A very short swipe counts as a tap. Returns \"Swiped\"; call "
+                        + "read_screen to see the result.",
+                props().put("x1", intProp("Start X in screen pixels")).put("y1", intProp("Start Y in screen pixels"))
+                        .put("x2", intProp("End X in screen pixels")).put("y2", intProp("End Y in screen pixels"))
+                        .put("duration_ms", intProp("How long the drag takes, 50 to 3000 ms (default 300); slower is "
+                                + "more like dragging, faster like flinging")),
                 "x1", "y1", "x2", "y2"));
         t.put(tool("press",
-                "Press a system button.",
+                "Press one of Android's system buttons: back (leave the current screen or close a dialog or the "
+                        + "keyboard), home (go to the home screen), recents (the recent apps list), notifications (pull "
+                        + "down the notification shade), quick_settings (open Quick Settings). To switch apps, open_app "
+                        + "is faster than home and recents. Returns \"Pressed\" or \"Could not press\".",
                 props().put("button", enumProp("back", "home", "recents", "notifications", "quick_settings")),
                 "button"));
         t.put(tool("open_app",
                 "Open an installed app by its name (e.g. 'Messenger') or package name.",
                 props().put("app", strProp("App name or package")), "app"));
         t.put(tool("list_apps", "List launchable apps with their package names.", props()));
-        t.put(tool("open_url", "Open a URL or deep link (https://, mailto:, tel:, geo:, ...).",
-                props().put("url", strProp("The URL")), "url"));
+        t.put(tool("open_url",
+                "Open a link on the phone the way tapping it would: https:// pages open in the user's browser or "
+                        + "in the app that handles them (a YouTube link in YouTube), and deep links open their app "
+                        + "(mailto: an email draft, tel: the dialer with the number, geo: or a maps link a map, "
+                        + "market:// the Play Store). Nothing is sent or called by opening a link. For public web pages "
+                        + "you only need to read, the browser_* tools work without taking over the screen. Returns "
+                        + "\"Opened\"; call read_screen to see it.",
+                props().put("url", strProp("The URL or deep link, e.g. https://example.com or tel:+491234")), "url"));
         t.put(tool("screenshot",
                 "Take a screenshot (JPEG). Use only when read_screen is not enough (images, games, canvas UIs). "
                         + "The reply says how to convert image coordinates to screen pixels.",

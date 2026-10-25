@@ -63,9 +63,18 @@ final class BrowserTools {
         t.put(tool("browser_screenshot",
                 "A picture of what the background browser shows, for images, maps or layouts browser_read can't describe.",
                 new JSONObject()));
-        t.put(tool("browser_back", "Go back to the previous page in the background browser.", new JSONObject()));
-        t.put(tool("browser_tabs", "List the background browser's tabs, or switch to or close one by its number.",
-                new JSONObject().put("switch_to", integer("Tab number to switch to")).put("close", integer("Tab number to close"))));
+        t.put(tool("browser_back",
+                "Go back to the previous page in the current tab of the background browser, like a browser's back "
+                        + "button. If the page warns that leaving loses unsaved changes, Buddy stays the first time and "
+                        + "says so. Returns where the tab is now, or that there's no previous page; then call "
+                        + "browser_read.", new JSONObject()));
+        t.put(tool("browser_tabs",
+                "Manage the background browser's tabs (this chat's own): with no arguments, list them as numbered "
+                        + "lines with title and address, the current one marked; with switch_to, make that tab current "
+                        + "(the browser_* tools act on the current tab); with close, close it. Tabs open with "
+                        + "browser_open new_tab or when a page opens a link in a new tab.",
+                new JSONObject().put("switch_to", integer("Number of the tab to switch to, from the list"))
+                        .put("close", integer("Number of the tab to close, from the list"))));
     }
 
     private static JSONObject tool(String name, String desc, JSONObject properties, String... required) throws JSONException {

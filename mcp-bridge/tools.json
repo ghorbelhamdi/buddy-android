@@ -30,21 +30,21 @@
  },
  {
   "name": "long_press",
-  "description": "Long-press an element or coordinate.",
+  "description": "Press and hold an element (by id from the last read_screen) or a screen coordinate in pixels, for about 0.7 s. Use it for what apps put behind a long press: a message's or item's menu (reply, copy, delete, react), selecting items or text, moving icons. Use tap for normal taps. Returns \"Long-pressed\" and where; call read_screen to see the menu or selection it opened.",
   "inputSchema": {
    "type": "object",
    "properties": {
     "element": {
      "type": "integer",
-     "description": "Element id from read_screen"
+     "description": "Element id from read_screen (give this, or x and y)"
     },
     "x": {
      "type": "integer",
-     "description": "X in screen pixels"
+     "description": "X in screen pixels, when there's no element id"
     },
     "y": {
      "type": "integer",
-     "description": "Y in screen pixels"
+     "description": "Y in screen pixels, when there's no element id"
     }
    }
   }
@@ -79,7 +79,7 @@
  },
  {
   "name": "scroll",
-  "description": "Scroll the screen (or a scrollable element) in a direction. 'down' reveals content further down.",
+  "description": "Scroll a list or page by about a third of its height or width, to reach content that isn't on screen yet: 'down' shows what's further down (like reading on), 'up' goes back, 'left'/'right' for carousels and tabs. Without element it scrolls the middle of the screen; give the id of a scrollable element (marked scroll in read_screen) to scroll just that list. Returns \"Scrolled\"; call read_screen to see what came into view. For a precise drag, use swipe.",
   "inputSchema": {
    "type": "object",
    "properties": {
@@ -94,7 +94,7 @@
     },
     "element": {
      "type": "integer",
-     "description": "Optional scrollable element id"
+     "description": "Optional: id of the scrollable element from read_screen"
     }
    },
    "required": [
@@ -104,29 +104,29 @@
  },
  {
   "name": "swipe",
-  "description": "Swipe from one point to another, in screen pixels.",
+  "description": "Drag a finger in a straight line from (x1, y1) to (x2, y2), in screen pixels. Use it for gestures scroll doesn't cover: moving a slider, swiping a card or a message aside, pulling down to refresh, dragging on a map. A very short swipe counts as a tap. Returns \"Swiped\"; call read_screen to see the result.",
   "inputSchema": {
    "type": "object",
    "properties": {
     "x1": {
      "type": "integer",
-     "description": ""
+     "description": "Start X in screen pixels"
     },
     "y1": {
      "type": "integer",
-     "description": ""
+     "description": "Start Y in screen pixels"
     },
     "x2": {
      "type": "integer",
-     "description": ""
+     "description": "End X in screen pixels"
     },
     "y2": {
      "type": "integer",
-     "description": ""
+     "description": "End Y in screen pixels"
     },
     "duration_ms": {
      "type": "integer",
-     "description": "Default 300"
+     "description": "How long the drag takes, 50 to 3000 ms (default 300); slower is more like dragging, faster like flinging"
     }
    },
    "required": [
@@ -139,7 +139,7 @@
  },
  {
   "name": "press",
-  "description": "Press a system button.",
+  "description": "Press one of Android's system buttons: back (leave the current screen or close a dialog or the keyboard), home (go to the home screen), recents (the recent apps list), notifications (pull down the notification shade), quick_settings (open Quick Settings). To switch apps, open_app is faster than home and recents. Returns \"Pressed\" or \"Could not press\".",
   "inputSchema": {
    "type": "object",
    "properties": {
@@ -185,13 +185,13 @@
  },
  {
   "name": "open_url",
-  "description": "Open a URL or deep link (https://, mailto:, tel:, geo:, ...).",
+  "description": "Open a link on the phone the way tapping it would: https:// pages open in the user's browser or in the app that handles them (a YouTube link in YouTube), and deep links open their app (mailto: an email draft, tel: the dialer with the number, geo: or a maps link a map, market:// the Play Store). Nothing is sent or called by opening a link. For public web pages you only need to read, the browser_* tools work without taking over the screen. Returns \"Opened\"; call read_screen to see it.",
   "inputSchema": {
    "type": "object",
    "properties": {
     "url": {
      "type": "string",
-     "description": "The URL"
+     "description": "The URL or deep link, e.g. https://example.com or tel:+491234"
     }
    },
    "required": [
@@ -555,7 +555,7 @@
  },
  {
   "name": "browser_back",
-  "description": "Go back to the previous page in the background browser.",
+  "description": "Go back to the previous page in the current tab of the background browser, like a browser's back button. If the page warns that leaving loses unsaved changes, Buddy stays the first time and says so. Returns where the tab is now, or that there's no previous page; then call browser_read.",
   "inputSchema": {
    "type": "object",
    "properties": {}
@@ -563,17 +563,17 @@
  },
  {
   "name": "browser_tabs",
-  "description": "List the background browser's tabs, or switch to or close one by its number.",
+  "description": "Manage the background browser's tabs (this chat's own): with no arguments, list them as numbered lines with title and address, the current one marked; with switch_to, make that tab current (the browser_* tools act on the current tab); with close, close it. Tabs open with browser_open new_tab or when a page opens a link in a new tab.",
   "inputSchema": {
    "type": "object",
    "properties": {
     "switch_to": {
      "type": "integer",
-     "description": "Tab number to switch to"
+     "description": "Number of the tab to switch to, from the list"
     },
     "close": {
      "type": "integer",
-     "description": "Tab number to close"
+     "description": "Number of the tab to close, from the list"
     }
    }
   }
