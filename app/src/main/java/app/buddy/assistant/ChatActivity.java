@@ -31,6 +31,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     private LinearLayout messages, strip, approval;
     private ScrollView scroll;
     private TextView title, chipText, stripText;
+    /** The Linux tools chip beside the model chip (none in the Play build). */
+    private LinearLayout linux;
+    /** The empty-chat hint, while the chat has no messages. */
+    private TextView hint;
     private Button mic;
     private LinearLayout pill;
     private VoiceBar voiceBar;
@@ -72,12 +76,24 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         titles.setPaddingRelative(dp(this, 4), 0, dp(this, 4), 0);
         title = single(title(this, ses.label(), 16));
         titles.addView(title);
+        // the model chip, then Linux tools: in a row only as wide as its chips, the weight just lets the model chip
+        // shrink (its text cut short) when a narrow screen has no room for both
+        LinearLayout chips = row(this);
         LinearLayout chip = chip(this, "");
         chipText = (TextView) chip.getChildAt(0);
         chip.setOnClickListener(v -> chooseModel());
+        chips.addView(chip, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        if (!Flavor.PLAY) {
+            linux = protect(linuxChip(this)); // agents never switch it, even when they may tap Buddy's screens
+            linux.setOnClickListener(v -> switchLinuxTools());
+            LinearLayout.LayoutParams lp = wrap();
+            lp.setMarginStart(dp(this, 6));
+            chips.addView(linux, lp);
+        }
         LinearLayout.LayoutParams cp = wrap();
         cp.topMargin = dp(this, 3);
-        titles.addView(chip, cp);
+        titles.addView(chips, cp);
         top.addView(titles, weight1());
         speaker = iconButton(this, R.drawable.ms_volume_off, getString(R.string.chat_read_aloud), MUTED);
         speaker.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 44), dp(this, 44)));
@@ -241,9 +257,9 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     private void showAll() {
         messages.removeAllViews();
         log = null;
+        hint = null;
         if (ses.messages.isEmpty()) {
-            TextView hint = text(this, getString(Prefs.devMode(this) ? R.string.chat_empty_hint_dev : R.string.chat_empty_hint,
-                    ses.brainName()), 14, MUTED);
+            hint = text(this, hintText(), 14, MUTED);
             hint.setGravity(Gravity.CENTER);
             hint.setPaddingRelative(dp(this, 24), dp(this, 40), dp(this, 24), 0);
             messages.addView(hint, full());
@@ -251,6 +267,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         for (Sessions.Msg m : ses.messages) show(m);
         if (log != null && !ses.running) log.finish();
         lastShown = lastMsg();
+    }
+
+    /** The empty-chat hint mentions Linux tools when the chat has them. */
+    private String hintText() {
+        return getString(ses.dev ? R.string.chat_empty_hint_dev : R.string.chat_empty_hint, ses.brainName());
     }
 
     /** The last message shown here: if the chat moved on while this screen was hidden, it's redrawn on return. */
@@ -327,7 +348,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     @Override
     public void onMessage(Sessions.Session s, Sessions.Msg msg) {
         if (s == ses) {
-            if (ses.messages.size() == 1) messages.removeAllViews(); // drop the empty-chat hint
+            if (ses.messages.size() == 1) { // drop the empty-chat hint
+                messages.removeAllViews();
+                hint = null;
+            }
             show(msg);
             lastShown = msg;
             scrollToEnd();
@@ -383,7 +407,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         final EditText et = new EditText(this);
         et.setHint(getString(R.string.chat_model_other_hint, "claude".equals(ses.backend) ? "claude-opus-5-5"
                 : "opencode".equals(ses.backend) ? "anthropic/claude-sonnet-5-5" : "agy".equals(ses.backend) ? "gemini-3.8-flash-high"
-                : "gpt-6.1-sol"));
+                : "grok".equals(ses.backend) ? "grok-4.7" : "gpt-6.1-sol"));
         et.setHintTextColor(MUTED);
         et.setTextColor(TEXT);
         et.setTextSize(14);
@@ -404,6 +428,43 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         c.addView(other, full());
         d[0] = bottomSheet(this, c);
         d[0].show();
+    }
+
+    /**
+     * The Linux tools chip: turning them on first says what the agent can then do and what could go wrong; turning
+     * them off is immediate. Either way the chat's next message gets the change (a running one goes on as it began).
+     */
+    private void switchLinuxTools() {
+        if (ses.dev) {
+            hub.setDev(ses, false);
+            return;
+        }
+        LinearLayout c = protect(column(this)); // only the user turns them on, as with the chip
+        c.addView(title(this, getString(R.string.chat_linux_tools_title), 18));
+        TextView what = text(this, getString(R.string.chat_linux_tools_what), 14, MUTED);
+        what.setPaddingRelative(0, dp(this, 8), 0, 0);
+        c.addView(what);
+        TextView when = text(this, getString(R.string.chat_linux_tools_when), 14, MUTED);
+        when.setPaddingRelative(0, dp(this, 8), 0, dp(this, 14));
+        c.addView(when);
+        c.addView(warning(this, getString(R.string.chat_linux_tools_risk)), full());
+        LinearLayout btns = row(this);
+        btns.setPaddingRelative(0, dp(this, 18), 0, 0);
+        Button no = button(this, getString(android.R.string.cancel), false);
+        Button yes = button(this, getString(R.string.chat_linux_tools_turn_on), true);
+        LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(0, dp(this, 48), 1);
+        btns.addView(no, bp);
+        LinearLayout.LayoutParams yp = new LinearLayout.LayoutParams(0, dp(this, 48), 1);
+        yp.setMarginStart(dp(this, 10));
+        btns.addView(yes, yp);
+        c.addView(btns, full());
+        Dialog d = bottomSheet(this, c);
+        no.setOnClickListener(v -> d.dismiss());
+        yes.setOnClickListener(v -> {
+            d.dismiss();
+            hub.setDev(ses, true);
+        });
+        d.show();
     }
 
     private View radio(boolean on) {
@@ -547,7 +608,9 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         speaker.setImageResource(speak ? R.drawable.ms_volume_up : R.drawable.ms_volume_off);
         speaker.setImageTintList(ColorStateList.valueOf(speak ? ACCENT : MUTED));
         title.setText(ses.label());
-        chipText.setText(Prefs.devMode(this) ? getString(R.string.chat_chip_dev, Models.summary(ses)) : Models.summary(ses));
+        chipText.setText(Models.summary(ses));
+        if (linux != null) paintLinuxChip(this, linux, ses.dev);
+        if (hint != null) hint.setText(hintText());
         strip.setVisibility(ses.running ? View.VISIBLE : View.GONE);
         input.setHint(ses.running ? getString(R.string.chat_input_hint_running) : getString(R.string.chat_input_hint, ses.brainName()));
         stripText.setText(ses.status.isEmpty() ? getString(R.string.chat_working) : ses.status);

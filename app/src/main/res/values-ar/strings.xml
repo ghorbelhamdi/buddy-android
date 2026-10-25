@@ -2,7 +2,7 @@
 <!-- Buddy's UI text in Arabic (Modern Standard Arabic). English source: res/values/strings.xml. -->
 <resources>
     <string name="service_label">مساعد Buddy</string>
-    <string name="service_description">تعرض فقاعة المحادثة في Buddy، وتتيح للوكيل الذي تختاره (Claude Code أو Codex أو OpenCode أو Antigravity)، الذي يعمل داخل Buddy على هذا الهاتف، قراءة الشاشة والنقر والكتابة والتمرير نيابةً عنك. لا يخرج أي شيء من الهاتف إلا ما يرسله الوكيل نفسه إلى خدمة الذكاء الاصطناعي الخاصة به (Anthropic أو OpenAI أو Google أو مزوّد النموذج الذي تستخدمه في OpenCode).</string>
+    <string name="service_description">تعرض فقاعة المحادثة في Buddy، وتتيح للوكيل الذي تختاره (Claude Code أو Codex أو OpenCode أو Antigravity أو Grok)، الذي يعمل داخل Buddy على هذا الهاتف، قراءة الشاشة والنقر والكتابة والتمرير نيابةً عنك. لا يخرج أي شيء من الهاتف إلا ما يرسله الوكيل نفسه إلى خدمة الذكاء الاصطناعي الخاصة به (Anthropic أو OpenAI أو Google أو xAI أو مزوّد النموذج الذي تستخدمه في OpenCode).</string>
 
     <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
 
@@ -21,7 +21,7 @@
     <string name="onboarding_welcome_ask_title">اطلب بكلمات بسيطة</string>
     <string name="onboarding_welcome_ask_text">«ردّ على سامي بأنني سأتأخر»، «أضف الحليب إلى سلّتي».</string>
     <string name="onboarding_welcome_plan_title">اشتراكك الخاص، بلا مفتاح API</string>
-    <string name="onboarding_welcome_plan_text">يشغّل Claude Code من اشتراكك في Claude. ويعمل Codex أيضًا مع اشتراك ChatGPT، وكذلك Antigravity مع حساب Google ونماذج OpenCode المجانية.</string>
+    <string name="onboarding_welcome_plan_text">يشغّل Claude Code من اشتراكك في Claude. ويعمل Codex أيضًا مع اشتراك ChatGPT، وكذلك Antigravity مع حساب Google، وGrok مع حساب Google أو X، ونماذج OpenCode المجانية.</string>
     <string name="onboarding_welcome_control_title">القرار بيدك</string>
     <string name="onboarding_welcome_control_text">يستأذنك دائمًا قبل الإرسال أو النشر أو الشراء أو الحذف.</string>
     <string name="onboarding_welcome_time">يستغرق الإعداد نحو 5 دقائق</string>
@@ -32,8 +32,9 @@
     <string name="onboarding_brain_text">الوكيل الذي يردّ على محادثاتك. يمكنك إضافة غيره لاحقًا من الإعدادات.</string>
     <string name="onboarding_brain_claude">يستخدم اشتراكك في Claude (خطة Pro أو Max).</string>
     <string name="onboarding_brain_codex">يستخدم اشتراكك في ChatGPT.</string>
-    <string name="onboarding_brain_opencode">نماذج مجانية، دون الحاجة إلى حساب. يمكنك ربط مزوّديك لاحقًا.</string>
-    <string name="onboarding_brain_agy">يستخدم حسابك في Google: الخطة المجانية أو Google AI Pro أو Ultra.</string>
+    <string name="onboarding_brain_opencode">دون الحاجة إلى حساب. يمكنك ربط مزوّديك لاحقًا.</string>
+    <string name="onboarding_brain_agy">يستخدم حسابك في Google، ويعمل أيضًا مع Google AI Pro أو Ultra.</string>
+    <string name="onboarding_brain_grok">يستخدم حسابك في Grok (سجّل الدخول باستخدام Google أو X).</string>
     <string name="onboarding_brain_both">ثبّت الاثنين واختر أحدهما لكل محادثة. يظل Claude Code هو الافتراضي.</string>
     <string name="onboarding_recommended">موصى به</string>
 
@@ -69,13 +70,16 @@
     <string name="onboarding_agent_checking_opencode">جارٍ التحقق من OpenCode…</string>
     <string name="onboarding_agent_sign_in_codex">سجّل الدخول بحسابك في ChatGPT من المتصفح، ثم ارجع إلى هنا.</string>
     <string name="onboarding_agent_sign_in_agy">سجّل الدخول بحسابك في Google. سيُفتح المتصفح؛ سجّل الدخول هناك وسيأخذ Buddy الرمز تلقائيًا.</string>
+    <string name="onboarding_agent_sign_in_grok">سجّل الدخول بحسابك في Grok. سيُفتح المتصفح؛ أكّد الرمز هناك وسيعود Buddy تلقائيًا.</string>
     <string name="onboarding_agent_download_claude">يتم تنزيل نحو 235 ميغابايت مرة واحدة (نظام Linux في Buddy وClaude Code من Anthropic).</string>
     <string name="onboarding_agent_download_opencode">يتم تنزيل نحو 230 ميغابايت مرة واحدة (نظام Linux في Buddy وNode.js وOpenCode). لا حاجة إلى حساب.</string>
     <string name="onboarding_agent_download_codex">يتم تنزيل نحو 150 ميغابايت مرة واحدة (نظام Linux في Buddy وNode.js وCodex من OpenAI).</string>
     <string name="onboarding_agent_download_agy">يتم تنزيل نحو 200 ميغابايت مرة واحدة (نظام Linux في Buddy وAntigravity CLI من Google).</string>
+    <string name="onboarding_agent_download_grok">يتم تنزيل نحو 170 ميغابايت مرة واحدة (نظام Linux في Buddy وGrok Build من xAI).</string>
     <string name="onboarding_sign_in_claude">تسجيل الدخول باستخدام Claude</string>
     <string name="onboarding_sign_in_chatgpt">تسجيل الدخول باستخدام ChatGPT</string>
     <string name="onboarding_sign_in_google">تسجيل الدخول باستخدام Google</string>
+    <string name="onboarding_sign_in_grok">تسجيل الدخول باستخدام Grok</string>
     <string name="onboarding_install_agent">تثبيت %1$s</string>
     <string name="onboarding_agents_wifi">استخدم شبكة Wi-Fi إن أمكن. يمكنك مغادرة هذه الشاشة أثناء التثبيت.</string>
     <string name="onboarding_stuck_sign_in_q">لم يعُد Buddy بعد تسجيل الدخول؟</string>
@@ -118,7 +122,7 @@
     <string name="main_section_working">قيد العمل</string>
     <string name="main_section_recent">الأخيرة</string>
     <string name="main_empty_title">لا توجد محادثات بعد</string>
-    <string name="main_empty_text">انقر على «محادثة جديدة» لبدء محادثة مع Claude Code أو Codex أو OpenCode أو Antigravity. اضغط مطولًا على محادثة لحذفها.</string>
+    <string name="main_empty_text">انقر على «محادثة جديدة» لبدء محادثة مع Claude Code أو Codex أو OpenCode أو Antigravity أو Grok. اضغط مطولًا على محادثة لحذفها.</string>
     <string name="main_chat_working">جارٍ العمل…</string>
     <string name="main_chat_last_you">أنت: %1$s</string>
     <string name="main_delete_title">هل تريد حذف هذه المحادثة؟</string>
@@ -255,7 +259,6 @@
     <string name="bubble_close">إغلاق</string>
     <string name="bubble_chats_title">المحادثات</string>
     <string name="bubble_model_effort_title">النموذج ومستوى الجهد</string>
-    <string name="bubble_summary_dev">%1$s · مطوّر</string>
 
     <!-- Strip at the top of the chat panel while the agent works. -->
     <string name="bubble_working">جارٍ العمل…</string>
@@ -328,7 +331,15 @@
     <string name="chat_read_aloud">قراءة الردود بصوت عالٍ</string>
     <string name="chat_read_aloud_on">ستتم قراءة الردود بصوت عالٍ</string>
     <string name="chat_read_aloud_off">لن تتم قراءة الردود بصوت عالٍ</string>
-    <string name="chat_chip_dev">%1$s · مطوّر</string>
+
+    <!-- Chat screen: Linux tools, the chip beside the model chip (also in the bubble's panel and the New chat sheets) -->
+    <string name="chat_linux_tools">أدوات Linux</string>
+    <string name="chat_linux_tools_info">الأوامر والملفات وإنشاء التطبيقات في نظام Linux في Buddy</string>
+    <string name="chat_linux_tools_title">هل تريد تفعيل أدوات Linux؟</string>
+    <string name="chat_linux_tools_what">سيتمكن الوكيل حينها من تنفيذ الأوامر وتثبيت الحزم وتعديل الملفات في &#x200E;~/.buddy/work، وبالتالي إنشاء التطبيقات وتثبيتها.</string>
+    <string name="chat_linux_tools_when">في هذه المحادثة فقط، بدءًا من رسالتك التالية.</string>
+    <string name="chat_linux_tools_risk">قد تحاول رسالة أو صفحة ويب ضارة على الشاشة خداع الوكيل لتنفيذ أوامر. وتظل بطاقات الموافقة تحمي عمليات الإرسال والنشر والشراء والحذف.</string>
+    <string name="chat_linux_tools_turn_on">تفعيل</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <string name="chat_stop">إيقاف</string>
@@ -341,7 +352,7 @@
     <string name="chat_talk">تحدّث</string>
     <string name="chat_send">إرسال</string>
     <string name="chat_empty_hint">محادثة جديدة مع %1$s. اطلب منه فعل شيء على هاتفك.</string>
-    <string name="chat_empty_hint_dev">محادثة جديدة مع %1$s. اطلب منه فعل شيء على هاتفك أو إنشاء تطبيق (وضع المطوّر مفعّل).</string>
+    <string name="chat_empty_hint_dev">محادثة جديدة مع %1$s وأدوات Linux مفعّلة. اطلب منه فعل شيء على هاتفك أو إنشاء تطبيق.</string>
 
     <!-- Model sheet (tap the model chip under the chat title) -->
     <string name="chat_model_title">نموذج %1$s</string>
@@ -489,7 +500,7 @@
     <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
     <string name="ui_a11y_title">كيف يستخدم Buddy خدمة سهولة الاستخدام</string>
     <string name="ui_a11y_what">يستخدم Buddy خدمة سهولة الاستخدام في Android لتنفيذ ما تطلبه في التطبيقات الأخرى: فهو يقرأ ما على الشاشة وينقر ويكتب ويمرّر نيابةً عنك. كما يعرض الفقاعة العائمة.</string>
-    <string name="ui_a11y_data">أثناء تنفيذ مهمة، يُرسَل محتوى الشاشة، الذي قد يتضمن معلومات شخصية مثل الرسائل أو الأسماء أو العناوين، إلى خدمة الذكاء الاصطناعي الخاصة بالوكيل الذي تختاره (Anthropic لـ Claude Code، أو OpenAI لـ Codex، أو Google لـ Antigravity، أو مزوّد النموذج الذي تستخدمه في OpenCode)، وذلك لتنفيذ طلبك فقط.</string>
+    <string name="ui_a11y_data">أثناء تنفيذ مهمة، يُرسَل محتوى الشاشة، الذي قد يتضمن معلومات شخصية مثل الرسائل أو الأسماء أو العناوين، إلى خدمة الذكاء الاصطناعي الخاصة بالوكيل الذي تختاره (Anthropic لـ Claude Code، أو OpenAI لـ Codex، أو Google لـ Antigravity، أو xAI لـ Grok، أو مزوّد النموذج الذي تستخدمه في OpenCode)، وذلك لتنفيذ طلبك فقط.</string>
     <string name="ui_a11y_no_servers">ليس لدى Buddy خوادم خاصة به. ولا يجمع هذه البيانات أو يبيعها أو يشاركها، ولا يستخدمها للإعلانات.</string>
     <string name="ui_a11y_asks">قبل أي إجراء يتضمن الإرسال أو النشر أو الشراء أو الحذف، يطلب Buddy موافقتك. ويمكنك إيقاف الخدمة في أي وقت من إعدادات سهولة الاستخدام في Android.</string>
     <string name="ui_privacy_policy">سياسة الخصوصية</string>
@@ -533,10 +544,12 @@
     <string name="signin_install_sub_opencode">يشغّل OpenCode داخل Buddy. تعمل نماذجه المجانية فورًا دون الحاجة إلى حساب، ويمكنك ربط مزوّديك (Anthropic وOpenAI وGitHub Copilot…) في أي وقت.</string>
     <string name="signin_install_sub_codex">يشغّل Codex داخل Buddy باستخدام اشتراكك في ChatGPT.</string>
     <string name="signin_install_sub_agy">يشغّل Antigravity CLI من Google داخل Buddy باستخدام حسابك في Google: الخطة المجانية أو Google AI Pro أو Ultra.</string>
+    <string name="signin_install_sub_grok">يشغّل Grok Build من xAI داخل Buddy باستخدام حسابك في Grok (يمكنك تسجيل الدخول باستخدام Google أو X).</string>
     <string name="signin_install_size_claude">يتم تنزيل نحو 235 ميغابايت مرة واحدة: نظام Linux في Buddy وClaude Code من Anthropic. استخدم شبكة Wi-Fi إن أمكن.</string>
     <string name="signin_install_size_opencode">يتم تنزيل نحو 230 ميغابايت مرة واحدة: نظام Linux في Buddy وNode.js وOpenCode. استخدم شبكة Wi-Fi إن أمكن.</string>
     <string name="signin_install_size_codex">يتم تنزيل نحو 150 ميغابايت مرة واحدة: نظام Linux في Buddy وNode.js وCodex من OpenAI. استخدم شبكة Wi-Fi إن أمكن.</string>
     <string name="signin_install_size_agy">يتم تنزيل نحو 200 ميغابايت مرة واحدة: نظام Linux في Buddy وAntigravity CLI من Google. استخدم شبكة Wi-Fi إن أمكن.</string>
+    <string name="signin_install_size_grok">يتم تنزيل نحو 170 ميغابايت مرة واحدة: نظام Linux في Buddy وGrok Build من xAI. استخدم شبكة Wi-Fi إن أمكن.</string>
 
     <!-- Sign-in screen: install or update in progress (screen titles). -->
     <string name="signin_installing">جارٍ التثبيت</string>
@@ -547,12 +560,15 @@
     <string name="signin_title_claude">تسجيل الدخول إلى Claude</string>
     <string name="signin_title_chatgpt">تسجيل الدخول إلى ChatGPT</string>
     <string name="signin_title_google">تسجيل الدخول إلى Google</string>
+    <string name="signin_title_grok">تسجيل الدخول إلى Grok</string>
     <string name="signin_sub_claude">استخدم حسابك في Claude (خطة Pro أو Max). سيُفتح المتصفح؛ وافِق هناك وسيعود Buddy تلقائيًا.</string>
     <string name="signin_sub_chatgpt">استخدم حسابك في ChatGPT (خطة Plus أو Pro أو Business). سيُفتح المتصفح؛ وافِق هناك وسيعود Buddy تلقائيًا.</string>
     <string name="signin_sub_agy">استخدم حسابك في Google. سيُفتح المتصفح؛ سجّل الدخول هناك وسيأخذ Buddy الرمز تلقائيًا. ينتظر Antigravity نحو دقيقة.</string>
+    <string name="signin_sub_grok">استخدم حسابك في Grok؛ ويمكنك أيضًا تسجيل الدخول باستخدام Google أو X. سيُفتح المتصفح مع رمز؛ أكّده هناك وسيعود Buddy تلقائيًا.</string>
     <string name="signin_with_claude">تسجيل الدخول باستخدام Claude</string>
     <string name="signin_with_chatgpt">تسجيل الدخول باستخدام ChatGPT</string>
     <string name="signin_with_google">تسجيل الدخول باستخدام Google</string>
+    <string name="signin_with_grok">تسجيل الدخول باستخدام Grok</string>
     <string name="signin_other_device">تسجيل الدخول على جهاز آخر</string>
     <string name="signin_with_code">تسجيل الدخول باستخدام رمز</string>
 
@@ -563,6 +579,7 @@
     <string name="signin_approve_claude">انقر على «Authorize» في صفحة Claude. سيأخذ Buddy الرمز ويعود تلقائيًا.</string>
     <string name="signin_approve_codex">سجّل الدخول واسمح لـ Codex. ثم ارجع إلى Buddy، وسيُكمل العملية تلقائيًا.</string>
     <string name="signin_approve_agy">سجّل الدخول واسمح لـ Antigravity. سيأخذ Buddy الرمز الذي تعرضه الصفحة ويعود تلقائيًا. إذا استغرق الأمر أكثر من دقيقة، فابدأ تسجيل الدخول من جديد.</string>
+    <string name="signin_approve_grok">تأكّد من أن الصفحة تعرض %1$s، ثم أكّد وسجّل الدخول. سيعود Buddy تلقائيًا.</string>
     <string name="signin_open_again">فتح صفحة تسجيل الدخول مرة أخرى</string>
     <string name="signin_signing_in">جارٍ تسجيل الدخول</string>
     <string name="signin_finishing">جارٍ إكمال تسجيل الدخول…</string>
@@ -573,6 +590,7 @@
     <string name="signin_enter_code">أدخِل هذا الرمز</string>
     <string name="signin_remote_codex">على أي جهاز، افتح الرابط أدناه وسجّل الدخول إلى ChatGPT وأدخِل الرمز. سيُكمل Buddy العملية تلقائيًا.</string>
     <string name="signin_remote_agy">افتح هذا الرابط على أي جهاز وسجّل الدخول. ثم انسخ الرمز الذي تعرضه الصفحة والصقه أدناه خلال دقيقة تقريبًا.</string>
+    <string name="signin_remote_grok">على أي جهاز، افتح الرابط أدناه وسجّل الدخول إلى Grok وأكّد الرمز. سيُكمل Buddy العملية تلقائيًا.</string>
     <string name="signin_copy_code">نسخ الرمز</string>
     <string name="signin_code_copied">تم نسخ الرمز</string>
     <string name="signin_code_expiry">الرمز صالح لمدة 15 دقيقة.</string>
@@ -615,9 +633,11 @@
 
     <!-- Agent status shown on the sign-in, setup and onboarding screens. -->
     <string name="account_tagline_claude">يستخدم اشتراكك في Claude</string>
-    <string name="account_tagline_opencode">نماذج مجانية أو مزوّدوك الخاصون</string>
+    <string name="account_tagline_opencode">دون حساب، أو مع مزوّديك الخاصين</string>
     <string name="account_tagline_codex">يستخدم اشتراكك في ChatGPT</string>
     <string name="account_tagline_agy">يستخدم حسابك في Google</string>
+    <string name="account_tagline_grok">يستخدم حسابك في Grok</string>
+    <string name="agent_tag_free">مجاني · محدود</string>
     <string name="account_setting_up_linux">جارٍ إعداد نظام Linux في Buddy…</string>
     <string name="account_installing_tools">جارٍ تثبيت الأدوات…</string>
     <string name="account_downloading_claude">جارٍ تنزيل Claude Code (نحو 230 ميغابايت)…</string>
@@ -640,6 +660,7 @@
     <string name="models_default_codex">يختاره Codex، ويظهر هنا بعد الرد التالي</string>
     <string name="models_default_opencode">النموذج الافتراضي في OpenCode</string>
     <string name="models_default_agy">النموذج الافتراضي في Antigravity</string>
+    <string name="models_default_grok">النموذج الافتراضي في Grok</string>
     <string name="models_effort_auto">تلقائي</string>
     <string name="models_effort_low">منخفض</string>
     <string name="models_effort_medium">متوسط</string>
@@ -681,7 +702,7 @@
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">الإعدادات</string>
-    <string name="setup_settings_subtitle">يشغّل Buddy داخل التطبيق Claude Code أو Codex أو OpenCode أو Antigravity باستخدام اشتراكك الخاص (أو نماذج OpenCode المجانية وخطة Antigravity المجانية).</string>
+    <string name="setup_settings_subtitle">يشغّل Buddy داخل التطبيق Claude Code أو Codex أو OpenCode أو Antigravity أو Grok باستخدام اشتراكك الخاص (أو نماذج OpenCode المجانية وخطة Antigravity المجانية).</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">الإعداد</string>
@@ -698,6 +719,7 @@
     <string name="setup_step_install_claude">ينزّل Buddy نظام Linux صغيرًا خاصًا به و%1$s من Anthropic (نحو 235 ميغابايت).</string>
     <string name="setup_step_install_opencode">ينزّل Buddy نظام Linux صغيرًا خاصًا به و%1$s (نحو 230 ميغابايت مع Node.js).</string>
     <string name="setup_step_install_codex">ينزّل Buddy نظام Linux صغيرًا خاصًا به و%1$s من OpenAI (نحو 150 ميغابايت).</string>
+    <string name="setup_step_install_grok">ينزّل Buddy نظام Linux صغيرًا خاصًا به و%1$s من xAI (نحو 170 ميغابايت).</string>
     <string name="setup_install">تثبيت</string>
     <string name="setup_step_signin_title">تسجيل الدخول</string>
     <string name="setup_step_signin_opencode_done">لا حاجة إلى تسجيل الدخول: تعمل نماذج OpenCode المجانية فورًا. يمكنك ربط مزوّديك في أي وقت.</string>
@@ -706,6 +728,7 @@
     <string name="setup_step_signin_done_email">تم تسجيل الدخول بحساب %1$s.</string>
     <string name="setup_step_signin_claude">باستخدام حسابك في Claude (خطة Pro أو Max). سيُفتح المتصفح؛ وافِق هناك وسيعود Buddy تلقائيًا.</string>
     <string name="setup_step_signin_codex">باستخدام حسابك في ChatGPT. سيُفتح المتصفح؛ وافِق هناك وسيعود Buddy تلقائيًا.</string>
+    <string name="setup_step_signin_grok">باستخدام حسابك في Grok. سيُفتح المتصفح؛ أكّد الرمز هناك وسيعود Buddy تلقائيًا.</string>
     <string name="setup_sign_in">تسجيل الدخول</string>
     <string name="setup_step_background_title">السماح لـ Buddy بالعمل في الخلفية</string>
     <string name="setup_step_background_done">تم السماح.</string>
@@ -739,7 +762,7 @@
     <!-- Settings screen: Agent. -->
     <string name="setup_agent">الوكيل</string>
     <string name="setup_default_brain">الوكيل الافتراضي</string>
-    <string name="setup_default_brain_info">الوكيل الذي يردّ على المحادثات الجديدة من الفقاعة أو زر «محادثة جديدة». يستخدم Claude Code اشتراكك في Claude، وCodex اشتراكك في ChatGPT، وAntigravity حسابك في Google، وOpenCode نماذجه المجانية أو مزوّديك الخاصين. لا يمكن اختيار إلا الوكلاء الذين تم إعدادهم.</string>
+    <string name="setup_default_brain_info">الوكيل الذي يردّ على المحادثات الجديدة من الفقاعة أو زر «محادثة جديدة». يستخدم Claude Code اشتراكك في Claude، وCodex اشتراكك في ChatGPT، وAntigravity حسابك في Google، وGrok حسابك في Grok، وOpenCode نماذجه المجانية أو مزوّديك الخاصين. لا يمكن اختيار إلا الوكلاء الذين تم إعدادهم.</string>
     <string name="setup_default_brain_set">ستستخدم المحادثات الجديدة %1$s. ويمكنك الاختيار لكل محادثة باستخدام زر «محادثة جديدة».</string>
     <string name="setup_set_up_first">أعِدّ %1$s أولًا.</string>
     <string name="setup_agent_installing">جارٍ التثبيت…</string>
@@ -838,11 +861,11 @@
     <string name="setup_check_updates_info">لديك Buddy %1$s. أو اطلب من أي وكيل: «حدِّث نفسك».</string>
     <string name="setup_app_permissions">أذونات التطبيقات</string>
     <string name="setup_app_permissions_info">اختر لكل تطبيق: «موثوق» يتيح للوكيل العمل فيه دون نوافذ منبثقة، و«صارم» يعني أن Buddy نفسه يسألك قبل «إرسال» و«دفع» و«حذف»…</string>
-    <string name="setup_dev_mode">وضع المطوّر</string>
-    <string name="setup_dev_mode_info">يمكن لوكيل الفقاعة تنفيذ الأوامر وتعديل الملفات في &#x200E;~/.buddy/work، ليتمكن من إنشاء التطبيقات وتثبيتها.</string>
+    <string name="setup_dev_mode">أدوات Linux في المحادثات الجديدة</string>
+    <string name="setup_dev_mode_info">تتيح أدوات Linux للوكيل تنفيذ الأوامر وتثبيت الحزم وتعديل الملفات في &#x200E;~/.buddy/work، ليتمكن من إنشاء التطبيقات وتثبيتها. تبدأ المحادثات الجديدة بهذا الإعداد، ويمكن تغييره لكل محادثة أسفل عنوانها.</string>
     <string name="setup_agents_tap">السماح للوكلاء بالنقر على شاشات Buddy</string>
     <string name="setup_agents_tap_info">لاختبار Buddy باستخدام وكيل (مثل Claude Code في Termux مع أدوات الهاتف). تظل الفقاعة وبطاقات الموافقة و«أذونات التطبيقات» وهذه المفاتيح خارج نطاق الوصول.</string>
-    <string name="setup_dev_mode_warning">أبقِه متوقفًا في الاستخدام اليومي: عند تفعيله، قد تحاول رسالة أو صفحة ويب ضارة على الشاشة خداع الوكيل لتنفيذ أوامر. وتظل بطاقات الموافقة تحمي عمليات الإرسال والنشر والشراء والحذف.</string>
+    <string name="setup_dev_mode_warning">الأفضل إبقاؤه متوقفًا وتفعيل أدوات Linux في المحادثات التي تحتاجها فقط. عند تفعيلها، قد تحاول رسالة أو صفحة ويب ضارة على الشاشة خداع الوكيل لتنفيذ أوامر. وتظل بطاقات الموافقة تحمي عمليات الإرسال والنشر والشراء والحذف.</string>
 
     <!-- Settings screen: footer links. -->
     <string name="setup_licences">تراخيص البرامج المفتوحة المصدر</string>
@@ -874,7 +897,7 @@
     <string name="terminal_session_ended_code">انتهت الجلسة · رمز الخروج %1$d</string>
     <string name="terminal_close">إغلاق</string>
     <string name="terminal_restart">إعادة التشغيل</string>
-    <string name="terminal_needs_linux">ثبّت Claude Code أو Codex أو OpenCode أو Antigravity من الإعدادات أولًا: سيؤدي ذلك إلى إعداد نظام Linux في Buddy.</string>
+    <string name="terminal_needs_linux">ثبّت Claude Code أو Codex أو OpenCode أو Antigravity أو Grok من الإعدادات أولًا: سيؤدي ذلك إلى إعداد نظام Linux في Buddy.</string>
     <string name="terminal_start_failed">تعذّر تشغيل الطرفية: %1$s</string>
     <string name="terminal_close_title">هل تريد إغلاق %1$s؟</string>
     <string name="terminal_close_running">لا تزال قيد التشغيل. سيؤدي إغلاقها إلى إيقافها وإيقاف كل ما بدأته.</string>
@@ -896,7 +919,7 @@
 
     <!-- Sessions screen: every agent session running on the phone, and recent history. -->
     <string name="monitor_title">الجلسات</string>
-    <string name="monitor_subtitle">كل جلسات Claude Code وCodex وOpenCode وAntigravity على هذا الهاتف.</string>
+    <string name="monitor_subtitle">كل جلسات Claude Code وCodex وOpenCode وAntigravity وGrok على هذا الهاتف.</string>
     <string name="monitor_terminal_running">توجد صدفة قيد التشغيل · انقر للعودة</string>
     <string name="monitor_terminal_idle">صدفة ضمن نظام Linux في Buddy</string>
     <string name="monitor_running_now">قيد التشغيل الآن</string>
@@ -936,7 +959,7 @@
     <string name="perms_smart_reviewer">المراجِع الذكي</string>
     <string name="perms_reviewer_same">مثل المحادثة</string>
     <string name="perms_reviewer_sign_in">سجّل الدخول إلى %1$s أولًا (من الإعدادات).</string>
-    <string name="perms_reviewer_about">جلسة مؤقتة لكل نقرة، بدون أدوات: يرى طلبك وملاحظة الوكيل والشاشة، ثم يقرر السماح أو سؤالك أو النصح بعدم التنفيذ. تستغرق نحو 3 ثوانٍ لكل نقرة. تتم مراجعة محادثات OpenCode وAntigravity بواسطة Claude Code (أو Codex).</string>
+    <string name="perms_reviewer_about">جلسة مؤقتة لكل نقرة، بدون أدوات: يرى طلبك وملاحظة الوكيل والشاشة، ثم يقرر السماح أو سؤالك أو النصح بعدم التنفيذ. تستغرق نحو 3 ثوانٍ لكل نقرة. تتم مراجعة محادثات OpenCode وAntigravity وGrok بواسطة Claude Code (أو Codex).</string>
     <string name="perms_reviewer_rules">كما يتحقق من الردود قبل أن ترسلها إحدى قواعد الإشعارات عند انتهاء العد التنازلي.</string>
     <string name="reviewer_default_claude">نموذج Haiku: سريع وخفيف. موصى به.</string>
     <string name="reviewer_default_codex">نموذج صغير وسريع. موصى به.</string>

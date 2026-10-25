@@ -2,7 +2,7 @@
 <!-- Every text Buddy shows, in Korean (해요체). Source of truth: res/values/strings.xml. -->
 <resources>
     <string name="service_label">Buddy 어시스턴트</string>
-    <string name="service_description">Buddy 채팅 버블을 표시하고, 이 휴대전화의 Buddy 안에서 실행되는, 선택한 에이전트(Claude Code, Codex, OpenCode 또는 Antigravity)가 화면을 읽고 대신 탭, 입력, 스크롤할 수 있게 해요. 에이전트가 직접 자신의 AI 서비스(Anthropic, OpenAI, Google 또는 선택한 OpenCode 모델의 제공업체)로 보내는 내용 외에는 아무것도 휴대전화 밖으로 나가지 않아요.</string>
+    <string name="service_description">Buddy 채팅 버블을 표시하고, 이 휴대전화의 Buddy 안에서 실행되는, 선택한 에이전트(Claude Code, Codex, OpenCode, Antigravity 또는 Grok)가 화면을 읽고 대신 탭, 입력, 스크롤할 수 있게 해요. 에이전트가 직접 자신의 AI 서비스(Anthropic, OpenAI, Google, xAI 또는 선택한 OpenCode 모델의 제공업체)로 보내는 내용 외에는 아무것도 휴대전화 밖으로 나가지 않아요.</string>
 
     <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
 
@@ -21,7 +21,7 @@
     <string name="onboarding_welcome_ask_title">평소 말투로 부탁하세요</string>
     <string name="onboarding_welcome_ask_text">“민수에게 늦는다고 답장해 줘”, “장바구니에 우유 담아 줘”처럼요.</string>
     <string name="onboarding_welcome_plan_title">API 키 없이 내 플랜으로</string>
-    <string name="onboarding_welcome_plan_text">Claude 구독으로 Claude Code를 실행해요. ChatGPT 플랜이 있으면 Codex도, Google 계정이 있으면 Antigravity도 쓸 수 있고, OpenCode의 무료 모델도 쓸 수 있어요.</string>
+    <string name="onboarding_welcome_plan_text">Claude 구독으로 Claude Code를 실행해요. ChatGPT 플랜이 있으면 Codex도, Google 계정이 있으면 Antigravity도, Google 또는 X 계정이 있으면 Grok도 쓸 수 있고, OpenCode의 무료 모델도 쓸 수 있어요.</string>
     <string name="onboarding_welcome_control_title">언제나 직접 결정해요</string>
     <string name="onboarding_welcome_control_text">보내기, 게시, 구매, 삭제는 항상 먼저 물어봐요.</string>
     <string name="onboarding_welcome_time">초기 설정은 5분 정도 걸려요</string>
@@ -32,8 +32,9 @@
     <string name="onboarding_brain_text">채팅에 답할 에이전트예요. 다른 에이전트는 나중에 ‘설정’에서 추가할 수 있어요.</string>
     <string name="onboarding_brain_claude">Claude 구독(Pro 또는 Max)을 사용해요.</string>
     <string name="onboarding_brain_codex">ChatGPT 플랜을 사용해요.</string>
-    <string name="onboarding_brain_opencode">무료 모델을 쓸 수 있고 계정이 필요 없어요. 원하는 제공업체는 나중에 연결하세요.</string>
-    <string name="onboarding_brain_agy">Google 계정(무료 플랜, Google AI Pro 또는 Ultra)을 사용해요.</string>
+    <string name="onboarding_brain_opencode">계정이 필요 없어요. 원하는 제공업체는 나중에 연결하세요.</string>
+    <string name="onboarding_brain_agy">Google 계정을 사용해요(Google AI Pro나 Ultra도 가능해요).</string>
+    <string name="onboarding_brain_grok">Grok 계정(Google 또는 X로 로그인)을 사용해요.</string>
     <string name="onboarding_brain_both">둘 다 설치하고 채팅마다 골라요. 기본값은 Claude Code예요.</string>
     <string name="onboarding_recommended">추천</string>
 
@@ -70,13 +71,16 @@
     <string name="onboarding_agent_checking_opencode">OpenCode 확인 중…</string>
     <string name="onboarding_agent_sign_in_codex">브라우저에서 ChatGPT 계정으로 로그인한 다음 돌아오세요.</string>
     <string name="onboarding_agent_sign_in_agy">Google 계정으로 로그인하세요. 브라우저가 열리면 거기서 로그인하세요. Buddy가 코드를 자동으로 받아요.</string>
+    <string name="onboarding_agent_sign_in_grok">Grok 계정으로 로그인하세요. 브라우저가 열리면 거기서 코드를 확인하세요. Buddy로 자동으로 돌아와요.</string>
     <string name="onboarding_agent_download_claude">처음 한 번만 약 235MB를 다운로드해요(Buddy의 Linux와 Anthropic의 Claude Code).</string>
     <string name="onboarding_agent_download_opencode">처음 한 번만 약 230MB를 다운로드해요(Buddy의 Linux, Node.js, OpenCode). 계정은 필요 없어요.</string>
     <string name="onboarding_agent_download_codex">처음 한 번만 약 150MB를 다운로드해요(Buddy의 Linux, Node.js, OpenAI의 Codex).</string>
     <string name="onboarding_agent_download_agy">처음 한 번만 약 200MB를 다운로드해요(Buddy의 Linux와 Google의 Antigravity CLI).</string>
+    <string name="onboarding_agent_download_grok">처음 한 번만 약 170MB를 다운로드해요(Buddy의 Linux와 xAI의 Grok Build).</string>
     <string name="onboarding_sign_in_claude">Claude로 로그인</string>
     <string name="onboarding_sign_in_chatgpt">ChatGPT로 로그인</string>
     <string name="onboarding_sign_in_google">Google로 로그인</string>
+    <string name="onboarding_sign_in_grok">Grok으로 로그인</string>
     <string name="onboarding_install_agent">%1$s 설치</string>
     <string name="onboarding_agents_wifi">가능하면 Wi-Fi를 사용하세요. 설치하는 동안 이 화면을 나가도 돼요.</string>
     <string name="onboarding_stuck_sign_in_q">로그인 후 돌아오지 않나요?</string>
@@ -119,7 +123,7 @@
     <string name="main_section_working">작업 중</string>
     <string name="main_section_recent">최근</string>
     <string name="main_empty_title">아직 채팅이 없어요</string>
-    <string name="main_empty_text">‘새 채팅’을 탭해 Claude Code, Codex, OpenCode 또는 Antigravity와 채팅을 시작하세요. 채팅을 길게 누르면 삭제할 수 있어요.</string>
+    <string name="main_empty_text">‘새 채팅’을 탭해 Claude Code, Codex, OpenCode, Antigravity 또는 Grok과 채팅을 시작하세요. 채팅을 길게 누르면 삭제할 수 있어요.</string>
     <string name="main_chat_working">작업 중…</string>
     <string name="main_chat_last_you">나: %1$s</string>
     <string name="main_delete_title">이 채팅을 삭제할까요?</string>
@@ -242,7 +246,6 @@
     <string name="bubble_close">닫기</string>
     <string name="bubble_chats_title">채팅</string>
     <string name="bubble_model_effort_title">모델 및 추론 강도</string>
-    <string name="bubble_summary_dev">%1$s · 개발자</string>
 
     <!-- Strip at the top of the chat panel while the agent works. -->
     <string name="bubble_working">작업 중…</string>
@@ -310,7 +313,15 @@
     <string name="chat_read_aloud">답변 읽어 주기</string>
     <string name="chat_read_aloud_on">답변을 읽어 줄게요</string>
     <string name="chat_read_aloud_off">답변을 읽어 주지 않아요</string>
-    <string name="chat_chip_dev">%1$s · 개발자</string>
+
+    <!-- Chat screen: Linux tools, the chip beside the model chip (also in the bubble's panel and the New chat sheets) -->
+    <string name="chat_linux_tools">Linux 도구</string>
+    <string name="chat_linux_tools_info">Buddy의 Linux에서 명령 실행, 파일 편집, 앱 빌드</string>
+    <string name="chat_linux_tools_title">Linux 도구를 켤까요?</string>
+    <string name="chat_linux_tools_what">에이전트가 명령을 실행하고 패키지를 설치하고 ~/.buddy/work의 파일을 편집할 수 있게 되어, 앱을 빌드하고 설치할 수 있어요.</string>
+    <string name="chat_linux_tools_when">이 채팅에서만, 다음 메시지부터 적용돼요.</string>
+    <string name="chat_linux_tools_risk">화면에 표시된 악성 메시지나 웹페이지가 에이전트를 속여 명령을 실행하게 할 수 있어요. 보내기, 게시, 구매, 삭제는 여전히 승인 카드로 보호돼요.</string>
+    <string name="chat_linux_tools_turn_on">켜기</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <string name="chat_stop">중지</string>
@@ -323,7 +334,7 @@
     <string name="chat_talk">말하기</string>
     <string name="chat_send">보내기</string>
     <string name="chat_empty_hint">새 %1$s 채팅이에요. 휴대전화에서 할 일을 부탁해 보세요.</string>
-    <string name="chat_empty_hint_dev">새 %1$s 채팅이에요. 휴대전화에서 할 일이나 앱 만들기를 부탁해 보세요(개발자 모드 켜짐).</string>
+    <string name="chat_empty_hint_dev">Linux 도구가 켜진 새 %1$s 채팅이에요. 휴대전화에서 할 일이나 앱 만들기를 부탁해 보세요.</string>
 
     <!-- Model sheet (tap the model chip under the chat title) -->
     <string name="chat_model_title">%1$s 모델</string>
@@ -451,7 +462,7 @@
     <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
     <string name="ui_a11y_title">Buddy가 접근성을 사용하는 방식</string>
     <string name="ui_a11y_what">Buddy는 Android 접근성 서비스를 사용해 다른 앱에서 요청한 작업을 수행해요. 화면에 표시된 내용을 읽고, 대신 탭하고 입력하고 스크롤해요. 플로팅 버블을 표시하는 데에도 사용해요.</string>
-    <string name="ui_a11y_data">작업이 실행되는 동안 화면 내용(메시지, 이름, 주소 같은 개인 정보가 포함될 수 있음)은 요청을 수행하기 위한 목적으로만, 선택한 에이전트의 AI 서비스(Claude Code는 Anthropic, Codex는 OpenAI, Antigravity는 Google, OpenCode는 선택한 모델의 제공업체)로 전송돼요.</string>
+    <string name="ui_a11y_data">작업이 실행되는 동안 화면 내용(메시지, 이름, 주소 같은 개인 정보가 포함될 수 있음)은 요청을 수행하기 위한 목적으로만, 선택한 에이전트의 AI 서비스(Claude Code는 Anthropic, Codex는 OpenAI, Antigravity는 Google, Grok은 xAI, OpenCode는 선택한 모델의 제공업체)로 전송돼요.</string>
     <string name="ui_a11y_no_servers">Buddy에는 자체 서버가 없어요. 이 데이터를 수집, 판매, 공유하지 않으며 광고에도 사용하지 않아요.</string>
     <string name="ui_a11y_asks">보내기, 게시, 구매, 삭제를 하기 전에는 Buddy가 승인을 요청해요. 이 서비스는 Android 접근성 설정에서 언제든지 끌 수 있어요.</string>
     <string name="ui_privacy_policy">개인정보처리방침</string>
@@ -495,10 +506,12 @@
     <string name="signin_install_sub_opencode">Buddy 안에서 OpenCode를 실행해요. 무료 모델은 계정 없이 바로 쓸 수 있고, 원하는 제공업체(Anthropic, OpenAI, GitHub Copilot 등)도 언제든지 연결할 수 있어요.</string>
     <string name="signin_install_sub_codex">ChatGPT 플랜으로 Buddy 안에서 Codex를 실행해요.</string>
     <string name="signin_install_sub_agy">Google 계정(무료 플랜, Google AI Pro 또는 Ultra)으로 Buddy 안에서 Google의 Antigravity CLI를 실행해요.</string>
+    <string name="signin_install_sub_grok">Grok 계정(Google 또는 X 로그인 가능)으로 Buddy 안에서 xAI의 Grok Build를 실행해요.</string>
     <string name="signin_install_size_claude">Buddy의 Linux와 Anthropic의 Claude Code를 처음 한 번만 다운로드해요(약 235MB). 가능하면 Wi-Fi를 사용하세요.</string>
     <string name="signin_install_size_opencode">Buddy의 Linux, Node.js, OpenCode를 처음 한 번만 다운로드해요(약 230MB). 가능하면 Wi-Fi를 사용하세요.</string>
     <string name="signin_install_size_codex">Buddy의 Linux, Node.js, OpenAI의 Codex를 처음 한 번만 다운로드해요(약 150MB). 가능하면 Wi-Fi를 사용하세요.</string>
     <string name="signin_install_size_agy">Buddy의 Linux와 Google의 Antigravity CLI를 처음 한 번만 다운로드해요(약 200MB). 가능하면 Wi-Fi를 사용하세요.</string>
+    <string name="signin_install_size_grok">Buddy의 Linux와 xAI의 Grok Build를 처음 한 번만 다운로드해요(약 170MB). 가능하면 Wi-Fi를 사용하세요.</string>
 
     <!-- Sign-in screen: install or update in progress (screen titles). -->
     <string name="signin_installing">설치 중</string>
@@ -509,12 +522,15 @@
     <string name="signin_title_claude">Claude에 로그인</string>
     <string name="signin_title_chatgpt">ChatGPT에 로그인</string>
     <string name="signin_title_google">Google에 로그인</string>
+    <string name="signin_title_grok">Grok에 로그인</string>
     <string name="signin_sub_claude">Claude 계정(Pro 또는 Max)을 사용해요. 브라우저가 열리면 거기서 승인하세요. Buddy로 자동으로 돌아와요.</string>
     <string name="signin_sub_chatgpt">ChatGPT 계정(Plus, Pro 또는 Business)을 사용해요. 브라우저가 열리면 거기서 승인하세요. Buddy로 자동으로 돌아와요.</string>
     <string name="signin_sub_agy">Google 계정을 사용해요. 브라우저가 열리면 거기서 로그인하세요. Buddy가 코드를 자동으로 받아요. Antigravity는 1분 정도 기다려요.</string>
+    <string name="signin_sub_grok">Grok 계정을 사용해요. Google 또는 X로 로그인해도 돼요. 브라우저가 코드와 함께 열리면 거기서 확인하세요. Buddy로 자동으로 돌아와요.</string>
     <string name="signin_with_claude">Claude로 로그인</string>
     <string name="signin_with_chatgpt">ChatGPT로 로그인</string>
     <string name="signin_with_google">Google로 로그인</string>
+    <string name="signin_with_grok">Grok으로 로그인</string>
     <string name="signin_other_device">다른 기기에서 로그인</string>
     <string name="signin_with_code">코드로 로그인</string>
 
@@ -525,6 +541,7 @@
     <string name="signin_approve_claude">Claude 페이지에서 ‘승인’(Authorize)을 탭하세요. Buddy가 코드를 받아 자동으로 돌아와요.</string>
     <string name="signin_approve_codex">로그인하고 Codex를 허용하세요. 그런 다음 Buddy로 돌아오면 자동으로 마무리돼요.</string>
     <string name="signin_approve_agy">로그인하고 Antigravity를 허용하세요. Buddy가 페이지에 표시된 코드를 받아 자동으로 돌아와요. 1분 넘게 걸리면 로그인을 다시 시작하세요.</string>
+    <string name="signin_approve_grok">페이지에 %1$s 코드가 표시되는지 확인한 다음 승인하고 로그인하세요. Buddy로 자동으로 돌아와요.</string>
     <string name="signin_open_again">로그인 페이지 다시 열기</string>
     <string name="signin_signing_in">로그인 중</string>
     <string name="signin_finishing">로그인 마무리하는 중…</string>
@@ -535,6 +552,7 @@
     <string name="signin_enter_code">이 코드를 입력하세요</string>
     <string name="signin_remote_codex">아무 기기에서나 아래 링크를 열고 ChatGPT에 로그인한 다음 코드를 입력하세요. 나머지는 Buddy가 알아서 마무리해요.</string>
     <string name="signin_remote_agy">아무 기기에서나 이 링크를 열고 로그인하세요. 그런 다음 페이지에 표시된 코드를 복사해 약 1분 안에 아래에 붙여넣으세요.</string>
+    <string name="signin_remote_grok">아무 기기에서나 아래 링크를 열고 Grok에 로그인한 다음 코드를 확인하세요. 나머지는 Buddy가 알아서 마무리해요.</string>
     <string name="signin_copy_code">코드 복사</string>
     <string name="signin_code_copied">코드를 복사했어요</string>
     <string name="signin_code_expiry">코드는 15분 동안 유효해요.</string>
@@ -577,9 +595,11 @@
 
     <!-- Agent status shown on the sign-in, setup and onboarding screens. -->
     <string name="account_tagline_claude">Claude 플랜 사용</string>
-    <string name="account_tagline_opencode">무료 모델 또는 원하는 제공업체</string>
+    <string name="account_tagline_opencode">계정 없이, 또는 원하는 제공업체로</string>
     <string name="account_tagline_codex">ChatGPT 플랜 사용</string>
     <string name="account_tagline_agy">Google 계정 사용</string>
+    <string name="account_tagline_grok">Grok 계정 사용</string>
+    <string name="agent_tag_free">무료 · 한도 있음</string>
     <string name="account_setting_up_linux">Buddy의 Linux 설정 중…</string>
     <string name="account_installing_tools">도구 설치 중…</string>
     <string name="account_downloading_claude">Claude Code 다운로드 중(약 230MB)…</string>
@@ -602,6 +622,7 @@
     <string name="models_default_codex">Codex가 골라요. 다음 답변 후에 여기에 표시돼요</string>
     <string name="models_default_opencode">OpenCode 기본 모델</string>
     <string name="models_default_agy">Antigravity 기본 모델</string>
+    <string name="models_default_grok">Grok 기본 모델</string>
     <!-- Effort levels in a row of up to 6 segments: keep each very short. -->
     <string name="models_effort_auto">자동</string>
     <string name="models_effort_low">낮음</string>
@@ -639,7 +660,7 @@
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">설정</string>
-    <string name="setup_settings_subtitle">Buddy는 내 구독(또는 OpenCode의 무료 모델과 Antigravity의 무료 플랜)으로 앱 안에서 Claude Code, Codex, OpenCode, Antigravity를 실행해요.</string>
+    <string name="setup_settings_subtitle">Buddy는 내 구독(또는 OpenCode의 무료 모델과 Antigravity의 무료 플랜)으로 앱 안에서 Claude Code, Codex, OpenCode, Antigravity, Grok을 실행해요.</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">초기 설정</string>
@@ -656,6 +677,7 @@
     <string name="setup_step_install_claude">Buddy가 자체 소형 Linux와 Anthropic의 %1$s를 다운로드해요(약 235MB).</string>
     <string name="setup_step_install_opencode">Buddy가 자체 소형 Linux와 %1$s를 다운로드해요(Node.js 포함 약 230MB).</string>
     <string name="setup_step_install_codex">Buddy가 자체 소형 Linux와 OpenAI의 %1$s를 다운로드해요(약 150MB).</string>
+    <string name="setup_step_install_grok">Buddy가 자체 소형 Linux와 xAI의 %1$s을 다운로드해요(약 170MB).</string>
     <string name="setup_install">설치</string>
     <string name="setup_step_signin_title">로그인</string>
     <string name="setup_step_signin_opencode_done">로그인이 필요 없어요. OpenCode의 무료 모델은 바로 쓸 수 있어요. 원하는 제공업체는 언제든지 연결할 수 있어요.</string>
@@ -664,6 +686,7 @@
     <string name="setup_step_signin_done_email">%1$s 계정으로 로그인했어요.</string>
     <string name="setup_step_signin_claude">Claude 계정(Pro 또는 Max)으로 로그인해요. 브라우저가 열리면 거기서 승인하세요. Buddy로 자동으로 돌아와요.</string>
     <string name="setup_step_signin_codex">ChatGPT 계정으로 로그인해요. 브라우저가 열리면 거기서 승인하세요. Buddy로 자동으로 돌아와요.</string>
+    <string name="setup_step_signin_grok">Grok 계정으로 로그인해요. 브라우저가 열리면 거기서 코드를 확인하세요. Buddy로 자동으로 돌아와요.</string>
     <string name="setup_sign_in">로그인</string>
     <string name="setup_step_background_title">Buddy 백그라운드 실행 허용</string>
     <string name="setup_step_background_done">허용했어요.</string>
@@ -698,7 +721,7 @@
     <!-- Settings screen: Agent. -->
     <string name="setup_agent">에이전트</string>
     <string name="setup_default_brain">기본 에이전트</string>
-    <string name="setup_default_brain_info">버블이나 ‘새 채팅’ 버튼으로 시작한 채팅에 답할 에이전트예요. Claude Code는 Claude 플랜을, Codex는 ChatGPT 플랜을, Antigravity는 Google 계정을, OpenCode는 무료 모델이나 원하는 제공업체를 사용해요. 설정을 마친 에이전트만 고를 수 있어요.</string>
+    <string name="setup_default_brain_info">버블이나 ‘새 채팅’ 버튼으로 시작한 채팅에 답할 에이전트예요. Claude Code는 Claude 플랜을, Codex는 ChatGPT 플랜을, Antigravity는 Google 계정을, Grok은 Grok 계정을, OpenCode는 무료 모델이나 원하는 제공업체를 사용해요. 설정을 마친 에이전트만 고를 수 있어요.</string>
     <string name="setup_default_brain_set">이제 새 채팅에서 %1$s를 사용해요. ‘새 채팅’ 버튼으로 채팅마다 고를 수도 있어요.</string>
     <string name="setup_set_up_first">먼저 %1$s를 설정하세요.</string>
     <!-- Agent status under each agent's name: lowercase, monospace, keep short. -->
@@ -788,11 +811,11 @@
     <string name="setup_check_updates_info">현재 버전: Buddy %1$s. 아무 에이전트에게나 “업데이트해 줘”라고 말해도 돼요.</string>
     <string name="setup_app_permissions">앱 권한</string>
     <string name="setup_app_permissions_info">앱별로 고를 수 있어요. ‘신뢰’는 에이전트가 팝업 없이 작업하고, ‘엄격’은 보내기, 결제, 삭제 등을 하기 전에 Buddy가 직접 물어봐요.</string>
-    <string name="setup_dev_mode">개발자 모드</string>
-    <string name="setup_dev_mode_info">버블의 에이전트가 ~/.buddy/work에서 명령을 실행하고 파일을 편집할 수 있어서, 앱을 빌드하고 설치할 수 있어요.</string>
+    <string name="setup_dev_mode">새 채팅의 Linux 도구</string>
+    <string name="setup_dev_mode_info">Linux 도구를 켜면 에이전트가 명령을 실행하고 패키지를 설치하고 ~/.buddy/work의 파일을 편집할 수 있어서, 앱을 빌드하고 설치할 수 있어요. 새 채팅은 이 설정으로 시작하고, 채팅마다 제목 아래에서 바꿀 수 있어요.</string>
     <string name="setup_agents_tap">에이전트가 Buddy 화면을 탭하도록 허용</string>
     <string name="setup_agents_tap_info">에이전트로 Buddy를 테스트할 때 사용해요(예: 휴대전화 도구를 쓰는 Termux의 Claude Code). 버블, 승인 카드, ‘앱 권한’, 이 스위치들은 계속 조작할 수 없어요.</string>
-    <string name="setup_dev_mode_warning">평소에는 꺼 두세요. 켜 두면 화면에 표시된 악성 메시지나 웹페이지가 에이전트를 속여 명령을 실행하게 할 수 있어요. 보내기, 게시, 구매, 삭제는 여전히 승인 카드로 보호돼요.</string>
+    <string name="setup_dev_mode_warning">평소에는 꺼 두고, 필요한 채팅에서만 Linux 도구를 켜세요. 켜 두면 화면에 표시된 악성 메시지나 웹페이지가 에이전트를 속여 명령을 실행하게 할 수 있어요. 보내기, 게시, 구매, 삭제는 여전히 승인 카드로 보호돼요.</string>
 
     <!-- Settings screen: footer links. -->
     <string name="setup_licences">오픈소스 라이선스</string>
@@ -819,7 +842,7 @@
     <string name="terminal_session_ended_code">세션 종료됨 · 종료 코드 %1$d</string>
     <string name="terminal_close">닫기</string>
     <string name="terminal_restart">다시 시작</string>
-    <string name="terminal_needs_linux">먼저 ‘설정’에서 Claude Code, Codex, OpenCode, Antigravity 중 하나를 설치하세요. 그러면 Buddy의 Linux가 설정돼요.</string>
+    <string name="terminal_needs_linux">먼저 ‘설정’에서 Claude Code, Codex, OpenCode, Antigravity, Grok 중 하나를 설치하세요. 그러면 Buddy의 Linux가 설정돼요.</string>
     <string name="terminal_start_failed">터미널을 시작하지 못했어요: %1$s</string>
     <string name="terminal_close_title">%1$s 탭을 닫을까요?</string>
     <string name="terminal_close_running">아직 실행 중이에요. 닫으면 이 세션과 여기서 시작한 모든 작업이 멈춰요.</string>
@@ -841,7 +864,7 @@
 
     <!-- Sessions screen: every agent session running on the phone, and recent history. -->
     <string name="monitor_title">세션</string>
-    <string name="monitor_subtitle">이 휴대전화의 모든 Claude Code, Codex, OpenCode 및 Antigravity 세션이에요.</string>
+    <string name="monitor_subtitle">이 휴대전화의 모든 Claude Code, Codex, OpenCode, Antigravity 및 Grok 세션이에요.</string>
     <string name="monitor_terminal_running">셸 실행 중 · 탭하여 돌아가기</string>
     <string name="monitor_terminal_idle">Buddy의 Linux 셸</string>
     <string name="monitor_running_now">실행 중</string>
@@ -881,7 +904,7 @@
     <string name="perms_smart_reviewer">스마트 검토 AI</string>
     <string name="perms_reviewer_same">채팅과 동일</string>
     <string name="perms_reviewer_sign_in">먼저 %1$s에 로그인하세요(설정).</string>
-    <string name="perms_reviewer_about">탭마다 도구 없는 임시 세션을 사용해요. 요청 내용, 에이전트의 메모, 화면을 보고 ‘허용’, ‘사용자에게 확인’, ‘권하지 않음’ 중 하나로 답해요. 탭 한 번에 약 3초 걸려요. OpenCode와 Antigravity 채팅은 Claude Code(또는 Codex)가 검토해요.</string>
+    <string name="perms_reviewer_about">탭마다 도구 없는 임시 세션을 사용해요. 요청 내용, 에이전트의 메모, 화면을 보고 ‘허용’, ‘사용자에게 확인’, ‘권하지 않음’ 중 하나로 답해요. 탭 한 번에 약 3초 걸려요. OpenCode, Antigravity, Grok 채팅은 Claude Code(또는 Codex)가 검토해요.</string>
     <string name="perms_reviewer_rules">알림 규칙의 카운트다운이 답장을 보내기 전에도 확인해요.</string>
     <string name="reviewer_default_claude">Haiku: 빠르고 가벼워요. 추천해요.</string>
     <string name="reviewer_default_codex">작고 빠른 모델이에요. 추천해요.</string>

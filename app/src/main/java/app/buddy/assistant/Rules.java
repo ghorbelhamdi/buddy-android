@@ -26,7 +26,7 @@ final class Rules {
         /** Who it's from (names, comma-separated) and words it contains; empty matches any. */
         String from = "", words = "";
         String instruction = "";
-        /** The agent that runs it (claude, codex or opencode), and its model ("" for the agent's default). */
+        /** The agent that runs it (claude, codex, opencode or grok), and its model ("" for the agent's default). */
         String backend = "claude", model = "";
         /** Before acting: "ask" (approval cards wait for the user) or "countdown" (they approve themselves). */
         String approval = "ask";

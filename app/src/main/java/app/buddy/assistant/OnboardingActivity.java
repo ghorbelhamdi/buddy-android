@@ -178,7 +178,8 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                     note("opencode".equals(agents) ? getString(R.string.onboarding_access_privacy_opencode, agentNames())
                             : "both".equals(agents) ? getString(R.string.onboarding_access_privacy_both)
                             : getString(R.string.onboarding_access_privacy, agentNames(),
-                            "codex".equals(agents) ? "OpenAI" : "agy".equals(agents) ? "Google" : "Anthropic"));
+                            "codex".equals(agents) ? "OpenAI" : "agy".equals(agents) ? "Google" : "grok".equals(agents) ? "xAI"
+                            : "Anthropic"));
                     if (accessTries > 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) restrictedHelp();
                     note(getString(R.string.onboarding_access_list_hint));
                     primary(getString(R.string.onboarding_access_open), v -> {
@@ -266,6 +267,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                 {"codex", "Codex", getString(R.string.onboarding_brain_codex)},
                 {"opencode", "OpenCode", getString(R.string.onboarding_brain_opencode)},
                 {"agy", "Antigravity", getString(R.string.onboarding_brain_agy)},
+                {"grok", "Grok", getString(R.string.onboarding_brain_grok)},
                 {"both", "Claude Code + Codex", getString(R.string.onboarding_brain_both)},
         };
         for (String[] o : opts) {
@@ -297,6 +299,11 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                 LinearLayout.LayoutParams tp = wrap();
                 tp.setMarginStart(dp(this, 8));
                 tr.addView(tag, tp);
+            }
+            if (Account.known(o[0]) && Account.of(o[0]).freeTier()) {
+                LinearLayout.LayoutParams tp = wrap();
+                tp.setMarginStart(dp(this, 8));
+                tr.addView(freeTag(this), tp);
             }
             t.addView(tr);
             t.addView(text(this, o[2], 13, MUTED));
@@ -347,17 +354,19 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                         : acc.step == Account.Step.ERROR ? acc.detail
                         : getString(installed ? (acc.claude() ? R.string.onboarding_agent_sign_in_claude : acc.opencode()
                         ? R.string.onboarding_agent_checking_opencode : acc.agy() ? R.string.onboarding_agent_sign_in_agy
-                        : R.string.onboarding_agent_sign_in_codex)
+                        : acc.grok() ? R.string.onboarding_agent_sign_in_grok : R.string.onboarding_agent_sign_in_codex)
                         : (acc.claude() ? R.string.onboarding_agent_download_claude
                         : acc.opencode() ? R.string.onboarding_agent_download_opencode
                         : acc.agy() ? R.string.onboarding_agent_download_agy
+                        : acc.grok() ? R.string.onboarding_agent_download_grok
                         : R.string.onboarding_agent_download_codex)), 14,
                         acc.step == Account.Step.ERROR ? ERR : MUTED);
                 how.setPaddingRelative(0, dp(this, 10), 0, installing ? 0 : dp(this, 10));
                 card.addView(how);
                 if (!installing && !(installed && acc.opencode())) {
                     Button b = button(this, installed ? getString(acc.claude() ? R.string.onboarding_sign_in_claude
-                            : acc.agy() ? R.string.onboarding_sign_in_google : R.string.onboarding_sign_in_chatgpt)
+                            : acc.agy() ? R.string.onboarding_sign_in_google : acc.grok() ? R.string.onboarding_sign_in_grok
+                            : R.string.onboarding_sign_in_chatgpt)
                             : getString(R.string.onboarding_install_agent, acc.name()), first);
                     b.setOnClickListener(v -> {
                         if (installed) startActivity(new Intent(this, SignInActivity.class).putExtra("agent", a));

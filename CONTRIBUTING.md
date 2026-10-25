@@ -4,7 +4,7 @@ Thanks for helping. Bug reports, ideas and pull requests are all welcome.
 
 ## Reporting a bug
 
-Open an [issue](https://github.com/ghorbelhamdi/buddy-android/issues/new/choose) with the bug form. The most useful details are your phone and Android version, the agent and model (Claude Code, Codex, OpenCode or Antigravity), what you asked, and what happened instead. A screenshot of the chat (open its "N tool calls" line) usually shows where it went wrong.
+Open an [issue](https://github.com/ghorbelhamdi/buddy-android/issues/new/choose) with the bug form. The most useful details are your phone and Android version, the agent and model (Claude Code, Codex, OpenCode, Antigravity or Grok), what you asked, and what happened instead. A screenshot of the chat (open its "N tool calls" line) usually shows where it went wrong.
 
 Found a way for an agent to act without your approval, or to approve for you? Please don't post it publicly: use [private vulnerability reporting](https://github.com/ghorbelhamdi/buddy-android/security/advisories/new).
 
@@ -68,7 +68,7 @@ Buddy is [Apache-2.0](LICENSE). By opening a pull request you agree that your co
 | `.../Ui.java`, `Theme.java` | Components and the light/dark/accent theme |
 | `.../Linux.java` | Buddy's Linux: downloads Alpine and runs commands through proot |
 | `.../Helper.java` | Runs `buddy-run` inside Linux and keeps its files up to date |
-| `.../Account.java`, `SignInActivity.java` | Install, one-tap sign-in and status for Claude Code, Codex, OpenCode and Antigravity |
+| `.../Account.java`, `SignInActivity.java` | Install, one-tap sign-in and status for Claude Code, Codex, OpenCode, Antigravity and Grok |
 | `.../RemoteSession.java` | The Remote Control session |
 | `.../CodexRemote.java` | The Codex session: runs `linux/codex-remote` and passes on pairing requests |
 | `.../SshServer.java` | SSH from Termux: the server in Buddy's Linux and the one-time code that lets a key in |

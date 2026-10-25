@@ -18,10 +18,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * One agent (Claude Code, Codex, OpenCode or Antigravity) inside Buddy's built-in Linux: install it, sign in, check
- * the account. Claude Code's and Antigravity's sign-ins show a one-time code in the browser; Buddy reads it off the
- * screen (accessibility), the clipboard, or a paste box. Codex's sign-in returns to a local address inside Linux by
- * itself. OpenCode needs no sign-in (its free models work right away); providers are connected in the terminal.
+ * One agent (Claude Code, Codex, OpenCode, Antigravity or Grok) inside Buddy's built-in Linux: install it, sign in,
+ * check the account. Claude Code's and Antigravity's sign-ins show a one-time code in the browser; Buddy reads it off
+ * the screen (accessibility), the clipboard, or a paste box. Codex's sign-in returns to a local address inside Linux by
+ * itself; Grok's is a device code the user confirms in the browser. OpenCode needs no sign-in (its free models work
+ * right away); providers are connected in the terminal.
  */
 final class Account {
     enum Step { CHECKING, NEED_INSTALL, INSTALLING, SIGNED_OUT, WAITING_BROWSER, FINISHING, SIGNED_IN, ERROR }
@@ -34,25 +35,28 @@ final class Account {
     static final Account CODEX = new Account("codex");
     static final Account OPENCODE = new Account("opencode");
     static final Account AGY = new Account("agy");
-    static final Account[] ALL = {CLAUDE, CODEX, OPENCODE, AGY};
+    static final Account GROK = new Account("grok");
+    static final Account[] ALL = {CLAUDE, CODEX, OPENCODE, AGY, GROK};
 
     static Account of(String agent) {
-        return "codex".equals(agent) ? CODEX : "opencode".equals(agent) ? OPENCODE : "agy".equals(agent) ? AGY : CLAUDE;
+        return "codex".equals(agent) ? CODEX : "opencode".equals(agent) ? OPENCODE : "agy".equals(agent) ? AGY
+                : "grok".equals(agent) ? GROK : CLAUDE;
     }
 
-    /** Is this one of Buddy's agents ("claude", "codex", "opencode" or "agy")? */
+    /** Is this one of Buddy's agents ("claude", "codex", "opencode", "agy" or "grok")? */
     static boolean known(String agent) {
         return of(agent).agent.equals(agent);
     }
 
-    /** The agent's display name: "Claude Code", "Codex", "OpenCode" or "Antigravity". */
+    /** The agent's display name: "Claude Code", "Codex", "OpenCode", "Antigravity" or "Grok". */
     static String nameOf(String agent) {
         return of(agent).name();
     }
 
-    /** Its command-line name, shown in mono labels: "claude-code", "codex", "opencode" or "agy". */
+    /** Its command-line name, shown in mono labels: "claude-code", "codex", "opencode", "agy" or "grok". */
     static String cliOf(String agent) {
-        return "codex".equals(agent) ? "codex" : "opencode".equals(agent) ? "opencode" : "agy".equals(agent) ? "agy" : "claude-code";
+        return "codex".equals(agent) ? "codex" : "opencode".equals(agent) ? "opencode" : "agy".equals(agent) ? "agy"
+                : "grok".equals(agent) ? "grok" : "claude-code";
     }
 
     final String agent;
@@ -62,7 +66,7 @@ final class Account {
     volatile String url, state;
     /** Signing in from another device: show the link (and Codex's one-time code) instead of opening the browser here. */
     volatile boolean remote;
-    /** Codex's device code ("ABCD-12345") in remote mode. */
+    /** Codex's device code ("ABCD-12345") in remote mode; Grok's ("ABCD-1234") always. */
     volatile String userCode;
     /** OpenCode 2 (npm @opencode/cli) rather than 1.x: its commands need --standalone, or it leaves a background service. */
     volatile boolean opencode2;
@@ -95,8 +99,17 @@ final class Account {
         return "agy".equals(agent);
     }
 
+    boolean grok() {
+        return "grok".equals(agent);
+    }
+
+    /** Usable without paying, within limits (OpenCode's free models, Antigravity's and Grok's free plans). */
+    boolean freeTier() {
+        return opencode() || agy() || grok();
+    }
+
     String name() {
-        return claude() ? "Claude Code" : opencode() ? "OpenCode" : agy() ? "Antigravity" : "Codex";
+        return claude() ? "Claude Code" : opencode() ? "OpenCode" : agy() ? "Antigravity" : grok() ? "Grok" : "Codex";
     }
 
     /** The plan to show: OpenCode's "free models" marker in the user's language, anything else as it is. */
@@ -107,7 +120,7 @@ final class Account {
     /** One line on what the agent runs on, for pickers. */
     String tagline() {
         return BuddyApp.str(claude() ? R.string.account_tagline_claude : opencode() ? R.string.account_tagline_opencode
-                : agy() ? R.string.account_tagline_agy : R.string.account_tagline_codex);
+                : agy() ? R.string.account_tagline_agy : grok() ? R.string.account_tagline_grok : R.string.account_tagline_codex);
     }
 
     static void addListener(Listener l) {
@@ -239,6 +252,43 @@ final class Account {
                     } else {
                         set(Step.SIGNED_OUT, "");
                     }
+                } else if (grok()) {
+                    // signed in = its saved login (auth.json, which also has the account's email)
+                    String out = Linux.exec(app, "[ -x " + GROK_BIN + " ] || { echo NOTINSTALLED; exit 0; }; "
+                            + "[ -s " + GROK_AUTH + " ] && echo GROK_SIGNED=$(jq -r '[.[].email // empty] | first // empty' "
+                            + GROK_AUTH + " 2>/dev/null); echo VER=$(" + GROK_BIN + " --version 2>/dev/null)", 60);
+                    version = ver(out);
+                    Matcher signed = Pattern.compile("GROK_SIGNED=(\\S*)").matcher(out);
+                    if (out.contains("NOTINSTALLED")) {
+                        set(Step.NEED_INSTALL, "");
+                    } else if (signed.find()) {
+                        email = signed.group(1);
+                        plan = "";
+                        set(Step.SIGNED_IN, "");
+                        // its model list ("  * grok-4.7 (default)" lines), for the model picker: as for Antigravity's,
+                        // one lookup at a time, at most every 10 minutes
+                        long now = System.currentTimeMillis();
+                        if (grokModelsBusy || now - grokModelsAt < 600_000) return;
+                        grokModelsBusy = true;
+                        String list;
+                        try {
+                            list = Linux.exec(app, "timeout 40 " + GROK_BIN + " models 2>/dev/null", 50);
+                        } finally {
+                            grokModelsBusy = false;
+                        }
+                        org.json.JSONArray a = new org.json.JSONArray();
+                        for (String line : list.split("\n")) {
+                            Matcher m = Pattern.compile("^\\s*[*-]\\s+([A-Za-z0-9._-]+)").matcher(line);
+                            if (m.find()) a.put(new org.json.JSONArray().put(m.group(1)).put(m.group(1)));
+                        }
+                        if (a.length() > 0) {
+                            grokModelsAt = now;
+                            Prefs.setGrokModels(app, a.toString());
+                            Models.setGrok(a.toString());
+                        }
+                    } else {
+                        set(Step.SIGNED_OUT, "");
+                    }
                 } else {
                     String out = Linux.exec(app, "command -v codex >/dev/null || { echo NOTINSTALLED; exit 0; }; "
                             + "codex login status 2>&1; echo VER=$(codex --version 2>/dev/null)", 60);
@@ -273,7 +323,7 @@ final class Account {
                     Helper.sync(app);
                     set(Step.INSTALLING, app.getString(R.string.account_installing_tools));
                     String o = Linux.exec(app, "apk update -q && apk add -q bash curl jq libgcc libstdc++ ripgrep git "
-                            + "ca-certificates procps coreutils findutils" + (claude() || agy() ? "" : " nodejs npm")
+                            + "ca-certificates procps coreutils findutils" + (claude() || agy() || grok() ? "" : " nodejs npm")
                             + (agy() ? " util-linux-misc" : "") // script: Antigravity's sign-in needs a terminal
                             + " && echo TOOLS_OK", 900);
                     if (!o.contains("TOOLS_OK")) throw new IOException(tail(o));
@@ -288,6 +338,12 @@ final class Account {
                     // Google's installer picks the Alpine (musl) build and puts agy in ~/.local/bin
                     String o = Linux.exec(app, "curl -fsSL https://antigravity.google/cli/install.sh -o /tmp/agy-install.sh"
                             + " && bash /tmp/agy-install.sh 2>&1 | tail -5 && " + AGY_BIN + " --version && echo AGENT_OK", 1800);
+                    if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
+                } else if (grok()) {
+                    set(Step.INSTALLING, app.getString(R.string.account_downloading, name()));
+                    // xAI's installer fetches one static binary (it runs on Alpine as it is) and links it in ~/.local/bin
+                    String o = Linux.exec(app, "curl -fsSL https://x.ai/cli/install.sh -o /tmp/grok-install.sh"
+                            + " && bash /tmp/grok-install.sh 2>&1 | tail -5 && " + GROK_BIN + " --version && echo AGENT_OK", 1800);
                     if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
                 } else if (opencode()) {
                     set(Step.INSTALLING, app.getString(R.string.account_downloading, name()));
@@ -327,6 +383,11 @@ final class Account {
     private static volatile long agyModelsAt;
     private static final String AGY_TOKEN = "/root/.gemini/antigravity-cli/antigravity-oauth-token";
 
+    private static final String GROK_BIN = "/root/.local/bin/grok";
+    private static final String GROK_AUTH = "/root/.grok/auth.json";
+    private static volatile boolean grokModelsBusy;
+    private static volatile long grokModelsAt;
+
     private static String ver(String out) {
         java.util.regex.Matcher m = java.util.regex.Pattern.compile("VER=\\D*(\\d+\\.\\d+\\.\\d+)").matcher(out);
         return m.find() ? m.group(1) : "";
@@ -355,6 +416,8 @@ final class Account {
                     o = Linux.exec(app, "/root/.local/bin/claude update 2>&1 | tail -3; echo VER=$(/root/.local/bin/claude --version)", 900);
                 } else if (agy()) {
                     o = Linux.exec(app, AGY_BIN + " update 2>&1 | tail -3; echo VER=$(" + AGY_BIN + " --version)", 900);
+                } else if (grok()) {
+                    o = Linux.exec(app, GROK_BIN + " update 2>&1 | tail -3; echo VER=$(" + GROK_BIN + " --version)", 900);
                 } else if (opencode()) {
                     // Reinstalls only when npm has a newer version (1.x counts: OpenCode 2 is a new npm package that
                     // keeps 1.x's connected providers). The install removes the old copy first (OC_REMOVE), so it
@@ -394,7 +457,8 @@ final class Account {
     /** remote = sign in on another device: Codex uses its device code; Claude and Antigravity show their link to open
      *  elsewhere. Antigravity has no login command: a one-line prompt asks for the sign-in first, then answers. It only
      *  offers the sign-in on a terminal ("no controlling terminal; cannot complete interactive login"), so it runs
-     *  under script, which gives it one. */
+     *  under script, which gives it one. Grok always signs in with a device code: its link carries the code, so here
+     *  it opens in the browser and the user confirms the code there; remote shows the link and code as for Codex. */
     void startLogin(Context c, boolean onOtherDevice) {
         app = c.getApplicationContext();
         if (busy() || opencode()) return; // OpenCode: providers are connected in the terminal (opencode auth login)
@@ -411,6 +475,7 @@ final class Account {
                         ? Linux.builder(app, "/root/.local/bin/claude", "auth", "login", "--claudeai")
                         : agy() ? Linux.builder(app, "/bin/sh", "-c", "command -v script >/dev/null || apk add -q util-linux-misc;"
                                 + " exec script -qec \"" + AGY_BIN + " -p 'Reply with just: ok'\" /dev/null")
+                        : grok() ? Linux.builder(app, GROK_BIN, "login", "--device-auth")
                         : onOtherDevice ? Linux.builder(app, "codex", "login", "--device-auth")
                         : Linux.builder(app, "codex", "login")).start();
                 synchronized (this) {
@@ -430,8 +495,9 @@ final class Account {
                     } catch (Exception ignored) {
                     }
                 }).start();
-                boolean device = onOtherDevice && !claude() && !agy(); // Codex's device code
+                boolean device = grok() || onOtherDevice && !claude() && !agy(); // Codex's or Grok's device code
                 Pattern u = Pattern.compile(agy() ? "https://accounts\\.google\\.com/o/oauth2/auth\\?\\S+"
+                        : grok() ? "https://accounts\\.x\\.ai/oauth2/device\\S*"
                         : device ? "https://\\S*/codex/device\\S*" : "https://\\S*/oauth/authorize\\?\\S+");
                 Pattern code = Pattern.compile("one-time code[^\\n]*\\n\\s*([A-Z0-9][A-Z0-9-]{4,15})");
                 try (InputStream in = p.getInputStream()) {
@@ -445,7 +511,7 @@ final class Account {
                             if (m.find()) {
                                 url = m.group();
                                 state = Uri.parse(url).getQueryParameter("state");
-                                // Codex's device flow also needs its code before the screen is useful
+                                // a device flow (Codex, Grok) also needs its code before the screen is useful
                                 if (!device) set(Step.WAITING_BROWSER, "");
                             }
                         }
@@ -515,6 +581,7 @@ final class Account {
         new Thread(() -> {
             try {
                 if (agy()) Linux.exec(app, "rm -f " + AGY_TOKEN, 60); // agy only signs out from its own screen (/logout)
+                else if (grok()) Linux.exec(app, GROK_BIN + " logout", 60);
                 else if (!opencode()) Linux.exec(app, claude() ? "claude auth logout" : "codex logout", 60);
             } catch (Exception ignored) {
             }

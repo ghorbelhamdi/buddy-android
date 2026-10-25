@@ -29,7 +29,12 @@ final class Models {
             {"gemini-3.8-flash-medium", "Gemini 3.8 Flash (Medium)"},
             {"gemini-3.8-flash-low", "Gemini 3.8 Flash (Low)"},
     };
-    private static String[][] codexLive, opencodeLive, agyLive;
+    /** Used until Grok reports its own list (`grok models`). */
+    static final String[][] GROK = {
+            {"", "Default"},
+            {"grok-4.7", "grok-4.7"},
+    };
+    private static String[][] codexLive, opencodeLive, agyLive, grokLive;
 
     private Models() {
     }
@@ -51,6 +56,7 @@ final class Models {
     static String[][] forBackend(String backend) {
         if ("opencode".equals(backend)) return withDefault(opencodeLive != null ? opencodeLive : OPENCODE);
         if ("agy".equals(backend)) return withDefault(agyLive != null ? agyLive : AGY);
+        if ("grok".equals(backend)) return withDefault(grokLive != null ? grokLive : GROK);
         if (!"codex".equals(backend)) return withDefault(CLAUDE);
         return withDefault(codexLive != null ? codexLive : CODEX);
     }
@@ -72,6 +78,12 @@ final class Models {
     static void setAgy(String json) {
         String[][] m = parse(json);
         if (m != null) agyLive = m;
+    }
+
+    /** Grok's models as JSON [[id, name], …] (its ids are its names). */
+    static void setGrok(String json) {
+        String[][] m = parse(json);
+        if (m != null) grokLive = m;
     }
 
     /** Codex's model list as reported by the helper: JSON [[slug, name], …]. */
@@ -105,7 +117,9 @@ final class Models {
         if ("codex".equals(backend)) return new String[][]{{"", BuddyApp.str(R.string.models_effort_auto)},
                 {"low", BuddyApp.str(R.string.models_effort_low)}, {"medium", BuddyApp.str(R.string.models_effort_medium)},
                 {"high", BuddyApp.str(R.string.models_effort_high)}};
-        return null; // OpenCode: effort ("variants") depends on the model; Antigravity's model ids include it
+        // OpenCode: effort ("variants") depends on the model; Antigravity's model ids include it; Grok's depends on the
+        // model too (it lists no levels)
+        return null;
     }
 
     /** "agent · model · effort" for a chat's chip. */
@@ -127,6 +141,7 @@ final class Models {
         if ("claude".equals(s.backend)) return BuddyApp.str(R.string.models_default_claude);
         if ("codex".equals(s.backend)) return BuddyApp.str(R.string.models_default_codex);
         if ("agy".equals(s.backend)) return BuddyApp.str(R.string.models_default_agy);
+        if ("grok".equals(s.backend)) return BuddyApp.str(R.string.models_default_grok);
         return BuddyApp.str(R.string.models_default_opencode);
     }
 

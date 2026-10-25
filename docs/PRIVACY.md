@@ -2,7 +2,7 @@
 
 *Last updated: 22 October 2026*
 
-Buddy is an open-source Android app (Apache 2.0) by Hamdi Ghorbel. It lets an AI agent of your choice (Claude Code, Codex, OpenCode or Antigravity) use your phone's apps for you. This policy explains what data Buddy handles. The source code is public at https://github.com/ghorbelhamdi/buddy-android, so every statement here can be checked.
+Buddy is an open-source Android app (Apache 2.0) by Hamdi Ghorbel. It lets an AI agent of your choice (Claude Code, Codex, OpenCode, Antigravity or Grok) use your phone's apps for you. This policy explains what data Buddy handles. The source code is public at https://github.com/ghorbelhamdi/buddy-android, so every statement here can be checked.
 
 ## Buddy has no servers
 
@@ -35,6 +35,7 @@ The agent runs inside the app and talks directly to its own provider. What you t
 - **Codex:** OpenAI, under your ChatGPT account. See https://openai.com/policies/privacy-policy
 - **OpenCode:** the provider of the model you pick (by default OpenCode's free models). See https://opencode.ai
 - **Antigravity:** Google, under your Google account. See https://policies.google.com/privacy
+- **Grok:** xAI, under your Grok account. See https://x.ai/legal/privacy-policy
 
 You sign in with these services yourself; Buddy never sees your passwords. Their own privacy policies apply to what they receive.
 
@@ -48,7 +49,7 @@ Your chats, settings, sign-ins and the agent's files are stored only in Buddy's 
 
 ## Downloads
 
-To set up an agent, Buddy downloads a small Linux system from Alpine Linux (dl-cdn.alpinelinux.org) and the agent from its official source (Anthropic, OpenAI, Google or npm). These downloads don't include any of your personal data. The version of Buddy from GitHub also asks GitHub (api.github.com) about once a day whether a newer version is out; the version from Google Play is updated by Play.
+To set up an agent, Buddy downloads a small Linux system from Alpine Linux (dl-cdn.alpinelinux.org) and the agent from its official source (Anthropic, OpenAI, Google, xAI or npm). These downloads don't include any of your personal data. The version of Buddy from GitHub also asks GitHub (api.github.com) about once a day whether a newer version is out; the version from Google Play is updated by Play.
 
 ## Permissions
 

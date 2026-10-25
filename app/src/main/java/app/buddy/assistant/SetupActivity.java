@@ -64,6 +64,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         Account.CODEX.refresh(this);
         Account.OPENCODE.refresh(this);
         Account.AGY.refresh(this);
+        Account.GROK.refresh(this);
         render();
     }
 
@@ -198,7 +199,8 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 installed ? getString(R.string.setup_step_install_done, acc.name())
                         : acc.step == Account.Step.INSTALLING ? acc.detail
                         : getString(acc.claude() ? R.string.setup_step_install_claude : acc.opencode()
-                        ? R.string.setup_step_install_opencode : R.string.setup_step_install_codex, acc.name()),
+                        ? R.string.setup_step_install_opencode : acc.grok() ? R.string.setup_step_install_grok
+                        : R.string.setup_step_install_codex, acc.name()),
                 installed, installed || acc.step == Account.Step.INSTALLING ? null : getString(R.string.setup_install),
                 v -> openAgent(backend), null, null);
 
@@ -207,7 +209,8 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                         ? getString(signed ? R.string.setup_step_signin_opencode_done : R.string.setup_step_signin_opencode)
                         : signed ? (acc.email.isEmpty() ? getString(R.string.setup_step_signin_done)
                         : getString(R.string.setup_step_signin_done_email, acc.email))
-                        : getString(acc.claude() ? R.string.setup_step_signin_claude : R.string.setup_step_signin_codex),
+                        : getString(acc.claude() ? R.string.setup_step_signin_claude : acc.grok() ? R.string.setup_step_signin_grok
+                        : R.string.setup_step_signin_codex),
                 installed ? signed : null, installed && !signed ? getString(R.string.setup_sign_in) : null,
                 v -> openAgent(backend), null, null);
 
@@ -286,7 +289,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         brainInfo.setPaddingRelative(0, dp(this, 2), 0, 0);
         ag.addView(brainInfo);
         ag.addView(segmented(this, new String[][]{{"claude", "Claude Code"}, {"codex", "Codex"}, {"opencode", "OpenCode"},
-                        {"agy", "Antigravity"}},
+                        {"agy", "Antigravity"}, {"grok", "Grok"}},
                 backend, false, v -> {
                     Prefs.setBackend(this, v);
                     Toast.makeText(this, getString(R.string.setup_default_brain_set, Account.nameOf(v)),
@@ -305,7 +308,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         mcp.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
         mcp.addView(text(this, getString(R.string.setup_phone_tools_info), 14, MUTED));
         mcp.addView(segmented(this, new String[][]{{"claude", "claude"}, {"codex", "codex"}, {"opencode", "opencode"},
-                        {"agy", "agy"}},
+                        {"agy", "agy"}, {"grok", "grok"}},
                 mcpAgent, true, v -> {
                     mcpAgent = v;
                     render();
@@ -327,6 +330,11 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 : "agy".equals(mcpAgent)
                 // Antigravity keeps it in ~/.gemini/config/mcp_config.json
                 ? "agy mcp add --header 'Authorization: Bearer " + token + "' phone " + url
+                : "grok".equals(mcpAgent)
+                // Grok keeps it in ~/.grok/config.toml; as for Codex, the timeout line goes under the table it just wrote
+                // (running it again rewrites the table, so the line is never doubled)
+                ? "grok mcp add --transport http phone " + url + " --header 'Authorization: Bearer " + token + "'"
+                + " && sed -i '/^\\[mcp_servers\\.phone\\]$/a tool_timeout_sec = 600' ~/.grok/config.toml"
                 // add-json refuses a name that's already there, so the earlier setup goes first (run again to update)
                 : "claude mcp remove -s user phone >/dev/null 2>&1; claude mcp add-json -s user phone '{\"type\":\"http\",\"url\":\"" + url
                 + "\",\"headers\":{\"Authorization\":\"Bearer " + token + "\"},\"timeout\":600000}'";
@@ -681,17 +689,9 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             render();
         })), full());
         if (dev) {
-            LinearLayout warn = row(this);
-            warn.setGravity(Gravity.TOP);
-            warn.setPaddingRelative(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
-            warn.setBackground(rounded(this, ERR_SOFT, 12));
-            warn.addView(icon(this, R.drawable.ms_warning, ERR, 18));
-            TextView wt = text(this, getString(R.string.setup_dev_mode_warning), 13, ERR);
-            wt.setPaddingRelative(dp(this, 10), 0, 0, 0);
-            warn.addView(wt, weight1());
             LinearLayout.LayoutParams wp = full();
             wp.setMargins(dp(this, 12), 0, dp(this, 12), dp(this, 12));
-            ex.addView(warn, wp);
+            ex.addView(warning(this, getString(R.string.setup_dev_mode_warning)), wp);
         }
         addCard(ex);
 

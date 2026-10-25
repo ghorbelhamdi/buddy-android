@@ -44,7 +44,7 @@ final class Prefs {
         sp(c).edit().putString("helper", status).putLong("helper_at", System.currentTimeMillis()).apply();
     }
 
-    /** Which agent answers the bubble: "claude" (default), "codex", "opencode" or "agy". */
+    /** Which agent answers the bubble: "claude" (default), "codex", "opencode", "agy" or "grok". */
     static String backend(Context c) {
         return sp(c).getString("backend", "claude");
     }
@@ -65,7 +65,6 @@ final class Prefs {
         sp(c).edit().putBoolean("agents_tap_buddy", on).apply();
     }
 
-    /** Developer mode: the bubble's agent may run commands and edit files in ~/.buddy/work. */
     /** Notify when a new Buddy release is out (checked about once a day). */
     static boolean updateNotices(Context c) {
         return !Flavor.PLAY && sp(c).getBoolean("update_notices", true);
@@ -112,6 +111,10 @@ final class Prefs {
         return out;
     }
 
+    /**
+     * Linux tools in new chats (was developer mode, for every chat): what a new chat starts with (each chat then has
+     * its own, Sessions.Session.dev), and whether the user's own sessions outside Buddy's chats may install apps.
+     */
     static boolean devMode(Context c) {
         return !Flavor.PLAY && sp(c).getBoolean("dev", false);
     }
@@ -257,6 +260,15 @@ final class Prefs {
         sp(c).edit().putString("agy_models", json).apply();
     }
 
+    /** Grok's model list (`grok models`), as JSON [[id, name], …]. */
+    static String grokModels(Context c) {
+        return sp(c).getString("grok_models", "[]");
+    }
+
+    static void setGrokModels(Context c, String json) {
+        sp(c).edit().putString("grok_models", json).apply();
+    }
+
     /** First-run guide finished (or skipped). */
     static boolean onboarded(Context c) {
         return sp(c).getBoolean("onboarded", false);
@@ -283,7 +295,7 @@ final class Prefs {
         sp(c).edit().putInt("onboard_step", step).apply();
     }
 
-    /** Which agents the user wants: "claude", "codex", "opencode", "agy" or "both" (Claude Code and Codex). */
+    /** Which agents the user wants: "claude", "codex", "opencode", "agy", "grok" or "both" (Claude Code and Codex). */
     static String agents(Context c) {
         return sp(c).getString("agents", "claude");
     }

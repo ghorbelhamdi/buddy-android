@@ -19,7 +19,7 @@ import org.json.JSONObject;
 
 import static app.buddy.assistant.Ui.*;
 
-/** Every Claude Code, Codex, OpenCode and Antigravity session on the phone: running processes and recent history. */
+/** Every Claude Code, Codex, OpenCode, Antigravity and Grok session on the phone: running processes and recent history. */
 public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
     private static final long REFRESH_MS = 3000;
 

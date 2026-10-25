@@ -66,7 +66,7 @@ final class Reviewer {
     static String harness(Context c, String chatBackend) {
         String r = Prefs.reviewer(c);
         if ("same".equals(r)) r = chatBackend != null ? chatBackend : "claude";
-        if (!"codex".equals(r)) r = "claude"; // the reviewer runs on Claude Code or Codex (an OpenCode or Antigravity chat uses Claude's)
+        if (!"codex".equals(r)) r = "claude"; // the reviewer runs on Claude Code or Codex (an OpenCode, Antigravity or Grok chat uses Claude's)
         if (!SetupState.signedIn(c, r)) r = "claude".equals(r) ? "codex" : "claude";
         return SetupState.signedIn(c, r) ? r : null;
     }

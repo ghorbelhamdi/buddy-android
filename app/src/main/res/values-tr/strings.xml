@@ -2,7 +2,7 @@
 <!-- Turkish translation of Buddy's UI. Source: res/values/strings.xml. -->
 <resources>
     <string name="service_label">Buddy asistanı</string>
-    <string name="service_description">Buddy sohbet baloncuğunu gösterir; bu telefonda Buddy içinde çalışan, seçtiğiniz ajanın (Claude Code, Codex, OpenCode veya Antigravity) ekranı okumasını ve sizin yerinize dokunmasını, yazmasını ve kaydırmasını sağlar. Ajanın kendisinin yapay zeka hizmetine (Anthropic, OpenAI, Google veya OpenCode modelinizin sağlayıcısı) gönderdikleri dışında hiçbir şey telefondan çıkmaz.</string>
+    <string name="service_description">Buddy sohbet baloncuğunu gösterir; bu telefonda Buddy içinde çalışan, seçtiğiniz ajanın (Claude Code, Codex, OpenCode, Antigravity veya Grok) ekranı okumasını ve sizin yerinize dokunmasını, yazmasını ve kaydırmasını sağlar. Ajanın kendisinin yapay zeka hizmetine (Anthropic, OpenAI, Google, xAI veya OpenCode modelinizin sağlayıcısı) gönderdikleri dışında hiçbir şey telefondan çıkmaz.</string>
 
     <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
 
@@ -21,7 +21,7 @@
     <string name="onboarding_welcome_ask_title">Gündelik bir dille isteyin</string>
     <string name="onboarding_welcome_ask_text">“Ayşe\'ye geç kalacağımı yaz”, “sepetime süt ekle”.</string>
     <string name="onboarding_welcome_plan_title">Kendi planınız, API anahtarı yok</string>
-    <string name="onboarding_welcome_plan_text">Claude Code\'u Claude aboneliğinizle çalıştırır. Codex de ChatGPT planıyla, Antigravity de Google hesabıyla, OpenCode da ücretsiz modelleriyle çalışır.</string>
+    <string name="onboarding_welcome_plan_text">Claude Code\'u Claude aboneliğinizle çalıştırır. Codex de ChatGPT planıyla, Antigravity de Google hesabıyla, Grok da Google veya X hesabıyla, OpenCode da ücretsiz modelleriyle çalışır.</string>
     <string name="onboarding_welcome_control_title">Kontrol sizde</string>
     <string name="onboarding_welcome_control_text">Göndermeden, paylaşmadan, satın almadan ve silmeden önce her zaman size sorulur.</string>
     <string name="onboarding_welcome_time">kurulum yaklaşık 5 dakika sürer</string>
@@ -32,8 +32,9 @@
     <string name="onboarding_brain_text">Sohbetlerinizi yanıtlayacak ajan. Diğerlerini daha sonra Ayarlar\'dan ekleyebilirsiniz.</string>
     <string name="onboarding_brain_claude">Claude aboneliğinizi kullanır (Pro veya Max).</string>
     <string name="onboarding_brain_codex">ChatGPT planınızı kullanır.</string>
-    <string name="onboarding_brain_opencode">Ücretsiz modeller, hesap gerekmez. Kendi sağlayıcılarınızı daha sonra bağlayabilirsiniz.</string>
-    <string name="onboarding_brain_agy">Google hesabınızı kullanır: ücretsiz plan, Google AI Pro veya Ultra.</string>
+    <string name="onboarding_brain_opencode">Hesap gerekmez. Kendi sağlayıcılarınızı daha sonra bağlayabilirsiniz.</string>
+    <string name="onboarding_brain_agy">Google hesabınızı kullanır, Google AI Pro veya Ultra ile de çalışır.</string>
+    <string name="onboarding_brain_grok">Grok hesabınızı kullanır (Google veya X ile giriş).</string>
     <string name="onboarding_brain_both">İkisini de yükleyin, her sohbette seçin. Varsayılan Claude Code olarak kalır.</string>
     <string name="onboarding_recommended">önerilen</string>
 
@@ -71,14 +72,17 @@
     <string name="onboarding_agent_checking_opencode">OpenCode kontrol ediliyor…</string>
     <string name="onboarding_agent_sign_in_codex">Tarayıcıda ChatGPT hesabınızla giriş yapın, sonra geri dönün.</string>
     <string name="onboarding_agent_sign_in_agy">Google hesabınızla giriş yapın. Tarayıcınız açılır; orada giriş yapın, Buddy kodu kendiliğinden alır.</string>
+    <string name="onboarding_agent_sign_in_grok">Grok hesabınızla giriş yapın. Tarayıcınız açılır; orada kodu onaylayın, Buddy kendiliğinden geri döner.</string>
     <string name="onboarding_agent_download_claude">Bir kerelik yaklaşık 235 MB indirir (Buddy\'nin Linux\'u ve Anthropic\'ten Claude Code).</string>
     <string name="onboarding_agent_download_opencode">Bir kerelik yaklaşık 230 MB indirir (Buddy\'nin Linux\'u, Node.js ve OpenCode). Hesap gerekmez.</string>
     <string name="onboarding_agent_download_codex">Bir kerelik yaklaşık 150 MB indirir (Buddy\'nin Linux\'u, Node.js ve OpenAI\'dan Codex).</string>
     <string name="onboarding_agent_download_agy">Bir kerelik yaklaşık 200 MB indirir (Buddy\'nin Linux\'u ve Google\'dan Antigravity CLI).</string>
+    <string name="onboarding_agent_download_grok">Bir kerelik yaklaşık 170 MB indirir (Buddy\'nin Linux\'u ve xAI\'dan Grok Build).</string>
     <!-- Buttons on the agent card. -->
     <string name="onboarding_sign_in_claude">Claude ile giriş yap</string>
     <string name="onboarding_sign_in_chatgpt">ChatGPT ile giriş yap</string>
     <string name="onboarding_sign_in_google">Google ile giriş yap</string>
+    <string name="onboarding_sign_in_grok">Grok ile giriş yap</string>
     <string name="onboarding_install_agent">%1$s ajanını yükle</string>
     <string name="onboarding_agents_wifi">Mümkünse Wi-Fi kullanın. Yükleme sürerken bu ekrandan çıkabilirsiniz.</string>
     <!-- Help questions and answers under "Stuck?". -->
@@ -122,7 +126,7 @@
     <string name="main_section_working">Çalışıyor</string>
     <string name="main_section_recent">Son sohbetler</string>
     <string name="main_empty_title">Henüz sohbet yok</string>
-    <string name="main_empty_text">Claude Code, Codex, OpenCode veya Antigravity ile sohbet başlatmak için Yeni sohbet düğmesine dokunun. Bir sohbeti silmek için ona uzun basın.</string>
+    <string name="main_empty_text">Claude Code, Codex, OpenCode, Antigravity veya Grok ile sohbet başlatmak için Yeni sohbet düğmesine dokunun. Bir sohbeti silmek için ona uzun basın.</string>
     <string name="main_chat_working">çalışıyor…</string>
     <string name="main_chat_last_you">Siz: %1$s</string>
     <string name="main_delete_title">Bu sohbet silinsin mi?</string>
@@ -249,7 +253,6 @@
     <string name="bubble_close">Kapat</string>
     <string name="bubble_chats_title">Sohbetler</string>
     <string name="bubble_model_effort_title">Model ve çaba</string>
-    <string name="bubble_summary_dev">%1$s · dev</string>
 
     <!-- Strip at the top of the chat panel while the agent works. -->
     <string name="bubble_working">Çalışıyor…</string>
@@ -318,7 +321,15 @@
     <string name="chat_read_aloud">Yanıtları sesli oku</string>
     <string name="chat_read_aloud_on">Yanıtlar sesli okunacak</string>
     <string name="chat_read_aloud_off">Yanıtlar sesli okunmayacak</string>
-    <string name="chat_chip_dev">%1$s · dev</string>
+
+    <!-- Chat screen: Linux tools, the chip beside the model chip (also in the bubble's panel and the New chat sheets) -->
+    <string name="chat_linux_tools">Linux araçları</string>
+    <string name="chat_linux_tools_info">Buddy\'nin Linux\'unda komutlar, dosyalar ve uygulama derleme</string>
+    <string name="chat_linux_tools_title">Linux araçları açılsın mı?</string>
+    <string name="chat_linux_tools_what">Ajan bu durumda komut çalıştırabilir, paket yükleyebilir ve ~/.buddy/work içindeki dosyaları düzenleyebilir; böylece uygulama geliştirip yükleyebilir.</string>
+    <string name="chat_linux_tools_when">Yalnızca bu sohbette, bir sonraki mesajınızdan itibaren.</string>
+    <string name="chat_linux_tools_risk">Ekrandaki kötü amaçlı bir mesaj veya web sayfası, ajanı komut çalıştırmaya kandırmaya çalışabilir. Onay kartları gönderme, paylaşma, satın alma ve silme işlemlerini korumaya devam eder.</string>
+    <string name="chat_linux_tools_turn_on">Aç</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <string name="chat_stop">Durdur</string>
@@ -331,7 +342,7 @@
     <string name="chat_talk">Konuş</string>
     <string name="chat_send">Gönder</string>
     <string name="chat_empty_hint">Yeni %1$s sohbeti. Telefonunuzda bir şey yapmasını isteyin.</string>
-    <string name="chat_empty_hint_dev">Yeni %1$s sohbeti. Telefonunuzda bir şey yapmasını veya bir uygulama geliştirmesini isteyin (geliştirici modu açık).</string>
+    <string name="chat_empty_hint_dev">Linux araçlarıyla yeni %1$s sohbeti. Telefonunuzda bir şey yapmasını veya bir uygulama geliştirmesini isteyin.</string>
 
     <!-- Model sheet (tap the model chip under the chat title) -->
     <string name="chat_model_title">%1$s modeli</string>
@@ -463,7 +474,7 @@
     <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
     <string name="ui_a11y_title">Buddy erişilebilirliği nasıl kullanır?</string>
     <string name="ui_a11y_what">Buddy, diğer uygulamalarda istediklerinizi yapmak için Android\'in erişilebilirlik hizmetini kullanır: ekranda ne olduğunu okur, sizin yerinize dokunur, yazar ve kaydırır. Ayrıca kayan baloncuğu da gösterir.</string>
-    <string name="ui_a11y_data">Bir görev çalışırken mesajlar, adlar veya adresler gibi kişisel bilgiler içerebilen ekran içeriği, yalnızca isteğinizi yerine getirmek için seçtiğiniz ajanın yapay zeka hizmetine (Claude Code için Anthropic, Codex için OpenAI, Antigravity için Google veya OpenCode modelinizin sağlayıcısı) gönderilir.</string>
+    <string name="ui_a11y_data">Bir görev çalışırken mesajlar, adlar veya adresler gibi kişisel bilgiler içerebilen ekran içeriği, yalnızca isteğinizi yerine getirmek için seçtiğiniz ajanın yapay zeka hizmetine (Claude Code için Anthropic, Codex için OpenAI, Antigravity için Google, Grok için xAI veya OpenCode modelinizin sağlayıcısı) gönderilir.</string>
     <string name="ui_a11y_no_servers">Buddy\'nin kendine ait sunucusu yoktur. Bu verileri toplamaz, satmaz, paylaşmaz ve reklamlar için kullanmaz.</string>
     <string name="ui_a11y_asks">Buddy, bir şey gönderen, paylaşan, satın alan veya silen her işlemden önce onayınızı ister. Hizmeti istediğiniz zaman Android\'in erişilebilirlik ayarlarından kapatabilirsiniz.</string>
     <string name="ui_privacy_policy">Gizlilik politikası</string>
@@ -507,10 +518,12 @@
     <string name="signin_install_sub_opencode">OpenCode\'u Buddy içinde çalıştırır. Ücretsiz modelleri hesap gerekmeden hemen çalışır; kendi sağlayıcılarınızı (Anthropic, OpenAI, GitHub Copilot…) istediğiniz zaman bağlayabilirsiniz.</string>
     <string name="signin_install_sub_codex">Codex\'i Buddy içinde ChatGPT planınızla çalıştırır.</string>
     <string name="signin_install_sub_agy">Google\'ın Antigravity CLI aracını Buddy içinde Google hesabınızla çalıştırır: ücretsiz plan, Google AI Pro veya Ultra.</string>
+    <string name="signin_install_sub_grok">xAI\'ın Grok Build aracını Buddy içinde Grok hesabınızla çalıştırır (Google veya X ile giriş de olur).</string>
     <string name="signin_install_size_claude">Bir kerelik yaklaşık 235 MB indirir: Buddy\'nin Linux\'u ve Anthropic\'ten Claude Code. Mümkünse Wi-Fi kullanın.</string>
     <string name="signin_install_size_opencode">Bir kerelik yaklaşık 230 MB indirir: Buddy\'nin Linux\'u, Node.js ve OpenCode. Mümkünse Wi-Fi kullanın.</string>
     <string name="signin_install_size_codex">Bir kerelik yaklaşık 150 MB indirir: Buddy\'nin Linux\'u, Node.js ve OpenAI\'dan Codex. Mümkünse Wi-Fi kullanın.</string>
     <string name="signin_install_size_agy">Bir kerelik yaklaşık 200 MB indirir: Buddy\'nin Linux\'u ve Google\'dan Antigravity CLI. Mümkünse Wi-Fi kullanın.</string>
+    <string name="signin_install_size_grok">Bir kerelik yaklaşık 170 MB indirir: Buddy\'nin Linux\'u ve xAI\'dan Grok Build. Mümkünse Wi-Fi kullanın.</string>
 
     <!-- Sign-in screen: install or update in progress (screen titles). -->
     <string name="signin_installing">Yükleniyor</string>
@@ -521,12 +534,15 @@
     <string name="signin_title_claude">Claude\'a giriş yapın</string>
     <string name="signin_title_chatgpt">ChatGPT\'ye giriş yapın</string>
     <string name="signin_title_google">Google\'a giriş yapın</string>
+    <string name="signin_title_grok">Grok\'a giriş yapın</string>
     <string name="signin_sub_claude">Claude hesabınızı kullanın (Pro veya Max). Tarayıcınız açılır; orada onaylayın, Buddy kendiliğinden geri döner.</string>
     <string name="signin_sub_chatgpt">ChatGPT hesabınızı kullanın (Plus, Pro veya Business). Tarayıcınız açılır; orada onaylayın, Buddy kendiliğinden geri döner.</string>
     <string name="signin_sub_agy">Google hesabınızı kullanın. Tarayıcınız açılır; orada giriş yapın, Buddy kodu kendiliğinden alır. Antigravity yaklaşık bir dakika bekler.</string>
+    <string name="signin_sub_grok">Grok hesabınızı kullanın; Google veya X ile giriş de olur. Tarayıcınız bir kodla açılır; orada onaylayın, Buddy kendiliğinden geri döner.</string>
     <string name="signin_with_claude">Claude ile giriş yap</string>
     <string name="signin_with_chatgpt">ChatGPT ile giriş yap</string>
     <string name="signin_with_google">Google ile giriş yap</string>
+    <string name="signin_with_grok">Grok ile giriş yap</string>
     <string name="signin_other_device">Başka bir cihazda giriş yap</string>
     <string name="signin_with_code">Kodla giriş yap</string>
 
@@ -537,6 +553,7 @@
     <string name="signin_approve_claude">Claude sayfasında Yetkilendir düğmesine dokunun. Buddy kodu alır ve kendiliğinden geri döner.</string>
     <string name="signin_approve_codex">Giriş yapın ve Codex\'e izin verin. Ardından Buddy\'ye dönün; işlemi kendisi tamamlar.</string>
     <string name="signin_approve_agy">Giriş yapın ve Antigravity\'ye izin verin. Buddy sayfada görünen kodu alır ve kendiliğinden geri döner. Bir dakikadan uzun sürerse girişi yeniden başlatın.</string>
+    <string name="signin_approve_grok">Sayfada %1$s kodunun göründüğünü kontrol edin, ardından onaylayıp giriş yapın. Buddy kendiliğinden geri döner.</string>
     <string name="signin_open_again">Giriş sayfasını yeniden aç</string>
     <string name="signin_signing_in">Giriş yapılıyor</string>
     <string name="signin_finishing">Giriş tamamlanıyor…</string>
@@ -547,6 +564,7 @@
     <string name="signin_enter_code">Bu kodu girin</string>
     <string name="signin_remote_codex">Herhangi bir cihazda aşağıdaki bağlantıyı açın, ChatGPT\'ye giriş yapın ve kodu girin. Buddy işlemi kendisi tamamlar.</string>
     <string name="signin_remote_agy">Bu bağlantıyı herhangi bir cihazda açıp giriş yapın. Ardından sayfada görünen kodu kopyalayıp yaklaşık bir dakika içinde aşağıya yapıştırın.</string>
+    <string name="signin_remote_grok">Herhangi bir cihazda aşağıdaki bağlantıyı açın, Grok\'a giriş yapın ve kodu onaylayın. Buddy işlemi kendisi tamamlar.</string>
     <string name="signin_copy_code">Kodu kopyala</string>
     <string name="signin_code_copied">Kod kopyalandı</string>
     <string name="signin_code_expiry">Kod 15 dakika geçerlidir.</string>
@@ -589,9 +607,11 @@
 
     <!-- Agent status shown on the sign-in, setup and onboarding screens. -->
     <string name="account_tagline_claude">Claude planınızı kullanır</string>
-    <string name="account_tagline_opencode">Ücretsiz modeller veya kendi sağlayıcılarınız</string>
+    <string name="account_tagline_opencode">Hesapsız veya kendi sağlayıcılarınızla</string>
     <string name="account_tagline_codex">ChatGPT planınızı kullanır</string>
     <string name="account_tagline_agy">Google hesabınızı kullanır</string>
+    <string name="account_tagline_grok">Grok hesabınızı kullanır</string>
+    <string name="agent_tag_free">ücretsiz · sınırlı</string>
     <string name="account_setting_up_linux">Buddy\'nin Linux\'u hazırlanıyor…</string>
     <string name="account_installing_tools">Araçlar yükleniyor…</string>
     <string name="account_downloading_claude">Claude Code indiriliyor (yaklaşık 230 MB)…</string>
@@ -614,6 +634,7 @@
     <string name="models_default_codex">Codex kendisi seçer; bir sonraki yanıttan sonra burada gösterilir</string>
     <string name="models_default_opencode">OpenCode\'un varsayılan modeli</string>
     <string name="models_default_agy">Antigravity\'nin varsayılan modeli</string>
+    <string name="models_default_grok">Grok\'un varsayılan modeli</string>
     <!-- Effort levels in a row of up to 6 segments: keep each very short. -->
     <string name="models_effort_auto">Oto</string>
     <string name="models_effort_low">Düşük</string>
@@ -652,7 +673,7 @@
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">Ayarlar</string>
-    <string name="setup_settings_subtitle">Buddy; Claude Code, Codex, OpenCode veya Antigravity\'yi uygulamanın içinde, kendi aboneliğinizle (ya da OpenCode\'un ücretsiz modelleriyle ve Antigravity\'nin ücretsiz planıyla) çalıştırır.</string>
+    <string name="setup_settings_subtitle">Buddy; Claude Code, Codex, OpenCode, Antigravity veya Grok\'u uygulamanın içinde, kendi aboneliğinizle (ya da OpenCode\'un ücretsiz modelleriyle ve Antigravity\'nin ücretsiz planıyla) çalıştırır.</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">Kurulum</string>
@@ -669,6 +690,7 @@
     <string name="setup_step_install_claude">Buddy kendi küçük Linux\'unu ve Anthropic\'ten %1$s ajanını indirir (yaklaşık 235 MB).</string>
     <string name="setup_step_install_opencode">Buddy kendi küçük Linux\'unu ve %1$s ajanını indirir (Node.js ile yaklaşık 230 MB).</string>
     <string name="setup_step_install_codex">Buddy kendi küçük Linux\'unu ve OpenAI\'dan %1$s ajanını indirir (yaklaşık 150 MB).</string>
+    <string name="setup_step_install_grok">Buddy kendi küçük Linux\'unu ve xAI\'dan %1$s ajanını indirir (yaklaşık 170 MB).</string>
     <string name="setup_install">Yükle</string>
     <string name="setup_step_signin_title">Giriş yapın</string>
     <string name="setup_step_signin_opencode_done">Giriş gerekmez: OpenCode\'un ücretsiz modelleri hemen çalışır. Kendi sağlayıcılarınızı istediğiniz zaman bağlayabilirsiniz.</string>
@@ -677,6 +699,7 @@
     <string name="setup_step_signin_done_email">%1$s olarak giriş yapıldı.</string>
     <string name="setup_step_signin_claude">Claude hesabınızla (Pro veya Max). Tarayıcınız açılır; orada onaylayın, Buddy kendiliğinden geri döner.</string>
     <string name="setup_step_signin_codex">ChatGPT hesabınızla. Tarayıcınız açılır; orada onaylayın, Buddy kendiliğinden geri döner.</string>
+    <string name="setup_step_signin_grok">Grok hesabınızla. Tarayıcınız açılır; orada kodu onaylayın, Buddy kendiliğinden geri döner.</string>
     <string name="setup_sign_in">Giriş yap</string>
     <string name="setup_step_background_title">Buddy\'nin arka planda çalışmasına izin verin</string>
     <string name="setup_step_background_done">İzin verildi.</string>
@@ -711,7 +734,7 @@
     <!-- Settings screen: Agent. -->
     <string name="setup_agent">Ajan</string>
     <string name="setup_default_brain">Varsayılan ajan</string>
-    <string name="setup_default_brain_info">Baloncuktan veya Yeni sohbet düğmesiyle başlatılan yeni sohbetleri yanıtlayan ajan. Claude Code Claude planınızı, Codex ChatGPT planınızı, Antigravity Google hesabınızı, OpenCode ise kendi ücretsiz modellerini veya sizin sağlayıcılarınızı kullanır. Yalnızca kurulmuş ajanlar seçilebilir.</string>
+    <string name="setup_default_brain_info">Baloncuktan veya Yeni sohbet düğmesiyle başlatılan yeni sohbetleri yanıtlayan ajan. Claude Code Claude planınızı, Codex ChatGPT planınızı, Antigravity Google hesabınızı, Grok Grok hesabınızı, OpenCode ise kendi ücretsiz modellerini veya sizin sağlayıcılarınızı kullanır. Yalnızca kurulmuş ajanlar seçilebilir.</string>
     <string name="setup_default_brain_set">Yeni sohbetlerde %1$s kullanılacak. Yeni sohbet düğmesiyle her sohbet için ayrı seçim yapabilirsiniz.</string>
     <string name="setup_set_up_first">Önce %1$s kurulumunu yapın.</string>
     <!-- Agent status under each agent's name: lowercase, monospace, keep short. -->
@@ -803,11 +826,11 @@
     <string name="setup_check_updates_info">Sizdeki sürüm: Buddy %1$s. Ya da herhangi bir ajana şunu söyleyin: “kendini güncelle”.</string>
     <string name="setup_app_permissions">Uygulama izinleri</string>
     <string name="setup_app_permissions_info">Uygulama bazında seçin: Güven modunda ajan orada açılır pencere olmadan çalışır; Katı modda ise Gönder, Öde, Sil… öncesinde Buddy size kendisi sorar.</string>
-    <string name="setup_dev_mode">Geliştirici modu</string>
-    <string name="setup_dev_mode_info">Baloncuğun ajanı ~/.buddy/work içinde komut çalıştırabilir ve dosya düzenleyebilir; böylece uygulama geliştirip yükleyebilir.</string>
+    <string name="setup_dev_mode">Yeni sohbetlerde Linux araçları</string>
+    <string name="setup_dev_mode_info">Linux araçlarıyla ajan komut çalıştırabilir, paket yükleyebilir ve ~/.buddy/work içindeki dosyaları düzenleyebilir; böylece uygulama geliştirip yükleyebilir. Yeni sohbetler bu ayarla başlar; her sohbet bunu kendi başlığının altından değiştirebilir.</string>
     <string name="setup_agents_tap">Ajanların Buddy ekranlarına dokunmasına izin ver</string>
     <string name="setup_agents_tap_info">Buddy\'yi bir ajanla test etmek için (örneğin telefon araçlarıyla Termux\'ta Claude Code). Baloncuk, onay kartları, Uygulama izinleri ve bu anahtarlar erişime kapalı kalır.</string>
-    <string name="setup_dev_mode_warning">Günlük kullanımda kapalı tutun: açıkken ekrandaki kötü amaçlı bir mesaj veya web sayfası, ajanı komut çalıştırmaya kandırmaya çalışabilir. Onay kartları gönderme, paylaşma, satın alma ve silme işlemlerini korumaya devam eder.</string>
+    <string name="setup_dev_mode_warning">Kapalı tutmanız daha iyi olur: Linux araçlarını yalnızca ihtiyaç duyan sohbetlerde açın. Açıkken ekrandaki kötü amaçlı bir mesaj veya web sayfası, ajanı komut çalıştırmaya kandırmaya çalışabilir. Onay kartları gönderme, paylaşma, satın alma ve silme işlemlerini korumaya devam eder.</string>
 
     <!-- Settings screen: footer links. -->
     <string name="setup_licences">Açık kaynak lisansları</string>
@@ -835,7 +858,7 @@
     <string name="terminal_session_ended_code">Oturum sona erdi · çıkış %1$d</string>
     <string name="terminal_close">Kapat</string>
     <string name="terminal_restart">Yeniden başlat</string>
-    <string name="terminal_needs_linux">Önce Ayarlar\'dan Claude Code, Codex, OpenCode veya Antigravity\'yi yükleyin: bu, Buddy\'nin Linux\'unu kurar.</string>
+    <string name="terminal_needs_linux">Önce Ayarlar\'dan Claude Code, Codex, OpenCode, Antigravity veya Grok\'u yükleyin: bu, Buddy\'nin Linux\'unu kurar.</string>
     <string name="terminal_start_failed">Terminal başlatılamadı: %1$s</string>
     <string name="terminal_close_title">%1$s kapatılsın mı?</string>
     <string name="terminal_close_running">Hâlâ çalışıyor. Kapatmak onu ve başlattığı her şeyi durdurur.</string>
@@ -857,7 +880,7 @@
 
     <!-- Sessions screen: every agent session running on the phone, and recent history. -->
     <string name="monitor_title">Oturumlar</string>
-    <string name="monitor_subtitle">Bu telefondaki tüm Claude Code, Codex, OpenCode ve Antigravity oturumları.</string>
+    <string name="monitor_subtitle">Bu telefondaki tüm Claude Code, Codex, OpenCode, Antigravity ve Grok oturumları.</string>
     <string name="monitor_terminal_running">Bir kabuk çalışıyor · dönmek için dokunun</string>
     <string name="monitor_terminal_idle">Buddy\'nin Linux\'unda bir kabuk</string>
     <string name="monitor_running_now">Şu an çalışanlar</string>
@@ -897,7 +920,7 @@
     <string name="perms_smart_reviewer">Akıllı denetçi</string>
     <string name="perms_reviewer_same">Sohbetle aynı</string>
     <string name="perms_reviewer_sign_in">Önce %1$s hesabına giriş yapın (Ayarlar).</string>
-    <string name="perms_reviewer_about">Her dokunma için araçsız, geçici bir oturum: isteğinizi, ajanın notunu ve ekranı görür; “izin ver”, “size sor” ya da “önerilmez” yanıtını verir. Dokunma başına yaklaşık 3 saniye. OpenCode ve Antigravity sohbetlerini Claude Code (veya Codex) denetler.</string>
+    <string name="perms_reviewer_about">Her dokunma için araçsız, geçici bir oturum: isteğinizi, ajanın notunu ve ekranı görür; “izin ver”, “size sor” ya da “önerilmez” yanıtını verir. Dokunma başına yaklaşık 3 saniye. OpenCode, Antigravity ve Grok sohbetlerini Claude Code (veya Codex) denetler.</string>
     <string name="perms_reviewer_rules">Bir bildirim kuralının geri sayımı yanıtları göndermeden önce onları da denetler.</string>
     <string name="reviewer_default_claude">Haiku: hızlı ve hafif. Önerilir.</string>
     <string name="reviewer_default_codex">Küçük ve hızlı bir model. Önerilir.</string>

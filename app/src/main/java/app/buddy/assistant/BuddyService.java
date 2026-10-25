@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Accessibility service: draws the Buddy bubble, hosts the local MCP server,
- * and performs the screen actions the agent (Claude Code, Codex, OpenCode or Antigravity) asks for.
+ * and performs the screen actions the agent (Claude Code, Codex, OpenCode, Antigravity or Grok) asks for.
  */
 public class BuddyService extends AccessibilityService implements McpServer.Handler {
     private static volatile BuddyService instance;
@@ -82,6 +82,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         Models.setCodex(Prefs.codexModels(this));
         Models.setOpencode(Prefs.opencodeModels(this));
         Models.setAgy(Prefs.agyModels(this));
+        Models.setGrok(Prefs.grokModels(this));
         new Thread(() -> Attachments.cleanup(this)).start();
         tools = new Tools(this);
         autoPause = new AutoPause(this);
@@ -408,6 +409,11 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             if (am != null && am.length() > 0) {
                 Prefs.setAgyModels(this, am.toString());
                 Models.setAgy(am.toString());
+            }
+            org.json.JSONArray gm = event.optJSONArray("grok_models");
+            if (gm != null && gm.length() > 0) {
+                Prefs.setGrokModels(this, gm.toString());
+                Models.setGrok(gm.toString());
             }
             return;
         }

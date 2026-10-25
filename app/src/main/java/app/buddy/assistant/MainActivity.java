@@ -93,6 +93,7 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         Account.CODEX.refresh(this);
         Account.OPENCODE.refresh(this);
         Account.AGY.refresh(this);
+        Account.GROK.refresh(this);
     }
 
     private final Runnable waitingChanged = this::render;
@@ -302,6 +303,14 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         h.setPaddingRelative(0, 0, 0, dp(this, 8));
         c.addView(h);
         final Dialog[] d = new Dialog[1];
+        // Linux tools for the new chat: the Settings default to start with; agents can't flip it, as in Settings
+        final boolean[] dev = {Prefs.devMode(this)};
+        if (!Flavor.PLAY) {
+            LinearLayout sw = protect(switchRow(this, getString(R.string.chat_linux_tools),
+                    getString(R.string.chat_linux_tools_info), dev[0], on -> dev[0] = on));
+            sw.setPaddingRelative(dp(this, 4), dp(this, 4), dp(this, 4), dp(this, 12));
+            c.addView(sw, full());
+        }
         String def = Prefs.backend(this);
         for (Account acc : Account.ALL) {
             String[] a = {acc.agent, acc.name(), acc.tagline()};
@@ -326,13 +335,18 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
                 tp.setMarginStart(dp(this, 8));
                 tr.addView(tag, tp);
             }
+            if (acc.freeTier()) {
+                LinearLayout.LayoutParams tp = wrap();
+                tp.setMarginStart(dp(this, 8));
+                tr.addView(freeTag(this), tp);
+            }
             t.addView(tr);
             t.addView(text(this, a[2], 13, MUTED));
             r.addView(t, weight1());
             r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
             r.setOnClickListener(v -> {
                 d[0].dismiss();
-                if (ready) open(hub.create(a[0]));
+                if (ready) open(hub.create(a[0], true, dev[0]));
                 else startActivity(new Intent(this, SignInActivity.class).putExtra("agent", a[0]));
             });
             c.addView(r, full());

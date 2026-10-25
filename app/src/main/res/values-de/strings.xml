@@ -2,7 +2,7 @@
 <!-- Every text Buddy shows, in German (du). Source and translator notes: res/values/strings.xml. -->
 <resources>
     <string name="service_label">Buddy-Assistent</string>
-    <string name="service_description">Zeigt die Chat-Bubble von Buddy an und lässt den von dir gewählten Agenten (Claude Code, Codex, OpenCode oder Antigravity), der in Buddy auf diesem Smartphone läuft, den Bildschirm lesen und für dich tippen, Text eingeben und scrollen. Nichts verlässt das Smartphone, außer dem, was der Agent selbst an seinen KI-Dienst sendet (Anthropic, OpenAI, Google oder den Anbieter deines OpenCode-Modells).</string>
+    <string name="service_description">Zeigt die Chat-Bubble von Buddy an und lässt den von dir gewählten Agenten (Claude Code, Codex, OpenCode, Antigravity oder Grok), der in Buddy auf diesem Smartphone läuft, den Bildschirm lesen und für dich tippen, Text eingeben und scrollen. Nichts verlässt das Smartphone, außer dem, was der Agent selbst an seinen KI-Dienst sendet (Anthropic, OpenAI, Google, xAI oder den Anbieter deines OpenCode-Modells).</string>
 
     <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
 
@@ -21,7 +21,7 @@
     <string name="onboarding_welcome_ask_title">Frag ganz normal</string>
     <string name="onboarding_welcome_ask_text">„Antworte Sam, dass ich mich verspäte“, „leg Milch in meinen Warenkorb“.</string>
     <string name="onboarding_welcome_plan_title">Dein eigenes Abo, kein API-Schlüssel</string>
-    <string name="onboarding_welcome_plan_text">Nutzt Claude Code mit deinem Claude-Abo. Codex mit einem ChatGPT-Abo, Antigravity mit einem Google-Konto und die kostenlosen Modelle von OpenCode gehen auch.</string>
+    <string name="onboarding_welcome_plan_text">Nutzt Claude Code mit deinem Claude-Abo. Codex mit einem ChatGPT-Abo, Antigravity mit einem Google-Konto, Grok mit einem Google- oder X-Konto und die kostenlosen Modelle von OpenCode gehen auch.</string>
     <string name="onboarding_welcome_control_title">Du behältst die Kontrolle</string>
     <string name="onboarding_welcome_control_text">Vor dem Senden, Posten, Kaufen und Löschen wird immer erst gefragt.</string>
     <string name="onboarding_welcome_time">Einrichtung dauert etwa 5 Minuten</string>
@@ -32,8 +32,9 @@
     <string name="onboarding_brain_text">Wer deine Chats beantwortet. Weitere kannst du später in den Einstellungen hinzufügen.</string>
     <string name="onboarding_brain_claude">Nutzt dein Claude-Abo (Pro oder Max).</string>
     <string name="onboarding_brain_codex">Nutzt dein ChatGPT-Abo.</string>
-    <string name="onboarding_brain_opencode">Kostenlose Modelle, kein Konto nötig. Eigene Anbieter kannst du später verbinden.</string>
-    <string name="onboarding_brain_agy">Nutzt dein Google-Konto: den kostenlosen Tarif, Google AI Pro oder Ultra.</string>
+    <string name="onboarding_brain_opencode">Kein Konto nötig. Eigene Anbieter kannst du später verbinden.</string>
+    <string name="onboarding_brain_agy">Nutzt dein Google-Konto, auch mit Google AI Pro oder Ultra.</string>
+    <string name="onboarding_brain_grok">Nutzt dein Grok-Konto (Anmeldung mit Google oder X).</string>
     <string name="onboarding_brain_both">Installiere beide und wähle pro Chat. Claude Code bleibt der Standard.</string>
     <string name="onboarding_recommended">empfohlen</string>
 
@@ -70,13 +71,16 @@
     <string name="onboarding_agent_checking_opencode">OpenCode wird geprüft…</string>
     <string name="onboarding_agent_sign_in_codex">Melde dich im Browser mit deinem ChatGPT-Konto an und komm dann zurück.</string>
     <string name="onboarding_agent_sign_in_agy">Melde dich mit deinem Google-Konto an. Dein Browser öffnet sich; melde dich dort an und Buddy übernimmt den Code von selbst.</string>
+    <string name="onboarding_agent_sign_in_grok">Melde dich mit deinem Grok-Konto an. Dein Browser öffnet sich; bestätige dort den Code und Buddy kommt von selbst zurück.</string>
     <string name="onboarding_agent_download_claude">Lädt einmalig etwa 235 MB herunter (Buddys Linux und Claude Code von Anthropic).</string>
     <string name="onboarding_agent_download_opencode">Lädt einmalig etwa 230 MB herunter (Buddys Linux, Node.js und OpenCode). Kein Konto nötig.</string>
     <string name="onboarding_agent_download_codex">Lädt einmalig etwa 150 MB herunter (Buddys Linux, Node.js und Codex von OpenAI).</string>
     <string name="onboarding_agent_download_agy">Lädt einmalig etwa 200 MB herunter (Buddys Linux und die Antigravity CLI von Google).</string>
+    <string name="onboarding_agent_download_grok">Lädt einmalig etwa 170 MB herunter (Buddys Linux und Grok Build von xAI).</string>
     <string name="onboarding_sign_in_claude">Mit Claude anmelden</string>
     <string name="onboarding_sign_in_chatgpt">Mit ChatGPT anmelden</string>
     <string name="onboarding_sign_in_google">Mit Google anmelden</string>
+    <string name="onboarding_sign_in_grok">Mit Grok anmelden</string>
     <string name="onboarding_install_agent">%1$s installieren</string>
     <string name="onboarding_agents_wifi">Nutze am besten WLAN. Du kannst diesen Bildschirm während der Installation verlassen.</string>
     <string name="onboarding_stuck_sign_in_q">Nach der Anmeldung nicht zurückgekommen?</string>
@@ -119,7 +123,7 @@
     <string name="main_section_working">Aktiv</string>
     <string name="main_section_recent">Kürzlich</string>
     <string name="main_empty_title">Noch keine Chats</string>
-    <string name="main_empty_text">Tippe auf „Neuer Chat“, um einen Chat mit Claude Code, Codex, OpenCode oder Antigravity zu starten. Halte einen Chat gedrückt, um ihn zu löschen.</string>
+    <string name="main_empty_text">Tippe auf „Neuer Chat“, um einen Chat mit Claude Code, Codex, OpenCode, Antigravity oder Grok zu starten. Halte einen Chat gedrückt, um ihn zu löschen.</string>
     <string name="main_chat_working">arbeitet…</string>
     <string name="main_chat_last_you">Du: %1$s</string>
     <string name="main_delete_title">Diesen Chat löschen?</string>
@@ -246,7 +250,6 @@
     <string name="bubble_close">Schließen</string>
     <string name="bubble_chats_title">Chats</string>
     <string name="bubble_model_effort_title">Modell &amp; Aufwand</string>
-    <string name="bubble_summary_dev">%1$s · dev</string>
 
     <!-- Strip at the top of the chat panel while the agent works. -->
     <string name="bubble_working">Arbeitet…</string>
@@ -315,7 +318,15 @@
     <string name="chat_read_aloud">Antworten vorlesen</string>
     <string name="chat_read_aloud_on">Antworten werden vorgelesen</string>
     <string name="chat_read_aloud_off">Antworten werden nicht vorgelesen</string>
-    <string name="chat_chip_dev">%1$s · dev</string>
+
+    <!-- Chat screen: Linux tools, the chip beside the model chip (also in the bubble's panel and the New chat sheets) -->
+    <string name="chat_linux_tools">Linux-Tools</string>
+    <string name="chat_linux_tools_info">Befehle, Dateien und App-Builds in Buddys Linux</string>
+    <string name="chat_linux_tools_title">Linux-Tools aktivieren?</string>
+    <string name="chat_linux_tools_what">Der Agent kann dann Befehle ausführen, Pakete installieren und Dateien in ~/.buddy/work bearbeiten, also Apps bauen und installieren.</string>
+    <string name="chat_linux_tools_when">Nur in diesem Chat, ab deiner nächsten Nachricht.</string>
+    <string name="chat_linux_tools_risk">Eine bösartige Nachricht oder Webseite auf dem Bildschirm könnte versuchen, ihn zum Ausführen von Befehlen zu verleiten. Freigabekarten schützen weiterhin Senden, Posten, Kaufen und Löschen.</string>
+    <string name="chat_linux_tools_turn_on">Aktivieren</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <string name="chat_stop">Stoppen</string>
@@ -328,7 +339,7 @@
     <string name="chat_talk">Sprechen</string>
     <string name="chat_send">Senden</string>
     <string name="chat_empty_hint">Neuer Chat mit %1$s. Bitte ihn, etwas auf deinem Smartphone zu erledigen.</string>
-    <string name="chat_empty_hint_dev">Neuer Chat mit %1$s. Bitte ihn, etwas auf deinem Smartphone zu erledigen oder eine App zu bauen (Entwicklermodus ist an).</string>
+    <string name="chat_empty_hint_dev">Neuer Chat mit %1$s und Linux-Tools. Bitte ihn, etwas auf deinem Smartphone zu erledigen oder eine App zu bauen.</string>
 
     <!-- Model sheet (tap the model chip under the chat title) -->
     <string name="chat_model_title">Modell für %1$s</string>
@@ -460,7 +471,7 @@
     <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
     <string name="ui_a11y_title">Wie Buddy die Bedienungshilfen nutzt</string>
     <string name="ui_a11y_what">Buddy nutzt den Bedienungshilfen-Dienst von Android, um in anderen Apps zu erledigen, worum du bittest: Buddy liest, was auf dem Bildschirm zu sehen ist, und tippt, schreibt und scrollt für dich. Außerdem zeigt Buddy die schwebende Bubble an.</string>
-    <string name="ui_a11y_data">Während eine Aufgabe läuft, werden die Bildschirminhalte, die persönliche Informationen wie Nachrichten, Namen oder Adressen enthalten können, an den KI-Dienst des von dir gewählten Agenten gesendet (Anthropic für Claude Code, OpenAI für Codex, Google für Antigravity oder der Anbieter deines OpenCode-Modells), und zwar ausschließlich, um deine Anfrage auszuführen.</string>
+    <string name="ui_a11y_data">Während eine Aufgabe läuft, werden die Bildschirminhalte, die persönliche Informationen wie Nachrichten, Namen oder Adressen enthalten können, an den KI-Dienst des von dir gewählten Agenten gesendet (Anthropic für Claude Code, OpenAI für Codex, Google für Antigravity, xAI für Grok oder der Anbieter deines OpenCode-Modells), und zwar ausschließlich, um deine Anfrage auszuführen.</string>
     <string name="ui_a11y_no_servers">Buddy hat keine eigenen Server. Buddy erhebt, verkauft oder teilt diese Daten nicht und nutzt sie nicht für Werbung.</string>
     <string name="ui_a11y_asks">Bevor etwas gesendet, gepostet, gekauft oder gelöscht wird, fragt Buddy nach deinem OK. Du kannst den Dienst jederzeit in den Android-Einstellungen unter „Bedienungshilfen“ deaktivieren.</string>
     <string name="ui_privacy_policy">Datenschutzerklärung</string>
@@ -504,10 +515,12 @@
     <string name="signin_install_sub_opencode">Führt OpenCode in Buddy aus. Die kostenlosen Modelle funktionieren sofort, ohne Konto; eigene Anbieter (Anthropic, OpenAI, GitHub Copilot …) kannst du jederzeit verbinden.</string>
     <string name="signin_install_sub_codex">Führt Codex in Buddy aus – mit deinem ChatGPT-Abo.</string>
     <string name="signin_install_sub_agy">Führt Googles Antigravity CLI in Buddy aus – mit deinem Google-Konto: im kostenlosen Tarif oder mit Google AI Pro bzw. Ultra.</string>
+    <string name="signin_install_sub_grok">Führt Grok Build von xAI in Buddy aus – mit deinem Grok-Konto (Anmeldung mit Google oder X geht auch).</string>
     <string name="signin_install_size_claude">Lädt einmalig etwa 235 MB herunter: Buddys Linux und Claude Code von Anthropic. Nutze am besten WLAN.</string>
     <string name="signin_install_size_opencode">Lädt einmalig etwa 230 MB herunter: Buddys Linux, Node.js und OpenCode. Nutze am besten WLAN.</string>
     <string name="signin_install_size_codex">Lädt einmalig etwa 150 MB herunter: Buddys Linux, Node.js und Codex von OpenAI. Nutze am besten WLAN.</string>
     <string name="signin_install_size_agy">Lädt einmalig etwa 200 MB herunter: Buddys Linux und die Antigravity CLI von Google. Nutze am besten WLAN.</string>
+    <string name="signin_install_size_grok">Lädt einmalig etwa 170 MB herunter: Buddys Linux und Grok Build von xAI. Nutze am besten WLAN.</string>
 
     <!-- Sign-in screen: install or update in progress (screen titles). -->
     <string name="signin_installing">Wird installiert</string>
@@ -518,12 +531,15 @@
     <string name="signin_title_claude">Bei Claude anmelden</string>
     <string name="signin_title_chatgpt">Bei ChatGPT anmelden</string>
     <string name="signin_title_google">Bei Google anmelden</string>
+    <string name="signin_title_grok">Bei Grok anmelden</string>
     <string name="signin_sub_claude">Nutze dein Claude-Konto (Pro oder Max). Dein Browser öffnet sich; bestätige dort und Buddy kommt von selbst zurück.</string>
     <string name="signin_sub_chatgpt">Nutze dein ChatGPT-Konto (Plus, Pro oder Business). Dein Browser öffnet sich; bestätige dort und Buddy kommt von selbst zurück.</string>
     <string name="signin_sub_agy">Nutze dein Google-Konto. Dein Browser öffnet sich; melde dich dort an und Buddy übernimmt den Code von selbst. Antigravity wartet etwa eine Minute.</string>
+    <string name="signin_sub_grok">Nutze dein Grok-Konto; die Anmeldung mit Google oder X geht auch. Dein Browser öffnet sich mit einem Code; bestätige ihn dort und Buddy kommt von selbst zurück.</string>
     <string name="signin_with_claude">Mit Claude anmelden</string>
     <string name="signin_with_chatgpt">Mit ChatGPT anmelden</string>
     <string name="signin_with_google">Mit Google anmelden</string>
+    <string name="signin_with_grok">Mit Grok anmelden</string>
     <string name="signin_other_device">Auf einem anderen Gerät anmelden</string>
     <string name="signin_with_code">Mit einem Code anmelden</string>
 
@@ -534,6 +550,7 @@
     <string name="signin_approve_claude">Tippe auf der Claude-Seite auf „Autorisieren“. Buddy übernimmt den Code und kommt von selbst zurück.</string>
     <string name="signin_approve_codex">Melde dich an und erlaube Codex den Zugriff. Komm dann zurück zu Buddy; der Rest geht automatisch.</string>
     <string name="signin_approve_agy">Melde dich an und erlaube Antigravity den Zugriff. Buddy übernimmt den Code, den die Seite anzeigt, und kommt von selbst zurück. Dauert es länger als eine Minute, starte die Anmeldung neu.</string>
+    <string name="signin_approve_grok">Prüfe, ob die Seite %1$s anzeigt, dann bestätige und melde dich an. Buddy kommt von selbst zurück.</string>
     <string name="signin_open_again">Anmeldeseite noch einmal öffnen</string>
     <string name="signin_signing_in">Anmeldung läuft</string>
     <string name="signin_finishing">Anmeldung wird abgeschlossen…</string>
@@ -544,6 +561,7 @@
     <string name="signin_enter_code">Gib diesen Code ein</string>
     <string name="signin_remote_codex">Öffne auf einem beliebigen Gerät den Link unten, melde dich bei ChatGPT an und gib den Code ein. Buddy erledigt den Rest von selbst.</string>
     <string name="signin_remote_agy">Öffne diesen Link auf einem beliebigen Gerät und melde dich an. Kopiere dann den Code, den die Seite anzeigt, und füge ihn innerhalb von etwa einer Minute unten ein.</string>
+    <string name="signin_remote_grok">Öffne auf einem beliebigen Gerät den Link unten, melde dich bei Grok an und bestätige den Code. Buddy erledigt den Rest von selbst.</string>
     <string name="signin_copy_code">Code kopieren</string>
     <string name="signin_code_copied">Code kopiert</string>
     <string name="signin_code_expiry">Der Code ist 15 Minuten lang gültig.</string>
@@ -586,9 +604,11 @@
 
     <!-- Agent status shown on the sign-in, setup and onboarding screens. -->
     <string name="account_tagline_claude">Nutzt dein Claude-Abo</string>
-    <string name="account_tagline_opencode">Kostenlose Modelle oder eigene Anbieter</string>
+    <string name="account_tagline_opencode">Ohne Konto oder mit eigenen Anbietern</string>
     <string name="account_tagline_codex">Nutzt dein ChatGPT-Abo</string>
     <string name="account_tagline_agy">Nutzt dein Google-Konto</string>
+    <string name="account_tagline_grok">Nutzt dein Grok-Konto</string>
+    <string name="agent_tag_free">kostenlos · begrenzt</string>
     <string name="account_setting_up_linux">Buddys Linux wird eingerichtet…</string>
     <string name="account_installing_tools">Tools werden installiert…</string>
     <string name="account_downloading_claude">Claude Code wird heruntergeladen (etwa 230 MB)…</string>
@@ -611,6 +631,7 @@
     <string name="models_default_codex">Codex wählt es; erscheint hier nach der nächsten Antwort</string>
     <string name="models_default_opencode">Standardmodell von OpenCode</string>
     <string name="models_default_agy">Standardmodell von Antigravity</string>
+    <string name="models_default_grok">Standardmodell von Grok</string>
     <!-- Effort levels in a row of up to 6 segments: about 5 characters each. -->
     <string name="models_effort_auto">Auto</string>
     <string name="models_effort_low">Klein</string>
@@ -649,7 +670,7 @@
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">Einstellungen</string>
-    <string name="setup_settings_subtitle">Buddy führt Claude Code, Codex, OpenCode oder Antigravity direkt in der App aus, mit deinem eigenen Abo (oder den kostenlosen Modellen von OpenCode und dem kostenlosen Tarif von Antigravity).</string>
+    <string name="setup_settings_subtitle">Buddy führt Claude Code, Codex, OpenCode, Antigravity oder Grok direkt in der App aus, mit deinem eigenen Abo (oder den kostenlosen Modellen von OpenCode und dem kostenlosen Tarif von Antigravity).</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">Einrichtung</string>
@@ -666,6 +687,7 @@
     <string name="setup_step_install_claude">Buddy lädt sein eigenes kleines Linux und %1$s von Anthropic herunter (etwa 235 MB).</string>
     <string name="setup_step_install_opencode">Buddy lädt sein eigenes kleines Linux und %1$s herunter (etwa 230 MB mit Node.js).</string>
     <string name="setup_step_install_codex">Buddy lädt sein eigenes kleines Linux und %1$s von OpenAI herunter (etwa 150 MB).</string>
+    <string name="setup_step_install_grok">Buddy lädt sein eigenes kleines Linux und %1$s von xAI herunter (etwa 170 MB).</string>
     <string name="setup_install">Installieren</string>
     <string name="setup_step_signin_title">Anmelden</string>
     <string name="setup_step_signin_opencode_done">Keine Anmeldung nötig: Die kostenlosen Modelle von OpenCode funktionieren sofort. Eigene Anbieter kannst du jederzeit verbinden.</string>
@@ -674,6 +696,7 @@
     <string name="setup_step_signin_done_email">Angemeldet als %1$s.</string>
     <string name="setup_step_signin_claude">Mit deinem Claude-Konto (Pro oder Max). Dein Browser öffnet sich; bestätige dort und Buddy kommt von selbst zurück.</string>
     <string name="setup_step_signin_codex">Mit deinem ChatGPT-Konto. Dein Browser öffnet sich; bestätige dort und Buddy kommt von selbst zurück.</string>
+    <string name="setup_step_signin_grok">Mit deinem Grok-Konto. Dein Browser öffnet sich; bestätige dort den Code und Buddy kommt von selbst zurück.</string>
     <string name="setup_sign_in">Anmelden</string>
     <string name="setup_step_background_title">Buddy im Hintergrund laufen lassen</string>
     <string name="setup_step_background_done">Zugelassen.</string>
@@ -708,7 +731,7 @@
     <!-- Settings screen: Agent. -->
     <string name="setup_agent">Agent</string>
     <string name="setup_default_brain">Standard-Agent</string>
-    <string name="setup_default_brain_info">Wer neue Chats beantwortet, die du über die Bubble oder „Neuer Chat“ startest. Claude Code nutzt dein Claude-Abo, Codex dein ChatGPT-Abo, Antigravity dein Google-Konto, OpenCode seine kostenlosen Modelle oder deine eigenen Anbieter. Nur eingerichtete Agenten können gewählt werden.</string>
+    <string name="setup_default_brain_info">Wer neue Chats beantwortet, die du über die Bubble oder „Neuer Chat“ startest. Claude Code nutzt dein Claude-Abo, Codex dein ChatGPT-Abo, Antigravity dein Google-Konto, Grok dein Grok-Konto, OpenCode seine kostenlosen Modelle oder deine eigenen Anbieter. Nur eingerichtete Agenten können gewählt werden.</string>
     <string name="setup_default_brain_set">Neue Chats nutzen %1$s. Über „Neuer Chat“ kannst du pro Chat wählen.</string>
     <string name="setup_set_up_first">Richte zuerst %1$s ein.</string>
     <!-- Agent status under each agent's name: lowercase, monospace, keep short. -->
@@ -800,11 +823,11 @@
     <string name="setup_check_updates_info">Du hast Buddy %1$s. Oder sag einem beliebigen Agenten: „Aktualisiere dich selbst“.</string>
     <string name="setup_app_permissions">App-Berechtigungen</string>
     <string name="setup_app_permissions_info">Wähle pro App: Bei „Frei“ arbeitet der Agent dort ohne Rückfragen; bei „Streng“ fragt Buddy dich selbst vor Senden, Bezahlen, Löschen …</string>
-    <string name="setup_dev_mode">Entwicklermodus</string>
-    <string name="setup_dev_mode_info">Der Agent der Bubble darf Befehle ausführen und Dateien in ~/.buddy/work bearbeiten, damit er Apps bauen und installieren kann.</string>
+    <string name="setup_dev_mode">Linux-Tools in neuen Chats</string>
+    <string name="setup_dev_mode_info">Mit Linux-Tools darf der Agent Befehle ausführen, Pakete installieren und Dateien in ~/.buddy/work bearbeiten, also Apps bauen und installieren. Neue Chats starten mit dieser Einstellung; jeder Chat kann sie unter seinem Titel ändern.</string>
     <string name="setup_agents_tap">Agenten auf Buddys Bildschirmen tippen lassen</string>
     <string name="setup_agents_tap_info">Zum Testen von Buddy mit einem Agenten (zum Beispiel Claude Code in Termux mit den Smartphone-Tools). Die Bubble, Freigabekarten, App-Berechtigungen und diese Schalter bleiben gesperrt.</string>
-    <string name="setup_dev_mode_warning">Für den Alltag lieber ausgeschaltet lassen: Ist er an, könnte eine bösartige Nachricht oder Webseite auf dem Bildschirm versuchen, den Agenten zum Ausführen von Befehlen zu verleiten. Freigabekarten schützen weiterhin Senden, Posten, Kaufen und Löschen.</string>
+    <string name="setup_dev_mode_warning">Lieber ausgeschaltet lassen und Linux-Tools nur in den Chats einschalten, die sie brauchen. Sind sie an, könnte eine bösartige Nachricht oder Webseite auf dem Bildschirm versuchen, den Agenten zum Ausführen von Befehlen zu verleiten. Freigabekarten schützen weiterhin Senden, Posten, Kaufen und Löschen.</string>
 
     <!-- Settings screen: footer links. -->
     <string name="setup_licences">Open-Source-Lizenzen</string>
@@ -832,7 +855,7 @@
     <string name="terminal_session_ended_code">Sitzung beendet · Exit-Code %1$d</string>
     <string name="terminal_close">Schließen</string>
     <string name="terminal_restart">Neu starten</string>
-    <string name="terminal_needs_linux">Installiere zuerst Claude Code, Codex, OpenCode oder Antigravity in den Einstellungen – damit wird Buddys Linux eingerichtet.</string>
+    <string name="terminal_needs_linux">Installiere zuerst Claude Code, Codex, OpenCode, Antigravity oder Grok in den Einstellungen – damit wird Buddys Linux eingerichtet.</string>
     <string name="terminal_start_failed">Terminal konnte nicht gestartet werden: %1$s</string>
     <string name="terminal_close_title">%1$s schließen?</string>
     <string name="terminal_close_running">Hier läuft noch etwas. Schließen beendet es und alles, was darin gestartet wurde.</string>
@@ -854,7 +877,7 @@
 
     <!-- Sessions screen: every agent session running on the phone, and recent history. -->
     <string name="monitor_title">Sitzungen</string>
-    <string name="monitor_subtitle">Alle Sitzungen von Claude Code, Codex, OpenCode und Antigravity auf diesem Smartphone.</string>
+    <string name="monitor_subtitle">Alle Sitzungen von Claude Code, Codex, OpenCode, Antigravity und Grok auf diesem Smartphone.</string>
     <string name="monitor_terminal_running">Eine Shell läuft · tippen, um zurückzukehren</string>
     <string name="monitor_terminal_idle">Eine Shell in Buddys Linux</string>
     <string name="monitor_running_now">Läuft gerade</string>
@@ -895,7 +918,7 @@
     <string name="perms_smart_reviewer">Smart-Prüfer</string>
     <string name="perms_reviewer_same">Wie im Chat</string>
     <string name="perms_reviewer_sign_in">Melde dich zuerst bei %1$s an (Einstellungen).</string>
-    <string name="perms_reviewer_about">Für jedes Tippen eine temporäre Sitzung ohne Tools: Sie sieht deine Anfrage, die Notiz des Agenten und den Bildschirm und sagt „erlauben“, „dich fragen“ oder „abraten“. Etwa 3 Sekunden pro Tippen. OpenCode- und Antigravity-Chats werden von Claude Code (oder Codex) geprüft.</string>
+    <string name="perms_reviewer_about">Für jedes Tippen eine temporäre Sitzung ohne Tools: Sie sieht deine Anfrage, die Notiz des Agenten und den Bildschirm und sagt „erlauben“, „dich fragen“ oder „abraten“. Etwa 3 Sekunden pro Tippen. OpenCode-, Antigravity- und Grok-Chats werden von Claude Code (oder Codex) geprüft.</string>
     <string name="perms_reviewer_rules">Der Prüfer kontrolliert auch Antworten, bevor sie nach dem Countdown einer Benachrichtigungsregel gesendet werden.</string>
     <string name="reviewer_default_claude">Haiku: schnell und sparsam. Empfohlen.</string>
     <string name="reviewer_default_codex">Kleines, schnelles Modell. Empfohlen.</string>

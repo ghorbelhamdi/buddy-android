@@ -105,6 +105,14 @@ final class Ui {
         return t;
     }
 
+    /** The quiet "free · limited" tag beside an agent's name in the pickers (Account.freeTier). */
+    static TextView freeTag(Context c) {
+        TextView tag = monoText(c, c.getString(R.string.agent_tag_free), 11, MUTED);
+        tag.setPaddingRelative(dp(c, 6), dp(c, 1), dp(c, 6), dp(c, 1));
+        tag.setBackground(rounded(c, CARD2, 6));
+        return tag;
+    }
+
     static TextView single(TextView t) {
         t.setSingleLine(true);
         t.setEllipsize(TextUtils.TruncateAt.END);
@@ -241,11 +249,12 @@ final class Ui {
         return t;
     }
 
-    /** 40×40 tile with "CC" (Claude Code), "CX" (Codex), "OC" (OpenCode) or "AG" (Antigravity). */
+    /** 40×40 tile with "CC" (Claude Code), "CX" (Codex), "OC" (OpenCode), "AG" (Antigravity) or "GK" (Grok). */
     static TextView agentTile(Context c, String backend) {
-        boolean claude = !"codex".equals(backend) && !"opencode".equals(backend) && !"agy".equals(backend);
+        boolean claude = !"codex".equals(backend) && !"opencode".equals(backend) && !"agy".equals(backend)
+                && !"grok".equals(backend);
         TextView t = monoText(c, "codex".equals(backend) ? "CX" : "opencode".equals(backend) ? "OC"
-                : "agy".equals(backend) ? "AG" : "CC", 12,
+                : "agy".equals(backend) ? "AG" : "grok".equals(backend) ? "GK" : "CC", 12,
                 claude ? ACCENT_TEXT : TEXT);
         t.setTypeface(mono(c, 600));
         t.setGravity(Gravity.CENTER);
@@ -260,10 +269,44 @@ final class Ui {
         l.setPaddingRelative(dp(c, 8), dp(c, 3), dp(c, 4), dp(c, 3));
         l.setBackground(outlined(c, 0x00000000, 8, OUTLINE, 1));
         TextView t = single(monoText(c, s, 12, MUTED));
-        l.addView(t);
+        l.addView(t, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT, 1)); // a chip short of room shortens its text, not the icon
         ImageView i = icon(c, R.drawable.ms_expand_more, MUTED, 16);
         l.addView(i);
         return l;
+    }
+
+    /** The "Linux tools" chip beside a chat's model chip: a terminal icon and the name (see paintLinuxChip). */
+    static LinearLayout linuxChip(Context c) {
+        LinearLayout l = row(c);
+        l.setPaddingRelative(dp(c, 6), dp(c, 3), dp(c, 8), dp(c, 3));
+        l.addView(icon(c, R.drawable.ms_terminal, MUTED, 14));
+        TextView t = single(monoText(c, c.getString(R.string.chat_linux_tools), 12, MUTED));
+        t.setPaddingRelative(dp(c, 4), 0, 0, 0);
+        l.addView(t);
+        return l;
+    }
+
+    /** On: accent, like the agent pickers' "default" tag; off: outlined and muted, like the model chip. */
+    static void paintLinuxChip(Context c, LinearLayout chip, boolean on) {
+        int color = on ? ACCENT_TEXT : MUTED;
+        ((ImageView) chip.getChildAt(0)).setImageTintList(ColorStateList.valueOf(color));
+        ((TextView) chip.getChildAt(1)).setTextColor(color);
+        chip.setBackground(on ? rounded(c, ACCENT_SOFT, 8) : outlined(c, 0x00000000, 8, OUTLINE, 1));
+        chip.setSelected(on); // for TalkBack: on reads as selected
+    }
+
+    /** A red note with a warning icon (what could go wrong with a setting). */
+    static LinearLayout warning(Context c, String s) {
+        LinearLayout w = row(c);
+        w.setGravity(Gravity.TOP);
+        w.setPaddingRelative(dp(c, 12), dp(c, 10), dp(c, 12), dp(c, 10));
+        w.setBackground(rounded(c, ERR_SOFT, 12));
+        w.addView(icon(c, R.drawable.ms_warning, ERR, 18));
+        TextView t = text(c, s, 13, ERR);
+        t.setPaddingRelative(dp(c, 10), 0, 0, 0);
+        w.addView(t, weight1());
+        return w;
     }
 
     /** A plain flat row with a ripple (for list rows). */
@@ -422,7 +465,7 @@ final class Ui {
         final android.widget.EditText et = new android.widget.EditText(a);
         et.setHint(a.getString(R.string.chat_model_other_hint, "claude".equals(backend) ? "claude-opus-5-5"
                 : "opencode".equals(backend) ? "anthropic/claude-sonnet-5-5" : "agy".equals(backend) ? "gemini-3.8-flash-high"
-                : "gpt-6.1-sol"));
+                : "grok".equals(backend) ? "grok-4.7" : "gpt-6.1-sol"));
         et.setHintTextColor(MUTED);
         et.setTextColor(TEXT);
         et.setTextSize(14);

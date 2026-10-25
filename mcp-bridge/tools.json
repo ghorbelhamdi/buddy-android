@@ -397,7 +397,7 @@
  },
  {
   "name": "install_apk",
-  "description": "(Developer mode) Open Android's installer for an APK built in Buddy's Linux, e.g. /root/.buddy/work/myapp/build/app.apk, or served by another app on this phone at a local URL (http://127.0.0.1:<port>/app.apk, e.g. from Termux). The user taps Install/Update themselves; call wait_for_install next.",
+  "description": "(Needs Linux tools) Open Android's installer for an APK built in Buddy's Linux, e.g. /root/.buddy/work/myapp/build/app.apk, or served by another app on this phone at a local URL (http://127.0.0.1:<port>/app.apk, e.g. from Termux). The user taps Install/Update themselves; call wait_for_install next.",
   "inputSchema": {
    "type": "object",
    "properties": {

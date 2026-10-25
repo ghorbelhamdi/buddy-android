@@ -1,18 +1,19 @@
 #!/bin/bash
 # Run by the Buddy app inside its built-in Linux (Alpine, through proot).
-#   buddy-run <token> ask <session> <claude|codex|opencode|agy> <dev:0|1|rule> <message> [model] [attachment-ids]
-#     (rule: a notification rule's run, working for someone else's message: no shell, files or web tools)
+#   buddy-run <token> ask <session> <claude|codex|opencode|agy|grok> <dev:0|1|rule|play> <message> [model] [attachment-ids]
+#     (rule: a notification rule's run, working for someone else's message: no shell, files or web tools;
+#      play: the Play version, which has no Linux tools at all)
 #                                    run the agent on the message in that session, streaming events to the bubble
 #   buddy-run <token> stop <session>       stop that session's running request
 #   buddy-run <token> delete <session>     forget that session
 #   buddy-run <token> ping                 answer the app's setup check
-#   buddy-run <token> procs                list running Claude Code / Codex / OpenCode / Antigravity processes (buddy_procs)
+#   buddy-run <token> procs                list running Claude Code / Codex / OpenCode / Antigravity / Grok processes (buddy_procs)
 #   buddy-run <token> kill <pid>           stop a running Claude Code / Codex process and its children
 #   buddy-run <token> recent               list recent Claude Code / Codex sessions from their history (buddy_recent)
 #   buddy-run <token> transcript <claude|codex> <file>   last messages of a session (buddy_transcript)
 #   buddy-run <token> adopt <session> <claude|codex> <agent-session-id>  continue that session as a Buddy chat
 # Every event sent to the bubble carries "buddy_session" so the app can route it.
-HELPER_VERSION=13
+HELPER_VERSION=16
 set -u
 export PATH=$HOME/.local/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # The claude launcher sets BUN_OPTIONS with a path relative to its folder; never inherit a stale one.
@@ -47,7 +48,7 @@ descendants() { # print a pid and all its descendants
 }
 
 
-# Is this pid an agent process (the real claude / codex / opencode / agy program)?
+# Is this pid an agent process (the real claude / codex / opencode / agy / grok program)?
 agent_of() {
   local cmd
   cmd=$(tr '\0' ' ' < "/proc/$1/cmdline" 2>/dev/null) || return 1
@@ -56,18 +57,19 @@ agent_of() {
     */codex-linux-*/*|*/bin/codex) echo codex ;;
     */opencode-ai/*|*/@opencode/cli*/*|*/bin/opencode) echo opencode ;;
     */antigravity-cli/bin/*|*/bin/agy) echo agy ;;
+    grok|*/bin/grok|*/grok-linux-*) echo grok ;;
     *) return 1 ;;
   esac
 }
 
 case "$CMD" in
   ping) # setup check: proves RUN_COMMAND, the helper and the callback all work
-    agents=$({ have claude && echo claude; have codex && echo codex; have opencode && echo opencode; have agy && echo agy; } \
-      | paste -sd, -)
+    agents=$({ have claude && echo claude; have codex && echo codex; have opencode && echo opencode; have agy && echo agy
+      have grok && echo grok; } | paste -sd, -)
     # signed in = the agent's saved login exists (OpenCode works without one: its free models)
     signed=$({ [ -s "$HOME/.claude/.credentials.json" ] && echo claude; [ -s "$HOME/.codex/auth.json" ] && echo codex
       have opencode && echo opencode; [ -s "$HOME/.gemini/antigravity-cli/antigravity-oauth-token" ] && echo agy
-    } | paste -sd, -)
+      [ -s "$HOME/.grok/auth.json" ] && echo grok; } | paste -sd, -)
     cm=$(jq -c '[.models[] | select(.visibility == "list") | [.slug, .display_name]]' "$HOME/.codex/models_cache.json" 2>/dev/null)
     # OpenCode's model list (a second or two; a background refresh got killed when the helper exited, so the list
     # never updated and new free models didn't show). On failure the last good list is kept.
@@ -79,10 +81,16 @@ case "$CMD" in
         && mv "$D/agy-models.new" "$D/agy-models"
     fi
     am=$(jq -Rsc 'split("\n") | map(select(test("^[A-Za-z0-9._-]+\t.")) | split("\t") | [.[0], .[1]])' "$D/agy-models" 2>/dev/null)
+    # Grok's ("  * grok-4.7 (default)" lines; its ids are its names)
+    if have grok && [ -s "$HOME/.grok/auth.json" ]; then
+      timeout 30 grok models >"$D/grok-models.new" 2>/dev/null && grep -q '^ *[*-] ' "$D/grok-models.new" \
+        && mv "$D/grok-models.new" "$D/grok-models"
+    fi
+    gm=$(jq -Rsc 'split("\n") | map(capture("^\\s*[*-]\\s+(?<id>[A-Za-z0-9._-]+)") | [.id, .id])' "$D/grok-models" 2>/dev/null)
     om=$(jq -Rsc 'split("\n") | map(select(test("^[A-Za-z0-9._-]+/\\S+$"))) | map([., (split("/") | .[1:] | join("/"))])' "$D/opencode-models" 2>/dev/null)
     jq -cn --arg s "${agents:-none}" --arg g "${signed:-none}" --argjson v "$HELPER_VERSION" --argjson cm "${cm:-[]}" \
-      --argjson om "${om:-[]}" --argjson am "${am:-[]}" \
-      '{type:"buddy_pong",text:$s,signed:$g,helper:$v,codex_models:$cm,opencode_models:$om,agy_models:$am}' | post
+      --argjson om "${om:-[]}" --argjson am "${am:-[]}" --argjson gm "${gm:-[]}" \
+      '{type:"buddy_pong",text:$s,signed:$g,helper:$v,codex_models:$cm,opencode_models:$om,agy_models:$am,grok_models:$gm}' | post
     exit 0 ;;
   procs)
     # map every process started by a Buddy chat to that chat
@@ -93,7 +101,7 @@ case "$CMD" in
       for q in $(descendants "$(cat "$f")"); do owner[$q]=$sid; done
     done
     {
-      for p in $(pgrep -f 'claude/versions/|codex-linux-|/bin/codex|opencode-ai/|@opencode/cli|/bin/opencode|antigravity-cli/bin/|/bin/agy' 2>/dev/null); do
+      for p in $(pgrep -f 'claude/versions/|codex-linux-|/bin/codex|opencode-ai/|@opencode/cli|/bin/opencode|antigravity-cli/bin/|/bin/agy|^grok( |$)|/bin/grok|grok-linux-' 2>/dev/null); do
         a=$(agent_of "$p") || continue
         [ "$p" = "$$" ] && continue
         cwd=$(readlink "/proc/$p/cwd" 2>/dev/null)
@@ -124,7 +132,7 @@ case "$CMD" in
     exit 0 ;;
   kill)
     P=${3:-}
-    [[ "$P" =~ ^[0-9]+$ ]] && agent_of "$P" >/dev/null || exit 2   # only ever kill claude/codex/opencode/agy
+    [[ "$P" =~ ^[0-9]+$ ]] && agent_of "$P" >/dev/null || exit 2   # only ever kill claude/codex/opencode/agy/grok
     kill_tree "$P"
     exit 0 ;;
   recent)
@@ -247,8 +255,13 @@ $(cat "$D/browser-prompt.md" 2>/dev/null)"
 if [ "$DEV" = 1 ]; then
   SYSTEM="$SYSTEM
 
-Developer mode is ON: you may run shell commands and create or edit files. Work inside $W (one folder per project).
-Before building an Android app, read the android-app skill (Claude Code) or AGENTS.md (Codex, OpenCode, Antigravity) in $W and follow it."
+Linux tools are ON in this chat: you may run shell commands and create or edit files. Work inside $W (one folder per project).
+Before building an Android app, read the android-app skill (Claude Code) or AGENTS.md (Codex, OpenCode, Antigravity, Grok) in $W and follow it."
+elif [ "$DEV" = 0 ]; then
+  SYSTEM="$SYSTEM
+
+Linux tools are off in this chat: no shell commands or file edits. If the user asks for something that needs them
+(building an app, running commands), tell them to turn on Linux tools with the chip under this chat's title, then ask again."
 fi
 
 # ---------------------------------------------------------------- Claude Code
@@ -596,6 +609,126 @@ stream_agy() {
   done
 }
 
+# ----------------------------------------------------------------------- Grok
+# grok reads MCP servers from ~/.grok/config.toml (and Claude Code's ~/.claude.json), but each chat needs its own phone
+# address (?chat=). So every run gets its own GROK_HOME: the user's config.toml without its MCP servers, plus the phone
+# with a 10-minute tool timeout (an approval card may wait for the user), and everything else (the sign-in, sessions)
+# linked to the real ~/.grok. A headless run refuses what isn't pre-approved: the phone tools are; normal mode offers
+# only the web and (once the chat has attachments) file reads, a rule's run only the phone; developer mode approves
+# everything, like Codex's full access.
+# grok's bundled skills (docx, pptx, code-review, …), found once per grok version: a phone chat turns them off
+grok_bundled_skills() {
+  local v f
+  v=$(grok --version 2>/dev/null | awk '{print $2}')
+  f=$D/grok-bundled-skills-${v:-unknown}
+  if [ ! -s "$f" ]; then
+    rm -f "$D"/grok-bundled-skills-*
+    (cd /tmp && GROK_CLAUDE_SKILLS_ENABLED=0 GROK_CURSOR_SKILLS_ENABLED=0 timeout 60 grok inspect 2>/dev/null) \
+      | sed -n 's/^ *└ \([A-Za-z0-9._-]*\) .* bundled.*$/\1/p' > "$f.new"
+    [ -s "$f.new" ] && mv -f "$f.new" "$f" || rm -f "$f.new"
+  fi
+  cat "$f" 2>/dev/null
+}
+
+run_grok() {
+  local h=$S/grok-home g=$HOME/.grok f sigs note
+  # sessions/ and logs/ must be links before grok first writes them, or a chat's would stay in its own home
+  mkdir -p "$h" "$g/sessions" "$g/logs"
+  for f in "$g"/* "$g"/.[!.]*; do
+    [ -e "$f" ] || continue
+    [ "${f##*/}" = config.toml ] || ln -sfn "$f" "$h/${f##*/}"
+  done
+  ( umask 077
+    { awk -v lean="$([ "$DEV" = 1 ] || echo 1)" '/^\[/ { skip = /^\[mcp_servers[.\]]/ || (lean && /^\[(skills|compat[.]codex)\]/) }
+        !skip && !/^disabled_mcp_servers/' "$g/config.toml" 2>/dev/null
+      printf '\n[mcp_servers.phone]\nurl = "%s"\ntool_timeout_sec = 600\n\n[mcp_servers.phone.headers]\nAuthorization = "Bearer %s"\n' \
+        "$URL/mcp?chat=$SID" "$TOKEN"
+      if [ "$DEV" != 1 ]; then
+        printf '\n[skills]\ndisabled = [%s]\n\n[compat.codex]\nskills = false\nhooks = false\n' \
+          "$(grok_bundled_skills | sed 's/.*/"&"/' | paste -sd, -)"
+      fi
+    } > "$h/config.toml" )
+  # the phone's tools with their arguments, "tap(element?, x?, y?)": grok otherwise looks each one up first (search_tool)
+  sigs=$(curl -s -m 10 -X POST -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+    -H 'Accept: application/json, text/event-stream' --data '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' \
+    "$URL/mcp?chat=$SID" | jq -r '[.result.tools[] | (.inputSchema.required // []) as $req | "\(.name)(" + ((.inputSchema.properties // {})
+    | keys_unsorted | map(. as $k | if ($req | index($k)) != null then $k else $k + "?" end) | join(", ")) + ")"]
+    | join(", ")' 2>/dev/null)
+  note="In this app the phone tools are on the MCP server named \"phone\". Call them right away with use_tool \
+(tool_name \"phone__<tool>\", e.g. phone__read_screen, and tool_input with its arguments${sigs:+ as listed here; ? marks an \
+optional one: $sigs}). You don't need search_tool for them."
+  [ "$DEV" = 1 ] || note="$note Shell commands are not available in this chat; don't try them."
+  # --rules adds Buddy's instructions to grok's own, on every run (as --append-system-prompt does for Claude Code)
+  local args=(-p "$MSG" --output-format streaming-messages-json --rules "$SYSTEM"$'\n\n'"$note" --allow 'MCPTool(phone__*)')
+  case "$DEV" in
+    1) args+=(--always-approve) ;;
+    rule) args+=(--tools use_tool --disable-web-search) ;;  # use_tool and search_tool: the phone only
+    *) if [ -d "$S/files" ]; then args+=(--tools read_file,web_search,web_fetch); else args+=(--tools web_search,web_fetch); fi
+       args+=(--allow WebFetch) ;;
+  esac
+  [ "$DEV" = 1 ] || args+=(--no-subagents --no-plan)
+  [ -s "$S/grok-session" ] && args+=(-r "$(cat "$S/grok-session")")
+  [ -n "${MODEL:-}" ] && args+=(-m "$MODEL")
+  [ -n "${EFFORT:-}" ] && args+=(--effort "$EFFORT")
+  local lean=()
+  [ "$DEV" = 1 ] || lean=(GROK_MEMORY=0 GROK_CLAUDE_SKILLS_ENABLED=0 GROK_CURSOR_SKILLS_ENABLED=0 GROK_CLAUDE_RULES_ENABLED=0
+    GROK_CURSOR_RULES_ENABLED=0 GROK_CLAUDE_AGENTS_ENABLED=0 GROK_CURSOR_AGENTS_ENABLED=0 GROK_CLAUDE_HOOKS_ENABLED=0
+    GROK_CURSOR_HOOKS_ENABLED=0)
+  cd "$W" && env "${lean[@]}" GROK_HOME=$h GROK_CLAUDE_MCPS_ENABLED=0 GROK_CURSOR_MCPS_ENABLED=0 GROK_DISABLE_AUTOUPDATER=1 \
+    grok "${args[@]}" </dev/null 2>"$S/last-error.log"
+  local status=$?
+  # a token refresh that replaced the link with a file: keep the new login in the real folder
+  f=$h/auth.json
+  [ -f "$f" ] && [ ! -L "$f" ] && mv -f "$f" "$g/auth.json" && ln -sfn "$g/auth.json" "$f"
+  return $status
+}
+
+# grok's streaming-messages-json is Claude Code's stream format; only the tool names differ. A phone tool comes as
+# use_tool {tool_name:"phone__tap", tool_input}; its lookups (search_tool) and its thinking aren't shown. A step the
+# run refused (headless grok can't ask) is only on stderr ("permission required: … was not run"): said under the steps.
+stream_grok() {
+  local line typ sid t=""
+  rm -f "$S/grok-error"
+  while IFS= read -r line; do
+    [ -z "$line" ] && continue
+    typ=$(printf '%s' "$line" | jq -r '.type // empty' 2>/dev/null)
+    case "$typ" in
+      system)
+        sid=$(printf '%s' "$line" | jq -r '.session_id // empty' 2>/dev/null)
+        [ -n "$sid" ] && printf '%s' "$sid" > "$S/grok-session" ;;
+      result)
+        t=$(sed -n 's/^permission required: \(.*\) was not run.*/\1/p' "$S/last-error.log" 2>/dev/null | sort -u | paste -sd, - | sed 's/,/, /g')
+        [ -n "$t" ] && jq -cn --arg t "Not allowed in this chat: $t" --arg s "$SID" '{type:"buddy_step", text:$t, buddy_session:$s}' | post
+        printf '%s' "$line" | jq -r 'select(.is_error) | (.errors // []) | join("; ") | if . == "" then "the request failed" else . end' \
+          2>/dev/null > "$S/grok-error" ;;
+    esac
+    printf '%s' "$line" | jq -c --arg s "$SID" --arg denied "$t" '
+      (if .type == "system" then {type, subtype, session_id, model}
+      elif .type == "assistant" then
+        .message.content |= [.[] | select(.type == "text" or (.type == "tool_use" and .name != "search_tool"))
+          | if .type == "text" then . else
+              (.input // {}) as $in | .name as $t
+              | if $t == "use_tool" then
+                  {type, name:("mcp__" + ($in.tool_name // "")),
+                   input:(($in.tool_input // {}) | if type == "string" then (fromjson? // {}) else . end)}
+                elif ($t | test("^[A-Za-z_][A-Za-z0-9_-]*__")) then {type, name:("mcp__" + $t), input:$in}
+                elif $t == "run_terminal_command" or $t == "run_terminal_cmd" then {type, name:"Bash", input:{command:($in.command // "")}}
+                elif $t == "write" or $t == "search_replace" then {type, name:"Edit", input:{file_path:($in.file_path // $in.target_file // "")}}
+                elif $t == "read_file" then {type, name:"Read", input:{file_path:($in.target_file // $in.file_path // $in.path // "")}}
+                elif $t == "web_search" then {type, name:"WebSearch", input:{query:($in.query // "")}}
+                elif $t == "web_fetch" then {type, name:"WebFetch", input:{url:($in.url // "")}}
+                else {type, name:$t, input:$in} end
+            end]
+        | select(.message.content | length > 0) | {type, message:{content:.message.content}}
+      elif .type == "result" and .is_error then
+        {type, subtype, is_error, result:(if $denied != "" and .errors == ["cancelled"] then "Grok stopped after this chat refused: " + $denied
+          else "Grok: " + ((.errors // []) | join("; ") | if . == "" then "the request failed" else . end) end)}
+      elif .type == "result" then {type, subtype, result:(.result // "")}
+      elif .type == "error" then {type:"result", subtype:"error", is_error:true, result:("Grok: " + (.message // "error"))}
+      else empty end) | . + {buddy_session:$s}' 2>/dev/null | while IFS= read -r ev; do printf '%s' "$ev" | post; done
+  done
+}
+
 # ------------------------------------------------------------------------ run
 (
   if [ "$BACKEND" = opencode ]; then
@@ -631,6 +764,19 @@ tools (call_mcp_tool, ServerName \"phone\") and finish the user's request."
     # the same error with raw JSON, which would show it twice
     [ -s "$S/agy-error" ] && status=0
     name=Antigravity
+  elif [ "$BACKEND" = grok ]; then
+    if ! have grok; then event buddy_error "Grok isn't installed yet. Install it in Buddy's Settings."; exit 0; fi
+    run_grok | stream_grok
+    status=${PIPESTATUS[0]}
+    if [ "$status" -ne 0 ] && [ -s "$S/grok-session" ] && grep -q -i -E 'session.*not found|failed to restore session' "$S/last-error.log" 2>/dev/null; then
+      rm -f "$S/grok-session"   # old session is gone; retry as a new conversation
+      run_grok | stream_grok
+      status=${PIPESTATUS[0]}
+    fi
+    # a failed turn (not signed in, …) is already in the chat from its result; grok also exits non-zero and prints
+    # the same error, which would show it twice
+    [ -s "$S/grok-error" ] && status=0
+    name=Grok
   elif [ "$BACKEND" = codex ]; then
     if ! have codex; then event buddy_error "Codex isn't installed yet. Install it in Buddy's Settings."; exit 0; fi
     run_codex | stream_codex

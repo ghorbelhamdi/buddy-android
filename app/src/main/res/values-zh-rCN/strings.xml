@@ -2,7 +2,7 @@
 <!-- Every text Buddy shows, in Simplified Chinese (zh-CN). English source: res/values/strings.xml. -->
 <resources>
     <string name="service_label">Buddy 助手</string>
-    <string name="service_description">显示 Buddy 聊天气泡，并让在本机 Buddy 中运行的、你所选的智能体（Claude Code、Codex、OpenCode 或 Antigravity）替你读取屏幕、点按、输入和滚动。除了智能体自身发送给其 AI 服务（Anthropic、OpenAI、Google 或你所用 OpenCode 模型的提供商）的内容外，任何数据都不会离开手机。</string>
+    <string name="service_description">显示 Buddy 聊天气泡，并让在本机 Buddy 中运行的、你所选的智能体（Claude Code、Codex、OpenCode、Antigravity 或 Grok）替你读取屏幕、点按、输入和滚动。除了智能体自身发送给其 AI 服务（Anthropic、OpenAI、Google、xAI 或你所用 OpenCode 模型的提供商）的内容外，任何数据都不会离开手机。</string>
 
     <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
 
@@ -28,7 +28,7 @@
     <!-- Two example requests a user could type. Translate them naturally and use your language's quotation marks. -->
     <string name="onboarding_welcome_ask_text">“回复小王说我要迟到了”、“把牛奶加入购物车”。</string>
     <string name="onboarding_welcome_plan_title">用你自己的套餐，无需 API 密钥</string>
-    <string name="onboarding_welcome_plan_text">通过你的 Claude 订阅运行 Claude Code。也可以用 ChatGPT 套餐运行 Codex、用 Google 账号运行 Antigravity，或使用 OpenCode 的免费模型。</string>
+    <string name="onboarding_welcome_plan_text">通过你的 Claude 订阅运行 Claude Code。也可以用 ChatGPT 套餐运行 Codex、用 Google 账号运行 Antigravity、用 Google 或 X 账号运行 Grok，或使用 OpenCode 的免费模型。</string>
     <string name="onboarding_welcome_control_title">一切由你掌控</string>
     <string name="onboarding_welcome_control_text">发送、发布、购买和删除之前，总会先问你。</string>
     <!-- Small lowercase mono line under the list. -->
@@ -41,8 +41,9 @@
     <string name="onboarding_brain_text">由它来回复你的对话。之后可以在“设置”中添加其他智能体。</string>
     <string name="onboarding_brain_claude">使用你的 Claude 订阅（Pro 或 Max）。</string>
     <string name="onboarding_brain_codex">使用你的 ChatGPT 套餐。</string>
-    <string name="onboarding_brain_opencode">免费模型，无需账号。之后可以连接你自己的模型提供商。</string>
-    <string name="onboarding_brain_agy">使用你的 Google 账号：免费套餐、Google AI Pro 或 Ultra。</string>
+    <string name="onboarding_brain_opencode">无需账号。之后可以连接你自己的模型提供商。</string>
+    <string name="onboarding_brain_agy">使用你的 Google 账号，也支持 Google AI Pro 或 Ultra。</string>
+    <string name="onboarding_brain_grok">使用你的 Grok 账号（可用 Google 或 X 登录）。</string>
     <!-- The option that installs both Claude Code and Codex. -->
     <string name="onboarding_brain_both">两个都安装，每个对话可单独选择。默认仍为 Claude Code。</string>
     <!-- Small lowercase tag next to "Claude Code". Keep very short. -->
@@ -97,15 +98,18 @@
     <string name="onboarding_agent_checking_opencode">正在检查 OpenCode…</string>
     <string name="onboarding_agent_sign_in_codex">在浏览器中使用你的 ChatGPT 账号登录，然后返回这里。</string>
     <string name="onboarding_agent_sign_in_agy">使用你的 Google 账号登录。浏览器会打开，在那里登录后，Buddy 会自动获取代码。</string>
+    <string name="onboarding_agent_sign_in_grok">使用你的 Grok 账号登录。浏览器会打开，在那里确认代码后，Buddy 会自动返回。</string>
     <!-- "Buddy's Linux" = the small Linux system built into Buddy. -->
     <string name="onboarding_agent_download_claude">需一次性下载约 235 MB（Buddy 的 Linux，以及来自 Anthropic 的 Claude Code）。</string>
     <string name="onboarding_agent_download_opencode">需一次性下载约 230 MB（Buddy 的 Linux、Node.js 和 OpenCode）。无需账号。</string>
     <string name="onboarding_agent_download_codex">需一次性下载约 150 MB（Buddy 的 Linux、Node.js，以及来自 OpenAI 的 Codex）。</string>
     <string name="onboarding_agent_download_agy">需一次性下载约 200 MB（Buddy 的 Linux，以及来自 Google 的 Antigravity CLI）。</string>
+    <string name="onboarding_agent_download_grok">需一次性下载约 170 MB（Buddy 的 Linux，以及来自 xAI 的 Grok Build）。</string>
     <!-- Buttons on the agent card. -->
     <string name="onboarding_sign_in_claude">使用 Claude 登录</string>
     <string name="onboarding_sign_in_chatgpt">使用 ChatGPT 登录</string>
     <string name="onboarding_sign_in_google">使用 Google 登录</string>
+    <string name="onboarding_sign_in_grok">使用 Grok 登录</string>
     <!-- %1$s = the agent's name (Claude Code, Codex or OpenCode). -->
     <string name="onboarding_install_agent">安装 %1$s</string>
     <string name="onboarding_agents_wifi">建议使用 WLAN。安装期间可以离开此屏幕。</string>
@@ -165,7 +169,7 @@
     <string name="main_section_recent">最近</string>
     <string name="main_empty_title">还没有对话</string>
     <!-- "New chat" = the button (main_new_chat). -->
-    <string name="main_empty_text">点按“新对话”，即可与 Claude Code、Codex、OpenCode 或 Antigravity 开始对话。长按对话可将其删除。</string>
+    <string name="main_empty_text">点按“新对话”，即可与 Claude Code、Codex、OpenCode、Antigravity 或 Grok 开始对话。长按对话可将其删除。</string>
     <!-- Status of a chat with a running task, until the agent reports what it's doing. Small lowercase mono text. -->
     <string name="main_chat_working">处理中…</string>
     <!-- Preview of a chat's last message when the user wrote it. %1$s = the message. -->
@@ -336,8 +340,6 @@
     <string name="bubble_chats_title">对话</string>
     <!-- Panel title while picking this chat's model and effort (how hard the agent thinks). -->
     <string name="bubble_model_effort_title">模型与思考强度</string>
-    <!-- Under the title. %1$s: the agent · model · effort summary; "dev" marks that developer mode is on. -->
-    <string name="bubble_summary_dev">%1$s · 开发</string>
 
     <!-- Strip at the top of the chat panel while the agent works. -->
     <string name="bubble_working">正在处理…</string>
@@ -437,9 +439,24 @@
     <string name="chat_read_aloud">朗读回复</string>
     <string name="chat_read_aloud_on">将朗读回复</string>
     <string name="chat_read_aloud_off">不再朗读回复</string>
-    <!-- Model chip under the chat title when developer mode is on. %1$s = agent · model · effort.
-         "dev" = developer mode. Keep very short. -->
-    <string name="chat_chip_dev">%1$s · 开发</string>
+
+    <!-- Chat screen: Linux tools, the chip beside the model chip (also in the bubble's panel and the New chat sheets) -->
+    <!-- A chat's own switch that lets its agent work in Buddy's Linux: run commands, install packages, edit files,
+         build and install apps. The name on the small chip under the chat's title, and of the switch in the New chat
+         sheets. Keep short. -->
+    <string name="chat_linux_tools">Linux 工具</string>
+    <!-- Under the Linux tools switch in the New chat sheets. "Buddy's Linux" = the Linux system inside the app. -->
+    <string name="chat_linux_tools_info">在 Buddy 的 Linux 中运行命令、编辑文件和构建应用</string>
+    <!-- Title of the sheet that opens when the user turns Linux tools on in a chat. -->
+    <string name="chat_linux_tools_title">开启 Linux 工具？</string>
+    <!-- ~/.buddy/work is a folder: keep it as is. -->
+    <string name="chat_linux_tools_what">智能体将可以运行命令、安装软件包，并编辑 ~/.buddy/work 中的文件，从而能够开发和安装应用。</string>
+    <!-- When the change applies: a task already running goes on as it was. -->
+    <string name="chat_linux_tools_when">仅限此对话，从你的下一条消息开始生效。</string>
+    <!-- "it" = the agent. -->
+    <string name="chat_linux_tools_risk">屏幕上的恶意消息或网页可能会诱骗智能体运行命令。发送、发布、购买和删除仍受确认卡片保护。</string>
+    <!-- Button, verb: turns Linux tools on for this chat. Keep short. -->
+    <string name="chat_linux_tools_turn_on">开启</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <!-- Button, verb: stops the agent's task. Keep short. -->
@@ -460,8 +477,8 @@
     <string name="chat_send">发送</string>
     <!-- Shown in a chat with no messages yet. %1$s = agent name (Claude Code, Codex, OpenCode). -->
     <string name="chat_empty_hint">新的 %1$s 对话。让它在你的手机上做点什么吧。</string>
-    <!-- Same, when developer mode is on. %1$s = agent name. -->
-    <string name="chat_empty_hint_dev">新的 %1$s 对话。让它在你的手机上做点什么，或者开发一个应用（开发者模式已开启）。</string>
+    <!-- Same, when the chat has Linux tools on. %1$s = agent name. -->
+    <string name="chat_empty_hint_dev">新的 %1$s 对话，已开启 Linux 工具。让它在你的手机上做点什么，或者开发一个应用。</string>
 
     <!-- Model sheet (tap the model chip under the chat title) -->
     <!-- %1$s = agent name, e.g. "Claude Code model". -->
@@ -651,7 +668,7 @@
     <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
     <string name="ui_a11y_title">Buddy 如何使用无障碍功能</string>
     <string name="ui_a11y_what">Buddy 使用 Android 的无障碍服务在其他应用中完成你的要求：它会读取屏幕上的内容，并替你点按、输入和滚动。它还会显示悬浮气泡。</string>
-    <string name="ui_a11y_data">任务运行期间，屏幕内容（可能包含消息、姓名或地址等个人信息）会被发送到你所选智能体的 AI 服务（Claude Code 对应 Anthropic，Codex 对应 OpenAI，Antigravity 对应 Google，OpenCode 则对应你所用模型的提供商），仅用于执行你的请求。</string>
+    <string name="ui_a11y_data">任务运行期间，屏幕内容（可能包含消息、姓名或地址等个人信息）会被发送到你所选智能体的 AI 服务（Claude Code 对应 Anthropic，Codex 对应 OpenAI，Antigravity 对应 Google，Grok 对应 xAI，OpenCode 则对应你所用模型的提供商），仅用于执行你的请求。</string>
     <string name="ui_a11y_no_servers">Buddy 没有自己的服务器。它不会收集、出售或分享这些数据，也不会将其用于广告。</string>
     <string name="ui_a11y_asks">在执行任何发送、发布、购买或删除操作之前，Buddy 都会先请你确认。你可以随时在 Android 的无障碍设置中关闭此服务。</string>
     <string name="ui_privacy_policy">隐私政策</string>
@@ -716,11 +733,13 @@
     <string name="signin_install_sub_opencode">在 Buddy 中运行 OpenCode。免费模型立即可用，无需账号；也可以随时连接你自己的模型提供商（Anthropic、OpenAI、GitHub Copilot…）。</string>
     <string name="signin_install_sub_codex">在 Buddy 中通过你的 ChatGPT 套餐运行 Codex。</string>
     <string name="signin_install_sub_agy">在 Buddy 中通过你的 Google 账号运行 Google 的 Antigravity CLI：免费套餐、Google AI Pro 或 Ultra 均可。</string>
+    <string name="signin_install_sub_grok">在 Buddy 中通过你的 Grok 账号（也可用 Google 或 X 登录）运行 xAI 的 Grok Build。</string>
     <!-- "Buddy's Linux" = the small Linux system Buddy installs inside the app. -->
     <string name="signin_install_size_claude">需一次性下载约 235 MB：Buddy 的 Linux，以及来自 Anthropic 的 Claude Code。建议使用 WLAN。</string>
     <string name="signin_install_size_opencode">需一次性下载约 230 MB：Buddy 的 Linux、Node.js 和 OpenCode。建议使用 WLAN。</string>
     <string name="signin_install_size_codex">需一次性下载约 150 MB：Buddy 的 Linux、Node.js，以及来自 OpenAI 的 Codex。建议使用 WLAN。</string>
     <string name="signin_install_size_agy">需一次性下载约 200 MB：Buddy 的 Linux，以及来自 Google 的 Antigravity CLI。建议使用 WLAN。</string>
+    <string name="signin_install_size_grok">需一次性下载约 170 MB：Buddy 的 Linux，以及来自 xAI 的 Grok Build。建议使用 WLAN。</string>
 
     <!-- Sign-in screen: install or update in progress (screen titles). -->
     <string name="signin_installing">正在安装</string>
@@ -731,13 +750,16 @@
     <string name="signin_title_claude">登录 Claude</string>
     <string name="signin_title_chatgpt">登录 ChatGPT</string>
     <string name="signin_title_google">登录 Google</string>
+    <string name="signin_title_grok">登录 Grok</string>
     <string name="signin_sub_claude">使用你的 Claude 账号（Pro 或 Max）。浏览器会打开，在那里授权后，Buddy 会自动返回。</string>
     <string name="signin_sub_chatgpt">使用你的 ChatGPT 账号（Plus、Pro 或 Business）。浏览器会打开，在那里授权后，Buddy 会自动返回。</string>
     <string name="signin_sub_agy">使用你的 Google 账号。浏览器会打开，在那里登录后，Buddy 会自动获取代码。Antigravity 会等待约 1 分钟。</string>
+    <string name="signin_sub_grok">使用你的 Grok 账号；也可以用 Google 或 X 登录。浏览器会带着一个代码打开，在那里确认后，Buddy 会自动返回。</string>
     <!-- Main button. -->
     <string name="signin_with_claude">使用 Claude 登录</string>
     <string name="signin_with_chatgpt">使用 ChatGPT 登录</string>
     <string name="signin_with_google">使用 Google 登录</string>
+    <string name="signin_with_grok">使用 Grok 登录</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <string name="signin_other_device">在其他设备上登录</string>
     <!-- Button (ChatGPT): sign in by entering a one-time code on another device. -->
@@ -753,6 +775,7 @@
     <string name="signin_approve_claude">在 Claude 页面上点按“Authorize”（授权）。Buddy 会自动获取代码并返回。</string>
     <string name="signin_approve_codex">登录并允许 Codex 访问，然后返回 Buddy，它会自动完成。</string>
     <string name="signin_approve_agy">登录并允许 Antigravity 访问。Buddy 会自动获取页面上显示的代码并返回。如果超过 1 分钟，请重新开始登录。</string>
+    <string name="signin_approve_grok">确认页面上显示的是 %1$s，然后确认并登录。Buddy 会自动返回。</string>
     <!-- Button. -->
     <string name="signin_open_again">重新打开登录页面</string>
     <!-- Screen title after the code was handed over. -->
@@ -768,6 +791,7 @@
     <string name="signin_enter_code">输入此代码</string>
     <string name="signin_remote_codex">在任意设备上打开下方链接，登录 ChatGPT 并输入代码。Buddy 会自动完成。</string>
     <string name="signin_remote_agy">在任意设备上打开此链接并登录，然后复制页面上显示的代码，在约 1 分钟内粘贴到下方。</string>
+    <string name="signin_remote_grok">在任意设备上打开下方链接，登录 Grok 并确认代码。Buddy 会自动完成。</string>
     <!-- Buttons and the toasts after them. -->
     <string name="signin_copy_code">复制代码</string>
     <string name="signin_code_copied">代码已复制</string>
@@ -832,9 +856,11 @@
     <!-- Agent status shown on the sign-in, setup and onboarding screens. -->
     <!-- One line under the agent's name in the agent pickers. -->
     <string name="account_tagline_claude">使用你的 Claude 套餐</string>
-    <string name="account_tagline_opencode">免费模型，或你自己的提供商</string>
+    <string name="account_tagline_opencode">无需账号，或使用你自己的提供商</string>
     <string name="account_tagline_codex">使用你的 ChatGPT 套餐</string>
     <string name="account_tagline_agy">使用你的 Google 账号</string>
+    <string name="account_tagline_grok">使用你的 Grok 账号</string>
+    <string name="agent_tag_free">免费 · 有限额</string>
     <!-- Install progress. -->
     <string name="account_setting_up_linux">正在设置 Buddy 的 Linux…</string>
     <string name="account_installing_tools">正在安装工具…</string>
@@ -872,6 +898,7 @@
     <string name="models_default_codex">由 Codex 选择；下次回复后会显示在这里</string>
     <string name="models_default_opencode">OpenCode 的默认模型</string>
     <string name="models_default_agy">Antigravity 的默认模型</string>
+    <string name="models_default_grok">Grok 的默认模型</string>
     <!-- Effort levels in a row of up to 6 segments: keep each very short (about 5 characters).
          "Auto" = the agent decides how much to think. -->
     <string name="models_effort_auto">自动</string>
@@ -917,7 +944,7 @@
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">设置</string>
-    <string name="setup_settings_subtitle">Buddy 在应用内运行 Claude Code、Codex、OpenCode 或 Antigravity，使用你自己的订阅（或 OpenCode 的免费模型和 Antigravity 的免费套餐）。</string>
+    <string name="setup_settings_subtitle">Buddy 在应用内运行 Claude Code、Codex、OpenCode、Antigravity 或 Grok，使用你自己的订阅（或 OpenCode 的免费模型和 Antigravity 的免费套餐）。</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <!-- Title of the setup checklist card (noun). -->
@@ -944,6 +971,7 @@
     <string name="setup_step_install_opencode">Buddy 会下载自带的小型 Linux 和 %1$s（含 Node.js 约 230 MB）。</string>
     <!-- %1$s = Codex. -->
     <string name="setup_step_install_codex">Buddy 会下载自带的小型 Linux 和来自 OpenAI 的 %1$s（约 150 MB）。</string>
+    <string name="setup_step_install_grok">Buddy 会下载自带的小型 Linux 和来自 xAI 的 %1$s（约 170 MB）。</string>
     <!-- Button (verb). -->
     <string name="setup_install">安装</string>
     <!-- Name of the sign-in setup step. -->
@@ -955,6 +983,7 @@
     <string name="setup_step_signin_done_email">已使用 %1$s 登录。</string>
     <string name="setup_step_signin_claude">使用你的 Claude 账号（Pro 或 Max）。浏览器会打开，在那里授权后，Buddy 会自动返回。</string>
     <string name="setup_step_signin_codex">使用你的 ChatGPT 账号。浏览器会打开，在那里授权后，Buddy 会自动返回。</string>
+    <string name="setup_step_signin_grok">使用你的 Grok 账号。浏览器会打开，在那里确认代码后，Buddy 会自动返回。</string>
     <!-- Button (verb). -->
     <string name="setup_sign_in">登录</string>
     <string name="setup_step_background_title">允许 Buddy 在后台运行</string>
@@ -1001,7 +1030,7 @@
     <!-- Which AI agent answers new chats. -->
     <string name="setup_default_brain">默认智能体</string>
     <!-- "New chat" is the name of a button in Buddy. -->
-    <string name="setup_default_brain_info">决定由谁回复从气泡或“新对话”按钮发起的新对话。Claude Code 使用你的 Claude 套餐，Codex 使用你的 ChatGPT 套餐，Antigravity 使用你的 Google 账号，OpenCode 使用其免费模型或你自己的提供商。只能选择已设置好的智能体。</string>
+    <string name="setup_default_brain_info">决定由谁回复从气泡或“新对话”按钮发起的新对话。Claude Code 使用你的 Claude 套餐，Codex 使用你的 ChatGPT 套餐，Antigravity 使用你的 Google 账号，Grok 使用你的 Grok 账号，OpenCode 使用其免费模型或你自己的提供商。只能选择已设置好的智能体。</string>
     <!-- Toast. %1$s = agent name. "New chat" is the name of a button in Buddy. -->
     <string name="setup_default_brain_set">新对话将使用 %1$s。你也可以通过“新对话”按钮为每个对话单独选择。</string>
     <!-- Toast. %1$s = agent name. -->
@@ -1123,13 +1152,14 @@
     <string name="setup_app_permissions">应用权限</string>
     <!-- "Trust" and "Hard" are names of approval modes on the App permissions screen: use the same words. Send, Pay, Delete are example buttons in other apps. -->
     <string name="setup_app_permissions_info">按应用选择：“信任”让智能体在其中直接操作、不弹窗；“严格”表示 Buddy 会在点按发送、支付、删除等按钮前亲自询问你。</string>
-    <string name="setup_dev_mode">开发者模式</string>
-    <string name="setup_dev_mode_info">气泡中的智能体可以在 ~/.buddy/work 中运行命令和编辑文件，从而能够开发和安装应用。</string>
+    <!-- Settings switch: whether new chats start with Linux tools (chat_linux_tools); each chat can change it. -->
+    <string name="setup_dev_mode">新对话中的 Linux 工具</string>
+    <string name="setup_dev_mode_info">开启 Linux 工具后，智能体可以运行命令、安装软件包，并编辑 ~/.buddy/work 中的文件，从而能够开发和安装应用。新对话会以此设置开始；每个对话都可以在标题下方单独更改。</string>
     <string name="setup_agents_tap">允许智能体点按 Buddy 的界面</string>
     <!-- "App permissions" is the name of a screen in Buddy. -->
     <string name="setup_agents_tap_info">用于借助智能体测试 Buddy（例如在 Termux 中使用带手机工具的 Claude Code）。气泡、确认卡片、“应用权限”和这些开关仍禁止智能体点按。</string>
-    <!-- Warning shown while Developer mode is on. -->
-    <string name="setup_dev_mode_warning">日常使用时请保持关闭：开启后，屏幕上的恶意消息或网页可能会诱骗智能体运行命令。发送、发布、购买和删除仍受确认卡片保护。</string>
+    <!-- Warning shown while Linux tools in new chats (setup_dev_mode) is on. -->
+    <string name="setup_dev_mode_warning">日常使用时最好保持关闭，只在需要的对话中开启 Linux 工具。开启后，屏幕上的恶意消息或网页可能会诱骗智能体运行命令。发送、发布、购买和删除仍受确认卡片保护。</string>
 
     <!-- Settings screen: footer links. -->
     <!-- Link and sheet title. -->
@@ -1170,7 +1200,7 @@
     <string name="terminal_close">关闭</string>
     <!-- Button (verb): starts a new shell. -->
     <string name="terminal_restart">重新启动</string>
-    <string name="terminal_needs_linux">请先在“设置”中安装 Claude Code、Codex、OpenCode 或 Antigravity，这会同时设置好 Buddy 的 Linux。</string>
+    <string name="terminal_needs_linux">请先在“设置”中安装 Claude Code、Codex、OpenCode、Antigravity 或 Grok，这会同时设置好 Buddy 的 Linux。</string>
     <!-- %1$s = error message. -->
     <string name="terminal_start_failed">无法启动终端：%1$s</string>
     <!-- Sheet title. %1$s = the tab's name, e.g. "shell 1". -->
@@ -1198,7 +1228,7 @@
 
     <!-- Sessions screen: every agent session running on the phone, and recent history. -->
     <string name="monitor_title">会话</string>
-    <string name="monitor_subtitle">这部手机上的所有 Claude Code、Codex、OpenCode 和 Antigravity 会话。</string>
+    <string name="monitor_subtitle">这部手机上的所有 Claude Code、Codex、OpenCode、Antigravity 和 Grok 会话。</string>
     <string name="monitor_terminal_running">有 shell 正在运行 · 点按返回</string>
     <string name="monitor_terminal_idle">Buddy 的 Linux 中的 shell</string>
     <string name="monitor_running_now">正在运行</string>
@@ -1259,7 +1289,7 @@
     <!-- Toast when the user picks a reviewer that isn't signed in. %1$s = Claude Code or Codex. -->
     <string name="perms_reviewer_sign_in">请先登录 %1$s（在“设置”中）。</string>
     <!-- Under the reviewer choice. “allow”, “ask you” and “advise against” are the reviewer's three possible answers. -->
-    <string name="perms_reviewer_about">每次点按都会开启一个不带工具的临时会话：它会查看你的请求、智能体的说明和屏幕，然后给出“允许”“询问你”或“建议不要”。每次点按约需 3 秒。OpenCode 和 Antigravity 对话由 Claude Code（或 Codex）审核。</string>
+    <string name="perms_reviewer_about">每次点按都会开启一个不带工具的临时会话：它会查看你的请求、智能体的说明和屏幕，然后给出“允许”“询问你”或“建议不要”。每次点按约需 3 秒。OpenCode、Antigravity 和 Grok 对话由 Claude Code（或 Codex）审核。</string>
     <!-- Under the reviewer's description: it also does the check before a notification rule's countdown. -->
     <string name="perms_reviewer_rules">在通知规则的倒计时发送回复之前，它也会检查这些回复。</string>
     <!-- In the reviewer's model picker, the first choice ("Default") described: for Claude Code it is Haiku. -->

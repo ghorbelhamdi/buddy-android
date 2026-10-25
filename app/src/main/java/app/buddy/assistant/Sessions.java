@@ -49,6 +49,8 @@ final class Sessions {
         String effort = "";
         /** The model the agent last reported using (for "Default"), or "" if it doesn't say. */
         String actualModel = "";
+        /** Linux tools: the agent may run commands and edit files in ~/.buddy/work (buddy-run's dev). Never on Play. */
+        boolean dev;
         long updated = System.currentTimeMillis();
         final List<Msg> messages = new ArrayList<>();
         // runtime only
@@ -74,25 +76,35 @@ final class Sessions {
         }
     }
 
+    private final Context app;
     private final SharedPreferences sp;
     final List<Session> all = new ArrayList<>(); // most recent first
     Session current;
 
     Sessions(Context c) {
+        app = c;
         sp = c.getSharedPreferences("buddy_sessions", Context.MODE_PRIVATE);
-        load();
+        boolean older = load(); // chats from before Linux tools were per chat
         if (all.isEmpty()) create(Prefs.backend(c));
         String cur = sp.getString("current", null);
         current = find(cur);
         if (current == null) current = all.get(0);
+        if (older) save(); // so they keep what Settings said now, whatever it says later
     }
 
     Session create(String backend) {
         return create(backend, true);
     }
 
+    /** New chats start with Linux tools as Settings says (Prefs.devMode). */
     Session create(String backend, boolean select) {
+        return create(backend, select, Prefs.devMode(app));
+    }
+
+    /** dev: Linux tools for this chat (a New chat sheet's switch). */
+    Session create(String backend, boolean select, boolean dev) {
         Session s = new Session(UUID.randomUUID().toString().replace("-", "").substring(0, 12), backend);
+        s.dev = dev;
         all.add(0, s);
         while (all.size() > MAX_SESSIONS) all.remove(all.size() - 1);
         if (select || current == null || !all.contains(current)) current = s;
@@ -159,14 +171,16 @@ final class Sessions {
                     msgs.put(mo);
                 }
                 arr.put(new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model).put("effort", s.effort).put("actual_model", s.actualModel)
-                        .put("updated", s.updated).put("messages", msgs));
+                        .put("dev", s.dev).put("updated", s.updated).put("messages", msgs));
             }
             sp.edit().putString("all", arr.toString()).putString("current", current == null ? null : current.id).apply();
         } catch (Exception ignored) {
         }
     }
 
-    private void load() {
+    /** Returns whether there were chats from before Linux tools were per chat. */
+    private boolean load() {
+        boolean older = false;
         try {
             JSONArray arr = new JSONArray(sp.getString("all", "[]"));
             for (int i = 0; i < arr.length(); i++) {
@@ -176,6 +190,9 @@ final class Sessions {
                 s.model = o.optString("model");
                 s.effort = o.optString("effort");
                 s.actualModel = o.optString("actual_model");
+                // a chat from before Linux tools were per chat gets what the one switch in Settings gave every chat
+                older |= !o.has("dev");
+                s.dev = !Flavor.PLAY && o.optBoolean("dev", Prefs.devMode(app));
                 s.updated = o.optLong("updated");
                 JSONArray msgs = o.optJSONArray("messages");
                 if (msgs != null) for (int j = 0; j < msgs.length(); j++) {
@@ -189,6 +206,8 @@ final class Sessions {
             }
         } catch (Exception ignored) {
             all.clear();
+            return false;
         }
+        return older;
     }
 }

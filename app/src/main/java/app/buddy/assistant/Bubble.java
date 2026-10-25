@@ -298,14 +298,25 @@ final class Bubble implements ChatHub.Listener {
         header.setCompoundDrawableTintList(android.content.res.ColorStateList.valueOf(Ui.MUTED));
         header.setCompoundDrawablePadding(dp(2));
         titles.addView(header, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        // agent · model · effort, as a chip like the chat screen's: tap to change the model or effort
+        // agent · model · effort, as a chip like the chat screen's: tap to change the model or effort. Beside it, while
+        // the chat has them, the Linux tools tag (the model chip gives way when there's no room for both, as there)
+        LinearLayout chips = new LinearLayout(svc);
+        chips.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout chip = Ui.chip(svc, "");
         subtitle = (TextView) chip.getChildAt(0);
         chip.setOnClickListener(v -> showModelPicker());
         modelChip = chip;
+        chips.addView(chip, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        LinearLayout tag = Ui.linuxChip(svc);
+        Ui.paintLinuxChip(svc, tag, true);
+        tag.setVisibility(View.GONE);
+        linuxTag = tag;
+        LinearLayout.LayoutParams ltp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        ltp.setMarginStart(dp(6));
+        chips.addView(tag, ltp);
         LinearLayout.LayoutParams chp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         chp.topMargin = dp(3);
-        titles.addView(chip, chp);
+        titles.addView(chips, chp);
         top.addView(titles, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
         top.addView(toolIcon(R.drawable.ms_add, svc.getString(R.string.bubble_new_chat), Ui.MUTED, v -> showNewChat()));
         expandIcon = toolIcon(R.drawable.ms_open_in_full, svc.getString(R.string.bubble_open_in_app), Ui.MUTED, v -> openInApp(false));
@@ -1554,7 +1565,7 @@ final class Bubble implements ChatHub.Listener {
     }
 
     private void newChat(String backend) {
-        hub.create(backend);
+        hub.create(backend, true, pickDev);
         showingList = false;
         renderCurrent();
     }
@@ -1576,6 +1587,9 @@ final class Bubble implements ChatHub.Listener {
 
     /** "+": pick the agent for a new chat, as in the app's New chat sheet. */
     private boolean picking;
+
+    /** The picker's Linux tools switch: the Settings default each time it opens. */
+    private boolean pickDev;
 
     /** The chip: pick this chat's model and effort (the next message uses them). */
     private boolean pickingModel;
@@ -1655,6 +1669,7 @@ final class Bubble implements ChatHub.Listener {
         showingList = true;
         pickingModel = false;
         picking = true;
+        pickDev = Prefs.devMode(svc);
         renderSessionList();
         showListMode();
         updateViewing();
@@ -1768,6 +1783,12 @@ final class Bubble implements ChatHub.Listener {
         TextView h = Ui.title(svc, svc.getString(R.string.bubble_new_chat), 18);
         h.setPaddingRelative(dp(8), dp(8), 0, dp(8));
         sessionList.addView(h);
+        if (!Flavor.PLAY) { // Linux tools for the new chat, as in the app's sheet
+            LinearLayout sw = Ui.switchRow(svc, svc.getString(R.string.chat_linux_tools),
+                    svc.getString(R.string.chat_linux_tools_info), pickDev, on -> pickDev = on);
+            sw.setPaddingRelative(dp(8), dp(4), dp(8), dp(12));
+            sessionList.addView(sw, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        }
         String def = Prefs.backend(svc);
         for (Account acc : Account.ALL) {
             boolean ready = SetupState.signedIn(svc, acc.agent);
@@ -1789,6 +1810,11 @@ final class Bubble implements ChatHub.Listener {
                 LinearLayout.LayoutParams tp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 tp.setMarginStart(dp(8));
                 tr.addView(tag, tp);
+            }
+            if (acc.freeTier()) {
+                LinearLayout.LayoutParams tp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                tp.setMarginStart(dp(8));
+                tr.addView(Ui.freeTag(svc), tp);
             }
             t.addView(tr);
             t.addView(Ui.text(svc, ready ? acc.tagline() : svc.getString(SetupState.installed(svc, acc.agent)
@@ -1849,9 +1875,9 @@ final class Bubble implements ChatHub.Listener {
         header.setText(pickingModel ? svc.getString(R.string.bubble_model_effort_title)
                 : picking ? svc.getString(R.string.bubble_new_chat)
                 : showingList ? svc.getString(R.string.bubble_chats_title) : ses.label());
-        String summary = Models.summary(ses);
-        subtitle.setText(Prefs.devMode(svc) ? svc.getString(R.string.bubble_summary_dev, summary) : summary);
+        subtitle.setText(Models.summary(ses));
         modelChip.setVisibility(showingList ? View.GONE : View.VISIBLE);
+        linuxTag.setVisibility(!showingList && ses.dev ? View.VISIBLE : View.GONE);
         boolean working = !showingList && (ses.running || controlling);
         strip.setVisibility(working ? View.VISIBLE : View.GONE);
         stripText.setText(!ses.status.isEmpty() ? ses.status
@@ -2561,6 +2587,8 @@ final class Bubble implements ChatHub.Listener {
 
     private TextView subtitle, stripText;
     private View modelChip;
+    /** The Linux tools tag beside the model chip, while the chat has them (switched in the app's chat screen). */
+    private View linuxTag;
     private LinearLayout strip;
 
     /** A small header icon (20dp glyph in a 36dp target), in the app's muted style. */

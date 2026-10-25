@@ -95,6 +95,13 @@ final class ChatHub {
         return s;
     }
 
+    /** A new chat from a New chat sheet, with Linux tools as its switch says (the others get the Settings default). */
+    Sessions.Session create(String backend, boolean select, boolean dev) {
+        Sessions.Session s = sessions.create(backend, select, dev);
+        changed();
+        return s;
+    }
+
     void select(Sessions.Session s) {
         sessions.select(s);
         changed();
@@ -137,8 +144,8 @@ final class ChatHub {
         // only the user's own message lifts a Stop: a queued rule run must not undo it
         if (svc != null && prompt == null) svc.allowControl();
         try {
-            // a rule's run works for someone else's message: no shell, files or web, even in developer mode
-            Helper.run(app, "ask", ses.id, ses.backend, prompt != null ? "rule" : Prefs.devMode(app) ? "1" : "0", forAgent,
+            // a rule's run works for someone else's message: no shell, files or web, even with Linux tools on
+            Helper.run(app, "ask", ses.id, ses.backend, prompt != null ? "rule" : devArg(ses), forAgent,
                     model(ses), hasFiles ? android.text.TextUtils.join(",", files) : "", ses.effort);
         } catch (Exception e) {
             return e.getMessage();
@@ -197,6 +204,23 @@ final class ChatHub {
         add(ses, Bubble.Kind.STEP, ses.effort.isEmpty() ? app.getString(R.string.hub_effort_default)
                 : app.getString(R.string.hub_effort_set, ses.effort));
         changed();
+    }
+
+    /** Turn a chat's Linux tools on or off; the next message uses them (a running one keeps what it started with). */
+    void setDev(Sessions.Session ses, boolean on) {
+        ses.dev = on && !Flavor.PLAY;
+        sessions.save();
+        changed();
+    }
+
+    /**
+     * Whether the agent behind a phone tool call has Linux tools (any thread): its chat's own, or for the user's own
+     * sessions outside Buddy's chats (no chat), the Settings default.
+     */
+    boolean devFor(String chat) {
+        if (chat == null) return Prefs.devMode(app);
+        for (Sessions.Session s : new ArrayList<>(sessions.all)) if (s.id.equals(chat)) return s.dev;
+        return false;
     }
 
     /** Stop every chat that is working (the bubble's stop button). */
@@ -375,6 +399,11 @@ final class ChatHub {
      * The model to run. OpenCode's own default free model can take over 30 seconds to answer, so without
      * connected providers Buddy uses Big Pickle, which answers in seconds.
      */
+    /** The helper's mode for a chat's run: "1" with Linux tools, "0" without, "play" where they don't exist. */
+    private static String devArg(Sessions.Session ses) {
+        return ses.dev ? "1" : Flavor.PLAY ? "play" : "0";
+    }
+
     private static String model(Sessions.Session ses) {
         if (!ses.model.isEmpty() || !"opencode".equals(ses.backend)) return ses.model;
         String plan = Account.OPENCODE.plan;
@@ -384,7 +413,7 @@ final class ChatHub {
     /** A note that arrived too late for the run: becomes the next message (already shown in the chat). */
     private void sendNoteAsMessage(Sessions.Session ses, String text) {
         try {
-            Helper.run(app, "ask", ses.id, ses.backend, Prefs.devMode(app) ? "1" : "0",
+            Helper.run(app, "ask", ses.id, ses.backend, devArg(ses),
                     "(Added while you were working:) " + text, model(ses), "", ses.effort);
         } catch (Exception e) {
             add(ses, Bubble.Kind.ERROR, e.getMessage());

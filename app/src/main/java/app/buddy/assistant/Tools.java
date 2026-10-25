@@ -32,7 +32,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-/** The phone-control tools exposed to the agents (Claude Code, Codex, OpenCode, Antigravity) over MCP. */
+/** The phone-control tools exposed to the agents (Claude Code, Codex, OpenCode, Antigravity, Grok) over MCP. */
 final class Tools {
     private static final int MAX_NODES = 350;
     /** Screenshots are scaled so their shorter side is at most this, the same in portrait and landscape. */
@@ -180,7 +180,7 @@ final class Tools {
                 props().put("text", strProp("The reply, exactly as it should be sent")), "text"));
         if (!Flavor.PLAY) { // Play updates Buddy itself and doesn't allow installing other APKs
             t.put(tool("install_apk",
-                    "(Developer mode) Open Android's installer for an APK built in Buddy's Linux, e.g. "
+                    "(Needs Linux tools) Open Android's installer for an APK built in Buddy's Linux, e.g. "
                             + "/root/.buddy/work/myapp/build/app.apk, or served by another app on this phone at a local URL "
                             + "(http://127.0.0.1:<port>/app.apk, e.g. from Termux). The user taps Install/Update themselves; "
                             + "call wait_for_install next.",
@@ -1174,7 +1174,15 @@ final class Tools {
 
     /** Copies an APK out of Buddy's Linux and opens Android's installer for it. */
     private String installApk(String path) throws Exception {
-        if (!Prefs.devMode(svc)) return "Installing apps needs developer mode. Ask the user to turn it on in Buddy's Settings.";
+        String chat = McpServer.CALLER_CHAT.get();
+        if (!ChatHub.get(svc).devFor(chat)) {
+            return chat != null ? "Installing apps needs Linux tools in this chat. Ask the user to turn them on in the "
+                    + "chat's header (the Linux tools chip under its title), wait until they say it's done, then call "
+                    + "install_apk again."
+                    : "Installing apps needs Linux tools. Ask the user to turn on 'Linux tools in new chats' in Buddy's "
+                    + "Settings (it also covers sessions outside Buddy's chats, like this one), wait until they say it's "
+                    + "done, then call install_apk again.";
+        }
         java.io.File out = FilesProvider.apkFile(svc);
         if (path != null && path.matches("http://(127\\.0\\.0\\.1|localhost):\\d+/.*")) {
             // only from this phone: another app (e.g. Termux) serving an APK it built

@@ -2,7 +2,7 @@
 <!-- Every text Buddy shows, in Indonesian (Bahasa Indonesia). English source: res/values/strings.xml. -->
 <resources>
     <string name="service_label">Asisten Buddy</string>
-    <string name="service_description">Menampilkan balon chat Buddy dan memungkinkan agen yang Anda pilih (Claude Code, Codex, OpenCode, atau Antigravity), yang berjalan di dalam Buddy di ponsel ini, membaca layar serta mengetuk, mengetik, dan menggulir untuk Anda. Tidak ada data yang keluar dari ponsel kecuali yang dikirim agen itu sendiri ke layanan AI-nya (Anthropic, OpenAI, Google, atau penyedia model OpenCode Anda).</string>
+    <string name="service_description">Menampilkan balon chat Buddy dan memungkinkan agen yang Anda pilih (Claude Code, Codex, OpenCode, Antigravity, atau Grok), yang berjalan di dalam Buddy di ponsel ini, membaca layar serta mengetuk, mengetik, dan menggulir untuk Anda. Tidak ada data yang keluar dari ponsel kecuali yang dikirim agen itu sendiri ke layanan AI-nya (Anthropic, OpenAI, Google, xAI, atau penyedia model OpenCode Anda).</string>
 
     <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
 
@@ -28,7 +28,7 @@
     <!-- Two example requests a user could type. Translate them naturally and use your language's quotation marks. -->
     <string name="onboarding_welcome_ask_text">“Balas Sari, bilang saya terlambat”, “tambahkan susu ke keranjang saya”.</string>
     <string name="onboarding_welcome_plan_title">Paket Anda sendiri, tanpa kunci API</string>
-    <string name="onboarding_welcome_plan_text">Menjalankan Claude Code dengan langganan Claude Anda. Codex dengan paket ChatGPT, Antigravity dengan akun Google, dan model gratis OpenCode juga bisa.</string>
+    <string name="onboarding_welcome_plan_text">Menjalankan Claude Code dengan langganan Claude Anda. Codex dengan paket ChatGPT, Antigravity dengan akun Google, Grok dengan akun Google atau X, dan model gratis OpenCode juga bisa.</string>
     <string name="onboarding_welcome_control_title">Anda tetap memegang kendali</string>
     <string name="onboarding_welcome_control_text">Mengirim, memposting, membeli, dan menghapus selalu meminta izin Anda dulu.</string>
     <!-- Small lowercase mono line under the list. -->
@@ -41,8 +41,9 @@
     <string name="onboarding_brain_text">Agen inilah yang menjawab chat Anda. Anda dapat menambahkan agen lain nanti di Setelan.</string>
     <string name="onboarding_brain_claude">Menggunakan langganan Claude Anda (Pro atau Max).</string>
     <string name="onboarding_brain_codex">Menggunakan paket ChatGPT Anda.</string>
-    <string name="onboarding_brain_opencode">Model gratis, tanpa perlu akun. Hubungkan penyedia Anda sendiri nanti.</string>
-    <string name="onboarding_brain_agy">Menggunakan akun Google Anda: paket gratis, Google AI Pro, atau Ultra.</string>
+    <string name="onboarding_brain_opencode">Tanpa perlu akun. Hubungkan penyedia Anda sendiri nanti.</string>
+    <string name="onboarding_brain_agy">Menggunakan akun Google Anda, juga dengan Google AI Pro atau Ultra.</string>
+    <string name="onboarding_brain_grok">Menggunakan akun Grok Anda (login dengan Google atau X).</string>
     <!-- The option that installs both Claude Code and Codex. -->
     <string name="onboarding_brain_both">Instal keduanya; pilih per chat. Claude Code tetap menjadi default.</string>
     <!-- Small lowercase tag next to "Claude Code". Keep very short. -->
@@ -97,15 +98,18 @@
     <string name="onboarding_agent_checking_opencode">Memeriksa OpenCode…</string>
     <string name="onboarding_agent_sign_in_codex">Login dengan akun ChatGPT Anda di browser, lalu kembali ke sini.</string>
     <string name="onboarding_agent_sign_in_agy">Login dengan akun Google Anda. Browser akan terbuka; login di sana dan Buddy akan mengambil kodenya dengan sendirinya.</string>
+    <string name="onboarding_agent_sign_in_grok">Login dengan akun Grok Anda. Browser akan terbuka; konfirmasi kodenya di sana dan Buddy akan kembali dengan sendirinya.</string>
     <!-- "Buddy's Linux" = the small Linux system built into Buddy. -->
     <string name="onboarding_agent_download_claude">Mendownload sekitar 235 MB, cukup sekali (Linux Buddy dan Claude Code dari Anthropic).</string>
     <string name="onboarding_agent_download_opencode">Mendownload sekitar 230 MB, cukup sekali (Linux Buddy, Node.js, dan OpenCode). Tidak perlu akun.</string>
     <string name="onboarding_agent_download_codex">Mendownload sekitar 150 MB, cukup sekali (Linux Buddy, Node.js, dan Codex dari OpenAI).</string>
     <string name="onboarding_agent_download_agy">Mendownload sekitar 200 MB, cukup sekali (Linux Buddy dan Antigravity CLI dari Google).</string>
+    <string name="onboarding_agent_download_grok">Mendownload sekitar 170 MB, cukup sekali (Linux Buddy dan Grok Build dari xAI).</string>
     <!-- Buttons on the agent card. -->
     <string name="onboarding_sign_in_claude">Login dengan Claude</string>
     <string name="onboarding_sign_in_chatgpt">Login dengan ChatGPT</string>
     <string name="onboarding_sign_in_google">Login dengan Google</string>
+    <string name="onboarding_sign_in_grok">Login dengan Grok</string>
     <!-- %1$s = the agent's name (Claude Code, Codex or OpenCode). -->
     <string name="onboarding_install_agent">Instal %1$s</string>
     <string name="onboarding_agents_wifi">Gunakan Wi-Fi jika bisa. Anda dapat meninggalkan layar ini selama proses instal.</string>
@@ -165,7 +169,7 @@
     <string name="main_section_recent">Terbaru</string>
     <string name="main_empty_title">Belum ada chat</string>
     <!-- "New chat" = the button (main_new_chat). -->
-    <string name="main_empty_text">Ketuk Chat baru untuk memulai chat dengan Claude Code, Codex, OpenCode, atau Antigravity. Tekan lama chat untuk menghapusnya.</string>
+    <string name="main_empty_text">Ketuk Chat baru untuk memulai chat dengan Claude Code, Codex, OpenCode, Antigravity, atau Grok. Tekan lama chat untuk menghapusnya.</string>
     <!-- Status of a chat with a running task, until the agent reports what it's doing. Small lowercase mono text. -->
     <string name="main_chat_working">bekerja…</string>
     <!-- Preview of a chat's last message when the user wrote it. %1$s = the message. -->
@@ -336,8 +340,6 @@
     <string name="bubble_chats_title">Chat</string>
     <!-- Panel title while picking this chat's model and effort (how hard the agent thinks). -->
     <string name="bubble_model_effort_title">Model &amp; upaya</string>
-    <!-- Under the title. %1$s: the agent · model · effort summary; "dev" marks that developer mode is on. -->
-    <string name="bubble_summary_dev">%1$s · dev</string>
 
     <!-- Strip at the top of the chat panel while the agent works. -->
     <string name="bubble_working">Sedang bekerja…</string>
@@ -437,9 +439,24 @@
     <string name="chat_read_aloud">Bacakan balasan</string>
     <string name="chat_read_aloud_on">Balasan akan dibacakan</string>
     <string name="chat_read_aloud_off">Balasan tidak akan dibacakan</string>
-    <!-- Model chip under the chat title when developer mode is on. %1$s = agent · model · effort.
-         "dev" = developer mode. Keep very short. -->
-    <string name="chat_chip_dev">%1$s · dev</string>
+
+    <!-- Chat screen: Linux tools, the chip beside the model chip (also in the bubble's panel and the New chat sheets) -->
+    <!-- A chat's own switch that lets its agent work in Buddy's Linux: run commands, install packages, edit files,
+         build and install apps. The name on the small chip under the chat's title, and of the switch in the New chat
+         sheets. Keep short. -->
+    <string name="chat_linux_tools">Alat Linux</string>
+    <!-- Under the Linux tools switch in the New chat sheets. "Buddy's Linux" = the Linux system inside the app. -->
+    <string name="chat_linux_tools_info">Perintah, file, dan build aplikasi di Linux Buddy</string>
+    <!-- Title of the sheet that opens when the user turns Linux tools on in a chat. -->
+    <string name="chat_linux_tools_title">Aktifkan alat Linux?</string>
+    <!-- ~/.buddy/work is a folder: keep it as is. -->
+    <string name="chat_linux_tools_what">Agen lalu dapat menjalankan perintah, menginstal paket, dan mengedit file di ~/.buddy/work, sehingga bisa membuat dan menginstal aplikasi.</string>
+    <!-- When the change applies: a task already running goes on as it was. -->
+    <string name="chat_linux_tools_when">Hanya di chat ini, mulai dari pesan Anda berikutnya.</string>
+    <!-- "it" = the agent. -->
+    <string name="chat_linux_tools_risk">Pesan atau halaman web berbahaya di layar bisa mencoba menipu agen agar menjalankan perintah. Kartu persetujuan tetap menjaga pengiriman, posting, pembelian, dan penghapusan.</string>
+    <!-- Button, verb: turns Linux tools on for this chat. Keep short. -->
+    <string name="chat_linux_tools_turn_on">Aktifkan</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <!-- Button, verb: stops the agent's task. Keep short. -->
@@ -460,8 +477,8 @@
     <string name="chat_send">Kirim</string>
     <!-- Shown in a chat with no messages yet. %1$s = agent name (Claude Code, Codex, OpenCode). -->
     <string name="chat_empty_hint">Chat %1$s baru. Minta agen melakukan sesuatu di ponsel Anda.</string>
-    <!-- Same, when developer mode is on. %1$s = agent name. -->
-    <string name="chat_empty_hint_dev">Chat %1$s baru. Minta agen melakukan sesuatu di ponsel Anda, atau membuat aplikasi (mode developer aktif).</string>
+    <!-- Same, when the chat has Linux tools on. %1$s = agent name. -->
+    <string name="chat_empty_hint_dev">Chat %1$s baru dengan alat Linux. Minta agen melakukan sesuatu di ponsel Anda, atau membuat aplikasi.</string>
 
     <!-- Model sheet (tap the model chip under the chat title) -->
     <!-- %1$s = agent name, e.g. "Claude Code model". -->
@@ -651,7 +668,7 @@
     <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
     <string name="ui_a11y_title">Cara Buddy menggunakan aksesibilitas</string>
     <string name="ui_a11y_what">Buddy menggunakan layanan aksesibilitas Android untuk melakukan apa yang Anda minta di aplikasi lain: Buddy membaca isi layar serta mengetuk, mengetik, dan menggulir untuk Anda. Buddy juga menampilkan balon mengambang.</string>
-    <string name="ui_a11y_data">Selama tugas berjalan, konten layar, yang dapat berisi informasi pribadi seperti pesan, nama, atau alamat, dikirim ke layanan AI dari agen yang Anda pilih (Anthropic untuk Claude Code, OpenAI untuk Codex, Google untuk Antigravity, atau penyedia model OpenCode Anda), hanya untuk menjalankan permintaan Anda.</string>
+    <string name="ui_a11y_data">Selama tugas berjalan, konten layar, yang dapat berisi informasi pribadi seperti pesan, nama, atau alamat, dikirim ke layanan AI dari agen yang Anda pilih (Anthropic untuk Claude Code, OpenAI untuk Codex, Google untuk Antigravity, xAI untuk Grok, atau penyedia model OpenCode Anda), hanya untuk menjalankan permintaan Anda.</string>
     <string name="ui_a11y_no_servers">Buddy tidak memiliki server sendiri. Buddy tidak mengumpulkan, menjual, atau membagikan data ini, dan tidak menggunakannya untuk iklan.</string>
     <string name="ui_a11y_asks">Sebelum melakukan apa pun yang mengirim, memposting, membeli, atau menghapus, Buddy meminta persetujuan Anda. Anda dapat menonaktifkan layanan ini kapan saja di setelan aksesibilitas Android.</string>
     <string name="ui_privacy_policy">Kebijakan privasi</string>
@@ -716,11 +733,13 @@
     <string name="signin_install_sub_opencode">Menjalankan OpenCode di dalam Buddy. Model gratisnya langsung bisa dipakai, tanpa perlu akun; hubungkan penyedia Anda sendiri (Anthropic, OpenAI, GitHub Copilot…) kapan saja.</string>
     <string name="signin_install_sub_codex">Menjalankan Codex di dalam Buddy dengan paket ChatGPT Anda.</string>
     <string name="signin_install_sub_agy">Menjalankan Antigravity CLI dari Google di dalam Buddy dengan akun Google Anda: paket gratis, Google AI Pro, atau Ultra.</string>
+    <string name="signin_install_sub_grok">Menjalankan Grok Build dari xAI di dalam Buddy dengan akun Grok Anda (bisa login dengan Google atau X).</string>
     <!-- "Buddy's Linux" = the small Linux system Buddy installs inside the app. -->
     <string name="signin_install_size_claude">Mendownload sekitar 235 MB, cukup sekali: Linux Buddy dan Claude Code dari Anthropic. Gunakan Wi-Fi jika bisa.</string>
     <string name="signin_install_size_opencode">Mendownload sekitar 230 MB, cukup sekali: Linux Buddy, Node.js, dan OpenCode. Gunakan Wi-Fi jika bisa.</string>
     <string name="signin_install_size_codex">Mendownload sekitar 150 MB, cukup sekali: Linux Buddy, Node.js, dan Codex dari OpenAI. Gunakan Wi-Fi jika bisa.</string>
     <string name="signin_install_size_agy">Mendownload sekitar 200 MB, cukup sekali: Linux Buddy dan Antigravity CLI dari Google. Gunakan Wi-Fi jika bisa.</string>
+    <string name="signin_install_size_grok">Mendownload sekitar 170 MB, cukup sekali: Linux Buddy dan Grok Build dari xAI. Gunakan Wi-Fi jika bisa.</string>
 
     <!-- Sign-in screen: install or update in progress (screen titles). -->
     <string name="signin_installing">Menginstal</string>
@@ -731,13 +750,16 @@
     <string name="signin_title_claude">Login ke Claude</string>
     <string name="signin_title_chatgpt">Login ke ChatGPT</string>
     <string name="signin_title_google">Login ke Google</string>
+    <string name="signin_title_grok">Login ke Grok</string>
     <string name="signin_sub_claude">Gunakan akun Claude Anda (Pro atau Max). Browser akan terbuka; setujui di sana dan Buddy akan kembali dengan sendirinya.</string>
     <string name="signin_sub_chatgpt">Gunakan akun ChatGPT Anda (Plus, Pro, atau Business). Browser akan terbuka; setujui di sana dan Buddy akan kembali dengan sendirinya.</string>
     <string name="signin_sub_agy">Gunakan akun Google Anda. Browser akan terbuka; login di sana dan Buddy akan mengambil kodenya dengan sendirinya. Antigravity menunggu sekitar satu menit.</string>
+    <string name="signin_sub_grok">Gunakan akun Grok Anda; login dengan Google atau X juga bisa. Browser akan terbuka dengan sebuah kode; konfirmasi di sana dan Buddy akan kembali dengan sendirinya.</string>
     <!-- Main button. -->
     <string name="signin_with_claude">Login dengan Claude</string>
     <string name="signin_with_chatgpt">Login dengan ChatGPT</string>
     <string name="signin_with_google">Login dengan Google</string>
+    <string name="signin_with_grok">Login dengan Grok</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <string name="signin_other_device">Login di perangkat lain</string>
     <!-- Button (ChatGPT): sign in by entering a one-time code on another device. -->
@@ -753,6 +775,7 @@
     <string name="signin_approve_claude">Ketuk Authorize di halaman Claude. Buddy akan mengambil kodenya dan kembali dengan sendirinya.</string>
     <string name="signin_approve_codex">Login dan izinkan Codex. Lalu kembali ke Buddy; prosesnya selesai dengan sendirinya.</string>
     <string name="signin_approve_agy">Login dan izinkan Antigravity. Buddy akan mengambil kode yang muncul di halaman dan kembali dengan sendirinya. Jika prosesnya lebih dari satu menit, mulai ulang login.</string>
+    <string name="signin_approve_grok">Pastikan halaman menampilkan %1$s, lalu konfirmasi dan login. Buddy akan kembali dengan sendirinya.</string>
     <!-- Button. -->
     <string name="signin_open_again">Buka lagi halaman login</string>
     <!-- Screen title after the code was handed over. -->
@@ -768,6 +791,7 @@
     <string name="signin_enter_code">Masukkan kode ini</string>
     <string name="signin_remote_codex">Di perangkat mana pun, buka link di bawah, login ke ChatGPT, dan masukkan kodenya. Buddy akan menyelesaikannya dengan sendirinya.</string>
     <string name="signin_remote_agy">Buka link ini di perangkat mana pun dan login. Lalu salin kode yang muncul di halaman tersebut dan tempel di bawah, dalam waktu sekitar satu menit.</string>
+    <string name="signin_remote_grok">Di perangkat mana pun, buka link di bawah, login ke Grok, dan konfirmasi kodenya. Buddy akan menyelesaikannya dengan sendirinya.</string>
     <!-- Buttons and the toasts after them. -->
     <string name="signin_copy_code">Salin kode</string>
     <string name="signin_code_copied">Kode disalin</string>
@@ -832,9 +856,11 @@
     <!-- Agent status shown on the sign-in, setup and onboarding screens. -->
     <!-- One line under the agent's name in the agent pickers. -->
     <string name="account_tagline_claude">Menggunakan paket Claude Anda</string>
-    <string name="account_tagline_opencode">Model gratis, atau penyedia Anda sendiri</string>
+    <string name="account_tagline_opencode">Tanpa akun, atau dengan penyedia Anda sendiri</string>
     <string name="account_tagline_codex">Menggunakan paket ChatGPT Anda</string>
     <string name="account_tagline_agy">Menggunakan akun Google Anda</string>
+    <string name="account_tagline_grok">Menggunakan akun Grok Anda</string>
+    <string name="agent_tag_free">gratis · terbatas</string>
     <!-- Install progress. -->
     <string name="account_setting_up_linux">Menyiapkan Linux Buddy…</string>
     <string name="account_installing_tools">Menginstal alat…</string>
@@ -872,6 +898,7 @@
     <string name="models_default_codex">Codex yang memilihnya; ditampilkan di sini setelah balasan berikutnya</string>
     <string name="models_default_opencode">Model default OpenCode</string>
     <string name="models_default_agy">Model default Antigravity</string>
+    <string name="models_default_grok">Model default Grok</string>
     <!-- Effort levels in a row of up to 6 segments: keep each very short (about 5 characters).
          "Auto" = the agent decides how much to think. -->
     <string name="models_effort_auto">Auto</string>
@@ -917,7 +944,7 @@
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">Setelan</string>
-    <string name="setup_settings_subtitle">Buddy menjalankan Claude Code, Codex, OpenCode, atau Antigravity di dalam aplikasi, dengan langganan Anda sendiri (atau model gratis OpenCode dan paket gratis Antigravity).</string>
+    <string name="setup_settings_subtitle">Buddy menjalankan Claude Code, Codex, OpenCode, Antigravity, atau Grok di dalam aplikasi, dengan langganan Anda sendiri (atau model gratis OpenCode dan paket gratis Antigravity).</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <!-- Title of the setup checklist card (noun). -->
@@ -944,6 +971,7 @@
     <string name="setup_step_install_opencode">Buddy mendownload Linux kecil miliknya sendiri dan %1$s (sekitar 230 MB dengan Node.js).</string>
     <!-- %1$s = Codex. -->
     <string name="setup_step_install_codex">Buddy mendownload Linux kecil miliknya sendiri dan %1$s dari OpenAI (sekitar 150 MB).</string>
+    <string name="setup_step_install_grok">Buddy mendownload Linux kecil miliknya sendiri dan %1$s dari xAI (sekitar 170 MB).</string>
     <!-- Button (verb). -->
     <string name="setup_install">Instal</string>
     <!-- Name of the sign-in setup step. -->
@@ -955,6 +983,7 @@
     <string name="setup_step_signin_done_email">Login sebagai %1$s.</string>
     <string name="setup_step_signin_claude">Dengan akun Claude Anda (Pro atau Max). Browser akan terbuka; setujui di sana dan Buddy akan kembali dengan sendirinya.</string>
     <string name="setup_step_signin_codex">Dengan akun ChatGPT Anda. Browser akan terbuka; setujui di sana dan Buddy akan kembali dengan sendirinya.</string>
+    <string name="setup_step_signin_grok">Dengan akun Grok Anda. Browser akan terbuka; konfirmasi kodenya di sana dan Buddy akan kembali dengan sendirinya.</string>
     <!-- Button (verb). -->
     <string name="setup_sign_in">Login</string>
     <string name="setup_step_background_title">Izinkan Buddy berjalan di latar belakang</string>
@@ -1001,7 +1030,7 @@
     <!-- Which AI agent answers new chats. -->
     <string name="setup_default_brain">Agen default</string>
     <!-- "New chat" is the name of a button in Buddy. -->
-    <string name="setup_default_brain_info">Agen yang menjawab chat baru dari balon atau tombol Chat baru. Claude Code memakai paket Claude Anda, Codex memakai paket ChatGPT Anda, Antigravity memakai akun Google Anda, OpenCode memakai model gratisnya atau penyedia Anda sendiri. Hanya agen yang sudah disiapkan yang bisa dipilih.</string>
+    <string name="setup_default_brain_info">Agen yang menjawab chat baru dari balon atau tombol Chat baru. Claude Code memakai paket Claude Anda, Codex memakai paket ChatGPT Anda, Antigravity memakai akun Google Anda, Grok memakai akun Grok Anda, OpenCode memakai model gratisnya atau penyedia Anda sendiri. Hanya agen yang sudah disiapkan yang bisa dipilih.</string>
     <!-- Toast. %1$s = agent name. "New chat" is the name of a button in Buddy. -->
     <string name="setup_default_brain_set">Chat baru akan menggunakan %1$s. Anda dapat memilih per chat dengan tombol Chat baru.</string>
     <!-- Toast. %1$s = agent name. -->
@@ -1123,13 +1152,14 @@
     <string name="setup_app_permissions">Izin aplikasi</string>
     <!-- "Trust" and "Hard" are names of approval modes on the App permissions screen: use the same words. Send, Pay, Delete are example buttons in other apps. -->
     <string name="setup_app_permissions_info">Pilih per aplikasi: Percaya membiarkan agen bekerja di sana tanpa pop-up; Ketat berarti Buddy sendiri yang bertanya kepada Anda sebelum Kirim, Bayar, Hapus…</string>
-    <string name="setup_dev_mode">Mode developer</string>
-    <string name="setup_dev_mode_info">Agen di balon dapat menjalankan perintah dan mengedit file di ~/.buddy/work, sehingga bisa membuat dan menginstal aplikasi.</string>
+    <!-- Settings switch: whether new chats start with Linux tools (chat_linux_tools); each chat can change it. -->
+    <string name="setup_dev_mode">Alat Linux di chat baru</string>
+    <string name="setup_dev_mode_info">Dengan alat Linux, agen dapat menjalankan perintah, menginstal paket, dan mengedit file di ~/.buddy/work, sehingga bisa membuat dan menginstal aplikasi. Chat baru dimulai dengan setelan ini; setiap chat bisa mengubahnya di bawah judulnya.</string>
     <string name="setup_agents_tap">Izinkan agen mengetuk layar Buddy</string>
     <!-- "App permissions" is the name of a screen in Buddy. -->
     <string name="setup_agents_tap_info">Untuk menguji Buddy dengan agen (misalnya Claude Code di Termux dengan alat ponsel). Balon, kartu persetujuan, Izin aplikasi, dan tombol-tombol ini tetap tidak bisa diketuk agen.</string>
-    <!-- Warning shown while Developer mode is on. -->
-    <string name="setup_dev_mode_warning">Biarkan nonaktif untuk penggunaan sehari-hari: saat aktif, pesan atau halaman web berbahaya di layar bisa mencoba menipu agen agar menjalankan perintah. Kartu persetujuan tetap menjaga pengiriman, posting, pembelian, dan penghapusan.</string>
+    <!-- Warning shown while Linux tools in new chats (setup_dev_mode) is on. -->
+    <string name="setup_dev_mode_warning">Sebaiknya biarkan nonaktif dan aktifkan alat Linux hanya di chat yang membutuhkannya. Saat aktif, pesan atau halaman web berbahaya di layar bisa mencoba menipu agen agar menjalankan perintah. Kartu persetujuan tetap menjaga pengiriman, posting, pembelian, dan penghapusan.</string>
 
     <!-- Settings screen: footer links. -->
     <!-- Link and sheet title. -->
@@ -1170,7 +1200,7 @@
     <string name="terminal_close">Tutup</string>
     <!-- Button (verb): starts a new shell. -->
     <string name="terminal_restart">Mulai ulang</string>
-    <string name="terminal_needs_linux">Instal Claude Code, Codex, OpenCode, atau Antigravity di Setelan terlebih dahulu: langkah itu akan menyiapkan Linux Buddy.</string>
+    <string name="terminal_needs_linux">Instal Claude Code, Codex, OpenCode, Antigravity, atau Grok di Setelan terlebih dahulu: langkah itu akan menyiapkan Linux Buddy.</string>
     <!-- %1$s = error message. -->
     <string name="terminal_start_failed">Tidak dapat memulai terminal: %1$s</string>
     <!-- Sheet title. %1$s = the tab's name, e.g. "shell 1". -->
@@ -1198,7 +1228,7 @@
 
     <!-- Sessions screen: every agent session running on the phone, and recent history. -->
     <string name="monitor_title">Sesi</string>
-    <string name="monitor_subtitle">Semua sesi Claude Code, Codex, OpenCode, dan Antigravity di ponsel ini.</string>
+    <string name="monitor_subtitle">Semua sesi Claude Code, Codex, OpenCode, Antigravity, dan Grok di ponsel ini.</string>
     <string name="monitor_terminal_running">Shell sedang berjalan · ketuk untuk kembali</string>
     <string name="monitor_terminal_idle">Shell di Linux Buddy</string>
     <string name="monitor_running_now">Sedang berjalan</string>
@@ -1259,7 +1289,7 @@
     <!-- Toast when the user picks a reviewer that isn't signed in. %1$s = Claude Code or Codex. -->
     <string name="perms_reviewer_sign_in">Login ke %1$s terlebih dahulu (Setelan).</string>
     <!-- Under the reviewer choice. “allow”, “ask you” and “advise against” are the reviewer's three possible answers. -->
-    <string name="perms_reviewer_about">Sesi sementara untuk setiap ketukan, tanpa alat: peninjau melihat permintaan Anda, catatan agen, dan layar, lalu menjawab “izinkan”, “tanya Anda”, atau “tidak disarankan”. Sekitar 3 detik per ketukan. Chat OpenCode dan Antigravity ditinjau oleh Claude Code (atau Codex).</string>
+    <string name="perms_reviewer_about">Sesi sementara untuk setiap ketukan, tanpa alat: peninjau melihat permintaan Anda, catatan agen, dan layar, lalu menjawab “izinkan”, “tanya Anda”, atau “tidak disarankan”. Sekitar 3 detik per ketukan. Chat OpenCode, Antigravity, dan Grok ditinjau oleh Claude Code (atau Codex).</string>
     <!-- Under the reviewer's description: it also does the check before a notification rule's countdown. -->
     <string name="perms_reviewer_rules">Peninjau juga memeriksa balasan sebelum hitung mundur aturan notifikasi mengirimnya.</string>
     <!-- In the reviewer's model picker, the first choice ("Default") described: for Claude Code it is Haiku. -->

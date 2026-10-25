@@ -13,11 +13,11 @@
 
 # Buddy
 
-**A floating chat bubble that lets Claude Code, Codex, OpenCode or Antigravity use your Android phone.**
+**A floating chat bubble that lets Claude Code, Codex, OpenCode, Antigravity or Grok use your Android phone.**
 
 Type or say what you want, like "reply to Sam that I'm running late" or "add a Switch 2 to my Amazon cart". Buddy reads the screen, taps and types to get it done, and asks you before anything is sent, posted, bought or deleted.
 
-It runs inside the app, on your own plan: [Claude Code](https://docs.claude.com/en/docs/claude-code) with your Claude plan, Codex with your ChatGPT plan, Google's [Antigravity CLI](https://antigravity.google) with your Google account, or [OpenCode](https://opencode.ai) with its free models and no account at all. No PC, no adb, no root, no API key.
+It runs inside the app, on your own plan: [Claude Code](https://docs.claude.com/en/docs/claude-code) with your Claude plan, Codex with your ChatGPT plan, Google's [Antigravity CLI](https://antigravity.google) with your Google account, xAI's [Grok Build](https://x.ai/cli) with your Google or X account, or [OpenCode](https://opencode.ai) with its free models and no account at all. No PC, no adb, no root, no API key.
 
 <p align="center"><a href="#setup"><b>Get it on Google Play</b></a> (closed testing) · <a href="https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk"><b>Download the APK</b></a> · <a href="https://ghorbelhamdi.github.io/buddy-android/">Website</a> · Android 11+, 64-bit</p>
 
@@ -46,15 +46,15 @@ https://github.com/user-attachments/assets/d07936fc-4788-4ab5-a105-31b3e9aeba4f
 | **Acts on notifications** | "When a customer asks on WhatsApp, reply with our opening hours", with your OK or a countdown you can stop. |
 | **Voice** | Talk to it and have replies read aloud. |
 | **Background browser** | Web pages in a browser inside Buddy, without taking over your screen, even while the phone is locked. Watch and use it live in the chat; it marks what you need to do (sign in, a captcha) and never types your passwords. GitHub version. |
-| **Builds apps** | In developer mode, "make me a calculator app" builds and installs a real APK on the phone. |
-| **Phone tools anywhere** | The same tools as a local MCP server for your own Claude Code, Codex, OpenCode or Antigravity sessions, or over stdio with [mcp-bridge](mcp-bridge) for clients that start servers as commands. |
+| **Builds apps** | Turn on Linux tools in a chat and "make me a calculator app" builds and installs a real APK on the phone. GitHub version. |
+| **Phone tools anywhere** | The same tools as a local MCP server for your own Claude Code, Codex, OpenCode, Antigravity or Grok sessions, or over stdio with [mcp-bridge](mcp-bridge) for clients that start servers as commands. |
 
-> **Status: 2.2, early.** It works well day to day but has rough edges. Tested most on a OnePlus 12 (Android 16). Buddy is an independent project, not made by or affiliated with Anthropic, OpenAI or Google.
+> **Status: 2.2, early.** It works well day to day but has rough edges. Tested most on a OnePlus 12 (Android 16). Buddy is an independent project, not made by or affiliated with Anthropic, OpenAI, Google or xAI.
 
 ## How it works
 
 ```
-Buddy app / bubble ──► Buddy's Linux (Alpine via proot): claude, codex, opencode or agy
+Buddy app / bubble ──► Buddy's Linux (Alpine via proot): claude, codex, opencode, agy or grok
         ▲                                                     │
         └──────────── streamed replies ◄──────────────────────┤
                                                               ▼
@@ -65,11 +65,11 @@ Buddy is a normal Android app with an accessibility service, the kind of permiss
 
 ## Setup
 
-You need a 64-bit Android 11+ phone, plus a Claude, ChatGPT or Google account for those agents. OpenCode's free models need no account.
+You need a 64-bit Android 11+ phone, plus a Claude, ChatGPT or Google account for those agents (Grok: a Google or X account). OpenCode's free models need no account.
 
 1. **Install Buddy.**
    - **Google Play (recommended):** join the [tester group](https://groups.google.com/g/buddy-testers), [opt in](https://play.google.com/apps/testing/app.buddy.assistant), then install Buddy from Google Play. Every tester helps it get to production.
-   - **APK:** [download buddy.apk](https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk) and open it. This version also has developer mode and self-updates.
+   - **APK:** [download buddy.apk](https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk) and open it. This version also has Linux tools (commands, files and app builds, per chat) and self-updates.
 2. **Follow the setup guide** that opens on first launch: pick your agent, turn on the accessibility service, install and sign in, and try a first task.
 
 **Install blocked or "Restricted setting"?** See [Setup in detail](docs/GUIDE.md#setup-in-detail).
@@ -86,13 +86,13 @@ An accessibility service is powerful, so please read this.
 - **Buddy enforces the approvals, not the agent.** Messaging, shopping and money apps start on a hard limit: Buddy itself stops on buttons like Send, Pay and Delete until you OK them.
 - **Prompt injection is the main risk.** A message or web page could try to give the agent orders. On-screen text is treated as content, and the approval card is the backstop, so read it.
 - **No passwords.** Buddy never types passwords, codes or payment details; it hands those to you.
-- **What leaves the phone:** only what the agent sends to its provider (Anthropic, OpenAI, Google, OpenCode's service or the provider you connected) to answer you.
+- **What leaves the phone:** only what the agent sends to its provider (Anthropic, OpenAI, Google, xAI, OpenCode's service or the provider you connected) to answer you.
 
 More in [Security in detail](docs/GUIDE.md#security-in-detail). Found a problem? Please open a private security advisory instead of a public issue.
 
 ## FAQ
 
-**What does it cost?** Buddy is free. The agent uses your plan's limits, or nothing at all with Antigravity's free plan or OpenCode's free models.
+**What does it cost?** Buddy is free. The agent uses your plan's limits, or nothing at all with OpenCode's free models (no account) or Antigravity's free plan (Google account).
 
 **iPhone?** No. iOS doesn't let apps operate other apps.
 
@@ -102,7 +102,7 @@ More in [Security in detail](docs/GUIDE.md#security-in-detail). Found a problem?
 
 ## Learn more
 
-- [User guide](docs/GUIDE.md): chats, models, voice, notification rules, the bubble, Remote Control, SSH and developer mode
+- [User guide](docs/GUIDE.md): chats, models, voice, notification rules, the bubble, Remote Control, SSH and Linux tools
 - [Benchmark](benchmark/README.md): which model uses a phone best
 - [Privacy policy](docs/PRIVACY.md)
 

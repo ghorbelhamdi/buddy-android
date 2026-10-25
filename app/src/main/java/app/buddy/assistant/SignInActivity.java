@@ -19,8 +19,8 @@ import android.widget.Toast;
 import static app.buddy.assistant.Ui.*;
 
 /**
- * Install an agent (Claude Code, Codex, OpenCode or Antigravity) in Buddy's built-in Linux and sign in: one button,
- * approve in the browser, done. OpenCode needs no sign-in; its providers are connected in Buddy's terminal.
+ * Install an agent (Claude Code, Codex, OpenCode, Antigravity or Grok) in Buddy's built-in Linux and sign in: one
+ * button, approve in the browser, done. OpenCode needs no sign-in; its providers are connected in Buddy's terminal.
  */
 public class SignInActivity extends Screen implements Account.Listener {
     private LinearLayout body, bottom;
@@ -104,10 +104,12 @@ public class SignInActivity extends Screen implements Account.Listener {
                         ? R.string.signin_install_sub_claude
                         : acc.opencode() ? R.string.signin_install_sub_opencode
                         : acc.agy() ? R.string.signin_install_sub_agy
+                        : acc.grok() ? R.string.signin_install_sub_grok
                         : R.string.signin_install_sub_codex), false);
                 note(getString(acc.claude() ? R.string.signin_install_size_claude
                         : acc.opencode() ? R.string.signin_install_size_opencode
                         : acc.agy() ? R.string.signin_install_size_agy
+                        : acc.grok() ? R.string.signin_install_size_grok
                         : R.string.signin_install_size_codex));
                 primary(getString(R.string.signin_install, acc.name()), v -> acc.install(this));
                 break;
@@ -123,12 +125,13 @@ public class SignInActivity extends Screen implements Account.Listener {
                     break;
                 }
                 header(R.drawable.ms_shield_person, getString(acc.claude() ? R.string.signin_title_claude
-                                : acc.agy() ? R.string.signin_title_google : R.string.signin_title_chatgpt),
+                                : acc.agy() ? R.string.signin_title_google : acc.grok() ? R.string.signin_title_grok
+                                : R.string.signin_title_chatgpt),
                         getString(acc.claude() ? R.string.signin_sub_claude : acc.agy() ? R.string.signin_sub_agy
-                                : R.string.signin_sub_chatgpt), false);
+                                : acc.grok() ? R.string.signin_sub_grok : R.string.signin_sub_chatgpt), false);
                 primary(getString(acc.claude() ? R.string.signin_with_claude : acc.agy() ? R.string.signin_with_google
-                        : R.string.signin_with_chatgpt), v -> acc.startLogin(this));
-                secondary(getString(acc.pastesCode() ? R.string.signin_other_device : R.string.signin_with_code), v -> {
+                        : acc.grok() ? R.string.signin_with_grok : R.string.signin_with_chatgpt), v -> acc.startLogin(this));
+                secondary(getString(acc.pastesCode() || acc.grok() ? R.string.signin_other_device : R.string.signin_with_code), v -> {
                     pasteOpen = true;
                     acc.startLogin(this, true);
                 });
@@ -144,7 +147,8 @@ public class SignInActivity extends Screen implements Account.Listener {
                     break;
                 }
                 openBrowserOnce();
-                header(R.drawable.ms_shield_person, getString(R.string.signin_approve_title), getString(acc.claude()
+                header(R.drawable.ms_shield_person, getString(R.string.signin_approve_title), acc.grok()
+                        ? getString(R.string.signin_approve_grok, acc.userCode == null ? "…" : acc.userCode) : getString(acc.claude()
                         ? R.string.signin_approve_claude : acc.agy() ? R.string.signin_approve_agy : R.string.signin_approve_codex), false);
                 primary(getString(R.string.signin_open_again), v -> {
                     openedUrl = null;
@@ -209,15 +213,15 @@ public class SignInActivity extends Screen implements Account.Listener {
                 v -> acc.update(this));
     }
 
-    /** Sign in on another device: show the link (and Codex's code) to use anywhere; nothing opens here. */
+    /** Sign in on another device: show the link (and Codex's or Grok's code) to use anywhere; nothing opens here. */
     private void remoteSignIn() {
         final String link = acc.url;
         if (acc.pastesCode()) {
             header(R.drawable.ms_shield_person, getString(R.string.signin_other_device),
                     getString(acc.agy() ? R.string.signin_remote_agy : R.string.signin_remote_claude), false);
         } else {
-            header(R.drawable.ms_shield_person, getString(R.string.signin_enter_code),
-                    getString(R.string.signin_remote_codex), false);
+            header(R.drawable.ms_shield_person, getString(acc.grok() ? R.string.signin_other_device : R.string.signin_enter_code),
+                    getString(acc.grok() ? R.string.signin_remote_grok : R.string.signin_remote_codex), false);
             TextView code = monoText(this, acc.userCode == null ? "…" : acc.userCode, 34, TEXT);
             code.setTypeface(mono(this, 600));
             code.setLetterSpacing(0.08f);
@@ -233,9 +237,11 @@ public class SignInActivity extends Screen implements Account.Listener {
             LinearLayout.LayoutParams ccp = wrap();
             ccp.topMargin = dp(this, 8);
             body.addView(copyCode, ccp);
-            TextView exp = text(this, getString(R.string.signin_code_expiry), 13, MUTED);
-            exp.setPaddingRelative(0, dp(this, 6), 0, 0);
-            body.addView(exp);
+            if (!acc.grok()) { // Codex's code works for 15 minutes; Grok doesn't say how long its code does
+                TextView exp = text(this, getString(R.string.signin_code_expiry), 13, MUTED);
+                exp.setPaddingRelative(0, dp(this, 6), 0, 0);
+                body.addView(exp);
+            }
         }
         TextView l = monoText(this, link, 13, ACCENT_TEXT);
         l.setTextIsSelectable(true);
