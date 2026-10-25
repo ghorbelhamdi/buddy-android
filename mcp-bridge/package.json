@@ -1,0 +1,11 @@
+{
+  "name": "buddy-phone-bridge",
+  "version": "1.0.0",
+  "description": "Buddy's Android phone tools as a stdio MCP server (a bridge to Buddy's local MCP server)",
+  "type": "module",
+  "bin": { "buddy-phone-bridge": "bridge.mjs" },
+  "files": ["bridge.mjs", "tools.json"],
+  "engines": { "node": ">=18" },
+  "license": "Apache-2.0",
+  "repository": { "type": "git", "url": "https://github.com/ghorbelhamdi/buddy-android", "directory": "mcp-bridge" }
+}

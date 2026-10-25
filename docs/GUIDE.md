@@ -55,7 +55,7 @@ The app has three tabs: **Chats**, **Sessions** and **Settings**.
 
 ### Phone tools in your own sessions
 
-Buddy's phone tools are a regular MCP server on the phone (`http://127.0.0.1:8765/mcp`, with a per-install token). Settings → **Phone tools in your own sessions** shows a ready-made command for **Claude Code** (`claude mcp add-json …`), **Codex** (`codex mcp add …`), **OpenCode** (an `OPENCODE_CONFIG_CONTENT` line for `~/.bashrc`) and **Antigravity** (`agy mcp add …`), with a Copy button. The first three set a 10-minute tool timeout, so an approval card can wait for you (the agents' default is a minute). Run it once in any terminal on the phone (Termux, for example), and every session of that agent gets the `phone` tools, even without the bubble. The token is masked on screen.
+Buddy's phone tools are a regular MCP server on the phone (`http://127.0.0.1:8765/mcp`, with a per-install token). Settings → **Phone tools in your own sessions** shows a ready-made command for **Claude Code** (`claude mcp add-json …`), **Codex** (`codex mcp add …`), **OpenCode** (an `OPENCODE_CONFIG_CONTENT` line for `~/.bashrc`) and **Antigravity** (`agy mcp add …`), with a Copy button. The first three set a 10-minute tool timeout, so an approval card can wait for you (the agents' default is a minute). Run it once in any terminal on the phone (Termux, for example), and every session of that agent gets the `phone` tools, even without the bubble. The token is masked on screen. For MCP clients that can only start a server as a command, [mcp-bridge](../mcp-bridge) passes stdio on to Buddy.
 
 ### Remote Control: a Claude Code session in your Claude app
 
