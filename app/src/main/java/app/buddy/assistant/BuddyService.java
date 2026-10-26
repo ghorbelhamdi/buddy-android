@@ -106,6 +106,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         main.postDelayed(() -> SshServer.ensure(this), 4000);
         main.postDelayed(() -> CodexRemote.ensure(this), 4000);
         main.postDelayed(updateCheck, 20_000);
+        Schedules.serviceStarted(this); // scheduled tasks' alarms, again after an update or a restart
         // the helper's answer refreshes Codex's model list
         main.postDelayed(() -> {
             if (Linux.installed(this)) {
@@ -465,6 +466,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     /** Stop from the indicator or its notification: stop Buddy's chats and refuse phone actions for a minute. */
     void takeBackControl() {
         main.post(() -> {
+            CodexLive.end(getString(R.string.live_ended_paused)); // the user took the phone back: no voice either
             revokedUntil = android.os.SystemClock.elapsedRealtime() + 60_000;
             endPause(); // after revoking, so tool calls waiting in a pause get "stopped", not go ahead
             ChatHub.get(this).stopAll();
@@ -519,6 +521,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
 
     private void pause(int note, int toast) {
         if (paused) return;
+        CodexLive.end(getString(R.string.live_ended_paused)); // the user takes the phone: the live call ends
         paused = true;
         pausedForBrowser = false;
         heldInPause = false;

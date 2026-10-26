@@ -347,12 +347,45 @@
     <string name="chat_keep_awake_info">للمهام الطويلة: يبقى الهاتف مستيقظًا ما دامت هذه المحادثة تعمل، ويخبرك إشعار بالنتيجة. قفل الهاتف يطفئ الشاشة كالمعتاد.</string>
     <string name="chat_allowed">مسموح دون سؤال</string>
     <string name="chat_allowed_info">حتى تنتهي مهمة هذه المحادثة، تمرّ الموافقات الروتينية في هذه التطبيقات تلقائيًا: إرسال رسالة، أو خطوة كان المراجع سيسأل عنها. تظهر كل واحدة في المحادثة. الدفع والشراء والحذف والتثبيت وكلمات المرور وإعدادات الأمان ما زالت تسألك.</string>
+    <string name="chat_allowed_kept">محفوظة لجدولة هذه المحادثة: تبقى هذه التطبيقات مسموحًا بها في تشغيلاتها المجدولة، حتى تزيلها أو تزيل الجدولة.</string>
     <string name="chat_allowed_add">إضافة تطبيق</string>
     <string name="chat_allowed_remove">إزالة %1$s</string>
     <string name="run_rule_approved">تمت الموافقة بقاعدتك لهذه المهمة: %1$s</string>
     <string name="run_end_done">انتهى %1$s</string>
     <string name="run_end_stopped">توقف %1$s</string>
     <string name="run_end_failed">واجه %1$s مشكلة</string>
+    <string name="schedule_title">الجدولة</string>
+    <string name="schedule_set">ضبط جدولة</string>
+    <string name="schedule_set_info">أرسل رسالة إلى هذه المحادثة تلقائيًا في أوقات محددة، مثلًا كل يوم الساعة 14:00.</string>
+    <string name="schedule_info">في الوقت المحدد يرسل Buddy هذه الرسالة إلى المحادثة كأنك كتبتها، بوكيل هذه المحادثة وخياراتها. بطاقات الموافقة ما زالت تنتظرك. إذا احتاج إلى الشاشة والهاتف مقفل، يطلب منك فتح القفل.</string>
+    <string name="schedule_time">الوقت</string>
+    <string name="schedule_days">الأيام</string>
+    <string name="schedule_daily">كل يوم</string>
+    <string name="schedule_weekdays">أيام العمل</string>
+    <string name="schedule_pick_days">اختيار الأيام</string>
+    <string name="schedule_message">الرسالة</string>
+    <string name="schedule_message_hint">ما الذي يُرسل، مثلًا: افتح التطبيق وسجّل حضور اليوم</string>
+    <string name="schedule_wake">إيقاظ الهاتف لهذه المهمة</string>
+    <string name="schedule_wake_info">عندما يحتاج إلى الشاشة تُضاء الشاشة (وتُفتح شاشة القفل التي بلا رمز PIN أو نمط أو بصمة). أثناء التشغيل يمكن لأي شخص قريب رؤية الشاشة.</string>
+    <string name="schedule_inexact">المنبّهات الدقيقة متوقفة لـ Buddy، لذا قد يبدأ متأخرًا بضع دقائق.</string>
+    <string name="schedule_allow_exact">السماح بالمنبّهات الدقيقة</string>
+    <string name="schedule_save">حفظ</string>
+    <string name="schedule_remove">إزالة</string>
+    <string name="schedule_summary_daily">كل يوم الساعة %1$s</string>
+    <string name="schedule_summary_weekdays">أيام العمل الساعة %1$s</string>
+    <string name="schedule_summary_days">%1$s الساعة %2$s</string>
+    <string name="schedule_next">المرة التالية: %1$s</string>
+    <string name="schedule_no_days">اختر يومًا واحدًا على الأقل</string>
+    <string name="schedule_no_message">اكتب الرسالة المراد إرسالها</string>
+    <string name="schedule_channel">المهام المجدولة</string>
+    <string name="schedule_screen_title">مهمة مجدولة تحتاج إلى شاشتك: افتح القفل للمتابعة</string>
+    <string name="schedule_screen_text">%1$s: تتابع عندما تفتح قفل الهاتف، حتى %2$s.</string>
+    <string name="schedule_skipped_title">تم تخطي مهمة مجدولة: %1$s</string>
+    <string name="schedule_stopped_title">تم إيقاف مهمة مجدولة: %1$s</string>
+    <string name="schedule_skip_running">كانت هذه المحادثة ما زالت تعمل على مهمتها السابقة.</string>
+    <string name="schedule_skip_busy">كان Buddy مشغولًا لمدة ساعة (مهمة أخرى أو إيقاف مؤقت أو لا إنترنت).</string>
+    <string name="schedule_skip_screen">بقي الهاتف مقفلًا لمدة ساعة.</string>
+    <string name="schedule_marker">مجدولة</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <string name="chat_stop">إيقاف</string>
@@ -379,6 +412,24 @@
     <!-- Language sheet (long-press the mic) -->
     <string name="chat_speak_in">لغة التحدث</string>
     <string name="chat_speak_in_help">اختر لغاتك من الإعدادات ← الصوت.</string>
+    <string name="live_option">صوت مباشر</string>
+    <string name="live_option_sub">تحدّث مع Codex بصوت عالٍ. يجيب بصوت ChatGPT وينفّذ على الهاتف في هذه المحادثة.</string>
+    <string name="live_label">مباشر</string>
+    <string name="live_end">إنهاء</string>
+    <string name="live_connecting">جارٍ الاتصال…</string>
+    <string name="live_started">الصوت المباشر يعمل. تحدّث: يسمعك Codex ويجيب بصوت عالٍ وينفّذ ما تطلبه في هذه المحادثة.</string>
+    <string name="live_ended">انتهى الصوت المباشر.</string>
+    <string name="live_ended_why">انتهى الصوت المباشر: %1$s</string>
+    <string name="live_ended_screen_off">انطفأت الشاشة</string>
+    <string name="live_ended_paused">تم إيقاف Buddy مؤقتًا</string>
+    <string name="live_ended_idle">لم يُقل شيء لمدة 5 دقائق</string>
+    <string name="live_notification_title">صوت مباشر مع Codex</string>
+    <string name="live_mic_busy">الصوت المباشر يستخدم الميكروفون. أنهِه أولًا.</string>
+    <string name="live_hint">جديد: تحدّث مباشرةً مع Codex</string>
+    <string name="live_status_listening">يستمع…</string>
+    <string name="live_status_thinking">يفكّر…</string>
+    <string name="live_status_working">يعمل على ذلك…</string>
+    <string name="live_status_speaking">يتحدّث…</string>
     <string name="chat_phone_voice">صوت الهاتف</string>
 
     <!-- Approval card above the composer, when the agent asks for an OK or asks a question -->

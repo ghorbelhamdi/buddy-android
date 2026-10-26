@@ -464,12 +464,45 @@
     <string name="chat_keep_awake_info">适合长任务：这个对话工作期间手机不会休眠，结束后会用通知告诉你结果。锁定手机仍会关闭屏幕。</string>
     <string name="chat_allowed">无需询问即可允许</string>
     <string name="chat_allowed_info">在这个对话的任务结束前，这些应用里的常规批准会自动通过：发送消息，或审核者会询问的步骤。每一次都会显示在对话中。付款、购买、删除、安装、密码和安全设置仍会询问你。</string>
+    <string name="chat_allowed_kept">为这个对话的定时任务保留：在你移除这些应用或移除定时之前，它们在定时运行中一直被允许。</string>
     <string name="chat_allowed_add">添加应用</string>
     <string name="chat_allowed_remove">移除 %1$s</string>
     <string name="run_rule_approved">已按你为本次任务设的规则批准：%1$s</string>
     <string name="run_end_done">%1$s 已完成</string>
     <string name="run_end_stopped">%1$s 已停止</string>
     <string name="run_end_failed">%1$s 遇到了问题</string>
+    <string name="schedule_title">定时</string>
+    <string name="schedule_set">设置定时</string>
+    <string name="schedule_set_info">在固定时间自动向这个对话发送一条消息，例如每天 14:00。</string>
+    <string name="schedule_info">到了设定时间，Buddy 会像你亲自输入一样把这条消息发到对话里，使用这个对话的智能体和选项。批准卡片仍会等你确认。如果手机锁定时需要用到屏幕，它会请你解锁。</string>
+    <string name="schedule_time">时间</string>
+    <string name="schedule_days">日期</string>
+    <string name="schedule_daily">每天</string>
+    <string name="schedule_weekdays">工作日</string>
+    <string name="schedule_pick_days">选择日期</string>
+    <string name="schedule_message">消息</string>
+    <string name="schedule_message_hint">要发送的内容，例如：打开应用，完成今天的签到</string>
+    <string name="schedule_wake">为这个任务唤醒手机</string>
+    <string name="schedule_wake_info">需要屏幕时屏幕会亮起（没有 PIN、图案或指纹的锁屏会被打开）。运行期间，附近的人都能看到屏幕。</string>
+    <string name="schedule_inexact">Buddy 的精确闹钟已关闭，所以可能会晚几分钟开始。</string>
+    <string name="schedule_allow_exact">允许精确闹钟</string>
+    <string name="schedule_save">保存</string>
+    <string name="schedule_remove">移除</string>
+    <string name="schedule_summary_daily">每天 %1$s</string>
+    <string name="schedule_summary_weekdays">工作日 %1$s</string>
+    <string name="schedule_summary_days">%1$s %2$s</string>
+    <string name="schedule_next">下次：%1$s</string>
+    <string name="schedule_no_days">请至少选择一天</string>
+    <string name="schedule_no_message">请写下要发送的消息</string>
+    <string name="schedule_channel">定时任务</string>
+    <string name="schedule_screen_title">定时任务需要你的屏幕：解锁以继续</string>
+    <string name="schedule_screen_text">%1$s：解锁手机后继续，最晚到 %2$s。</string>
+    <string name="schedule_skipped_title">已跳过定时任务：%1$s</string>
+    <string name="schedule_stopped_title">已停止定时任务：%1$s</string>
+    <string name="schedule_skip_running">这个对话还在进行上一个任务。</string>
+    <string name="schedule_skip_busy">Buddy 忙了一个小时（其他任务、暂停或没有网络）。</string>
+    <string name="schedule_skip_screen">手机保持锁定了一个小时。</string>
+    <string name="schedule_marker">定时</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <!-- Button, verb: stops the agent's task. Keep short. -->
@@ -513,6 +546,24 @@
     <string name="chat_speak_in">说话语言</string>
     <!-- "Settings → Voice" = the Voice section of Buddy's Settings tab; use the same names as there. -->
     <string name="chat_speak_in_help">可在“设置”→“语音”中选择你的语言。</string>
+    <string name="live_option">实时语音</string>
+    <string name="live_option_sub">与 Codex 出声对话。它用 ChatGPT 的声音回答，并在这个聊天里操作手机。</string>
+    <string name="live_label">实时</string>
+    <string name="live_end">结束</string>
+    <string name="live_connecting">正在连接…</string>
+    <string name="live_started">实时语音已开启。直接说话：Codex 能听到你，会出声回答，并在这个聊天里完成你的请求。</string>
+    <string name="live_ended">实时语音已结束。</string>
+    <string name="live_ended_why">实时语音已结束：%1$s</string>
+    <string name="live_ended_screen_off">屏幕已关闭</string>
+    <string name="live_ended_paused">Buddy 已暂停</string>
+    <string name="live_ended_idle">5 分钟内没有说话</string>
+    <string name="live_notification_title">与 Codex 实时语音</string>
+    <string name="live_mic_busy">实时语音正在使用麦克风。请先结束它。</string>
+    <string name="live_hint">新功能：与 Codex 实时对话</string>
+    <string name="live_status_listening">正在聆听…</string>
+    <string name="live_status_thinking">正在思考…</string>
+    <string name="live_status_working">正在处理…</string>
+    <string name="live_status_speaking">正在说话…</string>
     <!-- Small tag next to a language Claude's dictation doesn't support: the phone's own speech recognition is used. -->
     <string name="chat_phone_voice">手机语音</string>
 

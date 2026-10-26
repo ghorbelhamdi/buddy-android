@@ -329,12 +329,45 @@
     <string name="chat_keep_awake_info">長い作業向け：このチャットが作業している間はスリープせず、終わると結果を通知でお知らせします。スマホをロックすれば画面は通常どおり消えます。</string>
     <string name="chat_allowed">確認なしで許可</string>
     <string name="chat_allowed_info">このチャットの作業が終わるまで、これらのアプリでの定型的な承認は自動で進みます（メッセージの送信や、レビュー担当が確認を求める手順など）。それぞれチャットに表示されます。支払い、購入、削除、インストール、パスワード、セキュリティ設定は引き続き確認します。</string>
+    <string name="chat_allowed_kept">このチャットのスケジュール用に保持：これらのアプリは、削除するかスケジュールを削除するまで、スケジュール実行でも許可されたままです。</string>
     <string name="chat_allowed_add">アプリを追加</string>
     <string name="chat_allowed_remove">%1$sを削除</string>
     <string name="run_rule_approved">この作業のルールで承認：%1$s</string>
     <string name="run_end_done">%1$sが完了しました</string>
     <string name="run_end_stopped">%1$sが停止しました</string>
     <string name="run_end_failed">%1$sで問題が発生しました</string>
+    <string name="schedule_title">スケジュール</string>
+    <string name="schedule_set">スケジュールを設定</string>
+    <string name="schedule_set_info">決まった時刻にこのチャットへ自動でメッセージを送ります（例：毎日14:00）。</string>
+    <string name="schedule_info">設定した時刻に、Buddy があなたが入力したのと同じようにこのメッセージをチャットへ送ります。エージェントとオプションはこのチャットのものです。承認カードはこれまでどおりあなたを待ちます。スマホがロック中に画面が必要になったら、ロック解除をお願いします。</string>
+    <string name="schedule_time">時刻</string>
+    <string name="schedule_days">曜日</string>
+    <string name="schedule_daily">毎日</string>
+    <string name="schedule_weekdays">平日</string>
+    <string name="schedule_pick_days">曜日を選ぶ</string>
+    <string name="schedule_message">メッセージ</string>
+    <string name="schedule_message_hint">送る内容（例：アプリを開いて今日のチェックインをして）</string>
+    <string name="schedule_wake">このタスクのためにスマホを起こす</string>
+    <string name="schedule_wake_info">画面が必要になると画面がオンになります（PIN、パターン、指紋のないロック画面は解除されます）。実行中は近くの人にも画面が見えます。</string>
+    <string name="schedule_inexact">Buddy の正確なアラームがオフのため、数分遅れて始まることがあります。</string>
+    <string name="schedule_allow_exact">正確なアラームを許可</string>
+    <string name="schedule_save">保存</string>
+    <string name="schedule_remove">削除</string>
+    <string name="schedule_summary_daily">毎日 %1$s</string>
+    <string name="schedule_summary_weekdays">平日 %1$s</string>
+    <string name="schedule_summary_days">%1$s %2$s</string>
+    <string name="schedule_next">次回：%1$s</string>
+    <string name="schedule_no_days">曜日を1つ以上選んでください</string>
+    <string name="schedule_no_message">送るメッセージを入力してください</string>
+    <string name="schedule_channel">スケジュールされたタスク</string>
+    <string name="schedule_screen_title">スケジュールされたタスクに画面が必要です：ロックを解除して続行</string>
+    <string name="schedule_screen_text">%1$s：スマホのロックを解除すると続きます（%2$s まで）。</string>
+    <string name="schedule_skipped_title">スケジュールされたタスクをスキップしました：%1$s</string>
+    <string name="schedule_stopped_title">スケジュールされたタスクを停止しました：%1$s</string>
+    <string name="schedule_skip_running">このチャットはまだ前のタスクを実行中でした。</string>
+    <string name="schedule_skip_busy">Buddy が1時間ふさがっていました（別のタスク、一時停止、またはインターネットなし）。</string>
+    <string name="schedule_skip_screen">スマホが1時間ロックされたままでした。</string>
+    <string name="schedule_marker">スケジュール</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <string name="chat_stop">停止</string>
@@ -361,6 +394,24 @@
     <!-- Language sheet (long-press the mic) -->
     <string name="chat_speak_in">話す言語</string>
     <string name="chat_speak_in_help">言語は「設定」→「音声」で選べます。</string>
+    <string name="live_option">ライブ音声</string>
+    <string name="live_option_sub">Codex と声で話せます。ChatGPT の声で答え、このチャットでスマホを操作します。</string>
+    <string name="live_label">ライブ</string>
+    <string name="live_end">終了</string>
+    <string name="live_connecting">接続中…</string>
+    <string name="live_started">ライブ音声がオンです。話しかけてください。Codex が聞き取り、声で答え、頼んだことをこのチャットで実行します。</string>
+    <string name="live_ended">ライブ音声を終了しました。</string>
+    <string name="live_ended_why">ライブ音声を終了しました：%1$s</string>
+    <string name="live_ended_screen_off">画面がオフになりました</string>
+    <string name="live_ended_paused">Buddy が一時停止されました</string>
+    <string name="live_ended_idle">5 分間何も話されませんでした</string>
+    <string name="live_notification_title">Codex とライブ音声</string>
+    <string name="live_mic_busy">ライブ音声がマイクを使用中です。先に終了してください。</string>
+    <string name="live_hint">新機能：Codex とライブで話せます</string>
+    <string name="live_status_listening">聞いています…</string>
+    <string name="live_status_thinking">考え中…</string>
+    <string name="live_status_working">作業中…</string>
+    <string name="live_status_speaking">話しています…</string>
     <string name="chat_phone_voice">端末の音声入力</string>
 
     <!-- Approval card above the composer, when the agent asks for an OK or asks a question -->

@@ -489,6 +489,8 @@
     <string name="chat_allowed">Allowed without asking</string>
     <!-- Under that title. "The reviewer" = Buddy's smart reviewer (App permissions). -->
     <string name="chat_allowed_info">Until this chat\'s task ends, routine approvals in these apps go ahead on their own: sending a message, or a step the reviewer would ask about. Each one shows in the chat. Paying, buying, deleting, installing, passwords and security settings still ask you.</string>
+    <!-- Under that, when the chat has a schedule: the list isn't cleared when a run ends. -->
+    <string name="chat_allowed_kept">Kept for this chat\'s schedule: these apps stay allowed for its scheduled runs, until you remove them or the schedule.</string>
     <!-- Row that opens the app picker. -->
     <string name="chat_allowed_add">Add an app</string>
     <!-- Read by TalkBack for the X beside an allowed app; %1$s = the app's name. -->
@@ -501,6 +503,60 @@
     <string name="run_end_stopped">%1$s stopped</string>
     <!-- As above, when it ended with an error. -->
     <string name="run_end_failed">%1$s ran into a problem</string>
+
+    <!-- Chat options: Schedule (the chat's scheduled task: Buddy sends its message at set times) -->
+    <!-- Chat options: section title and the title of its sheet: the chat's scheduled task. Keep short. -->
+    <string name="schedule_title">Schedule</string>
+    <!-- Row in Chat options when the chat has no schedule; opens the Schedule sheet. -->
+    <string name="schedule_set">Set a schedule</string>
+    <!-- Under that row. -->
+    <string name="schedule_set_info">Send a message to this chat on its own at set times, e.g. every day at 14:00.</string>
+    <!-- At the top of the Schedule sheet. -->
+    <string name="schedule_info">At the set time Buddy sends this message into the chat as if you typed it, with this chat\'s agent and options. Approval cards still wait for you. If it needs the screen while the phone is locked, it asks you to unlock.</string>
+    <!-- Schedule sheet: section titles, the day choices and the message field. -->
+    <string name="schedule_time">Time</string>
+    <string name="schedule_days">Days</string>
+    <string name="schedule_daily">Every day</string>
+    <string name="schedule_weekdays">Weekdays</string>
+    <string name="schedule_pick_days">Pick days</string>
+    <string name="schedule_message">Message</string>
+    <!-- Hint in the message field: a generic example. -->
+    <string name="schedule_message_hint">What to send, e.g. Open the app and do today\'s check-in</string>
+    <!-- Switch in the Schedule sheet, off by default. -->
+    <string name="schedule_wake">Wake the phone for this task</string>
+    <!-- Under that switch. -->
+    <string name="schedule_wake_info">When it needs the screen, the screen turns on (and a lock screen without a PIN, pattern or fingerprint opens). While it runs, anyone nearby can see the screen.</string>
+    <!-- Schedule sheet, when Android doesn't let Buddy set exact alarms; then a button that opens that setting. -->
+    <string name="schedule_inexact">Exact alarms are off for Buddy, so it may start a few minutes late.</string>
+    <string name="schedule_allow_exact">Allow exact alarms</string>
+    <!-- Schedule sheet buttons. -->
+    <string name="schedule_save">Save</string>
+    <string name="schedule_remove">Remove</string>
+    <!-- What's set; %1$s = a time of day (14:00). -->
+    <string name="schedule_summary_daily">Every day at %1$s</string>
+    <string name="schedule_summary_weekdays">Weekdays at %1$s</string>
+    <!-- %1$s = short day names (Mon, Thu), %2$s = a time of day. -->
+    <string name="schedule_summary_days">%1$s at %2$s</string>
+    <!-- When it next runs; %1$s = weekday and time (Tue 14:00). -->
+    <string name="schedule_next">Next: %1$s</string>
+    <!-- Toasts when Save can't save yet. -->
+    <string name="schedule_no_days">Pick at least one day</string>
+    <string name="schedule_no_message">Write the message to send</string>
+    <!-- Notification channel name. -->
+    <string name="schedule_channel">Scheduled tasks</string>
+    <!-- Notification (and the screen Buddy turns on) when a scheduled task needs the screen while the phone is locked. -->
+    <string name="schedule_screen_title">Scheduled task needs your screen: unlock to continue</string>
+    <!-- Its text; %1$s = the chat's title, %2$s = the time it gives up waiting. -->
+    <string name="schedule_screen_text">%1$s: it goes on when you unlock the phone, until %2$s.</string>
+    <!-- Notification titles; %1$s = the chat's title. The text says why (the lines below). -->
+    <string name="schedule_skipped_title">Scheduled task skipped: %1$s</string>
+    <string name="schedule_stopped_title">Scheduled task stopped: %1$s</string>
+    <!-- Why a scheduled task was skipped or stopped. -->
+    <string name="schedule_skip_running">This chat was still working on its last task.</string>
+    <string name="schedule_skip_busy">Buddy was busy for an hour (another task, a pause, or no internet).</string>
+    <string name="schedule_skip_screen">The phone stayed locked for an hour.</string>
+    <!-- Small label over a message Buddy sent at its scheduled time; also read by TalkBack for the clock icon in the chat list. -->
+    <string name="schedule_marker">Scheduled</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <!-- Button, verb: stops the agent's task. Keep short. -->
@@ -544,6 +600,25 @@
     <string name="chat_speak_in">Speak in</string>
     <!-- "Settings → Voice" = the Voice section of Buddy's Settings tab; use the same names as there. -->
     <string name="chat_speak_in_help">Choose your languages in Settings → Voice.</string>
+    <!-- Live voice (CodexLive): a two-way ChatGPT voice call in a Codex chat. live_label is the bar's short tag. -->
+    <string name="live_option">Live voice</string>
+    <string name="live_option_sub">Talk with Codex out loud. It answers in ChatGPT\'s voice and works on the phone in this chat.</string>
+    <string name="live_label">Live</string>
+    <string name="live_end">End</string>
+    <string name="live_connecting">Connecting…</string>
+    <string name="live_started">Live voice is on. Talk: Codex hears you, answers out loud and does what you ask in this chat.</string>
+    <string name="live_ended">Live voice ended.</string>
+    <string name="live_ended_why">Live voice ended: %1$s</string>
+    <string name="live_ended_screen_off">the screen went off</string>
+    <string name="live_ended_paused">Buddy was paused</string>
+    <string name="live_ended_idle">nothing was said for 5 minutes</string>
+    <string name="live_notification_title">Live voice with Codex</string>
+    <string name="live_mic_busy">Live voice is using the microphone. End it first.</string>
+    <string name="live_hint">New: talk live with Codex</string>
+    <string name="live_status_listening">Listening…</string>
+    <string name="live_status_thinking">Thinking…</string>
+    <string name="live_status_working">Working on it…</string>
+    <string name="live_status_speaking">Speaking…</string>
     <!-- Small tag next to a language Claude's dictation doesn't support: the phone's own speech recognition is used. -->
     <string name="chat_phone_voice">phone voice</string>
 

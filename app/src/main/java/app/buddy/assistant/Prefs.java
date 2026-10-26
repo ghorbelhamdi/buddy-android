@@ -193,7 +193,16 @@ final class Prefs {
         return sp(c).getBoolean("had_reply", false);
     }
 
-    static void setHadReply(Context c) {
+    /** The "New: talk live with Codex" hint was shown (once, in a Codex chat; see CodexLive). */
+    static boolean liveHintShown(Context c) {
+        return sp(c).getBoolean("live_hint_shown", false);
+    }
+
+    static void setLiveHintShown(Context c) {
+        sp(c).edit().putBoolean("live_hint_shown", true).apply();
+    }
+
+        static void setHadReply(Context c) {
         if (!hadReply(c)) sp(c).edit().putBoolean("had_reply", true).apply();
     }
 

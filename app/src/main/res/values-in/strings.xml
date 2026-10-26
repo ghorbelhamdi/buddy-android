@@ -464,12 +464,45 @@
     <string name="chat_keep_awake_info">Untuk tugas panjang: ponsel tetap terjaga selama chat ini bekerja, dan notifikasi memberi tahu hasilnya. Mengunci ponsel tetap mematikan layar.</string>
     <string name="chat_allowed">Diizinkan tanpa bertanya</string>
     <string name="chat_allowed_info">Sampai tugas chat ini selesai, persetujuan rutin di aplikasi ini berjalan sendiri: mengirim pesan, atau langkah yang akan ditanyakan peninjau. Masing-masing muncul di chat. Membayar, membeli, menghapus, menginstal, kata sandi, dan setelan keamanan tetap menanyakan Anda.</string>
+    <string name="chat_allowed_kept">Disimpan untuk jadwal chat ini: aplikasi ini tetap diizinkan untuk tugas terjadwalnya, sampai Anda menghapusnya atau menghapus jadwalnya.</string>
     <string name="chat_allowed_add">Tambah aplikasi</string>
     <string name="chat_allowed_remove">Hapus %1$s</string>
     <string name="run_rule_approved">Disetujui oleh aturan tugas Anda: %1$s</string>
     <string name="run_end_done">%1$s selesai</string>
     <string name="run_end_stopped">%1$s dihentikan</string>
     <string name="run_end_failed">%1$s mengalami masalah</string>
+    <string name="schedule_title">Jadwal</string>
+    <string name="schedule_set">Atur jadwal</string>
+    <string name="schedule_set_info">Kirim pesan ke chat ini secara otomatis pada waktu tertentu, mis. setiap hari pukul 14:00.</string>
+    <string name="schedule_info">Pada waktu yang diatur, Buddy mengirim pesan ini ke chat seolah Anda yang mengetiknya, dengan agen dan opsi chat ini. Kartu persetujuan tetap menunggu Anda. Jika perlu layar saat ponsel terkunci, Buddy meminta Anda membukanya.</string>
+    <string name="schedule_time">Waktu</string>
+    <string name="schedule_days">Hari</string>
+    <string name="schedule_daily">Setiap hari</string>
+    <string name="schedule_weekdays">Hari kerja</string>
+    <string name="schedule_pick_days">Pilih hari</string>
+    <string name="schedule_message">Pesan</string>
+    <string name="schedule_message_hint">Apa yang dikirim, mis. Buka aplikasinya dan lakukan check-in hari ini</string>
+    <string name="schedule_wake">Bangunkan ponsel untuk tugas ini</string>
+    <string name="schedule_wake_info">Saat perlu layar, layar menyala (dan layar kunci tanpa PIN, pola, atau sidik jari terbuka). Selama berjalan, siapa pun di dekat Anda bisa melihat layar.</string>
+    <string name="schedule_inexact">Alarm tepat waktu nonaktif untuk Buddy, jadi bisa mulai beberapa menit terlambat.</string>
+    <string name="schedule_allow_exact">Izinkan alarm tepat waktu</string>
+    <string name="schedule_save">Simpan</string>
+    <string name="schedule_remove">Hapus</string>
+    <string name="schedule_summary_daily">Setiap hari pukul %1$s</string>
+    <string name="schedule_summary_weekdays">Hari kerja pukul %1$s</string>
+    <string name="schedule_summary_days">%1$s pukul %2$s</string>
+    <string name="schedule_next">Berikutnya: %1$s</string>
+    <string name="schedule_no_days">Pilih minimal satu hari</string>
+    <string name="schedule_no_message">Tulis pesan yang akan dikirim</string>
+    <string name="schedule_channel">Tugas terjadwal</string>
+    <string name="schedule_screen_title">Tugas terjadwal perlu layar Anda: buka kunci untuk melanjutkan</string>
+    <string name="schedule_screen_text">%1$s: lanjut saat Anda membuka kunci ponsel, sampai %2$s.</string>
+    <string name="schedule_skipped_title">Tugas terjadwal dilewati: %1$s</string>
+    <string name="schedule_stopped_title">Tugas terjadwal dihentikan: %1$s</string>
+    <string name="schedule_skip_running">Chat ini masih mengerjakan tugas sebelumnya.</string>
+    <string name="schedule_skip_busy">Buddy sibuk selama satu jam (tugas lain, jeda, atau tanpa internet).</string>
+    <string name="schedule_skip_screen">Ponsel tetap terkunci selama satu jam.</string>
+    <string name="schedule_marker">Terjadwal</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <!-- Button, verb: stops the agent's task. Keep short. -->
@@ -513,6 +546,24 @@
     <string name="chat_speak_in">Bicara dalam</string>
     <!-- "Settings → Voice" = the Voice section of Buddy's Settings tab; use the same names as there. -->
     <string name="chat_speak_in_help">Pilih bahasa Anda di Setelan → Suara.</string>
+    <string name="live_option">Suara langsung</string>
+    <string name="live_option_sub">Bicara dengan Codex secara lisan. Ia menjawab dengan suara ChatGPT dan bekerja di ponsel dalam chat ini.</string>
+    <string name="live_label">Langsung</string>
+    <string name="live_end">Akhiri</string>
+    <string name="live_connecting">Menghubungkan…</string>
+    <string name="live_started">Suara langsung aktif. Bicaralah: Codex mendengar Anda, menjawab dengan suara, dan melakukan permintaan Anda di chat ini.</string>
+    <string name="live_ended">Suara langsung berakhir.</string>
+    <string name="live_ended_why">Suara langsung berakhir: %1$s</string>
+    <string name="live_ended_screen_off">layar mati</string>
+    <string name="live_ended_paused">Buddy dijeda</string>
+    <string name="live_ended_idle">tidak ada yang diucapkan selama 5 menit</string>
+    <string name="live_notification_title">Suara langsung dengan Codex</string>
+    <string name="live_mic_busy">Suara langsung sedang memakai mikrofon. Akhiri dulu.</string>
+    <string name="live_hint">Baru: bicara langsung dengan Codex</string>
+    <string name="live_status_listening">Mendengarkan…</string>
+    <string name="live_status_thinking">Berpikir…</string>
+    <string name="live_status_working">Sedang dikerjakan…</string>
+    <string name="live_status_speaking">Berbicara…</string>
     <!-- Small tag next to a language Claude's dictation doesn't support: the phone's own speech recognition is used. -->
     <string name="chat_phone_voice">suara ponsel</string>
 

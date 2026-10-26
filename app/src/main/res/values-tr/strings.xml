@@ -337,12 +337,45 @@
     <string name="chat_keep_awake_info">Uzun görevler için: bu sohbet çalıştığı sürece telefon uyumaz ve bir bildirim nasıl gittiğini söyler. Telefonu kilitlemek yine de ekranı kapatır.</string>
     <string name="chat_allowed">Sormadan izin verilenler</string>
     <string name="chat_allowed_info">Bu sohbetin görevi bitene kadar bu uygulamalardaki rutin onaylar kendiliğinden geçer: mesaj göndermek ya da denetçinin soracağı bir adım. Her biri sohbette görünür. Ödeme, satın alma, silme, yükleme, şifreler ve güvenlik ayarları yine size sorulur.</string>
+    <string name="chat_allowed_kept">Bu sohbetin zamanlaması için saklanır: bu uygulamalar, siz onları ya da zamanlamayı kaldırana kadar zamanlanmış çalıştırmalarda izinli kalır.</string>
     <string name="chat_allowed_add">Uygulama ekle</string>
     <string name="chat_allowed_remove">%1$s kaldır</string>
     <string name="run_rule_approved">Bu görev için kuralınızla onaylandı: %1$s</string>
     <string name="run_end_done">%1$s bitirdi</string>
     <string name="run_end_stopped">%1$s durduruldu</string>
     <string name="run_end_failed">%1$s bir sorunla karşılaştı</string>
+    <string name="schedule_title">Zamanlama</string>
+    <string name="schedule_set">Zamanlama ayarla</string>
+    <string name="schedule_set_info">Bu sohbete belirli saatlerde kendiliğinden mesaj gönderin, örn. her gün 14:00\'te.</string>
+    <string name="schedule_info">Belirlenen saatte Buddy bu mesajı, siz yazmışsınız gibi bu sohbetin aracısı ve seçenekleriyle sohbete gönderir. Onay kartları yine sizi bekler. Telefon kilitliyken ekrana ihtiyaç duyarsa kilidi açmanızı ister.</string>
+    <string name="schedule_time">Saat</string>
+    <string name="schedule_days">Günler</string>
+    <string name="schedule_daily">Her gün</string>
+    <string name="schedule_weekdays">Hafta içi</string>
+    <string name="schedule_pick_days">Gün seç</string>
+    <string name="schedule_message">Mesaj</string>
+    <string name="schedule_message_hint">Ne gönderilecek, örn. Uygulamayı aç ve bugünkü girişi yap</string>
+    <string name="schedule_wake">Bu görev için telefonu uyandır</string>
+    <string name="schedule_wake_info">Ekrana ihtiyaç duyduğunda ekran açılır (PIN, desen veya parmak izi olmayan kilit ekranı da açılır). Çalışırken yakındaki herkes ekranı görebilir.</string>
+    <string name="schedule_inexact">Buddy için tam zamanlı alarmlar kapalı, bu yüzden birkaç dakika geç başlayabilir.</string>
+    <string name="schedule_allow_exact">Tam zamanlı alarmlara izin ver</string>
+    <string name="schedule_save">Kaydet</string>
+    <string name="schedule_remove">Kaldır</string>
+    <string name="schedule_summary_daily">Her gün %1$s</string>
+    <string name="schedule_summary_weekdays">Hafta içi %1$s</string>
+    <string name="schedule_summary_days">%1$s %2$s</string>
+    <string name="schedule_next">Sonraki: %1$s</string>
+    <string name="schedule_no_days">En az bir gün seçin</string>
+    <string name="schedule_no_message">Gönderilecek mesajı yazın</string>
+    <string name="schedule_channel">Zamanlanmış görevler</string>
+    <string name="schedule_screen_title">Zamanlanmış görev ekranınıza ihtiyaç duyuyor: devam etmek için kilidi açın</string>
+    <string name="schedule_screen_text">%1$s: telefonun kilidini açtığınızda devam eder, %2$s saatine kadar.</string>
+    <string name="schedule_skipped_title">Zamanlanmış görev atlandı: %1$s</string>
+    <string name="schedule_stopped_title">Zamanlanmış görev durduruldu: %1$s</string>
+    <string name="schedule_skip_running">Bu sohbet hâlâ önceki görevi üzerinde çalışıyordu.</string>
+    <string name="schedule_skip_busy">Buddy bir saat boyunca meşguldü (başka bir görev, bir duraklama veya internet yok).</string>
+    <string name="schedule_skip_screen">Telefon bir saat boyunca kilitli kaldı.</string>
+    <string name="schedule_marker">Zamanlandı</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <string name="chat_stop">Durdur</string>
@@ -369,6 +402,24 @@
     <!-- Language sheet (long-press the mic) -->
     <string name="chat_speak_in">Konuşma dili</string>
     <string name="chat_speak_in_help">Dillerinizi Ayarlar → Ses bölümünden seçin.</string>
+    <string name="live_option">Canlı ses</string>
+    <string name="live_option_sub">Codex ile sesli konuşun. ChatGPT\'nin sesiyle yanıt verir ve bu sohbette telefonda işlem yapar.</string>
+    <string name="live_label">Canlı</string>
+    <string name="live_end">Bitir</string>
+    <string name="live_connecting">Bağlanıyor…</string>
+    <string name="live_started">Canlı ses açık. Konuşun: Codex sizi duyar, sesli yanıt verir ve bu sohbette istediğinizi yapar.</string>
+    <string name="live_ended">Canlı ses sona erdi.</string>
+    <string name="live_ended_why">Canlı ses sona erdi: %1$s</string>
+    <string name="live_ended_screen_off">ekran kapandı</string>
+    <string name="live_ended_paused">Buddy duraklatıldı</string>
+    <string name="live_ended_idle">5 dakika boyunca hiçbir şey söylenmedi</string>
+    <string name="live_notification_title">Codex ile canlı ses</string>
+    <string name="live_mic_busy">Canlı ses mikrofonu kullanıyor. Önce onu bitirin.</string>
+    <string name="live_hint">Yeni: Codex ile canlı konuşun</string>
+    <string name="live_status_listening">Dinliyor…</string>
+    <string name="live_status_thinking">Düşünüyor…</string>
+    <string name="live_status_working">Üzerinde çalışıyor…</string>
+    <string name="live_status_speaking">Konuşuyor…</string>
     <string name="chat_phone_voice">telefon sesi</string>
 
     <!-- Approval card above the composer, when the agent asks for an OK or asks a question -->

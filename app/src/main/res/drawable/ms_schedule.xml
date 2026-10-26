@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A clock (a ring with its hands), drawn to match the Material Symbols icons. viewBox="0 -960 960 960" -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="960" android:viewportHeight="960">
+    <group android:translateY="960">
+        <path android:fillColor="#FFFFFFFF" android:fillType="evenOdd"
+            android:pathData="M480-880A400 400 0 1 1 480-80A400 400 0 1 1 480-880ZM480-810A330 330 0 1 0 480-150A330 330 0 1 0 480-810ZM445-690L515-690L515-515L650-515L650-445L445-445Z" />
+    </group>
+</vector>

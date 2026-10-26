@@ -331,12 +331,45 @@
     <string name="chat_keep_awake_info">लंबे कामों के लिए: जब तक यह चैट काम करती है, फ़ोन जागा रहता है, और एक सूचना बताती है कि काम कैसा रहा. फ़ोन लॉक करने पर स्क्रीन फिर भी बंद हो जाती है.</string>
     <string name="chat_allowed">बिना पूछे इजाज़त</string>
     <string name="chat_allowed_info">जब तक इस चैट का काम खत्म नहीं होता, इन ऐप्स में रोज़मर्रा की मंज़ूरियां अपने आप हो जाती हैं: मैसेज भेजना, या ऐसा कदम जिस पर समीक्षक पूछता. हर एक चैट में दिखती है. भुगतान, खरीदारी, हटाना, इंस्टॉल करना, पासवर्ड और सुरक्षा सेटिंग अब भी आपसे पूछेंगे.</string>
+    <string name="chat_allowed_kept">इस चैट के शेड्यूल के लिए रखे गए: ये ऐप्स इसके शेड्यूल किए गए कामों के लिए अनुमत रहते हैं, जब तक आप इन्हें या शेड्यूल को हटा नहीं देते.</string>
     <string name="chat_allowed_add">ऐप जोड़ें</string>
     <string name="chat_allowed_remove">%1$s हटाएं</string>
     <string name="run_rule_approved">इस काम के आपके नियम से मंज़ूर: %1$s</string>
     <string name="run_end_done">%1$s ने काम पूरा किया</string>
     <string name="run_end_stopped">%1$s रोका गया</string>
     <string name="run_end_failed">%1$s को एक समस्या आई</string>
+    <string name="schedule_title">शेड्यूल</string>
+    <string name="schedule_set">शेड्यूल सेट करें</string>
+    <string name="schedule_set_info">तय समय पर इस चैट में अपने आप एक मैसेज भेजें, जैसे हर दिन 14:00 बजे.</string>
+    <string name="schedule_info">तय समय पर Buddy यह मैसेज चैट में ऐसे भेजता है जैसे आपने लिखा हो, इसी चैट के एजेंट और विकल्पों के साथ. मंज़ूरी कार्ड अब भी आपका इंतज़ार करते हैं. अगर फ़ोन लॉक होने पर इसे स्क्रीन चाहिए, तो यह आपसे अनलॉक करने को कहता है.</string>
+    <string name="schedule_time">समय</string>
+    <string name="schedule_days">दिन</string>
+    <string name="schedule_daily">हर दिन</string>
+    <string name="schedule_weekdays">कामकाजी दिन</string>
+    <string name="schedule_pick_days">दिन चुनें</string>
+    <string name="schedule_message">मैसेज</string>
+    <string name="schedule_message_hint">क्या भेजना है, जैसे ऐप खोलो और आज का चेक-इन करो</string>
+    <string name="schedule_wake">इस काम के लिए फ़ोन जगाएं</string>
+    <string name="schedule_wake_info">जब इसे स्क्रीन चाहिए, स्क्रीन चालू हो जाती है (और बिना PIN, पैटर्न या फ़िंगरप्रिंट वाली लॉक स्क्रीन खुल जाती है). चलते समय पास का कोई भी स्क्रीन देख सकता है.</string>
+    <string name="schedule_inexact">Buddy के लिए सटीक अलार्म बंद हैं, इसलिए यह कुछ मिनट देर से शुरू हो सकता है.</string>
+    <string name="schedule_allow_exact">सटीक अलार्म की अनुमति दें</string>
+    <string name="schedule_save">सेव करें</string>
+    <string name="schedule_remove">हटाएं</string>
+    <string name="schedule_summary_daily">हर दिन %1$s बजे</string>
+    <string name="schedule_summary_weekdays">कामकाजी दिनों में %1$s बजे</string>
+    <string name="schedule_summary_days">%1$s को %2$s बजे</string>
+    <string name="schedule_next">अगली बार: %1$s</string>
+    <string name="schedule_no_days">कम से कम एक दिन चुनें</string>
+    <string name="schedule_no_message">भेजने वाला मैसेज लिखें</string>
+    <string name="schedule_channel">शेड्यूल किए गए काम</string>
+    <string name="schedule_screen_title">शेड्यूल किए गए काम को आपकी स्क्रीन चाहिए: जारी रखने के लिए अनलॉक करें</string>
+    <string name="schedule_screen_text">%1$s: फ़ोन अनलॉक करते ही आगे बढ़ेगा, %2$s तक.</string>
+    <string name="schedule_skipped_title">शेड्यूल किया गया काम छोड़ा गया: %1$s</string>
+    <string name="schedule_stopped_title">शेड्यूल किया गया काम रोका गया: %1$s</string>
+    <string name="schedule_skip_running">यह चैट अभी अपने पिछले काम में लगी थी.</string>
+    <string name="schedule_skip_busy">Buddy एक घंटे तक व्यस्त रहा (कोई और काम, विराम, या इंटरनेट नहीं).</string>
+    <string name="schedule_skip_screen">फ़ोन एक घंटे तक लॉक रहा.</string>
+    <string name="schedule_marker">शेड्यूल किया गया</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <string name="chat_stop">रोकें</string>
@@ -363,6 +396,24 @@
     <!-- Language sheet (long-press the mic) -->
     <string name="chat_speak_in">बोलने की भाषा</string>
     <string name="chat_speak_in_help">सेटिंग → आवाज़ में अपनी भाषाएं चुनें.</string>
+    <string name="live_option">लाइव आवाज़</string>
+    <string name="live_option_sub">Codex से ज़ोर से बात करें. यह ChatGPT की आवाज़ में जवाब देता है और इस चैट में फ़ोन पर काम करता है.</string>
+    <string name="live_label">लाइव</string>
+    <string name="live_end">खत्म करें</string>
+    <string name="live_connecting">कनेक्ट हो रहा है…</string>
+    <string name="live_started">लाइव आवाज़ चालू है. बोलिए: Codex आपको सुनता है, ज़ोर से जवाब देता है और इस चैट में आपका कहा काम करता है.</string>
+    <string name="live_ended">लाइव आवाज़ खत्म हुई.</string>
+    <string name="live_ended_why">लाइव आवाज़ खत्म हुई: %1$s</string>
+    <string name="live_ended_screen_off">स्क्रीन बंद हो गई</string>
+    <string name="live_ended_paused">Buddy को रोका गया</string>
+    <string name="live_ended_idle">5 मिनट तक कुछ नहीं कहा गया</string>
+    <string name="live_notification_title">Codex के साथ लाइव आवाज़</string>
+    <string name="live_mic_busy">लाइव आवाज़ माइक्रोफ़ोन इस्तेमाल कर रही है. पहले उसे खत्म करें.</string>
+    <string name="live_hint">नया: Codex से लाइव बात करें</string>
+    <string name="live_status_listening">सुन रहा है…</string>
+    <string name="live_status_thinking">सोच रहा है…</string>
+    <string name="live_status_working">काम चल रहा है…</string>
+    <string name="live_status_speaking">बोल रहा है…</string>
     <string name="chat_phone_voice">फ़ोन की आवाज़</string>
 
     <!-- Approval card above the composer, when the agent asks for an OK or asks a question -->

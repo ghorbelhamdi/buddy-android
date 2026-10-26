@@ -388,12 +388,17 @@ final class CodexDictation {
             }
             return;
         }
+        if (CodexLive.owns(p.optString("threadId"))) { // a live call's conversation: logged and handled there
+            CodexLive.notification(method, p);
+            if (method.startsWith("thread/realtime/")) return;
+        }
         if (method.startsWith("thread/realtime/") && CodexSpeech.owns(p.optString("threadId"))) {
             CodexSpeech.notification(method, p);
             return;
         }
         switch (method) {
-            case "turn/started": { // the voice handed something to Codex: stop it, dictation never runs tasks
+            case "turn/started": { // the voice handed something to Codex: stop it, dictation never runs tasks (and live
+                // voice hands it to the chat instead, see CodexLive)
                 String turn = p.has("turn") ? p.getJSONObject("turn").optString("id") : p.optString("turnId");
                 send(new JSONObject().put("id", ++nextId).put("method", "turn/interrupt")
                         .put("params", new JSONObject().put("threadId", p.optString("threadId", threadId)).put("turnId", turn)));

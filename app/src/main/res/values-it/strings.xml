@@ -468,12 +468,45 @@
     <string name="chat_keep_awake_info">Per i compiti lunghi: il telefono resta sveglio mentre questa chat lavora, e una notifica ti dice com\'è andata. Bloccare il telefono spegne comunque lo schermo.</string>
     <string name="chat_allowed">Consentito senza chiedere</string>
     <string name="chat_allowed_info">Finché il compito di questa chat non finisce, le approvazioni di routine in queste app vanno avanti da sole: inviare un messaggio, o un passaggio su cui il revisore chiederebbe. Ognuna appare nella chat. Pagare, comprare, eliminare, installare, password e impostazioni di sicurezza ti chiedono sempre.</string>
+    <string name="chat_allowed_kept">Tenute per la programmazione di questa chat: queste app restano consentite nelle sue esecuzioni programmate, finché non le rimuovi o rimuovi la programmazione.</string>
     <string name="chat_allowed_add">Aggiungi un\'app</string>
     <string name="chat_allowed_remove">Rimuovi %1$s</string>
     <string name="run_rule_approved">Approvato dalla tua regola per questo compito: %1$s</string>
     <string name="run_end_done">%1$s ha finito</string>
     <string name="run_end_stopped">%1$s si è fermato</string>
     <string name="run_end_failed">%1$s ha avuto un problema</string>
+    <string name="schedule_title">Programmazione</string>
+    <string name="schedule_set">Imposta una programmazione</string>
+    <string name="schedule_set_info">Invia da solo un messaggio a questa chat a orari fissi, ad es. ogni giorno alle 14:00.</string>
+    <string name="schedule_info">All\'ora impostata Buddy invia questo messaggio nella chat come se l\'avessi scritto tu, con l\'agente e le opzioni di questa chat. Le schede di approvazione ti aspettano comunque. Se gli serve lo schermo mentre il telefono è bloccato, ti chiede di sbloccarlo.</string>
+    <string name="schedule_time">Ora</string>
+    <string name="schedule_days">Giorni</string>
+    <string name="schedule_daily">Ogni giorno</string>
+    <string name="schedule_weekdays">Giorni feriali</string>
+    <string name="schedule_pick_days">Scegli i giorni</string>
+    <string name="schedule_message">Messaggio</string>
+    <string name="schedule_message_hint">Cosa inviare, ad es. Apri l\'app e fai il check-in di oggi</string>
+    <string name="schedule_wake">Riattiva il telefono per questo compito</string>
+    <string name="schedule_wake_info">Quando gli serve lo schermo, lo schermo si accende (e una schermata di blocco senza PIN, sequenza o impronta si apre). Mentre è in corso, chiunque vicino può vedere lo schermo.</string>
+    <string name="schedule_inexact">Le sveglie esatte sono disattivate per Buddy, quindi può partire qualche minuto in ritardo.</string>
+    <string name="schedule_allow_exact">Consenti sveglie esatte</string>
+    <string name="schedule_save">Salva</string>
+    <string name="schedule_remove">Rimuovi</string>
+    <string name="schedule_summary_daily">Ogni giorno alle %1$s</string>
+    <string name="schedule_summary_weekdays">Giorni feriali alle %1$s</string>
+    <string name="schedule_summary_days">%1$s alle %2$s</string>
+    <string name="schedule_next">Prossima: %1$s</string>
+    <string name="schedule_no_days">Scegli almeno un giorno</string>
+    <string name="schedule_no_message">Scrivi il messaggio da inviare</string>
+    <string name="schedule_channel">Compiti programmati</string>
+    <string name="schedule_screen_title">Un compito programmato ha bisogno del tuo schermo: sblocca per continuare</string>
+    <string name="schedule_screen_text">%1$s: riprende quando sblocchi il telefono, fino alle %2$s.</string>
+    <string name="schedule_skipped_title">Compito programmato saltato: %1$s</string>
+    <string name="schedule_stopped_title">Compito programmato interrotto: %1$s</string>
+    <string name="schedule_skip_running">Questa chat stava ancora lavorando al compito precedente.</string>
+    <string name="schedule_skip_busy">Buddy è stato occupato per un\'ora (un altro compito, una pausa o niente internet).</string>
+    <string name="schedule_skip_screen">Il telefono è rimasto bloccato per un\'ora.</string>
+    <string name="schedule_marker">Programmato</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <!-- Button, verb: stops the agent's task. Keep short. -->
@@ -517,6 +550,24 @@
     <string name="chat_speak_in">Parla in</string>
     <!-- "Settings → Voice" = the Voice section of Buddy's Settings tab; use the same names as there. -->
     <string name="chat_speak_in_help">Scegli le tue lingue in Impostazioni → Voce.</string>
+    <string name="live_option">Voce dal vivo</string>
+    <string name="live_option_sub">Parla con Codex ad alta voce. Risponde con la voce di ChatGPT e agisce sul telefono in questa chat.</string>
+    <string name="live_label">Dal vivo</string>
+    <string name="live_end">Termina</string>
+    <string name="live_connecting">Connessione…</string>
+    <string name="live_started">Voce dal vivo attiva. Parla: Codex ti sente, risponde ad alta voce e fa ciò che chiedi in questa chat.</string>
+    <string name="live_ended">Voce dal vivo terminata.</string>
+    <string name="live_ended_why">Voce dal vivo terminata: %1$s</string>
+    <string name="live_ended_screen_off">lo schermo si è spento</string>
+    <string name="live_ended_paused">Buddy è stato messo in pausa</string>
+    <string name="live_ended_idle">non è stato detto nulla per 5 minuti</string>
+    <string name="live_notification_title">Voce dal vivo con Codex</string>
+    <string name="live_mic_busy">La voce dal vivo sta usando il microfono. Terminala prima.</string>
+    <string name="live_hint">Novità: parla dal vivo con Codex</string>
+    <string name="live_status_listening">In ascolto…</string>
+    <string name="live_status_thinking">Sto pensando…</string>
+    <string name="live_status_working">Ci sto lavorando…</string>
+    <string name="live_status_speaking">Sta parlando…</string>
     <!-- Small tag next to a language Claude's dictation doesn't support: the phone's own speech recognition is used. -->
     <string name="chat_phone_voice">voce del telefono</string>
 

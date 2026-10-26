@@ -334,12 +334,45 @@
     <string name="chat_keep_awake_info">Voor lange taken: de telefoon blijft wakker zolang deze chat werkt, en een melding vertelt je hoe het ging. Als je de telefoon vergrendelt, gaat het scherm gewoon uit.</string>
     <string name="chat_allowed">Toegestaan zonder te vragen</string>
     <string name="chat_allowed_info">Tot de taak van deze chat klaar is, gaan routinegoedkeuringen in deze apps vanzelf door: een bericht versturen, of een stap waarover de controleur zou vragen. Elke staat in de chat. Betalen, kopen, verwijderen, installeren, wachtwoorden en beveiligingsinstellingen vragen het je nog steeds.</string>
+    <string name="chat_allowed_kept">Bewaard voor de planning van deze chat: deze apps blijven toegestaan voor de geplande taken, tot je ze of de planning verwijdert.</string>
     <string name="chat_allowed_add">App toevoegen</string>
     <string name="chat_allowed_remove">%1$s verwijderen</string>
     <string name="run_rule_approved">Goedgekeurd door je regel voor deze taak: %1$s</string>
     <string name="run_end_done">%1$s is klaar</string>
     <string name="run_end_stopped">%1$s is gestopt</string>
     <string name="run_end_failed">%1$s liep tegen een probleem aan</string>
+    <string name="schedule_title">Planning</string>
+    <string name="schedule_set">Planning instellen</string>
+    <string name="schedule_set_info">Stuur deze chat op vaste tijden vanzelf een bericht, bijv. elke dag om 14:00.</string>
+    <string name="schedule_info">Op de ingestelde tijd stuurt Buddy dit bericht in de chat alsof je het zelf typte, met de agent en opties van deze chat. Goedkeuringskaarten wachten nog steeds op je. Heeft het het scherm nodig terwijl de telefoon vergrendeld is, dan vraagt het je te ontgrendelen.</string>
+    <string name="schedule_time">Tijd</string>
+    <string name="schedule_days">Dagen</string>
+    <string name="schedule_daily">Elke dag</string>
+    <string name="schedule_weekdays">Werkdagen</string>
+    <string name="schedule_pick_days">Dagen kiezen</string>
+    <string name="schedule_message">Bericht</string>
+    <string name="schedule_message_hint">Wat te sturen, bijv. Open de app en doe de check-in van vandaag</string>
+    <string name="schedule_wake">Telefoon wekken voor deze taak</string>
+    <string name="schedule_wake_info">Als het het scherm nodig heeft, gaat het scherm aan (en een vergrendelscherm zonder pincode, patroon of vingerafdruk gaat open). Zolang het loopt, kan iedereen in de buurt het scherm zien.</string>
+    <string name="schedule_inexact">Exacte wekkers staan uit voor Buddy, dus het kan een paar minuten later beginnen.</string>
+    <string name="schedule_allow_exact">Exacte wekkers toestaan</string>
+    <string name="schedule_save">Opslaan</string>
+    <string name="schedule_remove">Verwijderen</string>
+    <string name="schedule_summary_daily">Elke dag om %1$s</string>
+    <string name="schedule_summary_weekdays">Werkdagen om %1$s</string>
+    <string name="schedule_summary_days">%1$s om %2$s</string>
+    <string name="schedule_next">Volgende: %1$s</string>
+    <string name="schedule_no_days">Kies minstens één dag</string>
+    <string name="schedule_no_message">Schrijf het bericht dat verstuurd moet worden</string>
+    <string name="schedule_channel">Geplande taken</string>
+    <string name="schedule_screen_title">Geplande taak heeft je scherm nodig: ontgrendel om door te gaan</string>
+    <string name="schedule_screen_text">%1$s: gaat verder als je de telefoon ontgrendelt, tot %2$s.</string>
+    <string name="schedule_skipped_title">Geplande taak overgeslagen: %1$s</string>
+    <string name="schedule_stopped_title">Geplande taak gestopt: %1$s</string>
+    <string name="schedule_skip_running">Deze chat was nog bezig met zijn vorige taak.</string>
+    <string name="schedule_skip_busy">Buddy was een uur bezig (een andere taak, een pauze of geen internet).</string>
+    <string name="schedule_skip_screen">De telefoon bleef een uur vergrendeld.</string>
+    <string name="schedule_marker">Gepland</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <string name="chat_stop">Stoppen</string>
@@ -366,6 +399,24 @@
     <!-- Language sheet (long-press the mic) -->
     <string name="chat_speak_in">Spreken in</string>
     <string name="chat_speak_in_help">Kies je talen in Instellingen → Spraak.</string>
+    <string name="live_option">Live stem</string>
+    <string name="live_option_sub">Praat hardop met Codex. Het antwoordt met de stem van ChatGPT en werkt in deze chat op de telefoon.</string>
+    <string name="live_label">Live</string>
+    <string name="live_end">Beëindigen</string>
+    <string name="live_connecting">Verbinden…</string>
+    <string name="live_started">Live stem staat aan. Praat maar: Codex hoort je, antwoordt hardop en doet in deze chat wat je vraagt.</string>
+    <string name="live_ended">Live stem beëindigd.</string>
+    <string name="live_ended_why">Live stem beëindigd: %1$s</string>
+    <string name="live_ended_screen_off">het scherm ging uit</string>
+    <string name="live_ended_paused">Buddy is gepauzeerd</string>
+    <string name="live_ended_idle">er is 5 minuten niets gezegd</string>
+    <string name="live_notification_title">Live stem met Codex</string>
+    <string name="live_mic_busy">De live stem gebruikt de microfoon. Beëindig die eerst.</string>
+    <string name="live_hint">Nieuw: praat live met Codex</string>
+    <string name="live_status_listening">Luistert…</string>
+    <string name="live_status_thinking">Denkt na…</string>
+    <string name="live_status_working">Bezig…</string>
+    <string name="live_status_speaking">Spreekt…</string>
     <string name="chat_phone_voice">via telefoon</string>
 
     <!-- Approval card above the composer, when the agent asks for an OK or asks a question -->

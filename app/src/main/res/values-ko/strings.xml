@@ -329,12 +329,45 @@
     <string name="chat_keep_awake_info">긴 작업용: 이 채팅이 작업하는 동안 휴대폰이 잠들지 않고, 끝나면 결과를 알림으로 알려 줘요. 휴대폰을 잠그면 화면은 그대로 꺼져요.</string>
     <string name="chat_allowed">묻지 않고 허용</string>
     <string name="chat_allowed_info">이 채팅의 작업이 끝날 때까지 이 앱들의 일상적인 승인은 자동으로 진행돼요: 메시지 보내기나 검토자가 물어볼 만한 단계 같은 것이요. 하나하나 채팅에 표시돼요. 결제, 구매, 삭제, 설치, 비밀번호, 보안 설정은 계속 물어봐요.</string>
+    <string name="chat_allowed_kept">이 채팅의 예약용으로 유지돼요: 이 앱들은 직접 삭제하거나 예약을 삭제할 때까지 예약된 실행에서도 계속 허용돼요.</string>
     <string name="chat_allowed_add">앱 추가</string>
     <string name="chat_allowed_remove">%1$s 삭제</string>
     <string name="run_rule_approved">이 작업의 규칙으로 승인됨: %1$s</string>
     <string name="run_end_done">%1$s 작업 완료</string>
     <string name="run_end_stopped">%1$s 중지됨</string>
     <string name="run_end_failed">%1$s에 문제가 생겼어요</string>
+    <string name="schedule_title">예약</string>
+    <string name="schedule_set">예약 설정</string>
+    <string name="schedule_set_info">정해진 시간에 이 채팅에 자동으로 메시지를 보내요. 예: 매일 14:00.</string>
+    <string name="schedule_info">설정한 시간에 Buddy가 직접 입력한 것처럼 이 메시지를 채팅에 보내요. 에이전트와 옵션은 이 채팅 그대로예요. 승인 카드는 여전히 기다려요. 휴대폰이 잠겨 있을 때 화면이 필요하면 잠금 해제를 부탁해요.</string>
+    <string name="schedule_time">시간</string>
+    <string name="schedule_days">요일</string>
+    <string name="schedule_daily">매일</string>
+    <string name="schedule_weekdays">평일</string>
+    <string name="schedule_pick_days">요일 선택</string>
+    <string name="schedule_message">메시지</string>
+    <string name="schedule_message_hint">보낼 내용, 예: 앱을 열고 오늘 체크인을 해 줘</string>
+    <string name="schedule_wake">이 작업을 위해 휴대폰 깨우기</string>
+    <string name="schedule_wake_info">화면이 필요하면 화면이 켜져요(PIN, 패턴, 지문이 없는 잠금 화면은 열려요). 실행 중에는 주변 사람도 화면을 볼 수 있어요.</string>
+    <string name="schedule_inexact">Buddy의 정확한 알람이 꺼져 있어서 몇 분 늦게 시작될 수 있어요.</string>
+    <string name="schedule_allow_exact">정확한 알람 허용</string>
+    <string name="schedule_save">저장</string>
+    <string name="schedule_remove">삭제</string>
+    <string name="schedule_summary_daily">매일 %1$s</string>
+    <string name="schedule_summary_weekdays">평일 %1$s</string>
+    <string name="schedule_summary_days">%1$s %2$s</string>
+    <string name="schedule_next">다음: %1$s</string>
+    <string name="schedule_no_days">요일을 하나 이상 선택하세요</string>
+    <string name="schedule_no_message">보낼 메시지를 입력하세요</string>
+    <string name="schedule_channel">예약된 작업</string>
+    <string name="schedule_screen_title">예약된 작업에 화면이 필요해요: 계속하려면 잠금 해제</string>
+    <string name="schedule_screen_text">%1$s: 휴대폰 잠금을 해제하면 이어서 진행해요(%2$s까지).</string>
+    <string name="schedule_skipped_title">예약된 작업 건너뜀: %1$s</string>
+    <string name="schedule_stopped_title">예약된 작업 중지됨: %1$s</string>
+    <string name="schedule_skip_running">이 채팅은 아직 이전 작업을 하고 있었어요.</string>
+    <string name="schedule_skip_busy">Buddy가 한 시간 동안 바빴어요(다른 작업, 일시정지, 또는 인터넷 없음).</string>
+    <string name="schedule_skip_screen">휴대폰이 한 시간 동안 잠겨 있었어요.</string>
+    <string name="schedule_marker">예약됨</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <string name="chat_stop">중지</string>
@@ -361,6 +394,24 @@
     <!-- Language sheet (long-press the mic) -->
     <string name="chat_speak_in">말할 언어</string>
     <string name="chat_speak_in_help">언어는 ‘설정’ → ‘음성’에서 고를 수 있어요.</string>
+    <string name="live_option">라이브 음성</string>
+    <string name="live_option_sub">Codex와 소리 내어 대화하세요. ChatGPT 목소리로 답하고 이 채팅에서 휴대폰을 조작해요.</string>
+    <string name="live_label">라이브</string>
+    <string name="live_end">종료</string>
+    <string name="live_connecting">연결 중…</string>
+    <string name="live_started">라이브 음성이 켜졌어요. 말해 보세요. Codex가 듣고 소리 내어 답하며 이 채팅에서 요청한 일을 해요.</string>
+    <string name="live_ended">라이브 음성이 종료됐어요.</string>
+    <string name="live_ended_why">라이브 음성이 종료됐어요: %1$s</string>
+    <string name="live_ended_screen_off">화면이 꺼짐</string>
+    <string name="live_ended_paused">Buddy가 일시 중지됨</string>
+    <string name="live_ended_idle">5분 동안 아무 말도 없음</string>
+    <string name="live_notification_title">Codex와 라이브 음성</string>
+    <string name="live_mic_busy">라이브 음성이 마이크를 쓰고 있어요. 먼저 종료하세요.</string>
+    <string name="live_hint">새 기능: Codex와 실시간으로 대화하세요</string>
+    <string name="live_status_listening">듣는 중…</string>
+    <string name="live_status_thinking">생각 중…</string>
+    <string name="live_status_working">작업 중…</string>
+    <string name="live_status_speaking">말하는 중…</string>
     <string name="chat_phone_voice">휴대전화 음성</string>
 
     <!-- Approval card above the composer, when the agent asks for an OK or asks a question -->

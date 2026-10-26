@@ -345,12 +345,45 @@
     <string name="chat_keep_awake_info">Do długich zadań: telefon nie zasypia, dopóki ten czat pracuje, a powiadomienie powie ci, jak poszło. Zablokowanie telefonu nadal wyłącza ekran.</string>
     <string name="chat_allowed">Dozwolone bez pytania</string>
     <string name="chat_allowed_info">Do końca zadania tego czatu rutynowe zgody w tych aplikacjach przechodzą same: wysłanie wiadomości albo krok, o który zapytałby recenzent. Każda pojawia się w czacie. Płacenie, kupowanie, usuwanie, instalowanie, hasła i ustawienia zabezpieczeń nadal wymagają twojej zgody.</string>
+    <string name="chat_allowed_kept">Zachowane dla harmonogramu tego czatu: te aplikacje pozostają dozwolone w jego zaplanowanych zadaniach, dopóki nie usuniesz ich albo harmonogramu.</string>
     <string name="chat_allowed_add">Dodaj aplikację</string>
     <string name="chat_allowed_remove">Usuń %1$s</string>
     <string name="run_rule_approved">Zatwierdzone przez twoją regułę tego zadania: %1$s</string>
     <string name="run_end_done">%1$s skończył</string>
     <string name="run_end_stopped">%1$s zatrzymał się</string>
     <string name="run_end_failed">%1$s napotkał problem</string>
+    <string name="schedule_title">Harmonogram</string>
+    <string name="schedule_set">Ustaw harmonogram</string>
+    <string name="schedule_set_info">Wysyłaj do tego czatu wiadomość samoczynnie o ustalonych porach, np. codziennie o 14:00.</string>
+    <string name="schedule_info">O ustalonej porze Buddy wysyła tę wiadomość do czatu, jakbyś ją wpisał, z agentem i opcjami tego czatu. Karty zgody nadal czekają na ciebie. Jeśli potrzebuje ekranu, gdy telefon jest zablokowany, prosi o odblokowanie.</string>
+    <string name="schedule_time">Godzina</string>
+    <string name="schedule_days">Dni</string>
+    <string name="schedule_daily">Codziennie</string>
+    <string name="schedule_weekdays">Dni robocze</string>
+    <string name="schedule_pick_days">Wybierz dni</string>
+    <string name="schedule_message">Wiadomość</string>
+    <string name="schedule_message_hint">Co wysłać, np. Otwórz aplikację i zrób dzisiejsze zameldowanie</string>
+    <string name="schedule_wake">Wybudź telefon dla tego zadania</string>
+    <string name="schedule_wake_info">Gdy potrzebuje ekranu, ekran się włącza (a ekran blokady bez PIN-u, wzoru czy odcisku palca się otwiera). Podczas działania każdy w pobliżu może zobaczyć ekran.</string>
+    <string name="schedule_inexact">Dokładne alarmy są wyłączone dla Buddy, więc może zacząć kilka minut później.</string>
+    <string name="schedule_allow_exact">Zezwól na dokładne alarmy</string>
+    <string name="schedule_save">Zapisz</string>
+    <string name="schedule_remove">Usuń</string>
+    <string name="schedule_summary_daily">Codziennie o %1$s</string>
+    <string name="schedule_summary_weekdays">W dni robocze o %1$s</string>
+    <string name="schedule_summary_days">%1$s o %2$s</string>
+    <string name="schedule_next">Następnie: %1$s</string>
+    <string name="schedule_no_days">Wybierz co najmniej jeden dzień</string>
+    <string name="schedule_no_message">Napisz wiadomość do wysłania</string>
+    <string name="schedule_channel">Zaplanowane zadania</string>
+    <string name="schedule_screen_title">Zaplanowane zadanie potrzebuje ekranu: odblokuj, aby kontynuować</string>
+    <string name="schedule_screen_text">%1$s: wznowi się po odblokowaniu telefonu, do %2$s.</string>
+    <string name="schedule_skipped_title">Pominięto zaplanowane zadanie: %1$s</string>
+    <string name="schedule_stopped_title">Zatrzymano zaplanowane zadanie: %1$s</string>
+    <string name="schedule_skip_running">Ten czat wciąż pracował nad poprzednim zadaniem.</string>
+    <string name="schedule_skip_busy">Buddy był zajęty przez godzinę (inne zadanie, pauza lub brak internetu).</string>
+    <string name="schedule_skip_screen">Telefon pozostał zablokowany przez godzinę.</string>
+    <string name="schedule_marker">Zaplanowane</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <string name="chat_stop">Zatrzymaj</string>
@@ -377,6 +410,24 @@
     <!-- Language sheet (long-press the mic) -->
     <string name="chat_speak_in">Mów w języku</string>
     <string name="chat_speak_in_help">Wybierz swoje języki w sekcji Ustawienia → Głos.</string>
+    <string name="live_option">Głos na żywo</string>
+    <string name="live_option_sub">Rozmawiaj z Codexem na głos. Odpowiada głosem ChatGPT i działa na telefonie w tym czacie.</string>
+    <string name="live_label">Na żywo</string>
+    <string name="live_end">Zakończ</string>
+    <string name="live_connecting">Łączenie…</string>
+    <string name="live_started">Głos na żywo włączony. Mów: Codex cię słyszy, odpowiada na głos i robi w tym czacie to, o co prosisz.</string>
+    <string name="live_ended">Głos na żywo zakończony.</string>
+    <string name="live_ended_why">Głos na żywo zakończony: %1$s</string>
+    <string name="live_ended_screen_off">ekran się wyłączył</string>
+    <string name="live_ended_paused">Buddy został wstrzymany</string>
+    <string name="live_ended_idle">przez 5 minut nic nie powiedziano</string>
+    <string name="live_notification_title">Głos na żywo z Codexem</string>
+    <string name="live_mic_busy">Głos na żywo używa mikrofonu. Najpierw go zakończ.</string>
+    <string name="live_hint">Nowość: rozmawiaj z Codexem na żywo</string>
+    <string name="live_status_listening">Słucham…</string>
+    <string name="live_status_thinking">Myślę…</string>
+    <string name="live_status_working">Pracuję nad tym…</string>
+    <string name="live_status_speaking">Mówię…</string>
     <string name="chat_phone_voice">głos telefonu</string>
 
     <!-- Approval card above the composer, when the agent asks for an OK or asks a question -->

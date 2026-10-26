@@ -524,6 +524,11 @@ final class Bubble implements ChatHub.Listener {
         svc.getSystemService(ClipboardManager.class).addPrimaryClipChangedListener(() -> input.post(this::updatePaste));
         // holding the field would select a word with handles, which misbehave over the keyboard in an overlay
         input.setLongClickable(false);
+        // live voice (Codex chats, see CodexLive): shown by paintLive for the chat on screen
+        live = Ui.iconButton(svc, R.drawable.ms_graphic_eq, svc.getString(R.string.live_option), Ui.MUTED);
+        live.setOnClickListener(v -> startLive());
+        live.setVisibility(View.GONE);
+        inputRow.addView(live, new LinearLayout.LayoutParams(dp(40), dp(40)));
         mic = new ImageButton(svc);
         mic.setImageResource(R.drawable.ms_mic);
         mic.setContentDescription(svc.getString(R.string.bubble_talk));
@@ -577,10 +582,82 @@ final class Bubble implements ChatHub.Listener {
         voiceBar.setVisibility(View.GONE);
         panel.addView(voiceBar, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
+        liveBar = new VoiceBar(svc, new VoiceBar.Actions() {
+            @Override
+            public void cancel() {
+                CodexLive.end(null);
+            }
+
+            @Override
+            public void send() {
+            }
+        }, true);
+        liveBar.setVisibility(View.GONE);
+        panel.addView(liveBar, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+        CodexLive.addUi(new CodexLive.Ui() {
+            @Override
+            public void onLevel(float level) {
+                if (CodexLive.on(sessions.current)) liveBar.level(level);
+            }
+
+            @Override
+            public void onLine(String text) {
+                if (CodexLive.on(sessions.current)) liveBar.setHeard(text);
+            }
+
+            @Override
+            public void onStatus(String status) {
+                if (CodexLive.on(sessions.current)) liveBar.setLiveStatus(status);
+                else paintLive(); // ended: the composer comes back at once
+            }
+        });
     }
 
     private LinearLayout composer;
     private VoiceBar voiceBar;
+    /** Live voice: the button in the composer, and the bar in its place during a call in the chat on screen. */
+    private ImageButton live;
+    private VoiceBar liveBar;
+
+    /** The live button for Codex chats, and the live bar instead of the composer while this chat has the call. */
+    private void paintLive() {
+        if (liveBar == null) return;
+        Sessions.Session ses = sessions.current;
+        live.setVisibility(CodexLive.available(svc, ses) ? View.VISIBLE : View.GONE);
+        boolean on = CodexLive.on(ses) && !showingList;
+        boolean shown = liveBar.getVisibility() == View.VISIBLE;
+        if (on) {
+            if (!shown) {
+                if (voiceBar.getVisibility() == View.VISIBLE) Voice.stopListening();
+                liveBar.begin(null);
+                hideKeyboard();
+            }
+            liveBar.setLiveStatus(CodexLive.statusText());
+            liveBar.since(System.currentTimeMillis() - (android.os.SystemClock.elapsedRealtime() - CodexLive.started()));
+            liveBar.setVisibility(View.VISIBLE);
+            voiceBar.setVisibility(View.GONE);
+            composer.setVisibility(View.GONE);
+        } else if (shown) {
+            liveBar.setVisibility(View.GONE);
+            composer.setVisibility(showingList ? View.GONE : View.VISIBLE);
+        }
+    }
+
+    /** The live button: talk with this chat's Codex out loud (see CodexLive). */
+    private void startLive() {
+        if (!Voice.micAllowed(svc)) {
+            // only an activity can ask for the microphone permission
+            toast(svc.getString(R.string.bubble_allow_mic_tap_mic));
+            svc.startActivity(new android.content.Intent(svc, MainActivity.class)
+                    .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK).putExtra("askMic", true));
+            collapse();
+            return;
+        }
+        String err = CodexLive.start(svc, sessions.current);
+        if (err != null) toast(err);
+        paintLive();
+    }
 
     private void showVoiceBar(boolean on) {
         if (on) voiceBar.begin(null);
@@ -1604,6 +1681,7 @@ final class Bubble implements ChatHub.Listener {
         if (composer != null && voiceBar != null && voiceBar.getVisibility() != View.VISIBLE) {
             composer.setVisibility(showingList ? View.GONE : View.VISIBLE);
         }
+        paintLive();
     }
 
     /** "+": pick the agent for a new chat, as in the app's New chat sheet. */
@@ -1737,6 +1815,13 @@ final class Bubble implements ChatHub.Listener {
         LinearLayout first = new LinearLayout(svc);
         first.setGravity(Gravity.CENTER_VERTICAL);
         first.addView(Ui.single(Ui.title(svc, ses.label(), 15)), new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        if (ses.schedule != null) { // a scheduled task
+            ImageView clock = Ui.icon(svc, R.drawable.ms_schedule, Ui.MUTED, 14);
+            clock.setContentDescription(svc.getString(R.string.schedule_marker));
+            LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(dp(14), dp(14));
+            cp.setMarginStart(dp(8));
+            first.addView(clock, cp);
+        }
         TextView time = Ui.monoText(svc, MainActivity.ago(ses.updated), 12, Ui.MUTED);
         time.setPaddingRelative(dp(8), 0, 0, 0);
         first.addView(time);
@@ -1933,6 +2018,7 @@ final class Bubble implements ChatHub.Listener {
             renderCurrent();
             return;
         }
+        paintLive();
         refreshStatus();
         if (showingList) renderSessionList();
     }

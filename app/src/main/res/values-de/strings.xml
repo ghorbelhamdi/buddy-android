@@ -334,12 +334,45 @@
     <string name="chat_keep_awake_info">Für lange Aufgaben: Das Handy bleibt wach, solange dieser Chat arbeitet, und eine Benachrichtigung sagt dir, wie es gelaufen ist. Wenn du das Handy sperrst, geht der Bildschirm trotzdem aus.</string>
     <string name="chat_allowed">Ohne Nachfrage erlaubt</string>
     <string name="chat_allowed_info">Bis die Aufgabe dieses Chats endet, laufen Routine-Freigaben in diesen Apps von selbst: eine Nachricht senden oder ein Schritt, bei dem der Prüfer nachfragen würde. Jede steht im Chat. Bezahlen, Kaufen, Löschen, Installieren, Passwörter und Sicherheitseinstellungen fragen dich weiterhin.</string>
+    <string name="chat_allowed_kept">Für den Zeitplan dieses Chats behalten: Diese Apps bleiben für seine geplanten Läufe erlaubt, bis du sie oder den Zeitplan entfernst.</string>
     <string name="chat_allowed_add">App hinzufügen</string>
     <string name="chat_allowed_remove">%1$s entfernen</string>
     <string name="run_rule_approved">Durch deine Regel für diese Aufgabe erlaubt: %1$s</string>
     <string name="run_end_done">%1$s ist fertig</string>
     <string name="run_end_stopped">%1$s wurde gestoppt</string>
     <string name="run_end_failed">%1$s hatte ein Problem</string>
+    <string name="schedule_title">Zeitplan</string>
+    <string name="schedule_set">Zeitplan festlegen</string>
+    <string name="schedule_set_info">Schick diesem Chat zu festen Zeiten von selbst eine Nachricht, z. B. jeden Tag um 14:00.</string>
+    <string name="schedule_info">Zur festgelegten Zeit schickt Buddy diese Nachricht in den Chat, als hättest du sie getippt, mit dem Agenten und den Optionen dieses Chats. Freigabekarten warten weiterhin auf dich. Braucht es den Bildschirm, während das Handy gesperrt ist, bittet es dich zu entsperren.</string>
+    <string name="schedule_time">Uhrzeit</string>
+    <string name="schedule_days">Tage</string>
+    <string name="schedule_daily">Jeden Tag</string>
+    <string name="schedule_weekdays">Werktags</string>
+    <string name="schedule_pick_days">Tage wählen</string>
+    <string name="schedule_message">Nachricht</string>
+    <string name="schedule_message_hint">Was gesendet wird, z. B. Öffne die App und mach den heutigen Check-in</string>
+    <string name="schedule_wake">Handy für diese Aufgabe wecken</string>
+    <string name="schedule_wake_info">Wenn es den Bildschirm braucht, geht er an (und ein Sperrbildschirm ohne PIN, Muster oder Fingerabdruck öffnet sich). Solange es läuft, kann jeder in der Nähe den Bildschirm sehen.</string>
+    <string name="schedule_inexact">Genaue Wecker sind für Buddy aus, daher kann es ein paar Minuten später starten.</string>
+    <string name="schedule_allow_exact">Genaue Wecker erlauben</string>
+    <string name="schedule_save">Speichern</string>
+    <string name="schedule_remove">Entfernen</string>
+    <string name="schedule_summary_daily">Jeden Tag um %1$s</string>
+    <string name="schedule_summary_weekdays">Werktags um %1$s</string>
+    <string name="schedule_summary_days">%1$s um %2$s</string>
+    <string name="schedule_next">Nächstes Mal: %1$s</string>
+    <string name="schedule_no_days">Wähl mindestens einen Tag</string>
+    <string name="schedule_no_message">Schreib die Nachricht, die gesendet werden soll</string>
+    <string name="schedule_channel">Geplante Aufgaben</string>
+    <string name="schedule_screen_title">Geplante Aufgabe braucht deinen Bildschirm: zum Fortfahren entsperren</string>
+    <string name="schedule_screen_text">%1$s: geht weiter, sobald du das Handy entsperrst, bis %2$s.</string>
+    <string name="schedule_skipped_title">Geplante Aufgabe übersprungen: %1$s</string>
+    <string name="schedule_stopped_title">Geplante Aufgabe gestoppt: %1$s</string>
+    <string name="schedule_skip_running">Dieser Chat war noch mit seiner letzten Aufgabe beschäftigt.</string>
+    <string name="schedule_skip_busy">Buddy war eine Stunde lang beschäftigt (eine andere Aufgabe, eine Pause oder kein Internet).</string>
+    <string name="schedule_skip_screen">Das Handy blieb eine Stunde lang gesperrt.</string>
+    <string name="schedule_marker">Geplant</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <string name="chat_stop">Stoppen</string>
@@ -366,6 +399,24 @@
     <!-- Language sheet (long-press the mic) -->
     <string name="chat_speak_in">Sprechen auf</string>
     <string name="chat_speak_in_help">Wähle deine Sprachen unter Einstellungen → Stimme.</string>
+    <string name="live_option">Live-Stimme</string>
+    <string name="live_option_sub">Sprich laut mit Codex. Es antwortet mit der Stimme von ChatGPT und erledigt in diesem Chat Dinge auf dem Smartphone.</string>
+    <string name="live_label">Live</string>
+    <string name="live_end">Beenden</string>
+    <string name="live_connecting">Verbinde…</string>
+    <string name="live_started">Live-Stimme ist an. Sprich einfach: Codex hört dich, antwortet laut und erledigt in diesem Chat, worum du bittest.</string>
+    <string name="live_ended">Live-Stimme beendet.</string>
+    <string name="live_ended_why">Live-Stimme beendet: %1$s</string>
+    <string name="live_ended_screen_off">der Bildschirm ging aus</string>
+    <string name="live_ended_paused">Buddy wurde pausiert</string>
+    <string name="live_ended_idle">5 Minuten lang wurde nichts gesagt</string>
+    <string name="live_notification_title">Live-Stimme mit Codex</string>
+    <string name="live_mic_busy">Die Live-Stimme nutzt das Mikrofon. Beende sie zuerst.</string>
+    <string name="live_hint">Neu: Sprich live mit Codex</string>
+    <string name="live_status_listening">Hört zu…</string>
+    <string name="live_status_thinking">Denkt nach…</string>
+    <string name="live_status_working">Arbeitet daran…</string>
+    <string name="live_status_speaking">Spricht…</string>
     <string name="chat_phone_voice">auf dem Gerät</string>
 
     <!-- Approval card above the composer, when the agent asks for an OK or asks a question -->

@@ -108,12 +108,14 @@ final class ChatHub {
     }
 
     void delete(Sessions.Session s) {
+        if (CodexLive.on(s)) CodexLive.end(null);
         try {
             Helper.run(app, "delete", s.id);
         } catch (Exception ignored) {
         }
         viewing.remove(s);
         sessions.remove(s);
+        if (s.schedule != null) Schedules.cancel(app, s.id);
         changed();
     }
 
@@ -129,10 +131,23 @@ final class ChatHub {
 
     /** A notification rule's run (see Triggers): the chat shows a short line, the agent gets the whole prompt. */
     String sendFromRule(Sessions.Session ses, String shown, String prompt) {
-        return send(ses, shown, null, prompt);
+        return send(ses, shown, null, prompt, false);
+    }
+
+    /**
+     * A scheduled task's run (see Schedules): the user's saved message, shown as theirs and marked "Scheduled", with
+     * the chat's own settings (Linux tools included). The agent gets it with a line saying when and why it came.
+     */
+    String sendScheduled(Sessions.Session ses, String text, String prompt) {
+        if (ses.running) return app.getString(R.string.schedule_skip_running);
+        return send(ses, text, null, prompt, true);
     }
 
     private String send(final Sessions.Session ses, String text, List<String> files, String prompt) {
+        return send(ses, text, files, prompt, false);
+    }
+
+    private String send(final Sessions.Session ses, String text, List<String> files, String prompt, boolean scheduled) {
         if (ses.running) {
             if (files != null && !files.isEmpty()) return app.getString(R.string.hub_still_working_attachments);
             return addNote(ses, text);
@@ -145,15 +160,20 @@ final class ChatHub {
         if (svc != null && prompt == null) svc.allowControl();
         try {
             // a rule's run works for someone else's message: no shell, files or web, even with Linux tools on
-            Helper.run(app, "ask", ses.id, ses.backend, prompt != null ? "rule" : devArg(ses), forAgent,
+            Helper.run(app, "ask", ses.id, ses.backend, prompt != null && !scheduled ? "rule" : devArg(ses), forAgent,
                     model(ses), hasFiles ? android.text.TextUtils.join(",", files) : "", ses.effort);
         } catch (Exception e) {
             return e.getMessage();
         }
         sessions.add(ses, Bubble.Kind.USER, text, hasFiles ? new ArrayList<>(files) : null);
         Sessions.Msg um = ses.messages.get(ses.messages.size() - 1);
+        if (scheduled) {
+            um.scheduled = true;
+            sessions.save();
+        }
         for (Listener l : new ArrayList<>(listeners)) l.onMessage(ses, um);
         startRun(ses);
+        ses.scheduledRun = scheduled;
         ses.status = app.getString(R.string.hub_thinking);
         changed();
         final int id = ses.runId;
@@ -215,6 +235,18 @@ final class ChatHub {
         changed();
     }
 
+    /**
+     * Set or remove (null) a chat's scheduled task, and its alarm with it. Removing it also ends the "Allowed without
+     * asking" apps kept for it (a running chat keeps them until its run ends, as any chat).
+     */
+    void setSchedule(Sessions.Session ses, Schedules.Plan plan) {
+        ses.schedule = plan;
+        if (plan == null && !ses.running) ses.allowed.clear();
+        sessions.save();
+        Schedules.set(app, ses);
+        changed();
+    }
+
     /** Long-task mode for a chat: the screen stays on while it works (see KeepAwake); a running one gets it at once. */
     void setAwake(Sessions.Session ses, boolean on) {
         ses.awake = on;
@@ -222,10 +254,14 @@ final class ChatHub {
         changed();
     }
 
-    /** Add or take away an app from a chat's "Allowed without asking" (until its run ends, see Guard.runRule). */
+    /**
+     * Add or take away an app from a chat's "Allowed without asking" (until its run ends, see Guard.runRule; with a
+     * schedule, kept for its scheduled runs).
+     */
     void setAllowed(Sessions.Session ses, String pkg, boolean on) {
         if (on) ses.allowed.add(pkg);
         else ses.allowed.remove(pkg);
+        if (ses.schedule != null) sessions.save();
         changed();
     }
 
@@ -317,12 +353,15 @@ final class ChatHub {
                             add(ses, Bubble.Kind.BUDDY, t);
                             ses.lastReply = t;
                             ses.gotText = true;
+                            CodexLive.agentSaid(ses, t); // a live voice call in this chat tells the user
                         }
                     } else if ("tool_use".equals(c.optString("type"))) {
                         String step = describeTool(c.optString("name"), c.optJSONObject("input"));
                         if (step != null) {
                             add(ses, Bubble.Kind.STEP, step);
                             ses.status = step;
+                            String n = c.optString("name");
+                            if (n.equals(TOOL_PREFIX + "confirm") || n.equals(TOOL_PREFIX + "ask")) CodexLive.agentWaiting(ses, step);
                         }
                     }
                 }
@@ -332,17 +371,24 @@ final class ChatHub {
                 boolean error = ev.optBoolean("is_error") || !"success".equals(ev.optString("subtype", "success"));
                 String r = ev.optString("result", "").trim();
                 if (error && ses.outcome == null) ses.outcome = "failed";
-                if (error) add(ses, Bubble.Kind.ERROR, r.isEmpty() ? app.getString(R.string.hub_agent_stopped, ses.brainName()) : r);
-                else if (!ses.gotText && !r.isEmpty()) {
+                if (error) {
+                    String shown = r.isEmpty() ? app.getString(R.string.hub_agent_stopped, ses.brainName()) : r;
+                    add(ses, Bubble.Kind.ERROR, shown);
+                    CodexLive.agentSaid(ses, shown);
+                } else if (!ses.gotText && !r.isEmpty()) {
                     add(ses, Bubble.Kind.BUDDY, r);
                     ses.lastReply = r;
+                    CodexLive.agentSaid(ses, r);
                 }
                 break;
             }
-            case "buddy_error":
+            case "buddy_error": {
                 if (ses.outcome == null) ses.outcome = "failed";
-                add(ses, Bubble.Kind.ERROR, ev.optString("text", app.getString(R.string.hub_something_wrong)));
+                String text = ev.optString("text", app.getString(R.string.hub_something_wrong));
+                add(ses, Bubble.Kind.ERROR, text);
+                CodexLive.agentSaid(ses, text);
                 break;
+            }
             case "buddy_stopped":
                 ses.outcome = "stopped";
                 add(ses, Bubble.Kind.STEP, app.getString(R.string.hub_stopped));
@@ -526,18 +572,21 @@ final class ChatHub {
 
     /**
      * A chat's run is over (finished, stopped or failed): what was allowed without asking ends with it, and in
-     * long-task mode a notification says how it went.
+     * long-task mode or a scheduled task's run (nobody may be watching) a notification says how it went.
      */
     private void runEnded(Sessions.Session ses) {
-        ses.allowed.clear();
-        if (ses.awake) KeepAwake.notifyEnded(app, ses);
+        if (ses.schedule == null) ses.allowed.clear(); // a scheduled chat keeps them for its next scheduled run
+        CodexLive.agentDone(ses, ses.outcome, !ses.lastReply.isEmpty());
+        if (ses.awake || ses.scheduledRun) KeepAwake.notifyEnded(app, ses);
+        ses.scheduledRun = false;
     }
 
     private void add(Sessions.Session ses, Bubble.Kind kind, String text) {
         if (text == null) return;
         sessions.add(ses, kind, text);
         if (kind == Bubble.Kind.BUDDY && !viewing.contains(ses)) ses.unread = true;
-        if (kind == Bubble.Kind.BUDDY && Prefs.speakReplies(app)) Voice.speak(app, text);
+        // not during a live voice call: the voice tells the user itself
+        if (kind == Bubble.Kind.BUDDY && Prefs.speakReplies(app) && !CodexLive.on()) Voice.speak(app, text);
         Sessions.Msg m = ses.messages.get(ses.messages.size() - 1);
         for (Listener l : new ArrayList<>(listeners)) l.onMessage(ses, m);
     }

@@ -476,12 +476,45 @@
     <string name="chat_keep_awake_info">Для долгих задач: телефон не засыпает, пока этот чат работает, а уведомление скажет, чем всё закончилось. Если заблокировать телефон, экран всё равно выключится.</string>
     <string name="chat_allowed">Разрешено без вопросов</string>
     <string name="chat_allowed_info">Пока задача этого чата не закончится, обычные подтверждения в этих приложениях проходят сами: отправка сообщения или шаг, о котором спросил бы проверяющий. Каждое видно в чате. Оплата, покупки, удаление, установка, пароли и настройки безопасности по-прежнему спрашивают вас.</string>
+    <string name="chat_allowed_kept">Сохраняются для расписания этого чата: эти приложения остаются разрешёнными для запусков по расписанию, пока вы не удалите их или расписание.</string>
     <string name="chat_allowed_add">Добавить приложение</string>
     <string name="chat_allowed_remove">Убрать %1$s</string>
     <string name="run_rule_approved">Одобрено вашим правилом для задачи: %1$s</string>
     <string name="run_end_done">%1$s закончил</string>
     <string name="run_end_stopped">%1$s остановлен</string>
     <string name="run_end_failed">У %1$s возникла проблема</string>
+    <string name="schedule_title">Расписание</string>
+    <string name="schedule_set">Задать расписание</string>
+    <string name="schedule_set_info">Сам отправляет сообщение в этот чат в заданное время, например каждый день в 14:00.</string>
+    <string name="schedule_info">В заданное время Buddy отправляет это сообщение в чат, как будто вы его набрали, с агентом и настройками этого чата. Карточки подтверждения по-прежнему ждут вас. Если ему нужен экран, когда телефон заблокирован, он попросит разблокировать.</string>
+    <string name="schedule_time">Время</string>
+    <string name="schedule_days">Дни</string>
+    <string name="schedule_daily">Каждый день</string>
+    <string name="schedule_weekdays">По будням</string>
+    <string name="schedule_pick_days">Выбрать дни</string>
+    <string name="schedule_message">Сообщение</string>
+    <string name="schedule_message_hint">Что отправить, например: Открой приложение и отметься за сегодня</string>
+    <string name="schedule_wake">Будить телефон для этой задачи</string>
+    <string name="schedule_wake_info">Когда нужен экран, он включается (а экран блокировки без PIN-кода, графического ключа или отпечатка открывается). Пока задача идёт, экран видно всем рядом.</string>
+    <string name="schedule_inexact">Точные будильники для Buddy выключены, поэтому он может начать на несколько минут позже.</string>
+    <string name="schedule_allow_exact">Разрешить точные будильники</string>
+    <string name="schedule_save">Сохранить</string>
+    <string name="schedule_remove">Удалить</string>
+    <string name="schedule_summary_daily">Каждый день в %1$s</string>
+    <string name="schedule_summary_weekdays">По будням в %1$s</string>
+    <string name="schedule_summary_days">%1$s в %2$s</string>
+    <string name="schedule_next">Следующий раз: %1$s</string>
+    <string name="schedule_no_days">Выберите хотя бы один день</string>
+    <string name="schedule_no_message">Напишите сообщение для отправки</string>
+    <string name="schedule_channel">Задачи по расписанию</string>
+    <string name="schedule_screen_title">Задаче по расписанию нужен экран: разблокируйте, чтобы продолжить</string>
+    <string name="schedule_screen_text">%1$s: продолжит, когда вы разблокируете телефон, до %2$s.</string>
+    <string name="schedule_skipped_title">Задача по расписанию пропущена: %1$s</string>
+    <string name="schedule_stopped_title">Задача по расписанию остановлена: %1$s</string>
+    <string name="schedule_skip_running">Этот чат ещё выполнял предыдущую задачу.</string>
+    <string name="schedule_skip_busy">Buddy был занят целый час (другая задача, пауза или нет интернета).</string>
+    <string name="schedule_skip_screen">Телефон оставался заблокированным целый час.</string>
+    <string name="schedule_marker">По расписанию</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <!-- Button, verb: stops the agent's task. Keep short. -->
@@ -525,6 +558,24 @@
     <string name="chat_speak_in">Язык речи</string>
     <!-- "Settings → Voice" = the Voice section of Buddy's Settings tab; use the same names as there. -->
     <string name="chat_speak_in_help">Выберите языки в разделе «Настройки» → «Голос».</string>
+    <string name="live_option">Живой голос</string>
+    <string name="live_option_sub">Говорите с Codex вслух. Он отвечает голосом ChatGPT и действует на телефоне в этом чате.</string>
+    <string name="live_label">В эфире</string>
+    <string name="live_end">Завершить</string>
+    <string name="live_connecting">Подключение…</string>
+    <string name="live_started">Живой голос включён. Говорите: Codex слышит вас, отвечает вслух и делает в этом чате то, что вы просите.</string>
+    <string name="live_ended">Живой голос завершён.</string>
+    <string name="live_ended_why">Живой голос завершён: %1$s</string>
+    <string name="live_ended_screen_off">экран погас</string>
+    <string name="live_ended_paused">Buddy приостановлен</string>
+    <string name="live_ended_idle">5 минут ничего не было сказано</string>
+    <string name="live_notification_title">Живой голос с Codex</string>
+    <string name="live_mic_busy">Живой голос использует микрофон. Сначала завершите его.</string>
+    <string name="live_hint">Новое: говорите с Codex вживую</string>
+    <string name="live_status_listening">Слушаю…</string>
+    <string name="live_status_thinking">Думаю…</string>
+    <string name="live_status_working">Работаю над этим…</string>
+    <string name="live_status_speaking">Говорю…</string>
     <!-- Small tag next to a language Claude's dictation doesn't support: the phone's own speech recognition is used. -->
     <string name="chat_phone_voice">через телефон</string>
 

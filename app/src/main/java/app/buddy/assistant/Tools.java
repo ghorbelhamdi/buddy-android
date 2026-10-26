@@ -269,6 +269,11 @@ final class Tools {
         }
         // locked or dark, the screen shows nothing to read or tap: say so instead of acting blind
         if (SCREEN.contains(name) && Triggers.locked(svc)) {
+            // a scheduled task's run asks the user to unlock and waits a little for them (null: unlocked, go on)
+            String locked = Schedules.awaitUnlock(svc, McpServer.CALLER_CHAT.get(), name);
+            if (locked != null) return text(locked);
+        }
+        if (SCREEN.contains(name) && Triggers.locked(svc)) {
             return text(Browser.available(svc) && !ruleRun()
                     ? "Phone is locked: only notification replies and the background browser work until the user unlocks. "
                     + "For web pages use the browser_* tools; for anything else, tell the user to unlock the phone."

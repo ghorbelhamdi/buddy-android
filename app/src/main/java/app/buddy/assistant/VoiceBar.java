@@ -15,7 +15,8 @@ import static app.buddy.assistant.Ui.*;
 
 /**
  * What the composer turns into while you talk (like a voice message in a messenger): cancel, a live
- * waveform of the microphone, a timer or status, and send. Words heard so far show above it.
+ * waveform of the microphone, a timer or status, and send. Words heard so far show above it. In a live voice call
+ * (see CodexLive) it says "Live" and has End instead (cancel), the waveform shows both sides, the line what's said.
  */
 final class VoiceBar extends LinearLayout {
     interface Actions {
@@ -30,6 +31,10 @@ final class VoiceBar extends LinearLayout {
     private String state; // null: recording (timer shows)
 
     VoiceBar(Context c, Actions a) {
+        this(c, a, false);
+    }
+
+    VoiceBar(Context c, Actions a, boolean live) {
         super(c);
         setOrientation(VERTICAL);
         heard = text(c, "", 14, MUTED);
@@ -42,10 +47,20 @@ final class VoiceBar extends LinearLayout {
         LinearLayout row = row(c);
         row.setGravity(Gravity.CENTER_VERTICAL);
         row.setPaddingRelative(dp(c, 4), dp(c, 4), dp(c, 4), dp(c, 4));
-        ImageButton cancel = iconButton(c, R.drawable.ms_close, c.getString(android.R.string.cancel), MUTED);
-        cancel.setLayoutParams(new LayoutParams(dp(c, 40), dp(c, 40)));
-        cancel.setOnClickListener(v -> a.cancel());
-        row.addView(cancel);
+        if (live) {
+            View dot = new View(c);
+            dot.setBackground(oval(ERR));
+            LayoutParams dp = new LayoutParams(dp(c, 10), dp(c, 10));
+            dp.setMarginStart(dp(c, 12));
+            dp.setMarginEnd(dp(c, 6));
+            row.addView(dot, dp);
+            row.addView(monoText(c, c.getString(R.string.live_label), 12, ERR), wrap());
+        } else {
+            ImageButton cancel = iconButton(c, R.drawable.ms_close, c.getString(android.R.string.cancel), MUTED);
+            cancel.setLayoutParams(new LayoutParams(dp(c, 40), dp(c, 40)));
+            cancel.setOnClickListener(v -> a.cancel());
+            row.addView(cancel);
+        }
         wave = new Wave(c);
         LayoutParams wp = new LayoutParams(0, dp(c, 32), 1);
         wp.leftMargin = wp.rightMargin = dp(c, 6);
@@ -53,6 +68,22 @@ final class VoiceBar extends LinearLayout {
         status = monoText(c, "", 12, MUTED);
         status.setSingleLine(true);
         row.addView(status, wrap());
+        if (live) {
+            android.widget.Button end = button(c, c.getString(R.string.live_end), false);
+            end.setTextColor(ERR);
+            end.setBackground(rounded(c, ERR_SOFT, 10));
+            end.setMinHeight(dp(c, 34));
+            end.setMinimumHeight(dp(c, 34));
+            end.setPaddingRelative(dp(c, 14), 0, dp(c, 14), 0);
+            end.setOnClickListener(v -> a.cancel());
+            LayoutParams ep = new LayoutParams(LayoutParams.WRAP_CONTENT, dp(c, 34));
+            ep.setMarginStart(dp(c, 8));
+            ep.setMarginEnd(dp(c, 4));
+            row.addView(end, ep);
+            addView(row, full());
+            setBackground(outlined(c, CARD, 26, ERR, 1));
+            return;
+        }
         ImageButton send = new ImageButton(c);
         send.setImageResource(R.drawable.ms_arrow_upward);
         send.setContentDescription(c.getString(R.string.voice_stop_and_send));
@@ -78,12 +109,26 @@ final class VoiceBar extends LinearLayout {
         tick();
     }
 
+    /** The timer counts from this moment (System.currentTimeMillis), e.g. when a live call started. */
+    void since(long t) {
+        started = t;
+        tick();
+    }
+
     void setState(String s) {
         if (s == null && state != null) started = System.currentTimeMillis();
         state = s;
         wave.live = s == null;
         tick();
     }
+
+    /** A live call's status (Listening…, Speaking…): shown beside the timer, the waveform stays live. */
+    void setLiveStatus(String s) {
+        liveStatus = s;
+        tick();
+    }
+
+    private String liveStatus;
 
     void setHeard(String t) {
         heard.setText(t);
@@ -99,7 +144,8 @@ final class VoiceBar extends LinearLayout {
             status.setText(state);
         } else {
             long s = (System.currentTimeMillis() - started) / 1000;
-            status.setText(String.format(java.util.Locale.ROOT, "%d:%02d", s / 60, s % 60));
+            String time = String.format(java.util.Locale.ROOT, "%d:%02d", s / 60, s % 60);
+            status.setText(liveStatus == null ? time : liveStatus + "  " + time);
         }
     }
 

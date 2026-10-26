@@ -250,6 +250,13 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
 
         LinearLayout first = row(this);
         first.addView(single(title(this, ses.label(), 15)), weight1());
+        if (ses.schedule != null) { // a scheduled task
+            android.widget.ImageView clock = icon(this, R.drawable.ms_schedule, MUTED, 14);
+            clock.setContentDescription(getString(R.string.schedule_marker));
+            LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(dp(this, 14), dp(this, 14));
+            cp.setMarginStart(dp(this, 8));
+            first.addView(clock, cp);
+        }
         TextView time = monoText(this, ago(ses.updated), 12, MUTED);
         time.setPaddingRelative(dp(this, 8), 0, 0, 0);
         first.addView(time);

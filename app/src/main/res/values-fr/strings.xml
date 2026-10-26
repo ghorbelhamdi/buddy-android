@@ -468,12 +468,45 @@
     <string name="chat_keep_awake_info">Pour les longues tâches : le téléphone reste éveillé tant que cette discussion travaille, et une notification vous dit comment ça s\'est passé. Verrouiller le téléphone éteint toujours l\'écran.</string>
     <string name="chat_allowed">Autorisé sans demander</string>
     <string name="chat_allowed_info">Jusqu\'à la fin de la tâche de cette discussion, les validations de routine dans ces apps se font seules : envoyer un message, ou une étape sur laquelle le vérificateur vous demanderait. Chacune apparaît dans la discussion. Payer, acheter, supprimer, installer, les mots de passe et les réglages de sécurité vous demandent toujours.</string>
+    <string name="chat_allowed_kept">Conservées pour la programmation de cette discussion : ces apps restent autorisées pour ses exécutions programmées, jusqu\'à ce que vous les retiriez ou supprimiez la programmation.</string>
     <string name="chat_allowed_add">Ajouter une app</string>
     <string name="chat_allowed_remove">Retirer %1$s</string>
     <string name="run_rule_approved">Approuvé par votre règle de tâche : %1$s</string>
     <string name="run_end_done">%1$s a terminé</string>
     <string name="run_end_stopped">%1$s s\'est arrêté</string>
     <string name="run_end_failed">%1$s a rencontré un problème</string>
+    <string name="schedule_title">Programmation</string>
+    <string name="schedule_set">Programmer</string>
+    <string name="schedule_set_info">Envoyez un message à cette discussion tout seul à heures fixes, par ex. chaque jour à 14:00.</string>
+    <string name="schedule_info">À l\'heure prévue, Buddy envoie ce message dans la discussion comme si vous l\'aviez tapé, avec l\'agent et les options de cette discussion. Les cartes de validation vous attendent toujours. S\'il a besoin de l\'écran alors que le téléphone est verrouillé, il vous demande de le déverrouiller.</string>
+    <string name="schedule_time">Heure</string>
+    <string name="schedule_days">Jours</string>
+    <string name="schedule_daily">Chaque jour</string>
+    <string name="schedule_weekdays">En semaine</string>
+    <string name="schedule_pick_days">Choisir les jours</string>
+    <string name="schedule_message">Message</string>
+    <string name="schedule_message_hint">Quoi envoyer, par ex. Ouvre l\'app et fais le pointage du jour</string>
+    <string name="schedule_wake">Réveiller le téléphone pour cette tâche</string>
+    <string name="schedule_wake_info">Quand il a besoin de l\'écran, celui-ci s\'allume (et un écran de verrouillage sans code, schéma ni empreinte s\'ouvre). Pendant qu\'il tourne, toute personne à côté peut voir l\'écran.</string>
+    <string name="schedule_inexact">Les alarmes exactes sont désactivées pour Buddy : il peut démarrer quelques minutes en retard.</string>
+    <string name="schedule_allow_exact">Autoriser les alarmes exactes</string>
+    <string name="schedule_save">Enregistrer</string>
+    <string name="schedule_remove">Supprimer</string>
+    <string name="schedule_summary_daily">Chaque jour à %1$s</string>
+    <string name="schedule_summary_weekdays">En semaine à %1$s</string>
+    <string name="schedule_summary_days">%1$s à %2$s</string>
+    <string name="schedule_next">Prochaine : %1$s</string>
+    <string name="schedule_no_days">Choisissez au moins un jour</string>
+    <string name="schedule_no_message">Écrivez le message à envoyer</string>
+    <string name="schedule_channel">Tâches programmées</string>
+    <string name="schedule_screen_title">Une tâche programmée a besoin de votre écran : déverrouillez pour continuer</string>
+    <string name="schedule_screen_text">%1$s : reprend quand vous déverrouillez le téléphone, jusqu\'à %2$s.</string>
+    <string name="schedule_skipped_title">Tâche programmée ignorée : %1$s</string>
+    <string name="schedule_stopped_title">Tâche programmée arrêtée : %1$s</string>
+    <string name="schedule_skip_running">Cette discussion travaillait encore sur sa tâche précédente.</string>
+    <string name="schedule_skip_busy">Buddy était occupé pendant une heure (une autre tâche, une pause ou pas d\'internet).</string>
+    <string name="schedule_skip_screen">Le téléphone est resté verrouillé pendant une heure.</string>
+    <string name="schedule_marker">Programmé</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <!-- Button, verb: stops the agent's task. Keep short. -->
@@ -517,6 +550,24 @@
     <string name="chat_speak_in">Parler en</string>
     <!-- "Settings → Voice" = the Voice section of Buddy's Settings tab; use the same names as there. -->
     <string name="chat_speak_in_help">Choisissez vos langues dans Paramètres → Voix.</string>
+    <string name="live_option">Voix en direct</string>
+    <string name="live_option_sub">Parlez à Codex à voix haute. Il répond avec la voix de ChatGPT et agit sur le téléphone dans ce chat.</string>
+    <string name="live_label">En direct</string>
+    <string name="live_end">Terminer</string>
+    <string name="live_connecting">Connexion…</string>
+    <string name="live_started">Voix en direct activée. Parlez : Codex vous entend, répond à voix haute et fait ce que vous demandez dans ce chat.</string>
+    <string name="live_ended">Voix en direct terminée.</string>
+    <string name="live_ended_why">Voix en direct terminée : %1$s</string>
+    <string name="live_ended_screen_off">l\'écran s\'est éteint</string>
+    <string name="live_ended_paused">Buddy a été mis en pause</string>
+    <string name="live_ended_idle">rien n\'a été dit pendant 5 minutes</string>
+    <string name="live_notification_title">Voix en direct avec Codex</string>
+    <string name="live_mic_busy">La voix en direct utilise le micro. Terminez-la d\'abord.</string>
+    <string name="live_hint">Nouveau : parlez en direct avec Codex</string>
+    <string name="live_status_listening">J\'écoute…</string>
+    <string name="live_status_thinking">Réflexion…</string>
+    <string name="live_status_working">En cours…</string>
+    <string name="live_status_speaking">Parle…</string>
     <!-- Small tag next to a language Claude's dictation doesn't support: the phone's own speech recognition is used. -->
     <string name="chat_phone_voice">voix du téléphone</string>
 

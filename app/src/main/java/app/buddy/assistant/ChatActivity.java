@@ -38,8 +38,13 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     private Button mic;
     private LinearLayout pill;
     private VoiceBar voiceBar;
+    /** In place of the composer while this chat has a live voice call (see CodexLive). */
+    private VoiceBar liveBar;
+    /** Starts live voice (Codex chats); the one-time hint about it above the composer. */
+    private ImageButton live;
+    private TextView liveHint;
     private ImageButton speaker, send;
-    /** Chat options: long-task mode and "Allowed without asking"; accent while either is on. */
+    /** Chat options: long-task mode, the schedule and "Allowed without asking"; accent while any is on. */
     private ImageButton options;
     private EditText input;
     private int maxBubble;
@@ -187,6 +192,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE
                 | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
         pill.addView(input, weight1());
+        live = iconButton(this, R.drawable.ms_graphic_eq, getString(R.string.live_option), MUTED);
+        live.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
+        live.setOnClickListener(v -> startLive());
+        live.setVisibility(CodexLive.available(this, ses) ? View.VISIBLE : View.GONE);
+        pill.addView(live);
         mic = button(this, "", false);
         mic.setContentDescription(getString(R.string.chat_talk));
         mic.setOnClickListener(v -> toggleMic());
@@ -223,6 +233,15 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         pp.leftMargin = pp.rightMargin = dp(this, 12);
         pp.bottomMargin = dp(this, 10);
         pp.topMargin = dp(this, 4);
+        liveHint = text(this, getString(R.string.live_hint), 13, ACCENT_TEXT);
+        liveHint.setBackground(rounded(this, ACCENT_SOFT, 12));
+        liveHint.setPaddingRelative(dp(this, 12), dp(this, 6), dp(this, 12), dp(this, 6));
+        liveHint.setOnClickListener(v -> liveHint.setVisibility(View.GONE));
+        liveHint.setVisibility(View.GONE);
+        LinearLayout.LayoutParams hp = wrap();
+        hp.gravity = Gravity.END;
+        hp.setMarginEnd(dp(this, 16));
+        root.addView(liveHint, hp);
         root.addView(pill, pp);
         voiceBar = new VoiceBar(this, new VoiceBar.Actions() {
             @Override
@@ -237,6 +256,22 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         });
         voiceBar.setVisibility(View.GONE);
         root.addView(voiceBar, pp);
+        liveBar = new VoiceBar(this, new VoiceBar.Actions() {
+            @Override
+            public void cancel() {
+                CodexLive.end(null);
+            }
+
+            @Override
+            public void send() {
+            }
+        }, true);
+        liveBar.setVisibility(View.GONE);
+        LinearLayout.LayoutParams lbp = full();
+        lbp.leftMargin = lbp.rightMargin = dp(this, 12);
+        lbp.bottomMargin = dp(this, 10);
+        lbp.topMargin = dp(this, 4);
+        root.addView(liveBar, lbp);
 
         // the outer frame takes the system-bar insets
         FrameLayout frame = new FrameLayout(this);
@@ -299,6 +334,14 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         hub.setViewing(ses, true);
         hub.select(ses);
         Voice.prepare(this); // so the mic is quick
+        CodexLive.addUi(liveUi);
+        boolean canLive = CodexLive.available(this, ses);
+        live.setVisibility(canLive ? View.VISIBLE : View.GONE);
+        if (canLive && !Prefs.liveHintShown(this)) { // once: the first Codex chat opened with live voice
+            Prefs.setLiveHintShown(this);
+            liveHint.setVisibility(View.VISIBLE);
+            liveHint.postDelayed(() -> liveHint.setVisibility(View.GONE), 10_000);
+        }
         if (lastMsg() != lastShown) showAll(); // messages came in while this screen was hidden
         refresh();
         scrollToEnd();
@@ -307,6 +350,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     @Override
     protected void onPause() {
         if (Voice.listening()) Voice.stopListening();
+        // a live call goes on (the agent works in other apps): it ends with End, the screen off or a pause
+        CodexLive.removeUi(liveUi);
         if (ses != null) {
             hub.setViewing(ses, false);
             hub.removeListener(this);
@@ -485,12 +530,43 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 ses.awake, on -> hub.setAwake(ses, on));
         sw.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
         c.addView(sw, full());
+        final Dialog[] sheet = new Dialog[1];
+        TextView sl = sectionLabel(this, getString(R.string.schedule_title));
+        sl.setPaddingRelative(0, dp(this, 12), 0, dp(this, 4));
+        c.addView(sl);
+        LinearLayout sr = row(this); // what's set and when it next runs, or a row to set one
+        sr.setGravity(Gravity.CENTER_VERTICAL);
+        sr.setPaddingRelative(dp(this, 4), dp(this, 10), dp(this, 4), dp(this, 10));
+        sr.setBackgroundResource(ripple(this, false));
+        sr.addView(icon(this, R.drawable.ms_schedule, ses.schedule != null ? ACCENT_TEXT : MUTED, 22));
+        LinearLayout st = column(this);
+        st.setPaddingRelative(dp(this, 12), 0, 0, 0);
+        if (ses.schedule == null) {
+            st.addView(text(this, getString(R.string.schedule_set), 15, ACCENT_TEXT));
+            st.addView(text(this, getString(R.string.schedule_set_info), 13, MUTED));
+        } else {
+            st.addView(title(this, ses.schedule.summary(this), 15));
+            st.addView(text(this, getString(R.string.schedule_next,
+                    Schedules.when(this, ses.schedule.next(System.currentTimeMillis()))), 13, MUTED));
+        }
+        sr.addView(st, weight1());
+        sr.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
+        sr.setOnClickListener(v -> {
+            sheet[0].dismiss();
+            scheduleSheet();
+        });
+        c.addView(sr, full());
         TextView label = sectionLabel(this, getString(R.string.chat_allowed));
         label.setPaddingRelative(0, dp(this, 12), 0, dp(this, 4));
         c.addView(label);
         TextView info = text(this, getString(R.string.chat_allowed_info), 13, MUTED);
         info.setPaddingRelative(0, 0, 0, dp(this, 8));
         c.addView(info);
+        if (ses.schedule != null) { // kept between runs (see ChatHub.runEnded)
+            TextView kept = text(this, getString(R.string.chat_allowed_kept), 13, ACCENT_TEXT);
+            kept.setPaddingRelative(0, 0, 0, dp(this, 8));
+            c.addView(kept);
+        }
         LinearLayout list = column(this);
         c.addView(list, full());
         final Runnable[] fill = new Runnable[1];
@@ -533,7 +609,157 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             list.addView(add, full());
         };
         fill[0].run();
-        bottomSheet(this, c).show();
+        sheet[0] = bottomSheet(this, c);
+        sheet[0].show();
+    }
+
+    /**
+     * The chat's schedule: a time of day, the days (every day, weekdays or picked ones), the message Buddy sends then as
+     * if the user typed it (at first the chat's first message), and whether to wake the phone for it. Nothing changes
+     * until Save.
+     */
+    private void scheduleSheet() {
+        final Schedules.Plan p = ses.schedule != null ? ses.schedule.copy() : new Schedules.Plan();
+        if (ses.schedule == null) p.text = Schedules.firstMessage(ses);
+        LinearLayout c = protect(column(this)); // only the user sets what runs on its own
+        c.addView(title(this, getString(R.string.schedule_title), 18));
+        TextView info = text(this, getString(R.string.schedule_info), 13, MUTED);
+        info.setPaddingRelative(0, dp(this, 4), 0, dp(this, 8));
+        c.addView(info);
+
+        TextView tl = sectionLabel(this, getString(R.string.schedule_time));
+        tl.setPaddingRelative(0, dp(this, 8), 0, dp(this, 4));
+        c.addView(tl);
+        TextView time = title(this, p.time(this), 28);
+        time.setTypeface(mono(this, 500));
+        time.setPaddingRelative(dp(this, 12), dp(this, 6), dp(this, 12), dp(this, 6));
+        time.setBackground(outlined(this, BG, 12, OUTLINE, 1));
+        time.setOnClickListener(v -> new android.app.TimePickerDialog(this, (tp, h, m) -> {
+            p.minute = h * 60 + m;
+            time.setText(p.time(this));
+        }, p.minute / 60, p.minute % 60, android.text.format.DateFormat.is24HourFormat(this)).show());
+        c.addView(time, wrap());
+
+        TextView dl = sectionLabel(this, getString(R.string.schedule_days));
+        dl.setPaddingRelative(0, dp(this, 14), 0, dp(this, 4));
+        c.addView(dl);
+        FrameLayout modes = new FrameLayout(this);
+        c.addView(modes, full());
+        LinearLayout picks = row(this);
+        LinearLayout.LayoutParams pp = full();
+        pp.topMargin = dp(this, 8);
+        c.addView(picks, pp);
+        String[] names = new java.text.DateFormatSymbols(Ui.locale(this)).getShortWeekdays();
+        final Runnable[] paint = new Runnable[1];
+        final String[] mode = {p.days == Schedules.Plan.EVERY_DAY ? "daily" : p.days == Schedules.Plan.WEEKDAYS ? "weekdays" : "pick"};
+        paint[0] = () -> {
+            modes.removeAllViews();
+            modes.addView(segmented(this, new String[][]{{"daily", getString(R.string.schedule_daily)},
+                    {"weekdays", getString(R.string.schedule_weekdays)}, {"pick", getString(R.string.schedule_pick_days)}},
+                    mode[0], false, v -> {
+                        mode[0] = v;
+                        if ("daily".equals(v)) p.days = Schedules.Plan.EVERY_DAY;
+                        else if ("weekdays".equals(v)) p.days = Schedules.Plan.WEEKDAYS;
+                        paint[0].run();
+                    }));
+            picks.removeAllViews();
+            picks.setVisibility("pick".equals(mode[0]) ? View.VISIBLE : View.GONE);
+            for (int d : Schedules.week()) {
+                boolean on = p.on(d);
+                TextView t = text(this, names[d], 13, on ? ON_ACCENT : MUTED);
+                t.setGravity(Gravity.CENTER);
+                t.setMaxLines(1);
+                t.setPaddingRelative(0, dp(this, 8), 0, dp(this, 8));
+                t.setBackground(on ? rounded(this, ACCENT, 10) : outlined(this, BG, 10, OUTLINE, 1));
+                t.setOnClickListener(v -> {
+                    p.days ^= 1 << (d - 1);
+                    paint[0].run();
+                });
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+                lp.setMarginEnd(dp(this, 4));
+                picks.addView(t, lp);
+            }
+        };
+        paint[0].run();
+
+        TextView ml = sectionLabel(this, getString(R.string.schedule_message));
+        ml.setPaddingRelative(0, dp(this, 14), 0, dp(this, 4));
+        c.addView(ml);
+        EditText msg = new EditText(this);
+        msg.setText(p.text);
+        msg.setHint(getString(R.string.schedule_message_hint));
+        msg.setHintTextColor(MUTED);
+        msg.setTextColor(TEXT);
+        msg.setTextSize(15);
+        msg.setTypeface(sans(this, 400));
+        msg.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE
+                | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
+        msg.setMinLines(2);
+        msg.setMaxLines(6);
+        msg.setGravity(Gravity.TOP | Gravity.START);
+        msg.setBackground(outlined(this, BG, 12, OUTLINE, 1));
+        msg.setPaddingRelative(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
+        c.addView(msg, full());
+
+        LinearLayout wake = switchRow(this, getString(R.string.schedule_wake), getString(R.string.schedule_wake_info),
+                p.wake, on -> p.wake = on);
+        wake.setPaddingRelative(dp(this, 4), dp(this, 14), dp(this, 4), dp(this, 6));
+        c.addView(wake, full());
+
+        if (!Schedules.exact(this)) { // Android 14+ asks the user for exact alarms
+            LinearLayout.LayoutParams wp = full();
+            wp.topMargin = dp(this, 8);
+            c.addView(warning(this, getString(R.string.schedule_inexact)), wp);
+            Button allow = outlinedButton(this, getString(R.string.schedule_allow_exact), ACCENT_TEXT);
+            allow.setOnClickListener(v -> {
+                try {
+                    startActivity(new android.content.Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                            android.net.Uri.parse("package:" + getPackageName())));
+                } catch (Exception e) {
+                    Toast.makeText(this, R.string.chat_no_app_for_action, Toast.LENGTH_SHORT).show();
+                }
+            });
+            LinearLayout.LayoutParams ap = wrap();
+            ap.topMargin = dp(this, 8);
+            c.addView(allow, ap);
+        }
+
+        LinearLayout btns = row(this);
+        btns.setPaddingRelative(0, dp(this, 18), 0, 0);
+        final Dialog[] d = new Dialog[1];
+        if (ses.schedule != null) {
+            Button remove = button(this, getString(R.string.schedule_remove), false);
+            remove.setTextColor(ERR);
+            remove.setBackground(rounded(this, ERR_SOFT, 12));
+            remove.setOnClickListener(v -> {
+                d[0].dismiss();
+                hub.setSchedule(ses, null);
+            });
+            LinearLayout.LayoutParams rp = new LinearLayout.LayoutParams(0, dp(this, 48), 1);
+            rp.setMarginEnd(dp(this, 10));
+            btns.addView(remove, rp);
+        }
+        Button save = button(this, getString(R.string.schedule_save), true);
+        btns.addView(save, new LinearLayout.LayoutParams(0, dp(this, 48), 1));
+        c.addView(btns, full());
+        save.setOnClickListener(v -> {
+            p.text = msg.getText().toString().trim();
+            if ((p.days & Schedules.Plan.EVERY_DAY) == 0) {
+                Toast.makeText(this, R.string.schedule_no_days, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (p.text.isEmpty()) {
+                msg.requestFocus();
+                Toast.makeText(this, R.string.schedule_no_message, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            d[0].dismiss();
+            hub.setSchedule(ses, p);
+            Toast.makeText(this, getString(R.string.schedule_next, Schedules.when(this, p.next(System.currentTimeMillis()))),
+                    Toast.LENGTH_SHORT).show();
+        });
+        d[0] = bottomSheet(this, c);
+        d[0].show();
     }
 
     /** Pick an app for "Allowed without asking": launchable apps, without those it never covers (Guard.allowable). */
@@ -688,14 +914,88 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         pill.setVisibility(on ? View.GONE : View.VISIBLE);
     }
 
-    /** Long-press the mic: which of your languages to listen for. */
+    /** The live bar's waveform and line, while this chat has the call. */
+    private final CodexLive.Ui liveUi = new CodexLive.Ui() {
+        @Override
+        public void onLevel(float level) {
+            if (CodexLive.on(ses)) liveBar.level(level);
+        }
+
+        @Override
+        public void onLine(String text) {
+            if (CodexLive.on(ses)) liveBar.setHeard(text);
+        }
+
+        @Override
+        public void onStatus(String status) {
+            if (CodexLive.on(ses)) liveBar.setLiveStatus(status);
+            else paintLive(); // ended: the composer comes back at once
+        }
+    };
+
+    /** The live bar in place of the composer while this chat has the call. */
+    private void paintLive() {
+        boolean live = CodexLive.on(ses);
+        boolean shown = liveBar.getVisibility() == View.VISIBLE;
+        if (live) {
+            if (!shown) {
+                if (voiceBar.getVisibility() == View.VISIBLE) Voice.stopListening();
+                liveBar.begin(null);
+                ((android.view.inputmethod.InputMethodManager) getSystemService(INPUT_METHOD_SERVICE))
+                        .hideSoftInputFromWindow(input.getWindowToken(), 0);
+            }
+            liveBar.setLiveStatus(CodexLive.statusText());
+            liveBar.since(System.currentTimeMillis() - (android.os.SystemClock.elapsedRealtime() - CodexLive.started()));
+            liveBar.setVisibility(View.VISIBLE);
+            voiceBar.setVisibility(View.GONE);
+            pill.setVisibility(View.GONE);
+            liveHint.setVisibility(View.GONE);
+        } else if (shown) {
+            liveBar.setVisibility(View.GONE);
+            pill.setVisibility(View.VISIBLE);
+        }
+    }
+
+    /** Go live: talk with Codex out loud in this chat (long-press the mic). */
+    private void startLive() {
+        liveHint.setVisibility(View.GONE);
+        if (!Voice.micAllowed(this)) {
+            requestPermissions(new String[]{android.Manifest.permission.RECORD_AUDIO}, 4);
+            return;
+        }
+        String err = CodexLive.start(this, ses);
+        if (err != null) Toast.makeText(this, err, Toast.LENGTH_LONG).show();
+        refresh();
+    }
+
+    /** Long-press the mic: which of your languages to listen for (and, in a Codex chat, live voice). */
     private void languageSheet() {
         LinearLayout c = column(this);
+        final Dialog[] d = new Dialog[1];
+        if (CodexLive.available(this, ses)) {
+            LinearLayout r = row(this);
+            r.setPaddingRelative(dp(this, 4), dp(this, 4), dp(this, 4), dp(this, 14));
+            r.setBackgroundResource(ripple(this, false));
+            FrameLayout ic = new FrameLayout(this);
+            ic.setBackground(rounded(this, ACCENT_SOFT, 12));
+            ic.addView(icon(this, R.drawable.ms_mic, ACCENT_TEXT, 22),
+                    new FrameLayout.LayoutParams(dp(this, 22), dp(this, 22), Gravity.CENTER));
+            r.addView(ic, new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
+            LinearLayout t = column(this);
+            t.setPaddingRelative(dp(this, 14), 0, 0, 0);
+            t.addView(title(this, getString(R.string.live_option), 15));
+            t.addView(text(this, getString(R.string.live_option_sub), 13, MUTED));
+            r.addView(t, weight1());
+            r.setOnClickListener(v -> {
+                d[0].dismiss();
+                startLive();
+            });
+            c.addView(r, full());
+        }
         c.addView(title(this, getString(R.string.chat_speak_in), 18));
         TextView sub = text(this, getString(R.string.chat_speak_in_help), 13, MUTED);
         sub.setPaddingRelative(0, dp(this, 2), 0, dp(this, 8));
         c.addView(sub);
-        final Dialog[] d = new Dialog[1];
         String cur = Prefs.voiceLang(this);
         for (String tag : Prefs.voiceLangs(this).split(",")) {
             LinearLayout r = row(this);
@@ -752,6 +1052,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     public void onRequestPermissionsResult(int code, String[] perms, int[] res) {
         super.onRequestPermissionsResult(code, perms, res);
         if (code == 3 && Voice.micAllowed(this)) toggleMic();
+        if (code == 4 && Voice.micAllowed(this)) startLive();
     }
 
     private void refresh() {
@@ -761,7 +1062,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         title.setText(ses.label());
         chipText.setText(Models.summary(ses));
         if (linux != null) paintLinuxChip(this, linux, ses.dev);
-        options.setImageTintList(ColorStateList.valueOf(ses.awake || !ses.allowed.isEmpty() ? ACCENT : MUTED));
+        options.setImageTintList(ColorStateList.valueOf(ses.awake || ses.schedule != null || !ses.allowed.isEmpty() ? ACCENT : MUTED));
         if (hint != null) hint.setText(hintText());
         strip.setVisibility(ses.running ? View.VISIBLE : View.GONE);
         input.setHint(ses.running ? getString(R.string.chat_input_hint_running) : getString(R.string.chat_input_hint, ses.brainName()));
@@ -772,6 +1073,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         }
         renderApproval();
         onBrowserChanged();
+        paintLive();
     }
 
     /** The live card shows while the background browser runs and this chat has a tab in it. */
@@ -993,6 +1295,23 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     }
 
     private void show(Sessions.Msg m) {
+        if (m.scheduled) { // sent by Buddy at the chat's scheduled time: a small "Scheduled" over it
+            if (log != null) {
+                log.finish();
+                log = null;
+            }
+            LinearLayout tag = row(this);
+            tag.setGravity(Gravity.CENTER_VERTICAL);
+            tag.addView(icon(this, R.drawable.ms_schedule, MUTED, 14));
+            TextView tt = monoText(this, getString(R.string.schedule_marker), 11, MUTED);
+            tt.setPaddingRelative(dp(this, 4), 0, 0, 0);
+            tag.addView(tt);
+            LinearLayout.LayoutParams tp = wrap();
+            tp.gravity = Gravity.END;
+            tp.topMargin = dp(this, 12);
+            tp.bottomMargin = -dp(this, 8); // close to its message
+            messages.addView(tag, tp);
+        }
         if (m.kind == Bubble.Kind.USER && !m.files.isEmpty()) {
             if (log != null) {
                 log.finish();

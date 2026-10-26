@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material Icons "graphic_eq" (Apache-2.0): live voice. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFFFF" android:pathData="M7,18h2V6H7V18z M11,22h2V2h-2V22z M3,14h2v-4H3V14z M15,18h2V6h-2V18z M19,10v4h2v-4H19z" />
+</vector>

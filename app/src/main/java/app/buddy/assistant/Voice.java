@@ -98,6 +98,7 @@ final class Voice {
     /** Start listening. Returns an error message, or null when started. */
     static String listen(Context c, Listener l) {
         if (!micAllowed(c)) return c.getString(R.string.voice_mic_needed);
+        if (CodexLive.on()) return c.getString(R.string.live_mic_busy); // the call has the microphone
         stopListening();
         stopSpeaking();
         String lang = Prefs.voiceLang(c);

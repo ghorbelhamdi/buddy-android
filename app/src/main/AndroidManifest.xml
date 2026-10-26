@@ -15,6 +15,9 @@
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <!-- Notification rules: the agent keeps working (and an approval countdown keeps running) with the screen off -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- Scheduled tasks: on time (the user allows it on Android 14+; without, a few minutes late), and again after a restart -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- Needed on Android 11+ to see launchable apps for open_app / list_apps -->
     <queries>
@@ -121,6 +124,34 @@
         <receiver
             android:name=".Updates"
             android:exported="false" />
+
+        <!-- Scheduled tasks: their alarms (only Buddy's own) -->
+        <receiver
+            android:name=".Schedules"
+            android:exported="false" />
+
+        <!-- Sets the scheduled tasks' alarms again; from the system, so exported (it only re-reads Buddy's own schedules) -->
+        <receiver
+            android:name=".Schedules$Boot"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- A scheduled task that needs the screen, with "Wake the phone for this task" on -->
+        <activity
+            android:name=".WakeActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:taskAffinity="" />
 
         <service
             android:name=".BuddyService"

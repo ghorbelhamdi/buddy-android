@@ -19,6 +19,8 @@ final class Sessions {
         final String text;
         /** Attachment ids (see Attachments); empty for most messages. */
         final List<String> files;
+        /** A user message Buddy sent on its own at a scheduled time (see Schedules): the chat marks it so. */
+        boolean scheduled;
 
         Msg(Bubble.Kind kind, String text) {
             this(kind, text, null);
@@ -53,6 +55,8 @@ final class Sessions {
         boolean dev;
         /** Long-task mode: the screen stays on while this chat works, and its end is a notification (see KeepAwake). */
         boolean awake;
+        /** The chat's scheduled task (see Schedules), or null. */
+        Schedules.Plan schedule;
         long updated = System.currentTimeMillis();
         final List<Msg> messages = new ArrayList<>();
         // runtime only
@@ -65,9 +69,12 @@ final class Sessions {
         final List<String> notes = new ArrayList<>();
         /**
          * "Allowed without asking": apps where this chat's routine approvals go ahead on their own until its run ends
-         * (see Guard.runRule). Never saved: a restart forgets them.
+         * (see Guard.runRule). Never saved, so a restart forgets them; except in a chat with a schedule, which keeps
+         * them between runs (and saved) for its scheduled runs, until the schedule is removed.
          */
         final java.util.Set<String> allowed = java.util.Collections.synchronizedSet(new java.util.LinkedHashSet<>());
+        /** The current run is a scheduled task's: its end is a notification, as in long-task mode. */
+        boolean scheduledRun;
         /** How the current run ended so far: null (fine), "stopped" or "failed". */
         String outcome;
 
@@ -115,7 +122,17 @@ final class Sessions {
         Session s = new Session(UUID.randomUUID().toString().replace("-", "").substring(0, 12), backend);
         s.dev = dev;
         all.add(0, s);
-        while (all.size() > MAX_SESSIONS) all.remove(all.size() - 1);
+        // the oldest chats make room, but not one with a schedule (unless every one has)
+        while (all.size() > MAX_SESSIONS) {
+            int drop = all.size() - 1;
+            for (int i = all.size() - 1; i > 0; i--) {
+                if (all.get(i).schedule == null && !all.get(i).running) {
+                    drop = i;
+                    break;
+                }
+            }
+            all.remove(drop);
+        }
         if (select || current == null || !all.contains(current)) current = s;
         save();
         return s;
@@ -177,10 +194,18 @@ final class Sessions {
                 for (Msg m : s.messages) {
                     JSONObject mo = new JSONObject().put("k", m.kind.name()).put("t", m.text);
                     if (!m.files.isEmpty()) mo.put("f", new JSONArray(m.files));
+                    if (m.scheduled) mo.put("s", true);
                     msgs.put(mo);
                 }
                 arr.put(new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model).put("effort", s.effort).put("actual_model", s.actualModel)
                         .put("dev", s.dev).put("awake", s.awake).put("updated", s.updated).put("messages", msgs));
+                if (s.schedule != null) {
+                    JSONArray ok;
+                    synchronized (s.allowed) {
+                        ok = new JSONArray(s.allowed);
+                    }
+                    arr.getJSONObject(arr.length() - 1).put("schedule", s.schedule.toJson()).put("allowed", ok);
+                }
             }
             sp.edit().putString("all", arr.toString()).putString("current", current == null ? null : current.id).apply();
         } catch (Exception ignored) {
@@ -203,6 +228,9 @@ final class Sessions {
                 older |= !o.has("dev");
                 s.dev = !Flavor.PLAY && o.optBoolean("dev", Prefs.devMode(app));
                 s.awake = o.optBoolean("awake");
+                s.schedule = Schedules.Plan.of(o.optJSONObject("schedule"));
+                JSONArray ok = s.schedule == null ? null : o.optJSONArray("allowed"); // kept for its scheduled runs
+                if (ok != null) for (int j = 0; j < ok.length(); j++) s.allowed.add(ok.getString(j));
                 s.updated = o.optLong("updated");
                 JSONArray msgs = o.optJSONArray("messages");
                 if (msgs != null) for (int j = 0; j < msgs.length(); j++) {
@@ -210,7 +238,9 @@ final class Sessions {
                     List<String> files = new ArrayList<>();
                     JSONArray f = m.optJSONArray("f");
                     if (f != null) for (int k = 0; k < f.length(); k++) files.add(f.getString(k));
-                    s.messages.add(new Msg(Bubble.Kind.valueOf(m.getString("k")), m.getString("t"), files));
+                    Msg msg = new Msg(Bubble.Kind.valueOf(m.getString("k")), m.getString("t"), files);
+                    msg.scheduled = m.optBoolean("s");
+                    s.messages.add(msg);
                 }
                 all.add(s);
             }

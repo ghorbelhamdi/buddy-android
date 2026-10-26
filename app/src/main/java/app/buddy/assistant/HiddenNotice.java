@@ -51,6 +51,10 @@ public final class HiddenNotice extends BroadcastReceiver {
             if (s != null) s.takeBackControl();
             return;
         }
+        if (CodexLive.ACTION_END.equals(intent.getAction())) { // the live voice notification's End
+            CodexLive.end(null);
+            return;
+        }
         if (AutoPause.ACTION_RESUME.equals(intent.getAction())) { // "Call ended": resume the paused task
             BuddyService s = BuddyService.get();
             if (s != null) s.resume();
