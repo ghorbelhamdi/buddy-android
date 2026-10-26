@@ -98,11 +98,9 @@ final class Guard {
             "com.zhiliaoapp.musically", "com.linkedin.android", "com.discord", "com.Slack", "com.viber.voip",
             "com.google.android.gm", "com.microsoft.office.outlook", "com.yahoo.mobile.client.android.mail",
             "com.google.android.dialer", "com.android.dialer", "com.samsung.android.dialer", "com.oneplus.dialer",
-            "com.android.vending", "com.amazon.mShop.android.shopping", "com.ebay.mobile", "com.paypal.android.p2pmobile",
-            "com.revolut.revolut", "de.number26.android", "com.google.android.apps.walletnfcrel", "com.wise.android",
-            "com.transferwise.android", "com.klarna.android", "com.coinbase.android", "com.binance.dev"));
+            "com.android.vending"));
     private static final Pattern HARD_NAME = Pattern.compile(
-            "(?i)(bank|banking|pay|wallet|finance|credit|sparkasse|volksbank|boursorama|revolut|n26|crypto|trading|broker)");
+            "(?i)(bank|banking|pay|wallet|finance|credit|crypto|trading|broker)");
 
     // ------------------------------------------------------------------ the user's button lists
 
@@ -366,8 +364,8 @@ final class Guard {
     }
 
     /**
-     * Does tapping this send or post a message (and nothing more, like paying or deleting)? Never in an app for money
-     * or shopping, where "Send" can mean sending money.
+     * Does tapping this send or post a message (and nothing more, like paying or deleting)? Never in a payment, bank or
+     * crypto app, where "Send" can mean sending money.
      */
     static boolean sends(android.content.Context c, AccessibilityNodeInfo n) {
         String l = n == null ? null : riskyLabel(n);
@@ -375,16 +373,11 @@ final class Guard {
         return SEND.matcher(l.trim()).find() || SEND_ID.matcher(l.trim()).find();
     }
 
-    private static final java.util.Set<String> MONEY = new java.util.HashSet<>(java.util.Arrays.asList(
-            "com.android.vending", "com.amazon.mShop.android.shopping", "com.ebay.mobile", "com.paypal.android.p2pmobile",
-            "com.revolut.revolut", "de.number26.android", "com.google.android.apps.walletnfcrel", "com.wise.android",
-            "com.transferwise.android", "com.klarna.android", "com.coinbase.android", "com.binance.dev"));
-
-    /** A payment, banking, crypto or shopping app (or one Buddy can't tell). */
+    /** A payment, banking or crypto app by its name (or one Buddy can't tell). */
     static boolean moneyApp(android.content.Context c, CharSequence pkg) {
         if (pkg == null) return true;
         String p = pkg.toString();
-        if (MONEY.contains(p) || HARD_NAME.matcher(p).find()) return true;
+        if (HARD_NAME.matcher(p).find()) return true;
         try {
             android.content.pm.PackageManager pm = c.getPackageManager();
             CharSequence label = pm.getApplicationLabel(pm.getApplicationInfo(p, 0));
@@ -404,7 +397,7 @@ final class Guard {
             "(?iu)(?<![\\p{L}])(install\\w*|passwords?|passcode|pin|otp|codes?|security|permissions?|bank\\w*|cards?|iban|money)(?![\\p{L}])|[€$£¥₹]");
 
     /**
-     * Can this app go on a chat's "Allowed without asking"? Not apps for money or shopping (see moneyApp), nor
+     * Can this app go on a chat's "Allowed without asking"? Not payment, bank or crypto apps (see moneyApp), nor
      * Settings, permission screens, app stores or installers: those approvals are always the user's.
      */
     static boolean allowable(android.content.Context c, String pkg) {
