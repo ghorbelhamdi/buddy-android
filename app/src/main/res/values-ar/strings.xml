@@ -208,6 +208,7 @@
     <string name="bubble_pill_hands_on">%1$s · اضغط هنا للإجابة</string>
     <string name="bubble_using_phone">يستخدم هاتفك</string>
     <string name="bubble_using_phone_status">يستخدم هاتفك · %1$s</string>
+    <string name="bubble_pill_background">في الخلفية · يمكنك استخدام هاتفك</string>
     <string name="activity_reading">يقرأ الشاشة</string>
     <string name="activity_typing">يكتب</string>
     <string name="activity_scrolling">يمرّر</string>
@@ -340,6 +341,18 @@
     <string name="chat_linux_tools_when">في هذه المحادثة فقط، بدءًا من رسالتك التالية.</string>
     <string name="chat_linux_tools_risk">قد تحاول رسالة أو صفحة ويب ضارة على الشاشة خداع الوكيل لتنفيذ أوامر. وتظل بطاقات الموافقة تحمي عمليات الإرسال والنشر والشراء والحذف.</string>
     <string name="chat_linux_tools_turn_on">تفعيل</string>
+
+    <string name="chat_options">خيارات المحادثة</string>
+    <string name="chat_keep_awake">إبقاء الشاشة مضاءة أثناء العمل</string>
+    <string name="chat_keep_awake_info">للمهام الطويلة: يبقى الهاتف مستيقظًا ما دامت هذه المحادثة تعمل، ويخبرك إشعار بالنتيجة. قفل الهاتف يطفئ الشاشة كالمعتاد.</string>
+    <string name="chat_allowed">مسموح دون سؤال</string>
+    <string name="chat_allowed_info">حتى تنتهي مهمة هذه المحادثة، تمرّ الموافقات الروتينية في هذه التطبيقات تلقائيًا: إرسال رسالة، أو خطوة كان المراجع سيسأل عنها. تظهر كل واحدة في المحادثة. الدفع والشراء والحذف والتثبيت وكلمات المرور وإعدادات الأمان ما زالت تسألك.</string>
+    <string name="chat_allowed_add">إضافة تطبيق</string>
+    <string name="chat_allowed_remove">إزالة %1$s</string>
+    <string name="run_rule_approved">تمت الموافقة بقاعدتك لهذه المهمة: %1$s</string>
+    <string name="run_end_done">انتهى %1$s</string>
+    <string name="run_end_stopped">توقف %1$s</string>
+    <string name="run_end_failed">واجه %1$s مشكلة</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <string name="chat_stop">إيقاف</string>
@@ -1185,6 +1198,9 @@
     <string name="browser_full_screen">ملء الشاشة</string>
     <string name="browser_fold">إظهار الصفحة أو إخفاؤها</string>
     <string name="browser_backspace">حذف حرف</string>
+    <string name="bubble_browser_thumb">عرض مباشر للمتصفح في الخلفية. انقر لفتحه بملء الشاشة.</string>
+    <string name="bubble_browser_thumb_hide">إخفاء</string>
+    <string name="bubble_pill_show_page">%1$s · انقر لعرض الصفحة</string>
     <string name="browser_type_hint">اكتب في الصفحة</string>
     <string name="browser_enter">إدخال</string>
     <string name="browser_dialog">تسأل الصفحة: %1$s</string>

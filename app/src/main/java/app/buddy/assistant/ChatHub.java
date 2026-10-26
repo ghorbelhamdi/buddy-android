@@ -171,6 +171,8 @@ final class ChatHub {
                 add(ses, Bubble.Kind.ERROR, app.getString(R.string.hub_no_answer) + (err.isEmpty() ? "" : "\n\n"
                         + ses.brainName()
                         + ": " + err));
+                ses.outcome = "failed";
+                runEnded(ses);
                 changed();
             }
         }, GIVE_UP_MS);
@@ -211,6 +213,32 @@ final class ChatHub {
         ses.dev = on && !Flavor.PLAY;
         sessions.save();
         changed();
+    }
+
+    /** Long-task mode for a chat: the screen stays on while it works (see KeepAwake); a running one gets it at once. */
+    void setAwake(Sessions.Session ses, boolean on) {
+        ses.awake = on;
+        sessions.save();
+        changed();
+    }
+
+    /** Add or take away an app from a chat's "Allowed without asking" (until its run ends, see Guard.runRule). */
+    void setAllowed(Sessions.Session ses, String pkg, boolean on) {
+        if (on) ses.allowed.add(pkg);
+        else ses.allowed.remove(pkg);
+        changed();
+    }
+
+    /** The calling chat's "Allowed without asking" apps (any thread); empty for a session outside Buddy's chats. */
+    java.util.Set<String> allowedFor(String chat) {
+        if (chat == null) return java.util.Collections.emptySet();
+        for (Sessions.Session s : new ArrayList<>(sessions.all)) {
+            if (!s.id.equals(chat)) continue;
+            synchronized (s.allowed) {
+                return new java.util.HashSet<>(s.allowed);
+            }
+        }
+        return java.util.Collections.emptySet();
     }
 
     /**
@@ -303,6 +331,7 @@ final class ChatHub {
             case "result": {
                 boolean error = ev.optBoolean("is_error") || !"success".equals(ev.optString("subtype", "success"));
                 String r = ev.optString("result", "").trim();
+                if (error && ses.outcome == null) ses.outcome = "failed";
                 if (error) add(ses, Bubble.Kind.ERROR, r.isEmpty() ? app.getString(R.string.hub_agent_stopped, ses.brainName()) : r);
                 else if (!ses.gotText && !r.isEmpty()) {
                     add(ses, Bubble.Kind.BUDDY, r);
@@ -311,9 +340,11 @@ final class ChatHub {
                 break;
             }
             case "buddy_error":
+                if (ses.outcome == null) ses.outcome = "failed";
                 add(ses, Bubble.Kind.ERROR, ev.optString("text", app.getString(R.string.hub_something_wrong)));
                 break;
             case "buddy_stopped":
+                ses.outcome = "stopped";
                 add(ses, Bubble.Kind.STEP, app.getString(R.string.hub_stopped));
                 break;
             case "buddy_step": // a line from the helper under the steps (Antigravity: a refused step)
@@ -323,6 +354,7 @@ final class ChatHub {
                 if (ses.running) {
                     ses.running = false;
                     ses.status = "";
+                    runEnded(ses);
                     if (!ses.lastReply.isEmpty()) {
                         Prefs.setHadReply(app);
                         flash(ses.lastReply);
@@ -485,10 +517,20 @@ final class ChatHub {
 
     private void startRun(Sessions.Session ses) {
         ses.running = true;
+        ses.outcome = null;
         ses.gotText = false;
         ses.lastReply = "";
         ses.lastEventAt = SystemClock.elapsedRealtime();
         ses.runId++;
+    }
+
+    /**
+     * A chat's run is over (finished, stopped or failed): what was allowed without asking ends with it, and in
+     * long-task mode a notification says how it went.
+     */
+    private void runEnded(Sessions.Session ses) {
+        ses.allowed.clear();
+        if (ses.awake) KeepAwake.notifyEnded(app, ses);
     }
 
     private void add(Sessions.Session ses, Bubble.Kind kind, String text) {
@@ -516,6 +558,8 @@ final class ChatHub {
             if (svc != null) svc.onRunsEnded();
         }
         wasRunning = now;
+        BuddyService svc = BuddyService.get();
+        if (svc != null) svc.keepAwake().update(); // a long-task chat started, ended or changed its switch
         for (Listener l : new ArrayList<>(listeners)) l.onChatsChanged();
     }
 

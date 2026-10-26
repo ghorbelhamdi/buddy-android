@@ -51,6 +51,8 @@ final class Sessions {
         String actualModel = "";
         /** Linux tools: the agent may run commands and edit files in ~/.buddy/work (buddy-run's dev). Never on Play. */
         boolean dev;
+        /** Long-task mode: the screen stays on while this chat works, and its end is a notification (see KeepAwake). */
+        boolean awake;
         long updated = System.currentTimeMillis();
         final List<Msg> messages = new ArrayList<>();
         // runtime only
@@ -61,6 +63,13 @@ final class Sessions {
         int runId;
         /** What the user added while this chat was working, not yet passed to the agent (guarded by itself). */
         final List<String> notes = new ArrayList<>();
+        /**
+         * "Allowed without asking": apps where this chat's routine approvals go ahead on their own until its run ends
+         * (see Guard.runRule). Never saved: a restart forgets them.
+         */
+        final java.util.Set<String> allowed = java.util.Collections.synchronizedSet(new java.util.LinkedHashSet<>());
+        /** How the current run ended so far: null (fine), "stopped" or "failed". */
+        String outcome;
 
         Session(String id, String backend) {
             this.id = id;
@@ -171,7 +180,7 @@ final class Sessions {
                     msgs.put(mo);
                 }
                 arr.put(new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model).put("effort", s.effort).put("actual_model", s.actualModel)
-                        .put("dev", s.dev).put("updated", s.updated).put("messages", msgs));
+                        .put("dev", s.dev).put("awake", s.awake).put("updated", s.updated).put("messages", msgs));
             }
             sp.edit().putString("all", arr.toString()).putString("current", current == null ? null : current.id).apply();
         } catch (Exception ignored) {
@@ -193,6 +202,7 @@ final class Sessions {
                 // a chat from before Linux tools were per chat gets what the one switch in Settings gave every chat
                 older |= !o.has("dev");
                 s.dev = !Flavor.PLAY && o.optBoolean("dev", Prefs.devMode(app));
+                s.awake = o.optBoolean("awake");
                 s.updated = o.optLong("updated");
                 JSONArray msgs = o.optJSONArray("messages");
                 if (msgs != null) for (int j = 0; j < msgs.length(); j++) {

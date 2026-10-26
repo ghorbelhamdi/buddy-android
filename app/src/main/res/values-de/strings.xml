@@ -199,6 +199,7 @@
     <string name="bubble_pill_hands_on">%1$s · hier tippen zum Antworten</string>
     <string name="bubble_using_phone">Bedient dein Smartphone</string>
     <string name="bubble_using_phone_status">Bedient dein Smartphone · %1$s</string>
+    <string name="bubble_pill_background">Im Hintergrund · du kannst dein Smartphone nutzen</string>
     <string name="activity_reading">Liest den Bildschirm</string>
     <string name="activity_typing">Tippt</string>
     <string name="activity_scrolling">Scrollt</string>
@@ -327,6 +328,18 @@
     <string name="chat_linux_tools_when">Nur in diesem Chat, ab deiner nächsten Nachricht.</string>
     <string name="chat_linux_tools_risk">Eine bösartige Nachricht oder Webseite auf dem Bildschirm könnte versuchen, ihn zum Ausführen von Befehlen zu verleiten. Freigabekarten schützen weiterhin Senden, Posten, Kaufen und Löschen.</string>
     <string name="chat_linux_tools_turn_on">Aktivieren</string>
+
+    <string name="chat_options">Chat-Optionen</string>
+    <string name="chat_keep_awake">Bildschirm anlassen, während es arbeitet</string>
+    <string name="chat_keep_awake_info">Für lange Aufgaben: Das Handy bleibt wach, solange dieser Chat arbeitet, und eine Benachrichtigung sagt dir, wie es gelaufen ist. Wenn du das Handy sperrst, geht der Bildschirm trotzdem aus.</string>
+    <string name="chat_allowed">Ohne Nachfrage erlaubt</string>
+    <string name="chat_allowed_info">Bis die Aufgabe dieses Chats endet, laufen Routine-Freigaben in diesen Apps von selbst: eine Nachricht senden oder ein Schritt, bei dem der Prüfer nachfragen würde. Jede steht im Chat. Bezahlen, Kaufen, Löschen, Installieren, Passwörter und Sicherheitseinstellungen fragen dich weiterhin.</string>
+    <string name="chat_allowed_add">App hinzufügen</string>
+    <string name="chat_allowed_remove">%1$s entfernen</string>
+    <string name="run_rule_approved">Durch deine Regel für diese Aufgabe erlaubt: %1$s</string>
+    <string name="run_end_done">%1$s ist fertig</string>
+    <string name="run_end_stopped">%1$s wurde gestoppt</string>
+    <string name="run_end_failed">%1$s hatte ein Problem</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <string name="chat_stop">Stoppen</string>
@@ -1144,6 +1157,9 @@
     <string name="browser_full_screen">Vollbild</string>
     <string name="browser_fold">Seite ein- oder ausblenden</string>
     <string name="browser_backspace">Ein Zeichen löschen</string>
+    <string name="bubble_browser_thumb">Live-Ansicht des Hintergrund-Browsers. Tippen, um ihn im Vollbild zu öffnen.</string>
+    <string name="bubble_browser_thumb_hide">Ausblenden</string>
+    <string name="bubble_pill_show_page">%1$s · tippe, um die Seite zu zeigen</string>
     <string name="browser_type_hint">In die Seite schreiben</string>
     <string name="browser_enter">Enter</string>
     <string name="browser_dialog">Die Seite fragt: %1$s</string>

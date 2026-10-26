@@ -284,7 +284,7 @@ final class Tools {
         }
         svc.onToolActivity(name);
         String step = activity(name, a);
-        if (step != null) svc.showActivity(step, false);
+        if (step != null) svc.showActivity(step, null);
         if (ACTIONS.contains(name)) svc.runOnMain(() -> svc.marks().clear()); // the screen is about to change
         switch (name) {
             case "read_screen": return text(readScreen());
@@ -316,7 +316,16 @@ final class Tools {
                     return text("APPROVED automatically: the user trusts " + svc.foregroundAppName() + ", so work on "
                             + "your own there without calling confirm. Apps on Hard or Smart still ask the user.");
                 }
-                String answer = svc.askConfirm(a.getString("summary"), true);
+                String summary = a.getString("summary");
+                if (!ruleRun() && Guard.routineText(summary) && Guard.runRule(svc, svc.foregroundPkg())) {
+                    // the user allowed this app until the run ends: as after a countdown, it covers sending, nothing more
+                    Guard.approved(summary, true);
+                    noteInChat(McpServer.CALLER_CHAT.get(), svc.getString(R.string.run_rule_approved, summary));
+                    return text("APPROVED by the user's rule for this run: they allowed routine steps in "
+                            + svc.foregroundAppName() + " without asking. Go ahead with this, and only this. Paying, "
+                            + "buying, deleting, installing, passwords and security settings still need their OK.");
+                }
+                String answer = svc.askConfirm(summary, true);
                 // covers the next risky tap (after a rule's countdown, only a send)
                 if (answer.startsWith("APPROVED")) Guard.approved(a.getString("summary"), answer.equals(BuddyService.AUTO_APPROVED));
                 return text(answer);
@@ -779,7 +788,7 @@ final class Tools {
         if (blocked != null) return blocked;
         String label = Guard.buttonLabel(n != null ? n : hit);
         svc.showActivity(label == null ? svc.getString(R.string.activity_tapping_plain)
-                : svc.getString(R.string.activity_tapping, label), false);
+                : svc.getString(R.string.activity_tapping, label), null);
         Path p = new Path();
         p.moveTo(x, y);
         boolean ok = gesture(p, longPress ? 700 : 60);
@@ -811,10 +820,14 @@ final class Tools {
         CharSequence draft = field == null || field.isShowingHintText() ? null : field.getText();
         String what = "Tap “" + (label == null ? "this" : label) + "”"; // for the agent and the reviewer
         java.util.function.Function<String, String> card = in -> tapCard(label, in); // the same, on the user's card
-        boolean ask = Guard.listed(svc, "ask", label, pkg)
+        boolean userAsks = Guard.listed(svc, "ask", label, pkg);
+        boolean ask = userAsks
                 || (Prefs.guardBuiltin(svc) && (Guard.riskyLabel(target) != null || (hit != null && Guard.riskyLabel(hit) != null)));
+        // the run rule covers a button that only sends, and not one the user listed as always asking
+        boolean byRule = !userAsks && Guard.sends(svc, target)
+                && (hit == null || Guard.riskyLabel(hit) == null || Guard.sends(svc, hit)) && Guard.runRule(svc, pkg);
         if (ask) return guardAction(what, card, draft == null ? null : draft.toString(),
-                Guard.sends(svc, target) || (hit != null && Guard.sends(svc, hit)));
+                Guard.sends(svc, target) || (hit != null && Guard.sends(svc, hit)), byRule);
         if (!"smart".equals(mode)) return null;
         return review(what, card, target, draft == null ? null : draft.toString());
     }
@@ -835,16 +848,20 @@ final class Tools {
         got.await(2, TimeUnit.SECONDS);
         String[] cx = ctx[0];
         String harness = Reviewer.harness(svc, cx == null ? null : cx[0]);
-        if (harness == null) return guardAction(what, card, svc.getString(R.string.tools_card_no_reviewer), false);
+        if (harness == null) return guardAction(what, card, svc.getString(R.string.tools_card_no_reviewer), false, false);
         svc.runOnMain(() -> {
             if (svc.bubble() != null) svc.bubble().setStatus(svc.getString(R.string.tools_status_checking_tap));
         });
         Reviewer.Decision d = Reviewer.review(svc, harness, cx == null ? null : cx[1], cx == null ? null : cx[2],
                 what + (app == null ? "" : " in " + app), Reviewer.screen(svc.getWindows(), target));
         if ("allow".equals(d.decision)) return null;
+        // the run rule covers the reviewer's "ask" on a routine step: not a risky button, not a password field
+        boolean byRule = "ask".equals(d.decision) && target != null && Guard.riskyLabel(target) == null && !target.isPassword()
+                && Guard.runRule(svc, str(target.getPackageName()));
         String why = svc.getString("block".equals(d.decision) ? R.string.tools_card_reviewer_block : R.string.tools_card_reviewer_ask,
                 d.by, d.reason);
-        return guardAction(what, card, (draft == null || draft.isEmpty() ? "" : svc.getString(R.string.tools_card_quote, draft) + "\n") + why, false);
+        return guardAction(what, card, (draft == null || draft.isEmpty() ? "" : svc.getString(R.string.tools_card_quote, draft) + "\n") + why,
+                false, byRule);
     }
 
     /** The card's line for a tap on label (null: a button without one) in the app named app (null: not known). */
@@ -856,12 +873,17 @@ final class Tools {
     /**
      * A risky action needs the user's OK: the agent's confirm just before, or a card now. what: the action in English,
      * for the agent; card: the same action on the card, in the user's language, given the app's name (or null).
-     * send: it sends a message, which a notification rule's countdown may approve.
+     * send: it sends a message, which a notification rule's countdown may approve. byRule: the chat's run rule covers
+     * it (see Guard.runRule): it goes ahead without a card, and the chat says so.
      */
-    private String guardAction(String what, java.util.function.Function<String, String> card, String detail, boolean send)
-            throws InterruptedException {
+    private String guardAction(String what, java.util.function.Function<String, String> card, String detail, boolean send,
+                               boolean byRule) throws InterruptedException {
         if (Guard.takeApproval(send)) return null;
         String app = svc.foregroundAppName();
+        if (byRule) {
+            noteInChat(McpServer.CALLER_CHAT.get(), svc.getString(R.string.run_rule_approved, card.apply(app)));
+            return null;
+        }
         String summary = detail == null || detail.trim().isEmpty() ? card.apply(app)
                 : svc.getString(R.string.tools_card_detail, card.apply(app), detail.contains("\n") || detail.startsWith("“")
                 ? detail.trim() : svc.getString(R.string.tools_card_quote, detail.trim()));
@@ -918,7 +940,9 @@ final class Tools {
             java.util.function.Function<String, String> card = in -> in == null ? svc.getString(R.string.tools_card_enter)
                     : svc.getString(R.string.tools_card_enter_in, in);
             // Hard always asks; Smart lets the reviewer decide, as for a tap the rules don't catch
-            String blocked = "hard".equals(mode) ? guardAction("Press Enter to send", card, text, !Guard.moneyApp(svc, target.getPackageName()))
+            boolean send = !Guard.moneyApp(svc, target.getPackageName());
+            String blocked = "hard".equals(mode) ? guardAction("Press Enter to send", card, text, send,
+                    send && !target.isPassword() && Guard.runRule(svc, str(target.getPackageName())))
                     : "smart".equals(mode) ? review("Press Enter to send", card, target, text) : null;
             if (blocked != null) return result + " Not sent: " + blocked;
             Thread.sleep(150);

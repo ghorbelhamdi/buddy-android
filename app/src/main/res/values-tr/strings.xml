@@ -202,6 +202,7 @@
     <string name="bubble_pill_hands_on">%1$s · yanıtlamak için buraya dokunun</string>
     <string name="bubble_using_phone">Telefonunuz kullanılıyor</string>
     <string name="bubble_using_phone_status">Telefonunuz kullanılıyor · %1$s</string>
+    <string name="bubble_pill_background">Arka planda · telefonunuzu kullanabilirsiniz</string>
     <string name="activity_reading">Ekranı okuyor</string>
     <string name="activity_typing">Yazıyor</string>
     <string name="activity_scrolling">Kaydırıyor</string>
@@ -330,6 +331,18 @@
     <string name="chat_linux_tools_when">Yalnızca bu sohbette, bir sonraki mesajınızdan itibaren.</string>
     <string name="chat_linux_tools_risk">Ekrandaki kötü amaçlı bir mesaj veya web sayfası, ajanı komut çalıştırmaya kandırmaya çalışabilir. Onay kartları gönderme, paylaşma, satın alma ve silme işlemlerini korumaya devam eder.</string>
     <string name="chat_linux_tools_turn_on">Aç</string>
+
+    <string name="chat_options">Sohbet seçenekleri</string>
+    <string name="chat_keep_awake">Çalışırken ekranı açık tut</string>
+    <string name="chat_keep_awake_info">Uzun görevler için: bu sohbet çalıştığı sürece telefon uyumaz ve bir bildirim nasıl gittiğini söyler. Telefonu kilitlemek yine de ekranı kapatır.</string>
+    <string name="chat_allowed">Sormadan izin verilenler</string>
+    <string name="chat_allowed_info">Bu sohbetin görevi bitene kadar bu uygulamalardaki rutin onaylar kendiliğinden geçer: mesaj göndermek ya da denetçinin soracağı bir adım. Her biri sohbette görünür. Ödeme, satın alma, silme, yükleme, şifreler ve güvenlik ayarları yine size sorulur.</string>
+    <string name="chat_allowed_add">Uygulama ekle</string>
+    <string name="chat_allowed_remove">%1$s kaldır</string>
+    <string name="run_rule_approved">Bu görev için kuralınızla onaylandı: %1$s</string>
+    <string name="run_end_done">%1$s bitirdi</string>
+    <string name="run_end_stopped">%1$s durduruldu</string>
+    <string name="run_end_failed">%1$s bir sorunla karşılaştı</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <string name="chat_stop">Durdur</string>
@@ -1145,6 +1158,9 @@
     <string name="browser_full_screen">Tam ekran</string>
     <string name="browser_fold">Sayfayı göster veya gizle</string>
     <string name="browser_backspace">Bir karakter sil</string>
+    <string name="bubble_browser_thumb">Arka plan tarayıcısının canlı görünümü. Tam ekran açmak için dokunun.</string>
+    <string name="bubble_browser_thumb_hide">Gizle</string>
+    <string name="bubble_pill_show_page">%1$s · sayfayı göstermek için dokunun</string>
     <string name="browser_type_hint">Sayfaya yazın</string>
     <string name="browser_enter">Enter</string>
     <string name="browser_dialog">Sayfa soruyor: %1$s</string>

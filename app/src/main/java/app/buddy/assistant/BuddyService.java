@@ -56,6 +56,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     private Tools tools;
     private McpServer server;
     private AutoPause autoPause;
+    private final KeepAwake keepAwake = new KeepAwake(this);
     private Marks marks;
     /** Touches on the screen while a card waited for the user (see onScreenTouched). */
     private volatile int cardTouches;
@@ -119,6 +120,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     private final BroadcastReceiver lockReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context c, Intent i) {
+            keepAwake.update(); // locked: the screen may sleep; unlocked: a long task keeps it on again
             if (bubble == null) return;
             if (Intent.ACTION_USER_PRESENT.equals(i.getAction())) bubble.setLocked(false);
             else if (Intent.ACTION_SCREEN_OFF.equals(i.getAction())) bubble.setLocked(true);
@@ -203,6 +205,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         main.removeCallbacks(updateCheck);
         if (server != null) server.stop();
         if (autoPause != null) autoPause.stop();
+        keepAwake.remove();
         if (marks != null) marks.clear();
         if (bubble != null) bubble.remove();
         if (control != null) control.end();
@@ -342,6 +345,10 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
 
     Bubble bubble() {
         return bubble;
+    }
+
+    KeepAwake keepAwake() {
+        return keepAwake;
     }
 
     AutoPause autoPauser() {
@@ -516,6 +523,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         pausedForBrowser = false;
         heldInPause = false;
         control.end();
+        keepAwake.update();
         main.postDelayed(pauseExpired, PAUSE_MAX_MS);
         ChatHub hub = ChatHub.get(this);
         Sessions.Session ses = hub.latestRunning();
@@ -585,6 +593,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             pauseLock.notifyAll();
         }
         autoPause.onPauseEnded();
+        keepAwake.update();
         if (bubble != null) bubble.onPauseChanged();
         Triggers.get(this).wake(); // rule runs wait while paused
     }
@@ -646,10 +655,13 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         }
     }
 
-    /** What a tool is doing right now, for the bubble's pill (see Bubble.setActivity); browser: the background browser. */
-    void showActivity(final String text, final boolean browser) {
+    /**
+     * What a tool is doing right now, for the bubble's pill (see Bubble.setActivity); browserTab: the background
+     * browser's tab it's in (Browser.key), or null.
+     */
+    void showActivity(final String text, final String browserTab) {
         main.post(() -> {
-            if (bubble != null) bubble.setActivity(text, browser);
+            if (bubble != null) bubble.setActivity(text, browserTab);
         });
     }
 

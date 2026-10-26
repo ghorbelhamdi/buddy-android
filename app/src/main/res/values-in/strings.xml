@@ -269,6 +269,7 @@
     <string name="bubble_using_phone">Menggunakan ponsel Anda</string>
     <!-- %1$s: what the agent is doing right now (its own status text). -->
     <string name="bubble_using_phone_status">Menggunakan ponsel Anda · %1$s</string>
+    <string name="bubble_pill_background">Di latar belakang · Anda bisa memakai ponsel</string>
     <string name="activity_reading">Membaca layar</string>
     <string name="activity_typing">Mengetik</string>
     <string name="activity_scrolling">Menggulir</string>
@@ -457,6 +458,18 @@
     <string name="chat_linux_tools_risk">Pesan atau halaman web berbahaya di layar bisa mencoba menipu agen agar menjalankan perintah. Kartu persetujuan tetap menjaga pengiriman, posting, pembelian, dan penghapusan.</string>
     <!-- Button, verb: turns Linux tools on for this chat. Keep short. -->
     <string name="chat_linux_tools_turn_on">Aktifkan</string>
+
+    <string name="chat_options">Opsi chat</string>
+    <string name="chat_keep_awake">Biarkan layar menyala selama bekerja</string>
+    <string name="chat_keep_awake_info">Untuk tugas panjang: ponsel tetap terjaga selama chat ini bekerja, dan notifikasi memberi tahu hasilnya. Mengunci ponsel tetap mematikan layar.</string>
+    <string name="chat_allowed">Diizinkan tanpa bertanya</string>
+    <string name="chat_allowed_info">Sampai tugas chat ini selesai, persetujuan rutin di aplikasi ini berjalan sendiri: mengirim pesan, atau langkah yang akan ditanyakan peninjau. Masing-masing muncul di chat. Membayar, membeli, menghapus, menginstal, kata sandi, dan setelan keamanan tetap menanyakan Anda.</string>
+    <string name="chat_allowed_add">Tambah aplikasi</string>
+    <string name="chat_allowed_remove">Hapus %1$s</string>
+    <string name="run_rule_approved">Disetujui oleh aturan tugas Anda: %1$s</string>
+    <string name="run_end_done">%1$s selesai</string>
+    <string name="run_end_stopped">%1$s dihentikan</string>
+    <string name="run_end_failed">%1$s mengalami masalah</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <!-- Button, verb: stops the agent's task. Keep short. -->
@@ -1579,6 +1592,9 @@
     <string name="browser_full_screen">Layar penuh</string>
     <string name="browser_fold">Tampilkan atau sembunyikan halaman</string>
     <string name="browser_backspace">Hapus satu karakter</string>
+    <string name="bubble_browser_thumb">Tampilan langsung browser latar belakang. Ketuk untuk membukanya di layar penuh.</string>
+    <string name="bubble_browser_thumb_hide">Sembunyikan</string>
+    <string name="bubble_pill_show_page">%1$s · ketuk untuk menampilkan halaman</string>
     <string name="browser_type_hint">Ketik di halaman</string>
     <string name="browser_enter">Enter</string>
     <string name="browser_dialog">Halaman bertanya: %1$s</string>

@@ -208,6 +208,7 @@
     <string name="bubble_pill_hands_on">%1$s · dotknij tutaj, by odpowiedzieć</string>
     <string name="bubble_using_phone">Używam twojego telefonu</string>
     <string name="bubble_using_phone_status">Używam twojego telefonu · %1$s</string>
+    <string name="bubble_pill_background">W tle · możesz korzystać z telefonu</string>
     <string name="activity_reading">Czyta ekran</string>
     <string name="activity_typing">Pisze</string>
     <string name="activity_scrolling">Przewija</string>
@@ -338,6 +339,18 @@
     <string name="chat_linux_tools_when">Tylko w tym czacie, od twojej następnej wiadomości.</string>
     <string name="chat_linux_tools_risk">Złośliwa wiadomość lub strona na ekranie może próbować nakłonić go do uruchomienia poleceń. Karty zatwierdzenia nadal chronią wysyłanie, publikowanie, kupowanie i usuwanie.</string>
     <string name="chat_linux_tools_turn_on">Włącz</string>
+
+    <string name="chat_options">Opcje czatu</string>
+    <string name="chat_keep_awake">Nie wyłączaj ekranu, gdy pracuje</string>
+    <string name="chat_keep_awake_info">Do długich zadań: telefon nie zasypia, dopóki ten czat pracuje, a powiadomienie powie ci, jak poszło. Zablokowanie telefonu nadal wyłącza ekran.</string>
+    <string name="chat_allowed">Dozwolone bez pytania</string>
+    <string name="chat_allowed_info">Do końca zadania tego czatu rutynowe zgody w tych aplikacjach przechodzą same: wysłanie wiadomości albo krok, o który zapytałby recenzent. Każda pojawia się w czacie. Płacenie, kupowanie, usuwanie, instalowanie, hasła i ustawienia zabezpieczeń nadal wymagają twojej zgody.</string>
+    <string name="chat_allowed_add">Dodaj aplikację</string>
+    <string name="chat_allowed_remove">Usuń %1$s</string>
+    <string name="run_rule_approved">Zatwierdzone przez twoją regułę tego zadania: %1$s</string>
+    <string name="run_end_done">%1$s skończył</string>
+    <string name="run_end_stopped">%1$s zatrzymał się</string>
+    <string name="run_end_failed">%1$s napotkał problem</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <string name="chat_stop">Zatrzymaj</string>
@@ -1169,6 +1182,9 @@
     <string name="browser_full_screen">Pełny ekran</string>
     <string name="browser_fold">Pokaż lub ukryj stronę</string>
     <string name="browser_backspace">Usuń znak</string>
+    <string name="bubble_browser_thumb">Podgląd na żywo przeglądarki w tle. Dotknij, aby otworzyć ją na pełnym ekranie.</string>
+    <string name="bubble_browser_thumb_hide">Ukryj</string>
+    <string name="bubble_pill_show_page">%1$s · dotknij, aby pokazać stronę</string>
     <string name="browser_type_hint">Pisz na stronie</string>
     <string name="browser_enter">Enter</string>
     <string name="browser_dialog">Strona pyta: %1$s</string>

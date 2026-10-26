@@ -199,6 +199,7 @@
     <string name="bubble_pill_hands_on">%1$s · tik hier om te antwoorden</string>
     <string name="bubble_using_phone">Bedient je telefoon</string>
     <string name="bubble_using_phone_status">Bedient je telefoon · %1$s</string>
+    <string name="bubble_pill_background">Op de achtergrond · je kunt je telefoon gebruiken</string>
     <string name="activity_reading">Leest het scherm</string>
     <string name="activity_typing">Typt</string>
     <string name="activity_scrolling">Scrolt</string>
@@ -327,6 +328,18 @@
     <string name="chat_linux_tools_when">Alleen in deze chat, vanaf je volgende bericht.</string>
     <string name="chat_linux_tools_risk">Een kwaadwillend bericht of een kwaadwillende webpagina op het scherm kan proberen hem te misleiden zodat hij opdrachten uitvoert. Goedkeuringskaarten bewaken nog steeds verzenden, plaatsen, kopen en verwijderen.</string>
     <string name="chat_linux_tools_turn_on">Aanzetten</string>
+
+    <string name="chat_options">Chatopties</string>
+    <string name="chat_keep_awake">Scherm aan laten terwijl het werkt</string>
+    <string name="chat_keep_awake_info">Voor lange taken: de telefoon blijft wakker zolang deze chat werkt, en een melding vertelt je hoe het ging. Als je de telefoon vergrendelt, gaat het scherm gewoon uit.</string>
+    <string name="chat_allowed">Toegestaan zonder te vragen</string>
+    <string name="chat_allowed_info">Tot de taak van deze chat klaar is, gaan routinegoedkeuringen in deze apps vanzelf door: een bericht versturen, of een stap waarover de controleur zou vragen. Elke staat in de chat. Betalen, kopen, verwijderen, installeren, wachtwoorden en beveiligingsinstellingen vragen het je nog steeds.</string>
+    <string name="chat_allowed_add">App toevoegen</string>
+    <string name="chat_allowed_remove">%1$s verwijderen</string>
+    <string name="run_rule_approved">Goedgekeurd door je regel voor deze taak: %1$s</string>
+    <string name="run_end_done">%1$s is klaar</string>
+    <string name="run_end_stopped">%1$s is gestopt</string>
+    <string name="run_end_failed">%1$s liep tegen een probleem aan</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <string name="chat_stop">Stoppen</string>
@@ -1143,6 +1156,9 @@
     <string name="browser_full_screen">Volledig scherm</string>
     <string name="browser_fold">Pagina tonen of verbergen</string>
     <string name="browser_backspace">Teken wissen</string>
+    <string name="bubble_browser_thumb">Live weergave van de achtergrondbrowser. Tik om hem op volledig scherm te openen.</string>
+    <string name="bubble_browser_thumb_hide">Verbergen</string>
+    <string name="bubble_pill_show_page">%1$s · tik om de pagina te tonen</string>
     <string name="browser_type_hint">Typ in de pagina</string>
     <string name="browser_enter">Enter</string>
     <string name="browser_dialog">De pagina vraagt: %1$s</string>

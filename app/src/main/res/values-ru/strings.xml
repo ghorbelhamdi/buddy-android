@@ -278,6 +278,7 @@
     <string name="bubble_using_phone">Управляет телефоном</string>
     <!-- %1$s: what the agent is doing right now (its own status text). -->
     <string name="bubble_using_phone_status">Управляет телефоном · %1$s</string>
+    <string name="bubble_pill_background">В фоне · телефоном можно пользоваться</string>
     <string name="activity_reading">Читает экран</string>
     <string name="activity_typing">Печатает</string>
     <string name="activity_scrolling">Прокручивает</string>
@@ -469,6 +470,18 @@
     <string name="chat_linux_tools_risk">Вредоносное сообщение или веб-страница на экране могут попытаться обманом заставить его выполнить команды. Отправка, публикация, покупки и удаление по-прежнему защищены карточками подтверждения.</string>
     <!-- Button, verb: turns Linux tools on for this chat. Keep short. -->
     <string name="chat_linux_tools_turn_on">Включить</string>
+
+    <string name="chat_options">Настройки чата</string>
+    <string name="chat_keep_awake">Не выключать экран, пока работает</string>
+    <string name="chat_keep_awake_info">Для долгих задач: телефон не засыпает, пока этот чат работает, а уведомление скажет, чем всё закончилось. Если заблокировать телефон, экран всё равно выключится.</string>
+    <string name="chat_allowed">Разрешено без вопросов</string>
+    <string name="chat_allowed_info">Пока задача этого чата не закончится, обычные подтверждения в этих приложениях проходят сами: отправка сообщения или шаг, о котором спросил бы проверяющий. Каждое видно в чате. Оплата, покупки, удаление, установка, пароли и настройки безопасности по-прежнему спрашивают вас.</string>
+    <string name="chat_allowed_add">Добавить приложение</string>
+    <string name="chat_allowed_remove">Убрать %1$s</string>
+    <string name="run_rule_approved">Одобрено вашим правилом для задачи: %1$s</string>
+    <string name="run_end_done">%1$s закончил</string>
+    <string name="run_end_stopped">%1$s остановлен</string>
+    <string name="run_end_failed">У %1$s возникла проблема</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <!-- Button, verb: stops the agent's task. Keep short. -->
@@ -1614,6 +1627,9 @@
     <string name="browser_full_screen">Во весь экран</string>
     <string name="browser_fold">Показать или скрыть страницу</string>
     <string name="browser_backspace">Удалить символ</string>
+    <string name="bubble_browser_thumb">Живой вид фонового браузера. Нажмите, чтобы открыть его во весь экран.</string>
+    <string name="bubble_browser_thumb_hide">Скрыть</string>
+    <string name="bubble_pill_show_page">%1$s · нажмите, чтобы показать страницу</string>
     <string name="browser_type_hint">Введите текст для страницы</string>
     <string name="browser_enter">Enter</string>
     <string name="browser_dialog">Страница спрашивает: %1$s</string>

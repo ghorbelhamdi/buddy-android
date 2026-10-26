@@ -271,6 +271,7 @@
     <string name="bubble_using_phone">Usando tu teléfono</string>
     <!-- %1$s: what the agent is doing right now (its own status text). -->
     <string name="bubble_using_phone_status">Usando tu teléfono · %1$s</string>
+    <string name="bubble_pill_background">En segundo plano · puedes usar tu teléfono</string>
     <string name="activity_reading">Leyendo la pantalla</string>
     <string name="activity_typing">Escribiendo</string>
     <string name="activity_scrolling">Desplazando</string>
@@ -460,6 +461,18 @@
     <string name="chat_linux_tools_risk">Un mensaje o una página web maliciosos en pantalla podrían intentar engañarlo para que ejecute comandos. Las tarjetas de aprobación siguen protegiendo los envíos, las publicaciones, las compras y las eliminaciones.</string>
     <!-- Button, verb: turns Linux tools on for this chat. Keep short. -->
     <string name="chat_linux_tools_turn_on">Activar</string>
+
+    <string name="chat_options">Opciones del chat</string>
+    <string name="chat_keep_awake">Mantener la pantalla encendida mientras trabaja</string>
+    <string name="chat_keep_awake_info">Para tareas largas: el teléfono no se duerme mientras este chat trabaja, y una notificación te dice cómo fue. Bloquear el teléfono sigue apagando la pantalla.</string>
+    <string name="chat_allowed">Permitido sin preguntar</string>
+    <string name="chat_allowed_info">Hasta que termine la tarea de este chat, las aprobaciones de rutina en estas apps siguen solas: enviar un mensaje, o un paso por el que el revisor preguntaría. Cada una aparece en el chat. Pagar, comprar, borrar, instalar, contraseñas y ajustes de seguridad te siguen preguntando.</string>
+    <string name="chat_allowed_add">Añadir una app</string>
+    <string name="chat_allowed_remove">Quitar %1$s</string>
+    <string name="run_rule_approved">Aprobado por tu regla de esta tarea: %1$s</string>
+    <string name="run_end_done">%1$s ha terminado</string>
+    <string name="run_end_stopped">%1$s se detuvo</string>
+    <string name="run_end_failed">%1$s tuvo un problema</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <!-- Button, verb: stops the agent's task. Keep short. -->
@@ -1576,6 +1589,9 @@
     <string name="browser_full_screen">Pantalla completa</string>
     <string name="browser_fold">Mostrar u ocultar la página</string>
     <string name="browser_backspace">Borrar un carácter</string>
+    <string name="bubble_browser_thumb">Vista en directo del navegador en segundo plano. Toca para abrirlo en pantalla completa.</string>
+    <string name="bubble_browser_thumb_hide">Ocultar</string>
+    <string name="bubble_pill_show_page">%1$s · toca para ver la página</string>
     <string name="browser_type_hint">Escribe en la página</string>
     <string name="browser_enter">Intro</string>
     <string name="browser_dialog">La página pregunta: %1$s</string>

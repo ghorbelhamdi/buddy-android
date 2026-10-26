@@ -196,6 +196,7 @@
     <string name="bubble_pill_hands_on">%1$s · जवाब देने के लिए यहां टैप करें</string>
     <string name="bubble_using_phone">आपका फ़ोन इस्तेमाल कर रहा है</string>
     <string name="bubble_using_phone_status">आपका फ़ोन इस्तेमाल कर रहा है · %1$s</string>
+    <string name="bubble_pill_background">बैकग्राउंड में · आप अपना फ़ोन इस्तेमाल कर सकते हैं</string>
     <string name="activity_reading">स्क्रीन पढ़ रहा है</string>
     <string name="activity_typing">टाइप कर रहा है</string>
     <string name="activity_scrolling">स्क्रॉल कर रहा है</string>
@@ -324,6 +325,18 @@
     <string name="chat_linux_tools_when">सिर्फ़ इस चैट में, आपके अगले मैसेज से.</string>
     <string name="chat_linux_tools_risk">स्क्रीन पर दिखने वाला कोई नुकसान पहुंचाने वाला मैसेज या वेब पेज, एजेंट को धोखे से कमांड चलाने के लिए उकसा सकता है. भेजने, पोस्ट करने, खरीदने और मिटाने से पहले मंज़ूरी कार्ड तब भी दिखते हैं.</string>
     <string name="chat_linux_tools_turn_on">चालू करें</string>
+
+    <string name="chat_options">चैट के विकल्प</string>
+    <string name="chat_keep_awake">काम करते समय स्क्रीन चालू रखें</string>
+    <string name="chat_keep_awake_info">लंबे कामों के लिए: जब तक यह चैट काम करती है, फ़ोन जागा रहता है, और एक सूचना बताती है कि काम कैसा रहा. फ़ोन लॉक करने पर स्क्रीन फिर भी बंद हो जाती है.</string>
+    <string name="chat_allowed">बिना पूछे इजाज़त</string>
+    <string name="chat_allowed_info">जब तक इस चैट का काम खत्म नहीं होता, इन ऐप्स में रोज़मर्रा की मंज़ूरियां अपने आप हो जाती हैं: मैसेज भेजना, या ऐसा कदम जिस पर समीक्षक पूछता. हर एक चैट में दिखती है. भुगतान, खरीदारी, हटाना, इंस्टॉल करना, पासवर्ड और सुरक्षा सेटिंग अब भी आपसे पूछेंगे.</string>
+    <string name="chat_allowed_add">ऐप जोड़ें</string>
+    <string name="chat_allowed_remove">%1$s हटाएं</string>
+    <string name="run_rule_approved">इस काम के आपके नियम से मंज़ूर: %1$s</string>
+    <string name="run_end_done">%1$s ने काम पूरा किया</string>
+    <string name="run_end_stopped">%1$s रोका गया</string>
+    <string name="run_end_failed">%1$s को एक समस्या आई</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <string name="chat_stop">रोकें</string>
@@ -1137,6 +1150,9 @@
     <string name="browser_full_screen">फ़ुल स्क्रीन</string>
     <string name="browser_fold">पेज दिखाएं या छिपाएं</string>
     <string name="browser_backspace">एक अक्षर मिटाएं</string>
+    <string name="bubble_browser_thumb">बैकग्राउंड ब्राउज़र का लाइव व्यू। फ़ुल स्क्रीन में खोलने के लिए टैप करें।</string>
+    <string name="bubble_browser_thumb_hide">छिपाएँ</string>
+    <string name="bubble_pill_show_page">%1$s · पेज देखने के लिए टैप करें</string>
     <string name="browser_type_hint">पेज में टाइप करें</string>
     <string name="browser_enter">Enter</string>
     <string name="browser_dialog">पेज पूछ रहा है: %1$s</string>

@@ -143,6 +143,7 @@ final class Bubble implements ChatHub.Listener {
         createArcs();
         createDismissTarget();
         wm.addView(root, lp);
+        createThumb();
         hub = ChatHub.get(svc);
         radial = new RadialMenu(svc, wm);
         sessions = hub.sessions;
@@ -165,6 +166,14 @@ final class Bubble implements ChatHub.Listener {
             }
         }
         if (hub != null) hub.removeListener(this);
+        if (thumbWatching != null) Browser.unwatch(thumbWatching, thumb);
+        thumbWatching = null;
+        if (thumbWindow != null) {
+            try {
+                wm.removeView(thumbWindow);
+            } catch (Exception ignored) {
+            }
+        }
         if (breathing != null) breathing.cancel();
         try {
             wm.removeView(root);
@@ -244,9 +253,16 @@ final class Bubble implements ChatHub.Listener {
         plp.setMarginStart(dp(6));
         plp.setMarginEnd(dp(6));
         collapsed.addView(pill, plp);
+        // the browser's thumbnail, in its own window under the pill (see updateThumb), follows the pill's size
+        pill.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
+            if (b - t != ob - ot || r - l != or - ol) updateThumb();
+        });
         pill.setOnClickListener(v -> { // paused, the pill is the Resume button
             if (svc.paused() && pendingConfirm == null) svc.resume();
-            else expand();
+            else if (thumbTab != null && thumbTab.equals(thumbHidden)) { // browsing with the thumbnail swiped away: back
+                thumbHidden = null;
+                updateThumb();
+            } else expand();
         });
 
         face.setOnTouchListener(new DragListener());
@@ -798,6 +814,7 @@ final class Bubble implements ChatHub.Listener {
             applyCollapsedParams();
         }
         wm.updateViewLayout(root, lp);
+        updateThumb();
         if (expanded) {
             fitPanelHeight();
             scrollToEnd();
@@ -810,6 +827,7 @@ final class Bubble implements ChatHub.Listener {
         svc.marks().setPanelOpen(true);
         root.setVisibility(View.VISIBLE);
         badge.setVisibility(View.GONE);
+        updateThumb();
         placePanel();
         // with Back/Home/Recents buttons the keyboard would cover them (it's layered above Buddy's overlay, so
         // above the navigation bar): open it only when the text field is tapped
@@ -884,6 +902,7 @@ final class Bubble implements ChatHub.Listener {
         pill.setTextColor(Ui.TEXT);
         pill.setTypeface(Ui.sans(svc, 500));
         pill.setBackground(rounded(Ui.BG, 18, Ui.ACCENT, 1));
+        thumb.restyle();
         renderedFor = null;
         if (showingList) renderSessionList();
         renderCurrent();
@@ -902,6 +921,7 @@ final class Bubble implements ChatHub.Listener {
         root.setVisibility(show ? View.VISIBLE : View.GONE);
         if (show && wasHidden && !expanded) popIn();
         if (!show) showDismissTarget(false);
+        updateThumb();
     }
 
     private boolean locked, controlling;
@@ -1029,6 +1049,7 @@ final class Bubble implements ChatHub.Listener {
             dismissWindow.setVisibility(View.GONE);
             dismissCircle.setTranslationY(0f);
         }
+        updateThumb(); // out of the way while the bubble moves
     }
 
     /** Centre of the target, measured on screen (accounts for nav bar and insets). */
@@ -2219,15 +2240,26 @@ final class Bubble implements ChatHub.Listener {
     /** What a tool is doing right now (see setActivity), shown in the pill for a few seconds. */
     private String activity;
     private boolean activityBrowser;
+    /** The browser tab of that step (see Browser.key), for the thumbnail. */
+    private String activityTab;
     private long activityAt;
     private static final long ACTIVITY_MS = 8_000;
     private final Runnable activityExpired = this::refreshStatus;
 
-    /** A tool's step ("Tapping “Send”"); browser: in the background browser, which isn't using the phone. */
-    void setActivity(String text, boolean browser) {
+    /**
+     * A tool's step ("Tapping “Send”"); browserTab: the background browser's tab it's in (it isn't using the phone), or
+     * null.
+     */
+    void setActivity(String text, String browserTab) {
         activity = text;
-        activityBrowser = browser;
+        activityBrowser = browserTab != null;
+        activityTab = browserTab;
         activityAt = android.os.SystemClock.elapsedRealtime();
+        if (browserTab != null && browserTab.equals(thumbHidden)) {
+            // swiped away for the rest of the run: a step after a long break is a new one
+            if (activityAt - thumbHiddenAt > THUMB_RUN_GAP_MS) thumbHidden = null;
+            else thumbHiddenAt = activityAt;
+        }
         svc.mainHandler().removeCallbacks(activityExpired);
         svc.mainHandler().postDelayed(activityExpired, ACTIVITY_MS + 100);
         refreshStatus();
@@ -2260,18 +2292,36 @@ final class Bubble implements ChatHub.Listener {
         } else if (browsing && pendingConfirm == null) {
             text = activity;
         }
+        thumbTab = browsing && !paused && pendingConfirm == null ? activityTab : null;
+        // its thumbnail swiped away: tapping the pill brings it back, so the pill says so
+        if (thumbTab != null && thumbTab.equals(thumbHidden) && text != null)
+            text = svc.getString(R.string.bubble_pill_show_page, text);
+        // working, but not on the screen (the background browser, Linux tools, thinking): the phone is the user's, so
+        // the pill says so above the status and the ring is calm; on the screen (ControlIndicator) the look stays loud
+        boolean background = !paused && !controlling && (running || browsing) && pendingConfirm == null;
         if (!paused && (controlling || browsing || hub.runningCount() > 0) && pendingConfirm == null && !Prefs.menuHinted(svc)) {
             text = text == null ? svc.getString(R.string.bubble_pill_hold_hint)
                     : svc.getString(R.string.bubble_pill_status_hold_hint, text);
         }
         if (!noteListening) { // while dictating a note the pill shows what's heard
-            pill.setText(text == null ? "" : text);
+            CharSequence shown = text;
+            if (background && text != null) {
+                android.text.SpannableStringBuilder sb = new android.text.SpannableStringBuilder(
+                        svc.getString(R.string.bubble_pill_background));
+                sb.setSpan(new android.text.style.RelativeSizeSpan(0.85f), 0, sb.length(), 0);
+                sb.setSpan(new android.text.style.ForegroundColorSpan(Ui.MUTED), 0, sb.length(), 0);
+                shown = sb.append('\n').append(text);
+            }
+            pill.setMaxLines(background ? 3 : 2); // the note's line, then the status's two
+            pill.setText(shown == null ? "" : shown);
             pill.setVisibility(text == null ? View.GONE : View.VISIBLE);
         }
+        ring.setCalm(background);
         // in control: a solid accent pill, so it's clear not to touch the phone
         pill.setTextColor(controlling ? Ui.ON_ACCENT : Ui.TEXT);
         pill.setBackground(rounded(controlling ? Ui.ACCENT : Ui.BG, 18, Ui.ACCENT, 1));
         badge.setVisibility(!expanded && hub.anyUnread() ? View.VISIBLE : View.GONE);
+        updateThumb();
         setWorking(!paused && (running || controlling || browsing));
         updateHeader();
         if (!expanded) {
@@ -2280,6 +2330,104 @@ final class Bubble implements ChatHub.Listener {
             } catch (Exception ignored) {
             }
         }
+    }
+
+    // ------------------------------------------------------ browser thumbnail
+
+    private FrameLayout thumbWindow;
+    private WindowManager.LayoutParams thumbLp;
+    private BrowserThumb thumb;
+    /** The tab the pill says an agent browses now, the one being watched, and the one the user swiped away (when). */
+    private String thumbTab, thumbWatching, thumbHidden;
+    private long thumbHiddenAt;
+    /** Browsing again after this long without a step is another run: its thumbnail shows again. */
+    private static final long THUMB_RUN_GAP_MS = 60_000;
+
+    /**
+     * A window of its own (in the bubble's, the space under the face beside it would take the app's touches), added
+     * after the bubble's so it's above it.
+     */
+    private void createThumb() {
+        thumbWindow = new FrameLayout(svc);
+        thumb = new BrowserThumb(svc, new BrowserThumb.Actions() {
+            @Override
+            public void open() {
+                if (thumbTab == null) return;
+                svc.startActivity(new android.content.Intent(svc, BrowserActivity.class).putExtra("key", thumbTab)
+                        .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK));
+            }
+
+            @Override
+            public void dismiss() {
+                thumbHidden = thumbTab;
+                thumbHiddenAt = SystemClock.elapsedRealtime();
+                updateThumb();
+            }
+        });
+        thumbWindow.addView(thumb, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT));
+        thumbWindow.setVisibility(View.GONE);
+        // the bubble's own flags, so its position counts from the same place (see placeThumb)
+        thumbLp = new WindowManager.LayoutParams(dp(160), dp(328),
+                WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                PixelFormat.TRANSLUCENT);
+        thumbLp.gravity = Gravity.TOP | Gravity.START;
+        wm.addView(thumbWindow, thumbLp);
+    }
+
+    /**
+     * The live thumbnail shows while the pill says an agent browses, unless swiped away or that tab is open full screen,
+     * and only while the bubble shows and stays still: it watches the tab's frames (Browser.watch, the screencast the
+     * live views use) only then.
+     */
+    private void updateThumb() {
+        if (thumbWindow == null) return;
+        boolean moving = faceDragging() || (windowAnim != null && windowAnim.isRunning());
+        boolean on = thumbTab != null && !thumbTab.equals(thumbHidden) && !thumbTab.equals(BrowserActivity.front)
+                && !expanded && !locked && !moving && root.getVisibility() == View.VISIBLE
+                && pill.getVisibility() == View.VISIBLE && Browser.available(svc);
+        if (on) on = placeThumb();
+        thumbWindow.setVisibility(on ? View.VISIBLE : View.GONE);
+        String want = on ? thumbTab : null;
+        if (java.util.Objects.equals(want, thumbWatching)) return;
+        if (thumbWatching != null) Browser.unwatch(thumbWatching, thumb);
+        thumbWatching = want;
+        if (want == null) return;
+        thumb.clear();
+        Browser.watch(svc, want, thumb);
+    }
+
+    /**
+     * Under the pill, on the bubble's side like the pill: about 40% of the screen's width at the page's shape, smaller
+     * if it would run off the bottom. False: no room.
+     */
+    private boolean placeThumb() {
+        if (pill.getHeight() == 0) return false; // not laid out yet: its layout listener comes back here
+        Rect usable = usable();
+        boolean right = (lp.gravity & Gravity.HORIZONTAL_GRAVITY_MASK) == Gravity.END;
+        int[] loc = new int[2];
+        root.getLocationOnScreen(loc);
+        int below = pill.getBottom() + dp(6);
+        int w = Math.min(usable.width() * 2 / 5, (usable.bottom - loc[1] - below - dp(12)) * Browser.WIDTH / Browser.HEIGHT);
+        if (w < dp(72)) return false;
+        int h = w * Browser.HEIGHT / Browser.WIDTH;
+        thumbLp.width = w;
+        thumbLp.height = h;
+        thumbLp.gravity = Gravity.TOP | (right ? Gravity.END : Gravity.START);
+        // the pill's edge by the face: from the window's right edge when the bubble is on the right
+        thumbLp.x = lp.x + (right ? root.getWidth() - pill.getRight() : pill.getLeft());
+        thumbLp.y = lp.y + below;
+        try {
+            wm.updateViewLayout(thumbWindow, thumbLp);
+        } catch (Exception ignored) {
+        }
+        return true;
+    }
+
+    /** The full-screen browser came to the front or went away: no thumbnail over its own tab. */
+    void onBrowserScreen() {
+        updateThumb();
     }
 
     /** Thinking face plus a gentle pulse while Claude is working; smiling face when idle. */
@@ -2808,6 +2956,7 @@ final class Bubble implements ChatHub.Listener {
                             applyCollapsedParams();
                             wm.updateViewLayout(root, lp);
                             followWaves();
+                            updateThumb();
                         });
                     } else {
                         maybeTip();

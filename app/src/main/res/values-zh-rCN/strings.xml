@@ -269,6 +269,7 @@
     <string name="bubble_using_phone">正在操作你的手机</string>
     <!-- %1$s: what the agent is doing right now (its own status text). -->
     <string name="bubble_using_phone_status">正在操作你的手机 · %1$s</string>
+    <string name="bubble_pill_background">在后台运行 · 你可以使用手机</string>
     <string name="activity_reading">正在读取屏幕</string>
     <string name="activity_typing">正在输入</string>
     <string name="activity_scrolling">正在滚动</string>
@@ -457,6 +458,18 @@
     <string name="chat_linux_tools_risk">屏幕上的恶意消息或网页可能会诱骗智能体运行命令。发送、发布、购买和删除仍受确认卡片保护。</string>
     <!-- Button, verb: turns Linux tools on for this chat. Keep short. -->
     <string name="chat_linux_tools_turn_on">开启</string>
+
+    <string name="chat_options">对话选项</string>
+    <string name="chat_keep_awake">工作时保持屏幕常亮</string>
+    <string name="chat_keep_awake_info">适合长任务：这个对话工作期间手机不会休眠，结束后会用通知告诉你结果。锁定手机仍会关闭屏幕。</string>
+    <string name="chat_allowed">无需询问即可允许</string>
+    <string name="chat_allowed_info">在这个对话的任务结束前，这些应用里的常规批准会自动通过：发送消息，或审核者会询问的步骤。每一次都会显示在对话中。付款、购买、删除、安装、密码和安全设置仍会询问你。</string>
+    <string name="chat_allowed_add">添加应用</string>
+    <string name="chat_allowed_remove">移除 %1$s</string>
+    <string name="run_rule_approved">已按你为本次任务设的规则批准：%1$s</string>
+    <string name="run_end_done">%1$s 已完成</string>
+    <string name="run_end_stopped">%1$s 已停止</string>
+    <string name="run_end_failed">%1$s 遇到了问题</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <!-- Button, verb: stops the agent's task. Keep short. -->
@@ -1578,6 +1591,9 @@
     <string name="browser_full_screen">全屏</string>
     <string name="browser_fold">显示或隐藏页面</string>
     <string name="browser_backspace">删除一个字符</string>
+    <string name="bubble_browser_thumb">后台浏览器的实时画面。点按即可全屏打开。</string>
+    <string name="bubble_browser_thumb_hide">隐藏</string>
+    <string name="bubble_pill_show_page">%1$s · 点按以显示页面</string>
     <string name="browser_type_hint">在页面中输入</string>
     <string name="browser_enter">Enter</string>
     <string name="browser_dialog">页面询问：%1$s</string>

@@ -11,6 +11,8 @@ import static app.buddy.assistant.Ui.*;
  * Settings, where they sign in to sites for the agents.
  */
 public class BrowserActivity extends Screen implements Browser.Listener {
+    /** The tab shown full screen while this is in front, or null (the bubble then leaves out its thumbnail). */
+    static volatile String front;
     private BrowserPanel panel;
     /** Opened for an agent's question (ask with browser_highlight): it closes once the question is answered. */
     private boolean guided;
@@ -52,11 +54,21 @@ public class BrowserActivity extends Screen implements Browser.Listener {
     protected void onResume() {
         super.onResume();
         if (panel != null) panel.setShown(true);
+        front = key;
+        bubbleRefresh();
     }
 
     @Override
     protected void onPause() {
         if (panel != null) panel.setShown(false);
+        front = null;
+        bubbleRefresh();
         super.onPause();
+    }
+
+    private static void bubbleRefresh() {
+        BuddyService svc = BuddyService.get();
+        Bubble b = svc == null ? null : svc.bubble();
+        if (b != null) b.onBrowserScreen();
     }
 }

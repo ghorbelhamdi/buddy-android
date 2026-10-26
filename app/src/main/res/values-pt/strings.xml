@@ -271,6 +271,7 @@
     <string name="bubble_using_phone">Usando seu telefone</string>
     <!-- %1$s: what the agent is doing right now (its own status text). -->
     <string name="bubble_using_phone_status">Usando seu telefone · %1$s</string>
+    <string name="bubble_pill_background">Em segundo plano · você pode usar o telefone</string>
     <string name="activity_reading">Lendo a tela</string>
     <string name="activity_typing">Digitando</string>
     <string name="activity_scrolling">Rolando</string>
@@ -460,6 +461,18 @@
     <string name="chat_linux_tools_risk">Uma mensagem ou página da web maliciosa na tela pode tentar enganá-lo para executar comandos. Os cartões de aprovação continuam protegendo envios, publicações, compras e exclusões.</string>
     <!-- Button, verb: turns Linux tools on for this chat. Keep short. -->
     <string name="chat_linux_tools_turn_on">Ativar</string>
+
+    <string name="chat_options">Opções do chat</string>
+    <string name="chat_keep_awake">Manter a tela ligada enquanto trabalha</string>
+    <string name="chat_keep_awake_info">Para tarefas longas: o celular fica acordado enquanto este chat trabalha, e uma notificação diz como foi. Bloquear o celular ainda desliga a tela.</string>
+    <string name="chat_allowed">Permitido sem perguntar</string>
+    <string name="chat_allowed_info">Até a tarefa deste chat terminar, as aprovações de rotina nestes apps seguem sozinhas: enviar uma mensagem, ou um passo sobre o qual o revisor perguntaria. Cada uma aparece no chat. Pagar, comprar, excluir, instalar, senhas e configurações de segurança ainda perguntam a você.</string>
+    <string name="chat_allowed_add">Adicionar um app</string>
+    <string name="chat_allowed_remove">Remover %1$s</string>
+    <string name="run_rule_approved">Aprovado pela sua regra desta tarefa: %1$s</string>
+    <string name="run_end_done">%1$s terminou</string>
+    <string name="run_end_stopped">%1$s parou</string>
+    <string name="run_end_failed">%1$s teve um problema</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <!-- Button, verb: stops the agent's task. Keep short. -->
@@ -1589,6 +1602,9 @@
     <string name="browser_full_screen">Tela cheia</string>
     <string name="browser_fold">Mostrar ou ocultar a página</string>
     <string name="browser_backspace">Apagar um caractere</string>
+    <string name="bubble_browser_thumb">Visualização ao vivo do navegador em segundo plano. Toque para abrir em tela cheia.</string>
+    <string name="bubble_browser_thumb_hide">Ocultar</string>
+    <string name="bubble_pill_show_page">%1$s · toque para ver a página</string>
     <string name="browser_type_hint">Digite na página</string>
     <string name="browser_enter">Enter</string>
     <string name="browser_dialog">A página pergunta: %1$s</string>

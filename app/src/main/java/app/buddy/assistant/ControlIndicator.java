@@ -82,14 +82,19 @@ final class ControlIndicator {
 
     // ------------------------------------------------------- notification
 
-    private void notifyChip() {
-        NotificationManager nm = svc.getSystemService(NotificationManager.class);
-        NotificationChannel ch = new NotificationChannel(CHANNEL, svc.getString(R.string.control_channel_name),
+    /** The channel for this and other notices about a task (see KeepAwake): quiet, no sound or vibration. */
+    static void channel(android.content.Context c) {
+        NotificationChannel ch = new NotificationChannel(CHANNEL, c.getString(R.string.control_channel_name),
                 NotificationManager.IMPORTANCE_DEFAULT);
-        ch.setDescription(svc.getString(R.string.control_channel_description));
+        ch.setDescription(c.getString(R.string.control_channel_description));
         ch.setSound(null, null);
         ch.enableVibration(false);
-        nm.createNotificationChannel(ch);
+        c.getSystemService(NotificationManager.class).createNotificationChannel(ch);
+    }
+
+    private void notifyChip() {
+        NotificationManager nm = svc.getSystemService(NotificationManager.class);
+        channel(svc);
         PendingIntent stop = PendingIntent.getBroadcast(svc, 2,
                 new Intent(svc, HiddenNotice.class).setAction(ACTION_STOP),
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);

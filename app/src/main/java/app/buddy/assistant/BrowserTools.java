@@ -435,7 +435,7 @@ final class BrowserTools {
             String h = android.net.Uri.parse(url.contains("://") ? url : "https://" + url).getHost();
             if (h != null) site = h.startsWith("www.") ? h.substring(4) : h;
         }
-        svc.showActivity("?".equals(site) ? what : svc.getString(R.string.activity_browsing, site, what), true);
+        svc.showActivity("?".equals(site) ? what : svc.getString(R.string.activity_browsing, site, what), key);
     }
 
     private static String stale(int ref) {

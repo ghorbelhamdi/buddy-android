@@ -195,6 +195,7 @@
     <string name="bubble_pill_hands_on">%1$s · ここをタップして回答</string>
     <string name="bubble_using_phone">スマートフォンを操作中</string>
     <string name="bubble_using_phone_status">スマートフォンを操作中 · %1$s</string>
+    <string name="bubble_pill_background">バックグラウンドで実行中 · スマホを使えます</string>
     <string name="activity_reading">画面を読み取り中</string>
     <string name="activity_typing">入力中</string>
     <string name="activity_scrolling">スクロール中</string>
@@ -322,6 +323,18 @@
     <string name="chat_linux_tools_when">このチャットのみで、次のメッセージから有効になります。</string>
     <string name="chat_linux_tools_risk">画面上の悪意のあるメッセージやウェブページが、エージェントをだましてコマンドを実行させようとするおそれがあります。送信、投稿、購入、削除は引き続き承認カードで保護されます。</string>
     <string name="chat_linux_tools_turn_on">オンにする</string>
+
+    <string name="chat_options">チャットのオプション</string>
+    <string name="chat_keep_awake">作業中は画面をオンのままにする</string>
+    <string name="chat_keep_awake_info">長い作業向け：このチャットが作業している間はスリープせず、終わると結果を通知でお知らせします。スマホをロックすれば画面は通常どおり消えます。</string>
+    <string name="chat_allowed">確認なしで許可</string>
+    <string name="chat_allowed_info">このチャットの作業が終わるまで、これらのアプリでの定型的な承認は自動で進みます（メッセージの送信や、レビュー担当が確認を求める手順など）。それぞれチャットに表示されます。支払い、購入、削除、インストール、パスワード、セキュリティ設定は引き続き確認します。</string>
+    <string name="chat_allowed_add">アプリを追加</string>
+    <string name="chat_allowed_remove">%1$sを削除</string>
+    <string name="run_rule_approved">この作業のルールで承認：%1$s</string>
+    <string name="run_end_done">%1$sが完了しました</string>
+    <string name="run_end_stopped">%1$sが停止しました</string>
+    <string name="run_end_failed">%1$sで問題が発生しました</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <string name="chat_stop">停止</string>
@@ -1130,6 +1143,9 @@
     <string name="browser_full_screen">全画面表示</string>
     <string name="browser_fold">ページの表示/非表示</string>
     <string name="browser_backspace">1 文字削除</string>
+    <string name="bubble_browser_thumb">バックグラウンドブラウザのライブ表示。タップすると全画面で開きます。</string>
+    <string name="bubble_browser_thumb_hide">非表示</string>
+    <string name="bubble_pill_show_page">%1$s · タップしてページを表示</string>
     <string name="browser_type_hint">ページに入力</string>
     <string name="browser_enter">Enter</string>
     <string name="browser_dialog">ページからの確認：%1$s</string>

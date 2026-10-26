@@ -39,6 +39,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     private LinearLayout pill;
     private VoiceBar voiceBar;
     private ImageButton speaker, send;
+    /** Chat options: long-task mode and "Allowed without asking"; accent while either is on. */
+    private ImageButton options;
     private EditText input;
     private int maxBubble;
     private ToolLog log; // the tool-call group being appended to, if the last message was a step
@@ -95,6 +97,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         cp.topMargin = dp(this, 3);
         titles.addView(chips, cp);
         top.addView(titles, weight1());
+        // agents never change these, even when they may tap Buddy's screens
+        options = protect(iconButton(this, R.drawable.ms_tune, getString(R.string.chat_options), MUTED));
+        options.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 44), dp(this, 44)));
+        options.setOnClickListener(v -> chatOptions());
+        top.addView(options);
         speaker = iconButton(this, R.drawable.ms_volume_off, getString(R.string.chat_read_aloud), MUTED);
         speaker.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 44), dp(this, 44)));
         speaker.setOnClickListener(v -> {
@@ -467,6 +474,150 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         d.show();
     }
 
+    /**
+     * Chat options: long-task mode (the screen stays on while the chat works, and a notification says how it ended) and
+     * "Allowed without asking", apps whose routine approvals go ahead on their own until the chat's run ends.
+     */
+    private void chatOptions() {
+        LinearLayout c = protect(column(this)); // only the user changes these, as with the Linux tools chip
+        c.addView(title(this, getString(R.string.chat_options), 18));
+        LinearLayout sw = switchRow(this, getString(R.string.chat_keep_awake), getString(R.string.chat_keep_awake_info),
+                ses.awake, on -> hub.setAwake(ses, on));
+        sw.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
+        c.addView(sw, full());
+        TextView label = sectionLabel(this, getString(R.string.chat_allowed));
+        label.setPaddingRelative(0, dp(this, 12), 0, dp(this, 4));
+        c.addView(label);
+        TextView info = text(this, getString(R.string.chat_allowed_info), 13, MUTED);
+        info.setPaddingRelative(0, 0, 0, dp(this, 8));
+        c.addView(info);
+        LinearLayout list = column(this);
+        c.addView(list, full());
+        final Runnable[] fill = new Runnable[1];
+        fill[0] = () -> {
+            list.removeAllViews();
+            android.content.pm.PackageManager pm = getPackageManager();
+            for (String pkg : new java.util.ArrayList<>(ses.allowed)) {
+                LinearLayout r = row(this);
+                r.setGravity(Gravity.CENTER_VERTICAL);
+                r.setPaddingRelative(dp(this, 4), dp(this, 6), 0, dp(this, 6));
+                ImageView ic = new ImageView(this);
+                String name = pkg;
+                try {
+                    android.content.pm.ApplicationInfo ai = pm.getApplicationInfo(pkg, 0);
+                    ic.setImageDrawable(pm.getApplicationIcon(ai));
+                    name = String.valueOf(pm.getApplicationLabel(ai));
+                } catch (Exception ignored) {
+                }
+                r.addView(ic, new LinearLayout.LayoutParams(dp(this, 28), dp(this, 28)));
+                TextView l = single(text(this, name, 15, TEXT));
+                l.setPaddingRelative(dp(this, 12), 0, 0, 0);
+                r.addView(l, weight1());
+                ImageButton x = iconButton(this, R.drawable.ms_close, getString(R.string.chat_allowed_remove, name), MUTED);
+                x.setOnClickListener(v -> {
+                    hub.setAllowed(ses, pkg, false);
+                    fill[0].run();
+                });
+                r.addView(x, new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
+                list.addView(r, full());
+            }
+            LinearLayout add = row(this);
+            add.setGravity(Gravity.CENTER_VERTICAL);
+            add.setPaddingRelative(dp(this, 4), dp(this, 10), dp(this, 4), dp(this, 10));
+            add.setBackgroundResource(ripple(this, false));
+            add.addView(icon(this, R.drawable.ms_add, ACCENT_TEXT, 22));
+            TextView at = text(this, getString(R.string.chat_allowed_add), 15, ACCENT_TEXT);
+            at.setPaddingRelative(dp(this, 12), 0, 0, 0);
+            add.addView(at, weight1());
+            add.setOnClickListener(v -> pickAllowedApp(fill[0]));
+            list.addView(add, full());
+        };
+        fill[0].run();
+        bottomSheet(this, c).show();
+    }
+
+    /** Pick an app for "Allowed without asking": launchable apps, without those it never covers (Guard.allowable). */
+    private void pickAllowedApp(Runnable done) {
+        LinearLayout c = protect(column(this));
+        c.addView(title(this, getString(R.string.rules_pick_app), 18));
+        EditText search = new EditText(this);
+        search.setHint(R.string.rules_search_apps);
+        search.setHintTextColor(MUTED);
+        search.setTextColor(TEXT);
+        search.setTextSize(15);
+        search.setSingleLine(true);
+        search.setBackground(outlined(this, CARD, 12, OUTLINE, 1));
+        search.setPaddingRelative(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
+        LinearLayout.LayoutParams sp = full();
+        sp.topMargin = dp(this, 12);
+        c.addView(search, sp);
+        LinearLayout list = column(this);
+        LinearLayout.LayoutParams lp = full();
+        lp.topMargin = dp(this, 8);
+        list.addView(spinner(this, 28));
+        c.addView(list, lp);
+        Dialog d = bottomSheet(this, c);
+        final java.util.List<String[]> apps = new java.util.ArrayList<>(); // {pkg, label}
+        final java.util.Map<String, android.graphics.drawable.Drawable> icons = new java.util.HashMap<>();
+        final Runnable fill = () -> {
+            list.removeAllViews();
+            String q = search.getText().toString().trim().toLowerCase(Ui.locale(this));
+            for (String[] a : apps) {
+                if (ses.allowed.contains(a[0]) || (!q.isEmpty() && !a[1].toLowerCase(Ui.locale(this)).contains(q))) continue;
+                LinearLayout r = row(this);
+                r.setGravity(Gravity.CENTER_VERTICAL);
+                r.setPaddingRelative(dp(this, 4), dp(this, 8), dp(this, 4), dp(this, 8));
+                r.setBackgroundResource(ripple(this, false));
+                ImageView ic = new ImageView(this);
+                ic.setImageDrawable(icons.get(a[0]));
+                r.addView(ic, new LinearLayout.LayoutParams(dp(this, 32), dp(this, 32)));
+                TextView l = single(text(this, a[1], 15, TEXT));
+                l.setPaddingRelative(dp(this, 12), 0, 0, 0);
+                r.addView(l, weight1());
+                r.setOnClickListener(v -> {
+                    d.dismiss();
+                    hub.setAllowed(ses, a[0], true);
+                    done.run();
+                });
+                list.addView(r, full());
+            }
+        };
+        search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int a, int b, int n) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int a, int b, int n) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable e) {
+                if (!apps.isEmpty()) fill.run();
+            }
+        });
+        d.show();
+        new Thread(() -> {
+            android.content.pm.PackageManager pm = getPackageManager();
+            java.util.List<String[]> out = new java.util.ArrayList<>();
+            java.util.Map<String, android.graphics.drawable.Drawable> ics = new java.util.HashMap<>();
+            for (android.content.pm.ResolveInfo ri : pm.queryIntentActivities(new android.content.Intent(
+                    android.content.Intent.ACTION_MAIN).addCategory(android.content.Intent.CATEGORY_LAUNCHER), 0)) {
+                String pkg = ri.activityInfo.packageName;
+                if (ics.containsKey(pkg) || !Guard.allowable(this, pkg)) continue;
+                out.add(new String[]{pkg, String.valueOf(ri.loadLabel(pm))});
+                ics.put(pkg, ri.loadIcon(pm));
+            }
+            out.sort((x, y) -> x[1].compareToIgnoreCase(y[1]));
+            runOnUiThread(() -> {
+                if (isFinishing() || !d.isShowing()) return;
+                apps.addAll(out);
+                icons.putAll(ics);
+                fill.run();
+            });
+        }, "allowed-apps").start();
+    }
+
     private View radio(boolean on) {
         FrameLayout f = new FrameLayout(this);
         f.setBackground(outlined(this, 0x00000000, 11, on ? ACCENT : MUTED, 2));
@@ -610,6 +761,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         title.setText(ses.label());
         chipText.setText(Models.summary(ses));
         if (linux != null) paintLinuxChip(this, linux, ses.dev);
+        options.setImageTintList(ColorStateList.valueOf(ses.awake || !ses.allowed.isEmpty() ? ACCENT : MUTED));
         if (hint != null) hint.setText(hintText());
         strip.setVisibility(ses.running ? View.VISIBLE : View.GONE);
         input.setHint(ses.running ? getString(R.string.chat_input_hint_running) : getString(R.string.chat_input_hint, ses.brainName()));

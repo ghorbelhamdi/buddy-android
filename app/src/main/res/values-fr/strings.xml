@@ -272,6 +272,7 @@
     <string name="bubble_using_phone">Utilisation du téléphone</string>
     <!-- %1$s: what the agent is doing right now (its own status text). -->
     <string name="bubble_using_phone_status">Utilisation du téléphone · %1$s</string>
+    <string name="bubble_pill_background">En arrière-plan · vous pouvez utiliser votre téléphone</string>
     <string name="activity_reading">Lit l\'écran</string>
     <string name="activity_typing">Saisit du texte</string>
     <string name="activity_scrolling">Fait défiler</string>
@@ -461,6 +462,18 @@
     <string name="chat_linux_tools_risk">Un message ou une page Web malveillants à l\'écran pourraient tenter de le pousser à exécuter des commandes. Les cartes d\'approbation protègent toujours l\'envoi, la publication, l\'achat et la suppression.</string>
     <!-- Button, verb: turns Linux tools on for this chat. Keep short. -->
     <string name="chat_linux_tools_turn_on">Activer</string>
+
+    <string name="chat_options">Options de la discussion</string>
+    <string name="chat_keep_awake">Garder l\'écran allumé pendant le travail</string>
+    <string name="chat_keep_awake_info">Pour les longues tâches : le téléphone reste éveillé tant que cette discussion travaille, et une notification vous dit comment ça s\'est passé. Verrouiller le téléphone éteint toujours l\'écran.</string>
+    <string name="chat_allowed">Autorisé sans demander</string>
+    <string name="chat_allowed_info">Jusqu\'à la fin de la tâche de cette discussion, les validations de routine dans ces apps se font seules : envoyer un message, ou une étape sur laquelle le vérificateur vous demanderait. Chacune apparaît dans la discussion. Payer, acheter, supprimer, installer, les mots de passe et les réglages de sécurité vous demandent toujours.</string>
+    <string name="chat_allowed_add">Ajouter une app</string>
+    <string name="chat_allowed_remove">Retirer %1$s</string>
+    <string name="run_rule_approved">Approuvé par votre règle de tâche : %1$s</string>
+    <string name="run_end_done">%1$s a terminé</string>
+    <string name="run_end_stopped">%1$s s\'est arrêté</string>
+    <string name="run_end_failed">%1$s a rencontré un problème</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <!-- Button, verb: stops the agent's task. Keep short. -->
@@ -1577,6 +1590,9 @@
     <string name="browser_full_screen">Plein écran</string>
     <string name="browser_fold">Afficher ou masquer la page</string>
     <string name="browser_backspace">Effacer un caractère</string>
+    <string name="bubble_browser_thumb">Vue en direct du navigateur en arrière-plan. Touchez pour l\'ouvrir en plein écran.</string>
+    <string name="bubble_browser_thumb_hide">Masquer</string>
+    <string name="bubble_pill_show_page">%1$s · touchez pour afficher la page</string>
     <string name="browser_type_hint">Écrire dans la page</string>
     <string name="browser_enter">Entrée</string>
     <string name="browser_dialog">La page demande : %1$s</string>

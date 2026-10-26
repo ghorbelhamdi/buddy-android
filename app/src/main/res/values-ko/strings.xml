@@ -195,6 +195,7 @@
     <string name="bubble_pill_hands_on">%1$s · 여기를 탭해 답하세요</string>
     <string name="bubble_using_phone">휴대전화 사용 중</string>
     <string name="bubble_using_phone_status">휴대전화 사용 중 · %1$s</string>
+    <string name="bubble_pill_background">백그라운드에서 작업 중 · 휴대전화를 사용해도 됩니다</string>
     <string name="activity_reading">화면 읽는 중</string>
     <string name="activity_typing">입력 중</string>
     <string name="activity_scrolling">스크롤 중</string>
@@ -322,6 +323,18 @@
     <string name="chat_linux_tools_when">이 채팅에서만, 다음 메시지부터 적용돼요.</string>
     <string name="chat_linux_tools_risk">화면에 표시된 악성 메시지나 웹페이지가 에이전트를 속여 명령을 실행하게 할 수 있어요. 보내기, 게시, 구매, 삭제는 여전히 승인 카드로 보호돼요.</string>
     <string name="chat_linux_tools_turn_on">켜기</string>
+
+    <string name="chat_options">채팅 옵션</string>
+    <string name="chat_keep_awake">작업 중에는 화면 켜 두기</string>
+    <string name="chat_keep_awake_info">긴 작업용: 이 채팅이 작업하는 동안 휴대폰이 잠들지 않고, 끝나면 결과를 알림으로 알려 줘요. 휴대폰을 잠그면 화면은 그대로 꺼져요.</string>
+    <string name="chat_allowed">묻지 않고 허용</string>
+    <string name="chat_allowed_info">이 채팅의 작업이 끝날 때까지 이 앱들의 일상적인 승인은 자동으로 진행돼요: 메시지 보내기나 검토자가 물어볼 만한 단계 같은 것이요. 하나하나 채팅에 표시돼요. 결제, 구매, 삭제, 설치, 비밀번호, 보안 설정은 계속 물어봐요.</string>
+    <string name="chat_allowed_add">앱 추가</string>
+    <string name="chat_allowed_remove">%1$s 삭제</string>
+    <string name="run_rule_approved">이 작업의 규칙으로 승인됨: %1$s</string>
+    <string name="run_end_done">%1$s 작업 완료</string>
+    <string name="run_end_stopped">%1$s 중지됨</string>
+    <string name="run_end_failed">%1$s에 문제가 생겼어요</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <string name="chat_stop">중지</string>
@@ -1129,6 +1142,9 @@
     <string name="browser_full_screen">전체 화면</string>
     <string name="browser_fold">페이지 표시 또는 숨기기</string>
     <string name="browser_backspace">한 글자 지우기</string>
+    <string name="bubble_browser_thumb">백그라운드 브라우저 실시간 화면. 탭하면 전체 화면으로 열립니다.</string>
+    <string name="bubble_browser_thumb_hide">숨기기</string>
+    <string name="bubble_pill_show_page">%1$s · 탭하여 페이지 보기</string>
     <string name="browser_type_hint">페이지에 입력</string>
     <string name="browser_enter">Enter</string>
     <string name="browser_dialog">페이지의 질문: %1$s</string>

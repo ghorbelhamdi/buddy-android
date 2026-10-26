@@ -277,6 +277,8 @@
     <string name="bubble_using_phone">Using your phone</string>
     <!-- %1$s: what the agent is doing right now (its own status text). -->
     <string name="bubble_using_phone_status">Using your phone · %1$s</string>
+    <!-- First line of the pill while the agent works without using the screen (background browser, Linux tools, thinking): the phone is free. -->
+    <string name="bubble_pill_background">In the background · you can use your phone</string>
     <string name="activity_reading">Reading the screen</string>
     <string name="activity_typing">Typing</string>
     <string name="activity_scrolling">Scrolling</string>
@@ -475,6 +477,30 @@
     <string name="chat_linux_tools_risk">A malicious message or web page on screen could try to trick it into running commands. Approval cards still guard sending, posting, buying and deleting.</string>
     <!-- Button, verb: turns Linux tools on for this chat. Keep short. -->
     <string name="chat_linux_tools_turn_on">Turn on</string>
+
+    <!-- Chat screen: Chat options (long-task mode, apps allowed without asking until the task ends) -->
+    <!-- Chat screen: the options button at the top (tune icon) and the title of its sheet. Keep short. -->
+    <string name="chat_options">Chat options</string>
+    <!-- Switch in Chat options: long-task mode. "it" = the chat's agent. -->
+    <string name="chat_keep_awake">Keep the screen on while it works</string>
+    <!-- Under that switch. -->
+    <string name="chat_keep_awake_info">For long tasks: the phone stays awake while this chat works, and a notification says how it went. Locking the phone still turns the screen off.</string>
+    <!-- Section title in Chat options: apps where this chat's routine approvals need no card until its task ends. -->
+    <string name="chat_allowed">Allowed without asking</string>
+    <!-- Under that title. "The reviewer" = Buddy's smart reviewer (App permissions). -->
+    <string name="chat_allowed_info">Until this chat\'s task ends, routine approvals in these apps go ahead on their own: sending a message, or a step the reviewer would ask about. Each one shows in the chat. Paying, buying, deleting, installing, passwords and security settings still ask you.</string>
+    <!-- Row that opens the app picker. -->
+    <string name="chat_allowed_add">Add an app</string>
+    <!-- Read by TalkBack for the X beside an allowed app; %1$s = the app's name. -->
+    <string name="chat_allowed_remove">Remove %1$s</string>
+    <!-- A line in the chat for an action that went ahead because of "Allowed without asking"; %1$s = the action, e.g. Tap “Complete Task” in Testers Community. -->
+    <string name="run_rule_approved">Approved by your run rule: %1$s</string>
+    <!-- Notification title when a long-task chat's run ends; %1$s = the agent's name (Claude Code, Codex…). -->
+    <string name="run_end_done">%1$s finished</string>
+    <!-- As above, when the user stopped it. -->
+    <string name="run_end_stopped">%1$s stopped</string>
+    <!-- As above, when it ended with an error. -->
+    <string name="run_end_failed">%1$s ran into a problem</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <!-- Button, verb: stops the agent's task. Keep short. -->
@@ -1682,6 +1708,10 @@
     <string name="browser_full_screen">Full screen</string>
     <string name="browser_fold">Show or hide the page</string>
     <string name="browser_backspace">Delete a character</string>
+    <!-- The small live picture of the browser under the bubble's status while an agent browses (for screen readers), and the action that hides it (a sideways swipe does too). -->
+    <string name="bubble_browser_thumb">Live view of the background browser. Tap to open it full screen.</string>
+    <string name="bubble_browser_thumb_hide">Hide</string>
+    <string name="bubble_pill_show_page">%1$s · tap to show the page</string>
     <!-- Hint of the text field under the page: what the user types goes into the page. -->
     <string name="browser_type_hint">Type into the page</string>
     <!-- Button: the keyboard's Enter key, for the page. -->

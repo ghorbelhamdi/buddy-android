@@ -394,6 +394,54 @@ final class Guard {
         }
     }
 
+    // ------------------------------------------------------------ a chat's run rule
+
+    /** Apps a run rule never covers, whatever the user picks: settings, permissions, app stores and installers. */
+    private static final Pattern NEVER_ALLOWED = Pattern.compile(
+            "(?i)(settings|permission|security|installer|vending|store|market|^com\\.google\\.android\\.gms$)");
+    /** Words in a confirm's text that a run rule never approves (the rest of RISKY is checked too). */
+    private static final Pattern NEVER_WORDS = Pattern.compile(
+            "(?iu)(?<![\\p{L}])(install\\w*|passwords?|passcode|pin|otp|codes?|security|permissions?|bank\\w*|cards?|iban|money)(?![\\p{L}])|[€$£¥₹]");
+
+    /**
+     * Can this app go on a chat's "Allowed without asking"? Not apps for money or shopping (see moneyApp), nor
+     * Settings, permission screens, app stores or installers: those approvals are always the user's.
+     */
+    static boolean allowable(android.content.Context c, String pkg) {
+        return pkg != null && !NEVER_ALLOWED.matcher(pkg).find() && !moneyApp(c, pkg)
+                && !BuildInfo.class.getPackage().getName().equals(pkg);
+    }
+
+    /**
+     * The calling chat's run rule: the user allowed this app without asking until the run ends (ChatHub.allowedFor).
+     * It covers only what a notification rule's countdown may approve (sending a message) and a smart reviewer's
+     * "ask" on a tap that isn't a risky button; Tools decides which an action is. Never in a notification rule's run.
+     */
+    static boolean runRule(android.content.Context c, String pkg) {
+        String chat = McpServer.CALLER_CHAT.get();
+        if (chat == null || Triggers.ruleRun(chat) || !allowable(c, pkg)) return false;
+        return ChatHub.get(c).allowedFor(chat).contains(pkg);
+    }
+
+    /**
+     * A confirm's text a run rule may approve: nothing in it pays, buys, deletes, installs, or names a password, code,
+     * card or security setting. Sending is fine. Every word is checked as a button label would be.
+     */
+    static boolean routineText(String s) {
+        if (s == null || s.trim().isEmpty() || NEVER_WORDS.matcher(s).find()) return false;
+        for (int i = 0; i < s.length(); i++) {
+            int cp = s.codePointAt(i);
+            if (!Character.isLetter(cp)) continue;
+            Character.UnicodeScript sc = Character.UnicodeScript.of(cp);
+            boolean noSpaces = sc == Character.UnicodeScript.HAN || sc == Character.UnicodeScript.HIRAGANA
+                    || sc == Character.UnicodeScript.KATAKANA || sc == Character.UnicodeScript.HANGUL;
+            if (i > 0 && Character.isLetter(s.codePointBefore(i)) && !noSpaces) continue; // a word's start only
+            String from = s.substring(i);
+            if (RISKY.matcher(from).find() && !SEND.matcher(from).find()) return false;
+        }
+        return true;
+    }
+
     /** What a tap at (x, y) would hit: the topmost app window's deepest node there. */
     static AccessibilityNodeInfo nodeAt(List<AccessibilityWindowInfo> windows, int x, int y) {
         AccessibilityWindowInfo top = null;

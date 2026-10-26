@@ -272,6 +272,7 @@
     <string name="bubble_using_phone">Sta usando il telefono</string>
     <!-- %1$s: what the agent is doing right now (its own status text). -->
     <string name="bubble_using_phone_status">Sta usando il telefono · %1$s</string>
+    <string name="bubble_pill_background">In background · puoi usare il telefono</string>
     <string name="activity_reading">Legge lo schermo</string>
     <string name="activity_typing">Scrive</string>
     <string name="activity_scrolling">Scorre</string>
@@ -461,6 +462,18 @@
     <string name="chat_linux_tools_risk">Un messaggio o una pagina web dannosi sullo schermo potrebbero cercare di indurlo a eseguire comandi. Le schede di approvazione continuano a proteggere invii, pubblicazioni, acquisti ed eliminazioni.</string>
     <!-- Button, verb: turns Linux tools on for this chat. Keep short. -->
     <string name="chat_linux_tools_turn_on">Attiva</string>
+
+    <string name="chat_options">Opzioni della chat</string>
+    <string name="chat_keep_awake">Tieni lo schermo acceso mentre lavora</string>
+    <string name="chat_keep_awake_info">Per i compiti lunghi: il telefono resta sveglio mentre questa chat lavora, e una notifica ti dice com\'è andata. Bloccare il telefono spegne comunque lo schermo.</string>
+    <string name="chat_allowed">Consentito senza chiedere</string>
+    <string name="chat_allowed_info">Finché il compito di questa chat non finisce, le approvazioni di routine in queste app vanno avanti da sole: inviare un messaggio, o un passaggio su cui il revisore chiederebbe. Ognuna appare nella chat. Pagare, comprare, eliminare, installare, password e impostazioni di sicurezza ti chiedono sempre.</string>
+    <string name="chat_allowed_add">Aggiungi un\'app</string>
+    <string name="chat_allowed_remove">Rimuovi %1$s</string>
+    <string name="run_rule_approved">Approvato dalla tua regola per questo compito: %1$s</string>
+    <string name="run_end_done">%1$s ha finito</string>
+    <string name="run_end_stopped">%1$s si è fermato</string>
+    <string name="run_end_failed">%1$s ha avuto un problema</string>
 
     <!-- Chat screen: the strip shown while the agent works -->
     <!-- Button, verb: stops the agent's task. Keep short. -->
@@ -1577,6 +1590,9 @@
     <string name="browser_full_screen">Schermo intero</string>
     <string name="browser_fold">Mostra o nascondi la pagina</string>
     <string name="browser_backspace">Cancella un carattere</string>
+    <string name="bubble_browser_thumb">Vista dal vivo del browser in background. Tocca per aprirlo a schermo intero.</string>
+    <string name="bubble_browser_thumb_hide">Nascondi</string>
+    <string name="bubble_pill_show_page">%1$s · tocca per vedere la pagina</string>
     <string name="browser_type_hint">Scrivi nella pagina</string>
     <string name="browser_enter">Invio</string>
     <string name="browser_dialog">La pagina chiede: %1$s</string>
