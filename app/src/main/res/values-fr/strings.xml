@@ -455,7 +455,7 @@
     <!-- Title of the sheet that opens when the user turns Linux tools on in a chat. -->
     <string name="chat_linux_tools_title">Activer les outils Linux ?</string>
     <!-- ~/.buddy/work is a folder: keep it as is. -->
-    <string name="chat_linux_tools_what">L\'agent peut alors exécuter des commandes, installer des paquets et modifier des fichiers dans ~/.buddy/work, pour créer et installer des applis.</string>
+    <string name="chat_linux_tools_what">L\'agent peut alors exécuter des commandes, installer des paquets et modifier des fichiers dans ~/.buddy/work, pour créer des applis.</string>
     <!-- When the change applies: a task already running goes on as it was. -->
     <string name="chat_linux_tools_when">Dans cette discussion uniquement, à partir de votre prochain message.</string>
     <!-- "it" = the agent. -->
@@ -551,19 +551,19 @@
     <!-- "Settings → Voice" = the Voice section of Buddy's Settings tab; use the same names as there. -->
     <string name="chat_speak_in_help">Choisissez vos langues dans Paramètres → Voix.</string>
     <string name="live_option">Voix en direct</string>
-    <string name="live_option_sub">Parlez à Codex à voix haute. Il répond avec la voix de ChatGPT et agit sur le téléphone dans ce chat.</string>
+    <string name="live_option_sub">Parlez à %1$s à voix haute. Il répond avec la voix de ChatGPT et agit sur le téléphone dans ce chat.</string>
     <string name="live_label">En direct</string>
     <string name="live_end">Terminer</string>
     <string name="live_connecting">Connexion…</string>
-    <string name="live_started">Voix en direct activée. Parlez : Codex vous entend, répond à voix haute et fait ce que vous demandez dans ce chat.</string>
+    <string name="live_started">Voix en direct activée. Parlez : %1$s vous entend, répond à voix haute et fait ce que vous demandez dans ce chat.</string>
     <string name="live_ended">Voix en direct terminée.</string>
     <string name="live_ended_why">Voix en direct terminée : %1$s</string>
     <string name="live_ended_screen_off">l\'écran s\'est éteint</string>
     <string name="live_ended_paused">Buddy a été mis en pause</string>
     <string name="live_ended_idle">rien n\'a été dit pendant 5 minutes</string>
-    <string name="live_notification_title">Voix en direct avec Codex</string>
+    <string name="live_notification_title">Voix en direct avec %1$s</string>
     <string name="live_mic_busy">La voix en direct utilise le micro. Terminez-la d\'abord.</string>
-    <string name="live_hint">Nouveau : parlez en direct avec Codex</string>
+    <string name="live_hint">Nouveau : parlez en direct avec %1$s</string>
     <string name="live_status_listening">J\'écoute…</string>
     <string name="live_status_thinking">Réflexion…</string>
     <string name="live_status_working">En cours…</string>
@@ -1218,7 +1218,7 @@
     <string name="setup_app_permissions_info">Choisissez pour chaque appli : en mode Libre, l\'agent y travaille sans confirmation ; en mode Strict, Buddy lui-même vous demande avant Envoyer, Payer, Supprimer…</string>
     <!-- Settings switch: whether new chats start with Linux tools (chat_linux_tools); each chat can change it. -->
     <string name="setup_dev_mode">Outils Linux dans les nouvelles discussions</string>
-    <string name="setup_dev_mode_info">Avec les outils Linux, l\'agent peut exécuter des commandes, installer des paquets et modifier des fichiers dans ~/.buddy/work, pour créer et installer des applis. Les nouvelles discussions démarrent avec ce réglage ; chaque discussion peut le changer sous son titre.</string>
+    <string name="setup_dev_mode_info">Avec les outils Linux, l\'agent peut exécuter des commandes, installer des paquets et modifier des fichiers dans ~/.buddy/work, pour créer des applis. Les nouvelles discussions démarrent avec ce réglage ; chaque discussion peut le changer sous son titre.</string>
     <string name="setup_agents_tap">Laisser les agents appuyer dans Buddy</string>
     <!-- "App permissions" is the name of a screen in Buddy. -->
     <string name="setup_agents_tap_info">Pour tester Buddy avec un agent (par exemple Claude Code dans Termux avec les outils du téléphone). La bulle, les cartes d\'approbation, Autorisations des applis et ces options restent hors de portée.</string>
@@ -1621,13 +1621,6 @@
     <string name="browser_install_failed">Impossible d\'installer Chromium. Vérifiez la connexion et réessayez.</string>
     <string name="browser_sign_in_help">Les agents ne saisissent jamais de mot de passe. Pour qu\'ils utilisent un site avec votre compte, ouvrez le navigateur et connectez-vous vous-même. « Continuer avec Google » échoue souvent dans les navigateurs automatisés : utilisez plutôt l\'adresse e-mail et le mot de passe.</string>
     <string name="browser_open">Ouvrir le navigateur</string>
-    <string name="browser_sites">Sites connectés</string>
-    <string name="browser_sites_help">Sites auxquels vous vous êtes connecté vous-même dans le navigateur en arrière-plan. Déconnectez-vous de l\'un d\'eux pour supprimer sa connexion.</string>
-    <string name="browser_sites_loading">Chargement…</string>
-    <string name="browser_sites_none">Aucun pour l\'instant. Connectez-vous vous-même à un site dans le navigateur et il apparaîtra ici.</string>
-    <string name="browser_sites_others">Autres sites avec des cookies (publicités, pages ouvertes par les agents) : %1$d. Effacer les données du navigateur les supprime.</string>
-    <string name="browser_log_out">Se déconnecter</string>
-    <string name="browser_logged_out">Déconnecté de %1$s</string>
     <string name="browser_wipe">Effacer les données du navigateur</string>
     <string name="browser_wipe_title">Effacer les données du navigateur ?</string>
     <string name="browser_wipe_body">Supprime toutes les connexions, les cookies et l\'historique du navigateur en arrière-plan. Chromium reste installé.</string>
@@ -1665,4 +1658,13 @@
     <string name="hub_tool_browser_screenshot">Navigateur : examen de la page</string>
     <string name="hub_tool_browser_back">Navigateur : retour en arrière</string>
     <string name="hub_tool_browser_tabs">Navigateur : onglets</string>
+    <string name="hub_tool_schedule_message">Programmation : %1$s</string>
+    <string name="hub_tool_list_scheduled">Vérification des messages programmés</string>
+    <string name="hub_tool_cancel_scheduled">Annulation d’un message programmé</string>
+    <string name="later_title">Message de l’agent pour %1$s</string>
+    <string name="later_cancel">Annuler le message</string>
+    <string name="setup_play_rate">Noter Buddy sur Google Play</string>
+    <string name="setup_play_rate_info">Un avis aide d’autres personnes à trouver Buddy.</string>
+    <string name="setup_play_get">Buddy sur Google Play</string>
+    <string name="setup_play_get_info">Les mises à jour passent par Play, mais cette version n’installe pas d’APK. C’est une installation à part : désinstallez d’abord cette version.</string>
 </resources>

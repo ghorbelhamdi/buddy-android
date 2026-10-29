@@ -38,8 +38,38 @@ import java.util.concurrent.ConcurrentHashMap;
  * phone for this task" the screen comes on too, see WakeActivity), and after an hour without that the run stops. A chat that's still working, an agent that isn't signed in, or Buddy's service being
  * off skips the task, with a notification; another chat at work, a pause or no internet make it wait, for an hour at
  * most. Main thread, except awaitUnlock (a phone tool's thread).
+ *
+ * The agent can schedule messages to itself too (schedule_message, see agentTool): "check the price again tomorrow at
+ * 9". Each is sent once, into its own chat, and runs like a scheduled task; the chat lists them above its composer,
+ * where the user can cancel them.
  */
 public final class Schedules extends BroadcastReceiver {
+    /** A message the agent scheduled for itself in a chat: sent once, at its time. */
+    static final class Later {
+        final String id;
+        final long at;
+        final String text;
+
+        Later(String id, long at, String text) {
+            this.id = id;
+            this.at = at;
+            this.text = text;
+        }
+
+        JSONObject toJson() {
+            try {
+                return new JSONObject().put("id", id).put("at", at).put("text", text);
+            } catch (Exception e) {
+                return new JSONObject();
+            }
+        }
+
+        static Later of(JSONObject o) {
+            if (o == null || o.optString("id").isEmpty() || o.optLong("at") <= 0 || o.optString("text").trim().isEmpty()) return null;
+            return new Later(o.optString("id"), o.optLong("at"), o.optString("text"));
+        }
+    }
+
     /** A chat's schedule: when, and what to send. */
     static final class Plan {
         /** Days of the week as bits (1 << (Calendar.DAY_OF_WEEK - 1)), Sunday first. */
@@ -155,7 +185,9 @@ public final class Schedules extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context c, Intent i) {
-        if (ACTION_FIRE.equals(i.getAction())) fire(c.getApplicationContext(), i.getStringExtra("id"), i.getLongExtra("at", 0));
+        if (!ACTION_FIRE.equals(i.getAction())) return;
+        if (i.hasExtra("later")) fireLater(c.getApplicationContext(), i.getStringExtra("id"), i.getStringExtra("later"));
+        else fire(c.getApplicationContext(), i.getStringExtra("id"), i.getLongExtra("at", 0));
     }
 
     /** Boot, an update of Buddy, a clock or time zone change, exact alarms allowed: every chat's alarm is set again. */
@@ -170,7 +202,10 @@ public final class Schedules extends BroadcastReceiver {
 
     /** Sets every scheduled chat's next alarm (main thread). */
     static void sync(Context c) {
-        for (Sessions.Session s : new ArrayList<>(ChatHub.get(c).sessions.all)) if (s.schedule != null) set(c, s);
+        for (Sessions.Session s : new ArrayList<>(ChatHub.get(c).sessions.all)) {
+            if (s.schedule != null) set(c, s);
+            for (Later l : s.later) setLater(c, s, l); // one whose time passed while the phone was off comes at once
+        }
     }
 
     /** Sets the chat's next alarm, or cancels it when the chat has no schedule. */
@@ -179,13 +214,16 @@ public final class Schedules extends BroadcastReceiver {
     }
 
     private static void set(Context c, Sessions.Session s, long after) {
-        AlarmManager am = c.getSystemService(AlarmManager.class);
         long at = s.schedule == null ? 0 : s.schedule.next(after);
         if (at == 0) {
             cancel(c, s.id);
             return;
         }
-        PendingIntent pi = alarm(c, s.id, at);
+        setAlarm(c, at, alarm(c, s.id, at));
+    }
+
+    private static void setAlarm(Context c, long at, PendingIntent pi) {
+        AlarmManager am = c.getSystemService(AlarmManager.class);
         if (exact(c)) {
             try {
                 am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pi);
@@ -201,6 +239,38 @@ public final class Schedules extends BroadcastReceiver {
         c.getSystemService(AlarmManager.class).cancel(alarm(c, id, 0));
         waiting.remove(id);
         clearNotice(c, id);
+    }
+
+    /** A chat goes: its schedule's alarm, and those of the messages its agent scheduled. */
+    static void cancelAll(Context c, Sessions.Session s) {
+        cancel(c, s.id);
+        for (Later l : s.later) cancelLater(c, s, l);
+    }
+
+    private static void setLater(Context c, Sessions.Session s, Later l) {
+        setAlarm(c, l.at, laterAlarm(c, s.id, l.id));
+    }
+
+    private static void cancelLater(Context c, Sessions.Session s, Later l) {
+        c.getSystemService(AlarmManager.class).cancel(laterAlarm(c, s.id, l.id));
+        waiting.remove(s.id + "/" + l.id);
+    }
+
+    private static PendingIntent laterAlarm(Context c, String chat, String later) {
+        Intent i = new Intent(c, Schedules.class).setAction(ACTION_FIRE).setData(Uri.parse("buddy-later:" + chat + "/" + later))
+                .putExtra("id", chat).putExtra("later", later);
+        return PendingIntent.getBroadcast(c, 0, i, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    /** The user cancels one of the agent's scheduled messages (main thread). */
+    static void cancelLater(Context c, Sessions.Session s, String id) {
+        for (Later l : new ArrayList<>(s.later)) {
+            if (!l.id.equals(id)) continue;
+            cancelLater(c, s, l);
+            s.later.remove(l);
+            ChatHub.get(c).sessions.save();
+            ChatHub.get(c).changed();
+        }
     }
 
     private static PendingIntent alarm(Context c, String id, long at) {
@@ -237,6 +307,20 @@ public final class Schedules extends BroadcastReceiver {
         pump();
     }
 
+    /** A message the agent scheduled came due: it starts, or waits as a task does (keyed "chat/message"). */
+    private static void fireLater(Context c, String chat, String id) {
+        Sessions.Session s = ChatHub.get(c).sessions.find(chat);
+        if (s == null || later(s, id) == null) return; // cancelled or deleted meanwhile
+        waiting.put(chat + "/" + id, SystemClock.elapsedRealtime() + WAIT_MS);
+        listen(c);
+        pump();
+    }
+
+    private static Later later(Sessions.Session s, String id) {
+        for (Later l : s.later) if (l.id.equals(id)) return l;
+        return null;
+    }
+
     private static final Runnable look = Schedules::pump;
 
     /** Starts what waits, skips what can't run, gives up on what waited too long. */
@@ -246,24 +330,31 @@ public final class Schedules extends BroadcastReceiver {
         try {
             ChatHub hub = ChatHub.get(app);
             long now = SystemClock.elapsedRealtime();
-            for (String id : new ArrayList<>(waiting.keySet())) {
-                Long until = waiting.get(id);
-                Sessions.Session s = hub.sessions.find(id);
-                if (until == null || s == null || s.schedule == null) {
-                    waiting.remove(id);
+            for (String key : new ArrayList<>(waiting.keySet())) {
+                Long until = waiting.get(key);
+                int slash = key.indexOf('/');
+                Sessions.Session s = hub.sessions.find(slash < 0 ? key : key.substring(0, slash));
+                Later l = s == null || slash < 0 ? null : later(s, key.substring(slash + 1));
+                if (until == null || s == null || (slash < 0 ? s.schedule == null : l == null)) {
+                    waiting.remove(key);
                     continue;
                 }
                 BuddyService svc = BuddyService.get();
                 String skip = svc == null ? app.getString(R.string.rules_log_no_service) // its server is how the agent works
                         : !SetupState.signedIn(app, s.backend) ? app.getString(R.string.rules_log_not_signed_in, s.brainName())
-                        : s.running ? app.getString(R.string.schedule_skip_running) : null;
-                if (skip == null && busy(hub, svc)) {
+                        : s.running && l == null ? app.getString(R.string.schedule_skip_running) : null;
+                if (skip == null && busy(hub, svc)) { // the agent's own message waits for its chat to finish, too
                     if (now < until) continue;
                     skip = app.getString(R.string.schedule_skip_busy);
                 }
-                waiting.remove(id);
+                waiting.remove(key);
+                if (l != null) {
+                    s.later.remove(l); // sent once, whatever happens now
+                    hub.sessions.save();
+                    hub.changed();
+                }
                 if (skip != null) notice(app, s, app.getString(R.string.schedule_skipped_title, s.label()), skip);
-                else start(s);
+                else start(s, l);
             }
             main.removeCallbacks(look);
             if (!waiting.isEmpty()) main.postDelayed(look, LOOK_MS);
@@ -281,19 +372,23 @@ public final class Schedules extends BroadcastReceiver {
                 || svc.controlRevoked() != null || !online();
     }
 
-    private static void start(Sessions.Session s) {
-        Plan p = s.schedule;
+    private static void start(Sessions.Session s, Later l) {
+        String text = l != null ? l.text : s.schedule.text;
         boolean locked = Triggers.locked(app);
-        StringBuilder prompt = new StringBuilder("[BUDDY_SCHEDULED] The user set this chat to send the message below ")
-                .append(p.english()).append(", and Buddy sent it now on its own: they may not be watching. Do it as ")
-                .append("if they had just typed it; approval cards still wait for them.\n");
+        StringBuilder prompt = new StringBuilder(l != null
+                ? "[BUDDY_SCHEDULED] Earlier in this chat you scheduled the message below for " + english(l.at)
+                + " (schedule_message), and Buddy sent it now: the user may not be watching. Do what it says; approval "
+                + "cards still wait for them.\n"
+                : "[BUDDY_SCHEDULED] The user set this chat to send the message below " + s.schedule.english()
+                + ", and Buddy sent it now on its own: they may not be watching. Do it as if they had just typed it; "
+                + "approval cards still wait for them.\n");
         if (locked) {
             prompt.append("The phone is locked right now. The background browser and Linux tools work as usual; a ")
                     .append("phone tool that needs the screen asks the user to unlock and waits for them, so use the ")
                     .append("screen only when the task needs it.\n");
         }
-        prompt.append('\n').append(p.text);
-        String err = ChatHub.get(app).sendScheduled(s, p.text, prompt.toString());
+        prompt.append('\n').append(text);
+        String err = ChatHub.get(app).sendScheduled(s, text, prompt.toString());
         if (err != null) {
             notice(app, s, app.getString(R.string.schedule_skipped_title, s.label()), err);
             return;
@@ -431,6 +526,98 @@ public final class Schedules extends BroadcastReceiver {
 
     private static void clearNotice(Context c, String id) {
         c.getSystemService(NotificationManager.class).cancel(TAG, id.hashCode());
+    }
+
+    // ------------------------------------------------ the agent's own messages
+
+    private static final int MAX_LATER = 10;
+    private static final long MAX_AHEAD_MS = 30 * 24 * 3600_000L;
+
+    /**
+     * schedule_message, list_scheduled and cancel_scheduled, from a phone tool's thread: what the agent is told. The
+     * chat's list changes on the main thread.
+     */
+    static String agentTool(Context c, String chat, String name, JSONObject a) throws Exception {
+        if (chat == null) return "Only in Buddy's own chats.";
+        if (Triggers.ruleRun(chat)) return "Not available in a notification rule's run.";
+        java.util.concurrent.FutureTask<String> t = new java.util.concurrent.FutureTask<>(() -> {
+            Sessions.Session s = ChatHub.get(c).sessions.find(chat);
+            if (s == null) return "This chat is gone.";
+            listen(c);
+            switch (name) {
+                case "schedule_message": return scheduleMessage(c, s, a);
+                case "cancel_scheduled": {
+                    Later l = later(s, a.optString("id"));
+                    if (l == null) return "No scheduled message " + a.optString("id") + " in this chat. " + list(s);
+                    cancelLater(c, s, l.id);
+                    return "Cancelled " + l.id + ".";
+                }
+                default: return list(s);
+            }
+        });
+        main.post(t);
+        return t.get();
+    }
+
+    private static String scheduleMessage(Context c, Sessions.Session s, JSONObject a) {
+        String text = a.optString("message").trim();
+        if (text.isEmpty()) return "Give the message to send.";
+        long now = System.currentTimeMillis(), at;
+        String when = a.optString("at").trim();
+        if (a.has("in_minutes")) {
+            at = now + Math.max(1, a.optLong("in_minutes")) * 60_000L;
+        } else if (!when.isEmpty()) {
+            at = parse(when, now);
+            if (at <= 0) return "Couldn't read at=\"" + when + "\": use \"2026-10-28 09:00\" or \"09:00\" (the phone's time).";
+        } else {
+            return "Give in_minutes or at.";
+        }
+        if (at <= now) return "That time has passed: it's " + english(now) + " now.";
+        if (at - now > MAX_AHEAD_MS) return "At most 30 days ahead.";
+        if (s.later.size() >= MAX_LATER) return "This chat has " + MAX_LATER + " scheduled messages already. " + list(s);
+        Later l = new Later(java.util.UUID.randomUUID().toString().substring(0, 6), at, text);
+        int i = 0;
+        while (i < s.later.size() && s.later.get(i).at <= at) i++;
+        s.later.add(i, l);
+        ChatHub.get(c).sessions.save();
+        setLater(c, s, l);
+        ChatHub.get(c).changed();
+        return "Scheduled " + l.id + " for " + english(at) + ". Buddy sends it into this chat then, as a new message "
+                + "to you, also with the phone locked; the user sees it above the chat and can cancel it."
+                + (exact(c) ? "" : " Android allows Buddy no exact alarms, so it may come a few minutes late.");
+    }
+
+    private static String list(Sessions.Session s) {
+        if (s.later.isEmpty()) return "No scheduled messages in this chat.";
+        StringBuilder b = new StringBuilder("Scheduled in this chat:");
+        for (Later l : s.later) b.append("\n").append(l.id).append(": ").append(english(l.at)).append(": ").append(l.text);
+        return b.toString();
+    }
+
+    /** "2026-10-28 09:00", "2026-10-28T09:00" or "09:00" (the next one), the phone's time; 0 if unreadable. */
+    private static long parse(String s, long now) {
+        java.util.regex.Matcher m = java.util.regex.Pattern
+                .compile("(?:(\\d{4})-(\\d{1,2})-(\\d{1,2})[ T])?(\\d{1,2}):(\\d{2})(?::\\d{2})?").matcher(s);
+        if (!m.matches()) return 0;
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(now);
+        c.setLenient(false);
+        try {
+            if (m.group(1) != null) c.set(Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)) - 1, Integer.parseInt(m.group(3)));
+            c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(m.group(4)));
+            c.set(Calendar.MINUTE, Integer.parseInt(m.group(5)));
+            c.set(Calendar.SECOND, 0);
+            c.set(Calendar.MILLISECOND, 0);
+            if (m.group(1) == null && c.getTimeInMillis() <= now) c.add(Calendar.DAY_OF_YEAR, 1);
+            return c.getTimeInMillis();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    /** For the agent: "Tue 2026-10-28 09:00", the phone's time. */
+    static String english(long at) {
+        return new java.text.SimpleDateFormat("EEE yyyy-MM-dd HH:mm", java.util.Locale.ENGLISH).format(new java.util.Date(at));
     }
 
     // ---------------------------------------------------------------- helpers

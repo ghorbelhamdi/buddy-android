@@ -364,7 +364,7 @@ run_opencode() {
   # OpenCode names MCP tools <server>_<tool>; small models otherwise call "read_screen" and give up
   printf '%s\n\n%s\n' "$SYSTEM" "In this app the phone tools are named with a phone_ prefix: phone_read_screen, phone_tap, \
 phone_long_press, phone_type_text, phone_scroll, phone_swipe, phone_press, phone_open_app, phone_list_apps, phone_open_url, \
-phone_screenshot, phone_wait, phone_confirm, phone_ask, phone_notify, phone_reply_notification, phone_update_buddy, phone_install_apk and phone_wait_for_install\
+phone_screenshot, phone_wait, phone_confirm, phone_ask, phone_notify, phone_reply_notification, phone_schedule_message, phone_list_scheduled, phone_cancel_scheduled, phone_update_buddy, phone_install_apk and phone_wait_for_install\
 $([ "$BROWSER" = 1 ] && printf '%s' ", and for the background browser phone_browser_open, phone_browser_read, phone_browser_click, \
 phone_browser_type, phone_browser_scroll, phone_browser_screenshot, phone_browser_back and phone_browser_tabs"). Always call them by \
 these exact names; they are available in every message of this chat." > "$S/system.md"
@@ -455,7 +455,8 @@ stream_opencode() {
 # Only the phone tools (and the chat's attachments) are pre-approved; developer mode skips agy's permission checks,
 # like Codex's full access. timeoutSeconds: an approval card may wait for the user (10 minutes, as for the others).
 AGY_PHONE_TOOLS='["read_screen","tap","long_press","type_text","scroll","swipe","press","open_app","list_apps","open_url",
-"screenshot","wait","confirm","ask","notify","reply_notification","update_buddy","install_apk","wait_for_install","point_out"]'
+"screenshot","wait","confirm","ask","notify","reply_notification","schedule_message","list_scheduled","cancel_scheduled",
+"update_buddy","install_apk","wait_for_install","point_out"]'
 run_agy() {
   local h=$S/agy-home g=$HOME/.gemini/antigravity-cli f list tools sigs
   mkdir -p "$h/.gemini/config" "$h/.gemini/antigravity-cli" "$g" "$HOME/.gemini/config"

@@ -90,7 +90,7 @@ final class Browser {
 
     /** The feature is there: the GitHub build, with the switch on in Settings (see Prefs.browser). */
     static boolean available(Context c) {
-        return !Flavor.PLAY && Prefs.browser(c);
+        return Prefs.browser(c);
     }
 
     /** Chromium is installed in Buddy's Linux. */
@@ -922,116 +922,11 @@ final class Browser {
         void run() throws Exception;
     }
 
-    // ------------------------------------------------------- signed-in sites
-
-    /**
-     * The sites with cookies in the browser's profile (its sign-ins), by site name ("amazon.de"), sorted. Read from
-     * the running browser, or else from the profile's cookie file. Not on the main thread.
-     */
-    static List<String> sites(Context c) {
-        java.util.TreeSet<String> out = new java.util.TreeSet<>();
-        if (running()) {
-            try {
-                JSONArray a = call("Storage.getCookies", null, null, 10_000).getJSONArray("cookies");
-                for (int i = 0; i < a.length(); i++) out.add(site(a.getJSONObject(i).optString("domain")));
-                out.remove("");
-                return new ArrayList<>(out);
-            } catch (Exception ignored) {
-            }
-        }
-        File db = new File(Linux.root(c), "root/.buddy/browser/Default/Cookies");
-        if (!db.exists()) return new ArrayList<>();
-        File copy = new File(c.getCacheDir(), "browser-cookies.db");
-        try {
-            java.nio.file.Files.copy(db.toPath(), copy.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            try (android.database.sqlite.SQLiteDatabase d = android.database.sqlite.SQLiteDatabase.openDatabase(copy.getPath(),
-                    null, android.database.sqlite.SQLiteDatabase.OPEN_READONLY);
-                 android.database.Cursor cur = d.rawQuery("SELECT DISTINCT host_key FROM cookies", null)) {
-                while (cur.moveToNext()) out.add(site(cur.getString(0)));
-            }
-        } catch (Exception e) {
-            android.util.Log.w("BuddyBrowser", "cookies", e);
-        } finally {
-            copy.delete();
-        }
-        out.remove("");
-        return new ArrayList<>(out);
-    }
-
-    /**
-     * The user typed on the chat's tab while it showed a sign-in form: remember its site as one they signed in to.
-     * Cookies alone don't say that (ads and every page an agent opened leave some). Not on the main thread.
-     */
-    static void userTyped(String key) {
-        try {
-            String[] p = page(key);
-            if (p == null || !((JSONObject) eval(key, "__buddy.signals()")).optBoolean("login")) return;
-            String site = site(new java.net.URI(p[0]).getHost());
-            if (site.isEmpty()) return;
-            java.util.Set<String> s = new java.util.TreeSet<>(signIns(app));
-            if (s.add(site)) app.getSharedPreferences("browser", 0).edit().putStringSet("signins", s).apply();
-        } catch (Exception ignored) {
-        }
-    }
-
-    /** The sites the user signed in to in the browser (see userTyped), whether or not they still have cookies. */
-    static java.util.Set<String> signIns(Context c) {
-        return c.getSharedPreferences("browser", 0).getStringSet("signins", java.util.Collections.emptySet());
-    }
-
-    private static void forget(Context c, String site) {
-        java.util.Set<String> s = new java.util.TreeSet<>(c.getSharedPreferences("browser", 0)
-                .getStringSet("signins", java.util.Collections.emptySet()));
-        if (site == null) s.clear();
-        else s.remove(site);
-        c.getSharedPreferences("browser", 0).edit().putStringSet("signins", s).apply();
-    }
-
-    /** "accounts.google.com" → "google.com", "www.amazon.co.uk" → "amazon.co.uk". */
-    static String site(String host) {
-        String h = host == null ? "" : host.trim().toLowerCase(java.util.Locale.ROOT);
-        while (h.startsWith(".")) h = h.substring(1);
-        String[] p = h.split("\\.");
-        if (p.length <= 2) return h;
-        // a second level under a country (co.uk, com.au, co.jp, …) belongs to the name
-        int keep = p[p.length - 2].matches("co|com|net|org|gov|ac|edu|ne|or|gob|gouv") && p[p.length - 1].length() == 2 ? 3 : 2;
-        StringBuilder sb = new StringBuilder();
-        for (int i = Math.max(0, p.length - keep); i < p.length; i++) sb.append(sb.length() > 0 ? "." : "").append(p[i]);
-        return sb.toString();
-    }
-
-    /** Signs the browser out of a site: its cookies and the data it stored go (starts the browser for it). */
-    static void logOut(Context c, String site) throws Exception {
-        String why = ensure(c, 60_000);
-        if (why != null) throw new IllegalStateException(why);
-        JSONArray a = call("Storage.getCookies", null, null, 10_000).getJSONArray("cookies");
-        java.util.Set<String> hosts = new java.util.HashSet<>();
-        for (int i = 0; i < a.length(); i++) {
-            JSONObject k = a.getJSONObject(i);
-            if (!site.equals(site(k.optString("domain")))) continue;
-            call("Network.deleteCookies", new JSONObject().put("name", k.getString("name")).put("domain", k.getString("domain"))
-                    .put("path", k.optString("path", "/")), sessionFor(USER), 5000);
-            String d = k.getString("domain");
-            hosts.add(d.startsWith(".") ? d.substring(1) : d);
-        }
-        hosts.add(site);
-        hosts.add("www." + site);
-        forget(c, site);
-        for (String h : hosts) {
-            try {
-                call("Storage.clearDataForOrigin", new JSONObject().put("origin", "https://" + h)
-                        .put("storageTypes", "local_storage,indexeddb,websql,cache_storage,service_workers"), null, 5000);
-            } catch (Exception ignored) {
-            }
-        }
-        changed();
-    }
-
     /** Wipes the browser's profile: every sign-in, cookie, history and cache. Not on the main thread. */
     static void wipe(Context c) {
         stop();
         Linux.deleteTree(new File(Linux.root(c), "root/.buddy/browser"));
-        forget(c, null);
+        c.getSharedPreferences("browser", 0).edit().remove("signins").apply(); // from the Signed-in sites list Buddy had
         changed();
     }
 }

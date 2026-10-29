@@ -1,0 +1,36 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.ghorbelhamdi/buddy-phone-bridge",
+  "title": "Buddy phone tools",
+  "description": "Android phone tools for AI agents (read the screen, tap, type, open apps), served by the Buddy app.",
+  "repository": {
+    "url": "https://github.com/ghorbelhamdi/buddy-android",
+    "source": "github",
+    "subfolder": "mcp-bridge"
+  },
+  "websiteUrl": "https://ghorbelhamdi.github.io/buddy-android/",
+  "version": "1.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "buddy-phone-bridge",
+      "version": "1.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "BUDDY_TOKEN",
+          "description": "Token from Buddy's Settings > Phone tools in your own sessions",
+          "isRequired": true,
+          "isSecret": true
+        },
+        {
+          "name": "BUDDY_URL",
+          "description": "Buddy's address, if not http://127.0.0.1:8765/mcp",
+          "isRequired": false
+        }
+      ]
+    }
+  ]
+}

@@ -31,8 +31,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Live voice (Codex chats, both builds): a two-way ChatGPT voice call through Codex's app server, like
- * {@link CodexDictation}'s, where the user talks to the chat's Codex out loud and hears its answers. The voice is only
+ * Live voice (any agent's chat, with Codex signed in; both builds): a two-way ChatGPT voice call through Codex's app
+ * server, like {@link CodexDictation}'s, where the user talks to the chat's agent (Claude, Codex, …) out loud and hears its answers. The voice is only
  * the voice: each thing the user says goes to the chat as if typed (a new task, or a note for the one under way), so
  * the chat's agent answers and does the work with Buddy's phone tools, its approval cards and Guard exactly as always;
  * what the agent says goes back to the call for the voice to say. (The voice's own hand-off tool is unreliable for short
@@ -57,8 +57,10 @@ final class CodexLive {
             + "acknowledgement such as \"On it\" or \"Okay\". Messages starting with " + AGENT.trim() + " are the agent "
             + "speaking to the user through you: say them to the user naturally and briefly, in the user's language, "
             + "keeping the meaning exactly; don't read out long lists, code or links, and never add anything the agent "
-            + "didn't say. If the agent waits for the user to approve or answer something, tell the user to look at the "
-            + "screen: you can't approve anything, and a spoken yes is not an approval.";
+            + "didn't say. When the agent waits for the user to approve something or to answer a question, say what it "
+            + "is in a sentence and ask them to answer out loud (yes or no, or one of the choices) or on the screen. "
+            + "Buddy takes their spoken answer itself: never say something is approved or chosen unless a "
+            + AGENT.trim() + " message says so.";
 
     /** The chat screen showing the live bar. */
     interface Ui {
@@ -103,9 +105,9 @@ final class CodexLive {
     private CodexLive() {
     }
 
-    /** Whether a chat can go live: Codex chats, Codex signed in. */
+    /** Whether a chat can go live: any agent's chat, with Codex signed in (the call goes through it). */
     static boolean available(Context c, Sessions.Session s) {
-        return s != null && "codex".equals(s.backend) && SetupState.signedIn(c, "codex");
+        return s != null && SetupState.signedIn(c, "codex");
     }
 
     static boolean on() {
@@ -205,7 +207,7 @@ final class CodexLive {
         app.registerReceiver(screenOff, new IntentFilter(Intent.ACTION_SCREEN_OFF));
         notifyLive();
         main.postDelayed(watchdog, 250);
-        ChatHub.get(app).note(s, Bubble.Kind.STEP, app.getString(R.string.live_started));
+        ChatHub.get(app).note(s, Bubble.Kind.STEP, app.getString(R.string.live_started, s.brainName()));
         status();
         return null;
     }
@@ -313,7 +315,7 @@ final class CodexLive {
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
         Notification n = new Notification.Builder(app, ControlIndicator.CHANNEL)
                 .setSmallIcon(R.drawable.ic_launcher_monochrome)
-                .setContentTitle(app.getString(R.string.live_notification_title))
+                .setContentTitle(app.getString(R.string.live_notification_title, ses.brainName()))
                 .setContentText(ses.label())
                 .setContentIntent(open)
                 .addAction(new Notification.Action.Builder(null, app.getString(R.string.live_end), stop).build())
@@ -366,10 +368,19 @@ final class CodexLive {
         status();
     }
 
-    /** The agent waits for the user on screen (an approval or a question; main thread). */
-    static void agentWaiting(Sessions.Session s, String what) {
+    /** The agent waits for the user (an approval or a question; main thread): input is its confirm or ask call's. */
+    static void agentWaiting(Sessions.Session s, String what, JSONObject input) {
         if (!on(s)) return;
-        tell(AGENT + "I'm waiting for you to answer on the screen: " + what);
+        org.json.JSONArray o = input == null ? null : input.optJSONArray("options");
+        if (o != null && o.length() > 0) {
+            StringBuilder b = new StringBuilder();
+            for (int i = 0; i < o.length(); i++) b.append(i == 0 ? "" : " / ").append(o.optString(i));
+            tell(AGENT + "I'm asking you: " + input.optString("question") + " Choices: " + b + ". Answer out loud or on the screen.");
+        } else if (input != null && input.has("summary")) {
+            tell(AGENT + "I need your OK for: " + input.optString("summary") + ". Say yes or no, or answer on the screen.");
+        } else {
+            tell(AGENT + "I'm waiting for your answer: " + what);
+        }
     }
 
     /** The agent's run ended (main thread); outcome as in Sessions.Session. */
@@ -500,6 +511,11 @@ final class CodexLive {
         lastActivity = SystemClock.elapsedRealtime();
         log("to chat (" + why + "): " + clip(words, 200));
         for (Ui u : new ArrayList<>(uis)) u.onLine("");
+        if (answerCard(s, words)) {
+            awaiting = false;
+            status();
+            return;
+        }
         // a new task, or a note for the one under way; cards and Guard work as always
         String err = ChatHub.get(app).send(s, words);
         if (err != null) {
@@ -509,6 +525,73 @@ final class CodexLive {
             tell(AGENT + "That didn't start: " + err);
         }
         status();
+    }
+
+    // ------------------------------------------------- answering a card out loud
+
+    private static final java.util.regex.Pattern YES = java.util.regex.Pattern.compile("(?:^| )(?:yes|yeah|yep|yup|sure|"
+            + "ok|okay|approve|approved|confirm|confirmed|go ahead|do it|send it|post it|ja|jawohl|genau|oui|sí|si|sì|sim|"
+            + "claro|tak|evet|da|да|так|ya|iya|haan|हाँ|हां|نعم|はい|ええ|네|예|是|是的|好|好的|对)(?: |$)"),
+            NO = java.util.regex.Pattern.compile("(?:^| )(?:no|nope|nah|don t|dont|do not|cancel|deny|stop|nein|nicht|"
+                    + "non|nee|nie|hayır|hayir|нет|ні|tidak|jangan|नहीं|لا|いいえ|だめ|아니|아니요|不|不要|别)(?: |$)");
+    private static final String[] ORDINALS = {"first|1|one|1st", "second|2|two|2nd", "third|3|three|3rd", "fourth|4|four|4th"};
+
+    /**
+     * The user said something while this chat's approval or question waits (main thread): a clear answer answers it,
+     * as a tap on the card would. Buddy decides from the transcript of what the user said, never from the voice. A
+     * question takes a choice ("the second one", or its words) or, with more words, the user's own answer; an approval
+     * takes only a short clear yes (three words at most) or no, and a longer sentence asks for that change. Returns whether the words were
+     * taken (or the user is asked again), so they don't go to the chat as well.
+     */
+    private static boolean answerCard(Sessions.Session s, String words) {
+        BuddyService svc = BuddyService.get();
+        Bubble b = svc == null ? null : svc.bubble();
+        if (b == null || b.pendingChat() != s) return false;
+        String w = " " + words.toLowerCase(java.util.Locale.ROOT).replaceAll("[\\p{Punct}¿¡。、！？，]+", " ")
+                .replaceAll("\\s+", " ").trim() + " ";
+        int count = w.trim().isEmpty() ? 0 : w.trim().split(" ").length;
+        List<String> options = b.pendingOptions();
+        if (options != null) {
+            String pick = null;
+            int found = 0;
+            for (int i = 0; i < options.size(); i++) {
+                String o = " " + options.get(i).toLowerCase(java.util.Locale.ROOT).replaceAll("[\\p{Punct}]+", " ")
+                        .replaceAll("\\s+", " ").trim() + " ";
+                boolean named = o.trim().length() > 1 && w.contains(o);
+                boolean ordinal = i < ORDINALS.length && count <= 4
+                        && java.util.regex.Pattern.compile(" (?:" + ORDINALS[i] + ") ").matcher(w).find();
+                if (named || ordinal) {
+                    pick = options.get(i);
+                    found++;
+                }
+            }
+            if (found == 1) {
+                log("voice picked: " + pick);
+                b.pickFromApp(pick);
+                tell(AGENT + "Got it: " + pick + ".");
+            } else if (found == 0 && count >= 2) {
+                log("voice answered: " + clip(words, 200));
+                b.changeFromApp(words);
+                tell(AGENT + "Got it.");
+            } else {
+                tell(AGENT + "I didn't catch which one. Say one of the choices again, or answer on the screen.");
+            }
+            return true;
+        }
+        boolean yes = YES.matcher(w).find(), no = NO.matcher(w).find();
+        // approving takes a short yes ("yes", "okay go ahead"): "yes but change the time" is a change
+        if (yes != no && count <= (yes ? 3 : 5)) {
+            log("voice " + (yes ? "approved" : "denied") + ": " + clip(words, 100));
+            b.answerFromApp(yes);
+            tell(AGENT + (yes ? "Approved." : "Okay, I won't."));
+        } else if (count >= 4) {
+            log("voice change: " + clip(words, 200));
+            b.changeFromApp(words);
+            tell(AGENT + "Okay, I'll change that first.");
+        } else {
+            tell(AGENT + "I didn't catch a clear yes or no. Say yes or no, or answer on the screen.");
+        }
+        return true;
     }
 
     private static String clean(CharSequence s) {

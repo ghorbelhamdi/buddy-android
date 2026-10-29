@@ -46,6 +46,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     private ImageButton speaker, send;
     /** Chat options: long-task mode, the schedule and "Allowed without asking"; accent while any is on. */
     private ImageButton options;
+    /** The messages the agent scheduled for itself in this chat (schedule_message), each with Cancel. */
+    private LinearLayout laterList;
     private EditText input;
     private int maxBubble;
     private ToolLog log; // the tool-call group being appended to, if the last message was a step
@@ -91,13 +93,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         chip.setOnClickListener(v -> chooseModel());
         chips.addView(chip, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-        if (!Flavor.PLAY) {
-            linux = protect(linuxChip(this)); // agents never switch it, even when they may tap Buddy's screens
-            linux.setOnClickListener(v -> switchLinuxTools());
-            LinearLayout.LayoutParams lp = wrap();
-            lp.setMarginStart(dp(this, 6));
-            chips.addView(linux, lp);
-        }
+        linux = protect(linuxChip(this)); // agents never switch it, even when they may tap Buddy's screens
+        linux.setOnClickListener(v -> switchLinuxTools());
+        LinearLayout.LayoutParams lp = wrap();
+        lp.setMarginStart(dp(this, 6));
+        chips.addView(linux, lp);
         LinearLayout.LayoutParams cp = wrap();
         cp.topMargin = dp(this, 3);
         titles.addView(chips, cp);
@@ -161,6 +161,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         ap.leftMargin = ap.rightMargin = dp(this, 12);
         ap.bottomMargin = dp(this, 8);
         root.addView(approval, ap);
+
+        laterList = column(this);
+        LinearLayout.LayoutParams llp = full();
+        llp.leftMargin = llp.rightMargin = dp(this, 12);
+        root.addView(laterList, llp);
 
         // composer
         trayScroll = new android.widget.HorizontalScrollView(this);
@@ -233,7 +238,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         pp.leftMargin = pp.rightMargin = dp(this, 12);
         pp.bottomMargin = dp(this, 10);
         pp.topMargin = dp(this, 4);
-        liveHint = text(this, getString(R.string.live_hint), 13, ACCENT_TEXT);
+        liveHint = text(this, getString(R.string.live_hint, ses.brainName()), 13, ACCENT_TEXT);
         liveHint.setBackground(rounded(this, ACCENT_SOFT, 12));
         liveHint.setPaddingRelative(dp(this, 12), dp(this, 6), dp(this, 12), dp(this, 6));
         liveHint.setOnClickListener(v -> liveHint.setVisibility(View.GONE));
@@ -337,7 +342,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         CodexLive.addUi(liveUi);
         boolean canLive = CodexLive.available(this, ses);
         live.setVisibility(canLive ? View.VISIBLE : View.GONE);
-        if (canLive && !Prefs.liveHintShown(this)) { // once: the first Codex chat opened with live voice
+        if (canLive && !Prefs.liveHintShown(this)) { // once: the first chat opened with live voice
             Prefs.setLiveHintShown(this);
             liveHint.setVisibility(View.VISIBLE);
             liveHint.postDelayed(() -> liveHint.setVisibility(View.GONE), 10_000);
@@ -968,7 +973,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         refresh();
     }
 
-    /** Long-press the mic: which of your languages to listen for (and, in a Codex chat, live voice). */
+    /** Long-press the mic: which of your languages to listen for (and live voice). */
     private void languageSheet() {
         LinearLayout c = column(this);
         final Dialog[] d = new Dialog[1];
@@ -984,7 +989,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             LinearLayout t = column(this);
             t.setPaddingRelative(dp(this, 14), 0, 0, 0);
             t.addView(title(this, getString(R.string.live_option), 15));
-            t.addView(text(this, getString(R.string.live_option_sub), 13, MUTED));
+            t.addView(text(this, getString(R.string.live_option_sub, ses.brainName()), 13, MUTED));
             r.addView(t, weight1());
             r.setOnClickListener(v -> {
                 d[0].dismiss();
@@ -1055,6 +1060,31 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         if (code == 4 && Voice.micAllowed(this)) startLive();
     }
 
+    /** One line per scheduled message: when, what, and Cancel. */
+    private void renderLater() {
+        laterList.removeAllViews();
+        for (Schedules.Later l : ses.later) {
+            LinearLayout r = row(this);
+            r.setGravity(Gravity.CENTER_VERTICAL);
+            r.setBackground(rounded(this, CARD, 14));
+            r.setPaddingRelative(dp(this, 12), 0, dp(this, 2), 0);
+            r.addView(icon(this, R.drawable.ms_schedule, ACCENT_TEXT, 18));
+            TextView t = text(this, getString(R.string.later_item, Schedules.when(this, l.at), l.text.replace('\n', ' ')), 13, TEXT);
+            t.setSingleLine(true);
+            t.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            t.setPaddingRelative(dp(this, 8), 0, dp(this, 4), 0);
+            t.setOnClickListener(v -> confirmSheet(this, getString(R.string.later_title, Schedules.when(this, l.at)), l.text,
+                    getString(R.string.later_cancel), true, () -> Schedules.cancelLater(this, ses, l.id)));
+            r.addView(t, weight1());
+            ImageButton x = iconButton(this, R.drawable.ms_close, getString(R.string.later_cancel), MUTED);
+            x.setOnClickListener(v -> Schedules.cancelLater(this, ses, l.id));
+            r.addView(x, new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
+            LinearLayout.LayoutParams rp = full();
+            rp.bottomMargin = dp(this, 6);
+            laterList.addView(r, rp);
+        }
+    }
+
     private void refresh() {
         boolean speak = Prefs.speakReplies(this);
         speaker.setImageResource(speak ? R.drawable.ms_volume_up : R.drawable.ms_volume_off);
@@ -1072,6 +1102,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             else log.finish();
         }
         renderApproval();
+        renderLater();
         onBrowserChanged();
         paintLive();
     }
@@ -1342,6 +1373,14 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             return;
         }
         show(m.kind, m.text);
+        if (m.kind == Bubble.Kind.BUDDY) { // pictures the reply names (see ChatHub.pictures), under it
+            for (String id : m.files) {
+                LinearLayout.LayoutParams fp = wrap();
+                fp.setMarginStart(dp(this, 32));
+                fp.topMargin = dp(this, 6);
+                messages.addView(attachmentView(id, true), fp);
+            }
+        }
     }
 
     // --------------------------------------------------------- attachments
@@ -1577,7 +1616,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 r.addView(av, avp);
                 TextView tv = text(this, text, 15, TEXT);
                 tv.setTextIsSelectable(true);
-                tv.setText(Ui.markdownLinks(text, null)); // [text](url): the text, as a link
+                tv.setText(Ui.markdown(text, null)); // **bold**, lists, `code`, [text](url) as a link…
                 links(tv);
                 Ui.copyWithLinks(tv);
                 tv.setLineSpacing(0, 1.15f);

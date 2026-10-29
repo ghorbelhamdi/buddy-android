@@ -443,6 +443,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             // nor is waiting or listing apps
             if (!"confirm".equals(tool) && !"ask".equals(tool) && !"notify".equals(tool) && !"reply_notification".equals(tool)
                     && !"point_out".equals(tool) && !"wait".equals(tool) && !"list_apps".equals(tool)
+                    && !Tools.SCHEDULING.contains(tool)
                     && !tool.startsWith("browser_")) { // the background browser isn't the phone
                 control.onActivity();
             }

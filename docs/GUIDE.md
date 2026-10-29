@@ -41,7 +41,7 @@ The app has three tabs: **Chats**, **Sessions** and **Settings**.
 
 - **Chats:** start one with **New chat** (Claude Code, Codex, OpenCode, Antigravity or Grok; agents that aren't set up are greyed out), tap a chat to open it, long-press to delete it. Several chats can work at the same time.
 - **Models:** tap the chip under a chat's title to pick the model for that chat (Opus, Sonnet, Haiku, Fable, Codex's own list, OpenCode's models including the free ones, Antigravity's and Grok's lists, or any model name). The conversation continues with the new model.
-- **Linux tools** (GitHub version): the chip next to the model shows whether the agent may work in Buddy's Linux in that chat (run commands, install packages, edit files, build and install apps); tap it to switch. **New chat** has the same switch. See [Linux tools](#linux-tools-building-apps).
+- **Linux tools**: the chip next to the model shows whether the agent may work in Buddy's Linux in that chat (run commands, install packages, edit files, build apps); tap it to switch. **New chat** has the same switch. See [Linux tools](#linux-tools-building-apps).
 - **Photos and files:** tap the paperclip to take a photo, pick photos, or attach any file up to 25 MB.
 - **Voice:** tap the mic to talk; the box turns into a recording bar (✕ cancel, live waveform, ↑ send). Choose the engine in Settings → Voice: the **phone's** recognizer, **Claude** (Claude Code's own dictation, on your Claude plan) or **ChatGPT** (ChatGPT's voice through Codex, on your ChatGPT plan; any language, even mixed). Claude and ChatGPT are greyed out until Claude Code or Codex is signed in. Pick your languages there; long-press the mic to switch.
 - **Read aloud:** the speaker button reads replies, in the phone's voice or in **ChatGPT's voice** (Juniper, Maple, Ember, Cove: Settings → Voice → Voice output).
@@ -76,14 +76,14 @@ As soon as an agent starts operating the phone, Buddy makes it obvious so you kn
 
 ### Background browser
 
-*GitHub version only, for now.* Turn on **Settings → Background browser**: the first time, Buddy downloads Chromium into its Linux (about 300 MB). Agents then use this browser for web pages (looking things up, comparing prices, checking a page) without taking over your screen, also while the phone is locked; for your own accounts and apps they still use the phone. It starts when an agent needs it and stops after 3 minutes unused.
+Turn on **Settings → Background browser**: the first time, Buddy downloads Chromium into its Linux (about 300 MB). Agents then use this browser for web pages (looking things up, comparing prices, checking a page) without taking over your screen, also while the phone is locked; for your own accounts and apps they still use the phone. It starts when an agent needs it and stops after 3 minutes unused.
 
 - **Live view.** A chat that uses it shows the page live above the messages; tap it full screen to use it yourself, with an address bar. Touching it while the agent works pauses the agent until you tap **Continue** or write to it; using the rest of the phone doesn't hold it up. The bubble says what it's doing ("Browsing reddit.com · Typing").
 - **The same approvals.** Buttons like Post, Send, Buy, Pay and Delete get Buddy's approval card, as on the phone. Agents never type into password, code or card fields.
 - **Unsaved work stays.** When a page warns that leaving loses what's typed (an unsent post, a form), Buddy stays on it and tells the agent; only a second try leaves.
 - **Your part, marked.** When a page needs you (a sign-in, a captcha, your details), the agent asks, and Buddy opens the browser full screen with the fields and buttons marked; it closes again when you tap **Done**.
 - **Apps closing by themselves?** Android 12+ kills apps' child processes once all apps together run more than about 32, and the browser, Remote Control sessions and Termux all count. If Termux or Buddy's sessions get closed ("signal 9"), turn on **Developer options → Disable child process restrictions**.
-- **Sign-ins.** To let agents use a site with your account, open the browser and sign in yourself. **Signed-in sites** lists the sites you signed in to, each with **Log out**; **Wipe browser data** clears everything. "Continue with Google" often fails in automated browsers: use email and password.
+- **Sign-ins.** To let agents use a site with your account, open the browser and sign in yourself. **Wipe browser data** clears every sign-in. "Continue with Google" often fails in automated browsers: use email and password.
 
 ### The bubble
 
@@ -100,7 +100,7 @@ As soon as an agent starts operating the phone, Buddy makes it obvious so you kn
 
 ## Linux tools: building apps
 
-*GitHub version only.* Each chat has its own **Linux tools**, off by default. With them on, the chat's agent may run commands in Buddy's Linux (including installing packages with `apk`) and create or edit files in `~/.buddy/work`. Turn them on with the **Linux tools** chip under the chat's title (a sheet says what that allows first) or with the switch in **New chat**; the chat's next message gets them, and turning them off again is one tap. Settings → Experience → **Linux tools in new chats** sets what new chats start with; it also decides whether your own sessions outside Buddy's chats may install apps. With the bundled **android-app** skill (plus `AGENTS.md` for Codex) you can ask *"make me a calculator app"*: it sets up a toolchain the first time (OpenJDK, aapt2, d8, apksigner; about 400 MB), writes plain Java, builds a signed APK on the phone without Gradle, and opens Android's installer for you to confirm. The first time, Android asks you to allow Buddy to install apps.
+Each chat has its own **Linux tools**, off by default. With them on, the chat's agent may run commands in Buddy's Linux (including installing packages with `apk`) and create or edit files in `~/.buddy/work`. Turn them on with the **Linux tools** chip under the chat's title (a sheet says what that allows first) or with the switch in **New chat**; the chat's next message gets them, and turning them off again is one tap. Settings → Experience → **Linux tools in new chats** sets what new chats start with; it also decides whether your own sessions outside Buddy's chats may install apps. With the bundled **android-app** skill (plus `AGENTS.md` for Codex) you can ask *"make me a calculator app"*: it sets up a toolchain the first time (OpenJDK, aapt2, d8, apksigner; about 400 MB), writes plain Java, builds a signed APK on the phone without Gradle, and opens Android's installer for you to confirm. The first time, Android asks you to allow Buddy to install apps. Installing is in the GitHub version only: Google Play doesn't allow it, so the Play version builds the APK but can't install it.
 
 Turn them on only in the chats that need them: with Linux tools on, text on screen that tries to trick the agent could lead to commands being run.
 

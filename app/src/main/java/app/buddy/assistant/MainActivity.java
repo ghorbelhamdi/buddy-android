@@ -312,12 +312,10 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         final Dialog[] d = new Dialog[1];
         // Linux tools for the new chat: the Settings default to start with; agents can't flip it, as in Settings
         final boolean[] dev = {Prefs.devMode(this)};
-        if (!Flavor.PLAY) {
-            LinearLayout sw = protect(switchRow(this, getString(R.string.chat_linux_tools),
-                    getString(R.string.chat_linux_tools_info), dev[0], on -> dev[0] = on));
-            sw.setPaddingRelative(dp(this, 4), dp(this, 4), dp(this, 4), dp(this, 12));
-            c.addView(sw, full());
-        }
+        LinearLayout sw = protect(switchRow(this, getString(R.string.chat_linux_tools),
+                getString(R.string.chat_linux_tools_info), dev[0], on -> dev[0] = on));
+        sw.setPaddingRelative(dp(this, 4), dp(this, 4), dp(this, 4), dp(this, 12));
+        c.addView(sw, full());
         String def = Prefs.backend(this);
         for (Account acc : Account.ALL) {
             String[] a = {acc.agent, acc.name(), acc.tagline()};

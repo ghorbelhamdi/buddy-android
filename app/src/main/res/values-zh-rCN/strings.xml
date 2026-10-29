@@ -451,7 +451,7 @@
     <!-- Title of the sheet that opens when the user turns Linux tools on in a chat. -->
     <string name="chat_linux_tools_title">开启 Linux 工具？</string>
     <!-- ~/.buddy/work is a folder: keep it as is. -->
-    <string name="chat_linux_tools_what">智能体将可以运行命令、安装软件包，并编辑 ~/.buddy/work 中的文件，从而能够开发和安装应用。</string>
+    <string name="chat_linux_tools_what">智能体将可以运行命令、安装软件包，并编辑 ~/.buddy/work 中的文件，从而能够开发应用。</string>
     <!-- When the change applies: a task already running goes on as it was. -->
     <string name="chat_linux_tools_when">仅限此对话，从你的下一条消息开始生效。</string>
     <!-- "it" = the agent. -->
@@ -547,19 +547,19 @@
     <!-- "Settings → Voice" = the Voice section of Buddy's Settings tab; use the same names as there. -->
     <string name="chat_speak_in_help">可在“设置”→“语音”中选择你的语言。</string>
     <string name="live_option">实时语音</string>
-    <string name="live_option_sub">与 Codex 出声对话。它用 ChatGPT 的声音回答，并在这个聊天里操作手机。</string>
+    <string name="live_option_sub">与 %1$s 出声对话。它用 ChatGPT 的声音回答，并在这个聊天里操作手机。</string>
     <string name="live_label">实时</string>
     <string name="live_end">结束</string>
     <string name="live_connecting">正在连接…</string>
-    <string name="live_started">实时语音已开启。直接说话：Codex 能听到你，会出声回答，并在这个聊天里完成你的请求。</string>
+    <string name="live_started">实时语音已开启。直接说话：%1$s 能听到你，会出声回答，并在这个聊天里完成你的请求。</string>
     <string name="live_ended">实时语音已结束。</string>
     <string name="live_ended_why">实时语音已结束：%1$s</string>
     <string name="live_ended_screen_off">屏幕已关闭</string>
     <string name="live_ended_paused">Buddy 已暂停</string>
     <string name="live_ended_idle">5 分钟内没有说话</string>
-    <string name="live_notification_title">与 Codex 实时语音</string>
+    <string name="live_notification_title">与 %1$s 实时语音</string>
     <string name="live_mic_busy">实时语音正在使用麦克风。请先结束它。</string>
-    <string name="live_hint">新功能：与 Codex 实时对话</string>
+    <string name="live_hint">新功能：与 %1$s 实时对话</string>
     <string name="live_status_listening">正在聆听…</string>
     <string name="live_status_thinking">正在思考…</string>
     <string name="live_status_working">正在处理…</string>
@@ -1218,7 +1218,7 @@
     <string name="setup_app_permissions_info">按应用选择：“信任”让智能体在其中直接操作、不弹窗；“严格”表示 Buddy 会在点按发送、支付、删除等按钮前亲自询问你。</string>
     <!-- Settings switch: whether new chats start with Linux tools (chat_linux_tools); each chat can change it. -->
     <string name="setup_dev_mode">新对话中的 Linux 工具</string>
-    <string name="setup_dev_mode_info">开启 Linux 工具后，智能体可以运行命令、安装软件包，并编辑 ~/.buddy/work 中的文件，从而能够开发和安装应用。新对话会以此设置开始；每个对话都可以在标题下方单独更改。</string>
+    <string name="setup_dev_mode_info">开启 Linux 工具后，智能体可以运行命令、安装软件包，并编辑 ~/.buddy/work 中的文件，从而能够开发应用。新对话会以此设置开始；每个对话都可以在标题下方单独更改。</string>
     <string name="setup_agents_tap">允许智能体点按 Buddy 的界面</string>
     <!-- "App permissions" is the name of a screen in Buddy. -->
     <string name="setup_agents_tap_info">用于借助智能体测试 Buddy（例如在 Termux 中使用带手机工具的 Claude Code）。气泡、确认卡片、“应用权限”和这些开关仍禁止智能体点按。</string>
@@ -1622,13 +1622,6 @@
     <string name="browser_install_failed">无法安装 Chromium。请检查网络连接后重试。</string>
     <string name="browser_sign_in_help">智能体从不输入密码。如需让它们用你的账号使用某个网站，请打开浏览器自行登录。“使用 Google 账号继续”在自动化浏览器中经常失败：请改用邮箱和密码。</string>
     <string name="browser_open">打开浏览器</string>
-    <string name="browser_sites">已登录的网站</string>
-    <string name="browser_sites_help">你在后台浏览器中亲自登录过的网站。退出某个网站即可删除其登录信息。</string>
-    <string name="browser_sites_loading">正在加载…</string>
-    <string name="browser_sites_none">还没有。在浏览器中亲自登录某个网站后,它会显示在这里。</string>
-    <string name="browser_sites_others">其他有 Cookie 的网站(广告、代理打开的页面):%1$d 个。清除浏览器数据即可删除。</string>
-    <string name="browser_log_out">退出登录</string>
-    <string name="browser_logged_out">已退出 %1$s</string>
     <string name="browser_wipe">清除浏览器数据</string>
     <string name="browser_wipe_title">要清除浏览器数据吗？</string>
     <string name="browser_wipe_body">删除后台浏览器的所有登录信息、Cookie 和历史记录。Chromium 会保留安装。</string>
@@ -1666,4 +1659,13 @@
     <string name="hub_tool_browser_screenshot">浏览器：正在查看页面</string>
     <string name="hub_tool_browser_back">浏览器：正在返回</string>
     <string name="hub_tool_browser_tabs">浏览器：标签页</string>
+    <string name="hub_tool_schedule_message">正在安排：%1$s</string>
+    <string name="hub_tool_list_scheduled">正在查看已安排的消息</string>
+    <string name="hub_tool_cancel_scheduled">正在取消已安排的消息</string>
+    <string name="later_title">代理在 %1$s 的消息</string>
+    <string name="later_cancel">取消消息</string>
+    <string name="setup_play_rate">在 Google Play 上为 Buddy 评分</string>
+    <string name="setup_play_rate_info">评价能帮助别人找到 Buddy。</string>
+    <string name="setup_play_get">Google Play 上的 Buddy</string>
+    <string name="setup_play_get_info">更新通过 Play 推送，但该版本不能安装 APK。它是单独安装的：请先卸载此版本。</string>
 </resources>

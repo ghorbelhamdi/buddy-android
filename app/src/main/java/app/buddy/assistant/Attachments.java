@@ -85,6 +85,25 @@ final class Attachments {
         return id;
     }
 
+    /** Copies a picture an agent's reply names (see ChatHub.pictures) into Buddy's storage. Returns the id. */
+    static String importFile(Context c, File f) throws IOException {
+        String base = f.getName().replaceAll("[^A-Za-z0-9._-]", "_");
+        if (base.length() > 60) base = base.substring(base.length() - 60);
+        byte[] r = new byte[4];
+        new SecureRandom().nextBytes(r);
+        String id = String.format("%02x%02x%02x%02x_", r[0], r[1], r[2], r[3]) + base;
+        File out = new File(dir(c), id);
+        try (InputStream in = new java.io.FileInputStream(f); OutputStream o = new FileOutputStream(out)) {
+            byte[] buf = new byte[64 * 1024];
+            int n;
+            while ((n = in.read(buf)) > 0) o.write(buf, 0, n);
+        } catch (IOException e) {
+            out.delete();
+            throw e;
+        }
+        return id;
+    }
+
     private static boolean savePhoto(Context c, Uri uri, File out) {
         try {
             BitmapFactory.Options bounds = new BitmapFactory.Options();

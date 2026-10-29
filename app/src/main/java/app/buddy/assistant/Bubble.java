@@ -826,7 +826,9 @@ final class Bubble implements ChatHub.Listener {
         closeIcon.setVisibility(heads ? View.GONE : View.VISIBLE);
         headButtons = null;
         if (!heads) {
-            root.addView(panel);
+            // Fresh params: after heads() the panel still carries the column's (height 0, weight 1).
+            root.addView(panel, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT));
             return;
         }
         LinearLayout col = new LinearLayout(svc);
@@ -1889,12 +1891,10 @@ final class Bubble implements ChatHub.Listener {
         TextView h = Ui.title(svc, svc.getString(R.string.bubble_new_chat), 18);
         h.setPaddingRelative(dp(8), dp(8), 0, dp(8));
         sessionList.addView(h);
-        if (!Flavor.PLAY) { // Linux tools for the new chat, as in the app's sheet
-            LinearLayout sw = Ui.switchRow(svc, svc.getString(R.string.chat_linux_tools),
-                    svc.getString(R.string.chat_linux_tools_info), pickDev, on -> pickDev = on);
-            sw.setPaddingRelative(dp(8), dp(4), dp(8), dp(12));
-            sessionList.addView(sw, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        }
+        LinearLayout sw = Ui.switchRow(svc, svc.getString(R.string.chat_linux_tools),
+                svc.getString(R.string.chat_linux_tools_info), pickDev, on -> pickDev = on);
+        sw.setPaddingRelative(dp(8), dp(4), dp(8), dp(12));
+        sessionList.addView(sw, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         String def = Prefs.backend(svc);
         for (Account acc : Account.ALL) {
             boolean ready = SetupState.signedIn(svc, acc.agent);
@@ -2629,12 +2629,13 @@ final class Bubble implements ChatHub.Listener {
                 avp.setMarginEnd(dp(8));
                 r.addView(av, avp);
                 TextView tv = Ui.text(svc, text, 15, Ui.TEXT);
-                tv.setText(Ui.markdownLinks(text, this::collapse)); // [text](url): the text, as a link
+                CharSequence md = Ui.markdown(text, this::collapse); // **bold**, lists, `code`, [text](url) as a link…
+                tv.setText(md);
                 tv.setLineSpacing(0, 1.15f);
                 tv.setBackground(Ui.corners(svc, Ui.CARD, 20, 20, 20, 6));
                 tv.setPaddingRelative(dp(14), dp(10), dp(14), dp(10));
                 Ui.linkifyForService(tv, this::collapse);
-                copyOnLongPress(tv, Ui.linkCopy(text)); // links as "text (address)"
+                copyOnLongPress(tv, Ui.linkCopy(md, 0, md.length())); // as shown, links as "text (address)"
                 r.addView(tv);
                 p.setMarginEnd(dp(24));
                 v = r;

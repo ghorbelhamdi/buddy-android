@@ -175,10 +175,7 @@ final class BrowserPanel extends LinearLayout implements Browser.Listener {
             String t = field.getText().toString();
             field.setText("");
             Browser.later(() -> {
-                if (!t.isEmpty()) {
-                    Browser.userTyped(key);
-                    Browser.insertText(key, t);
-                }
+                if (!t.isEmpty()) Browser.insertText(key, t);
                 Browser.key(key, "Enter");
             });
         });
@@ -290,10 +287,7 @@ final class BrowserPanel extends LinearLayout implements Browser.Listener {
         if (t.isEmpty()) return;
         field.setText("");
         touched();
-        Browser.later(() -> {
-            Browser.userTyped(key);
-            Browser.insertText(key, t);
-        });
+        Browser.later(() -> Browser.insertText(key, t));
     }
 
     private void answerDialog(boolean ok) {

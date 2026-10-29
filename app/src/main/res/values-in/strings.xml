@@ -451,7 +451,7 @@
     <!-- Title of the sheet that opens when the user turns Linux tools on in a chat. -->
     <string name="chat_linux_tools_title">Aktifkan alat Linux?</string>
     <!-- ~/.buddy/work is a folder: keep it as is. -->
-    <string name="chat_linux_tools_what">Agen lalu dapat menjalankan perintah, menginstal paket, dan mengedit file di ~/.buddy/work, sehingga bisa membuat dan menginstal aplikasi.</string>
+    <string name="chat_linux_tools_what">Agen lalu dapat menjalankan perintah, menginstal paket, dan mengedit file di ~/.buddy/work, sehingga bisa membuat aplikasi.</string>
     <!-- When the change applies: a task already running goes on as it was. -->
     <string name="chat_linux_tools_when">Hanya di chat ini, mulai dari pesan Anda berikutnya.</string>
     <!-- "it" = the agent. -->
@@ -547,19 +547,19 @@
     <!-- "Settings → Voice" = the Voice section of Buddy's Settings tab; use the same names as there. -->
     <string name="chat_speak_in_help">Pilih bahasa Anda di Setelan → Suara.</string>
     <string name="live_option">Suara langsung</string>
-    <string name="live_option_sub">Bicara dengan Codex secara lisan. Ia menjawab dengan suara ChatGPT dan bekerja di ponsel dalam chat ini.</string>
+    <string name="live_option_sub">Bicara dengan %1$s secara lisan. Ia menjawab dengan suara ChatGPT dan bekerja di ponsel dalam chat ini.</string>
     <string name="live_label">Langsung</string>
     <string name="live_end">Akhiri</string>
     <string name="live_connecting">Menghubungkan…</string>
-    <string name="live_started">Suara langsung aktif. Bicaralah: Codex mendengar Anda, menjawab dengan suara, dan melakukan permintaan Anda di chat ini.</string>
+    <string name="live_started">Suara langsung aktif. Bicaralah: %1$s mendengar Anda, menjawab dengan suara, dan melakukan permintaan Anda di chat ini.</string>
     <string name="live_ended">Suara langsung berakhir.</string>
     <string name="live_ended_why">Suara langsung berakhir: %1$s</string>
     <string name="live_ended_screen_off">layar mati</string>
     <string name="live_ended_paused">Buddy dijeda</string>
     <string name="live_ended_idle">tidak ada yang diucapkan selama 5 menit</string>
-    <string name="live_notification_title">Suara langsung dengan Codex</string>
+    <string name="live_notification_title">Suara langsung dengan %1$s</string>
     <string name="live_mic_busy">Suara langsung sedang memakai mikrofon. Akhiri dulu.</string>
-    <string name="live_hint">Baru: bicara langsung dengan Codex</string>
+    <string name="live_hint">Baru: bicara langsung dengan %1$s</string>
     <string name="live_status_listening">Mendengarkan…</string>
     <string name="live_status_thinking">Berpikir…</string>
     <string name="live_status_working">Sedang dikerjakan…</string>
@@ -1218,7 +1218,7 @@
     <string name="setup_app_permissions_info">Pilih per aplikasi: Percaya membiarkan agen bekerja di sana tanpa pop-up; Ketat berarti Buddy sendiri yang bertanya kepada Anda sebelum Kirim, Bayar, Hapus…</string>
     <!-- Settings switch: whether new chats start with Linux tools (chat_linux_tools); each chat can change it. -->
     <string name="setup_dev_mode">Alat Linux di chat baru</string>
-    <string name="setup_dev_mode_info">Dengan alat Linux, agen dapat menjalankan perintah, menginstal paket, dan mengedit file di ~/.buddy/work, sehingga bisa membuat dan menginstal aplikasi. Chat baru dimulai dengan setelan ini; setiap chat bisa mengubahnya di bawah judulnya.</string>
+    <string name="setup_dev_mode_info">Dengan alat Linux, agen dapat menjalankan perintah, menginstal paket, dan mengedit file di ~/.buddy/work, sehingga bisa membuat aplikasi. Chat baru dimulai dengan setelan ini; setiap chat bisa mengubahnya di bawah judulnya.</string>
     <string name="setup_agents_tap">Izinkan agen mengetuk layar Buddy</string>
     <!-- "App permissions" is the name of a screen in Buddy. -->
     <string name="setup_agents_tap_info">Untuk menguji Buddy dengan agen (misalnya Claude Code di Termux dengan alat ponsel). Balon, kartu persetujuan, Izin aplikasi, dan tombol-tombol ini tetap tidak bisa diketuk agen.</string>
@@ -1623,13 +1623,6 @@
     <string name="browser_install_failed">Tidak dapat menginstal Chromium. Periksa koneksi lalu coba lagi.</string>
     <string name="browser_sign_in_help">Agen tidak pernah mengetik sandi. Agar agen dapat menggunakan situs dengan akun Anda, buka browser dan login sendiri. “Lanjutkan dengan Google” sering gagal di browser otomatis: gunakan email dan sandi sebagai gantinya.</string>
     <string name="browser_open">Buka browser</string>
-    <string name="browser_sites">Situs yang sudah login</string>
-    <string name="browser_sites_help">Situs tempat kamu login sendiri di browser latar belakang. Logout dari salah satunya untuk menghapus login-nya.</string>
-    <string name="browser_sites_loading">Memuat…</string>
-    <string name="browser_sites_none">Belum ada. Login sendiri ke sebuah situs di browser dan situs itu muncul di sini.</string>
-    <string name="browser_sites_others">Situs lain dengan cookie (iklan, halaman yang dibuka agen): %1$d. Hapus data browser untuk membersihkannya.</string>
-    <string name="browser_log_out">Logout</string>
-    <string name="browser_logged_out">Logout dari %1$s</string>
     <string name="browser_wipe">Hapus data browser</string>
     <string name="browser_wipe_title">Hapus data browser?</string>
     <string name="browser_wipe_body">Menghapus semua login, cookie, dan histori browser latar belakang. Chromium tetap terinstal.</string>
@@ -1667,4 +1660,13 @@
     <string name="hub_tool_browser_screenshot">Browser: melihat halaman</string>
     <string name="hub_tool_browser_back">Browser: kembali</string>
     <string name="hub_tool_browser_tabs">Browser: tab</string>
+    <string name="hub_tool_schedule_message">Menjadwalkan: %1$s</string>
+    <string name="hub_tool_list_scheduled">Memeriksa pesan terjadwal</string>
+    <string name="hub_tool_cancel_scheduled">Membatalkan pesan terjadwal</string>
+    <string name="later_title">Pesan agen untuk %1$s</string>
+    <string name="later_cancel">Batalkan pesan</string>
+    <string name="setup_play_rate">Beri nilai Buddy di Google Play</string>
+    <string name="setup_play_rate_info">Ulasan membantu orang lain menemukan Buddy.</string>
+    <string name="setup_play_get">Buddy di Google Play</string>
+    <string name="setup_play_get_info">Pembaruan datang lewat Play, tetapi versi itu tidak memasang APK. Itu pemasangan terpisah: copot dulu versi ini.</string>
 </resources>

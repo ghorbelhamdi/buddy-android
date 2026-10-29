@@ -116,7 +116,7 @@ final class Prefs {
      * its own, Sessions.Session.dev), and whether the user's own sessions outside Buddy's chats may install apps.
      */
     static boolean devMode(Context c) {
-        return !Flavor.PLAY && sp(c).getBoolean("dev", false);
+        return sp(c).getBoolean("dev", false);
     }
 
     static void setDevMode(Context c, boolean on) {
@@ -368,7 +368,7 @@ final class Prefs {
      * and runs a whole browser (Chromium from Alpine), which Play's policies on downloaded executable code may not allow.
      */
     static boolean browser(Context c) {
-        return !Flavor.PLAY && sp(c).getBoolean("browser", false);
+        return sp(c).getBoolean("browser", false);
     }
 
     static void setBrowser(Context c, boolean on) {

@@ -470,7 +470,7 @@
     <!-- Title of the sheet that opens when the user turns Linux tools on in a chat. -->
     <string name="chat_linux_tools_title">Turn on Linux tools?</string>
     <!-- ~/.buddy/work is a folder: keep it as is. -->
-    <string name="chat_linux_tools_what">The agent can then run commands, install packages and edit files in ~/.buddy/work, so it can build and install apps.</string>
+    <string name="chat_linux_tools_what">The agent can then run commands, install packages and edit files in ~/.buddy/work, so it can build apps.</string>
     <!-- When the change applies: a task already running goes on as it was. -->
     <string name="chat_linux_tools_when">Only in this chat, from your next message.</string>
     <!-- "it" = the agent. -->
@@ -600,21 +600,21 @@
     <string name="chat_speak_in">Speak in</string>
     <!-- "Settings → Voice" = the Voice section of Buddy's Settings tab; use the same names as there. -->
     <string name="chat_speak_in_help">Choose your languages in Settings → Voice.</string>
-    <!-- Live voice (CodexLive): a two-way ChatGPT voice call in a Codex chat. live_label is the bar's short tag. -->
+    <!-- Live voice (CodexLive): a two-way ChatGPT voice call (through Codex) in any agent's chat; %1$s is the chat's agent (Claude, Codex…). live_label is the bar's short tag. -->
     <string name="live_option">Live voice</string>
-    <string name="live_option_sub">Talk with Codex out loud. It answers in ChatGPT\'s voice and works on the phone in this chat.</string>
+    <string name="live_option_sub">Talk with %1$s out loud. It answers in ChatGPT\'s voice and works on the phone in this chat.</string>
     <string name="live_label">Live</string>
     <string name="live_end">End</string>
     <string name="live_connecting">Connecting…</string>
-    <string name="live_started">Live voice is on. Talk: Codex hears you, answers out loud and does what you ask in this chat.</string>
+    <string name="live_started">Live voice is on. Talk: %1$s hears you, answers out loud and does what you ask in this chat.</string>
     <string name="live_ended">Live voice ended.</string>
     <string name="live_ended_why">Live voice ended: %1$s</string>
     <string name="live_ended_screen_off">the screen went off</string>
     <string name="live_ended_paused">Buddy was paused</string>
     <string name="live_ended_idle">nothing was said for 5 minutes</string>
-    <string name="live_notification_title">Live voice with Codex</string>
+    <string name="live_notification_title">Live voice with %1$s</string>
     <string name="live_mic_busy">Live voice is using the microphone. End it first.</string>
-    <string name="live_hint">New: talk live with Codex</string>
+    <string name="live_hint">New: talk live with %1$s</string>
     <string name="live_status_listening">Listening…</string>
     <string name="live_status_thinking">Thinking…</string>
     <string name="live_status_working">Working on it…</string>
@@ -1301,7 +1301,7 @@
     <string name="setup_rules_info">Let an agent act when a notification arrives: answer a message, put a delivery in your calendar…</string>
     <!-- Settings switch: whether new chats start with Linux tools (chat_linux_tools); each chat can change it. -->
     <string name="setup_dev_mode">Linux tools in new chats</string>
-    <string name="setup_dev_mode_info">Linux tools let the agent run commands, install packages and edit files in ~/.buddy/work, so it can build and install apps. New chats start with this setting; each chat can change it under its title.</string>
+    <string name="setup_dev_mode_info">Linux tools let the agent run commands, install packages and edit files in ~/.buddy/work, so it can build apps. New chats start with this setting; each chat can change it under its title.</string>
     <string name="setup_agents_tap">Let agents tap Buddy\'s screens</string>
     <!-- "App permissions" is the name of a screen in Buddy. -->
     <string name="setup_agents_tap_info">For testing Buddy with an agent (for example Claude Code in Termux with the phone tools). The bubble, approval cards, App permissions and these switches stay off-limits.</string>
@@ -1753,16 +1753,6 @@
     <string name="browser_sign_in_help">Agents never type passwords. To let them use a site with your account, open the browser and sign in yourself. “Continue with Google” often fails in automated browsers: use email and password instead.</string>
     <!-- Button: opens the background browser full screen. -->
     <string name="browser_open">Open browser</string>
-    <!-- Button and sheet title: the sites the browser is signed in to (it keeps their cookies). -->
-    <string name="browser_sites">Signed-in sites</string>
-    <string name="browser_sites_help">Sites you signed in to yourself in the background browser. Log out of one to remove its sign-in.</string>
-    <string name="browser_sites_loading">Loading…</string>
-    <string name="browser_sites_none">None yet. Sign in to a site yourself in the browser and it shows here.</string>
-    <string name="browser_sites_others">Other sites with cookies (ads, pages agents opened): %1$d. Wipe browser data clears them.</string>
-    <!-- Button next to a site. -->
-    <string name="browser_log_out">Log out</string>
-    <!-- %1$s = a site, e.g. amazon.com. -->
-    <string name="browser_logged_out">Logged out of %1$s</string>
     <string name="browser_wipe">Wipe browser data</string>
     <string name="browser_wipe_title">Wipe browser data?</string>
     <string name="browser_wipe_body">Removes every sign-in, cookie and history of the background browser. Chromium stays installed.</string>
@@ -1823,4 +1813,14 @@
     <string name="hub_tool_browser_screenshot">Browser: looking at the page</string>
     <string name="hub_tool_browser_back">Browser: going back</string>
     <string name="hub_tool_browser_tabs">Browser: tabs</string>
+    <string name="hub_tool_schedule_message">Scheduling: %1$s</string>
+    <string name="hub_tool_list_scheduled">Checking scheduled messages</string>
+    <string name="hub_tool_cancel_scheduled">Cancelling a scheduled message</string>
+    <string name="later_title">Agent’s message for %1$s</string>
+    <string name="later_cancel">Cancel message</string>
+    <string name="later_item" translatable="false">%1$s · %2$s</string>
+    <string name="setup_play_rate">Rate Buddy on Google Play</string>
+    <string name="setup_play_rate_info">A review helps others find Buddy.</string>
+    <string name="setup_play_get">Buddy on Google Play</string>
+    <string name="setup_play_get_info">Updates come through Play, but it can\'t install APKs. It\'s a separate install: uninstall this version first.</string>
 </resources>

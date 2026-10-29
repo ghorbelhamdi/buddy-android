@@ -463,7 +463,7 @@
     <!-- Title of the sheet that opens when the user turns Linux tools on in a chat. -->
     <string name="chat_linux_tools_title">Включить инструменты Linux?</string>
     <!-- ~/.buddy/work is a folder: keep it as is. -->
-    <string name="chat_linux_tools_what">Агент сможет выполнять команды, устанавливать пакеты и изменять файлы в ~/.buddy/work, чтобы собирать и устанавливать приложения.</string>
+    <string name="chat_linux_tools_what">Агент сможет выполнять команды, устанавливать пакеты и изменять файлы в ~/.buddy/work, чтобы собирать приложения.</string>
     <!-- When the change applies: a task already running goes on as it was. -->
     <string name="chat_linux_tools_when">Только в этом чате, начиная с вашего следующего сообщения.</string>
     <!-- "it" = the agent. -->
@@ -559,19 +559,19 @@
     <!-- "Settings → Voice" = the Voice section of Buddy's Settings tab; use the same names as there. -->
     <string name="chat_speak_in_help">Выберите языки в разделе «Настройки» → «Голос».</string>
     <string name="live_option">Живой голос</string>
-    <string name="live_option_sub">Говорите с Codex вслух. Он отвечает голосом ChatGPT и действует на телефоне в этом чате.</string>
+    <string name="live_option_sub">Говорите с %1$s вслух. Он отвечает голосом ChatGPT и действует на телефоне в этом чате.</string>
     <string name="live_label">В эфире</string>
     <string name="live_end">Завершить</string>
     <string name="live_connecting">Подключение…</string>
-    <string name="live_started">Живой голос включён. Говорите: Codex слышит вас, отвечает вслух и делает в этом чате то, что вы просите.</string>
+    <string name="live_started">Живой голос включён. Говорите: %1$s слышит вас, отвечает вслух и делает в этом чате то, что вы просите.</string>
     <string name="live_ended">Живой голос завершён.</string>
     <string name="live_ended_why">Живой голос завершён: %1$s</string>
     <string name="live_ended_screen_off">экран погас</string>
     <string name="live_ended_paused">Buddy приостановлен</string>
     <string name="live_ended_idle">5 минут ничего не было сказано</string>
-    <string name="live_notification_title">Живой голос с Codex</string>
+    <string name="live_notification_title">Живой голос с %1$s</string>
     <string name="live_mic_busy">Живой голос использует микрофон. Сначала завершите его.</string>
-    <string name="live_hint">Новое: говорите с Codex вживую</string>
+    <string name="live_hint">Новое: говорите с %1$s вживую</string>
     <string name="live_status_listening">Слушаю…</string>
     <string name="live_status_thinking">Думаю…</string>
     <string name="live_status_working">Работаю над этим…</string>
@@ -1251,7 +1251,7 @@
     <string name="setup_app_permissions_info">Выберите режим для каждого приложения: «Доверие» позволяет агенту работать там без запросов, а «Строгий» означает, что Buddy сам спросит вас перед «Отправить», «Оплатить», «Удалить»…</string>
     <!-- Settings switch: whether new chats start with Linux tools (chat_linux_tools); each chat can change it. -->
     <string name="setup_dev_mode">Инструменты Linux в новых чатах</string>
-    <string name="setup_dev_mode_info">С инструментами Linux агент может выполнять команды, устанавливать пакеты и изменять файлы в ~/.buddy/work, чтобы собирать и устанавливать приложения. Новые чаты получают это значение; в каждом чате его можно изменить под названием чата.</string>
+    <string name="setup_dev_mode_info">С инструментами Linux агент может выполнять команды, устанавливать пакеты и изменять файлы в ~/.buddy/work, чтобы собирать приложения. Новые чаты получают это значение; в каждом чате его можно изменить под названием чата.</string>
     <string name="setup_agents_tap">Разрешить агентам нажимать на экранах Buddy</string>
     <!-- "App permissions" is the name of a screen in Buddy. -->
     <string name="setup_agents_tap_info">Для тестирования Buddy с помощью агента (например, Claude Code в Termux с инструментами телефона). Пузырёк, карточки подтверждения, «Разрешения для приложений» и эти переключатели остаются недоступны.</string>
@@ -1658,13 +1658,6 @@
     <string name="browser_install_failed">Не удалось установить Chromium. Проверьте подключение и повторите попытку.</string>
     <string name="browser_sign_in_help">Агенты никогда не вводят пароли. Чтобы они могли пользоваться сайтом под вашим аккаунтом, откройте браузер и войдите сами. «Продолжить с Google» часто не работает в автоматизированных браузерах: используйте электронную почту и пароль.</string>
     <string name="browser_open">Открыть браузер</string>
-    <string name="browser_sites">Сайты со входом</string>
-    <string name="browser_sites_help">Сайты, в которые вы сами вошли в фоновом браузере. Выйдите из сайта, чтобы удалить вход в него.</string>
-    <string name="browser_sites_loading">Загрузка…</string>
-    <string name="browser_sites_none">Пока нет. Войдите на сайт сами в браузере, и он появится здесь.</string>
-    <string name="browser_sites_others">Другие сайты с cookie (реклама, страницы, открытые агентами): %1$d. Очистка данных браузера удаляет их.</string>
-    <string name="browser_log_out">Выйти</string>
-    <string name="browser_logged_out">Выполнен выход из %1$s</string>
     <string name="browser_wipe">Очистить данные браузера</string>
     <string name="browser_wipe_title">Очистить данные браузера?</string>
     <string name="browser_wipe_body">Удаляет все входы, файлы cookie и историю фонового браузера. Chromium останется установленным.</string>
@@ -1702,4 +1695,13 @@
     <string name="hub_tool_browser_screenshot">Браузер: просмотр страницы</string>
     <string name="hub_tool_browser_back">Браузер: возврат назад</string>
     <string name="hub_tool_browser_tabs">Браузер: вкладки</string>
+    <string name="hub_tool_schedule_message">Планирует: %1$s</string>
+    <string name="hub_tool_list_scheduled">Проверяет запланированные сообщения</string>
+    <string name="hub_tool_cancel_scheduled">Отменяет запланированное сообщение</string>
+    <string name="later_title">Сообщение агента на %1$s</string>
+    <string name="later_cancel">Отменить сообщение</string>
+    <string name="setup_play_rate">Оценить Buddy в Google Play</string>
+    <string name="setup_play_rate_info">Отзыв помогает другим найти Buddy.</string>
+    <string name="setup_play_get">Buddy в Google Play</string>
+    <string name="setup_play_get_info">Обновления приходят через Play, но эта версия не устанавливает APK. Это отдельная установка: сначала удалите эту версию.</string>
 </resources>

@@ -520,7 +520,7 @@ final class Ui {
             s.removeSpan(u);
             s.setSpan(new LinkSpan(u.getURL(), then), a, b, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
-        // markdown links (see markdownLinks) are LinkSpans already
+        // markdown links (see markdown) are LinkSpans already
         if (!found && s.getSpans(0, s.length(), LinkSpan.class).length == 0) return;
         t.setText(s);
         t.setLinkTextColor(ACCENT_TEXT);
@@ -531,38 +531,128 @@ final class Ui {
     private static final java.util.regex.Pattern MD_LINK = java.util.regex.Pattern.compile(
             "\\[([^\\[\\]\\n]+)\\]\\((https?://[^\\s()]*(?:\\([^\\s()]*\\)[^\\s()]*)*)\\)");
 
-    /**
-     * Agents often write links in markdown: shown as their text alone, which opens the address when tapped. Then runs
-     * before it opens (e.g. to fold the panel). Bare addresses are left to Linkify.
-     */
-    static CharSequence markdownLinks(CharSequence text, Runnable then) {
-        java.util.regex.Matcher m = MD_LINK.matcher(text);
-        if (!m.find()) return text;
-        android.text.SpannableStringBuilder out = new android.text.SpannableStringBuilder();
-        int last = 0;
-        do {
-            out.append(text, last, m.start());
-            int a = out.length();
-            out.append(m.group(1));
-            out.setSpan(new LinkSpan(m.group(2), then), a, out.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            last = m.end();
-        } while (m.find());
-        return out.append(text, last, text.length());
-    }
-
-    /** The same in plain text, for one-line previews: [text](url) becomes text. */
+    /** The same in plain text, for one-line previews: [text](url) becomes text, **bold** bold, and so on. */
     static String linkText(String text) {
-        return MD_LINK.matcher(text).replaceAll("$1");
+        return markdown(text, null).toString();
     }
 
-    /** For copying a whole reply: [text](url) becomes "text (url)", which other apps turn back into a link. */
-    static String linkCopy(String text) {
-        return MD_LINK.matcher(text).replaceAll("$1 ($2)");
+    private static final java.util.regex.Pattern MD_INLINE = java.util.regex.Pattern.compile(
+            "`([^`\\n]+)`" // 1: code
+                    + "|!\\[([^\\[\\]\\n]*)\\]\\(([^\\s()]+)\\)" // 2, 3: an image (shown under the reply, see ChatHub.pictures)
+                    + "|" + MD_LINK.pattern() // 4, 5: a link
+                    + "|\\*\\*(?!\\s)(.+?)\\*\\*|__(?!\\s)(.+?)__" // 6, 7: bold
+                    + "|~~(.+?)~~" // 8: struck through
+                    + "|(?<![\\w*])\\*(?![\\s*])(.+?)(?<!\\s)\\*(?![\\w*])" // 9: italic; not a * b * c
+                    + "|(?<![\\w_])_(?![\\s_])(.+?)(?<!\\s)_(?![\\w_])"); // 10: italic; not snake_case
+    private static final java.util.regex.Pattern MD_HEADING = java.util.regex.Pattern.compile("#{1,6}\\s+(.*?)\\s*#*\\s*"),
+            MD_BULLET = java.util.regex.Pattern.compile("(\\s*)[-*+]\\s+(.*)"),
+            MD_NUMBER = java.util.regex.Pattern.compile("(\\s*)(\\d{1,3}[.)])\\s+(.*)"),
+            MD_RULE = java.util.regex.Pattern.compile("\\s*([-*_])(\\s*\\1){2,}\\s*"),
+            MD_TABLE_LINE = java.util.regex.Pattern.compile("\\s*\\|?\\s*:?-{3,}:?\\s*(\\|\\s*:?-{3,}:?\\s*)*\\|?\\s*");
+
+    /**
+     * An agent's reply in Markdown, as formatted text: headings, bold, italic, struck through, `code` and code blocks,
+     * lists, quotes, rules, tables (monospaced) and links, [text](url): the text, opening the address when tapped
+     * (bare addresses are left to Linkify). Then runs before a link opens (e.g. to fold the panel).
+     */
+    static CharSequence markdown(String text, Runnable then) {
+        android.text.SpannableStringBuilder out = new android.text.SpannableStringBuilder();
+        String[] lines = text.split("\n", -1);
+        int code = -1; // where the open code block started
+        for (int i = 0; i < lines.length; i++) {
+            String l = lines[i];
+            int start = out.length();
+            java.util.regex.Matcher m;
+            if (l.trim().startsWith("```")) {
+                if (code < 0) {
+                    code = start;
+                    continue;
+                }
+                if (out.length() > code && out.charAt(out.length() - 1) == '\n') out.delete(out.length() - 1, out.length());
+                monospace(out, code, out.length());
+                code = -1;
+            } else if (code >= 0) {
+                out.append(l);
+            } else if ((m = MD_HEADING.matcher(l)).matches()) {
+                inline(out, m.group(1), then);
+                int level = l.indexOf(' ');
+                set(out, new android.text.style.StyleSpan(android.graphics.Typeface.BOLD), start);
+                set(out, new android.text.style.RelativeSizeSpan(level == 1 ? 1.25f : level == 2 ? 1.15f : 1.05f), start);
+            } else if (MD_RULE.matcher(l).matches()) {
+                out.append("――――――");
+                set(out, new android.text.style.ForegroundColorSpan(MUTED), start);
+            } else if ((m = MD_BULLET.matcher(l)).matches()) {
+                indent(out, m.group(1));
+                out.append("•  ");
+                inline(out, m.group(2), then);
+            } else if ((m = MD_NUMBER.matcher(l)).matches()) {
+                indent(out, m.group(1));
+                out.append(m.group(2)).append(' ');
+                inline(out, m.group(3), then);
+            } else if (l.startsWith(">")) {
+                inline(out, l.replaceFirst(">\\s?", ""), then);
+                set(out, new android.text.style.QuoteSpan(MUTED), start);
+            } else if (l.trim().startsWith("|") && l.trim().endsWith("|") && l.trim().length() > 1) {
+                if (MD_TABLE_LINE.matcher(l).matches()) continue; // |---|---|
+                out.append(l.trim());
+                monospace(out, start, out.length());
+            } else {
+                inline(out, l, then);
+            }
+            if (i < lines.length - 1) out.append('\n');
+        }
+        if (code >= 0) monospace(out, code, out.length()); // never closed
+        return out;
+    }
+
+    private static void inline(android.text.SpannableStringBuilder out, String s, Runnable then) {
+        java.util.regex.Matcher m = MD_INLINE.matcher(s);
+        int last = 0;
+        while (m.find()) {
+            out.append(s, last, m.start());
+            int a = out.length();
+            if (m.group(1) != null) {
+                out.append(m.group(1));
+                monospace(out, a, out.length());
+            } else if (m.group(3) != null) {
+                String alt = m.group(2).trim();
+                out.append(alt.isEmpty() ? m.group(3).substring(m.group(3).lastIndexOf('/') + 1) : alt);
+            } else if (m.group(5) != null) {
+                out.append(m.group(4));
+                set(out, new LinkSpan(m.group(5), then), a);
+            } else if (m.group(6) != null || m.group(7) != null) {
+                inline(out, m.group(6) != null ? m.group(6) : m.group(7), then);
+                set(out, new android.text.style.StyleSpan(android.graphics.Typeface.BOLD), a);
+            } else if (m.group(8) != null) {
+                inline(out, m.group(8), then);
+                set(out, new android.text.style.StrikethroughSpan(), a);
+            } else {
+                inline(out, m.group(9) != null ? m.group(9) : m.group(10), then);
+                set(out, new android.text.style.StyleSpan(android.graphics.Typeface.ITALIC), a);
+            }
+            last = m.end();
+        }
+        out.append(s, last, s.length());
+    }
+
+    private static void indent(android.text.SpannableStringBuilder out, String spaces) {
+        for (int i = 0; i < Math.min(3, spaces.replace("\t", "  ").length() / 2); i++) out.append("    ");
+    }
+
+    private static void monospace(android.text.SpannableStringBuilder out, int a, int b) {
+        if (b <= a) return;
+        out.setSpan(new android.text.style.TypefaceSpan("monospace"), a, b, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        out.setSpan(new android.text.style.BackgroundColorSpan(CARD2), a, b, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        out.setSpan(new android.text.style.RelativeSizeSpan(0.9f), a, b, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    }
+
+    private static void set(android.text.SpannableStringBuilder out, Object span, int from) {
+        if (out.length() > from) out.setSpan(span, from, out.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
     /**
-     * For copying part of a reply as shown (start to end): a link whose text hides its address gets it after it, as in
-     * linkCopy, so the address isn't lost outside Buddy.
+     * For copying part of a reply as shown (start to end): a link whose text hides its address gets it after it,
+     * "text (address)", so the address isn't lost outside Buddy.
      */
     static String linkCopy(CharSequence shown, int start, int end) {
         if (!(shown instanceof android.text.Spanned)) return shown.subSequence(start, end).toString();

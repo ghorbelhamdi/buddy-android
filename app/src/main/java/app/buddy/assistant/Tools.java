@@ -145,16 +145,14 @@ final class Tools {
                                 + "every mark is a button or a switch, Buddy closes the question itself once it sees "
                                 + "them done (the result starts with DONE).")),
                 "question", "options"));
-        if (!Flavor.PLAY) { // the background browser's items, for a step the user does there (see BrowserTools)
-            JSONObject item = new JSONObject().put("type", "object").put("properties", props()
-                    .put("ref", intProp("The item's number from browser_read"))
-                    .put("label", strProp("A few words shown next to it, e.g. \"Your password\"")));
-            t.getJSONObject(t.length() - 1).getJSONObject("inputSchema").getJSONObject("properties").put("browser_highlight",
-                    new JSONObject().put("type", "array").put("maxItems", 6).put("items", item).put("description",
-                            "Optional, instead of highlight: items in the background browser the user has to use (a "
-                                    + "sign-in, a captcha, their details). Buddy opens the browser full screen with them "
-                                    + "marked, and closes it once the user answers."));
-        }
+        JSONObject item = new JSONObject().put("type", "object").put("properties", props()
+                .put("ref", intProp("The item's number from browser_read"))
+                .put("label", strProp("A few words shown next to it, e.g. \"Your password\"")));
+        t.getJSONObject(t.length() - 1).getJSONObject("inputSchema").getJSONObject("properties").put("browser_highlight",
+                new JSONObject().put("type", "array").put("maxItems", 6).put("items", item).put("description",
+                        "Optional, instead of highlight: items in the background browser the user has to use (a "
+                                + "sign-in, a captcha, their details). Buddy opens the browser full screen with them "
+                                + "marked, and closes it once the user answers."));
         t.put(tool("point_out",
                 "Show the user where to look or what to do on the screen: a box, circle or arrow with a short label "
                         + "around up to 6 elements, drawn over the app without blocking their touches. When the user does "
@@ -178,6 +176,19 @@ final class Tools {
                         + "field. Buddy shows the user an approval card with the text first, unless you called confirm "
                         + "with it just before.",
                 props().put("text", strProp("The reply, exactly as it should be sent")), "text"));
+        t.put(tool("schedule_message",
+                "Schedule a message to yourself in this chat, sent once at a later time: to check something again, "
+                        + "remind the user, or go on with a task later (\"check the price again tomorrow at 9\"). At its time "
+                        + "Buddy sends it into this chat as a new message to you, also with the phone locked, and you work "
+                        + "as usual. The user sees it above the chat and can cancel it. For something every day, tell "
+                        + "the user about Chat options > Schedule instead.",
+                props().put("message", strProp("What to do then, as a message to yourself with everything you'll need"))
+                        .put("in_minutes", intProp("In this many minutes"))
+                        .put("at", strProp("Or at this time, the phone's: \"2026-10-28 09:00\", or \"09:00\" for the next one")),
+                "message"));
+        t.put(tool("list_scheduled", "List the messages scheduled in this chat with schedule_message.", props()));
+        t.put(tool("cancel_scheduled", "Cancel a message scheduled with schedule_message.",
+                props().put("id", strProp("Its id, from schedule_message or list_scheduled")), "id"));
         if (!Flavor.PLAY) { // Play updates Buddy itself and doesn't allow installing other APKs
             t.put(tool("install_apk",
                     "(Needs Linux tools) Open Android's installer for an APK built in Buddy's Linux, e.g. "
@@ -283,7 +294,7 @@ final class Tools {
         // asking the user, posting a note, pointing something out and answering in a notification go on while paused;
         // operating the phone waits
         if (!"confirm".equals(name) && !"ask".equals(name) && !"notify".equals(name) && !"reply_notification".equals(name)
-                && !"point_out".equals(name)) {
+                && !"point_out".equals(name) && !SCHEDULING.contains(name)) {
             String held = svc.awaitResume(name);
             if (held != null) return text(held);
         }
@@ -368,6 +379,10 @@ final class Tools {
             case "wait_for_install":
                 if (ruleRun()) return text("Not available in a notification rule's run. Tell the user what's needed instead.");
                 return text(installs(name, a));
+            case "schedule_message":
+            case "list_scheduled":
+            case "cancel_scheduled":
+                return text(Schedules.agentTool(svc, McpServer.CALLER_CHAT.get(), name, a));
             case "notify": {
                 svc.showStatus(a.getString("text"));
                 return text("Shown.");
@@ -385,7 +400,7 @@ final class Tools {
      */
     private String askInBrowser(String question, List<String> options, JSONArray items) throws Exception {
         String key = Browser.key(McpServer.CALLER_CHAT.get());
-        if (Flavor.PLAY || !Browser.available(svc) || !Browser.running() || !Browser.hasTab(key)) {
+        if (!Browser.available(svc) || !Browser.running() || !Browser.hasTab(key)) {
             return "The background browser has no page open for you: use browser_open first, or highlight instead.";
         }
         JSONArray m = new JSONArray();
@@ -490,6 +505,10 @@ final class Tools {
     }
 
     /** Tools that need the screen: they can't work while the phone is locked or its screen is off. */
+    /** The agent's own scheduled messages (see Schedules.agentTool): no phone, so no pause either. */
+    static final java.util.Set<String> SCHEDULING = new java.util.HashSet<>(java.util.Arrays.asList(
+            "schedule_message", "list_scheduled", "cancel_scheduled"));
+
     private static final java.util.Set<String> SCREEN = new java.util.HashSet<>(java.util.Arrays.asList(
             "read_screen", "tap", "long_press", "type_text", "scroll", "swipe", "press", "open_app", "open_url",
             "screenshot", "point_out"));

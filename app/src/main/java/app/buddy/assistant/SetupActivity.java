@@ -441,7 +441,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         addCard(vc);
 
         // --------------------------------------------------- background browser
-        if (!Flavor.PLAY) browserSection(); // not in the Play build for now (see Prefs.browser)
+        browserSection();
 
         // ------------------------------------------------------- remote control
         list.addView(sectionLabel(this, getString(R.string.setup_remote_control)));
@@ -648,6 +648,17 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             ex.addView(upd, full());
             ex.addView(divider(), lineParams());
         }
+        // Play: rate it there; GitHub: the Play version exists (a separate install, signed by Google)
+        LinearLayout play = listRow(this);
+        play.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout gp = column(this);
+        gp.addView(title(this, getString(Flavor.PLAY ? R.string.setup_play_rate : R.string.setup_play_get), 15));
+        gp.addView(text(this, getString(Flavor.PLAY ? R.string.setup_play_rate_info : R.string.setup_play_get_info), 13, MUTED), topGap(2));
+        play.addView(gp, weight1());
+        play.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
+        play.setOnClickListener(v -> openPlay());
+        ex.addView(play, full());
+        ex.addView(divider(), lineParams());
         LinearLayout rules = listRow(this);
         rules.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout rt = column(this);
@@ -675,14 +686,12 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         ex.addView(perms, full());
         ex.addView(divider(), lineParams());
         final boolean dev = Prefs.devMode(this);
-        if (!Flavor.PLAY) { // building and installing apps isn't allowed on Play
-            ex.addView(protect(switchRow(this, getString(R.string.setup_dev_mode), getString(R.string.setup_dev_mode_info),
-                    dev, on -> {
-                Prefs.setDevMode(this, on);
-                render();
-            })), full());
-            ex.addView(divider(), lineParams());
-        }
+        ex.addView(protect(switchRow(this, getString(R.string.setup_dev_mode), getString(R.string.setup_dev_mode_info),
+                dev, on -> {
+            Prefs.setDevMode(this, on);
+            render();
+        })), full());
+        ex.addView(divider(), lineParams());
         ex.addView(protect(switchRow(this, getString(R.string.setup_agents_tap), getString(R.string.setup_agents_tap_info),
                 Prefs.agentsTapBuddy(this), on -> {
             Prefs.setAgentsTapBuddy(this, on);
@@ -1008,11 +1017,6 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             Button open = button(this, getString(R.string.browser_open), false);
             open.setOnClickListener(v -> startActivity(new Intent(this, BrowserActivity.class).putExtra("key", Browser.USER)));
             btns.addView(open, new LinearLayout.LayoutParams(0, dp(this, 44), 1));
-            Button sites = button(this, getString(R.string.browser_sites), false);
-            sites.setOnClickListener(v -> sitesSheet());
-            LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(0, dp(this, 44), 1);
-            sp.setMarginStart(dp(this, 10));
-            btns.addView(sites, sp);
             how.addView(btns, topGap(12));
             Button wipe = button(this, getString(R.string.browser_wipe), false);
             wipe.setTextColor(ERR);
@@ -1027,67 +1031,6 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             bc.addView(how, full());
         }
         addCard(bc);
-    }
-
-    /** The sites the background browser has cookies for (its sign-ins), each with Log out. */
-    private void sitesSheet() {
-        LinearLayout c = column(this);
-        c.addView(title(this, getString(R.string.browser_sites), 18));
-        TextView sub = text(this, getString(R.string.browser_sites_help), 13, MUTED);
-        sub.setPaddingRelative(0, dp(this, 2), 0, dp(this, 8));
-        c.addView(sub);
-        LinearLayout rows = column(this);
-        rows.addView(text(this, getString(R.string.browser_sites_loading), 14, MUTED));
-        c.addView(rows, full());
-        final Dialog d = bottomSheet(this, c);
-        d.show();
-        new Thread(() -> {
-            // only sites the user signed in to; the rest of the cookies (ads, pages agents opened) just get counted
-            java.util.List<String> all = Browser.sites(this), sites = new java.util.ArrayList<>();
-            java.util.Set<String> signIns = Browser.signIns(this);
-            for (String site : all) if (signIns.contains(site)) sites.add(site);
-            int others = all.size() - sites.size();
-            runOnUiThread(() -> {
-                if (!d.isShowing()) return;
-                rows.removeAllViews();
-                if (sites.isEmpty()) rows.addView(text(this, getString(R.string.browser_sites_none), 14, MUTED));
-                if (others > 0) {
-                    TextView o = text(this, getString(R.string.browser_sites_others, others), 13, MUTED);
-                    o.setPaddingRelative(0, dp(this, 4), 0, dp(this, 8));
-                    rows.addView(o);
-                }
-                for (String site : sites) {
-                    LinearLayout r = row(this);
-                    r.setGravity(Gravity.CENTER_VERTICAL);
-                    r.setPaddingRelative(0, dp(this, 6), 0, dp(this, 6));
-                    r.addView(single(title(this, site, 15)), weight1());
-                    Button out = button(this, getString(R.string.browser_log_out), false);
-                    out.setOnClickListener(v -> {
-                        out.setEnabled(false);
-                        new Thread(() -> {
-                            String err = null;
-                            try {
-                                Browser.logOut(this, site);
-                            } catch (Exception e) {
-                                err = e.getMessage();
-                            }
-                            final String error = err;
-                            runOnUiThread(() -> {
-                                if (error == null) {
-                                    rows.removeView(r);
-                                    Toast.makeText(this, getString(R.string.browser_logged_out, site), Toast.LENGTH_SHORT).show();
-                                } else {
-                                    out.setEnabled(true);
-                                    Toast.makeText(this, error, Toast.LENGTH_LONG).show();
-                                }
-                            });
-                        }).start();
-                    });
-                    r.addView(out, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 40)));
-                    rows.addView(r, full());
-                }
-            });
-        }).start();
     }
 
     private void codexPairSheet() {
@@ -1240,6 +1183,16 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
 
     private void openAppInfo(String pkg) {
         startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + pkg)));
+    }
+
+    /** Buddy's Play listing: in the Play Store app, or the web page without it. */
+    private void openPlay() {
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=app.buddy.assistant"))
+                    .setPackage("com.android.vending"));
+        } catch (Exception e) {
+            openUrl(BuildInfo.PLAY_URL);
+        }
     }
 
     private void openUrl(String url) {

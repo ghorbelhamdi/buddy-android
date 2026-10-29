@@ -115,7 +115,7 @@ final class ChatHub {
         }
         viewing.remove(s);
         sessions.remove(s);
-        if (s.schedule != null) Schedules.cancel(app, s.id);
+        Schedules.cancelAll(app, s);
         changed();
     }
 
@@ -230,7 +230,7 @@ final class ChatHub {
 
     /** Turn a chat's Linux tools on or off; the next message uses them (a running one keeps what it started with). */
     void setDev(Sessions.Session ses, boolean on) {
-        ses.dev = on && !Flavor.PLAY;
+        ses.dev = on;
         sessions.save();
         changed();
     }
@@ -350,7 +350,7 @@ final class ChatHub {
                     if ("text".equals(c.optString("type"))) {
                         String t = c.optString("text").trim();
                         if (!t.isEmpty()) {
-                            add(ses, Bubble.Kind.BUDDY, t);
+                            add(ses, Bubble.Kind.BUDDY, t, pictures(t));
                             ses.lastReply = t;
                             ses.gotText = true;
                             CodexLive.agentSaid(ses, t); // a live voice call in this chat tells the user
@@ -361,7 +361,7 @@ final class ChatHub {
                             add(ses, Bubble.Kind.STEP, step);
                             ses.status = step;
                             String n = c.optString("name");
-                            if (n.equals(TOOL_PREFIX + "confirm") || n.equals(TOOL_PREFIX + "ask")) CodexLive.agentWaiting(ses, step);
+                            if (n.equals(TOOL_PREFIX + "confirm") || n.equals(TOOL_PREFIX + "ask")) CodexLive.agentWaiting(ses, step, c.optJSONObject("input"));
                         }
                     }
                 }
@@ -376,7 +376,7 @@ final class ChatHub {
                     add(ses, Bubble.Kind.ERROR, shown);
                     CodexLive.agentSaid(ses, shown);
                 } else if (!ses.gotText && !r.isEmpty()) {
-                    add(ses, Bubble.Kind.BUDDY, r);
+                    add(ses, Bubble.Kind.BUDDY, r, pictures(r));
                     ses.lastReply = r;
                     CodexLive.agentSaid(ses, r);
                 }
@@ -477,9 +477,9 @@ final class ChatHub {
      * The model to run. OpenCode's own default free model can take over 30 seconds to answer, so without
      * connected providers Buddy uses Big Pickle, which answers in seconds.
      */
-    /** The helper's mode for a chat's run: "1" with Linux tools, "0" without, "play" where they don't exist. */
+    /** The helper's mode for a chat's run: "1" with Linux tools, "0" without. */
     private static String devArg(Sessions.Session ses) {
-        return ses.dev ? "1" : Flavor.PLAY ? "play" : "0";
+        return ses.dev ? "1" : "0";
     }
 
     private static String model(Sessions.Session ses) {
@@ -582,13 +582,46 @@ final class ChatHub {
     }
 
     private void add(Sessions.Session ses, Bubble.Kind kind, String text) {
+        add(ses, kind, text, null);
+    }
+
+    private void add(Sessions.Session ses, Bubble.Kind kind, String text, List<String> files) {
         if (text == null) return;
-        sessions.add(ses, kind, text);
+        sessions.add(ses, kind, text, files);
         if (kind == Bubble.Kind.BUDDY && !viewing.contains(ses)) ses.unread = true;
         // not during a live voice call: the voice tells the user itself
         if (kind == Bubble.Kind.BUDDY && Prefs.speakReplies(app) && !CodexLive.on()) Voice.speak(app, text);
         Sessions.Msg m = ses.messages.get(ses.messages.size() - 1);
         for (Listener l : new ArrayList<>(listeners)) l.onMessage(ses, m);
+    }
+
+    /** A picture's path in Buddy's Linux, as agents write it: /root/.buddy/work/chart.png, ~/out/photo.jpg. */
+    private static final java.util.regex.Pattern PICTURE = java.util.regex.Pattern.compile(
+            "(?<![\\w/.~-])(~|/(?:root|tmp|home|srv|opt|var|mnt|media))(/[^\\s`'\"()\\[\\]<>|*]+?\\.(?i:png|jpe?g|webp|gif))(?![\\w/])");
+
+    /**
+     * Pictures a reply names in Buddy's Linux (a chart the agent drew, a photo it edited), copied to the attachments so
+     * the chat shows them under it; at most 4. Only files inside Buddy's Linux, never through a link out of it.
+     */
+    private List<String> pictures(String text) {
+        List<String> out = new ArrayList<>();
+        java.util.regex.Matcher m = PICTURE.matcher(text);
+        if (!m.find() || !Linux.installed(app)) return out;
+        java.util.Set<String> seen = new java.util.HashSet<>();
+        do {
+            String path = ("~".equals(m.group(1)) ? "/root" : m.group(1)) + m.group(2);
+            if (!seen.add(path)) continue;
+            try {
+                java.io.File root = Linux.root(app).getCanonicalFile(), f = new java.io.File(root, path).getCanonicalFile();
+                if (!f.getPath().startsWith(root.getPath() + "/") || !f.isFile() || f.length() > Attachments.MAX_BYTES) continue;
+                android.graphics.BitmapFactory.Options b = new android.graphics.BitmapFactory.Options();
+                b.inJustDecodeBounds = true;
+                android.graphics.BitmapFactory.decodeFile(f.getPath(), b);
+                if (b.outWidth > 0) out.add(Attachments.importFile(app, f));
+            } catch (Exception ignored) { // not there (yet), or unreadable: the path stays in the text
+            }
+        } while (out.size() < 4 && m.find());
+        return out;
     }
 
     private boolean wasRunning;
@@ -686,6 +719,9 @@ final class ChatHub {
             }
             case "update_buddy": return BuddyApp.str(in.optBoolean("install") ? R.string.hub_tool_update_download : R.string.hub_tool_update_check);
             case "notify": return in.optString("text");
+            case "schedule_message": return BuddyApp.str(R.string.hub_tool_schedule_message, clip(in.optString("message"), 40));
+            case "list_scheduled": return BuddyApp.str(R.string.hub_tool_list_scheduled);
+            case "cancel_scheduled": return BuddyApp.str(R.string.hub_tool_cancel_scheduled);
             case "reply_notification": return BuddyApp.str(R.string.hub_tool_reply_notification, clip(in.optString("text"), 40));
             case "browser_open": return BuddyApp.str(R.string.hub_tool_browser_open, clip(in.optString("url"), 40));
             case "browser_read": return BuddyApp.str(R.string.hub_tool_browser_read);

@@ -37,7 +37,7 @@ final class Sessions {
             if (files.isEmpty()) return text;
             String n = files.size() == 1 ? "📎 " + Attachments.name(files.get(0))
                     : BuddyApp.plural(R.plurals.attach_count, files.size(), files.size());
-            return text.isEmpty() ? n : n + "\n" + text;
+            return text.isEmpty() ? n : kind == Bubble.Kind.BUDDY ? text + "\n" + n : n + "\n" + text;
         }
     }
 
@@ -57,6 +57,8 @@ final class Sessions {
         boolean awake;
         /** The chat's scheduled task (see Schedules), or null. */
         Schedules.Plan schedule;
+        /** Messages the agent scheduled for itself in this chat (schedule_message), soonest first. Main thread. */
+        final List<Schedules.Later> later = new ArrayList<>();
         long updated = System.currentTimeMillis();
         final List<Msg> messages = new ArrayList<>();
         // runtime only
@@ -122,11 +124,11 @@ final class Sessions {
         Session s = new Session(UUID.randomUUID().toString().replace("-", "").substring(0, 12), backend);
         s.dev = dev;
         all.add(0, s);
-        // the oldest chats make room, but not one with a schedule (unless every one has)
+        // the oldest chats make room, but not one with something scheduled (unless every one has)
         while (all.size() > MAX_SESSIONS) {
             int drop = all.size() - 1;
             for (int i = all.size() - 1; i > 0; i--) {
-                if (all.get(i).schedule == null && !all.get(i).running) {
+                if (all.get(i).schedule == null && all.get(i).later.isEmpty() && !all.get(i).running) {
                     drop = i;
                     break;
                 }
@@ -206,6 +208,11 @@ final class Sessions {
                     }
                     arr.getJSONObject(arr.length() - 1).put("schedule", s.schedule.toJson()).put("allowed", ok);
                 }
+                if (!s.later.isEmpty()) {
+                    JSONArray l = new JSONArray();
+                    for (Schedules.Later m : s.later) l.put(m.toJson());
+                    arr.getJSONObject(arr.length() - 1).put("later", l);
+                }
             }
             sp.edit().putString("all", arr.toString()).putString("current", current == null ? null : current.id).apply();
         } catch (Exception ignored) {
@@ -226,11 +233,16 @@ final class Sessions {
                 s.actualModel = o.optString("actual_model");
                 // a chat from before Linux tools were per chat gets what the one switch in Settings gave every chat
                 older |= !o.has("dev");
-                s.dev = !Flavor.PLAY && o.optBoolean("dev", Prefs.devMode(app));
+                s.dev = o.optBoolean("dev", Prefs.devMode(app));
                 s.awake = o.optBoolean("awake");
                 s.schedule = Schedules.Plan.of(o.optJSONObject("schedule"));
                 JSONArray ok = s.schedule == null ? null : o.optJSONArray("allowed"); // kept for its scheduled runs
                 if (ok != null) for (int j = 0; j < ok.length(); j++) s.allowed.add(ok.getString(j));
+                JSONArray later = o.optJSONArray("later");
+                for (int j = 0; later != null && j < later.length(); j++) {
+                    Schedules.Later m = Schedules.Later.of(later.optJSONObject(j));
+                    if (m != null) s.later.add(m);
+                }
                 s.updated = o.optLong("updated");
                 JSONArray msgs = o.optJSONArray("messages");
                 if (msgs != null) for (int j = 0; j < msgs.length(); j++) {

@@ -19,7 +19,11 @@ Type or say what you want, like "reply to Sam that I'm running late" or "add a S
 
 It runs inside the app, on your own plan: [Claude Code](https://docs.claude.com/en/docs/claude-code) with your Claude plan, Codex with your ChatGPT plan, Google's [Antigravity CLI](https://antigravity.google) with your Google account, xAI's [Grok Build](https://x.ai/build) with your Google or X account, or [OpenCode](https://opencode.ai) with its free models and no account at all. No PC, no adb, no root, no API key.
 
-<p align="center"><a href="#setup"><b>Get it on Google Play</b></a> (closed testing) · <a href="https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk"><b>Download the APK</b></a> · <a href="https://ghorbelhamdi.github.io/buddy-android/">Website</a> · Android 11+, 64-bit</p>
+<p align="center">
+  <a href="https://play.google.com/store/apps/details?id=app.buddy.assistant"><img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="80"></a>
+</p>
+
+<p align="center"><a href="https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk"><b>Download the APK</b></a> · <a href="https://ghorbelhamdi.github.io/buddy-android/">Website</a> · Android 11+, 64-bit</p>
 
 <div align="center">
 
@@ -45,8 +49,8 @@ https://github.com/user-attachments/assets/d07936fc-4788-4ab5-a105-31b3e9aeba4f
 | **Shows you how** | "Show me how to turn on dark mode": it points at each step and waits for your tap. |
 | **Acts on notifications** | "When a customer asks on WhatsApp, reply with our opening hours", with your OK or a countdown you can stop. |
 | **Voice** | Talk to it and have replies read aloud. |
-| **Background browser** | Web pages in a browser inside Buddy, without taking over your screen, even while the phone is locked. Watch and use it live in the chat; it marks what you need to do (sign in, a captcha) and never types your passwords. GitHub version. |
-| **Builds apps** | Turn on Linux tools in a chat and "make me a calculator app" builds and installs a real APK on the phone. GitHub version. |
+| **Background browser** | Web pages in a browser inside Buddy, without taking over your screen, even while the phone is locked. Watch and use it live in the chat; it marks what you need to do (sign in, a captcha) and never types your passwords. |
+| **Builds apps** | Turn on Linux tools in a chat and "make me a calculator app" builds a real APK on the phone; the GitHub version also installs it for you. |
 | **Phone tools anywhere** | The same tools as a local MCP server for your own Claude Code, Codex, OpenCode, Antigravity or Grok sessions, or over stdio with [mcp-bridge](mcp-bridge) for clients that start servers as commands. |
 
 > **Status: 2.2, early.** It works well day to day but has rough edges. Tested most on a OnePlus 12 (Android 16). Buddy is an independent project, not made by or affiliated with Anthropic, OpenAI, Google or xAI.
@@ -68,8 +72,8 @@ Buddy is a normal Android app with an accessibility service, the kind of permiss
 You need a 64-bit Android 11+ phone, plus a Claude, ChatGPT or Google account for those agents (Grok: a Google or X account). OpenCode's free models need no account.
 
 1. **Install Buddy.**
-   - **Google Play (recommended):** join the [tester group](https://groups.google.com/g/buddy-testers), [opt in](https://play.google.com/apps/testing/app.buddy.assistant), then install Buddy from Google Play. Every tester helps it get to production.
-   - **APK:** [download buddy.apk](https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk) and open it. This version also has Linux tools (commands, files and app builds, per chat) and self-updates.
+   - **Google Play (recommended):** [install Buddy from Google Play](https://play.google.com/store/apps/details?id=app.buddy.assistant). It updates through Play.
+   - **APK:** [download buddy.apk](https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk) and open it. This version also installs the apps it builds for you, and updates itself. The two are separate installs: to switch, uninstall the other one first.
 2. **Follow the setup guide** that opens on first launch: pick your agent, turn on the accessibility service, install and sign in, and try a first task.
 
 **Install blocked or "Restricted setting"?** See [Setup in detail](docs/GUIDE.md#setup-in-detail).

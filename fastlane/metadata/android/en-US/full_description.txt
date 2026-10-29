@@ -1,0 +1,18 @@
+Buddy lets AI coding agents use your Android phone: Claude Code with your Claude plan, Codex with your ChatGPT plan, Antigravity with your Google account, Grok, or OpenCode's free models with no account at all.
+
+Type or say what you want in the floating chat bubble. Buddy reads the screen, taps and types to get it done, and asks you before anything is sent, posted, bought or deleted. Passwords and payment details are handed to you.
+
+How it works: the agent runs in a small Alpine Linux inside the app (via proot), and Buddy gives it phone tools through its accessibility service and a local MCP server on 127.0.0.1. No root, no adb, no PC, no API keys.
+
+Also:
+• acts on your notifications with rules you write
+• guides you step by step ("show me how…")
+• builds apps on the phone (Linux tools)
+• a background browser for web pages
+• live voice and scheduled tasks
+• its phone tools work from your own Claude Code or Codex sessions in Termux
+• 17 languages
+
+What Buddy downloads: Alpine Linux (from alpinelinux.org, checked by SHA-256) when you set it up, and each agent's official CLI when you pick it. Chromium for the background browser only if you turn it on.
+
+Buddy is an independent project, not made by or affiliated with Anthropic, OpenAI, Google or xAI.
