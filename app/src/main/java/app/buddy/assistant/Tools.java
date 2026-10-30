@@ -274,6 +274,8 @@ final class Tools {
     private JSONObject call0(String name, JSONObject a) throws Exception {
         String revoked = svc.controlRevoked();
         if (revoked != null && !"notify".equals(name)) return text(revoked);
+        String capped = countStep(name, a);
+        if (capped != null) return text(capped);
         if (name.startsWith("browser_")) { // the background browser: it doesn't need the phone's screen
             svc.onToolActivity(name);
             return browser.call(name, a);
@@ -439,8 +441,13 @@ final class Tools {
                 if (Flavor.PLAY) return "Installing APKs isn't available in Buddy from Google Play.";
                 return installApk(a.getString("path"));
             default:
-                return waitForInstall(a.getString("package"), a.optLong("min_version_code", 0),
-                        Math.max(10, Math.min(300, a.optInt("timeout_s", 120))));
+                svc.installWaits++;
+                try {
+                    return waitForInstall(a.getString("package"), a.optLong("min_version_code", 0),
+                            Math.max(10, Math.min(300, a.optInt("timeout_s", 120))));
+                } finally {
+                    svc.installWaits--;
+                }
         }
     }
 
@@ -508,6 +515,54 @@ final class Tools {
     /** The agent's own scheduled messages (see Schedules.agentTool): no phone, so no pause either. */
     static final java.util.Set<String> SCHEDULING = new java.util.HashSet<>(java.util.Arrays.asList(
             "schedule_message", "list_scheduled", "cancel_scheduled"));
+
+    /** Phone and browser actions, counted per run (see countStep). */
+    private static final java.util.Set<String> COUNTED = new java.util.HashSet<>(java.util.Arrays.asList(
+            "tap", "long_press", "type_text", "scroll", "swipe", "press", "open_app", "open_url",
+            "browser_open", "browser_click", "browser_type", "browser_scroll", "browser_back"));
+    /** Actions that go over a list or a page: doing them again and again is normal, not a loop. */
+    private static final java.util.Set<String> REPEATS_OK = new java.util.HashSet<>(java.util.Arrays.asList(
+            "scroll", "swipe", "browser_scroll"));
+    /** A run stops after this many actions, or the same action this many times in a row: a runaway loop spends the plan. */
+    private static final int MAX_STEPS = 60, MAX_REPEATS = 6;
+    /** Per Buddy chat in its current run: {actions, the same action in a row}, and the last action. */
+    private static final java.util.Map<String, int[]> steps = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Map<String, String> lastStep = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /** A chat's run starts: its count starts again. */
+    static void runStarted(String chat) {
+        steps.remove(chat);
+        lastStep.remove(chat);
+    }
+
+    /**
+     * Counts a Buddy chat's actions (sessions outside Buddy have no runs and aren't counted). null: go ahead; otherwise
+     * why the run stops here (every later action in the run gets it too).
+     */
+    private String countStep(String name, JSONObject a) {
+        String chat = McpServer.CALLER_CHAT.get();
+        if (chat == null || !COUNTED.contains(name)) return null;
+        int[] n = steps.computeIfAbsent(chat, k -> new int[2]);
+        String step = name + " " + a;
+        boolean same = step.equals(lastStep.put(chat, step)) && !REPEATS_OK.contains(name);
+        synchronized (n) {
+            if (n[0] >= MAX_STEPS || n[1] >= MAX_REPEATS) return stopped(n[0] >= MAX_STEPS);
+            n[0]++;
+            n[1] = same ? n[1] + 1 : 1;
+            if (n[0] == MAX_STEPS) noteInChat(chat, svc.getString(R.string.tools_step_cap, MAX_STEPS));
+            else if (n[1] == MAX_REPEATS) {
+                noteInChat(chat, svc.getString(R.string.tools_step_loop, MAX_REPEATS));
+                return stopped(false);
+            }
+        }
+        return null;
+    }
+
+    private static String stopped(boolean cap) {
+        return "STOPPED by Buddy: " + (cap ? "this run has used its " + MAX_STEPS + " phone actions"
+                : "the same action " + MAX_REPEATS + " times in a row looks like a loop")
+                + ". Don't try more actions; tell the user what's done and what's left. They can tell you to go on.";
+    }
 
     private static final java.util.Set<String> SCREEN = new java.util.HashSet<>(java.util.Arrays.asList(
             "read_screen", "tap", "long_press", "type_text", "scroll", "swipe", "press", "open_app", "open_url",
@@ -902,7 +957,8 @@ final class Tools {
      */
     private String guardAction(String what, java.util.function.Function<String, String> card, String detail, boolean send,
                                boolean byRule) throws InterruptedException {
-        if (Guard.takeApproval(send)) return null;
+        // a send's detail is the message itself: an approval for another text doesn't cover it (a card asks instead)
+        if (Guard.takeApproval(send, send ? detail : null)) return null;
         String app = svc.foregroundAppName();
         if (byRule) {
             noteInChat(McpServer.CALLER_CHAT.get(), svc.getString(R.string.run_rule_approved, card.apply(app)));

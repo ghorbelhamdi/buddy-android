@@ -172,6 +172,8 @@
     <string name="main_empty_text">点按“新对话”，即可与 Claude Code、Codex、OpenCode、Antigravity 或 Grok 开始对话。长按对话可将其删除。</string>
     <!-- Status of a chat with a running task, until the agent reports what it's doing. Small lowercase mono text. -->
     <string name="main_chat_working">处理中…</string>
+    <string name="main_chat_waiting">等你处理…</string>
+    <string name="main_card_other_session">其他会话</string>
     <!-- Preview of a chat's last message when the user wrote it. %1$s = the message. -->
     <string name="main_chat_last_you">你：%1$s</string>
     <string name="main_delete_title">删除此对话？</string>
@@ -396,6 +398,7 @@
     <!-- The card's label when the request comes from an agent session outside Buddy's chats (e.g. a terminal).
          %1$s: card_label_approval or card_label_question. All caps. -->
     <string name="card_label_other_session">%1$s · 来自其他会话</string>
+    <string name="card_label_queue">%1$s · 第 1 个，共 %2$d 个</string>
     <!-- Buttons side by side at the bottom of the card: keep them short. -->
     <string name="card_deny">拒绝</string>
     <!-- Verb: the user says what the agent should change instead of approving. -->
@@ -638,6 +641,7 @@
     <string name="hub_something_wrong">出了点问题。</string>
     <!-- After the user adds something while the agent works. %1$s = agent name. -->
     <string name="hub_note_added">已补充：%1$s 会在下一步收到</string>
+    <string name="hub_note_not_sent">你已停止，所以补充内容没有发送：已放回输入框</string>
     <!-- The agent received what the user added while it worked. -->
     <string name="hub_note_passed">已转达你补充的内容</string>
     <!-- The bubble's status pill when several chats work at once. %1$d = number of chats (always 2 or more),
@@ -935,6 +939,11 @@
     <string name="account_check_failed">无法检查 %1$s：%2$s</string>
     <!-- Error. %1$s = technical detail in English. -->
     <string name="account_install_failed">安装失败：%1$s</string>
+    <string name="account_install_no_space">手机可用空间不足。请腾出约 1 GB 后重试。</string>
+    <string name="account_install_network">Buddy 无法连接下载服务器。请检查 Wi-Fi 或移动数据（或是否有 VPN、私人 DNS 拦截），然后重试。</string>
+    <string name="account_install_refused">下载服务器拒绝了请求或要求放慢速度。请几分钟后重试。</string>
+    <string name="account_install_space_needed">仅剩 %1$s。安装智能体大约需要 1 GB：请腾出空间后重试。</string>
+    <string name="signin_details">详情</string>
     <!-- Update progress and result. %1$s = agent name: checking for a newer version of it. -->
     <string name="account_update_checking">正在检查新版 %1$s…</string>
     <!-- %1$s = version number. -->
@@ -1668,4 +1677,52 @@
     <string name="setup_play_rate_info">评价能帮助别人找到 Buddy。</string>
     <string name="setup_play_get">Google Play 上的 Buddy</string>
     <string name="setup_play_get_info">更新通过 Play 推送，但该版本不能安装 APK。它是单独安装的：请先卸载此版本。</string>
+    <string name="share_label">问 Buddy</string>
+    <string name="share_title">分享给 Buddy</string>
+    <string name="share_new_chat">与 %1$s 新建对话</string>
+    <string name="usage_five">5 小时 %1$d%% · %2$s 重置</string>
+    <string name="usage_week">每周 %1$d%% · %2$s 重置</string>
+    <string name="usage_five_short">5 小时 %1$d%%</string>
+    <string name="usage_week_short">每周 %1$d%%</string>
+    <string name="usage_warn_five">你已用掉套餐 5 小时额度的 %1$d%%，将在 %2$s 重置。</string>
+    <string name="usage_warn_week">你已用掉套餐每周额度的 %1$d%%，将在 %2$s 重置。</string>
+    <string name="check_title">检查 Buddy</string>
+    <string name="check_info">立即测试 Buddy 的每个部分，并告诉你如何修复问题</string>
+    <string name="check_running">正在检查…</string>
+    <string name="check_all_ok">一切正常</string>
+    <string name="check_a11y">无障碍服务</string>
+    <string name="check_a11y_bad">未运行，所以 Buddy 无法查看或操作屏幕。请在无障碍设置中开启 Buddy。</string>
+    <string name="check_notifications">通知使用权</string>
+    <string name="check_notifications_bad">你的通知规则需要它，但它已关闭。</string>
+    <string name="check_battery">电池优化</string>
+    <string name="check_battery_bad">对 Buddy 已开启：Android 可能会在后台停止它，定时任务可能无法运行。</string>
+    <string name="check_linux">Buddy 的 Linux</string>
+    <string name="check_linux_ok">%1$.1f 秒内启动</string>
+    <string name="check_linux_bad">无法启动：%1$s</string>
+    <string name="check_linux_missing">尚未安装。请在设置中进行设置。</string>
+    <string name="check_helper">Buddy 助手程序</string>
+    <string name="check_helper_bad">Linux 中的副本比当前 Buddy 版本旧。</string>
+    <string name="check_server">手机工具服务器</string>
+    <string name="check_server_bad">在 127.0.0.1:%1$d 上没有响应。请在无障碍设置中关闭再重新开启 Buddy。</string>
+    <string name="check_agent_version">版本 %1$s</string>
+    <string name="check_network">网络</string>
+    <string name="check_network_bad">找不到 %1$s。请检查 Wi-Fi 或移动数据，或是否有 VPN 或私人 DNS 拦截了它。</string>
+    <string name="check_space">可用空间</string>
+    <string name="check_space_ok">可用 %1$s</string>
+    <string name="check_space_bad">仅剩 %1$s。安装或更新智能体大约需要 1 GB。</string>
+    <string name="check_fix">修复</string>
+    <string name="check_open_settings">打开设置</string>
+    <string name="check_copy">复制报告</string>
+    <string name="check_copied">报告已复制</string>
+    <string name="check_report">在 GitHub 上报告问题</string>
+    <string name="check_report_title">会发送到 GitHub 的内容</string>
+    <string name="check_report_text">这会打开一个已填好这些信息的新 GitHub issue。在你在那里提交之前不会发送任何内容，你也可以先修改。聊天、屏幕文字和通知绝不会包含在内。</string>
+    <string name="check_report_open">打开 GitHub</string>
+    <plurals name="check_failed">
+        <item quantity="other">%1$d 项检查未通过</item>
+    </plurals>
+    <string name="tools_step_cap">已连续执行 %1$d 次手机操作后停止，以免失控的任务耗尽你的套餐额度。如需继续，请告诉它。</string>
+    <string name="tools_step_loop">已停止：它连续 %1$d 次做同一件事，看起来陷入了循环。</string>
+    <string name="setup_help">帮助</string>
+    <string name="setup_help_info">GitHub 上的 Buddy 使用指南。你也可以问任何智能体 Buddy 怎么用。</string>
 </resources>

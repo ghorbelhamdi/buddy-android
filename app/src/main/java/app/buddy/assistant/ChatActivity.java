@@ -31,6 +31,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     private LinearLayout messages, strip, approval;
     private ScrollView scroll;
     private TextView title, chipText, stripText;
+    private UsageGauge usage;
     /** The Linux tools chip beside the model chip (none in the Play build). */
     private LinearLayout linux;
     /** The empty-chat hint, while the chat has no messages. */
@@ -102,6 +103,15 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         cp.topMargin = dp(this, 3);
         titles.addView(chips, cp);
         top.addView(titles, weight1());
+        // how much of the plan is used (Claude Code, Codex): a small speedometer; a tap says both windows and resets
+        usage = new UsageGauge(this);
+        usage.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 40), dp(this, 44)));
+        usage.setBackgroundResource(ripple(this, true));
+        usage.setOnClickListener(v -> {
+            String full = Usage.line(this, ses.backend);
+            if (full != null) Toast.makeText(this, full, Toast.LENGTH_LONG).show();
+        });
+        top.addView(usage);
         // agents never change these, even when they may tap Buddy's screens
         options = protect(iconButton(this, R.drawable.ms_tune, getString(R.string.chat_options), MUTED));
         options.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 44), dp(this, 44)));
@@ -1091,6 +1101,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         speaker.setImageTintList(ColorStateList.valueOf(speak ? ACCENT : MUTED));
         title.setText(ses.label());
         chipText.setText(Models.summary(ses));
+        int used = Usage.peak(this, ses.backend);
+        usage.set(used);
+        usage.setContentDescription(Usage.shortLine(this, ses.backend));
+        usage.setVisibility(used < 0 ? View.GONE : View.VISIBLE);
         if (linux != null) paintLinuxChip(this, linux, ses.dev);
         options.setImageTintList(ColorStateList.valueOf(ses.awake || ses.schedule != null || !ses.allowed.isEmpty() ? ACCENT : MUTED));
         if (hint != null) hint.setText(hintText());
@@ -1105,6 +1119,17 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         renderLater();
         onBrowserChanged();
         paintLive();
+        if (resumed) restoreUnsent(ses);
+    }
+
+    /** Notes the user added before pressing Stop go back into the message box, to send or delete. */
+    private void restoreUnsent(Sessions.Session ses) {
+        if (ses.running) return;
+        String text = hub.takeUnsent(ses);
+        if (text == null) return;
+        String now = input.getText().toString();
+        input.setText(now.trim().isEmpty() ? text : now + "\n" + text);
+        input.setSelection(input.length());
     }
 
     /** The live card shows while the background browser runs and this chat has a tab in it. */

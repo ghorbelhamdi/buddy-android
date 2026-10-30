@@ -19,10 +19,6 @@ Type or say what you want, like "reply to Sam that I'm running late" or "add a S
 
 It runs inside the app, on your own plan: [Claude Code](https://docs.claude.com/en/docs/claude-code) with your Claude plan, Codex with your ChatGPT plan, Google's [Antigravity CLI](https://antigravity.google) with your Google account, xAI's [Grok Build](https://x.ai/build) with your Google or X account, or [OpenCode](https://opencode.ai) with its free models and no account at all. No PC, no adb, no root, no API key.
 
-<p align="center">
-  <a href="https://play.google.com/store/apps/details?id=app.buddy.assistant"><img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="80"></a>
-</p>
-
 <p align="center"><a href="https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk"><b>Download the APK</b></a> · <a href="https://ghorbelhamdi.github.io/buddy-android/">Website</a> · Android 11+, 64-bit</p>
 
 <div align="center">
@@ -71,16 +67,14 @@ Buddy is a normal Android app with an accessibility service, the kind of permiss
 
 You need a 64-bit Android 11+ phone, plus a Claude, ChatGPT or Google account for those agents (Grok: a Google or X account). OpenCode's free models need no account.
 
-1. **Install Buddy.**
-   - **Google Play (recommended):** [install Buddy from Google Play](https://play.google.com/store/apps/details?id=app.buddy.assistant). It updates through Play.
-   - **APK:** [download buddy.apk](https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk) and open it. This version also installs the apps it builds for you, and updates itself. The two are separate installs: to switch, uninstall the other one first.
+1. **Install Buddy:** [download buddy.apk](https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk) and open it. It updates itself, and installs the apps it builds for you. (Google Play turned Buddy down for production: its policy doesn't allow apps that use accessibility to carry out tasks.)
 2. **Follow the setup guide** that opens on first launch: pick your agent, turn on the accessibility service, install and sign in, and try a first task.
 
 **Install blocked or "Restricted setting"?** See [Setup in detail](docs/GUIDE.md#setup-in-detail).
 
 ## Updating
 
-Install the new APK over the old one: chats, settings and sign-ins stay (don't uninstall first). You can also ask Buddy to *"update yourself"*, or let [Obtainium](https://obtainium.imranr.dev) do it ([how](docs/GUIDE.md#updating)). The Play version updates through Play.
+Install the new APK over the old one: chats, settings and sign-ins stay (don't uninstall first). You can also ask Buddy to *"update yourself"*, or let [Obtainium](https://obtainium.imranr.dev) do it ([how](docs/GUIDE.md#updating)).
 
 ## Security
 

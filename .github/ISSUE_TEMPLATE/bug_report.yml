@@ -32,6 +32,8 @@ body:
         - Claude Code
         - Codex
         - OpenCode
+        - Antigravity
+        - Grok
         - Not about an agent
     validations:
       required: true

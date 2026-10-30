@@ -148,7 +148,7 @@ final class McpServer {
                 return;
             }
 
-            if (!("Bearer " + token).equals(headers.get("authorization"))) {
+            if (!authorized(headers.get("authorization"))) {
                 send(out, 401, "application/json", "{\"error\":\"unauthorized\"}");
                 return;
             }
@@ -352,5 +352,12 @@ final class McpServer {
             out.write(buf, 0, r);
             n -= r;
         }
+    }
+
+    /** The bearer token matches, compared in constant time (how long it takes says nothing about the token). */
+    private boolean authorized(String header) {
+        if (header == null) return false;
+        return java.security.MessageDigest.isEqual(("Bearer " + token).getBytes(StandardCharsets.UTF_8),
+                header.getBytes(StandardCharsets.UTF_8));
     }
 }

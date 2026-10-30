@@ -11,6 +11,14 @@ permissions:
   contents: write # needed to attach the APK to a GitHub release on tags
 
 jobs:
+  # buddy-run's translation of each agent's output, on recorded runs (linux/test/run.sh); jq comes with the runner
+  helper-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Test the helper on recorded agent output
+        run: bash linux/test/run.sh
+
   apk:
     runs-on: ubuntu-latest
     steps:

@@ -172,6 +172,8 @@
     <string name="main_empty_text">Tocca Nuova chat per iniziarne una con Claude Code, Codex, OpenCode, Antigravity o Grok. Tieni premuta una chat per eliminarla.</string>
     <!-- Status of a chat with a running task, until the agent reports what it's doing. Small lowercase mono text. -->
     <string name="main_chat_working">in corso…</string>
+    <string name="main_chat_waiting">ti aspetta…</string>
+    <string name="main_card_other_session">Un’altra sessione</string>
     <!-- Preview of a chat's last message when the user wrote it. %1$s = the message. -->
     <string name="main_chat_last_you">Tu: %1$s</string>
     <string name="main_delete_title">Eliminare questa chat?</string>
@@ -400,6 +402,7 @@
     <!-- The card's label when the request comes from an agent session outside Buddy's chats (e.g. a terminal).
          %1$s: card_label_approval or card_label_question. All caps. -->
     <string name="card_label_other_session">%1$s · DA UN\'ALTRA SESSIONE</string>
+    <string name="card_label_queue">%1$s · 1 DI %2$d</string>
     <!-- Buttons side by side at the bottom of the card: keep them short. -->
     <string name="card_deny">Rifiuta</string>
     <!-- Verb: the user says what the agent should change instead of approving. -->
@@ -644,6 +647,7 @@
     <string name="hub_something_wrong">Qualcosa è andato storto.</string>
     <!-- After the user adds something while the agent works. %1$s = agent name. -->
     <string name="hub_note_added">Aggiunto mentre lavora: %1$s lo riceverà al prossimo passo</string>
+    <string name="hub_note_not_sent">L’hai fermato, quindi la tua nota non è stata inviata: è di nuovo nella casella del messaggio</string>
     <!-- The agent received what the user added while it worked. -->
     <string name="hub_note_passed">La tua aggiunta è stata inoltrata</string>
     <!-- The bubble's status pill when several chats work at once. %1$d = number of chats (always 2 or more),
@@ -943,6 +947,11 @@
     <string name="account_check_failed">Impossibile verificare %1$s: %2$s</string>
     <!-- Error. %1$s = technical detail in English. -->
     <string name="account_install_failed">Installazione non riuscita: %1$s</string>
+    <string name="account_install_no_space">Non c’è abbastanza spazio libero sul telefono. Libera circa 1 GB e riprova.</string>
+    <string name="account_install_network">Buddy non è riuscito a raggiungere il server di download. Controlla il Wi-Fi o i dati mobili (o una VPN o un DNS privato che lo blocca) e riprova.</string>
+    <string name="account_install_refused">Il server di download ha rifiutato la richiesta o ha chiesto di rallentare. Riprova tra qualche minuto.</string>
+    <string name="account_install_space_needed">Solo %1$s liberi. Installare un agente richiede circa 1 GB: libera spazio e riprova.</string>
+    <string name="signin_details">Dettagli</string>
     <!-- Update progress and result. %1$s = agent name: checking for a newer version of it. -->
     <string name="account_update_checking">Ricerca di una nuova versione di %1$s…</string>
     <!-- %1$s = version number. -->
@@ -1667,4 +1676,53 @@
     <string name="setup_play_rate_info">Una recensione aiuta altri a trovare Buddy.</string>
     <string name="setup_play_get">Buddy su Google Play</string>
     <string name="setup_play_get_info">Gli aggiornamenti arrivano da Play, ma quella versione non installa APK. È un’installazione separata: disinstalla prima questa versione.</string>
+    <string name="share_label">Chiedi a Buddy</string>
+    <string name="share_title">Condividi con Buddy</string>
+    <string name="share_new_chat">Nuova chat con %1$s</string>
+    <string name="usage_five">5 ore %1$d%% · si azzera %2$s</string>
+    <string name="usage_week">settimana %1$d%% · si azzera %2$s</string>
+    <string name="usage_five_short">5 h %1$d%%</string>
+    <string name="usage_week_short">settimana %1$d%%</string>
+    <string name="usage_warn_five">Hai usato il %1$d%% del limite di 5 ore del tuo piano. Si azzera alle %2$s.</string>
+    <string name="usage_warn_week">Hai usato il %1$d%% del limite settimanale del tuo piano. Si azzera %2$s.</string>
+    <string name="check_title">Controlla Buddy</string>
+    <string name="check_info">Prova ora ogni parte di Buddy e dice come sistemare ciò che non va</string>
+    <string name="check_running">Controllo in corso…</string>
+    <string name="check_all_ok">Funziona tutto</string>
+    <string name="check_a11y">Servizio di accessibilità</string>
+    <string name="check_a11y_bad">Non è attivo, quindi Buddy non può vedere né usare lo schermo. Attiva Buddy nelle impostazioni di accessibilità.</string>
+    <string name="check_notifications">Accesso alle notifiche</string>
+    <string name="check_notifications_bad">Le tue regole sulle notifiche ne hanno bisogno, ed è disattivato.</string>
+    <string name="check_battery">Ottimizzazione batteria</string>
+    <string name="check_battery_bad">Attiva per Buddy: Android può fermarlo in background e le attività pianificate potrebbero non partire.</string>
+    <string name="check_linux">Linux di Buddy</string>
+    <string name="check_linux_ok">Si avvia in %1$.1f s</string>
+    <string name="check_linux_bad">Non si avvia: %1$s</string>
+    <string name="check_linux_missing">Non ancora installato. Configuralo nelle impostazioni.</string>
+    <string name="check_helper">Assistente di Buddy</string>
+    <string name="check_helper_bad">Linux ne ha una copia più vecchia di questa versione di Buddy.</string>
+    <string name="check_server">Server degli strumenti del telefono</string>
+    <string name="check_server_bad">Non risponde su 127.0.0.1:%1$d. Disattiva e riattiva Buddy nelle impostazioni di accessibilità.</string>
+    <string name="check_agent_version">Versione %1$s</string>
+    <string name="check_network">Internet</string>
+    <string name="check_network_bad">Impossibile trovare %1$s. Controlla il Wi-Fi o i dati mobili, o una VPN o un DNS privato che lo blocca.</string>
+    <string name="check_space">Spazio libero</string>
+    <string name="check_space_ok">%1$s liberi</string>
+    <string name="check_space_bad">Solo %1$s liberi. Installare o aggiornare un agente richiede circa 1 GB.</string>
+    <string name="check_fix">Risolvi</string>
+    <string name="check_open_settings">Apri impostazioni</string>
+    <string name="check_copy">Copia rapporto</string>
+    <string name="check_copied">Rapporto copiato</string>
+    <string name="check_report">Segnala un bug su GitHub</string>
+    <string name="check_report_title">Cosa va su GitHub</string>
+    <string name="check_report_text">Si apre una nuova issue su GitHub con questi dati già compilati. Non viene inviato nulla finché non la invii lì, e puoi modificarla prima. Chat, testo dello schermo e notifiche non sono mai inclusi.</string>
+    <string name="check_report_open">Apri GitHub</string>
+    <plurals name="check_failed">
+        <item quantity="one">%1$d controllo non riuscito</item>
+        <item quantity="other">%1$d controlli non riusciti</item>
+    </plurals>
+    <string name="tools_step_cap">Fermato dopo %1$d azioni di fila sul telefono, perché un’attività fuori controllo non consumi il tuo piano. Digli di continuare se serve.</string>
+    <string name="tools_step_loop">Fermato: ha fatto la stessa cosa %1$d volte di fila, sembra un ciclo.</string>
+    <string name="setup_help">Aiuto</string>
+    <string name="setup_help_info">La guida di Buddy, su GitHub. Puoi anche chiedere a qualsiasi agente come funziona Buddy.</string>
 </resources>

@@ -99,6 +99,30 @@ final class Bubble implements ChatHub.Listener {
     private boolean expanded, running, passThrough, showingList;
     private int imeTop;
     private ConfirmCallback pendingConfirm;
+    /** A card that waits its turn behind the one shown (another chat asked meanwhile). */
+    private static final class Card {
+        final String text, chat;
+        final java.util.List<String> options;
+        final ConfirmCallback cb;
+        final boolean open;
+        final int countdown;
+
+        Card(String text, java.util.List<String> options, String chat, ConfirmCallback cb, boolean open, int countdown) {
+            this.text = text;
+            this.options = options;
+            this.chat = chat;
+            this.cb = cb;
+            this.open = open;
+            this.countdown = countdown;
+        }
+    }
+
+    /** Cards waiting behind the shown one, oldest first: each is answered on its own, none is denied unseen. */
+    private final java.util.ArrayDeque<Card> queued = new java.util.ArrayDeque<>();
+    /** The shown card's label, before "1 of 3". */
+    private String cardLabel = "";
+    /** The card shown now (null: none). */
+    private Card shownCard;
     private ChatHub hub;
     private Sessions sessions;
     private Sessions.Session viewingSes;
@@ -1802,7 +1826,10 @@ final class Bubble implements ChatHub.Listener {
             renderNewChat();
             return;
         }
-        for (final Sessions.Session ses : sessions.all) sessionList.addView(chatRow(ses), new LinearLayout.LayoutParams(
+        // chats with a card waiting for the user first
+        java.util.List<Sessions.Session> list = new java.util.ArrayList<>(sessions.all);
+        java.util.Collections.sort(list, (a, b) -> Boolean.compare(waitingIn(b), waitingIn(a)));
+        for (final Sessions.Session ses : list) sessionList.addView(chatRow(ses), new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
     }
 
@@ -2021,6 +2048,17 @@ final class Bubble implements ChatHub.Listener {
         paintLive();
         refreshStatus();
         if (showingList) renderSessionList();
+        else if (expanded && renderedFor != null) restoreUnsent(renderedFor);
+    }
+
+    /** Notes the user added before pressing Stop go back into the message box, to send or delete. */
+    private void restoreUnsent(Sessions.Session ses) {
+        if (ses.running) return;
+        String text = hub.takeUnsent(ses);
+        if (text == null) return;
+        String now = input.getText().toString();
+        input.setText(now.trim().isEmpty() ? text : now + "\n" + text);
+        input.setSelection(input.length());
     }
 
     @Override
@@ -2099,6 +2137,7 @@ final class Bubble implements ChatHub.Listener {
         refreshStatus();
         collapse();
         hub.changed();
+        showNext();
     }
 
     void askConfirm(String summary, String chat, ConfirmCallback cb) {
@@ -2107,8 +2146,7 @@ final class Bubble implements ChatHub.Listener {
 
     /** countdown: seconds after which the card approves itself unless the user stops it (0: it waits for the user). */
     void askConfirm(String summary, String chat, int countdown, ConfirmCallback cb) {
-        showCard(summary, null, chat, cb);
-        if (countdown > 0) startCountdown(countdown);
+        showCard(new Card(summary, null, chat, cb, true, countdown));
     }
 
     // ------------------------------------------------------------ countdown
@@ -2132,7 +2170,7 @@ final class Bubble implements ChatHub.Listener {
     private void startCountdown(int seconds) {
         countdownLength = seconds * 1000L;
         countdownEnd = SystemClock.elapsedRealtime() + countdownLength;
-        confirmLabel.setText(R.string.card_label_countdown);
+        setCardLabel(svc.getString(R.string.card_label_countdown));
         countdownRow.setVisibility(View.VISIBLE);
         root.removeCallbacks(countdownTick);
         countdownTick.run();
@@ -2143,7 +2181,7 @@ final class Bubble implements ChatHub.Listener {
     void stopCountdown() {
         if (countdownEnd == 0) return;
         endCountdown();
-        confirmLabel.setText(cardChat == null ? svc.getString(R.string.card_label_other_session, svc.getString(R.string.card_label_approval))
+        setCardLabel(cardChat == null ? svc.getString(R.string.card_label_other_session, svc.getString(R.string.card_label_approval))
                 : svc.getString(R.string.card_label_approval));
         if (cardChat != null) hub.note(cardChat, Kind.STEP, svc.getString(R.string.card_note_countdown_stopped));
         hub.changed();
@@ -2173,6 +2211,7 @@ final class Bubble implements ChatHub.Listener {
         refreshStatus();
         collapse();
         hub.changed();
+        showNext();
     }
 
     /**
@@ -2181,7 +2220,7 @@ final class Bubble implements ChatHub.Listener {
      * and opens when they tap it.
      */
     void askQuestion(String question, java.util.List<String> options, String chat, boolean handsOn, ConfirmCallback cb) {
-        showCard(question, options, chat, cb, !handsOn);
+        showCard(new Card(question, options, chat, cb, !handsOn, 0));
     }
 
     /** The waiting card has a step for the user to do on the screen first (see askQuestion). */
@@ -2195,15 +2234,21 @@ final class Bubble implements ChatHub.Listener {
         return pendingConfirm == null ? null : cardChat;
     }
 
-    private void showCard(String text, java.util.List<String> options, String chat, ConfirmCallback cb) {
-        showCard(text, options, chat, cb, true);
-    }
-
-    private void showCard(String text, java.util.List<String> options, String chat, ConfirmCallback cb, boolean open) {
-        if (pendingConfirm != null) pendingConfirm.onAnswer(false, null);
+    /** Shows the card, or queues it while another one waits for the user. */
+    private void showCard(Card card) {
+        if (pendingConfirm != null) {
+            queued.add(card);
+            paintCardLabel();
+            hub.changed();
+            return;
+        }
+        shownCard = card;
+        String text = card.text, chat = card.chat;
+        java.util.List<String> options = card.options;
+        boolean open = card.open;
         endCountdown();
         if (changing) endChange();
-        pendingConfirm = cb;
+        pendingConfirm = card.cb;
         handsOn = !open;
         cardChat = chat == null ? null : sessions.find(chat);
         if (cardChat != null && cardChat != sessions.current) { // show the chat that's asking
@@ -2213,7 +2258,7 @@ final class Bubble implements ChatHub.Listener {
         asking = options != null;
         askOptions = options;
         String label = svc.getString(asking ? R.string.card_label_question : R.string.card_label_approval);
-        confirmLabel.setText(cardChat == null ? svc.getString(R.string.card_label_other_session, label) : label);
+        setCardLabel(cardChat == null ? svc.getString(R.string.card_label_other_session, label) : label);
         confirmOptions.removeAllViews();
         if (asking) for (String o : options) confirmOptions.addView(optionButton(o, false, v -> answerOption(o)));
         layoutOptions();
@@ -2235,7 +2280,71 @@ final class Bubble implements ChatHub.Listener {
         else collapse(); // the screen stays free for the step; the pill asks
         // on the lock screen the card waits out of sight (a notification says so): approving needs the phone unlocked
         applyEnabled();
+        if (card.countdown > 0) startCountdown(card.countdown);
         hub.changed();
+    }
+
+    /** The card was answered or taken down: the next waiting one, if any, shows (a deleted chat's is denied). */
+    private void showNext() {
+        while (pendingConfirm == null && !queued.isEmpty()) {
+            Card next = queued.poll();
+            if (next.chat != null && sessions.find(next.chat) == null) next.cb.onAnswer(false, null);
+            else showCard(next);
+        }
+        paintCardLabel();
+    }
+
+    private void setCardLabel(String label) {
+        cardLabel = label;
+        paintCardLabel();
+    }
+
+    /** "Approval · 1 of 3" while more cards wait behind this one. */
+    private void paintCardLabel() {
+        confirmLabel.setText(queued.isEmpty() ? cardLabel
+                : svc.getString(R.string.card_label_queue, cardLabel, queued.size() + 1));
+    }
+
+    /** Every card waiting for the user, the shown one first: {chat id (null: another session), text, "ask" or ""}. */
+    java.util.List<String[]> openCards() {
+        java.util.List<String[]> out = new java.util.ArrayList<>();
+        if (pendingConfirm == null) return out;
+        if (shownCard != null) out.add(new String[]{shownCard.chat, shownCard.text, shownCard.options != null ? "ask" : ""});
+        for (Card c : queued) out.add(new String[]{c.chat, c.text, c.options != null ? "ask" : ""});
+        return out;
+    }
+
+    /** A card waits for the user in this chat (shown or queued). */
+    boolean waitingIn(Sessions.Session s) {
+        if (pendingConfirm == null || s == null) return false;
+        if (shownCard != null && s.id.equals(shownCard.chat)) return true;
+        for (Card c : queued) if (s.id.equals(c.chat)) return true;
+        return false;
+    }
+
+    /**
+     * The user opened this chat from "Waiting for you": its queued card shows now, and the shown one waits its turn
+     * again (not one with a countdown running or a change being typed: that stays).
+     */
+    void bringForward(String chat) {
+        if (pendingConfirm == null || shownCard == null || chat == null || chat.equals(shownCard.chat)
+                || countdownEnd != 0 || changing) return;
+        Card next = null;
+        for (Card c : queued) if (chat.equals(c.chat)) {
+            next = c;
+            break;
+        }
+        if (next == null) return;
+        queued.remove(next);
+        queued.addFirst(shownCard);
+        pendingConfirm = null;
+        confirmCard.setVisibility(View.GONE);
+        showCard(next);
+    }
+
+    /** How many cards wait for the user, the shown one included. */
+    int cardCount() {
+        return pendingConfirm == null ? 0 : queued.size() + 1;
     }
 
     /** An approval card is waiting for the user (the agent must not tap anything meanwhile). */
@@ -2248,13 +2357,21 @@ final class Bubble implements ChatHub.Listener {
         return expanded;
     }
 
-    void cancelConfirm() {
+    /** The agent stopped waiting for this card (timed out, stopped or stale): take it down, or out of the queue. */
+    void cancelConfirm(ConfirmCallback cb) {
+        if (pendingConfirm != cb) {
+            queued.removeIf(c -> c.cb == cb);
+            paintCardLabel();
+            hub.changed();
+            return;
+        }
         pendingConfirm = null;
         endCountdown();
         if (changing) endChange();
         confirmCard.setVisibility(View.GONE);
         refreshStatus();
         hub.changed();
+        showNext();
     }
 
     private Button optionButton(String label, boolean muted, View.OnClickListener onClick) {
@@ -2294,6 +2411,7 @@ final class Bubble implements ChatHub.Listener {
         refreshStatus();
         collapse();
         hub.changed();
+        showNext();
     }
 
     private void answerConfirm(boolean approved) {
@@ -2311,6 +2429,7 @@ final class Bubble implements ChatHub.Listener {
         refreshStatus();
         collapse();
         hub.changed();
+        showNext();
     }
 
     // ------------------------------------------------------ claude events

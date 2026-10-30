@@ -648,17 +648,46 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             ex.addView(upd, full());
             ex.addView(divider(), lineParams());
         }
-        // Play: rate it there; GitHub: the Play version exists (a separate install, signed by Google)
-        LinearLayout play = listRow(this);
-        play.setGravity(Gravity.CENTER_VERTICAL);
-        LinearLayout gp = column(this);
-        gp.addView(title(this, getString(Flavor.PLAY ? R.string.setup_play_rate : R.string.setup_play_get), 15));
-        gp.addView(text(this, getString(Flavor.PLAY ? R.string.setup_play_rate_info : R.string.setup_play_get_info), 13, MUTED), topGap(2));
-        play.addView(gp, weight1());
-        play.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
-        play.setOnClickListener(v -> openPlay());
-        ex.addView(play, full());
+        LinearLayout help = listRow(this);
+        help.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout hp = column(this);
+        hp.addView(title(this, getString(R.string.setup_help), 15));
+        hp.addView(text(this, getString(R.string.setup_help_info), 13, MUTED), topGap(2));
+        help.addView(hp, weight1());
+        help.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
+        help.setOnClickListener(v -> {
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(
+                        "https://github.com/ghorbelhamdi/buddy-android/blob/main/docs/GUIDE.md")));
+            } catch (Exception ignored) {
+            }
+        });
+        ex.addView(help, full());
         ex.addView(divider(), lineParams());
+        LinearLayout check = listRow(this);
+        check.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout ck = column(this);
+        ck.addView(title(this, getString(R.string.check_title), 15));
+        ck.addView(text(this, getString(R.string.check_info), 13, MUTED), topGap(2));
+        check.addView(ck, weight1());
+        check.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
+        check.setOnClickListener(v -> startActivity(new Intent(this, CheckActivity.class)));
+        ex.addView(check, full());
+        ex.addView(divider(), lineParams());
+        // the Play version (closed testing): rate it there; the GitHub version no longer points to Play, which turned
+        // Buddy down for production
+        if (Flavor.PLAY) {
+            LinearLayout play = listRow(this);
+            play.setGravity(Gravity.CENTER_VERTICAL);
+            LinearLayout gp = column(this);
+            gp.addView(title(this, getString(R.string.setup_play_rate), 15));
+            gp.addView(text(this, getString(R.string.setup_play_rate_info), 13, MUTED), topGap(2));
+            play.addView(gp, weight1());
+            play.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
+            play.setOnClickListener(v -> openPlay());
+            ex.addView(play, full());
+            ex.addView(divider(), lineParams());
+        }
         LinearLayout rules = listRow(this);
         rules.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout rt = column(this);
@@ -1175,6 +1204,8 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         t.setPaddingRelative(dp(this, 12), 0, dp(this, 8), 0);
         t.addView(title(this, a.name(), 15));
         t.addView(single(monoText(this, state, 12, "SIGNED_IN".equals(st) && !busy ? OK : MUTED)));
+        String usage = "SIGNED_IN".equals(st) ? Usage.line(this, agent) : null;
+        if (usage != null) t.addView(monoText(this, usage, 12, MUTED));
         r.addView(t, weight1());
         r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
         r.setOnClickListener(v -> openAgent(agent));

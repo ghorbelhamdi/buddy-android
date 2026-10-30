@@ -13,7 +13,7 @@
 #   buddy-run <token> transcript <claude|codex> <file>   last messages of a session (buddy_transcript)
 #   buddy-run <token> adopt <session> <claude|codex> <agent-session-id>  continue that session as a Buddy chat
 # Every event sent to the bubble carries "buddy_session" so the app can route it.
-HELPER_VERSION=16
+HELPER_VERSION=18
 set -u
 export PATH=$HOME/.local/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # The claude launcher sets BUN_OPTIONS with a path relative to its folder; never inherit a stale one.
@@ -269,7 +269,7 @@ run_claude() {
   local mcp tools
   mcp=$(jq -cn --arg url "$URL/mcp?chat=$SID" --arg auth "Bearer $TOKEN" \
     '{mcpServers:{phone:{type:"http",url:$url,headers:{Authorization:$auth},timeout:600000}}}')
-  tools=("mcp__phone" "WebSearch" "WebFetch" "Read(/$S/files/**)")
+  tools=("mcp__phone" "WebSearch" "WebFetch" "Read(/$S/files/**)" "Read(/$D/GUIDE.md)")
   [ "$DEV" = rule ] && tools=("mcp__phone")
   local deny=()
   [ "$DEV" = rule ] && deny=(--disallowedTools "Bash" "WebFetch" "WebSearch" "Write" "Edit" "NotebookEdit" "Skill")
@@ -333,6 +333,13 @@ stream_codex() {
       log=$(find "$HOME/.codex/sessions" -name "rollout-*$(cat "$S/codex-thread").jsonl" 2>/dev/null | head -1)
       model=$([ -n "$log" ] && grep '"turn_context"' "$log" | tail -1 | jq -r '.payload.model // empty' 2>/dev/null)
       [ -n "$model" ] && jq -cn --arg m "$model" --arg s "$SID" '{type:"system", subtype:"model", model:$m, buddy_session:$s}' | post
+      # the plan's 5-hour and weekly limits, from the log's last token_count, passed on as Claude Code reports them
+      [ -n "$log" ] && grep '"rate_limits"' "$log" | tail -1 | jq -c --arg s "$SID" '.payload.rate_limits // empty
+        | [.primary, .secondary] | map(select(. != null and .window_minutes != null)
+            | {key:(if .window_minutes <= 300 then "five_hour" else "seven_day" end),
+               value:{utilization:((.used_percent // 0) / 100), resetsAt:(.resets_at // 0)}})
+        | select(length > 0)
+        | {type:"rate_limit_event", rate_limit_info:{unifiedWindows:from_entries}, buddy_session:$s}' 2>/dev/null | post
     fi
     printf '%s' "$line" | jq -c --arg s "$SID" '
       (if .type == "item.started" and .item.type == "mcp_tool_call" then
@@ -729,6 +736,14 @@ stream_grok() {
       else empty end) | . + {buddy_session:$s}' 2>/dev/null | while IFS= read -r ev; do printf '%s' "$ev" | post; done
   done
 }
+
+# Tests (linux/test/run.sh): translate an agent's recorded output from stdin with its stream_ function and print the
+# events instead of posting them.
+if [ -n "${BUDDY_TEST_STREAM:-}" ]; then
+  post() { cat; echo; }
+  "stream_$BUDDY_TEST_STREAM"
+  exit 0
+fi
 
 # ------------------------------------------------------------------------ run
 (

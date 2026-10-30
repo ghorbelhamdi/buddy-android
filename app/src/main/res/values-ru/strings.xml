@@ -172,6 +172,8 @@
     <string name="main_empty_text">Нажмите «Новый чат», чтобы начать чат с Claude Code, Codex, OpenCode, Antigravity или Grok. Чтобы удалить чат, нажмите на него и удерживайте.</string>
     <!-- Status of a chat with a running task, until the agent reports what it's doing. Small lowercase mono text. -->
     <string name="main_chat_working">работает…</string>
+    <string name="main_chat_waiting">ждёт вас…</string>
+    <string name="main_card_other_session">Другой сеанс</string>
     <!-- Preview of a chat's last message when the user wrote it. %1$s = the message. -->
     <string name="main_chat_last_you">Вы: %1$s</string>
     <string name="main_delete_title">Удалить этот чат?</string>
@@ -408,6 +410,7 @@
     <!-- The card's label when the request comes from an agent session outside Buddy's chats (e.g. a terminal).
          %1$s: card_label_approval or card_label_question. All caps. -->
     <string name="card_label_other_session">%1$s · ИЗ ДРУГОГО СЕАНСА</string>
+    <string name="card_label_queue">%1$s · 1 ИЗ %2$d</string>
     <!-- Buttons side by side at the bottom of the card: keep them short. -->
     <string name="card_deny">Отклонить</string>
     <!-- Verb: the user says what the agent should change instead of approving. -->
@@ -656,6 +659,7 @@
     <string name="hub_something_wrong">Что-то пошло не так.</string>
     <!-- After the user adds something while the agent works. %1$s = agent name. -->
     <string name="hub_note_added">Добавлено во время работы: %1$s получит это на следующем шаге</string>
+    <string name="hub_note_not_sent">Вы остановили задачу, поэтому заметка не отправлена: она снова в поле сообщения</string>
     <!-- The agent received what the user added while it worked. -->
     <string name="hub_note_passed">Ваше дополнение передано</string>
     <!-- The bubble's status pill when several chats work at once. %1$d = number of chats (always 2 or more),
@@ -959,6 +963,11 @@
     <string name="account_check_failed">Не удалось проверить %1$s: %2$s</string>
     <!-- Error. %1$s = technical detail in English. -->
     <string name="account_install_failed">Ошибка установки: %1$s</string>
+    <string name="account_install_no_space">На телефоне недостаточно свободного места. Освободите около 1 ГБ и попробуйте снова.</string>
+    <string name="account_install_network">Buddy не смог связаться с сервером загрузки. Проверьте Wi-Fi или мобильные данные (или VPN либо частный DNS, который его блокирует) и попробуйте снова.</string>
+    <string name="account_install_refused">Сервер загрузки отклонил запрос или попросил подождать. Попробуйте снова через несколько минут.</string>
+    <string name="account_install_space_needed">Свободно только %1$s. Для установки агента нужно около 1 ГБ: освободите место и попробуйте снова.</string>
+    <string name="signin_details">Подробности</string>
     <!-- Update progress and result. %1$s = agent name: checking for a newer version of it. -->
     <string name="account_update_checking">Поиск новой версии %1$s…</string>
     <!-- %1$s = version number. -->
@@ -1704,4 +1713,55 @@
     <string name="setup_play_rate_info">Отзыв помогает другим найти Buddy.</string>
     <string name="setup_play_get">Buddy в Google Play</string>
     <string name="setup_play_get_info">Обновления приходят через Play, но эта версия не устанавливает APK. Это отдельная установка: сначала удалите эту версию.</string>
+    <string name="share_label">Спросить Buddy</string>
+    <string name="share_title">Поделиться с Buddy</string>
+    <string name="share_new_chat">Новый чат с %1$s</string>
+    <string name="usage_five">5 часов %1$d%% · сброс %2$s</string>
+    <string name="usage_week">неделя %1$d%% · сброс %2$s</string>
+    <string name="usage_five_short">5 ч %1$d%%</string>
+    <string name="usage_week_short">неделя %1$d%%</string>
+    <string name="usage_warn_five">Использовано %1$d%% пятичасового лимита вашего плана. Сброс в %2$s.</string>
+    <string name="usage_warn_week">Использовано %1$d%% недельного лимита вашего плана. Сброс %2$s.</string>
+    <string name="check_title">Проверить Buddy</string>
+    <string name="check_info">Сейчас проверит каждую часть Buddy и подскажет, как исправить проблемы</string>
+    <string name="check_running">Проверка…</string>
+    <string name="check_all_ok">Всё работает</string>
+    <string name="check_a11y">Служба специальных возможностей</string>
+    <string name="check_a11y_bad">Не запущена, поэтому Buddy не видит экран и не может им пользоваться. Включите Buddy в настройках специальных возможностей.</string>
+    <string name="check_notifications">Доступ к уведомлениям</string>
+    <string name="check_notifications_bad">Он нужен вашим правилам уведомлений, а сейчас выключен.</string>
+    <string name="check_battery">Оптимизация батареи</string>
+    <string name="check_battery_bad">Включена для Buddy: Android может остановить его в фоне, и задачи по расписанию могут не запуститься.</string>
+    <string name="check_linux">Linux в Buddy</string>
+    <string name="check_linux_ok">Запускается за %1$.1f с</string>
+    <string name="check_linux_bad">Не запускается: %1$s</string>
+    <string name="check_linux_missing">Ещё не установлен. Настройте его в настройках.</string>
+    <string name="check_helper">Помощник Buddy</string>
+    <string name="check_helper_bad">В Linux более старая копия, чем в этой версии Buddy.</string>
+    <string name="check_server">Сервер инструментов телефона</string>
+    <string name="check_server_bad">Не отвечает на 127.0.0.1:%1$d. Выключите и снова включите Buddy в настройках специальных возможностей.</string>
+    <string name="check_agent_version">Версия %1$s</string>
+    <string name="check_network">Интернет</string>
+    <string name="check_network_bad">Не удаётся найти %1$s. Проверьте Wi-Fi или мобильные данные, а также VPN или частный DNS, который может это блокировать.</string>
+    <string name="check_space">Свободное место</string>
+    <string name="check_space_ok">Свободно %1$s</string>
+    <string name="check_space_bad">Свободно только %1$s. Для установки или обновления агента нужно около 1 ГБ.</string>
+    <string name="check_fix">Исправить</string>
+    <string name="check_open_settings">Открыть настройки</string>
+    <string name="check_copy">Копировать отчёт</string>
+    <string name="check_copied">Отчёт скопирован</string>
+    <string name="check_report">Сообщить об ошибке на GitHub</string>
+    <string name="check_report_title">Что уйдёт на GitHub</string>
+    <string name="check_report_text">Откроется новый issue на GitHub с этими данными. Ничего не отправится, пока вы не отправите его там, и его можно сначала изменить. Чаты, текст с экрана и уведомления никогда не включаются.</string>
+    <string name="check_report_open">Открыть GitHub</string>
+    <plurals name="check_failed">
+        <item quantity="one">%1$d проверка не прошла</item>
+        <item quantity="few">%1$d проверки не прошли</item>
+        <item quantity="many">%1$d проверок не прошли</item>
+        <item quantity="other">%1$d проверки не прошли</item>
+    </plurals>
+    <string name="tools_step_cap">Остановлено после %1$d действий подряд, чтобы вышедшая из-под контроля задача не израсходовала ваш план. Скажите продолжить, если нужно.</string>
+    <string name="tools_step_loop">Остановлено: одно и то же действие %1$d раз подряд похоже на зацикливание.</string>
+    <string name="setup_help">Справка</string>
+    <string name="setup_help_info">Руководство по Buddy на GitHub. Можно также спросить любого агента, как работает Buddy.</string>
 </resources>

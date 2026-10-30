@@ -1,0 +1,2 @@
+{"buddy_session":"fixture","model":"no-such-model-xyz","session_id":"01a18bc6-0324-7ea1-98ad-056f99657382","subtype":"init","type":"system"}
+{"buddy_session":"fixture","is_error":true,"result":"Grok: Couldn't set model 'no-such-model-xyz': Invalid params: \"unknown model id\". Run 'grok models' to see available models.","subtype":"error_during_execution","type":"result"}

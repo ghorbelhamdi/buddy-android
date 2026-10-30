@@ -170,6 +170,8 @@ public class SignInActivity extends Screen implements Account.Listener {
                         ? getString(R.string.signin_agent_ready, acc.name()) : acc.email)
                         + (acc.plan.isEmpty() ? "" : " · " + acc.planLabel()), true);
                 versionNote();
+                String usage = Usage.line(this, acc.agent);
+                if (usage != null) note(usage);
                 primary(getString(R.string.signin_done), v -> finish());
                 updateButton();
                 secondary(getString(R.string.signin_sign_out), v -> confirmSheet(this, getString(R.string.signin_sign_out_title, acc.name()),
@@ -183,6 +185,17 @@ public class SignInActivity extends Screen implements Account.Listener {
                     acc.refresh(this);
                     render();
                 });
+                if (!acc.errorDetail.isEmpty()) { // what the installer itself said, for a bug report
+                    final String raw = acc.errorDetail;
+                    secondary(getString(R.string.signin_details), v -> {
+                        v.setVisibility(View.GONE);
+                        TextView t = monoText(this, raw, 12, MUTED);
+                        t.setTextIsSelectable(true);
+                        LinearLayout.LayoutParams p = full();
+                        p.topMargin = dp(this, 14);
+                        body.addView(t, p);
+                    });
+                }
                 break;
         }
     }

@@ -75,6 +75,8 @@ final class Account {
     /** Updating rather than installing (same INSTALLING step), and what the last update did, for the screen. */
     volatile boolean updating;
     volatile String updateNote = "";
+    /** A failed install's own output, behind Details when detail says it in plain words ("" otherwise). */
+    volatile String errorDetail = "";
 
     private static final Handler main = new Handler(Looper.getMainLooper());
     private static volatile Context app;
@@ -315,6 +317,14 @@ final class Account {
         app = c.getApplicationContext();
         if (busy()) return;
         final Context app = c.getApplicationContext();
+        errorDetail = "";
+        // an agent, node and Alpine's packages take a few hundred MB: ask for about 1 GB before starting
+        long free = new android.os.StatFs(app.getFilesDir().getPath()).getAvailableBytes();
+        if (free < 1024L * 1024 * 1024) {
+            set(Step.ERROR, app.getString(R.string.account_install_space_needed,
+                    android.text.format.Formatter.formatShortFileSize(app, free)));
+            return;
+        }
         set(Step.INSTALLING, app.getString(R.string.account_setting_up_linux));
         new Thread(() -> {
             try {
@@ -360,7 +370,9 @@ final class Account {
                 set(Step.SIGNED_OUT, "");
                 refresh(app);
             } catch (Exception e) {
-                set(Step.ERROR, app.getString(R.string.account_install_failed, e.getMessage()));
+                String raw = String.valueOf(e.getMessage()), plain = plainError(app, raw);
+                errorDetail = plain == null ? "" : raw;
+                set(Step.ERROR, plain != null ? plain : app.getString(R.string.account_install_failed, raw));
             }
         }).start();
     }
@@ -626,6 +638,19 @@ final class Account {
 
     private static String stripAnsi(String s) {
         return s.replaceAll("\u001B\\[[0-9;?]*[ -/]*[@-~]", "").replaceAll("\u001B\\][^\u0007]*\u0007", "");
+    }
+
+    /** The common ways an install fails, in plain words (null: none of them; the raw output is shown instead). */
+    private static String plainError(Context c, String out) {
+        if (out.contains("No space left")) return c.getString(R.string.account_install_no_space);
+        if (out.matches("(?s).*(Could not resolve host|curl: \\((6|7|28)\\)|ENOTFOUND|ETIMEDOUT|EAI_AGAIN|ECONNRESET"
+                + "|Network is unreachable|temporary error \\(try again later\\)).*")) {
+            return c.getString(R.string.account_install_network);
+        }
+        if (out.matches("(?s).*(error: 403|error: 429|\\b403 Forbidden|\\b429 Too Many|E403|E429).*")) {
+            return c.getString(R.string.account_install_refused);
+        }
+        return null;
     }
 
     private static String tail(String s) {

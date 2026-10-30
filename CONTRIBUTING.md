@@ -6,7 +6,7 @@ Thanks for helping. Bug reports, ideas and pull requests are all welcome.
 
 Open an [issue](https://github.com/ghorbelhamdi/buddy-android/issues/new/choose) with the bug form. The most useful details are your phone and Android version, the agent and model (Claude Code, Codex, OpenCode, Antigravity or Grok), what you asked, and what happened instead. A screenshot of the chat (open its "N tool calls" line) usually shows where it went wrong.
 
-Found a way for an agent to act without your approval, or to approve for you? Please don't post it publicly: use [private vulnerability reporting](https://github.com/ghorbelhamdi/buddy-android/security/advisories/new).
+Found a way for an agent to act without your approval, or to approve for you? Please don't post it publicly: see [SECURITY.md](SECURITY.md).
 
 ## Before you write code
 
@@ -17,6 +17,8 @@ Found a way for an agent to act without your approval, or to approve for you? Pl
 ## Building
 
 See [For developers](README.md#for-developers) in the README: `./gradlew assembleRelease`, or `./build.sh` right on the phone in Termux.
+
+Changing how `linux/buddy-run` reads an agent's output? Run `bash linux/test/run.sh`: it feeds recorded runs of each agent (`linux/test/fixtures`) through the helper and compares the events. CI runs it too.
 
 There are two flavors: `github` (the full app) and `play` (without self-updates and developer mode, as Google Play requires). Build the `github` one unless your change is about Play.
 

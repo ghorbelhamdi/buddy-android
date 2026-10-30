@@ -53,12 +53,20 @@ To set up an agent, Buddy downloads a small Linux system from Alpine Linux (dl-c
 
 ## Permissions
 
-- **Accessibility:** described above.
-- **Microphone:** only when you tap the mic.
-- **Notifications:** for task status and approvals.
-- **Notification access:** only for notification rules, described above.
-- **Keep awake (wake lock):** while a notification rule's task runs, so it can finish with the screen off.
-- **Internet:** to reach the AI service you chose and the downloads above.
+Every permission Buddy asks for, why, and what happens without it:
+
+- **Accessibility service:** described above. Buddy's core: without it, agents can't see or use the screen.
+- **Microphone (`RECORD_AUDIO`):** only when you tap the mic or start live voice. Without it, you type instead.
+- **Audio settings (`MODIFY_AUDIO_SETTINGS`):** voice input and live voice record through Android's WebView (WebRTC), which needs it to set up the microphone. Buddy doesn't change your volume or sound settings.
+- **Notifications (`POST_NOTIFICATIONS`, `POST_PROMOTED_NOTIFICATIONS`):** task status, approvals while the phone is locked, and on Android 16 the "Buddy is using your phone" chip in the status bar. Without them, you only see these in the app and the bubble.
+- **Vibration (`VIBRATE`):** a short buzz when an approval card or a reply arrives.
+- **Notification access:** only for notification rules, described above. Without it, rules don't run.
+- **Keep awake (`WAKE_LOCK`):** while a notification rule's or a scheduled task's run works, so it can finish with the screen off.
+- **Battery optimization exemption (`REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`):** lets the setup screen ask Android not to stop Buddy in the background. If you say no, Android may stop it, and rules or scheduled tasks may run late or not at all.
+- **Exact alarms and start at boot (`SCHEDULE_EXACT_ALARM`, `RECEIVE_BOOT_COMPLETED`):** scheduled tasks run on time, and are set again after a restart. Without exact alarms they run a few minutes late.
+- **Install apps (`REQUEST_INSTALL_PACKAGES`, GitHub version only):** installing a Buddy update when you tap Update, and an app an agent built when you ask it to. Android's installer asks you each time. Without it, you install those yourself.
+- **Internet and network state (`INTERNET`, `ACCESS_NETWORK_STATE`):** to reach the AI service you chose and the downloads above.
+- **Seeing installed apps (`<queries>` for launchable apps):** so agents can open apps by name. Buddy doesn't send the list anywhere except to the AI you chose, when an agent asks for it.
 
 ## Children
 

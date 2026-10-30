@@ -1,0 +1,7 @@
+{"type":"thread.started","thread_id":"01a18bbf-d926-7a50-b51e-f9e6d94b1d7c"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"I’ll wait one second."}}
+{"type":"item.started","item":{"id":"item_1","type":"mcp_tool_call","server":"phone","tool":"wait","arguments":{"ms":1000},"result":null,"error":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_1","type":"mcp_tool_call","server":"phone","tool":"wait","arguments":{"ms":1000},"result":{"content":[{"type":"text","text":"Waited 1000 ms."}],"structured_content":null},"error":null,"status":"completed"}}
+{"type":"item.completed","item":{"id":"item_2","type":"agent_message","text":"done"}}
+{"type":"turn.completed","usage":{"input_tokens":49796,"cached_input_tokens":44928,"cache_write_input_tokens":0,"output_tokens":80,"reasoning_output_tokens":0}}

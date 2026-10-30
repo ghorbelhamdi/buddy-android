@@ -201,12 +201,21 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
             list.addView(wb, wp);
         }
 
+        // approvals and questions waiting in the bubble, one row each: a tap opens the chat with its card
+        Bubble bubble = BuddyService.get() == null ? null : BuddyService.get().bubble();
+        List<String[]> cards = bubble == null ? new ArrayList<>() : bubble.openCards();
+        if (!cards.isEmpty()) {
+            list.addView(sectionHeader(getString(R.string.waiting_title), cards.size()));
+            for (String[] c : cards) list.addView(cardRow(c, bubble), full());
+        }
+
         List<Sessions.Session> working = new ArrayList<>(), recent = new ArrayList<>();
         for (Sessions.Session ses : hub.sessions.all) {
             if (ses.running) working.add(ses);
             else if (!ses.messages.isEmpty()) recent.add(ses); // hide untouched new chats
         }
         java.util.Collections.sort(recent, (a, b) -> Long.compare(b.updated, a.updated));
+        if (bubble != null) java.util.Collections.sort(working, (a, b) -> Boolean.compare(bubble.waitingIn(b), bubble.waitingIn(a)));
         if (!working.isEmpty()) {
             list.addView(sectionHeader(getString(R.string.main_section_working), working.size()));
             for (Sessions.Session s : working) list.addView(chatRow(s), full());
@@ -242,6 +251,27 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         return r;
     }
 
+    /** A card waiting in the bubble ({chat id, text, "ask" or ""}, see Bubble.openCards). */
+    private View cardRow(String[] card, Bubble bubble) {
+        Sessions.Session ses = card[0] == null ? null : hub.sessions.find(card[0]);
+        LinearLayout r = listRow(this);
+        r.addView(icon(this, "ask".equals(card[2]) ? R.drawable.ms_chat_bubble : R.drawable.ms_shield_person, ACCENT, 24));
+        LinearLayout col = column(this);
+        col.setPaddingRelative(dp(this, 14), 0, 0, 0);
+        col.addView(single(title(this, ses != null ? ses.label() : getString(R.string.main_card_other_session), 15)));
+        TextView t = text(this, card[1].replace('\n', ' '), 14, MUTED);
+        t.setMaxLines(2);
+        t.setEllipsize(TextUtils.TruncateAt.END);
+        col.addView(t);
+        r.addView(col, weight1());
+        r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
+        r.setOnClickListener(v -> {
+            bubble.bringForward(card[0]);
+            if (ses != null) open(ses);
+        });
+        return r;
+    }
+
     private View chatRow(final Sessions.Session ses) {
         LinearLayout r = listRow(this);
         r.addView(agentTile(this, ses.backend));
@@ -271,8 +301,9 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         col.addView(single(monoText(this, agent + " · " + Models.shownModel(ses).toLowerCase(Ui.locale(this)),
                 12, MUTED)));
         if (ses.running) {
-            TextView s = single(monoText(this, ses.status.isEmpty() ? getString(R.string.main_chat_working) : ses.status,
-                    12, ACCENT_TEXT));
+            Bubble b = BuddyService.get() == null ? null : BuddyService.get().bubble();
+            TextView s = single(monoText(this, b != null && b.waitingIn(ses) ? getString(R.string.main_chat_waiting)
+                    : ses.status.isEmpty() ? getString(R.string.main_chat_working) : ses.status, 12, ACCENT_TEXT));
             s.setPaddingRelative(0, dp(this, 4), 0, dp(this, 6));
             col.addView(s);
             col.addView(thinBar(this));

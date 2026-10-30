@@ -172,6 +172,8 @@
     <string name="main_empty_text">Ketuk Chat baru untuk memulai chat dengan Claude Code, Codex, OpenCode, Antigravity, atau Grok. Tekan lama chat untuk menghapusnya.</string>
     <!-- Status of a chat with a running task, until the agent reports what it's doing. Small lowercase mono text. -->
     <string name="main_chat_working">bekerja…</string>
+    <string name="main_chat_waiting">menunggumu…</string>
+    <string name="main_card_other_session">Sesi lain</string>
     <!-- Preview of a chat's last message when the user wrote it. %1$s = the message. -->
     <string name="main_chat_last_you">Anda: %1$s</string>
     <string name="main_delete_title">Hapus chat ini?</string>
@@ -396,6 +398,7 @@
     <!-- The card's label when the request comes from an agent session outside Buddy's chats (e.g. a terminal).
          %1$s: card_label_approval or card_label_question. All caps. -->
     <string name="card_label_other_session">%1$s · DARI SESI LAIN</string>
+    <string name="card_label_queue">%1$s · 1 DARI %2$d</string>
     <!-- Buttons side by side at the bottom of the card: keep them short. -->
     <string name="card_deny">Tolak</string>
     <!-- Verb: the user says what the agent should change instead of approving. -->
@@ -638,6 +641,7 @@
     <string name="hub_something_wrong">Terjadi masalah.</string>
     <!-- After the user adds something while the agent works. %1$s = agent name. -->
     <string name="hub_note_added">Ditambahkan saat bekerja: %1$s akan menerimanya di langkah berikutnya</string>
+    <string name="hub_note_not_sent">Kamu menghentikannya, jadi catatanmu tidak dikirim: catatan itu kembali di kotak pesan</string>
     <!-- The agent received what the user added while it worked. -->
     <string name="hub_note_passed">Tambahan Anda sudah diteruskan</string>
     <!-- The bubble's status pill when several chats work at once. %1$d = number of chats (always 2 or more),
@@ -935,6 +939,11 @@
     <string name="account_check_failed">Tidak dapat memeriksa %1$s: %2$s</string>
     <!-- Error. %1$s = technical detail in English. -->
     <string name="account_install_failed">Instalasi gagal: %1$s</string>
+    <string name="account_install_no_space">Ruang kosong di ponsel tidak cukup. Kosongkan sekitar 1 GB lalu coba lagi.</string>
+    <string name="account_install_network">Buddy tidak bisa menjangkau server unduhan. Periksa Wi-Fi atau data seluler (atau VPN maupun DNS pribadi yang memblokirnya) lalu coba lagi.</string>
+    <string name="account_install_refused">Server unduhan menolak permintaan atau meminta untuk melambat. Coba lagi beberapa menit lagi.</string>
+    <string name="account_install_space_needed">Hanya %1$s kosong. Memasang agen butuh sekitar 1 GB: kosongkan ruang lalu coba lagi.</string>
+    <string name="signin_details">Detail</string>
     <!-- Update progress and result. %1$s = agent name: checking for a newer version of it. -->
     <string name="account_update_checking">Memeriksa versi baru %1$s…</string>
     <!-- %1$s = version number. -->
@@ -1669,4 +1678,52 @@
     <string name="setup_play_rate_info">Ulasan membantu orang lain menemukan Buddy.</string>
     <string name="setup_play_get">Buddy di Google Play</string>
     <string name="setup_play_get_info">Pembaruan datang lewat Play, tetapi versi itu tidak memasang APK. Itu pemasangan terpisah: copot dulu versi ini.</string>
+    <string name="share_label">Tanya Buddy</string>
+    <string name="share_title">Bagikan ke Buddy</string>
+    <string name="share_new_chat">Chat baru dengan %1$s</string>
+    <string name="usage_five">5 jam %1$d%% · reset %2$s</string>
+    <string name="usage_week">mingguan %1$d%% · reset %2$s</string>
+    <string name="usage_five_short">5 jam %1$d%%</string>
+    <string name="usage_week_short">minggu %1$d%%</string>
+    <string name="usage_warn_five">Kamu sudah memakai %1$d%% batas 5 jam paketmu. Batas direset pukul %2$s.</string>
+    <string name="usage_warn_week">Kamu sudah memakai %1$d%% batas mingguan paketmu. Batas direset %2$s.</string>
+    <string name="check_title">Periksa Buddy</string>
+    <string name="check_info">Menguji setiap bagian Buddy sekarang dan memberi tahu cara memperbaiki yang bermasalah</string>
+    <string name="check_running">Memeriksa…</string>
+    <string name="check_all_ok">Semua berfungsi</string>
+    <string name="check_a11y">Layanan aksesibilitas</string>
+    <string name="check_a11y_bad">Tidak berjalan, jadi Buddy tidak bisa melihat atau memakai layar. Aktifkan Buddy di setelan aksesibilitas.</string>
+    <string name="check_notifications">Akses notifikasi</string>
+    <string name="check_notifications_bad">Aturan notifikasimu membutuhkannya, dan saat ini mati.</string>
+    <string name="check_battery">Optimasi baterai</string>
+    <string name="check_battery_bad">Aktif untuk Buddy: Android bisa menghentikannya di latar belakang, dan tugas terjadwal mungkin tidak berjalan.</string>
+    <string name="check_linux">Linux Buddy</string>
+    <string name="check_linux_ok">Mulai dalam %1$.1f dtk</string>
+    <string name="check_linux_bad">Tidak bisa mulai: %1$s</string>
+    <string name="check_linux_missing">Belum dipasang. Siapkan di Setelan.</string>
+    <string name="check_helper">Pembantu Buddy</string>
+    <string name="check_helper_bad">Linux punya salinan yang lebih lama dari versi Buddy ini.</string>
+    <string name="check_server">Server alat ponsel</string>
+    <string name="check_server_bad">Tidak menjawab di 127.0.0.1:%1$d. Matikan lalu nyalakan lagi Buddy di setelan aksesibilitas.</string>
+    <string name="check_agent_version">Versi %1$s</string>
+    <string name="check_network">Internet</string>
+    <string name="check_network_bad">Tidak dapat menemukan %1$s. Periksa Wi-Fi atau data seluler, atau VPN maupun DNS pribadi yang memblokirnya.</string>
+    <string name="check_space">Ruang kosong</string>
+    <string name="check_space_ok">%1$s kosong</string>
+    <string name="check_space_bad">Hanya %1$s kosong. Memasang atau memperbarui agen butuh sekitar 1 GB.</string>
+    <string name="check_fix">Perbaiki</string>
+    <string name="check_open_settings">Buka setelan</string>
+    <string name="check_copy">Salin laporan</string>
+    <string name="check_copied">Laporan disalin</string>
+    <string name="check_report">Laporkan bug di GitHub</string>
+    <string name="check_report_title">Yang dikirim ke GitHub</string>
+    <string name="check_report_text">Ini membuka issue GitHub baru dengan detail ini sudah terisi. Tidak ada yang terkirim sampai kamu mengirimnya di sana, dan kamu bisa mengeditnya dulu. Chat, teks layar, dan notifikasi tidak pernah disertakan.</string>
+    <string name="check_report_open">Buka GitHub</string>
+    <plurals name="check_failed">
+        <item quantity="other">%1$d pemeriksaan gagal</item>
+    </plurals>
+    <string name="tools_step_cap">Dihentikan setelah %1$d tindakan berturut-turut, agar tugas yang lepas kendali tidak menghabiskan paketmu. Suruh lanjut jika perlu.</string>
+    <string name="tools_step_loop">Dihentikan: melakukan hal yang sama %1$d kali berturut-turut, sepertinya berulang terus.</string>
+    <string name="setup_help">Bantuan</string>
+    <string name="setup_help_info">Panduan Buddy di GitHub. Kamu juga bisa bertanya ke agen mana pun cara kerja Buddy.</string>
 </resources>

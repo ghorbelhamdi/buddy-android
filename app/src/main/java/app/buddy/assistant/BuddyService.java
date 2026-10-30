@@ -444,6 +444,8 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             if (!"confirm".equals(tool) && !"ask".equals(tool) && !"notify".equals(tool) && !"reply_notification".equals(tool)
                     && !"point_out".equals(tool) && !"wait".equals(tool) && !"list_apps".equals(tool)
                     && !Tools.SCHEDULING.contains(tool)
+                    // installing: Android's installer asks the user, the agent doesn't touch the screen
+                    && !"update_buddy".equals(tool) && !"install_apk".equals(tool) && !"wait_for_install".equals(tool)
                     && !tool.startsWith("browser_")) { // the background browser isn't the phone
                 control.onActivity();
             }
@@ -543,12 +545,22 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
      */
     void onScreenTouched() {
         if (bubble == null || paused || bubble.expanded()) return; // the keyboard over Buddy's panel, say
-        if (bubble.confirming() || marks.waiting()) { // the agent waits on them: the touch is them doing their part
+        // the agent waits on them (a card, marks, Android's installer): the touch is them doing their part
+        if (bubble.confirming() || marks.waiting() || installWaits > 0 || installerInFront()) {
             cardTouches++;
             return;
         }
         if (getPackageName().equals(foregroundPkg()) || onlyRuleRuns()) return;
         autoPause(R.string.service_autopaused_touch);
+    }
+
+    /** Agents waiting for the user to confirm an install (wait_for_install, update_buddy): touches are theirs. */
+    volatile int installWaits;
+
+    /** Android's package installer is in front (its Install/Update dialog). */
+    private boolean installerInFront() {
+        String pkg = foregroundPkg();
+        return pkg != null && pkg.contains("packageinstaller");
     }
 
     /** Only notification rules' runs are working: they start on their own, often while the user is on the phone. */
@@ -790,7 +802,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         final AtomicReference<String> change = new AtomicReference<>();
         final java.util.concurrent.atomic.AtomicBoolean auto = new java.util.concurrent.atomic.AtomicBoolean();
         final int touches = cardTouches;
-        main.post(() -> bubble.askConfirm(text, chat, countdown, new Bubble.ConfirmCallback() {
+        final Bubble.ConfirmCallback cb = new Bubble.ConfirmCallback() {
             @Override
             public void onAnswer(boolean approved, String wanted) {
                 answer.set(approved);
@@ -803,7 +815,8 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
                 auto.set(true);
                 onAnswer(true, null);
             }
-        }));
+        };
+        main.post(() -> bubble.askConfirm(text, chat, countdown, cb));
         Triggers.approvalShown(this, chat, text, countdown);
         String ended = null;
         try {
@@ -818,7 +831,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         }
         if (cardTouches != touches) rereadNeeded = true; // they used the screen meanwhile: ids may be stale
         if (ended != null) {
-            main.post(() -> bubble.cancelConfirm());
+            main.post(() -> bubble.cancelConfirm(cb));
             return ended;
         }
         if (auto.get()) return AUTO_APPROVED;
@@ -850,11 +863,12 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
                     + "them. Don't guess; say in your last reply what you need to know.";
         }
         final int touches = cardTouches;
-        main.post(() -> bubble.askQuestion(question, options, chat, handsOn, (fromButton, text) -> {
+        final Bubble.ConfirmCallback cb = (fromButton, text) -> {
             picked.set(fromButton);
             answer.set(text);
             done.countDown();
-        }));
+        };
+        main.post(() -> bubble.askQuestion(question, options, chat, handsOn, cb));
         Triggers.approvalShown(this, chat, question, 0);
         boolean answered;
         try {
@@ -865,7 +879,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         boolean usedScreen = handsOn || cardTouches != touches;
         if (usedScreen) rereadNeeded = true;
         if (!answered) {
-            main.post(() -> bubble.cancelConfirm());
+            main.post(() -> bubble.cancelConfirm(cb));
             String step = stepDone == null ? null : stepDone.get();
             if (step != null) {
                 return step + " Buddy saw it and closed the question for them. Call read_screen before going on.";

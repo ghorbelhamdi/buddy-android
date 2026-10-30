@@ -26,6 +26,7 @@ final class Helper {
             {"linux/asound-cards", "/etc/buddy/asound-cards", "644"},
             {"linux/arecord", "/usr/local/bin/rec", "755"}, // SoX's recorder, same arguments that matter (-r, -c)
             {"linux/system-prompt.md", "/root/.buddy/system-prompt.md", "600"},
+            {"linux/GUIDE.md", "/root/.buddy/GUIDE.md", "644"}, // Buddy's user guide, for questions about Buddy itself
             {"linux/browser-prompt.md", "/root/.buddy/browser-prompt.md", "600"},
             {"linux/AGENTS.md", "/root/.buddy/work/AGENTS.md", "600"},
             {"linux/android-app/SKILL.md", "/root/.buddy/work/.claude/skills/android-app/SKILL.md", "600"},
@@ -120,6 +121,12 @@ final class Helper {
         } catch (Exception e) {
             return pkg;
         }
+    }
+
+    /** Copies the helper files again now (Check Buddy's fix when Linux still has an older copy). */
+    static synchronized void resync(Context c) throws IOException {
+        syncedFor = -1;
+        sync(c);
     }
 
     /** Copies the helper files from the APK into Linux once per app version. */

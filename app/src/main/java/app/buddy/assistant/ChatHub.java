@@ -298,6 +298,8 @@ final class ChatHub {
         if (svc != null) svc.stopPaused();
         try {
             Helper.run(app, "stop", ses.id);
+            // set now: the run's own buddy_done can arrive before buddy_stopped, and must not send the notes
+            ses.outcome = "stopped";
             ses.status = app.getString(R.string.hub_stopping);
         } catch (Exception e) {
             add(ses, Bubble.Kind.ERROR, e.getMessage());
@@ -393,6 +395,11 @@ final class ChatHub {
                 ses.outcome = "stopped";
                 add(ses, Bubble.Kind.STEP, app.getString(R.string.hub_stopped));
                 break;
+            case "rate_limit_event": { // Claude Code, Codex: how much of the plan's 5-hour and weekly limits is used
+                String warning = Usage.onEvent(app, ses.backend, ev);
+                if (warning != null) add(ses, Bubble.Kind.STEP, warning);
+                break;
+            }
             case "buddy_step": // a line from the helper under the steps (Antigravity: a refused step)
                 add(ses, Bubble.Kind.STEP, ev.optString("text"));
                 break;
@@ -411,7 +418,11 @@ final class ChatHub {
                         left = ses.notes.isEmpty() ? null : android.text.TextUtils.join("\n", ses.notes);
                         ses.notes.clear();
                     }
-                    if (left != null) {
+                    if (left != null && "stopped".equals(ses.outcome)) {
+                        // Stop means stop: no new run; the notes go back into the chat's message box
+                        ses.unsent = ses.unsent == null ? left : ses.unsent + "\n" + left;
+                        add(ses, Bubble.Kind.STEP, app.getString(R.string.hub_note_not_sent));
+                    } else if (left != null) {
                         final String msg = left;
                         main.post(() -> {
                             if (!ses.running) sendNoteAsMessage(ses, msg);
@@ -502,6 +513,13 @@ final class ChatHub {
         changed();
     }
 
+    /** Notes the user added before stopping this chat, for its message box; taken once (null when none). */
+    String takeUnsent(Sessions.Session ses) {
+        String text = ses.unsent;
+        ses.unsent = null;
+        return text;
+    }
+
     /** The newest working chat, or null. */
     Sessions.Session latestRunning() {
         Sessions.Session latest = null;
@@ -568,6 +586,7 @@ final class ChatHub {
         ses.lastReply = "";
         ses.lastEventAt = SystemClock.elapsedRealtime();
         ses.runId++;
+        Tools.runStarted(ses.id);
     }
 
     /**

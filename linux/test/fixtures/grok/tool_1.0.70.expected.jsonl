@@ -1,0 +1,4 @@
+{"buddy_session":"fixture","model":"grok-4.7","session_id":"01a18bc5-c3cf-7110-bd60-72d616578ccc","subtype":"init","type":"system"}
+{"buddy_session":"fixture","message":{"content":[{"input":{"ms":1000},"name":"mcp__phone__wait","type":"tool_use"}]},"type":"assistant"}
+{"buddy_session":"fixture","message":{"content":[{"text":"done","type":"text"}]},"type":"assistant"}
+{"buddy_session":"fixture","result":"done","subtype":"success","type":"result"}

@@ -69,6 +69,8 @@ final class Sessions {
         int runId;
         /** What the user added while this chat was working, not yet passed to the agent (guarded by itself). */
         final List<String> notes = new ArrayList<>();
+        /** Notes the agent never got because the user stopped it: put back into the message box (main thread). */
+        String unsent;
         /**
          * "Allowed without asking": apps where this chat's routine approvals go ahead on their own until its run ends
          * (see Guard.runRule). Never saved, so a restart forgets them; except in a chat with a schedule, which keeps
