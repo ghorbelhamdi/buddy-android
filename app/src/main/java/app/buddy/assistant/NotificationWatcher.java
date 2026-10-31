@@ -76,6 +76,21 @@ public class NotificationWatcher extends NotificationListenerService {
         }
     }
 
+    /** The notifications on the phone now (none when Buddy has no notification access). */
+    static StatusBarNotification[] active() {
+        NotificationWatcher w = instance;
+        if (w == null) return null;
+        try {
+            return w.getActiveNotifications();
+        } catch (Exception e) { // not connected right now
+            return null;
+        }
+    }
+
+    static Context context() {
+        return instance;
+    }
+
     /** Has the user given Buddy notification access? */
     static boolean enabled(Context c) {
         return c.getSystemService(android.app.NotificationManager.class)

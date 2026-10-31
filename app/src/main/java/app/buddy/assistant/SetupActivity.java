@@ -751,6 +751,10 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             wp.setMargins(dp(this, 12), 0, dp(this, 12), dp(this, 12));
             ex.addView(warning(this, getString(R.string.setup_dev_mode_warning)), wp);
         }
+        View sch = navRow(R.drawable.ms_schedule, getString(R.string.schedules_title), getString(R.string.schedules_row), false,
+                SchedulesActivity.class);
+        sch.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
+        ex.addView(sch, full());
         View bk = navRow(R.drawable.ms_backup, getString(R.string.backup_title), getString(R.string.backup_row), false,
                 BackupActivity.class);
         bk.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));

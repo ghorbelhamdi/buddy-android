@@ -49,6 +49,10 @@ public final class Schedules extends BroadcastReceiver {
         final String id;
         final long at;
         final String text;
+        /** A plain reminder: at its time the user gets it as a notification, and the agent doesn't run. */
+        boolean remind;
+        /** The run may end without a notification when there's no news (see ChatHub, QUIET). */
+        boolean quiet;
 
         Later(String id, long at, String text) {
             this.id = id;
@@ -58,7 +62,7 @@ public final class Schedules extends BroadcastReceiver {
 
         JSONObject toJson() {
             try {
-                return new JSONObject().put("id", id).put("at", at).put("text", text);
+                return new JSONObject().put("id", id).put("at", at).put("text", text).put("remind", remind).put("quiet", quiet);
             } catch (Exception e) {
                 return new JSONObject();
             }
@@ -66,7 +70,10 @@ public final class Schedules extends BroadcastReceiver {
 
         static Later of(JSONObject o) {
             if (o == null || o.optString("id").isEmpty() || o.optLong("at") <= 0 || o.optString("text").trim().isEmpty()) return null;
-            return new Later(o.optString("id"), o.optLong("at"), o.optString("text"));
+            Later l = new Later(o.optString("id"), o.optLong("at"), o.optString("text"));
+            l.remind = o.optBoolean("remind");
+            l.quiet = o.optBoolean("quiet");
+            return l;
         }
     }
 
@@ -84,6 +91,10 @@ public final class Schedules extends BroadcastReceiver {
          * a lock screen without a PIN, pattern or fingerprint goes (see WakeActivity). Off unless the user turns it on.
          */
         boolean wake;
+        /** Only tell the user when there's news: the agent can end a run without a notification (see ChatHub, QUIET). */
+        boolean quiet;
+        /** Paused on the Scheduled page: kept, but doesn't run. */
+        boolean paused;
 
         Plan copy() {
             Plan p = new Plan();
@@ -91,12 +102,15 @@ public final class Schedules extends BroadcastReceiver {
             p.days = days;
             p.text = text;
             p.wake = wake;
+            p.quiet = quiet;
+            p.paused = paused;
             return p;
         }
 
         JSONObject toJson() {
             try {
-                return new JSONObject().put("minute", minute).put("days", days).put("text", text).put("wake", wake);
+                return new JSONObject().put("minute", minute).put("days", days).put("text", text).put("wake", wake)
+                        .put("quiet", quiet).put("paused", paused);
             } catch (Exception e) {
                 return new JSONObject();
             }
@@ -109,6 +123,8 @@ public final class Schedules extends BroadcastReceiver {
             p.days = o.optInt("days") & EVERY_DAY;
             p.text = o.optString("text");
             p.wake = o.optBoolean("wake");
+            p.quiet = o.optBoolean("quiet");
+            p.paused = o.optBoolean("paused");
             return p;
         }
 
@@ -214,7 +230,7 @@ public final class Schedules extends BroadcastReceiver {
     }
 
     private static void set(Context c, Sessions.Session s, long after) {
-        long at = s.schedule == null ? 0 : s.schedule.next(after);
+        long at = s.schedule == null || s.schedule.paused ? 0 : s.schedule.next(after);
         if (at == 0) {
             cancel(c, s.id);
             return;
@@ -307,10 +323,37 @@ public final class Schedules extends BroadcastReceiver {
         pump();
     }
 
+    /** The Scheduled page's Run now: the chat's task starts as at its time (or waits, as it would then). */
+    static void runNow(Context c, Sessions.Session s) {
+        if (s.schedule == null || waiting.containsKey(s.id)) return;
+        app = c.getApplicationContext();
+        waiting.put(s.id, SystemClock.elapsedRealtime() + WAIT_MS);
+        listen(c);
+        pump();
+    }
+
+    /** Pause or resume a chat's schedule. */
+    static void setPaused(Context c, Sessions.Session s, boolean paused) {
+        if (s.schedule == null) return;
+        s.schedule.paused = paused;
+        ChatHub.get(c).sessions.save();
+        set(c, s);
+        ChatHub.get(c).changed();
+    }
+
     /** A message the agent scheduled came due: it starts, or waits as a task does (keyed "chat/message"). */
     private static void fireLater(Context c, String chat, String id) {
         Sessions.Session s = ChatHub.get(c).sessions.find(chat);
-        if (s == null || later(s, id) == null) return; // cancelled or deleted meanwhile
+        Later l = s == null ? null : later(s, id);
+        if (l == null) return; // cancelled or deleted meanwhile
+        if (l.remind) { // a plain reminder: the user gets it, the agent doesn't run
+            ChatHub hub = ChatHub.get(c);
+            s.later.remove(l);
+            hub.sessions.save();
+            hub.note(s, Bubble.Kind.STEP, c.getString(R.string.schedule_reminder_line, l.text));
+            notice(c, s, c.getString(R.string.schedule_reminder_title), l.text);
+            return;
+        }
         waiting.put(chat + "/" + id, SystemClock.elapsedRealtime() + WAIT_MS);
         listen(c);
         pump();
@@ -387,12 +430,20 @@ public final class Schedules extends BroadcastReceiver {
                     .append("phone tool that needs the screen asks the user to unlock and waits for them, so use the ")
                     .append("screen only when the task needs it.\n");
         }
+        boolean quiet = l != null ? l.quiet : s.schedule.quiet;
+        if (quiet) {
+            prompt.append("Only tell the user when there's news: if this run finds nothing they need to hear about ")
+                    .append("(nothing new or changed, nothing they must do), end your last reply with the line ")
+                    .append(ChatHub.QUIET).append(", and Buddy won't notify them. Leave it out whenever there's news, ")
+                    .append("a problem, or something for them to do.\n");
+        }
         prompt.append('\n').append(text);
         String err = ChatHub.get(app).sendScheduled(s, text, prompt.toString());
         if (err != null) {
             notice(app, s, app.getString(R.string.schedule_skipped_title, s.label()), err);
             return;
         }
+        s.quietRun = quiet;
         clearNotice(app, s.id);
         running.add(s.id);
         holdWake();
@@ -576,14 +627,17 @@ public final class Schedules extends BroadcastReceiver {
         if (at - now > MAX_AHEAD_MS) return "At most 30 days ahead.";
         if (s.later.size() >= MAX_LATER) return "This chat has " + MAX_LATER + " scheduled messages already. " + list(s);
         Later l = new Later(java.util.UUID.randomUUID().toString().substring(0, 6), at, text);
+        l.remind = a.optBoolean("remind");
+        l.quiet = a.optBoolean("quiet");
         int i = 0;
         while (i < s.later.size() && s.later.get(i).at <= at) i++;
         s.later.add(i, l);
         ChatHub.get(c).sessions.save();
         setLater(c, s, l);
         ChatHub.get(c).changed();
-        return "Scheduled " + l.id + " for " + english(at) + ". Buddy sends it into this chat then, as a new message "
-                + "to you, also with the phone locked; the user sees it above the chat and can cancel it."
+        return "Scheduled " + l.id + " for " + english(at) + (l.remind ? ". It's a reminder: Buddy shows it to the user "
+                + "then as a notification, without running you." : ". Buddy sends it into this chat then, as a new message "
+                + "to you, also with the phone locked; the user sees it above the chat and can cancel it.")
                 + (exact(c) ? "" : " Android allows Buddy no exact alarms, so it may come a few minutes late.");
     }
 

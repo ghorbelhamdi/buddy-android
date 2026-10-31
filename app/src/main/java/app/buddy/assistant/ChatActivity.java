@@ -807,6 +807,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 p.wake, on -> p.wake = on);
         wake.setPaddingRelative(dp(this, 4), dp(this, 14), dp(this, 4), dp(this, 6));
         c.addView(wake, full());
+        LinearLayout quiet = switchRow(this, getString(R.string.schedule_quiet), getString(R.string.schedule_quiet_info),
+                p.quiet, on -> p.quiet = on);
+        quiet.setPaddingRelative(dp(this, 4), dp(this, 6), dp(this, 4), dp(this, 6));
+        c.addView(quiet, full());
 
         if (!Schedules.exact(this)) { // Android 14+ asks the user for exact alarms
             LinearLayout.LayoutParams wp = full();
@@ -1819,6 +1823,12 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             count = monoText(ChatActivity.this, "", 12, MUTED);
             count.setPaddingRelative(dp(ChatActivity.this, 8), 0, 0, 0);
             head.addView(count, weight1());
+            // "View steps": what each action did, with a picture of the screen after it (see StepLog)
+            TextView steps = monoText(ChatActivity.this, getString(R.string.steps_view), 12, ACCENT_TEXT);
+            steps.setPaddingRelative(dp(ChatActivity.this, 8), dp(ChatActivity.this, 2), dp(ChatActivity.this, 8), dp(ChatActivity.this, 2));
+            steps.setOnClickListener(v -> startActivity(new android.content.Intent(ChatActivity.this, StepsActivity.class)
+                    .putExtra("id", ses.id)));
+            if (!ses.incognito) head.addView(steps);
             chevron = icon(ChatActivity.this, R.drawable.ms_expand_more, MUTED, 18);
             head.addView(chevron);
             head.setOnClickListener(v -> {

@@ -20,6 +20,8 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- set_alarm and set_timer: the Clock app's alarms and timers, without opening it -->
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+    <!-- calendar_events: read the phone's calendars, asked for the first time it's used -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
     <!-- the location tool, asked for the first time it's used (not in the Play build) -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -114,6 +116,14 @@
 
         <activity
             android:name=".GitHubActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".SchedulesActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".StepsActivity"
             android:exported="false" />
 
         <activity

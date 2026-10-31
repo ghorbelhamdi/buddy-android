@@ -57,6 +57,8 @@ final class Sessions {
         boolean interrupted;
         /** Incognito: deleted, with what the agent kept of it, when Buddy starts again (see ChatHub). */
         boolean incognito;
+        /** This run may end quietly (a scheduled task's "only tell me when there's news"); quietSaid: it did. Runtime. */
+        boolean quietRun, quietSaid;
         /** Linux tools: the agent may run commands and edit files in ~/.buddy/work (buddy-run's dev). Never on Play. */
         boolean dev;
         /** Long-task mode: the screen stays on while this chat works, and its end is a notification (see KeepAwake). */

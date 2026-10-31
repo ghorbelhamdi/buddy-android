@@ -56,6 +56,9 @@ final class ChatHub {
         return s;
     }
 
+    /** The line a scheduled run with nothing to report ends with (see Schedules.start): no notification then. */
+    static final String QUIET = "[QUIET]";
+
     static synchronized ChatHub get(Context c) {
         if (instance == null) instance = new ChatHub(c.getApplicationContext());
         return instance;
@@ -77,6 +80,7 @@ final class ChatHub {
         for (Sessions.Session s : new ArrayList<>(sessions.all)) {
             if (!s.incognito) continue;
             sessions.remove(s);
+            StepLog.deleteChat(app, s.id);
             if (Linux.installed(app)) {
                 try {
                     Helper.run(app, "delete", s.id, "forget");
@@ -137,6 +141,7 @@ final class ChatHub {
 
     void delete(Sessions.Session s) {
         if (CodexLive.on(s)) CodexLive.end(null);
+        StepLog.deleteChat(app, s.id);
         try {
             Helper.run(app, "delete", s.id);
         } catch (Exception ignored) {
@@ -414,6 +419,10 @@ final class ChatHub {
                     if (c == null) continue;
                     if ("text".equals(c.optString("type"))) {
                         String t = c.optString("text").trim();
+                        if (t.contains(QUIET)) { // the agent's "no news" for a quiet scheduled run: not shown
+                            ses.quietSaid = true;
+                            t = t.replace(QUIET, "").trim();
+                        }
                         if (!t.isEmpty()) {
                             add(ses, Bubble.Kind.BUDDY, t, pictures(t));
                             ses.lastReply = t;
@@ -453,6 +462,13 @@ final class ChatHub {
                     String shown = r.isEmpty() ? app.getString(R.string.hub_agent_stopped, ses.brainName()) : r;
                     add(ses, Bubble.Kind.ERROR, shown);
                     CodexLive.agentSaid(ses, shown);
+                } else if (r.contains(QUIET)) {
+                    ses.quietSaid = true;
+                    r = r.replace(QUIET, "").trim();
+                    if (!ses.gotText && !r.isEmpty()) {
+                        add(ses, Bubble.Kind.BUDDY, r, pictures(r));
+                        ses.lastReply = r;
+                    }
                 } else if (!ses.gotText && !r.isEmpty()) {
                     add(ses, Bubble.Kind.BUDDY, r, pictures(r));
                     ses.lastReply = r;
@@ -676,6 +692,7 @@ final class ChatHub {
         ses.lastEventAt = SystemClock.elapsedRealtime();
         ses.runId++;
         Tools.runStarted(ses.id);
+        StepLog.runStarted(app, ses);
         Prefs.setBusy(app, ses.id, true);
     }
 
@@ -685,10 +702,15 @@ final class ChatHub {
      */
     private void runEnded(Sessions.Session ses) {
         Prefs.setBusy(app, ses.id, false);
+        StepLog.runEnded(app, ses);
         if (ses.schedule == null) ses.allowed.clear(); // a scheduled chat keeps them for its next scheduled run
         CodexLive.agentDone(ses, ses.outcome, !ses.lastReply.isEmpty());
-        if (ses.awake || ses.scheduledRun) KeepAwake.notifyEnded(app, ses);
+        // a quiet scheduled run that found nothing new ends without a notification (a failed one always says so)
+        boolean quiet = ses.quietRun && ses.quietSaid && ses.outcome == null;
+        if ((ses.awake || ses.scheduledRun) && !quiet) KeepAwake.notifyEnded(app, ses);
         ses.scheduledRun = false;
+        ses.quietRun = false;
+        ses.quietSaid = false;
     }
 
     private void add(Sessions.Session ses, Bubble.Kind kind, String text) {
@@ -842,6 +864,26 @@ final class ChatHub {
             case "browser_screenshot": return BuddyApp.str(R.string.hub_tool_browser_screenshot);
             case "browser_back": return BuddyApp.str(R.string.hub_tool_browser_back);
             case "browser_tabs": return BuddyApp.str(R.string.hub_tool_browser_tabs);
+            case "clipboard_read": return BuddyApp.str(R.string.hub_tool_clipboard_read);
+            case "clipboard_write": return BuddyApp.str(R.string.hub_tool_clipboard_write);
+            case "set_alarm": return BuddyApp.str(R.string.hub_tool_set_alarm, in.optString("time"));
+            case "set_timer": return BuddyApp.str(R.string.hub_tool_set_timer);
+            case "share": return BuddyApp.str(R.string.hub_tool_share);
+            case "save_to_downloads": return BuddyApp.str(R.string.hub_tool_save_downloads, clip(in.optString("path").replaceAll(".*/", ""), 40));
+            case "device_status": return BuddyApp.str(R.string.hub_tool_device_status);
+            case "take_photo": return BuddyApp.str(R.string.hub_tool_take_photo);
+            case "location": return BuddyApp.str(R.string.hub_tool_location);
+            case "notifications": return BuddyApp.str(R.string.hub_tool_notifications);
+            case "media": return BuddyApp.str(R.string.hub_tool_media);
+            case "calendar_events": return BuddyApp.str(R.string.hub_tool_calendar_events);
+            case "add_calendar_event": return BuddyApp.str(R.string.hub_tool_add_event, clip(in.optString("title"), 40));
+            case "wait_for": return BuddyApp.str(R.string.hub_tool_wait_for);
+            case "do_steps": {
+                JSONArray st = in.optJSONArray("steps");
+                return BuddyApp.str(R.string.hub_tool_do_steps, st == null ? 0 : st.length());
+            }
+            case "collect": return BuddyApp.str(R.string.hub_tool_collect);
+            case "find": return BuddyApp.str(R.string.hub_tool_find, clip(in.optString("text"), 40));
             case "WebSearch": return BuddyApp.str(R.string.hub_tool_web_search, clip(in.optString("query"), 40));
             case "WebFetch": return BuddyApp.str(R.string.hub_tool_web_fetch, clip(in.optString("url"), 40));
             case "Bash": return in.has("command") ? BuddyApp.str(R.string.hub_tool_command, clip(in.optString("command"), 40))
