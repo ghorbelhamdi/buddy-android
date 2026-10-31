@@ -68,7 +68,7 @@ final class RemoteSession {
         final Context app = c.getApplicationContext();
         synchronized (RemoteSession.class) {
             if (!Prefs.remoteSession(app) || proc != null || starting) return;
-            if (!SetupState.signedIn(app, "claude")) {
+            if (!SetupState.planSignedIn(app, "claude")) {
                 set(State.ERROR, app.getString(R.string.remote_sign_in_first));
                 return;
             }

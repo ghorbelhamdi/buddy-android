@@ -67,7 +67,8 @@ final class Reviewer {
         String r = Prefs.reviewer(c);
         if ("same".equals(r)) r = chatBackend != null ? chatBackend : "claude";
         if (!"codex".equals(r)) r = "claude"; // the reviewer runs on Claude Code or Codex (an OpenCode, Antigravity or Grok chat uses Claude's)
-        if (!SetupState.signedIn(c, r)) r = "claude".equals(r) ? "codex" : "claude";
+        // Codex reviews through the ChatGPT session (its plan); Claude Code with its plan or an API key service
+        if (!("codex".equals(r) ? SetupState.planSignedIn(c, r) : SetupState.signedIn(c, r))) r = "claude".equals(r) ? "codex" : "claude";
         return SetupState.signedIn(c, r) ? r : null;
     }
 
@@ -114,7 +115,8 @@ final class Reviewer {
         try {
             String model = Prefs.reviewerModel(c, "claude");
             if (!model.matches("[A-Za-z0-9._:/-]+")) model = "haiku"; // the default; anything else goes into a shell command
-            return Linux.exec(c, "cd /root/review && timeout " + (TIMEOUT_MS / 1000) + " claude -p --model " + model + " --tools '' "
+            return Linux.exec(c, "cd /root/review && " + Providers.claudeEnv(c) + "timeout " + (TIMEOUT_MS / 1000)
+                    + " claude -p --model " + model + " --tools '' "
                     + "--strict-mcp-config --no-session-persistence --system-prompt \"$(cat " + id + ".sys)\" < " + id + ".txt 2>&1",
                     (int) (TIMEOUT_MS / 1000) + 5);
         } finally {

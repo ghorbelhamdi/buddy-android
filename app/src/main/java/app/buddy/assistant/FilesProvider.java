@@ -35,6 +35,19 @@ public class FilesProvider extends ContentProvider {
         return new File(c.getCacheDir(), "install.apk");
     }
 
+    /** A file from Buddy's Linux handed to the share sheet (share): a copy, by its name. */
+    static File shareFile(android.content.Context c, String name) {
+        File dir = new File(c.getCacheDir(), "share");
+        File[] old = dir.listFiles();
+        if (old != null) for (File f : old) f.delete(); // one share at a time
+        dir.mkdirs();
+        return new File(dir, name);
+    }
+
+    static Uri shareUri(String name) {
+        return Uri.parse("content://" + AUTHORITY + "/share/" + Uri.encode(name));
+    }
+
     static File captureFile(android.content.Context c) {
         return new File(c.getCacheDir(), "capture.jpg");
     }
@@ -44,6 +57,9 @@ public class FilesProvider extends ContentProvider {
         if (p.size() == 1 && "capture".equals(p.get(0))) return captureFile(getContext());
         if (p.size() == 2 && "a".equals(p.get(0))) return Attachments.file(getContext(), p.get(1));
         if (p.size() == 2 && "apk".equals(p.get(0))) return apkFile(getContext());
+        if (p.size() == 2 && "share".equals(p.get(0)) && !p.get(1).contains("/") && !p.get(1).startsWith(".")) {
+            return new File(new File(getContext().getCacheDir(), "share"), p.get(1));
+        }
         return null;
     }
 
@@ -73,6 +89,10 @@ public class FilesProvider extends ContentProvider {
         if (n.endsWith(".pdf")) return "application/pdf";
         if (n.endsWith(".apk")) return "application/vnd.android.package-archive";
         if (n.endsWith(".txt") || n.endsWith(".md") || n.endsWith(".csv")) return "text/plain";
+        if (n.endsWith(".html") || n.endsWith(".htm")) return "text/html";
+        if (n.endsWith(".zip")) return "application/zip";
+        if (n.endsWith(".mp4")) return "video/mp4";
+        if (n.endsWith(".mp3")) return "audio/mpeg";
         return "application/octet-stream";
     }
 
@@ -82,6 +102,7 @@ public class FilesProvider extends ContentProvider {
         if (f == null) return null;
         MatrixCursor c = new MatrixCursor(new String[]{OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE});
         String name = f.equals(apkFile(getContext())) ? "app.apk"
+                : f.getParentFile() != null && "share".equals(f.getParentFile().getName()) ? f.getName()
                 : f.getParentFile() != null && "attachments".equals(f.getParentFile().getName())
                 ? Attachments.name(f.getName()) : "photo.jpg";
         c.addRow(new Object[]{name, f.length()});

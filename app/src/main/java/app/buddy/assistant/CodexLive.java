@@ -107,7 +107,7 @@ final class CodexLive {
 
     /** Whether a chat can go live: any agent's chat, with Codex signed in (the call goes through it). */
     static boolean available(Context c, Sessions.Session s) {
-        return s != null && SetupState.signedIn(c, "codex");
+        return s != null && SetupState.planSignedIn(c, "codex");
     }
 
     static boolean on() {
@@ -338,14 +338,27 @@ final class CodexLive {
         return ses == null ? null : statusText;
     }
 
+    /** How long Speaking… stays after the voice goes quiet (it dips between words). */
+    private static final long SPEAKING_HOLD_MS = 1200;
+    private static long lastAudible;
+
+    /** The chat started or stopped working (main thread): Working on it… comes and goes with it. */
+    static void refresh() {
+        if (ses != null) main.post(() -> {
+            if (ses != null) status();
+        });
+    }
+
     /** The bar's status from what's going on (main thread). */
     private static void status() {
         if (ses == null) {
             for (Ui u : new ArrayList<>(uis)) u.onStatus(null);
             return;
         }
+        boolean speaking = audible || saying.length() > 0
+                || SystemClock.elapsedRealtime() - lastAudible < SPEAKING_HOLD_MS;
         int s = !connected ? R.string.live_connecting
-                : audible || saying.length() > 0 ? R.string.live_status_speaking
+                : speaking ? R.string.live_status_speaking
                 : heard.length() > 0 && !sent ? R.string.live_status_listening
                 : ses.running ? R.string.live_status_working
                 : awaiting ? R.string.live_status_thinking
@@ -646,8 +659,11 @@ final class CodexLive {
             public void level(float v, boolean voice) {
                 main.post(() -> {
                     if (web != mine) return;
+                    if (voice) lastAudible = SystemClock.elapsedRealtime();
                     if (voice != audible) {
                         audible = voice;
+                        // the voice's level dips between words: Speaking… holds a moment instead of flickering
+                        if (!voice) main.postDelayed(CodexLive::status, SPEAKING_HOLD_MS + 50);
                         CodexLive.log("voice " + (voice ? "audible" : "quiet"));
                         status();
                     }
@@ -664,7 +680,7 @@ final class CodexLive {
             @JavascriptInterface
             public void connected() {
                 main.post(() -> {
-                    if (web != mine) return;
+                    if (web != mine || connected) return; // reported by more than one event
                     connected = true;
                     lastActivity = SystemClock.elapsedRealtime();
                     List<String> waiting = new ArrayList<>(pending);
@@ -842,7 +858,7 @@ final class CodexLive {
             + "    pc = new RTCPeerConnection();\n"
             + "    pc.addTrack(stream.getAudioTracks()[0], stream);\n"
             + "    const dc = pc.createDataChannel('oai-events');\n"
-            + "    dc.onopen = () => L('data channel open'); dc.onclose = () => L('data channel closed');\n"
+            + "    dc.onopen = () => { L('data channel open'); Buddy.connected(); }; dc.onclose = () => L('data channel closed');\n"
             + "    dc.onmessage = m => { try { const j = JSON.parse(m.data), ty = j.type || '?';\n"
             + "      if (/delta|transcript\\.added|audio/.test(ty) && !/error/.test(ty)) return;\n"
             + "      let more = '';\n"
@@ -867,7 +883,9 @@ final class CodexLive {
             + "      (await pc.getStats()).forEach(r => { if (r.type === 'outbound-rtp' && r.kind === 'audio') a = 'sent ' + (r.bytesSent - lastOut) + ' B', lastOut = r.bytesSent;\n"
             + "        if (r.type === 'inbound-rtp' && r.kind === 'audio') b = 'got ' + (r.bytesReceived - lastIn) + ' B, level ' + (r.audioLevel || 0).toFixed(3), lastIn = r.bytesReceived; });\n"
             + "      L('rtp 10 s: ' + a + '; ' + b + '; mic peak ' + heard().toFixed(3)); }, 10000);\n"
-            + "    pc.oniceconnectionstatechange = () => L('ice ' + pc.iceConnectionState);\n"
+            + "    pc.oniceconnectionstatechange = () => { L('ice ' + pc.iceConnectionState);\n"
+            // some WebViews never report connectionState 'connected': the network connection or the data channel says it too
+            + "      if (pc.iceConnectionState === 'connected' || pc.iceConnectionState === 'completed') Buddy.connected(); };\n"
             + "    pc.onconnectionstatechange = () => {\n"
             + "      L('connection ' + pc.connectionState);\n"
             + "      if (pc.connectionState === 'connected') Buddy.connected();\n"

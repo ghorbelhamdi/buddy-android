@@ -17,7 +17,7 @@
 
 Type or say what you want, like "reply to Sam that I'm running late" or "add a Switch 2 to my Amazon cart". Buddy reads the screen, taps and types to get it done, and asks you before anything is sent, posted, bought or deleted.
 
-It runs inside the app, on your own plan: [Claude Code](https://docs.claude.com/en/docs/claude-code) with your Claude plan, Codex with your ChatGPT plan, Google's [Antigravity CLI](https://antigravity.google) with your Google account, xAI's [Grok Build](https://x.ai/build) with your Google or X account, or [OpenCode](https://opencode.ai) with its free models and no account at all. No PC, no adb, no root, no API key.
+It runs inside the app, on your own plan: [Claude Code](https://docs.claude.com/en/docs/claude-code) with your Claude plan, Codex with your ChatGPT plan, Google's [Antigravity CLI](https://antigravity.google) with your Google account, xAI's [Grok Build](https://x.ai/build) with your Google or X account, or [OpenCode](https://opencode.ai) with its free models and no account at all. No PC, no adb, no root, and no API key needed (you can add keys for other services, such as DeepSeek or OpenRouter, and use them with Claude Code, Codex or OpenCode).
 
 <p align="center"><a href="https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk"><b>Download the APK</b></a> · <a href="https://ghorbelhamdi.github.io/buddy-android/">Website</a> · Android 11+, 64-bit</p>
 
@@ -108,7 +108,7 @@ More in [Security in detail](docs/GUIDE.md#security-in-detail). Found a problem?
 
 ## Contributing
 
-Bug reports, ideas and pull requests are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md). If Buddy is useful to you, a ⭐ helps other people find it.
+Bug reports, ideas and translation fixes are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md). If Buddy is useful to you, a ⭐ helps other people find it.
 
 ## For developers
 

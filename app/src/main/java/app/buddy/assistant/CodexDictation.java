@@ -56,7 +56,7 @@ final class CodexDictation {
     // ------------------------------------------------------------------ listening
 
     static String listen(Context c, Voice.Listener l) {
-        if (!SetupState.signedIn(c, "codex")) return c.getString(R.string.dictation_codex_sign_in);
+        if (!SetupState.planSignedIn(c, "codex")) return c.getString(R.string.dictation_codex_sign_in);
         final Context app = c.getApplicationContext();
         listener = l;
         finishing = drained = connected = false;
@@ -331,7 +331,7 @@ final class CodexDictation {
 
     /** Start Codex ahead of time (a chat opened) so the first tap on the mic is quick. */
     static void prepare(Context c) {
-        if (!SetupState.signedIn(c, "codex") || (server != null && server.isAlive() && threadId != null)) return;
+        if (!SetupState.planSignedIn(c, "codex") || (server != null && server.isAlive() && threadId != null)) return;
         final Context app = c.getApplicationContext();
         new Thread(() -> {
             try {

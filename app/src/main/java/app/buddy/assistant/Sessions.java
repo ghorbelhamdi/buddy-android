@@ -51,6 +51,12 @@ final class Sessions {
         String effort = "";
         /** The model the agent last reported using (for "Default"), or "" if it doesn't say. */
         String actualModel = "";
+        /** How much of the model's context the conversation fills, and its size, in tokens (0: the agent hasn't said). */
+        long ctxUsed, ctxWindow;
+        /** Android closed Buddy while the agent was working: the chat offers to continue (see ChatHub.resume). */
+        boolean interrupted;
+        /** Incognito: deleted, with what the agent kept of it, when Buddy starts again (see ChatHub). */
+        boolean incognito;
         /** Linux tools: the agent may run commands and edit files in ~/.buddy/work (buddy-run's dev). Never on Play. */
         boolean dev;
         /** Long-task mode: the screen stays on while this chat works, and its end is a notification (see KeepAwake). */
@@ -201,7 +207,7 @@ final class Sessions {
                     if (m.scheduled) mo.put("s", true);
                     msgs.put(mo);
                 }
-                arr.put(new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model).put("effort", s.effort).put("actual_model", s.actualModel)
+                arr.put(new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model).put("effort", s.effort).put("actual_model", s.actualModel).put("ctx_used", s.ctxUsed).put("ctx_window", s.ctxWindow).put("interrupted", s.interrupted).put("incognito", s.incognito)
                         .put("dev", s.dev).put("awake", s.awake).put("updated", s.updated).put("messages", msgs));
                 if (s.schedule != null) {
                     JSONArray ok;
@@ -233,6 +239,10 @@ final class Sessions {
                 s.model = o.optString("model");
                 s.effort = o.optString("effort");
                 s.actualModel = o.optString("actual_model");
+                s.ctxUsed = o.optLong("ctx_used");
+                s.ctxWindow = o.optLong("ctx_window");
+                s.interrupted = o.optBoolean("interrupted");
+                s.incognito = o.optBoolean("incognito");
                 // a chat from before Linux tools were per chat gets what the one switch in Settings gave every chat
                 older |= !o.has("dev");
                 s.dev = o.optBoolean("dev", Prefs.devMode(app));

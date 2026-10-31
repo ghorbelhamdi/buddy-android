@@ -116,6 +116,7 @@ final class McpServer {
             if (parts.length < 2) return;
             String method = parts[0];
             String path = parts[1];
+            final String rawPath = path; // with its query, for the API relay
             int q = path.indexOf('?');
             String chat = null;
             if (q >= 0) {
@@ -148,7 +149,9 @@ final class McpServer {
                 return;
             }
 
-            if (!authorized(headers.get("authorization"))) {
+            // Anthropic-style clients (OpenCode's) send the token they were given as x-api-key: the relay takes that too
+            String xKey = path.startsWith(Relay.PATH) ? headers.get("x-api-key") : null;
+            if (!authorized(headers.get("authorization")) && !(xKey != null && authorized("Bearer " + xKey))) {
                 send(out, 401, "application/json", "{\"error\":\"unauthorized\"}");
                 return;
             }
@@ -186,6 +189,9 @@ final class McpServer {
                 java.io.File f = handler.attachment(path.substring(6));
                 if (f == null || !f.isFile()) send(out, 404, null, null);
                 else sendFile(out, f);
+            } else if (path.startsWith(Relay.PATH)) {
+                // an agent's API request with Buddy's token: on to the service with the real key (see Relay)
+                Relay.handle(BuddyApp.context(), method, rawPath, headers, body, out);
             } else if ("/health".equals(path)) {
                 send(out, 200, "application/json", "{\"ok\":true}");
             } else {

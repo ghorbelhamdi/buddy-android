@@ -49,6 +49,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     private ImageButton options;
     /** The messages the agent scheduled for itself in this chat (schedule_message), each with Cancel. */
     private LinearLayout laterList;
+    /** The skills offered while the message starts with "/". */
+    private LinearLayout slashList;
+    /** "Android closed Buddy while this chat was working": Continue or Dismiss. */
+    private LinearLayout interruptedBox;
     private EditText input;
     private int maxBubble;
     private ToolLog log; // the tool-call group being appended to, if the last message was a step
@@ -172,10 +176,26 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         ap.bottomMargin = dp(this, 8);
         root.addView(approval, ap);
 
+        interruptedBox = column(this);
+        LinearLayout.LayoutParams ibp = full();
+        ibp.leftMargin = ibp.rightMargin = dp(this, 12);
+        ibp.bottomMargin = dp(this, 8);
+        root.addView(interruptedBox, ibp);
+
         laterList = column(this);
         LinearLayout.LayoutParams llp = full();
         llp.leftMargin = llp.rightMargin = dp(this, 12);
         root.addView(laterList, llp);
+
+        // "/": the skills (and Claude Code's /compact), to pick from as the message starts
+        slashList = column(this);
+        slashList.setBackground(outlined(this, CARD, 16, OUTLINE, 1));
+        slashList.setPaddingRelative(dp(this, 4), dp(this, 4), dp(this, 4), dp(this, 4));
+        slashList.setVisibility(View.GONE);
+        LinearLayout.LayoutParams slp = full();
+        slp.leftMargin = slp.rightMargin = dp(this, 12);
+        slp.bottomMargin = dp(this, 6);
+        root.addView(slashList, slp);
 
         // composer
         trayScroll = new android.widget.HorizontalScrollView(this);
@@ -241,6 +261,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             @Override
             public void afterTextChanged(Editable e) {
                 paintSend();
+                renderSlash();
             }
         });
         paintSend();
@@ -390,6 +411,42 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         send.setImageTintList(ColorStateList.valueOf(has ? ON_ACCENT : MUTED));
     }
 
+    /** While the message is "/" and a name's start: the skills that match, and /compact for Claude Code. */
+    private void renderSlash() {
+        slashList.removeAllViews();
+        String t = input.getText().toString();
+        if (!t.matches("/[a-z0-9-]*") || !Linux.installed(this)) {
+            slashList.setVisibility(View.GONE);
+            return;
+        }
+        String q = t.substring(1);
+        java.util.List<String[]> items = new java.util.ArrayList<>();
+        if ("claude".equals(ses.backend)) items.add(new String[]{"compact", getString(R.string.chat_context_compact)});
+        for (Skills.Skill s : Skills.all(this)) items.add(new String[]{s.name, s.description});
+        int n = 0;
+        for (String[] it : items) {
+            if (!it[0].startsWith(q) || n >= 6) continue;
+            n++;
+            LinearLayout r = column(this);
+            r.setPaddingRelative(dp(this, 10), dp(this, 8), dp(this, 10), dp(this, 8));
+            r.setBackgroundResource(ripple(this, false));
+            r.addView(single(monoText(this, "/" + it[0], 14, TEXT)));
+            if (!it[1].isEmpty()) r.addView(single(text(this, it[1], 12, MUTED)));
+            r.setOnClickListener(v -> {
+                input.setText("/" + it[0] + " ");
+                input.setSelection(input.getText().length());
+            });
+            slashList.addView(r, full());
+        }
+        if (n == 0) {
+            TextView none = text(this, getString(R.string.skills_slash_none), 13, MUTED);
+            none.setPaddingRelative(dp(this, 10), dp(this, 8), dp(this, 10), dp(this, 8));
+            none.setOnClickListener(v -> startActivity(new android.content.Intent(this, SkillsActivity.class)));
+            slashList.addView(none, full());
+        }
+        slashList.setVisibility(View.VISIBLE);
+    }
+
     private void send() {
         String text = input.getText().toString().trim();
         if (text.isEmpty() && pending.isEmpty()) return;
@@ -428,7 +485,6 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     /** Pick this chat's model; the conversation continues with the new one. */
     private void chooseModel() {
         Models.refresh(this);
-        final String[][] options = Models.forBackend(ses.backend);
         LinearLayout c = column(this);
         TextView h = title(this, getString(R.string.chat_model_title, ses.brainName()), 18);
         c.addView(h);
@@ -436,7 +492,28 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         sub.setPaddingRelative(0, dp(this, 2), 0, dp(this, 10));
         c.addView(sub);
         final Dialog[] d = new Dialog[1];
-        String[][] efforts = Models.efforts(ses.backend);
+        int ctx = Models.contextPercent(ses);
+        if (ctx >= 0) { // how full the conversation is; Claude Code can also compact it on request
+            c.addView(sectionLabel(this, getString(R.string.chat_context)));
+            TextView cu = text(this, getString(R.string.chat_context_used, Models.tokens(ses.ctxUsed),
+                    Models.tokens(ses.ctxWindow), ctx), 14, TEXT);
+            cu.setPaddingRelative(0, dp(this, 2), 0, 0);
+            c.addView(cu);
+            TextView ch = text(this, getString(R.string.chat_context_help, ses.brainName()), 13, MUTED);
+            ch.setPaddingRelative(0, dp(this, 2), 0, dp(this, 8));
+            c.addView(ch);
+            if ("claude".equals(ses.backend) && !ses.running) {
+                Button compact = button(this, getString(R.string.chat_context_compact), false);
+                compact.setOnClickListener(v -> {
+                    d[0].dismiss();
+                    String err = hub.send(ses, "/compact");
+                    if (err != null) Toast.makeText(this, err, Toast.LENGTH_LONG).show();
+                });
+                c.addView(compact, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 44)));
+            }
+            c.addView(new View(this), new LinearLayout.LayoutParams(1, dp(this, 12)));
+        }
+        String[][] efforts = Models.efforts(ses);
         if (efforts != null) {
             c.addView(sectionLabel(this, getString(R.string.chat_effort)));
             TextView es = text(this, getString(R.string.chat_effort_help), 13, MUTED);
@@ -451,7 +528,13 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             c.addView(ml);
         }
         boolean known = false;
-        for (final String[] o : options) {
+        for (final String[] o : Models.options(ses.backend, true)) {
+            if (o[0] == null) { // an API key service's models
+                TextView sl = sectionLabel(this, o[1]);
+                sl.setPaddingRelative(0, dp(this, 14), 0, dp(this, 2));
+                c.addView(sl);
+                continue;
+            }
             boolean on = o[0].equals(ses.model);
             known |= on;
             LinearLayout r = row(this);
@@ -461,7 +544,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             LinearLayout t = column(this);
             t.setPaddingRelative(dp(this, 14), 0, 0, 0);
             t.addView(title(this, o[1], 15));
-            t.addView(single(monoText(this, o[0].isEmpty() ? Models.defaultHint(ses) : o[0], 12, MUTED)));
+            t.addView(single(monoText(this, Models.detail(ses.backend, o[0], Models.defaultHint(ses)), 12, MUTED)));
             r.addView(t, weight1());
             r.setOnClickListener(v -> {
                 d[0].dismiss();
@@ -545,6 +628,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 ses.awake, on -> hub.setAwake(ses, on));
         sw.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
         c.addView(sw, full());
+        LinearLayout inc = switchRow(this, getString(R.string.chat_incognito), getString(R.string.chat_incognito_info),
+                ses.incognito, on -> hub.setIncognito(ses, on));
+        inc.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
+        c.addView(inc, full());
         final Dialog[] sheet = new Dialog[1];
         TextView sl = sectionLabel(this, getString(R.string.schedule_title));
         sl.setPaddingRelative(0, dp(this, 12), 0, dp(this, 4));
@@ -1071,6 +1158,31 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     }
 
     /** One line per scheduled message: when, what, and Cancel. */
+    private void renderInterrupted() {
+        interruptedBox.removeAllViews();
+        if (!ses.interrupted || ses.running) return;
+        LinearLayout card = column(this);
+        card.setBackground(rounded(this, CARD, 14));
+        card.setPaddingRelative(dp(this, 14), dp(this, 12), dp(this, 14), dp(this, 10));
+        card.addView(text(this, getString(R.string.chat_interrupted, ses.brainName()), 14, TEXT));
+        LinearLayout btns = row(this);
+        btns.setPaddingRelative(0, dp(this, 10), 0, 0);
+        Button dismiss = button(this, getString(R.string.chat_interrupted_dismiss), false);
+        dismiss.setOnClickListener(v -> hub.dismissInterrupted(ses));
+        Button go = button(this, getString(R.string.chat_interrupted_continue), true);
+        go.setOnClickListener(v -> {
+            String err = hub.resume(ses);
+            if (err != null) Toast.makeText(this, err, Toast.LENGTH_LONG).show();
+        });
+        LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(0, dp(this, 44), 1);
+        btns.addView(dismiss, bp);
+        LinearLayout.LayoutParams gp = new LinearLayout.LayoutParams(0, dp(this, 44), 1);
+        gp.setMarginStart(dp(this, 8));
+        btns.addView(go, gp);
+        card.addView(btns, full());
+        interruptedBox.addView(card, full());
+    }
+
     private void renderLater() {
         laterList.removeAllViews();
         for (Schedules.Later l : ses.later) {
@@ -1117,6 +1229,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         }
         renderApproval();
         renderLater();
+        renderInterrupted();
         onBrowserChanged();
         paintLive();
         if (resumed) restoreUnsent(ses);

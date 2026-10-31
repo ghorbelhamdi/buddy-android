@@ -60,27 +60,14 @@ jobs:
           name: buddy-apk
           path: dist/*.apk
 
-      # The Play bundle is never attached to the GitHub release; on tags it goes to Google Play (below).
+      # The Play bundle is never attached to the GitHub release (see below).
       - uses: actions/upload-artifact@v7
         with:
           name: buddy-play-aab
           path: app/build/outputs/bundle/playRelease/*.aab
 
-      # On tags, send the bundle to the closed testing track (Alpha) for review, with the notes in
-      # play/whatsnew. Needs the PLAY_SERVICE_ACCOUNT_JSON secret (a service account with release
-      # rights in the Play Console); without it this step is skipped and the bundle is uploaded by hand.
-      - name: Upload to Google Play
-        if: startsWith(github.ref, 'refs/tags/v') && env.PLAY_JSON != ''
-        env:
-          PLAY_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
-          packageName: app.buddy.assistant
-          releaseFiles: app/build/outputs/bundle/playRelease/*.aab
-          track: alpha
-          status: completed
-          whatsNewDirectory: play/whatsnew
+      # No automatic upload to Google Play: Play turned Buddy down (its accessibility policy), so releases are on
+      # GitHub only. The bundle above is still built and kept as an artifact, for a manual upload if that changes.
 
       - name: Publish GitHub release
         if: startsWith(github.ref, 'refs/tags/v')

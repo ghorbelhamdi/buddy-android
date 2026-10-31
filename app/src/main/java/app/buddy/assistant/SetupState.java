@@ -39,6 +39,14 @@ final class SetupState {
         return Linux.installed(c) && "SIGNED_IN".equals(Prefs.agentState(c, agent));
     }
 
+    /**
+     * Signed in with the plan itself, not an API key: what voice input, live voice, Remote Control and the ChatGPT
+     * app's Codex session need.
+     */
+    static boolean planSignedIn(Context c, String agent) {
+        return signedIn(c, agent) && Prefs.agentPlan(c, agent);
+    }
+
     int count() {
         int n = 0;
         for (boolean d : done) if (d) n++;

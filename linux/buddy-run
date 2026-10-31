@@ -13,7 +13,7 @@
 #   buddy-run <token> transcript <claude|codex> <file>   last messages of a session (buddy_transcript)
 #   buddy-run <token> adopt <session> <claude|codex> <agent-session-id>  continue that session as a Buddy chat
 # Every event sent to the bubble carries "buddy_session" so the app can route it.
-HELPER_VERSION=18
+HELPER_VERSION=23
 set -u
 export PATH=$HOME/.local/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # The claude launcher sets BUN_OPTIONS with a path relative to its folder; never inherit a stale one.
@@ -67,7 +67,10 @@ case "$CMD" in
     agents=$({ have claude && echo claude; have codex && echo codex; have opencode && echo opencode; have agy && echo agy
       have grok && echo grok; } | paste -sd, -)
     # signed in = the agent's saved login exists (OpenCode works without one: its free models)
-    signed=$({ [ -s "$HOME/.claude/.credentials.json" ] && echo claude; [ -s "$HOME/.codex/auth.json" ] && echo codex
+    # (or Claude Code's API key in its settings' env; Codex keeps an API key in auth.json too)
+    # (or an API key service saved in Buddy that the agent can use: $D/providers, without the keys)
+    signed=$({ { [ -s "$HOME/.claude/.credentials.json" ] || grep -qs '"anthropic":true' "$D"/providers/*.json; } && echo claude
+      { [ -s "$HOME/.codex/auth.json" ] || grep -qs '"openai":"responses"' "$D"/providers/*.json; } && echo codex
       have opencode && echo opencode; [ -s "$HOME/.gemini/antigravity-cli/antigravity-oauth-token" ] && echo agy
       [ -s "$HOME/.grok/auth.json" ] && echo grok; } | paste -sd, -)
     cm=$(jq -c '[.models[] | select(.visibility == "list") | [.slug, .display_name]]' "$HOME/.codex/models_cache.json" 2>/dev/null)
@@ -199,6 +202,13 @@ case "$CMD" in
     SID=${3:-}; valid_sid "$SID" || exit 2
     S=$D/sessions/$SID
     [ -f "$S/pid" ] && kill_tree "$(cat "$S/pid")"
+    # forget (an incognito chat): the agents own records of the conversation go too
+    if [ "${4:-}" = forget ]; then
+      c=$(cat "$S/claude-session" 2>/dev/null); t=$(cat "$S/codex-thread" 2>/dev/null); o=$(cat "$S/opencode-session" 2>/dev/null)
+      [[ "$c" =~ ^[A-Za-z0-9-]+$ ]] && rm -f "$HOME"/.claude/projects/*/"$c".jsonl
+      [[ "$t" =~ ^[A-Za-z0-9-]+$ ]] && find "$HOME/.codex/sessions" -name "rollout-*$t.jsonl" -delete 2>/dev/null
+      [[ "$o" =~ ^[A-Za-z0-9_-]+$ ]] && have opencode && timeout 30 opencode session delete $(oc2 && echo --standalone) "$o" >/dev/null 2>&1
+    fi
     rm -rf "${S:?}"
     exit 0 ;;
   ask) SID=${3:-}; BACKEND=${4:-claude}; DEV=${5:-0}; MSG=${6:-}; MODEL=${7:-}; FILES=${8:-}; EFFORT=${9:-}
@@ -208,6 +218,17 @@ esac
 
 valid_sid "$SID" || exit 2
 [ -z "$MSG" ] && exit 0
+# A model of an API key service saved in Buddy (Settings, API keys) comes as @service/model. The agent is pointed at
+# the relay on Buddy, which adds the key (it never enters Linux); $D/providers/<service>.json says which kinds of
+# address the service has and its models context sizes.
+SVC="" SVCM=""
+if [[ "${MODEL:-}" == @*/* ]]; then
+  SVC=${MODEL#@}; SVC=${SVC%%/*}; SVCM=${MODEL#@*/}
+  [[ "$SVC" =~ ^[a-z0-9-]+$ ]] || exit 2
+fi
+svc_window() {
+  jq -r --arg m "$SVCM" '.models[$m].window // 0 | select(. > 0)' "$D/providers/$SVC.json" 2>/dev/null
+}
 S=$D/sessions/$SID
 mkdir -p "$S"
 event() { jq -cn --arg type "$1" --arg text "${2:-}" --arg s "$SID" '{type:$type,text:$text,buddy_session:$s}' | post; }
@@ -215,6 +236,11 @@ tag() { jq -c --arg s "$SID" '. + {buddy_session:$s}' 2>/dev/null; }
 
 if [ -f "$S/pid" ] && kill -0 "$(cat "$S/pid")" 2>/dev/null; then
   event buddy_error "This session is still working. Tap Stop first, or start another session."
+  exit 0
+fi
+
+if [ -n "$SVC" ] && [ ! -s "$D/providers/$SVC.json" ]; then
+  event buddy_error "This chat's model is from an API key that is no longer in Buddy. Pick another model."
   exit 0
 fi
 
@@ -257,6 +283,10 @@ if [ "$DEV" = 1 ]; then
 
 Linux tools are ON in this chat: you may run shell commands and create or edit files. Work inside $W (one folder per project).
 Before building an Android app, read the android-app skill (Claude Code) or AGENTS.md (Codex, OpenCode, Antigravity, Grok) in $W and follow it."
+  # Settings, GitHub: git and gh are signed in to the user account
+  [ -s "$HOME/.config/gh/hosts.yml" ] && SYSTEM="$SYSTEM
+git and the GitHub CLI (gh) are signed in to the user's GitHub account: you can clone, commit, push and open pull requests.
+Pushing, creating a repository, and opening an issue or pull request are outward-facing: call confirm first with what you will do."
 elif [ "$DEV" = 0 ]; then
   SYSTEM="$SYSTEM
 
@@ -264,12 +294,30 @@ Linux tools are off in this chat: no shell commands or file edits. If the user a
 (building an app, running commands), tell them to turn on Linux tools with the chip under this chat's title, then ask again."
 fi
 
+# Buddy's shared skills (Settings, Skills) live in ~/.agents/skills, where Codex and OpenCode look: Claude Code gets a
+# link to each in its own folder (a skill of the same name already there wins), and links to removed ones go.
+link_skills() {
+  local d n l
+  mkdir -p "$HOME/.claude/skills"
+  for d in "$HOME"/.agents/skills/*/; do
+    [ -f "$d/SKILL.md" ] || continue
+    n=$(basename "$d")
+    [ -e "$HOME/.claude/skills/$n" ] || [ -L "$HOME/.claude/skills/$n" ] || ln -s "${d%/}" "$HOME/.claude/skills/$n"
+  done
+  for l in "$HOME"/.claude/skills/*; do
+    [ -L "$l" ] && [ ! -e "$l" ] && rm -f "$l"
+  done
+  return 0
+}
+
 # ---------------------------------------------------------------- Claude Code
 run_claude() {
   local mcp tools
   mcp=$(jq -cn --arg url "$URL/mcp?chat=$SID" --arg auth "Bearer $TOKEN" \
     '{mcpServers:{phone:{type:"http",url:$url,headers:{Authorization:$auth},timeout:600000}}}')
-  tools=("mcp__phone" "WebSearch" "WebFetch" "Read(/$S/files/**)" "Read(/$D/GUIDE.md)")
+  link_skills
+  tools=("mcp__phone" "WebSearch" "WebFetch" "Read(/$S/files/**)" "Read(/$D/GUIDE.md)" "Skill"
+    "Read(/$HOME/.agents/skills/**)" "Read(/$HOME/.claude/skills/**)")
   [ "$DEV" = rule ] && tools=("mcp__phone")
   local deny=()
   [ "$DEV" = rule ] && deny=(--disallowedTools "Bash" "WebFetch" "WebSearch" "Write" "Edit" "NotebookEdit" "Skill")
@@ -279,9 +327,20 @@ run_claude() {
     --allowedTools "${tools[@]}" "${deny[@]}"
     --append-system-prompt "$SYSTEM")
   [ -s "$S/claude-session" ] && args+=(--resume "$(cat "$S/claude-session")")
-  [ -n "${MODEL:-}" ] && args+=(--model "$MODEL")
+  [ -n "${MODEL:-}" ] && args+=(--model "${SVCM:-$MODEL}")
   [ -n "${EFFORT:-}" ] && args+=(--effort "$EFFORT")
-  cd "$W" && claude "${args[@]}" 2>"$S/last-error.log"
+  # an API key service: every model Claude Code would pick (its helpers and subagents too) is the chosen one, and it
+  # gets the real context size, not the one it guesses for a model it does not know; the plan stays for the rest
+  local keyenv=()
+  if [ -n "$SVC" ]; then
+    keyenv=(env -u ANTHROPIC_API_KEY ANTHROPIC_BASE_URL="$URL/llm/$SVC/a" ANTHROPIC_AUTH_TOKEN="$TOKEN"
+      ANTHROPIC_MODEL="$SVCM" ANTHROPIC_DEFAULT_OPUS_MODEL="$SVCM" ANTHROPIC_DEFAULT_SONNET_MODEL="$SVCM"
+      ANTHROPIC_DEFAULT_HAIKU_MODEL="$SVCM" CLAUDE_CODE_SUBAGENT_MODEL="$SVCM")
+    local win
+    win=$(svc_window)
+    [ -n "$win" ] && keyenv+=(CLAUDE_CODE_MAX_CONTEXT_TOKENS="$win")
+  fi
+  cd "$W" && "${keyenv[@]}" claude "${args[@]}" 2>"$S/last-error.log"
 }
 
 stream_claude() {
@@ -302,10 +361,22 @@ run_codex() {
     -c 'mcp_servers.phone.bearer_token_env_var="BUDDY_TOKEN"'
     -c 'mcp_servers.phone.default_tools_approval_mode="approve"'
     -c 'mcp_servers.phone.tool_timeout_sec=600')
-  local sandbox=(--sandbox read-only)
+  # Linux tools off (and a rule's run): no shell at all, as for Claude Code, not even read-only commands
+  local sandbox=(--sandbox read-only --disable shell_tool --disable unified_exec)
   # developer mode: the whole of Buddy's Linux, like Claude Code's Bash and OpenCode (so apk add works too)
   [ "$DEV" = 1 ] && sandbox=(--sandbox danger-full-access)
-  [ -n "${MODEL:-}" ] && cfg+=(-m "$MODEL")
+  # a run with a file attached (not a picture, which goes in with --image) keeps read-only commands to open it
+  [ "$DEV" != 1 ] && [ ${#ATT[@]} -gt ${#IMGS[@]} ] && sandbox=(--sandbox read-only)
+  # an API key service: through the relay, over plain requests (no WebSocket, which other services refuse), with the
+  # real context size
+  if [ -n "$SVC" ]; then
+    cfg+=(-c 'model_provider="buddy-key"'
+      -c 'model_providers.buddy-key={name="API key",base_url="'"$URL/llm/$SVC/o"'",wire_api="responses",env_key="BUDDY_TOKEN",supports_websockets=false}')
+    local win
+    win=$(svc_window)
+    [ -n "$win" ] && cfg+=(-c "model_context_window=$win")
+  fi
+  [ -n "${MODEL:-}" ] && cfg+=(-m "${SVCM:-$MODEL}")
   [ -n "${EFFORT:-}" ] && cfg+=(-c "model_reasoning_effort=\"$EFFORT\"")
   local img=() f
   for f in "${IMGS[@]}"; do img+=("--image=$f"); done
@@ -333,6 +404,11 @@ stream_codex() {
       log=$(find "$HOME/.codex/sessions" -name "rollout-*$(cat "$S/codex-thread").jsonl" 2>/dev/null | head -1)
       model=$([ -n "$log" ] && grep '"turn_context"' "$log" | tail -1 | jq -r '.payload.model // empty' 2>/dev/null)
       [ -n "$model" ] && jq -cn --arg m "$model" --arg s "$SID" '{type:"system", subtype:"model", model:$m, buddy_session:$s}' | post
+      # how full the context is and its size, from the same token_count
+      [ -n "$log" ] && grep '"token_count"' "$log" | tail -1 | jq -c --arg s "$SID" '.payload.info // empty
+        | select(.model_context_window != null)
+        | {type:"buddy_context", used:(.last_token_usage.total_tokens // 0), window:.model_context_window, buddy_session:$s}' \
+        2>/dev/null | post
       # the plan's 5-hour and weekly limits, from the log's last token_count, passed on as Claude Code reports them
       [ -n "$log" ] && grep '"rate_limits"' "$log" | tail -1 | jq -c --arg s "$SID" '.payload.rate_limits // empty
         | [.primary, .secondary] | map(select(. != null and .window_minutes != null)
@@ -394,9 +470,19 @@ these exact names; they are available in every message of this chat." > "$S/syst
     + {instructions:[$sys], autoupdate:false, share:"disabled"}
     + (if $dev == "1" then {} elif $dev == "rule" then {permission:{bash:"ask", edit:"ask", webfetch:"ask"}}
        else {permission:{bash:"ask", edit:"ask"}} end)')
+  # an API key service: a provider of its own, pointed at the relay (OpenAI-style when it has that address)
+  if [ -n "$SVC" ]; then
+    cfg=$(jq -c --argjson c "$cfg" --arg url "$URL/llm/$SVC" --arg t "$TOKEN" --arg id "buddy-$SVC" '
+      (if .openai != "" then {npm:"@ai-sdk/openai-compatible", options:{baseURL:($url + "/o"), apiKey:$t}}
+       else {npm:"@ai-sdk/anthropic", options:{baseURL:($url + "/a/v1"), apiKey:$t}} end) as $p
+      | $c + {provider:{($id):($p + {name:.name, models:(.models | with_entries(.value = ({name:.value.name}
+          + (if .value.window > 0 then {limit:{context:.value.window, output:([.value.window / 4, 32000] | min | floor)}}
+             else {} end))))})}}' "$D/providers/$SVC.json") || return 1
+  fi
   local args=(run --format json)
   [ "$v2" = 1 ] && args+=(--standalone)
   [ -s "$S/opencode-session" ] && args+=(-s "$(cat "$S/opencode-session")")
+  [ -n "$SVC" ] && MODEL="buddy-$SVC/$SVCM"
   [ -n "${MODEL:-}" ] && args+=(-m "$MODEL")
   local f
   for f in "${ATT[@]}"; do args+=(-f "$f"); done

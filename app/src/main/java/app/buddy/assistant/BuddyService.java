@@ -85,6 +85,10 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         Models.setAgy(Prefs.agyModels(this));
         Models.setGrok(Prefs.grokModels(this));
         new Thread(() -> Attachments.cleanup(this)).start();
+        new Thread(() -> { // API key services: the key saved per agent by earlier builds, then fresh model lists
+            Providers.migrate(this);
+            Providers.refresh(this);
+        }, "providers").start();
         tools = new Tools(this);
         autoPause = new AutoPause(this);
         marks = new Marks(this);

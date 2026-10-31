@@ -38,7 +38,7 @@ final class ClaudeDictation {
 
     /** Start listening (the hidden session starts first if needed: a few seconds the first time). */
     static String listen(Context c, String lang, Voice.Listener l) {
-        if (!SetupState.signedIn(c, "claude")) return c.getString(R.string.dictation_claude_sign_in);
+        if (!SetupState.planSignedIn(c, "claude")) return c.getString(R.string.dictation_claude_sign_in);
         final Context app = c.getApplicationContext();
         listener = l;
         holding = false;
@@ -70,7 +70,7 @@ final class ClaudeDictation {
 
     /** Start the hidden session ahead of time (a chat opened), so the first tap on the mic is quick. */
     static void prepare(Context c, String lang) {
-        if (!SetupState.signedIn(c, "claude") || ready(code(lang))) return;
+        if (!SetupState.planSignedIn(c, "claude") || ready(code(lang))) return;
         final Context app = c.getApplicationContext();
         new Thread(() -> {
             try {

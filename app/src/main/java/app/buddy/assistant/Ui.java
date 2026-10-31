@@ -435,6 +435,11 @@ final class Ui {
      * to l; nothing happens if the sheet is closed.
      */
     static void modelSheet(Activity a, String backend, String current, String defaultHint, Pick l) {
+        modelSheet(a, backend, current, defaultHint, true, l);
+    }
+
+    /** services: also the API key services' models (not for runs outside a chat, like the reviewer's). */
+    static void modelSheet(Activity a, String backend, String current, String defaultHint, boolean services, Pick l) {
         Models.refresh(a);
         LinearLayout c = column(a);
         TextView h = title(a, a.getString(R.string.chat_model_title, Account.nameOf(backend)), 18);
@@ -442,7 +447,13 @@ final class Ui {
         c.addView(h);
         final Dialog[] d = new Dialog[1];
         boolean known = false;
-        for (final String[] o : Models.forBackend(backend)) {
+        for (final String[] o : Models.options(backend, services)) {
+            if (o[0] == null) { // an API key service's models
+                TextView sl = sectionLabel(a, o[1]);
+                sl.setPaddingRelative(0, dp(a, 14), 0, dp(a, 2));
+                c.addView(sl);
+                continue;
+            }
             boolean on = o[0].equals(current);
             known |= on;
             LinearLayout r = row(a);
@@ -452,7 +463,7 @@ final class Ui {
             LinearLayout t = column(a);
             t.setPaddingRelative(dp(a, 14), 0, 0, 0);
             t.addView(title(a, o[1], 15));
-            t.addView(single(monoText(a, o[0].isEmpty() ? defaultHint : o[0], 12, MUTED)));
+            t.addView(single(monoText(a, Models.detail(backend, o[0], defaultHint), 12, MUTED)));
             r.addView(t, weight1());
             r.setOnClickListener(v -> {
                 d[0].dismiss();

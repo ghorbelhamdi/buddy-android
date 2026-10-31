@@ -18,6 +18,11 @@
     <!-- Scheduled tasks: on time (the user allows it on Android 14+; without, a few minutes late), and again after a restart -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- set_alarm and set_timer: the Clock app's alarms and timers, without opening it -->
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+    <!-- the location tool, asked for the first time it's used (not in the Play build) -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <!-- Needed on Android 11+ to see launchable apps for open_app / list_apps -->
     <queries>
@@ -98,6 +103,26 @@
         <activity
             android:name=".AppPermissionsActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".ApiKeysActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".SkillsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".GitHubActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".PhoneToolActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="false"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <activity
             android:name=".SetupActivity"

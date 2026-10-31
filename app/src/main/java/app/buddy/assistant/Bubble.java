@@ -1742,7 +1742,7 @@ final class Bubble implements ChatHub.Listener {
         TextView note = Ui.text(svc, svc.getString(R.string.bubble_model_note), 13, Ui.MUTED);
         note.setPaddingRelative(dp(8), dp(4), dp(8), dp(10));
         sessionList.addView(note);
-        String[][] efforts = Models.efforts(ses.backend);
+        String[][] efforts = Models.efforts(ses);
         if (efforts != null) {
             TextView el = Ui.sectionLabel(svc, svc.getString(R.string.bubble_effort));
             el.setPaddingRelative(dp(8), dp(4), 0, dp(2));
@@ -1762,7 +1762,13 @@ final class Bubble implements ChatHub.Listener {
         ml.setPaddingRelative(dp(8), dp(16), 0, dp(4));
         sessionList.addView(ml);
         Models.refresh(svc);
-        for (final String[] o : Models.forBackend(ses.backend)) {
+        for (final String[] o : Models.options(ses.backend, true)) {
+            if (o[0] == null) { // an API key service's models
+                TextView sl = Ui.sectionLabel(svc, o[1]);
+                sl.setPaddingRelative(dp(8), dp(14), 0, dp(2));
+                sessionList.addView(sl);
+                continue;
+            }
             boolean on = o[0].equals(ses.model);
             LinearLayout r = Ui.listRow(svc);
             r.setGravity(Gravity.CENTER_VERTICAL);
@@ -1779,7 +1785,7 @@ final class Bubble implements ChatHub.Listener {
             t.setOrientation(LinearLayout.VERTICAL);
             t.setPaddingRelative(dp(14), 0, 0, 0);
             t.addView(Ui.title(svc, o[1], 15));
-            t.addView(Ui.single(Ui.monoText(svc, o[0].isEmpty() ? Models.defaultHint(ses) : o[0], 12, Ui.MUTED)));
+            t.addView(Ui.single(Ui.monoText(svc, Models.detail(ses.backend, o[0], Models.defaultHint(ses)), 12, Ui.MUTED)));
             r.addView(t, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
             r.setOnClickListener(v -> {
                 if (!o[0].equals(ses.model)) hub.setModel(ses, o[0]);

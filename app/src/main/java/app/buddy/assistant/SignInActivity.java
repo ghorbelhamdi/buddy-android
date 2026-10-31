@@ -135,6 +135,7 @@ public class SignInActivity extends Screen implements Account.Listener {
                     pasteOpen = true;
                     acc.startLogin(this, true);
                 });
+                if (acc.claude() || "codex".equals(acc.agent)) secondary(getString(R.string.signin_api_key), v -> apiKeys());
                 break;
             case WAITING_BROWSER:
                 if (acc.url == null) {
@@ -172,11 +173,21 @@ public class SignInActivity extends Screen implements Account.Listener {
                 versionNote();
                 String usage = Usage.line(this, acc.agent);
                 if (usage != null) note(usage);
+                boolean keys = acc.claude() || "codex".equals(acc.agent);
+                if (keys && acc.apiKey) { // chats can use the services' models; the plan, if signed in, stays for the rest
+                    note(getString(acc.planIn ? R.string.signin_api_key_on_plan : R.string.signin_api_key_on, acc.name()));
+                }
                 primary(getString(R.string.signin_done), v -> finish());
                 updateButton();
-                secondary(getString(R.string.signin_sign_out), v -> confirmSheet(this, getString(R.string.signin_sign_out_title, acc.name()),
-                        getString(R.string.signin_sign_out_text, acc.name()), getString(R.string.signin_sign_out), true,
-                        () -> acc.logout(this)));
+                if (keys) secondary(getString(R.string.signin_api_keys), v -> apiKeys());
+                if (acc.planIn || !keys) {
+                    secondary(getString(R.string.signin_sign_out), v -> confirmSheet(this, getString(R.string.signin_sign_out_title, acc.name()),
+                            getString(R.string.signin_sign_out_text, acc.name()), getString(R.string.signin_sign_out), true,
+                            () -> acc.logout(this)));
+                } else { // services only: the plan can be added for voice and the rest
+                    secondary(getString(acc.claude() ? R.string.signin_with_claude : R.string.signin_with_chatgpt),
+                            v -> acc.startLogin(this));
+                }
                 break;
             case ERROR:
                 header(R.drawable.ms_error, getString(R.string.signin_error_title), acc.detail, false);
@@ -354,6 +365,14 @@ public class SignInActivity extends Screen implements Account.Listener {
         LinearLayout.LayoutParams p = full();
         p.topMargin = dp(this, 18);
         body.addView(c, p);
+    }
+
+    /**
+     * Claude Code or Codex with an API key (and, for a compatible service, its base URL) instead of the plan. Billed to
+     * the key's account; the key stays in Buddy's private storage.
+     */
+    private void apiKeys() {
+        startActivity(new Intent(this, ApiKeysActivity.class));
     }
 
     // ------------------------------------------------------------ pieces

@@ -3,6 +3,6 @@ contact_links:
   - name: Security issue (an agent acting without approval)
     url: https://github.com/ghorbelhamdi/buddy-android/security/advisories/new
     about: Please report these privately, not as a public issue.
-  - name: How to contribute
+  - name: How to help
     url: https://github.com/ghorbelhamdi/buddy-android/blob/main/CONTRIBUTING.md
-    about: Building, testing on a phone, and code style.
+    about: Reporting bugs, ideas, translations and building Buddy yourself.

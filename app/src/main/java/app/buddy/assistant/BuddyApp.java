@@ -13,6 +13,10 @@ public class BuddyApp extends Application {
         ctx = this;
     }
 
+    static Context context() {
+        return ctx;
+    }
+
     /** String resource id in the app's language, formatted with args if there are any. */
     static String str(int id, Object... args) {
         return args.length == 0 ? ctx.getString(id) : ctx.getString(id, args);

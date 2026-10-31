@@ -3,4 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
     <!-- Play updates the app itself, and installing APKs needs developer mode, which the Play build leaves out. -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" tools:node="remove" />
+    <!-- the location tool is left out of the Play build -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" tools:node="remove" />
 </manifest>

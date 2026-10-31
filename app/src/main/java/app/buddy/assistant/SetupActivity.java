@@ -21,6 +21,8 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.util.ArrayList;
+import java.util.List;
 
 import static app.buddy.assistant.Ui.*;
 
@@ -56,6 +58,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         super.onResume();
         if (isFinishing()) return;
         Account.addListener(this);
+        if (GitHub.login == null && Linux.installed(this)) GitHub.refresh(this); // for the GitHub row, next time it's drawn
         RemoteSession.addListener(this);
         SshServer.addListener(this);
         CodexRemote.addListener(this);
@@ -205,14 +208,26 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 v -> openAgent(backend), null, null);
 
         boolean signed = SetupState.signedIn(this, backend);
-        steps[2] = step(getString(R.string.setup_step_signin_title), acc.opencode()
-                        ? getString(signed ? R.string.setup_step_signin_opencode_done : R.string.setup_step_signin_opencode)
-                        : signed ? (acc.email.isEmpty() ? getString(R.string.setup_step_signin_done)
-                        : getString(R.string.setup_step_signin_done_email, acc.email))
-                        : getString(acc.claude() ? R.string.setup_step_signin_claude : acc.grok() ? R.string.setup_step_signin_grok
-                        : R.string.setup_step_signin_codex),
+        String signText = acc.opencode()
+                ? getString(signed ? R.string.setup_step_signin_opencode_done : R.string.setup_step_signin_opencode)
+                : signed ? (acc.email.isEmpty() ? getString(R.string.setup_step_signin_done)
+                : getString(R.string.setup_step_signin_done_email, acc.email))
+                : getString(acc.claude() ? R.string.setup_step_signin_claude : acc.grok() ? R.string.setup_step_signin_grok
+                : R.string.setup_step_signin_codex);
+        // Claude Code and Codex also take an API key (on their sign-in screen)
+        if (!signed && (acc.claude() || "codex".equals(backend))) signText += "\n\n" + getString(R.string.setup_step_signin_api_key);
+        // the default agent isn't signed in, but others are: making one of them the default is enough
+        java.util.List<String> ready = new java.util.ArrayList<>();
+        for (Account a : Account.ALL) if (!a.agent.equals(backend) && SetupState.signedIn(this, a.agent)) ready.add(a.agent);
+        if (!signed && !ready.isEmpty()) {
+            java.util.List<String> names = new java.util.ArrayList<>();
+            for (String r : ready) names.add(Account.nameOf(r));
+            signText += "\n\n" + getString(R.string.setup_step_signin_others, acc.name(), android.text.TextUtils.join(", ", names));
+        }
+        steps[2] = step(getString(R.string.setup_step_signin_title), signText,
                 installed ? signed : null, installed && !signed ? getString(R.string.setup_sign_in) : null,
-                v -> openAgent(backend), null, null);
+                v -> openAgent(backend), !signed && !ready.isEmpty() ? getString(R.string.setup_switch_default) : null,
+                v -> switchDefaultSheet(ready));
 
         PowerManager pm = getSystemService(PowerManager.class);
         boolean buddyBg = pm.isIgnoringBatteryOptimizations(getPackageName());
@@ -300,6 +315,11 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                     openAgent(v);
                 }), topGap(12));
         for (Account a : Account.ALL) ag.addView(agentRow(a.agent), topGap(a == Account.CLAUDE ? 12 : 4));
+        ag.addView(apiKeysRow(), topGap(4));
+        ag.addView(skillsRow(), topGap(4));
+        ag.addView(navRow(R.drawable.ms_terminal, "GitHub", GitHub.login == null || GitHub.login.isEmpty()
+                ? getString(R.string.github_row_none) : "@" + GitHub.login, GitHub.login != null && !GitHub.login.isEmpty(),
+                GitHubActivity.class), topGap(4));
         addCard(ag);
 
         // ---------------------------------------------------------- phone tools
@@ -362,8 +382,8 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         String engine = Prefs.voiceEngine(this);
         // Claude's dictation needs Claude Code signed in, ChatGPT's voice needs Codex: otherwise greyed out
         java.util.Set<String> noVoice = new java.util.HashSet<>();
-        if (!SetupState.signedIn(this, "claude")) noVoice.add("claude");
-        if (!SetupState.signedIn(this, "codex")) noVoice.add("chatgpt");
+        if (!SetupState.planSignedIn(this, "claude")) noVoice.add("claude");
+        if (!SetupState.planSignedIn(this, "codex")) noVoice.add("chatgpt");
         vc.addView(segmented(this, new String[][]{{"phone", getString(R.string.setup_voice_phone)}, {"claude", "Claude"},
                         {"chatgpt", "ChatGPT"}},
                 engine, false, v -> {
@@ -446,7 +466,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         // ------------------------------------------------------- remote control
         list.addView(sectionLabel(this, getString(R.string.setup_remote_control)));
         LinearLayout rcc = card();
-        boolean claudeIn = SetupState.signedIn(this, "claude");
+        boolean claudeIn = SetupState.planSignedIn(this, "claude");
         rcc.addView(switchRow(this, getString(R.string.setup_remote_session), getString(R.string.setup_remote_session_info),
                 Prefs.remoteSession(this), on -> {
             if (on && !claudeIn) {
@@ -489,7 +509,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         }
         // a Codex session for the ChatGPT app (CodexRemote)
         rcc.addView(divider(), lineParams());
-        boolean codexIn = SetupState.signedIn(this, "codex");
+        boolean codexIn = SetupState.planSignedIn(this, "codex");
         rcc.addView(switchRow(this, getString(R.string.setup_codex_session), getString(R.string.setup_codex_session_info),
                 Prefs.codexRemote(this), on -> {
             if (on && !codexIn) {
@@ -731,6 +751,10 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             wp.setMargins(dp(this, 12), 0, dp(this, 12), dp(this, 12));
             ex.addView(warning(this, getString(R.string.setup_dev_mode_warning)), wp);
         }
+        View bk = navRow(R.drawable.ms_backup, getString(R.string.backup_title), getString(R.string.backup_row), false,
+                BackupActivity.class);
+        bk.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
+        ex.addView(bk, full());
         addCard(ex);
 
         TextView ver = monoText(this, "buddy " + BuildInfo.VERSION + " · " + getPackageName(), 12, MUTED);
@@ -1184,6 +1208,36 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 getString(R.string.setup_set_up_agent, Account.nameOf(agent)), false, () -> openAgent(agent));
     }
 
+    /** Pick another agent that's ready as the default brain (the setup card, when the default one isn't signed in). */
+    private void switchDefaultSheet(java.util.List<String> ready) {
+        LinearLayout c = column(this);
+        TextView h = title(this, getString(R.string.setup_switch_default_title), 18);
+        h.setPaddingRelative(0, 0, 0, dp(this, 8));
+        c.addView(h);
+        final android.app.Dialog[] d = new android.app.Dialog[1];
+        for (String agent : ready) {
+            Account a = Account.of(agent);
+            LinearLayout r = row(this);
+            r.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
+            r.setBackgroundResource(ripple(this, false));
+            r.addView(agentTile(this, agent));
+            LinearLayout t = column(this);
+            t.setPaddingRelative(dp(this, 14), 0, 0, 0);
+            t.addView(title(this, a.name(), 15));
+            t.addView(text(this, a.tagline(), 13, MUTED));
+            r.addView(t, weight1());
+            r.setOnClickListener(v -> {
+                d[0].dismiss();
+                Prefs.setBackend(this, agent);
+                Toast.makeText(this, getString(R.string.setup_default_brain_set, a.name()), Toast.LENGTH_LONG).show();
+                render();
+            });
+            c.addView(r, full());
+        }
+        d[0] = bottomSheet(this, c);
+        d[0].show();
+    }
+
     /** An agent with its state (not installed / signed out / signed in); tap to install or sign in. */
     private View agentRow(String agent) {
         Account a = Account.of(agent);
@@ -1209,6 +1263,42 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         r.addView(t, weight1());
         r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
         r.setOnClickListener(v -> openAgent(agent));
+        return r;
+    }
+
+    /** Settings → API keys: other services' models for Claude Code, Codex and OpenCode. */
+    private View apiKeysRow() {
+        List<String> names = new ArrayList<>();
+        for (Providers.P p : Providers.all()) names.add(p.name);
+        return navRow(R.drawable.ms_key, getString(R.string.api_keys_title), names.isEmpty()
+                ? getString(R.string.api_keys_row_none) : android.text.TextUtils.join(", ", names), !names.isEmpty(),
+                ApiKeysActivity.class);
+    }
+
+    /** Settings → Skills: instructions the agents share. */
+    private View skillsRow() {
+        List<String> names = new ArrayList<>();
+        if (Linux.installed(this)) for (Skills.Skill s : Skills.all(this)) names.add("/" + s.name);
+        return navRow(R.drawable.ms_auto_awesome, getString(R.string.skills_title), names.isEmpty()
+                ? getString(R.string.skills_row_none) : android.text.TextUtils.join(" ", names), !names.isEmpty(),
+                SkillsActivity.class);
+    }
+
+    private View navRow(int iconRes, String title, String sub, boolean on, Class<?> screen) {
+        LinearLayout r = row(this);
+        r.setPaddingRelative(0, dp(this, 10), 0, dp(this, 10));
+        r.setBackgroundResource(ripple(this, false));
+        FrameLayout ic = new FrameLayout(this);
+        ic.setBackground(rounded(this, CARD2, 12));
+        ic.addView(icon(this, iconRes, MUTED, 22), new FrameLayout.LayoutParams(dp(this, 22), dp(this, 22), Gravity.CENTER));
+        r.addView(ic, new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
+        LinearLayout t = column(this);
+        t.setPaddingRelative(dp(this, 12), 0, dp(this, 8), 0);
+        t.addView(title(this, title, 15));
+        t.addView(single(monoText(this, sub, 12, on ? OK : MUTED)));
+        r.addView(t, weight1());
+        r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
+        r.setOnClickListener(v -> startActivity(new Intent(this, screen)));
         return r;
     }
 

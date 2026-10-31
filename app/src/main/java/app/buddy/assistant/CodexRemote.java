@@ -67,7 +67,7 @@ final class CodexRemote {
         final Context app = c.getApplicationContext();
         synchronized (CodexRemote.class) {
             if (!Prefs.codexRemote(app) || proc != null || starting) return;
-            if (!SetupState.signedIn(app, "codex")) {
+            if (!SetupState.planSignedIn(app, "codex")) {
                 set(State.ERROR, app.getString(R.string.setup_set_up_first, "Codex"));
                 return;
             }

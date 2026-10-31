@@ -110,7 +110,7 @@ public class AppPermissionsActivity extends Screen {
                     : Models.label(h, m), 13, MUTED)));
             r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
             r.setOnClickListener(v -> modelSheet(this, h, m, getString("claude".equals(h) ? R.string.reviewer_default_claude
-                    : R.string.reviewer_default_codex), picked -> {
+                    : R.string.reviewer_default_codex), false, picked -> {
                 Prefs.setReviewerModel(this, h, picked);
                 renderApps();
             }));

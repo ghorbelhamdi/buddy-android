@@ -331,6 +331,57 @@ final class Prefs {
         sp(c).edit().putString("agent_" + agent, state).apply();
     }
 
+    /** Chats whose agent is working right now: one still here when Buddy starts again was cut off (see ChatHub). */
+    static java.util.Set<String> busyChats(Context c) {
+        return new java.util.HashSet<>(sp(c).getStringSet("busy_chats", new java.util.HashSet<>()));
+    }
+
+    static void setBusy(Context c, String chat, boolean busy) {
+        java.util.Set<String> s = busyChats(c);
+        if (busy ? s.add(chat) : s.remove(chat)) sp(c).edit().putStringSet("busy_chats", s).commit();
+    }
+
+    /** The API key services (see Providers), as JSON, without their keys. */
+    static String providers(Context c) {
+        return sp(c).getString("providers", "[]");
+    }
+
+    static void setProviders(Context c, String json) {
+        sp(c).edit().putString("providers", json).apply();
+    }
+
+    /** What a chat on Default uses with this agent: "" (the agent's own default, on its plan) or "@service/model". */
+    static String agentDefault(Context c, String agent) {
+        return sp(c).getString("agent_default_" + agent, "");
+    }
+
+    static void setAgentDefault(Context c, String agent, String ref) {
+        sp(c).edit().putString("agent_default_" + agent, ref).apply();
+    }
+
+    /** Earlier builds' model list for an agent's API key: only cleared now (see Providers.migrate). */
+    static void setKeyModels(Context c, String agent, String json) {
+        sp(c).edit().putString("key_models_" + agent, json).apply();
+    }
+
+    /** The base URL of another service an agent's API key is for ("": Anthropic's or OpenAI's API). */
+    static String apiBase(Context c, String agent) {
+        return sp(c).getString("api_base_" + agent, "");
+    }
+
+    static void setApiBase(Context c, String agent, String base) {
+        sp(c).edit().putString("api_base_" + agent, base).apply();
+    }
+
+    /** The agent is signed in with its plan (not only an API key): plan-only features (voice…) need it. */
+    static boolean agentPlan(Context c, String agent) {
+        return sp(c).getBoolean("agent_plan_" + agent, true);
+    }
+
+    static void setAgentPlan(Context c, String agent, boolean plan) {
+        sp(c).edit().putBoolean("agent_plan_" + agent, plan).apply();
+    }
+
     /** Keep a Claude Code session with Remote Control running inside Buddy's Linux. */
     static boolean remoteSession(Context c) {
         return sp(c).getBoolean("remote_session", false);

@@ -64,6 +64,34 @@ final class ChatHub {
     private ChatHub(Context app) {
         this.app = app;
         sessions = new Sessions(app);
+        // a chat still marked working when Buddy starts was cut off: Android closed Buddy (an update, low memory), and
+        // its agent with it
+        for (String id : Prefs.busyChats(app)) {
+            Sessions.Session s = sessions.find(id);
+            Prefs.setBusy(app, id, false);
+            if (s == null) continue;
+            s.interrupted = true;
+            sessions.add(s, Bubble.Kind.STEP, app.getString(R.string.hub_interrupted), null);
+        }
+        // incognito chats don't outlive Buddy: they go, with what their agent kept of them
+        for (Sessions.Session s : new ArrayList<>(sessions.all)) {
+            if (!s.incognito) continue;
+            sessions.remove(s);
+            if (Linux.installed(app)) {
+                try {
+                    Helper.run(app, "delete", s.id, "forget");
+                } catch (Exception ignored) {
+                }
+            }
+        }
+    }
+
+    /** After a cut-off run: the agent checks what's done and goes on. */
+    String resume(Sessions.Session ses) {
+        return send(ses, app.getString(R.string.hub_resume_message), null, "(From Buddy, not the user) Android closed Buddy "
+                + "in the middle of your last task, and stopped you with it. Check what is already done (the screen, the "
+                + "files, the conversation so far), then carry on from where you stopped. Don't redo steps that already "
+                + "happened, such as sending a message again.", false, false);
     }
 
     void addListener(Listener l) {
@@ -126,6 +154,8 @@ final class ChatHub {
 
     /** Sends a message with attachments (ids from Attachments); the helper fetches them before the agent runs. */
     String send(final Sessions.Session ses, String text, List<String> files) {
+        String skill = ses.running ? null : Skills.prompt(app, ses.backend, text); // "/name …": a skill picked with /
+        if (skill != null) return send(ses, text, files, skill, false, false);
         return send(ses, text, files, null);
     }
 
@@ -148,6 +178,12 @@ final class ChatHub {
     }
 
     private String send(final Sessions.Session ses, String text, List<String> files, String prompt, boolean scheduled) {
+        return send(ses, text, files, prompt, scheduled, prompt != null && !scheduled);
+    }
+
+    /** rule: a notification rule's run (someone else's message): no shell, files or web. */
+    private String send(final Sessions.Session ses, String text, List<String> files, String prompt, boolean scheduled,
+                        boolean rule) {
         if (ses.running) {
             if (files != null && !files.isEmpty()) return app.getString(R.string.hub_still_working_attachments);
             return addNote(ses, text);
@@ -160,11 +196,12 @@ final class ChatHub {
         if (svc != null && prompt == null) svc.allowControl();
         try {
             // a rule's run works for someone else's message: no shell, files or web, even with Linux tools on
-            Helper.run(app, "ask", ses.id, ses.backend, prompt != null && !scheduled ? "rule" : devArg(ses), forAgent,
+            Helper.run(app, "ask", ses.id, ses.backend, rule ? "rule" : devArg(ses), forAgent,
                     model(ses), hasFiles ? android.text.TextUtils.join(",", files) : "", ses.effort);
         } catch (Exception e) {
             return e.getMessage();
         }
+        ses.interrupted = false;
         sessions.add(ses, Bubble.Kind.USER, text, hasFiles ? new ArrayList<>(files) : null);
         Sessions.Msg um = ses.messages.get(ses.messages.size() - 1);
         if (scheduled) {
@@ -197,6 +234,10 @@ final class ChatHub {
             }
         }, GIVE_UP_MS);
         return null;
+    }
+
+    private static long read(JSONObject modelUsage) {
+        return modelUsage.optLong("inputTokens") + modelUsage.optLong("cacheReadInputTokens");
     }
 
     /** The end of what the agent wrote to stderr this run (buddy-run keeps it), or "": a hung agent often says why there. */
@@ -248,6 +289,12 @@ final class ChatHub {
     }
 
     /** Long-task mode for a chat: the screen stays on while it works (see KeepAwake); a running one gets it at once. */
+    void setIncognito(Sessions.Session ses, boolean on) {
+        ses.incognito = on;
+        sessions.save();
+        changed();
+    }
+
     void setAwake(Sessions.Session ses, boolean on) {
         ses.awake = on;
         sessions.save();
@@ -332,6 +379,15 @@ final class ChatHub {
                         sessions.save();
                         changed();
                     }
+                } else if ("status".equals(ev.optString("subtype"))) { // Claude Code: compacting the conversation
+                    if ("compacting".equals(ev.optString("status"))) ses.status = app.getString(R.string.hub_compacting);
+                } else if ("compact_boundary".equals(ev.optString("subtype"))) {
+                    JSONObject cm = ev.optJSONObject("compact_metadata");
+                    if (cm != null && cm.optLong("post_tokens") > 0) {
+                        ses.ctxUsed = cm.optLong("post_tokens");
+                        add(ses, Bubble.Kind.STEP, app.getString(R.string.hub_compacted,
+                                Models.tokens(cm.optLong("pre_tokens")), Models.tokens(ses.ctxUsed)));
+                    }
                 } else if ("init".equals(ev.optString("subtype"))) {
                     ses.status = app.getString(R.string.hub_thinking);
                     // the model really in use (Claude Code says it here), shown when the chat is on "Default"
@@ -344,6 +400,13 @@ final class ChatHub {
                 break;
             case "assistant": {
                 JSONObject msg = ev.optJSONObject("message");
+                JSONObject u = msg == null ? null : msg.optJSONObject("usage");
+                // Claude Code: what this request sent and got is how full the context is now (not a subagent's)
+                if (u != null && ev.isNull("parent_tool_use_id")) {
+                    long used = u.optLong("input_tokens") + u.optLong("cache_creation_input_tokens")
+                            + u.optLong("cache_read_input_tokens") + u.optLong("output_tokens");
+                    if (used > 0) ses.ctxUsed = used;
+                }
                 JSONArray content = msg == null ? null : msg.optJSONArray("content");
                 if (content == null) break;
                 for (int i = 0; i < content.length(); i++) {
@@ -370,6 +433,19 @@ final class ChatHub {
                 break;
             }
             case "result": {
+                // Claude Code: the context size it works with for the chat's model (its own idea of an unknown one)
+                JSONObject mu = ev.optJSONObject("modelUsage");
+                if (mu != null) {
+                    JSONObject m = mu.optJSONObject(ses.actualModel);
+                    if (m == null) { // otherwise the one that did most of the reading (a helper model reads little)
+                        for (java.util.Iterator<String> it = mu.keys(); it.hasNext(); ) {
+                            JSONObject o = mu.optJSONObject(it.next());
+                            if (o != null && (m == null || read(o) > read(m))) m = o;
+                        }
+                    }
+                    if (m != null && m.optLong("contextWindow") > 0) ses.ctxWindow = m.optLong("contextWindow");
+                    sessions.save();
+                }
                 boolean error = ev.optBoolean("is_error") || !"success".equals(ev.optString("subtype", "success"));
                 String r = ev.optString("result", "").trim();
                 if (error && ses.outcome == null) ses.outcome = "failed";
@@ -400,6 +476,11 @@ final class ChatHub {
                 if (warning != null) add(ses, Bubble.Kind.STEP, warning);
                 break;
             }
+            case "buddy_context": // Codex, after its turn (see buddy-run): how full the context is, and its size
+                if (ev.optLong("used") > 0) ses.ctxUsed = ev.optLong("used");
+                if (ev.optLong("window") > 0) ses.ctxWindow = ev.optLong("window");
+                sessions.save();
+                break;
             case "buddy_step": // a line from the helper under the steps (Antigravity: a refused step)
                 add(ses, Bubble.Kind.STEP, ev.optString("text"));
                 break;
@@ -494,7 +575,8 @@ final class ChatHub {
     }
 
     private static String model(Sessions.Session ses) {
-        if (!ses.model.isEmpty() || !"opencode".equals(ses.backend)) return ses.model;
+        String eff = Models.effective(ses); // the chat's pick, or a service the agent uses by default
+        if (!eff.isEmpty() || !"opencode".equals(ses.backend)) return eff;
         String plan = Account.OPENCODE.plan;
         return plan.isEmpty() || plan.equals("free models") ? "opencode/big-pickle" : "";
     }
@@ -510,6 +592,13 @@ final class ChatHub {
         }
         startRun(ses);
         ses.status = app.getString(R.string.hub_thinking);
+        changed();
+    }
+
+    /** The user dismissed the offer to continue a cut-off run. */
+    void dismissInterrupted(Sessions.Session ses) {
+        ses.interrupted = false;
+        sessions.save();
         changed();
     }
 
@@ -587,6 +676,7 @@ final class ChatHub {
         ses.lastEventAt = SystemClock.elapsedRealtime();
         ses.runId++;
         Tools.runStarted(ses.id);
+        Prefs.setBusy(app, ses.id, true);
     }
 
     /**
@@ -594,6 +684,7 @@ final class ChatHub {
      * long-task mode or a scheduled task's run (nobody may be watching) a notification says how it went.
      */
     private void runEnded(Sessions.Session ses) {
+        Prefs.setBusy(app, ses.id, false);
         if (ses.schedule == null) ses.allowed.clear(); // a scheduled chat keeps them for its next scheduled run
         CodexLive.agentDone(ses, ses.outcome, !ses.lastReply.isEmpty());
         if (ses.awake || ses.scheduledRun) KeepAwake.notifyEnded(app, ses);
@@ -652,6 +743,7 @@ final class ChatHub {
     }
 
     void changed() {
+        CodexLive.refresh(); // a live call's status follows the chat (Working on it…)
         boolean now = runningCount() > 0;
         if (wasRunning && !now) {
             lastRunEndedAt = SystemClock.elapsedRealtime();

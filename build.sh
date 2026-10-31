@@ -23,8 +23,9 @@ aapt2 compile --dir "$SRC/res" -o "$OUT/res.zip"
 echo "2/6 Linking resources and manifest"
 # The manifest has no package attribute (Gradle uses `namespace`), so add it for aapt2.
 sed "s|<manifest |<manifest package=\"$PACKAGE\" |" "$SRC/AndroidManifest.xml" > "$OUT/AndroidManifest.xml"
-# The play flavor drops REQUEST_INSTALL_PACKAGES (Gradle does this with app/src/play/AndroidManifest.xml).
-[ "$FLAVOR" = play ] && sed -i '/REQUEST_INSTALL_PACKAGES/d' "$OUT/AndroidManifest.xml"
+# The play flavor drops REQUEST_INSTALL_PACKAGES and the location permissions (Gradle does this with
+# app/src/play/AndroidManifest.xml).
+[ "$FLAVOR" = play ] && sed -i -e '/REQUEST_INSTALL_PACKAGES/d' -e '/ACCESS_COARSE_LOCATION/d' -e '/ACCESS_FINE_LOCATION/d' "$OUT/AndroidManifest.xml"
 aapt2 link -I "$SDK_JAR" --manifest "$OUT/AndroidManifest.xml" \
   --min-sdk-version 30 --target-sdk-version 36 \
   --version-code "$VERSION_CODE" --version-name "$VERSION_NAME" \

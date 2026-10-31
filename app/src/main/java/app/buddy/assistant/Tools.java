@@ -42,10 +42,12 @@ final class Tools {
     private final Object lock = new Object();
     private final List<AccessibilityNodeInfo> lastNodes = new ArrayList<>();
     private final BrowserTools browser;
+    private final PhoneTools phone;
 
     Tools(BuddyService svc) {
         this.svc = svc;
         browser = new BrowserTools(svc);
+        phone = new PhoneTools(svc);
     }
 
     // ---------------------------------------------------------------- schema
@@ -210,11 +212,12 @@ final class Tools {
                             .put("timeout_s", intProp("Default 120, max 300")),
                     "package"));
         }
+        PhoneTools.list(t); // the clipboard, alarms, sharing, Downloads, status, camera, location
         if (Browser.available(svc)) BrowserTools.list(t); // the background browser (Settings)
         return t;
     }
 
-    private static JSONObject tool(String name, String desc, JSONObject properties, String... required) throws JSONException {
+    static JSONObject tool(String name, String desc, JSONObject properties, String... required) throws JSONException {
         JSONObject schema = new JSONObject().put("type", "object").put("properties", properties);
         if (required.length > 0) {
             JSONArray r = new JSONArray();
@@ -224,19 +227,19 @@ final class Tools {
         return new JSONObject().put("name", name).put("description", desc).put("inputSchema", schema);
     }
 
-    private static JSONObject props() {
+    static JSONObject props() {
         return new JSONObject();
     }
 
-    private static JSONObject intProp(String d) throws JSONException {
+    static JSONObject intProp(String d) throws JSONException {
         return new JSONObject().put("type", "integer").put("description", d);
     }
 
-    private static JSONObject strProp(String d) throws JSONException {
+    static JSONObject strProp(String d) throws JSONException {
         return new JSONObject().put("type", "string").put("description", d);
     }
 
-    private static JSONObject boolProp(String d) throws JSONException {
+    static JSONObject boolProp(String d) throws JSONException {
         return new JSONObject().put("type", "boolean").put("description", d);
     }
 
@@ -304,6 +307,7 @@ final class Tools {
         String step = activity(name, a);
         if (step != null) svc.showActivity(step, null);
         if (ACTIONS.contains(name)) svc.runOnMain(() -> svc.marks().clear()); // the screen is about to change
+        if (PhoneTools.NAMES.contains(name)) return phone.call(name, a, ruleRun());
         switch (name) {
             case "read_screen": return text(readScreen());
             case "tap": return text(tap(a, false));

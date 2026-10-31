@@ -13,9 +13,3 @@ body:
     id: why
     attributes:
       label: Why does it matter to you?
-  - type: checkboxes
-    id: pr
-    attributes:
-      label: Contributing
-      options:
-        - label: I'd like to build this myself (we'll agree on the approach here first).

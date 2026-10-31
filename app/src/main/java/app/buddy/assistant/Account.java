@@ -75,6 +75,10 @@ final class Account {
     /** Updating rather than installing (same INSTALLING step), and what the last update did, for the screen. */
     volatile boolean updating;
     volatile String updateNote = "";
+    /** Signed in with the plan itself (Claude, ChatGPT): what voice, Remote Control and the ChatGPT app need. */
+    volatile boolean planIn = true;
+    /** Claude Code or Codex can use an API key service (Settings → API keys), with or without the plan. */
+    volatile boolean apiKey;
     /** A failed install's own output, behind Details when detail says it in plain words ("" otherwise). */
     volatile String errorDetail = "";
 
@@ -140,6 +144,7 @@ final class Account {
         // remembered, so screens can show progress right away before the next check finishes
         if (a != null && (s == Step.NEED_INSTALL || s == Step.SIGNED_OUT || s == Step.SIGNED_IN)) {
             Prefs.setAgentState(a, agent, s.name());
+            if (s == Step.SIGNED_IN) Prefs.setAgentPlan(a, agent, planIn);
         }
         main.post(() -> {
             for (Listener l : new ArrayList<>(listeners)) l.onAccountChanged();
@@ -180,9 +185,12 @@ final class Account {
                         return;
                     }
                     JSONObject j = new JSONObject(out.substring(from, to + 1));
-                    if (j.optBoolean("loggedIn")) {
-                        email = j.optString("email", j.optString("emailAddress", ""));
-                        plan = j.optString("subscriptionType", "");
+                    // signed in = the plan, or an API key service it can use (or both)
+                    planIn = j.optBoolean("loggedIn") && !"api_key".equals(j.optString("authMethod"));
+                    apiKey = !Providers.forAgent(agent).isEmpty();
+                    if (planIn || apiKey || j.optBoolean("loggedIn")) {
+                        email = planIn ? j.optString("email", j.optString("emailAddress", "")) : "";
+                        plan = planIn || !apiKey ? j.optString("subscriptionType", "") : keyPlan();
                         set(Step.SIGNED_IN, "");
                     } else {
                         set(Step.SIGNED_OUT, "");
@@ -298,12 +306,17 @@ final class Account {
                     String low = out.toLowerCase(Locale.ROOT);
                     if (out.contains("NOTINSTALLED")) {
                         set(Step.NEED_INSTALL, "");
-                    } else if (low.contains("logged in") && !low.contains("not logged in")) {
-                        email = "";
-                        plan = out.contains("ChatGPT") ? "ChatGPT" : "";
-                        set(Step.SIGNED_IN, "");
                     } else {
-                        set(Step.SIGNED_OUT, "");
+                        boolean logged = low.contains("logged in") && !low.contains("not logged in");
+                        planIn = logged && !low.contains("api key");
+                        apiKey = !Providers.forAgent(agent).isEmpty();
+                        if (logged || apiKey) {
+                            email = "";
+                            plan = planIn ? out.contains("ChatGPT") ? "ChatGPT" : "" : apiKey ? keyPlan() : "";
+                            set(Step.SIGNED_IN, "");
+                        } else {
+                            set(Step.SIGNED_OUT, "");
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -588,6 +601,7 @@ final class Account {
         if (login != null) login.destroy();
     }
 
+    /** Signs out of the plan (or the account). API key services stay (Settings → API keys). */
     void logout(Context c) {
         final Context app = c.getApplicationContext();
         new Thread(() -> {
@@ -599,6 +613,13 @@ final class Account {
             }
             refresh(app);
         }).start();
+    }
+
+    /** "API key · DeepSeek, OpenRouter": the services this agent can use, for when it has no plan. */
+    private String keyPlan() {
+        StringBuilder b = new StringBuilder();
+        for (Providers.P p : Providers.forAgent(agent)) b.append(b.length() == 0 ? "" : ", ").append(p.name);
+        return BuddyApp.str(R.string.account_plan_api_key_at, b.toString());
     }
 
     /** The confirmation code if this text contains it, else null: Claude's "&lt;code&gt;#&lt;state&gt;", or the Google
