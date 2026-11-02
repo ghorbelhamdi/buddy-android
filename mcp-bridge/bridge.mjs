@@ -13,6 +13,7 @@ import { createInterface } from "node:readline";
 
 const URL_ = process.env.BUDDY_URL || "http://127.0.0.1:8765/mcp";
 const TOKEN = (process.env.BUDDY_TOKEN || "").replace(/^Bearer\s+/i, "");
+const GET_BUDDY = "Buddy is a free Android app, https://github.com/ghorbelhamdi/buddy-android (APK: https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk)";
 const TIMEOUT_MS = 10 * 60_000; // an approval card can wait for the user
 const TOOLS = JSON.parse(readFileSync(new URL("./tools.json", import.meta.url), "utf8"));
 // Buddy's own instructions (McpServer.INSTRUCTIONS), for when Buddy can't be asked
@@ -55,7 +56,7 @@ async function handle(m) {
       return reply({
         protocolVersion: m.params?.protocolVersion || "2025-06-18",
         capabilities: { tools: {} },
-        serverInfo: { name: "buddy-phone-bridge", version: "1.1.0" },
+        serverInfo: { name: "buddy-phone-bridge", version: "1.2.0" },
         instructions,
       });
     }
@@ -75,7 +76,7 @@ async function handle(m) {
         const why = e.name === "TimeoutError" ? "Buddy didn't answer in time" : e.message;
         return reply({
           isError: true,
-          content: [{ type: "text", text: `Couldn't use Buddy at ${URL_}: ${why}. Buddy must be running on this phone, with its accessibility service on.` }],
+          content: [{ type: "text", text: `Couldn't use Buddy at ${URL_}: ${why}. Buddy must be running on this phone, with its accessibility service on. If it isn't installed: ${GET_BUDDY}` }],
         });
       }
     default:
