@@ -137,6 +137,10 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     public void onAccessibilityEvent(AccessibilityEvent event) {
         if (bubble == null) return;
         int type = event.getEventType();
+        if (type == AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED) { // only toasts; notifications aren't read here
+            noteToast(event);
+            return;
+        }
         if (type == AccessibilityEvent.TYPE_VIEW_CLICKED) { // only while a mark waits for a tap (listenForClicks)
             marks.onClicked(event.getSource(), event.getEventTime());
             return;
@@ -168,6 +172,30 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             marks.clear("LEFT: the user switched to another app before doing it.");
         }
         frontApp = front;
+    }
+
+    private String toast;
+    private long toastAt;
+
+    private synchronized void noteToast(AccessibilityEvent event) {
+        if (!String.valueOf(event.getClassName()).contains("Toast") || getPackageName().contentEquals(String.valueOf(event.getPackageName()))) return;
+        StringBuilder b = new StringBuilder();
+        for (CharSequence c : event.getText()) if (c != null) b.append(b.length() > 0 ? " " : "").append(c);
+        if (b.toString().trim().isEmpty()) return;
+        toast = b.toString().trim();
+        toastAt = android.os.SystemClock.elapsedRealtime();
+    }
+
+    /** The toast waiting to be told to the agent, if any. */
+    synchronized String peekToast() {
+        return toast;
+    }
+
+    /** The last toast if it's at most maxAgeMs old (toasts are told once, and last only seconds); forgets it either way. */
+    synchronized String takeToast(long maxAgeMs) {
+        String t = toast != null && android.os.SystemClock.elapsedRealtime() - toastAt <= maxAgeMs ? toast : null;
+        toast = null;
+        return t;
     }
 
     /** The app in front (the home screen and Recents count as apps). */

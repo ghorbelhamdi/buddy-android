@@ -31,6 +31,14 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v6
 
+      # proot, talloc, libandroid-shmem and the pty helper, from source with a fixed NDK
+      - name: Build native libraries
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;$NDK_VERSION" >/dev/null
+          ANDROID_NDK_HOME="$ANDROID_HOME/ndk/$NDK_VERSION" native/build.sh
+        env:
+          NDK_VERSION: 27.2.12479018
+
       # Release signing is optional: add the BUDDY_KEYSTORE_BASE64 and BUDDY_KEYSTORE_PASSWORD
       # repository secrets to get a signed APK; otherwise the APK is unsigned.
       - name: Decode signing key

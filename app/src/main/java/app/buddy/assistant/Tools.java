@@ -56,10 +56,13 @@ final class Tools {
         JSONArray t = new JSONArray();
         t.put(tool("read_screen",
                 "Read what is on the phone screen as a list of UI elements with ids, text, and tap coordinates. "
-                        + "Call this first and after every action to see the result. Element ids are only valid until the next read_screen.",
+                        + "Call this first and after every action to see the result. Element ids are only valid until the next read_screen. "
+                        + "Elements can also show a field's error, its hint, a heading, a tooltip or a pane title; \"(covered by ...)\" means "
+                        + "a tap there would land on something else. A toast that just showed is listed at the end.",
                 props()));
         t.put(tool("tap",
-                "Tap an element (by id from the last read_screen) or a screen coordinate in pixels.",
+                "Tap an element (by id from the last read_screen) or a screen coordinate in pixels. The result says NOTHING CHANGED "
+                        + "when the screen reads the same afterwards, and an element under another window isn't tapped.",
                 props().put("element", intProp("Element id from read_screen"))
                         .put("x", intProp("X in screen pixels")).put("y", intProp("Y in screen pixels"))));
         t.put(tool("long_press",
@@ -791,10 +794,14 @@ final class Tools {
                 if (w.getType() == AccessibilityWindowInfo.TYPE_APPLICATION && root.getPackageName() != null
                         && !svc.getPackageName().contentEquals(root.getPackageName())
                         && (app == null || w.isActive())) app = root.getPackageName().toString();
+                covers = coversAbove(windows, w);
                 walk(root, sb, 0);
+                covers = Collections.emptyList();
             }
             if (keyboard) sb.append("\n(The on-screen keyboard is open.)\n");
             if (lastNodes.size() >= MAX_NODES) sb.append("\n(Truncated at ").append(MAX_NODES).append(" elements; scroll for more.)\n");
+            String toast = svc.takeToast(TOAST_FRESH_MS);
+            if (toast != null) sb.append("\n(A toast just showed: \"").append(clip(toast)).append("\")\n");
             sb.append(Tips.once(svc, McpServer.CALLER_CHAT.get(), app));
         }
         return sb.toString();
@@ -808,8 +815,10 @@ final class Tools {
         }
         CharSequence text = n.getText();
         CharSequence desc = n.getContentDescription();
+        CharSequence error = n.getError(), tooltip = n.getTooltipText(), pane = n.getPaneTitle();
         boolean interesting = !empty(text) || !empty(desc) || n.isClickable() || n.isEditable()
-                || n.isScrollable() || n.isCheckable() || n.isLongClickable();
+                || n.isScrollable() || n.isCheckable() || n.isLongClickable()
+                || !empty(error) || !empty(tooltip) || !empty(pane);
         if (interesting) {
             int id = lastNodes.size();
             lastNodes.add(AccessibilityNodeInfo.obtain(n));
@@ -820,23 +829,102 @@ final class Tools {
             if (!empty(desc) && (empty(text) || !desc.toString().equals(text.toString())))
                 sb.append(" desc=\"").append(clip(desc)).append('"');
             if (n.isEditable() && n.isShowingHintText()) sb.append(" (hint)");
+            else if (n.isEditable() && !empty(n.getHintText())) sb.append(" hint=\"").append(clip(n.getHintText())).append('"');
+            if (!empty(error)) sb.append(" error=\"").append(clip(error)).append('"');
+            if (!empty(n.getStateDescription())) sb.append(" state=\"").append(clip(n.getStateDescription())).append('"');
+            if (!empty(tooltip) && !tooltip.toString().equals(String.valueOf(desc))) sb.append(" tooltip=\"").append(clip(tooltip)).append('"');
+            if (!empty(pane)) sb.append(" pane=\"").append(clip(pane)).append('"');
             sb.append(" @").append(r.centerX()).append(',').append(r.centerY());
             StringBuilder f = new StringBuilder();
             if (n.isClickable()) f.append(" click");
             if (n.isLongClickable()) f.append(" longclick");
             if (n.isEditable()) f.append(" edit");
+            if (n.isPassword()) f.append(" password");
+            if (n.isHeading()) f.append(" heading");
             if (n.isScrollable()) f.append(" scroll");
             if (n.isCheckable()) f.append(n.isChecked() ? " checked" : " unchecked");
             if (n.isFocused()) f.append(" focused");
             if (n.isSelected()) f.append(" selected");
             if (!n.isEnabled()) f.append(" disabled");
             if (f.length() > 0) sb.append(" {").append(f.toString().trim()).append('}');
+            for (Cover c : covers) {
+                if (c.area.contains(r.centerX(), r.centerY())) {
+                    sb.append(" (covered by ").append(c.name).append(')');
+                    break;
+                }
+            }
             sb.append('\n');
         }
         int count = n.getChildCount();
         for (int i = 0; i < count; i++) {
             walk(n.getChild(i), sb, interesting ? depth + 1 : depth);
         }
+    }
+
+    /** A window lying over the one being read; set while its nodes are walked. */
+    private static final class Cover {
+        final android.graphics.Region area;
+        final String name;
+
+        Cover(android.graphics.Region area, String name) {
+            this.area = area;
+            this.name = name;
+        }
+    }
+
+    private List<Cover> covers = Collections.emptyList();
+
+    /** The windows lying over w that take touches (a window's touchable area, not all of its bounds, where Android says). */
+    private List<Cover> coversAbove(List<AccessibilityWindowInfo> windows, AccessibilityWindowInfo w) {
+        List<Cover> out = new ArrayList<>();
+        for (AccessibilityWindowInfo o : windows) {
+            if (o.getType() == AccessibilityWindowInfo.TYPE_ACCESSIBILITY_OVERLAY || o.getLayer() <= w.getLayer()) continue;
+            android.graphics.Region area = new android.graphics.Region();
+            if (android.os.Build.VERSION.SDK_INT >= 33) {
+                o.getRegionInScreen(area);
+            } else {
+                Rect b = new Rect();
+                o.getBoundsInScreen(b);
+                area.set(b);
+            }
+            if (area.isEmpty()) continue;
+            out.add(new Cover(area, coverName(o)));
+        }
+        return out;
+    }
+
+    private String coverName(AccessibilityWindowInfo w) {
+        if (w.getType() == AccessibilityWindowInfo.TYPE_INPUT_METHOD) return "the keyboard";
+        AccessibilityNodeInfo root = w.getRoot();
+        CharSequence title = w.getTitle();
+        if (!empty(title)) return "\"" + clip(title) + "\"";
+        return root != null && root.getPackageName() != null ? "a window of " + root.getPackageName() : "another window";
+    }
+
+    /** What lies over element n at x, y so that a tap there wouldn't reach it, or null when nothing does. */
+    private String coveredBy(AccessibilityNodeInfo n, int x, int y) {
+        List<AccessibilityWindowInfo> windows = svc.getWindows();
+        for (AccessibilityWindowInfo w : windows) {
+            if (w.getId() != n.getWindowId()) continue;
+            for (Cover c : coversAbove(windows, w)) if (c.area.contains(x, y)) return c.name;
+        }
+        return null;
+    }
+
+    /** A note when the tap at x, y lands on another button than the element aimed at, in the same window. */
+    private static String otherButtonNote(AccessibilityNodeInfo n, AccessibilityNodeInfo hit) {
+        if (n == null || hit == null || n.equals(hit)) return "";
+        AccessibilityNodeInfo mine = clickableAncestor(n, false), there = clickableAncestor(hit, false);
+        if (there == null || there.equals(mine) || there.equals(n) || isInside(there, n) || isInside(n, there)) return "";
+        String label = Guard.buttonLabel(there);
+        return " Note: the point tapped is on " + (label == null ? "another control" : "\"" + clip(label) + "\"")
+                + ", not the element you aimed at.";
+    }
+
+    private static boolean isInside(AccessibilityNodeInfo n, AccessibilityNodeInfo ancestor) {
+        AccessibilityNodeInfo cur = n;
+        for (int i = 0; cur != null && i < 60; i++, cur = cur.getParent()) if (cur.equals(ancestor)) return true;
+        return false;
     }
 
     private static String windowType(int t) {
@@ -1072,7 +1160,8 @@ final class Tools {
             String low = r.toLowerCase(Locale.ROOT);
             if (low.startsWith("failed") || low.contains("blocked") || low.contains("denied") || low.contains("not done")
                     || low.contains("could not") || low.contains("couldn't") || low.contains("cancelled")
-                    || low.contains("changes requested") || low.contains("not tapped") || low.contains("stopped")) stop = true;
+                    || low.contains("changes requested") || low.contains("not tapped") || low.contains("stopped")
+                    || (r.contains(NOTHING_CHANGED) && !st.has("until"))) stop = true;
             out.append(i + 1).append(". ").append(action).append(": ").append(r.replace("Call read_screen to see the new content.", "").trim());
             if (!stop && st.has("until")) {
                 String w = waitFor(st.getJSONObject("until"));
@@ -1203,6 +1292,12 @@ final class Tools {
             x = a.getInt("x");
             y = a.getInt("y");
         }
+        if (n != null) {
+            String cover = coveredBy(n, x, y);
+            if (cover != null) return "Not tapped: this element is covered by " + cover + " at (" + x + ", " + y + "), so the tap "
+                    + "would land on that instead. Close it or scroll the element into the clear, then read_screen. To tap what's "
+                    + "there on purpose, give x and y.";
+        }
         AccessibilityNodeInfo hit = Guard.nodeAt(svc.getWindows(), x, y);
         String blocked = guard(n, hit);
         if (blocked != null) return blocked;
@@ -1211,9 +1306,86 @@ final class Tools {
                 : svc.getString(R.string.activity_tapping, label), null);
         Path p = new Path();
         p.moveTo(x, y);
+        String note = otherButtonNote(n, hit);
+        String before = beforeAction();
         boolean ok = gesture(p, longPress ? 700 : 60);
-        return (ok ? (longPress ? "Long-pressed" : "Tapped") : "Gesture was cancelled at")
-                + " (" + x + ", " + y + "). Call read_screen to see the result.";
+        String done = (ok ? (longPress ? "Long-pressed" : "Tapped") : "Gesture was cancelled at") + " (" + x + ", " + y + ")." + note;
+        if (!ok) return done + " Call read_screen to see the result.";
+        String after = afterAction(before, 1200);
+        return done + (after.isEmpty() ? " Call read_screen to see the result." : after);
+    }
+
+    // ------------------------------------------------------------- did the action do anything?
+
+    private static final String NOTHING_CHANGED = "NOTHING CHANGED";
+    /** A toast older than this isn't news to the agent. */
+    private static final long TOAST_FRESH_MS = 8000;
+
+    /** Call just before an action: forgets older toasts and returns the screen's state for {@link #afterAction}. */
+    private String beforeAction() {
+        svc.takeToast(0);
+        return screenPrint();
+    }
+
+    /**
+     * What the agent should know after an action: a toast that showed, or that the screen still reads the same after
+     * waitMs (returning at once when it changes). Empty when the screen simply changed, or when it can't be read.
+     */
+    private String afterAction(String before, long waitMs) {
+        long end = android.os.SystemClock.elapsedRealtime() + waitMs;
+        try {
+            while (before != null && before.equals(screenPrint()) && svc.peekToast() == null
+                    && android.os.SystemClock.elapsedRealtime() < end) {
+                Thread.sleep(150);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return "";
+        }
+        String toast = svc.takeToast(TOAST_FRESH_MS);
+        if (toast != null) return " A toast showed: \"" + clip(toast) + "\".";
+        if (before == null || !before.equals(screenPrint())) return "";
+        return " " + NOTHING_CHANGED + ": the screen reads the same as before. It may have missed, the app may be slow, or it "
+                + "draws something Buddy can't read. Look with read_screen or screenshot before trying again, and try "
+                + "something different rather than repeating this.";
+    }
+
+    /**
+     * The state of the apps on screen, to compare before and after an action; null when it can't be told (a window
+     * hides its content). Leaves out the bubble (an overlay) and the system bars, whose clock and network speed always move.
+     */
+    private String screenPrint() {
+        DisplayMetrics dm = svc.getResources().getDisplayMetrics();
+        StringBuilder b = new StringBuilder();
+        Rect r = new Rect();
+        for (AccessibilityWindowInfo w : svc.getWindows()) {
+            int type = w.getType();
+            if (type == AccessibilityWindowInfo.TYPE_INPUT_METHOD) {
+                b.append("keyboard\n");
+                continue;
+            }
+            if (type != AccessibilityWindowInfo.TYPE_APPLICATION && type != AccessibilityWindowInfo.TYPE_SYSTEM) continue;
+            w.getBoundsInScreen(r);
+            if (type == AccessibilityWindowInfo.TYPE_SYSTEM && (r.height() < dm.heightPixels / 5 || r.width() < dm.widthPixels / 5)) continue;
+            AccessibilityNodeInfo root = w.getRoot();
+            if (root == null) {
+                if (type == AccessibilityWindowInfo.TYPE_APPLICATION) return null;
+                continue;
+            }
+            b.append("window ").append(w.getId()).append('\n');
+            print(root, b, r);
+        }
+        return b.length() == 0 ? null : b.toString();
+    }
+
+    private void print(AccessibilityNodeInfo n, StringBuilder b, Rect r) {
+        if (n == null || b.length() > 200_000 || !n.isVisibleToUser()) return;
+        n.getBoundsInScreen(r);
+        b.append(r.left).append(',').append(r.top).append(',').append(r.right).append(',').append(r.bottom)
+                .append(n.isChecked() ? " c" : "").append(n.isSelected() ? " s" : "").append(n.isFocused() ? " f" : "")
+                .append(n.isEnabled() ? "" : " d").append(' ')
+                .append(n.getText()).append('|').append(n.getContentDescription()).append('|').append(n.getStateDescription()).append('\n');
+        for (int i = 0; i < n.getChildCount(); i++) print(n.getChild(i), b, r);
     }
 
     /**
@@ -1355,6 +1527,15 @@ final class Tools {
             boolean ok = target.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, args);
             if (!ok) throw new IllegalStateException("This field did not accept text.");
             result = "Typed " + text.length() + " characters.";
+            if (!target.isPassword()) { // some fields take the text and then change or drop it
+                Thread.sleep(150);
+                target.refresh();
+                CharSequence now = target.isShowingHintText() ? "" : target.getText();
+                String got = now == null ? "" : now.toString();
+                if (!got.replaceAll("\\s+", " ").trim().equals(value.replaceAll("\\s+", " ").trim())) {
+                    result += " The field now reads “" + ChatHub.clip(got, 200) + "”: check it with read_screen.";
+                }
+            }
         }
         if (a.optBoolean("submit")) {
             String mode = mode(str(target.getPackageName()));
@@ -1446,9 +1627,13 @@ final class Tools {
         Path p = new Path();
         p.moveTo(xy[0], xy[1]);
         p.lineTo(xy[2], xy[3]);
+        String before = beforeAction();
         boolean ok = gesture(p, 350);
         Thread.sleep(400);
-        return ok ? "Scrolled " + dir + ". Call read_screen to see the new content." : "Scroll was cancelled.";
+        if (!ok) return "Scroll was cancelled.";
+        String after = afterAction(before, 500);
+        return "Scrolled " + dir + "." + (after.isEmpty() ? " Call read_screen to see the new content."
+                : after.contains(NOTHING_CHANGED) ? " " + NOTHING_CHANGED + ": this is probably the end of the list, or that spot doesn't scroll." : after);
     }
 
     private String swipe(JSONObject a) throws Exception {
@@ -1462,8 +1647,9 @@ final class Tools {
         p.moveTo(x1, y1);
         p.lineTo(x2, y2);
         long d = Math.max(50, Math.min(3000, a.optLong("duration_ms", 300)));
+        String before = beforeAction();
         boolean ok = gesture(p, d);
-        return ok ? "Swiped." : "Swipe was cancelled.";
+        return ok ? "Swiped." + afterAction(before, 1000) : "Swipe was cancelled.";
     }
 
     /**
@@ -1520,12 +1706,13 @@ final class Tools {
             case "quick_settings": action = AccessibilityService.GLOBAL_ACTION_QUICK_SETTINGS; break;
             default: throw new IllegalArgumentException("Unknown button " + button);
         }
+        String before = "back".equals(button) ? beforeAction() : null;
         boolean ok = svc.performGlobalAction(action);
         try {
             Thread.sleep(500);
         } catch (InterruptedException ignored) {
         }
-        return ok ? "Pressed " + button + "." : "Could not press " + button + ".";
+        return ok ? "Pressed " + button + "." + afterAction(before, 500) : "Could not press " + button + ".";
     }
 
     private List<ResolveInfo> launchables() {

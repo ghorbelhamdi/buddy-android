@@ -58,7 +58,11 @@ final class Guard {
             + "삭제|삭제하기|송금|이체|구독|구독하기|차단|신고|로그아웃|전화 걸기|"
             + "发送|发布|支付|付款|立即支付|立即付款|购买|立即购买|下单|提交订单|加入购物车|删除|移除|确认|转账|"
             + "订阅|卸载|拉黑|举报|退出登录|拨打|"
-            + "إرسال|ارسال|أرسل|دفع|ادفع|شراء|اشتر|حذف|احذف|تأكيد|اتصال|أضف إلى السلة|إضافة إلى السلة"
+            + "إرسال|ارسال|أرسل|دفع|ادفع|شراء|اشتر|حذف|احذف|تأكيد|اتصال|أضف إلى السلة|إضافة إلى السلة|"
+            // Vietnamese ("Đăng nhập" is logging in and "Đăng ký" signing up, not posting)
+            + "gửi|gửi đi|đăng(?! nhập| ký| xuất)|đăng bài|chia sẻ ngay|thanh toán|thanh toán ngay|mua|mua ngay|mua hàng|đặt hàng|đặt mua|"
+            + "thêm vào giỏ|thêm vào giỏ hàng|xóa|xoá|gỡ|gỡ bỏ|gỡ cài đặt|xác nhận|chuyển tiền|chuyển khoản|đăng ký|"
+            + "hủy đăng ký|huỷ đăng ký|chặn|báo cáo|đăng xuất|gọi|gọi điện"
             + ")(?![\\p{L}])");
     /** Of those, the ones that send or post a message, in each of Buddy's languages: a notification rule's countdown
      * may approve these (see Triggers), never paying, buying, deleting and the rest. */
@@ -68,7 +72,7 @@ final class Guard {
             + "enviar|publicar|responder|inviare|invia|pubblica|rispondi|verzenden|versturen|verstuur|plaatsen|publiceren|"
             + "beantwoorden|wyślij|opublikuj|odpowiedz|отправить|опубликовать|ответить|надіслати|відправити|опублікувати|"
             + "відповісти|gönder|paylaş|yayınla|yanıtla|भेजें|पोस्ट करें|जवाब दें|kirim|balas|送信|送信する|投稿|投稿する|返信|"
-            + "보내기|전송|게시|답장|发送|发布|回复|إرسال|ارسال|أرسل|رد"
+            + "보내기|전송|게시|답장|发送|发布|回复|إرسال|ارسال|أرسل|رد|gửi|gửi đi|đăng(?! nhập| ký| xuất)|đăng bài|trả lời"
             + ")(?![\\p{L}])");
     /** A send button known only by its id (see RISKY_ID), as riskyLabel words it ("send", "btn send", "send button"). */
     private static final Pattern SEND_ID = Pattern.compile("(?i)(^|\\s)(send|sendbutton|post|reply)(\\s|$)");

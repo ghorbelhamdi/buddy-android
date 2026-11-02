@@ -1,14 +1,15 @@
 # Third-party components
 
 Buddy's built-in Linux runs through **proot**, which ships inside the APK as native libraries
-(`app/src/main/jniLibs/arm64-v8a/`, copied from Termux's aarch64 packages; renamed to `lib*.so` so
-Android extracts them, and with their library search paths adjusted with `patchelf`).
+(named `lib*.so` so Android extracts them). They are built from source by [`native/build.sh`](../native/build.sh):
+it downloads the exact source releases below, checks their SHA-256, and compiles them with the Android NDK
+in CI (or Termux's clang on a phone), the way Termux builds them.
 
 | File in the APK | Component | Version | Licence | Source |
 |---|---|---|---|---|
-| `libproot.so`, `libproot-loader.so` | PRoot (Termux fork) | 5.1.107.96 | GPL-2.0 ([text](proot-LICENSE.txt)) | https://github.com/termux/proot · build recipe: https://github.com/termux/termux-packages/tree/master/packages/proot |
+| `libproot.so`, `libproot-loader.so` | PRoot (Termux fork) | 5.1.107.102 | GPL-2.0 ([text](proot-LICENSE.txt)) | https://github.com/termux/proot/archive/v5.1.107.102.zip |
 | `libtalloc.so` | talloc | 2.5.0 | LGPL-3.0-or-later ([text](talloc-LICENSE.txt)) | https://www.samba.org/ftp/talloc/talloc-2.5.0.tar.gz |
-| `libandroid-shmem.so` | libandroid-shmem | 0.7 | BSD-3-Clause ([text](libandroid-shmem-LICENSE.txt)) | https://github.com/termux/libandroid-shmem |
+| `libandroid-shmem.so` | libandroid-shmem | 0.7 | BSD-3-Clause ([text](libandroid-shmem-LICENSE.txt)) | https://github.com/termux/libandroid-shmem/archive/refs/tags/v0.7.tar.gz |
 
 Downloaded at runtime, not bundled: Alpine Linux (minirootfs and packages, various open-source licences,
 https://alpinelinux.org), Claude Code (Anthropic, installed with Anthropic's official installer under

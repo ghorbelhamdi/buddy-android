@@ -17,6 +17,9 @@ OUT=build
 rm -rf "$OUT"
 mkdir -p "$OUT/gen" "$OUT/classes" "$OUT/dex"
 
+# proot and the other native libraries are built from source, not kept in git
+[[ -f $SRC/jniLibs/arm64-v8a/libproot.so ]] || native/build.sh
+
 echo "1/6 Compiling resources"
 aapt2 compile --dir "$SRC/res" -o "$OUT/res.zip"
 

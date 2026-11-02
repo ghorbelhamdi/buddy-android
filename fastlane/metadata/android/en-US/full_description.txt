@@ -11,7 +11,7 @@ Also:
 • a background browser for web pages
 • live voice and scheduled tasks
 • its phone tools work from your own Claude Code or Codex sessions in Termux
-• 17 languages
+• 18 languages
 
 What Buddy downloads: Alpine Linux (from alpinelinux.org, checked by SHA-256) when you set it up, and each agent's official CLI when you pick it. Chromium for the background browser only if you turn it on.
 

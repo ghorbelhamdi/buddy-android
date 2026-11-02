@@ -1,5 +1,7 @@
 # build output
 build/
+# native libraries: built from source by native/build.sh (CI and build.sh run it)
+app/src/main/jniLibs/
 app/build/
 dist/
 .gradle/
