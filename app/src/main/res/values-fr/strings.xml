@@ -1175,6 +1175,8 @@
     <!-- %1$s = the account's email address. -->
     <string name="setup_agent_signed_in_email">connecté · %1$s</string>
     <string name="setup_agent_not_signed_in">non connecté</string>
+    <string name="setup_agent_api_key">non connecté · clé API</string>
+    <string name="signin_key_only">Utilise une clé API</string>
 
     <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
     <string name="setup_phone_tools">Outils du téléphone dans vos propres sessions</string>
@@ -1845,13 +1847,22 @@
     <string name="api_keys_saving">Vérification de la clé…</string>
     <string name="api_keys_save">Enregistrer</string>
     <string name="api_keys_addresses_info">Claude Code utilise l\'adresse de style Anthropic. Codex utilise celle de style OpenAI, si le service a la Responses API d\'OpenAI. OpenCode utilise l\'une ou l\'autre. Laisse une adresse vide si le service ne l\'a pas.</string>
-    <string name="api_keys_responses">A la Responses API d\'OpenAI</string>
+    <string name="api_keys_check">Vérifier maintenant</string>
+    <string name="api_keys_check_info">Facultatif : envoie une toute petite requête de test, qui peut consommer une infime partie de votre crédit API.</string>
+    <string name="api_keys_check_ok">%1$s : fonctionne.</string>
+    <string name="api_keys_check_chat">%1$s : fonctionne avec OpenCode, mais sans Responses API, donc pas avec Codex.</string>
+    <string name="api_keys_check_none">%1$s : rien n\'a répondu à cette adresse. %2$s</string>
+    <string name="api_keys_check_unsure">%1$s : pas de réponse claire. %2$s</string>
+    <string name="api_keys_service">Service</string>
+    <string name="api_keys_custom">Personnalisé</string>
+    <string name="setup_step_signin_key_mismatch">Vos clés API (%2$s) ne fonctionnent pas avec %1$s. Elles fonctionnent avec %3$s.</string>
+    <string name="setup_step_signin_free">Pas de compte ? OpenCode a des modèles gratuits et ne demande aucune connexion.</string>
+    <string name="setup_use_agent">Utiliser %1$s</string>
     <string name="api_keys_openai_hint">Adresse de style OpenAI</string>
     <string name="api_keys_anthropic_hint">Adresse de style Anthropic</string>
     <string name="api_keys_key_keep_hint">Clé API (laisse vide pour la garder)</string>
     <string name="api_keys_key_hint">Clé API</string>
     <string name="api_keys_name_hint">Nom</string>
-    <string name="api_keys_preset_other">Autre</string>
     <string name="api_keys_own_default">Son propre défaut</string>
     <string name="api_keys_defaults_info">Ce qu\'utilise un chat quand son modèle est Par défaut. Son propre défaut passe par l\'abonnement de l\'agent.</string>
     <string name="api_keys_defaults">Chats sur Par défaut</string>

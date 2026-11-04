@@ -167,7 +167,8 @@ public class SignInActivity extends Screen implements Account.Listener {
                     openCodeReady();
                     break;
                 }
-                header(R.drawable.ms_check, getString(R.string.signin_signed_in), (acc.email.isEmpty()
+                boolean keyOnly = (acc.claude() || "codex".equals(acc.agent)) && acc.apiKey && !acc.planIn;
+                header(R.drawable.ms_check, getString(keyOnly ? R.string.signin_key_only : R.string.signin_signed_in), (acc.email.isEmpty()
                         ? getString(R.string.signin_agent_ready, acc.name()) : acc.email)
                         + (acc.plan.isEmpty() ? "" : " · " + acc.planLabel()), true);
                 versionNote();

@@ -1239,6 +1239,8 @@
     <!-- %1$s = the account's email address. -->
     <string name="setup_agent_signed_in_email">signed in · %1$s</string>
     <string name="setup_agent_not_signed_in">not signed in</string>
+    <string name="setup_agent_api_key">not signed in · API key</string>
+    <string name="signin_key_only">Using an API key</string>
 
     <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
     <string name="setup_phone_tools">Phone tools in your own sessions</string>
@@ -1947,14 +1949,23 @@
     <string name="api_keys_defaults">Chats on Default</string>
     <string name="api_keys_defaults_info">What a chat uses when its model is Default. Its own default runs on the agent\'s plan.</string>
     <string name="api_keys_own_default">Its own default</string>
-    <string name="api_keys_preset_other">Other</string>
     <string name="api_keys_name_hint">Name</string>
     <string name="api_keys_key_hint">API key</string>
     <string name="api_keys_key_keep_hint">API key (leave empty to keep it)</string>
     <string name="api_keys_anthropic_hint">Anthropic-style address</string>
     <string name="api_keys_openai_hint">OpenAI-style address</string>
-    <string name="api_keys_responses">Has OpenAI\'s Responses API</string>
     <string name="api_keys_addresses_info">Claude Code uses the Anthropic-style address. Codex uses the OpenAI-style one, when the service has OpenAI\'s Responses API. OpenCode uses either. Leave an address empty if the service doesn\'t have it.</string>
+    <string name="api_keys_check">Check now</string>
+    <string name="api_keys_check_info">Optional: sends a very small test request, which may use a tiny bit of API credit.</string>
+    <string name="api_keys_check_ok">%1$s: works.</string>
+    <string name="api_keys_check_chat">%1$s: works with OpenCode, but has no Responses API, so not with Codex.</string>
+    <string name="api_keys_check_none">%1$s: nothing answered at this address. %2$s</string>
+    <string name="api_keys_check_unsure">%1$s: no clear answer. %2$s</string>
+    <string name="api_keys_service">Service</string>
+    <string name="api_keys_custom">Custom</string>
+    <string name="setup_step_signin_key_mismatch">Your API keys (%2$s) don\'t work with %1$s. They work with %3$s.</string>
+    <string name="setup_step_signin_free">No account? OpenCode has free models and needs no sign-in.</string>
+    <string name="setup_use_agent">Use %1$s</string>
     <string name="api_keys_save">Save</string>
     <string name="api_keys_saving">Checking the key…</string>
     <string name="api_keys_need_key">Enter the API key.</string>

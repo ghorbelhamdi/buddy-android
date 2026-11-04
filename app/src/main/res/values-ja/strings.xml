@@ -853,6 +853,8 @@
     <string name="setup_agent_signed_in">ログイン済み</string>
     <string name="setup_agent_signed_in_email">ログイン済み · %1$s</string>
     <string name="setup_agent_not_signed_in">未ログイン</string>
+    <string name="setup_agent_api_key">未サインイン · API キー</string>
+    <string name="signin_key_only">API キーを使用中</string>
 
     <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
     <string name="setup_phone_tools">自分のセッションでスマートフォンツールを使う</string>
@@ -1397,13 +1399,22 @@
     <string name="api_keys_saving">キーを確認しています…</string>
     <string name="api_keys_save">保存</string>
     <string name="api_keys_addresses_info">Claude Code は Anthropic 形式のアドレスを使います。Codex はサービスが OpenAI の Responses API に対応していれば OpenAI 形式を使います。OpenCode はどちらでも使えます。サービスにないアドレスは空欄のままにしてください。</string>
-    <string name="api_keys_responses">OpenAI の Responses API に対応</string>
+    <string name="api_keys_check">今すぐ確認</string>
+    <string name="api_keys_check_info">任意: ごく小さなテストリクエストを送ります。API クレジットをごくわずかに消費することがあります。</string>
+    <string name="api_keys_check_ok">%1$s: 使えます。</string>
+    <string name="api_keys_check_chat">%1$s: OpenCode で使えますが、Responses API がないため Codex では使えません。</string>
+    <string name="api_keys_check_none">%1$s: このアドレスから応答がありませんでした。%2$s</string>
+    <string name="api_keys_check_unsure">%1$s: 明確な応答がありませんでした。%2$s</string>
+    <string name="api_keys_service">サービス</string>
+    <string name="api_keys_custom">カスタム</string>
+    <string name="setup_step_signin_key_mismatch">API キー (%2$s) は %1$s では使えません。%3$s で使えます。</string>
+    <string name="setup_step_signin_free">アカウントがなくても大丈夫です。OpenCode には無料モデルがあり、サインインは不要です。</string>
+    <string name="setup_use_agent">%1$s を使う</string>
     <string name="api_keys_openai_hint">OpenAI 形式のアドレス</string>
     <string name="api_keys_anthropic_hint">Anthropic 形式のアドレス</string>
     <string name="api_keys_key_keep_hint">APIキー(空欄なら現在のキーを維持)</string>
     <string name="api_keys_key_hint">APIキー</string>
     <string name="api_keys_name_hint">名前</string>
-    <string name="api_keys_preset_other">その他</string>
     <string name="api_keys_own_default">エージェント自身のデフォルト</string>
     <string name="api_keys_defaults_info">モデルがデフォルトのチャットで使うもの。エージェント自身のデフォルトはそのプランで動きます。</string>
     <string name="api_keys_defaults">デフォルトのチャット</string>

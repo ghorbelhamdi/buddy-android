@@ -1175,6 +1175,8 @@
     <!-- %1$s = the account's email address. -->
     <string name="setup_agent_signed_in_email">connesso · %1$s</string>
     <string name="setup_agent_not_signed_in">non connesso</string>
+    <string name="setup_agent_api_key">accesso non effettuato · chiave API</string>
+    <string name="signin_key_only">Usa una chiave API</string>
 
     <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
     <string name="setup_phone_tools">Strumenti del telefono nelle tue sessioni</string>
@@ -1845,13 +1847,22 @@
     <string name="api_keys_saving">Verifica della chiave…</string>
     <string name="api_keys_save">Salva</string>
     <string name="api_keys_addresses_info">Claude Code usa l\'indirizzo stile Anthropic. Codex usa quello stile OpenAI, se il servizio ha la Responses API di OpenAI. OpenCode usa l\'uno o l\'altro. Lascia vuoto un indirizzo se il servizio non ce l\'ha.</string>
-    <string name="api_keys_responses">Ha la Responses API di OpenAI</string>
+    <string name="api_keys_check">Controlla ora</string>
+    <string name="api_keys_check_info">Facoltativo: invia una richiesta di prova molto piccola, che può consumare una minima parte del credito API.</string>
+    <string name="api_keys_check_ok">%1$s: funziona.</string>
+    <string name="api_keys_check_chat">%1$s: funziona con OpenCode, ma non ha la Responses API, quindi non con Codex.</string>
+    <string name="api_keys_check_none">%1$s: nessuna risposta a questo indirizzo. %2$s</string>
+    <string name="api_keys_check_unsure">%1$s: nessuna risposta chiara. %2$s</string>
+    <string name="api_keys_service">Servizio</string>
+    <string name="api_keys_custom">Personalizzato</string>
+    <string name="setup_step_signin_key_mismatch">Le tue chiavi API (%2$s) non funzionano con %1$s. Funzionano con %3$s.</string>
+    <string name="setup_step_signin_free">Niente account? OpenCode ha modelli gratuiti e non richiede l\'accesso.</string>
+    <string name="setup_use_agent">Usa %1$s</string>
     <string name="api_keys_openai_hint">Indirizzo stile OpenAI</string>
     <string name="api_keys_anthropic_hint">Indirizzo stile Anthropic</string>
     <string name="api_keys_key_keep_hint">Chiave API (lascia vuoto per tenerla)</string>
     <string name="api_keys_key_hint">Chiave API</string>
     <string name="api_keys_name_hint">Nome</string>
-    <string name="api_keys_preset_other">Altro</string>
     <string name="api_keys_own_default">Il suo predefinito</string>
     <string name="api_keys_defaults_info">Cosa usa una chat quando il suo modello è Predefinito. Il suo predefinito usa il piano dell\'agente.</string>
     <string name="api_keys_defaults">Chat su Predefinito</string>

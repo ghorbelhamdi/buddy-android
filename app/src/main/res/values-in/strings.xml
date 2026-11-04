@@ -1166,6 +1166,8 @@
     <!-- %1$s = the account's email address. -->
     <string name="setup_agent_signed_in_email">sudah login · %1$s</string>
     <string name="setup_agent_not_signed_in">belum login</string>
+    <string name="setup_agent_api_key">belum masuk · kunci API</string>
+    <string name="signin_key_only">Memakai kunci API</string>
 
     <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
     <string name="setup_phone_tools">Alat ponsel di sesi Anda sendiri</string>
@@ -1846,13 +1848,22 @@
     <string name="api_keys_saving">Memeriksa kunci…</string>
     <string name="api_keys_save">Simpan</string>
     <string name="api_keys_addresses_info">Claude Code memakai alamat gaya Anthropic. Codex memakai alamat gaya OpenAI, jika layanan punya Responses API OpenAI. OpenCode memakai salah satunya. Kosongkan alamat jika layanan tidak memilikinya.</string>
-    <string name="api_keys_responses">Punya Responses API OpenAI</string>
+    <string name="api_keys_check">Periksa sekarang</string>
+    <string name="api_keys_check_info">Opsional: mengirim permintaan tes sangat kecil, yang mungkin memakai sedikit sekali kredit API.</string>
+    <string name="api_keys_check_ok">%1$s: berfungsi.</string>
+    <string name="api_keys_check_chat">%1$s: berfungsi dengan OpenCode, tetapi tidak punya Responses API, jadi tidak dengan Codex.</string>
+    <string name="api_keys_check_none">%1$s: tidak ada jawaban di alamat ini. %2$s</string>
+    <string name="api_keys_check_unsure">%1$s: tidak ada jawaban jelas. %2$s</string>
+    <string name="api_keys_service">Layanan</string>
+    <string name="api_keys_custom">Khusus</string>
+    <string name="setup_step_signin_key_mismatch">Kunci API Anda (%2$s) tidak berfungsi dengan %1$s. Kunci itu berfungsi dengan %3$s.</string>
+    <string name="setup_step_signin_free">Tidak punya akun? OpenCode punya model gratis dan tidak perlu masuk.</string>
+    <string name="setup_use_agent">Pakai %1$s</string>
     <string name="api_keys_openai_hint">Alamat gaya OpenAI</string>
     <string name="api_keys_anthropic_hint">Alamat gaya Anthropic</string>
     <string name="api_keys_key_keep_hint">Kunci API (kosongkan untuk mempertahankan)</string>
     <string name="api_keys_key_hint">Kunci API</string>
     <string name="api_keys_name_hint">Nama</string>
-    <string name="api_keys_preset_other">Lainnya</string>
     <string name="api_keys_own_default">Default-nya sendiri</string>
     <string name="api_keys_defaults_info">Yang dipakai chat saat modelnya Default. Default-nya sendiri berjalan dengan paket agen.</string>
     <string name="api_keys_defaults">Chat di Default</string>

@@ -553,7 +553,10 @@ final class Account {
                         }
                     }
                 }
-                if (p.waitFor() == 0) {
+                int exit = p.waitFor();
+                // nothing printed: the exit code is all there is to show why
+                if (exit != 0 && out.toString().trim().isEmpty()) out.append("exit ").append(exit);
+                if (exit == 0) {
                     // signed in: bring Buddy back from the browser
                     main.post(() -> {
                         try {

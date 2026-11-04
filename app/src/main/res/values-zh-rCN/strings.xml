@@ -1166,6 +1166,8 @@
     <!-- %1$s = the account's email address. -->
     <string name="setup_agent_signed_in_email">已登录 · %1$s</string>
     <string name="setup_agent_not_signed_in">未登录</string>
+    <string name="setup_agent_api_key">未登录 · API 密钥</string>
+    <string name="signin_key_only">正在使用 API 密钥</string>
 
     <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
     <string name="setup_phone_tools">在你自己的会话中使用手机工具</string>
@@ -1845,13 +1847,22 @@
     <string name="api_keys_saving">正在检查密钥…</string>
     <string name="api_keys_save">保存</string>
     <string name="api_keys_addresses_info">Claude Code 使用 Anthropic 风格地址。若服务支持 OpenAI 的 Responses API,Codex 使用 OpenAI 风格地址。OpenCode 两者皆可。服务没有的地址请留空。</string>
-    <string name="api_keys_responses">支持 OpenAI 的 Responses API</string>
+    <string name="api_keys_check">立即检查</string>
+    <string name="api_keys_check_info">可选:发送一个很小的测试请求,可能会消耗极少量的 API 额度。</string>
+    <string name="api_keys_check_ok">%1$s:可用。</string>
+    <string name="api_keys_check_chat">%1$s:可用于 OpenCode,但没有 Responses API,因此不能用于 Codex。</string>
+    <string name="api_keys_check_none">%1$s:此地址没有响应。%2$s</string>
+    <string name="api_keys_check_unsure">%1$s:没有明确回应。%2$s</string>
+    <string name="api_keys_service">服务</string>
+    <string name="api_keys_custom">自定义</string>
+    <string name="setup_step_signin_key_mismatch">你的 API 密钥（%2$s）无法用于 %1$s。它们适用于 %3$s。</string>
+    <string name="setup_step_signin_free">没有账号?OpenCode 有免费模型,无需登录。</string>
+    <string name="setup_use_agent">使用 %1$s</string>
     <string name="api_keys_openai_hint">OpenAI 风格地址</string>
     <string name="api_keys_anthropic_hint">Anthropic 风格地址</string>
     <string name="api_keys_key_keep_hint">API 密钥(留空则保留原密钥)</string>
     <string name="api_keys_key_hint">API 密钥</string>
     <string name="api_keys_name_hint">名称</string>
-    <string name="api_keys_preset_other">其他</string>
     <string name="api_keys_own_default">智能体自己的默认</string>
     <string name="api_keys_defaults_info">对话的模型为默认时所用的模型。智能体自己的默认模型使用其订阅。</string>
     <string name="api_keys_defaults">使用默认模型的对话</string>

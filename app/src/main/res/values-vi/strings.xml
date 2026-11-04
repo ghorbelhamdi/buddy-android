@@ -1229,6 +1229,8 @@
     <!-- %1$s = the account's email address. -->
     <string name="setup_agent_signed_in_email">đã đăng nhập · %1$s</string>
     <string name="setup_agent_not_signed_in">chưa đăng nhập</string>
+    <string name="setup_agent_api_key">chưa đăng nhập · khóa API</string>
+    <string name="signin_key_only">Đang dùng khóa API</string>
 
     <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
     <string name="setup_phone_tools">Công cụ điện thoại trong phiên của riêng bạn</string>
@@ -1932,14 +1934,23 @@
     <string name="api_keys_defaults">Trò chuyện dùng Mặc định</string>
     <string name="api_keys_defaults_info">Mô hình một cuộc trò chuyện dùng khi mô hình của nó là Mặc định. Mặc định riêng của agent chạy bằng gói của agent.</string>
     <string name="api_keys_own_default">Mặc định riêng của agent</string>
-    <string name="api_keys_preset_other">Khác</string>
     <string name="api_keys_name_hint">Tên</string>
     <string name="api_keys_key_hint">Khóa API</string>
     <string name="api_keys_key_keep_hint">Khóa API (để trống để giữ nguyên)</string>
     <string name="api_keys_anthropic_hint">Địa chỉ kiểu Anthropic</string>
     <string name="api_keys_openai_hint">Địa chỉ kiểu OpenAI</string>
-    <string name="api_keys_responses">Có Responses API của OpenAI</string>
     <string name="api_keys_addresses_info">Claude Code dùng địa chỉ kiểu Anthropic. Codex dùng địa chỉ kiểu OpenAI, khi dịch vụ có Responses API của OpenAI. OpenCode dùng loại nào cũng được. Để trống địa chỉ nếu dịch vụ không có.</string>
+    <string name="api_keys_check">Kiểm tra ngay</string>
+    <string name="api_keys_check_info">Không bắt buộc: gửi một yêu cầu kiểm tra rất nhỏ, có thể tốn một chút rất nhỏ tín dụng API.</string>
+    <string name="api_keys_check_ok">%1$s: hoạt động.</string>
+    <string name="api_keys_check_chat">%1$s: dùng được với OpenCode, nhưng không có Responses API nên không dùng được với Codex.</string>
+    <string name="api_keys_check_none">%1$s: không có phản hồi ở địa chỉ này. %2$s</string>
+    <string name="api_keys_check_unsure">%1$s: không có câu trả lời rõ ràng. %2$s</string>
+    <string name="api_keys_service">Dịch vụ</string>
+    <string name="api_keys_custom">Tùy chỉnh</string>
+    <string name="setup_step_signin_key_mismatch">Khóa API của bạn (%2$s) không dùng được với %1$s. Khóa dùng được với %3$s.</string>
+    <string name="setup_step_signin_free">Không có tài khoản? OpenCode có các mô hình miễn phí và không cần đăng nhập.</string>
+    <string name="setup_use_agent">Dùng %1$s</string>
     <string name="api_keys_save">Lưu</string>
     <string name="api_keys_saving">Đang kiểm tra khóa…</string>
     <string name="api_keys_need_key">Hãy nhập khóa API.</string>

@@ -884,6 +884,8 @@
     <string name="setup_agent_signed_in">zalogowany</string>
     <string name="setup_agent_signed_in_email">zalogowany · %1$s</string>
     <string name="setup_agent_not_signed_in">niezalogowany</string>
+    <string name="setup_agent_api_key">niezalogowano · klucz API</string>
+    <string name="signin_key_only">Używa klucza API</string>
 
     <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
     <string name="setup_phone_tools">Narzędzia telefonu we własnych sesjach</string>
@@ -1439,13 +1441,22 @@
     <string name="api_keys_saving">Sprawdzanie klucza…</string>
     <string name="api_keys_save">Zapisz</string>
     <string name="api_keys_addresses_info">Claude Code używa adresu w stylu Anthropic. Codex używa adresu w stylu OpenAI, jeśli usługa ma Responses API od OpenAI. OpenCode używa dowolnego. Zostaw adres pusty, jeśli usługa go nie ma.</string>
-    <string name="api_keys_responses">Ma Responses API od OpenAI</string>
+    <string name="api_keys_check">Sprawdź teraz</string>
+    <string name="api_keys_check_info">Opcjonalnie: wysyła bardzo małe żądanie testowe, które może zużyć odrobinę środków API.</string>
+    <string name="api_keys_check_ok">%1$s: działa.</string>
+    <string name="api_keys_check_chat">%1$s: działa z OpenCode, ale nie ma Responses API, więc nie z Codex.</string>
+    <string name="api_keys_check_none">%1$s: nic nie odpowiedziało pod tym adresem. %2$s</string>
+    <string name="api_keys_check_unsure">%1$s: brak jasnej odpowiedzi. %2$s</string>
+    <string name="api_keys_service">Usługa</string>
+    <string name="api_keys_custom">Własna</string>
+    <string name="setup_step_signin_key_mismatch">Twoje klucze API (%2$s) nie działają z %1$s. Działają z: %3$s.</string>
+    <string name="setup_step_signin_free">Nie masz konta? OpenCode ma darmowe modele i nie wymaga logowania.</string>
+    <string name="setup_use_agent">Użyj: %1$s</string>
     <string name="api_keys_openai_hint">Adres w stylu OpenAI</string>
     <string name="api_keys_anthropic_hint">Adres w stylu Anthropic</string>
     <string name="api_keys_key_keep_hint">Klucz API (zostaw puste, aby zachować)</string>
     <string name="api_keys_key_hint">Klucz API</string>
     <string name="api_keys_name_hint">Nazwa</string>
-    <string name="api_keys_preset_other">Inny</string>
     <string name="api_keys_own_default">Własny domyślny</string>
     <string name="api_keys_defaults_info">Czego używa czat, gdy jego model to Domyślny. Własny domyślny działa na planie agenta.</string>
     <string name="api_keys_defaults">Czaty na Domyślnym</string>

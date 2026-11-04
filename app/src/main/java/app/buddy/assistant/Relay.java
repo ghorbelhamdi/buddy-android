@@ -64,7 +64,7 @@ final class Relay {
                 InputStream in = code >= 400 ? con.getErrorStream() : con.getInputStream();
                 String body = in == null ? "" : read(in);
                 if (code >= 400) {
-                    if (error == null || code != 404) error = code + " " + body.trim();
+                    if (error == null || code != 404) error = code + " " + hideKey(body.trim(), key);
                     continue;
                 }
                 org.json.JSONArray list = parseModels(body);
@@ -76,6 +76,99 @@ final class Relay {
         }
         throw new Exception(error != null ? error : BuddyApp.str(R.string.signin_api_models_none));
     }
+
+    /** What a test request to a service's API found: it answered, it has no such API, or no clear answer. */
+    static final String YES = "yes", NO = "no", UNSURE = "unsure";
+
+    /** What a test request found; detail is the service's own answer when it wasn't a clear yes. */
+    static final class Probe {
+        String result = UNSURE, detail = "";
+        int code;
+        /** The service turned down the model, which says nothing about the API. */
+        boolean model;
+    }
+
+    /** Does this OpenAI-style address have the Responses API, which Codex needs? */
+    static Probe responses(String key, String base, String model) throws Exception {
+        return probe(false, key, trim(base) + "/responses", new org.json.JSONObject().put("model", model)
+                .put("input", "Hi").put("max_output_tokens", 16).toString());
+    }
+
+    /** Does this OpenAI-style address have Chat Completions? */
+    static Probe chat(String key, String base, String model) throws Exception {
+        return probe(false, key, trim(base) + "/chat/completions", new org.json.JSONObject().put("model", model)
+                .put("max_tokens", 1).put("messages", new org.json.JSONArray()
+                        .put(new org.json.JSONObject().put("role", "user").put("content", "Hi"))).toString());
+    }
+
+    /** Is this an Anthropic-style address? */
+    static Probe messages(String key, String base, String model) throws Exception {
+        return probe(true, key, trim(base) + "/v1/messages", new org.json.JSONObject().put("model", model)
+                .put("max_tokens", 1).put("messages", new org.json.JSONArray()
+                        .put(new org.json.JSONObject().put("role", "user").put("content", "Hi"))).toString());
+    }
+
+    /**
+     * One very small request (it may use a tiny bit of API credit). Only a real answer means yes, and only "there's
+     * nothing at this address" means no: a limit, an outage or a rejected model says nothing about the API itself.
+     */
+    private static Probe probe(boolean anthropic, String key, String url, String json) {
+        Probe p = new Probe();
+        HttpURLConnection con = null;
+        try {
+            con = (HttpURLConnection) new URL(url).openConnection();
+            con.setRequestMethod("POST");
+            con.setConnectTimeout(15_000);
+            con.setReadTimeout(30_000);
+            con.setInstanceFollowRedirects(false);
+            con.setDoOutput(true);
+            con.setRequestProperty("Content-Type", "application/json");
+            if (anthropic) con.setRequestProperty("anthropic-version", "2023-06-01");
+            if (xApiKey(anthropic, url)) con.setRequestProperty("x-api-key", key);
+            else con.setRequestProperty("Authorization", "Bearer " + key);
+            try (OutputStream o = con.getOutputStream()) {
+                o.write(json.getBytes(StandardCharsets.UTF_8));
+            }
+            p.code = con.getResponseCode();
+            if (p.code >= 200 && p.code < 300) {
+                p.result = YES;
+                return p;
+            }
+            InputStream in = con.getErrorStream();
+            String body = in == null ? "" : read(in);
+            String said = errorText(body);
+            p.detail = hideKey(p.code + " " + (said.isEmpty() ? body.trim() : said), key);
+            if (p.detail.length() > 300) p.detail = p.detail.substring(0, 300);
+            p.model = said.toLowerCase(Locale.ROOT).matches("(?s).*(model|deployment).*");
+            // a 404 about the model (OpenAI's for an unknown one) doesn't mean the API isn't there
+            if ((p.code == 404 || p.code == 405 || p.code == 501) && !p.model) p.result = NO;
+            return p;
+        } catch (Exception e) {
+            p.detail = hideKey(String.valueOf(e.getMessage()), key);
+            return p;
+        } finally {
+            if (con != null) con.disconnect();
+        }
+    }
+
+    /** The error a service's JSON answer states, "" if it isn't one: a web page's words about models mean nothing. */
+    private static String errorText(String body) {
+        try {
+            org.json.JSONObject o = new org.json.JSONObject(body.trim());
+            org.json.JSONObject e = o.optJSONObject("error");
+            if (e != null) return (e.optString("code") + " " + e.optString("message")).trim();
+            String s = o.optString("error");
+            return s.isEmpty() ? o.optString("message") : s;
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    /** A service's words with the key taken out: some repeat it in their errors ("Your api key: ... is invalid"). */
+    static String hideKey(String text, String key) {
+        return key == null || key.trim().length() < 4 ? text : text.replace(key.trim(), "•••");
+    }
+
     private static String read(InputStream in) throws Exception {
         java.io.ByteArrayOutputStream o = new java.io.ByteArrayOutputStream();
         byte[] buf = new byte[16 * 1024];
@@ -163,7 +256,15 @@ final class Relay {
         out.flush();
         // as it arrives: replies stream token by token
         try (InputStream in = code >= 400 ? con.getErrorStream() : con.getInputStream()) {
-            if (in != null) {
+            if (in != null && code >= 400) { // an error may quote the key back, and the agent must never see it
+                byte[] said = hideKey(read(in), key).getBytes(StandardCharsets.UTF_8);
+                if (said.length > 0) {
+                    out.write((Integer.toHexString(said.length) + "\r\n").getBytes(StandardCharsets.US_ASCII));
+                    out.write(said);
+                    out.write("\r\n".getBytes(StandardCharsets.US_ASCII));
+                    out.flush();
+                }
+            } else if (in != null) {
                 byte[] buf = new byte[16 * 1024];
                 int n;
                 while ((n = in.read(buf)) > 0) {

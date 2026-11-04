@@ -866,6 +866,8 @@
     <string name="setup_agent_signed_in">giriş yapıldı</string>
     <string name="setup_agent_signed_in_email">giriş yapıldı · %1$s</string>
     <string name="setup_agent_not_signed_in">giriş yapılmadı</string>
+    <string name="setup_agent_api_key">giriş yapılmadı · API anahtarı</string>
+    <string name="signin_key_only">API anahtarı kullanılıyor</string>
 
     <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
     <string name="setup_phone_tools">Kendi oturumlarınızda telefon araçları</string>
@@ -1413,13 +1415,22 @@
     <string name="api_keys_saving">Anahtar kontrol ediliyor…</string>
     <string name="api_keys_save">Kaydet</string>
     <string name="api_keys_addresses_info">Claude Code Anthropic tarzı adresi kullanır. Codex, hizmette OpenAI\'nin Responses API\'si varsa OpenAI tarzı adresi kullanır. OpenCode ikisini de kullanır. Hizmette yoksa bir adresi boş bırak.</string>
-    <string name="api_keys_responses">OpenAI\'nin Responses API\'si var</string>
+    <string name="api_keys_check">Şimdi kontrol et</string>
+    <string name="api_keys_check_info">İsteğe bağlı: çok küçük bir test isteği gönderir, bu API kredisini çok az kullanabilir.</string>
+    <string name="api_keys_check_ok">%1$s: çalışıyor.</string>
+    <string name="api_keys_check_chat">%1$s: OpenCode ile çalışıyor ama Responses API yok, bu yüzden Codex ile çalışmaz.</string>
+    <string name="api_keys_check_none">%1$s: bu adreste yanıt veren olmadı. %2$s</string>
+    <string name="api_keys_check_unsure">%1$s: net yanıt yok. %2$s</string>
+    <string name="api_keys_service">Hizmet</string>
+    <string name="api_keys_custom">Özel</string>
+    <string name="setup_step_signin_key_mismatch">API anahtarlarınız (%2$s) %1$s ile çalışmıyor. Şunlarla çalışıyor: %3$s.</string>
+    <string name="setup_step_signin_free">Hesabınız yok mu? OpenCode\'da ücretsiz modeller var ve giriş gerekmez.</string>
+    <string name="setup_use_agent">%1$s kullan</string>
     <string name="api_keys_openai_hint">OpenAI tarzı adres</string>
     <string name="api_keys_anthropic_hint">Anthropic tarzı adres</string>
     <string name="api_keys_key_keep_hint">API anahtarı (korumak için boş bırak)</string>
     <string name="api_keys_key_hint">API anahtarı</string>
     <string name="api_keys_name_hint">Ad</string>
-    <string name="api_keys_preset_other">Diğer</string>
     <string name="api_keys_own_default">Kendi varsayılanı</string>
     <string name="api_keys_defaults_info">Modeli Varsayılan olan bir sohbetin kullandığı. Kendi varsayılanı ajanın planıyla çalışır.</string>
     <string name="api_keys_defaults">Varsayılan\'daki sohbetler</string>

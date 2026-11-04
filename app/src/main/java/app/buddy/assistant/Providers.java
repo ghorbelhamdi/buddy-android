@@ -18,8 +18,6 @@ final class Providers {
     static final class P {
         final String id;
         String name = "", anthropic = "", openai = "";
-        /** The OpenAI-style address has only Chat Completions, not the Responses API Codex needs. */
-        boolean chatOnly;
         /** [{id, name, window, efforts}] (see Relay.models). */
         JSONArray models = new JSONArray();
         /** The model a chat on Default uses when this service is an agent's default ("": the first listed). */
@@ -34,7 +32,7 @@ final class Providers {
         /** Can this agent use it? */
         boolean fits(String agent) {
             if ("claude".equals(agent)) return !anthropic.isEmpty();
-            if ("codex".equals(agent)) return !openai.isEmpty() && !chatOnly;
+            if ("codex".equals(agent)) return !openai.isEmpty(); // an OpenAI-style service is taken to have the Responses API; if not, the agent says so
             return "opencode".equals(agent) && (!anthropic.isEmpty() || !openai.isEmpty());
         }
 
@@ -51,7 +49,8 @@ final class Providers {
 
         String defaultModel() {
             if (!model.isEmpty() || models.length() == 0) return model;
-            return offered().optJSONObject(0).optString("id");
+            List<String> chat = chatModels(offered());
+            return chat.isEmpty() ? offered().optJSONObject(0).optString("id") : chat.get(0);
         }
 
         JSONObject modelInfo(String m) {
@@ -92,7 +91,6 @@ final class Providers {
                 p.name = o.optString("name");
                 p.anthropic = o.optString("anthropic");
                 p.openai = o.optString("openai");
-                p.chatOnly = o.optBoolean("chat_only");
                 p.model = o.optString("model");
                 JSONArray m = o.optJSONArray("models");
                 if (m != null) p.models = m;
@@ -180,14 +178,14 @@ final class Providers {
             }
             Linux.write(new File(dir, p.id + ".json"), new JSONObject().put("name", p.name)
                     .put("anthropic", !p.anthropic.isEmpty())
-                    .put("openai", p.openai.isEmpty() ? "" : p.chatOnly ? "chat" : "responses")
+                    .put("openai", p.openai.isEmpty() ? "" : "responses")
                     .put("models", windows).toString());
         }
     }
 
     private static JSONObject json(P p) throws Exception {
         return new JSONObject().put("id", p.id).put("name", p.name).put("anthropic", p.anthropic).put("openai", p.openai)
-                .put("chat_only", p.chatOnly).put("model", p.model).put("shown", new JSONArray(p.shown));
+               .put("model", p.model).put("shown", new JSONArray(p.shown));
     }
 
     /** Asks the service for its models (OpenAI-style address first: it lists more) and keeps them. */
@@ -216,6 +214,81 @@ final class Providers {
             }
         }
         throw first != null ? first : new Exception(BuddyApp.str(R.string.signin_api_models_none));
+    }
+
+    /**
+     * The optional Check now, off the main thread: one very small request per address, reported in the service's own
+     * words. Nothing depends on it: a problem it doesn't find shows as the agent's error on first use. Returns the
+     * report and the OpenAI-style address that answered, if it needs /v1 added. Throws when the key lists no models.
+     */
+    static String[] check(String key, String anthropic, String openai) throws Exception {
+        JSONArray models = list(key, anthropic, openai);
+        StringBuilder out = new StringBuilder();
+        String better = "";
+        if (!anthropic.isEmpty()) {
+            Relay.Probe m = ask(2, key, anthropic, models);
+            out.append(line(BuddyApp.str(R.string.api_keys_anthropic_hint), m, false));
+        }
+        if (!openai.isEmpty()) {
+            Relay.Probe r = null;
+            boolean chat = false;
+            for (String b : bases(openai)) {
+                r = ask(0, key, b, models);
+                chat = Relay.NO.equals(r.result) && !Relay.NO.equals(ask(1, key, b, models).result);
+                if (chat || !Relay.NO.equals(r.result)) {
+                    if (!b.equals(openai.replaceAll("/+$", ""))) better = b;
+                    break;
+                }
+            }
+            if (out.length() > 0) out.append('\n');
+            out.append(line(BuddyApp.str(R.string.api_keys_openai_hint), r, chat));
+        }
+        return new String[]{out.toString(), better};
+    }
+
+    private static String line(String label, Relay.Probe p, boolean chat) {
+        if (chat) return BuddyApp.str(R.string.api_keys_check_chat, label);
+        if (Relay.YES.equals(p.result)) return BuddyApp.str(R.string.api_keys_check_ok, label);
+        return BuddyApp.str(Relay.NO.equals(p.result) ? R.string.api_keys_check_none : R.string.api_keys_check_unsure, label, p.detail);
+    }
+
+    /** The address as given, then with /v1 added or at the service's root. */
+    private static List<String> bases(String base) {
+        String b = base.replaceAll("/+$", "");
+        java.util.LinkedHashSet<String> out = new java.util.LinkedHashSet<>();
+        out.add(b);
+        if (!b.matches(".*/v\\d+(beta)?$")) out.add(b + "/v1");
+        return new ArrayList<>(out);
+    }
+
+    /** A test (0 Responses, 1 Chat Completions, 2 Anthropic-style), with a second model if the first was turned down. */
+    private static Relay.Probe ask(int kind, String key, String base, JSONArray models) throws Exception {
+        List<String> chat = chatModels(models);
+        if (chat.isEmpty() && models.length() > 0) chat.add(models.optJSONObject(0).optString("id"));
+        Relay.Probe p = new Relay.Probe();
+        for (int i = 0; i < Math.min(2, chat.size()); i++) {
+            String m = chat.get(i);
+            p = kind == 0 ? Relay.responses(key, base, m) : kind == 1 ? Relay.chat(key, base, m) : Relay.messages(key, base, m);
+            if (!p.model) break;
+        }
+        return p;
+    }
+
+    /** The listed models that can chat: services list embedding, speech and image models too. */
+    static List<String> chatModels(JSONArray models) {
+        List<String> out = new ArrayList<>();
+        for (int i = 0; i < models.length(); i++) {
+            String id = models.optJSONObject(i).optString("id");
+            if (!id.toLowerCase(java.util.Locale.ROOT).matches(".*(embed|whisper|tts|image|dall-e|moderation|audio|realtime|transcribe|sora|babbage|davinci|rerank|guard|ocr).*")) out.add(id);
+        }
+        return out;
+    }
+
+    /** A saved service this agent can't use, while another can: why setup is still waiting for this agent. */
+    static P mismatch(String agent) {
+        if (!forAgent(agent).isEmpty()) return null;
+        for (P p : all()) for (Account a : Account.ALL) if (p.fits(a.agent)) return p;
+        return null;
     }
 
     /** Fresh model lists for every service, at most every 10 minutes (in the background). */
@@ -297,7 +370,6 @@ final class Providers {
                     p.name = pr[0];
                     if (p.anthropic.isEmpty()) p.anthropic = pr[1];
                     if (p.openai.isEmpty()) p.openai = pr[2];
-                    p.chatOnly = "chat".equals(pr[3]);
                 }
                 File f = new File(Linux.root(c), "root/.buddy/" + agent + "-key");
                 String model = "";

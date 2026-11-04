@@ -857,6 +857,8 @@
     <string name="setup_agent_signed_in">साइन इन है</string>
     <string name="setup_agent_signed_in_email">साइन इन है · %1$s</string>
     <string name="setup_agent_not_signed_in">साइन इन नहीं है</string>
+    <string name="setup_agent_api_key">साइन इन नहीं · API कुंजी</string>
+    <string name="signin_key_only">API कुंजी का उपयोग</string>
 
     <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
     <string name="setup_phone_tools">आपके अपने सेशन में फ़ोन टूल</string>
@@ -1405,13 +1407,22 @@
     <string name="api_keys_saving">कुंजी जाँची जा रही है…</string>
     <string name="api_keys_save">सहेजें</string>
     <string name="api_keys_addresses_info">Claude Code Anthropic-शैली पता इस्तेमाल करता है। Codex OpenAI-शैली पता, अगर सेवा में OpenAI का Responses API हो। OpenCode दोनों में से कोई भी। अगर सेवा में कोई पता न हो तो उसे खाली छोड़ें।</string>
-    <string name="api_keys_responses">OpenAI का Responses API है</string>
+    <string name="api_keys_check">अभी जाँचें</string>
+    <string name="api_keys_check_info">वैकल्पिक: एक बहुत छोटा टेस्ट अनुरोध भेजता है, जिसमें API क्रेडिट का बहुत थोड़ा हिस्सा लग सकता है।</string>
+    <string name="api_keys_check_ok">%1$s: काम करता है।</string>
+    <string name="api_keys_check_chat">%1$s: OpenCode के साथ काम करता है, पर Responses API नहीं है, इसलिए Codex के साथ नहीं।</string>
+    <string name="api_keys_check_none">%1$s: इस पते पर कोई जवाब नहीं मिला। %2$s</string>
+    <string name="api_keys_check_unsure">%1$s: स्पष्ट जवाब नहीं मिला। %2$s</string>
+    <string name="api_keys_service">सेवा</string>
+    <string name="api_keys_custom">कस्टम</string>
+    <string name="setup_step_signin_key_mismatch">आपकी API कुंजियाँ (%2$s) %1$s के साथ काम नहीं करतीं। वे %3$s के साथ काम करती हैं।</string>
+    <string name="setup_step_signin_free">खाता नहीं है? OpenCode में मुफ़्त मॉडल हैं और साइन इन की ज़रूरत नहीं है।</string>
+    <string name="setup_use_agent">%1$s का उपयोग करें</string>
     <string name="api_keys_openai_hint">OpenAI-शैली पता</string>
     <string name="api_keys_anthropic_hint">Anthropic-शैली पता</string>
     <string name="api_keys_key_keep_hint">API कुंजी (रखने के लिए खाली छोड़ें)</string>
     <string name="api_keys_key_hint">API कुंजी</string>
     <string name="api_keys_name_hint">नाम</string>
-    <string name="api_keys_preset_other">अन्य</string>
     <string name="api_keys_own_default">अपना डिफ़ॉल्ट</string>
     <string name="api_keys_defaults_info">जब चैट का मॉडल डिफ़ॉल्ट हो तो वह क्या इस्तेमाल करती है। अपना डिफ़ॉल्ट एजेंट के प्लान पर चलता है।</string>
     <string name="api_keys_defaults">डिफ़ॉल्ट पर चैट</string>

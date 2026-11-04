@@ -863,6 +863,8 @@
     <string name="setup_agent_signed_in">ingelogd</string>
     <string name="setup_agent_signed_in_email">ingelogd · %1$s</string>
     <string name="setup_agent_not_signed_in">niet ingelogd</string>
+    <string name="setup_agent_api_key">niet ingelogd · API-sleutel</string>
+    <string name="signin_key_only">Gebruikt een API-sleutel</string>
 
     <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
     <string name="setup_phone_tools">Telefoontools in je eigen sessies</string>
@@ -1411,13 +1413,22 @@
     <string name="api_keys_saving">Sleutel controleren…</string>
     <string name="api_keys_save">Opslaan</string>
     <string name="api_keys_addresses_info">Claude Code gebruikt het Anthropic-adres. Codex gebruikt het OpenAI-adres, als de dienst de Responses API van OpenAI heeft. OpenCode gebruikt beide. Laat een adres leeg als de dienst het niet heeft.</string>
-    <string name="api_keys_responses">Heeft de Responses API van OpenAI</string>
+    <string name="api_keys_check">Nu controleren</string>
+    <string name="api_keys_check_info">Optioneel: stuurt een heel klein testverzoek, dat een heel klein beetje API-tegoed kan kosten.</string>
+    <string name="api_keys_check_ok">%1$s: werkt.</string>
+    <string name="api_keys_check_chat">%1$s: werkt met OpenCode, maar heeft geen Responses API, dus niet met Codex.</string>
+    <string name="api_keys_check_none">%1$s: geen antwoord op dit adres. %2$s</string>
+    <string name="api_keys_check_unsure">%1$s: geen duidelijk antwoord. %2$s</string>
+    <string name="api_keys_service">Dienst</string>
+    <string name="api_keys_custom">Aangepast</string>
+    <string name="setup_step_signin_key_mismatch">Je API-sleutels (%2$s) werken niet met %1$s. Ze werken met %3$s.</string>
+    <string name="setup_step_signin_free">Geen account? OpenCode heeft gratis modellen en vraagt niet om in te loggen.</string>
+    <string name="setup_use_agent">%1$s gebruiken</string>
     <string name="api_keys_openai_hint">OpenAI-adres</string>
     <string name="api_keys_anthropic_hint">Anthropic-adres</string>
     <string name="api_keys_key_keep_hint">API-sleutel (leeg laten om te bewaren)</string>
     <string name="api_keys_key_hint">API-sleutel</string>
     <string name="api_keys_name_hint">Naam</string>
-    <string name="api_keys_preset_other">Anders</string>
     <string name="api_keys_own_default">Eigen standaard</string>
     <string name="api_keys_defaults_info">Wat een chat gebruikt als zijn model Standaard is. De eigen standaard draait op het abonnement van de agent.</string>
     <string name="api_keys_defaults">Chats op Standaard</string>

@@ -179,36 +179,33 @@ public class ApiKeysActivity extends Screen {
         EditText key = field(getString(adding ? R.string.api_keys_key_hint : R.string.api_keys_key_keep_hint), true);
         EditText anthropic = field(getString(R.string.api_keys_anthropic_hint), false);
         EditText openai = field(getString(R.string.api_keys_openai_hint), false);
-        final boolean[] responses = {adding || !p.chatOnly};
-        FrameLayout responsesBox = new FrameLayout(this); // rebuilt when a preset changes it
-        Runnable responsesRow = () -> {
-            responsesBox.removeAllViews();
-            responsesBox.addView(switchRow(this, getString(R.string.api_keys_responses), null, responses[0],
-                    on -> responses[0] = on));
-        };
-        responsesRow.run();
-        if (adding) { // a preset fills in the addresses
-            List<String[]> opts = new ArrayList<>();
-            for (String[] pr : Providers.PRESETS) opts.add(new String[]{pr[0], pr[0]});
-            opts.add(new String[]{"", getString(R.string.api_keys_preset_other)});
-            LinearLayout seg = segmented(this, opts.toArray(new String[0][]), null, false, v -> {
-                for (String[] pr : Providers.PRESETS) {
-                    if (!pr[0].equals(v)) continue;
-                    name.setText(pr[0]);
-                    anthropic.setText(pr[1]);
-                    openai.setText(pr[2]);
-                    responses[0] = !"chat".equals(pr[3]);
-                    responsesRow.run();
-                    return;
-                }
-                name.setText("");
-                anthropic.setText("");
-                openai.setText("");
+        if (adding) { // a known service fills in its addresses; Custom leaves them to the user
+            LinearLayout menu = row(this);
+            menu.setGravity(Gravity.CENTER_VERTICAL);
+            menu.setPaddingRelative(dp(this, 12), dp(this, 12), dp(this, 10), dp(this, 12));
+            menu.setBackground(outlined(this, BG, 12, OUTLINE, 1));
+            TextView chosen = text(this, getString(R.string.api_keys_custom), 15, TEXT);
+            menu.addView(chosen, weight1());
+            menu.addView(icon(this, R.drawable.ms_expand_more, MUTED, 22));
+            menu.setOnClickListener(v -> {
+                android.widget.PopupMenu pm = new android.widget.PopupMenu(
+                        new android.view.ContextThemeWrapper(this, android.R.style.Theme_DeviceDefault_DayNight), menu);
+                for (String[] pr : Providers.PRESETS) pm.getMenu().add(pr[0]);
+                pm.getMenu().add(getString(R.string.api_keys_custom));
+                pm.setOnMenuItemClickListener(it -> {
+                    String picked = String.valueOf(it.getTitle());
+                    chosen.setText(picked);
+                    String[] known = null;
+                    for (String[] pr : Providers.PRESETS) if (pr[0].equals(picked)) known = pr;
+                    name.setText(known == null ? "" : known[0]);
+                    anthropic.setText(known == null ? "" : known[1]);
+                    openai.setText(known == null ? "" : known[2]);
+                    return true;
+                });
+                pm.show();
             });
-            android.widget.HorizontalScrollView hs = new android.widget.HorizontalScrollView(this);
-            hs.setHorizontalScrollBarEnabled(false);
-            hs.addView(seg);
-            c.addView(hs, gap(12));
+            c.addView(text(this, getString(R.string.api_keys_service), 13, MUTED), gap(12));
+            c.addView(menu, gap(6));
         } else {
             name.setText(p.name);
             anthropic.setText(p.anthropic);
@@ -218,9 +215,7 @@ public class ApiKeysActivity extends Screen {
         c.addView(key, gap(8));
         c.addView(anthropic, gap(8));
         c.addView(openai, gap(8));
-        c.addView(responsesBox, gap(4));
-        TextView info = text(this, getString(R.string.api_keys_addresses_info), 13, MUTED);
-        c.addView(info, gap(6));
+        c.addView(text(this, getString(R.string.api_keys_addresses_info), 13, MUTED), gap(6));
         TextView status = text(this, "", 13, MUTED);
         status.setVisibility(View.GONE);
         c.addView(status, gap(8));
@@ -228,6 +223,48 @@ public class ApiKeysActivity extends Screen {
         LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(this, 52));
         sp.topMargin = dp(this, 14);
         c.addView(save, sp);
+        Button checkNow = button(this, getString(R.string.api_keys_check), false);
+        LinearLayout.LayoutParams kp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(this, 48));
+        kp.topMargin = dp(this, 8);
+        c.addView(checkNow, kp);
+        c.addView(text(this, getString(R.string.api_keys_check_info), 12, MUTED), gap(4));
+        checkNow.setOnClickListener(v -> {
+            String k = key.getText().toString().trim();
+            String an = anthropic.getText().toString().trim(), oa = openai.getText().toString().trim();
+            String useKey = !k.isEmpty() || adding ? k : Secrets.get(this, Providers.secretName(p.id));
+            if (useKey == null || useKey.isEmpty()) {
+                key.requestFocus();
+                Toast.makeText(this, R.string.api_keys_need_key, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (an.isEmpty() && oa.isEmpty()) {
+                Toast.makeText(this, R.string.api_keys_need_address, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (!addressOk(an) || !addressOk(oa)) {
+                Toast.makeText(this, R.string.signin_api_base_bad, Toast.LENGTH_LONG).show();
+                return;
+            }
+            checkNow.setEnabled(false);
+            status.setVisibility(View.VISIBLE);
+            status.setText(R.string.api_keys_saving);
+            new Thread(() -> {
+                String report, better = "";
+                try {
+                    String[] r = Providers.check(useKey, an, oa);
+                    report = r[0];
+                    better = r[1];
+                } catch (Exception e) {
+                    report = getString(R.string.api_keys_failed, e.getMessage());
+                }
+                final String said = report, use = better;
+                runOnUiThread(() -> {
+                    checkNow.setEnabled(true);
+                    status.setText(said);
+                    if (!use.isEmpty()) openai.setText(use); // it answered with /v1 added: saved if the user saves
+                });
+            }, "api-key-check").start();
+        });
         if (!adding && p.models.length() > 0) {
             Button choose = button(this, getString(R.string.api_keys_choose, p.offered().length(), p.models.length()), false);
             LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(this, 48));
@@ -235,6 +272,7 @@ public class ApiKeysActivity extends Screen {
             c.addView(choose, cp);
             choose.setOnClickListener(v -> chooseModels(p));
         }
+        final Dialog[] sheet = new Dialog[1];
         if (!adding) {
             Button remove = button(this, getString(R.string.api_keys_remove), false);
             LinearLayout.LayoutParams rp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(this, 48));
@@ -242,6 +280,7 @@ public class ApiKeysActivity extends Screen {
             c.addView(remove, rp);
             remove.setOnClickListener(v -> confirmSheet(this, getString(R.string.api_keys_remove_title, p.name),
                     getString(R.string.api_keys_remove_text), getString(R.string.api_keys_remove), true, () -> {
+                        sheet[0].dismiss();
                         Providers.remove(this, p.id);
                         forgetChats(p.id);
                         refreshAgents();
@@ -249,6 +288,7 @@ public class ApiKeysActivity extends Screen {
                     }));
         }
         final Dialog d = bottomSheet(this, protect(c));
+        sheet[0] = d;
         save.setOnClickListener(v -> {
             String n = name.getText().toString().trim(), k = key.getText().toString().trim();
             String an = anthropic.getText().toString().trim(), oa = openai.getText().toString().trim();
@@ -274,8 +314,9 @@ public class ApiKeysActivity extends Screen {
             new Thread(() -> {
                 org.json.JSONArray models = null;
                 String err = null;
-                try {
-                    models = Providers.list(useKey, an, oa);
+                try { // a new name isn't a reason to ask the service again
+                    boolean same = !adding && k.isEmpty() && an.equals(p.anthropic) && oa.equals(p.openai) && p.models.length() > 0;
+                    models = same ? p.models : Providers.list(useKey, an, oa);
                 } catch (Exception e) {
                     err = e.getMessage();
                 }
@@ -291,7 +332,6 @@ public class ApiKeysActivity extends Screen {
                     q.name = fn;
                     q.anthropic = an;
                     q.openai = oa;
-                    q.chatOnly = !oa.isEmpty() && !responses[0];
                     q.models = m;
                     try {
                         Providers.save(this, q, k.isEmpty() ? null : k);

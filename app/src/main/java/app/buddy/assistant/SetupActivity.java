@@ -215,19 +215,47 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 : getString(acc.claude() ? R.string.setup_step_signin_claude : acc.grok() ? R.string.setup_step_signin_grok
                 : R.string.setup_step_signin_codex);
         // Claude Code and Codex also take an API key (on their sign-in screen)
-        if (!signed && (acc.claude() || "codex".equals(backend))) signText += "\n\n" + getString(R.string.setup_step_signin_api_key);
+        // a saved key this agent can't use: say so, and offer the agent that can
+        Providers.P misfit = !signed && (acc.claude() || "codex".equals(backend)) ? Providers.mismatch(backend) : null;
+        java.util.List<String> keyAgents = new java.util.ArrayList<>();
+        if (misfit != null) {
+            java.util.List<String> keys = new java.util.ArrayList<>(), fit = new java.util.ArrayList<>();
+            for (Providers.P k : Providers.all()) keys.add(k.name);
+            for (Account a : Account.ALL) {
+                if (!Providers.forAgent(a.agent).isEmpty()) {
+                    keyAgents.add(a.agent);
+                    fit.add(a.name());
+                }
+            }
+            signText += "\n\n" + getString(R.string.setup_step_signin_key_mismatch, acc.name(),
+                    android.text.TextUtils.join(", ", keys), android.text.TextUtils.join(", ", fit));
+        } else if (!signed && (acc.claude() || "codex".equals(backend))) {
+            signText += "\n\n" + getString(R.string.setup_step_signin_api_key);
+        }
         // the default agent isn't signed in, but others are: making one of them the default is enough
         java.util.List<String> ready = new java.util.ArrayList<>();
         for (Account a : Account.ALL) if (!a.agent.equals(backend) && SetupState.signedIn(this, a.agent)) ready.add(a.agent);
-        if (!signed && !ready.isEmpty()) {
+        if (!signed && !ready.isEmpty() && misfit == null) {
             java.util.List<String> names = new java.util.ArrayList<>();
             for (String r : ready) names.add(Account.nameOf(r));
             signText += "\n\n" + getString(R.string.setup_step_signin_others, acc.name(), android.text.TextUtils.join(", ", names));
         }
+        // no key and no other agent ready: OpenCode's free models need no account at all
+        boolean offerFree = !signed && misfit == null && ready.isEmpty() && !acc.opencode();
+        if (offerFree) signText += "\n\n" + getString(R.string.setup_step_signin_free);
+        // what can answer instead: the agents already ready, and those that can use the saved key
+        java.util.List<String> choices = new java.util.ArrayList<>(signed ? new java.util.ArrayList<String>() : ready);
+        for (String a : keyAgents) if (!choices.contains(a)) choices.add(a);
+        if (offerFree) choices.add("opencode");
         steps[2] = step(getString(R.string.setup_step_signin_title), signText,
                 installed ? signed : null, installed && !signed ? getString(R.string.setup_sign_in) : null,
-                v -> openAgent(backend), !signed && !ready.isEmpty() ? getString(R.string.setup_switch_default) : null,
-                v -> switchDefaultSheet(ready));
+                v -> openAgent(backend),
+                choices.isEmpty() ? null : choices.size() == 1 ? getString(R.string.setup_use_agent, Account.nameOf(choices.get(0)))
+                        : getString(R.string.setup_switch_default),
+                v -> {
+                    if (choices.size() == 1) useInstead(choices.get(0), misfit);
+                    else switchDefaultSheet(choices, misfit);
+                });
 
         PowerManager pm = getSystemService(PowerManager.class);
         boolean buddyBg = pm.isIgnoringBatteryOptimizations(getPackageName());
@@ -1212,8 +1240,23 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 getString(R.string.setup_set_up_agent, Account.nameOf(agent)), false, () -> openAgent(agent));
     }
 
+    /**
+     * Another agent becomes the default brain; its own step asks to install it if needed. If it can use the saved key
+     * it also gets that key, unless it's on its plan: nobody asked to bill the key instead.
+     */
+    private void useInstead(String agent, Providers.P misfit) {
+        Prefs.setBackend(this, agent);
+        Providers.P key = misfit == null || Providers.forAgent(agent).isEmpty() ? null : Providers.forAgent(agent).get(0);
+        if (key != null && key.fits(agent) && ("opencode".equals(agent) || !SetupState.planSignedIn(this, agent))) {
+            Prefs.setAgentDefault(this, agent, Providers.ref(key, key.defaultModel()));
+            ChatHub.get(this).changed();
+        }
+        Toast.makeText(this, getString(R.string.setup_default_brain_set, Account.nameOf(agent)), Toast.LENGTH_LONG).show();
+        render();
+    }
+
     /** Pick another agent that's ready as the default brain (the setup card, when the default one isn't signed in). */
-    private void switchDefaultSheet(java.util.List<String> ready) {
+    private void switchDefaultSheet(java.util.List<String> ready, Providers.P key) {
         LinearLayout c = column(this);
         TextView h = title(this, getString(R.string.setup_switch_default_title), 18);
         h.setPaddingRelative(0, 0, 0, dp(this, 8));
@@ -1232,9 +1275,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             r.addView(t, weight1());
             r.setOnClickListener(v -> {
                 d[0].dismiss();
-                Prefs.setBackend(this, agent);
-                Toast.makeText(this, getString(R.string.setup_default_brain_set, a.name()), Toast.LENGTH_LONG).show();
-                render();
+                useInstead(agent, key);
             });
             c.addView(r, full());
         }
@@ -1251,6 +1292,8 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 : !Linux.installed(this) || st == null || "NEED_INSTALL".equals(st) ? getString(R.string.setup_agent_not_installed)
                 : a.opencode() ? (a.plan.isEmpty() ? getString(R.string.setup_agent_ready)
                 : getString(R.string.setup_agent_ready_plan, a.planLabel()))
+                // ready through an API key isn't being signed in: the plan's features still need that
+                : "SIGNED_IN".equals(st) && (a.claude() || "codex".equals(agent)) && a.apiKey && !a.planIn ? getString(R.string.setup_agent_api_key)
                 : "SIGNED_IN".equals(st) ? (a.email.isEmpty() ? getString(R.string.setup_agent_signed_in)
                 : getString(R.string.setup_agent_signed_in_email, a.email))
                 : getString(R.string.setup_agent_not_signed_in);

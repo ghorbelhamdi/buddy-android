@@ -1193,6 +1193,8 @@
     <!-- %1$s = the account's email address. -->
     <string name="setup_agent_signed_in_email">вхід виконано · %1$s</string>
     <string name="setup_agent_not_signed_in">вхід не виконано</string>
+    <string name="setup_agent_api_key">вхід не виконано · ключ API</string>
+    <string name="signin_key_only">Використовує ключ API</string>
 
     <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
     <string name="setup_phone_tools">Інструменти телефона у ваших сеансах</string>
@@ -1884,13 +1886,22 @@
     <string name="api_keys_saving">Перевірка ключа…</string>
     <string name="api_keys_save">Зберегти</string>
     <string name="api_keys_addresses_info">Claude Code використовує адресу у стилі Anthropic. Codex — адресу у стилі OpenAI, якщо сервіс має Responses API від OpenAI. OpenCode — будь-яку. Залиште адресу порожньою, якщо в сервісу її немає.</string>
-    <string name="api_keys_responses">Має Responses API від OpenAI</string>
+    <string name="api_keys_check">Перевірити зараз</string>
+    <string name="api_keys_check_info">Необов\'язково: надсилає дуже маленький тестовий запит, на який може піти зовсім трохи коштів API.</string>
+    <string name="api_keys_check_ok">%1$s: працює.</string>
+    <string name="api_keys_check_chat">%1$s: працює з OpenCode, але немає Responses API, тому не з Codex.</string>
+    <string name="api_keys_check_none">%1$s: за цією адресою ніхто не відповів. %2$s</string>
+    <string name="api_keys_check_unsure">%1$s: немає чіткої відповіді. %2$s</string>
+    <string name="api_keys_service">Сервіс</string>
+    <string name="api_keys_custom">Власний</string>
+    <string name="setup_step_signin_key_mismatch">Ваші ключі API (%2$s) не працюють із %1$s. Вони працюють із %3$s.</string>
+    <string name="setup_step_signin_free">Немає акаунта? В OpenCode є безкоштовні моделі, і вхід не потрібен.</string>
+    <string name="setup_use_agent">Використовувати %1$s</string>
     <string name="api_keys_openai_hint">Адреса у стилі OpenAI</string>
     <string name="api_keys_anthropic_hint">Адреса у стилі Anthropic</string>
     <string name="api_keys_key_keep_hint">API-ключ (залиште порожнім, щоб зберегти)</string>
     <string name="api_keys_key_hint">API-ключ</string>
     <string name="api_keys_name_hint">Назва</string>
-    <string name="api_keys_preset_other">Інше</string>
     <string name="api_keys_own_default">Своя за замовчуванням</string>
     <string name="api_keys_defaults_info">Що використовує чат, коли його модель — «За замовчуванням». Власна модель агента працює за його підпискою.</string>
     <string name="api_keys_defaults">Чати на «За замовчуванням»</string>

@@ -863,6 +863,8 @@
     <string name="setup_agent_signed_in">angemeldet</string>
     <string name="setup_agent_signed_in_email">angemeldet · %1$s</string>
     <string name="setup_agent_not_signed_in">nicht angemeldet</string>
+    <string name="setup_agent_api_key">nicht angemeldet · API-Schlüssel</string>
+    <string name="signin_key_only">Nutzt einen API-Schlüssel</string>
 
     <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
     <string name="setup_phone_tools">Smartphone-Tools in deinen eigenen Sitzungen</string>
@@ -1412,13 +1414,22 @@
     <string name="api_keys_saving">Schlüssel wird geprüft…</string>
     <string name="api_keys_save">Speichern</string>
     <string name="api_keys_addresses_info">Claude Code nutzt die Anthropic-Adresse. Codex nutzt die OpenAI-Adresse, wenn der Dienst die Responses API von OpenAI hat. OpenCode nutzt beide. Lass eine Adresse leer, wenn der Dienst sie nicht hat.</string>
-    <string name="api_keys_responses">Hat die Responses API von OpenAI</string>
+    <string name="api_keys_check">Jetzt prüfen</string>
+    <string name="api_keys_check_info">Optional: Sendet eine sehr kleine Testanfrage, die ein winziges bisschen API-Guthaben kosten kann.</string>
+    <string name="api_keys_check_ok">%1$s: funktioniert.</string>
+    <string name="api_keys_check_chat">%1$s: funktioniert mit OpenCode, hat aber keine Responses API, also nicht mit Codex.</string>
+    <string name="api_keys_check_none">%1$s: An dieser Adresse hat nichts geantwortet. %2$s</string>
+    <string name="api_keys_check_unsure">%1$s: keine klare Antwort. %2$s</string>
+    <string name="api_keys_service">Dienst</string>
+    <string name="api_keys_custom">Eigener</string>
+    <string name="setup_step_signin_key_mismatch">Deine API-Schlüssel (%2$s) funktionieren nicht mit %1$s. Sie funktionieren mit %3$s.</string>
+    <string name="setup_step_signin_free">Kein Konto? OpenCode hat kostenlose Modelle und braucht keine Anmeldung.</string>
+    <string name="setup_use_agent">%1$s nutzen</string>
     <string name="api_keys_openai_hint">OpenAI-Adresse</string>
     <string name="api_keys_anthropic_hint">Anthropic-Adresse</string>
     <string name="api_keys_key_keep_hint">API-Schlüssel (leer lassen, um ihn zu behalten)</string>
     <string name="api_keys_key_hint">API-Schlüssel</string>
     <string name="api_keys_name_hint">Name</string>
-    <string name="api_keys_preset_other">Andere</string>
     <string name="api_keys_own_default">Eigener Standard</string>
     <string name="api_keys_defaults_info">Was ein Chat nutzt, wenn sein Modell Standard ist. Der eigene Standard läuft über das Abo des Agenten.</string>
     <string name="api_keys_defaults">Chats auf Standard</string>
