@@ -1327,7 +1327,7 @@
     <string name="setup_help">ヘルプ</string>
     <string name="setup_help_info">GitHub にある Buddy のガイドです。Buddy の使い方はどのエージェントにも聞けます。</string>
     <string name="signin_api_key">代わりに API キーを使う</string>
-    <string name="signin_api_base_bad">https:// で始まるアドレスを入力してください</string>
+    <string name="signin_api_base_bad">https:// で始まるアドレスを入力してください（この端末や自分のネットワーク上なら http:// も可）</string>
     <string name="account_plan_api_key_at">API キー · %1$s</string>
     <string name="models_via">%2$s 経由の %1$s</string>
     <string name="api_keys_remove_text">キーはこの端末から削除されます。そのモデルを使うチャットはデフォルトに戻ります。</string>
@@ -1438,4 +1438,5 @@
     <string name="signin_api_key_on">%1$s はAPIキーで動いています。チャットのモデルメニューでモデルを選ぶか、APIキーでデフォルトを設定してください。</string>
     <string name="signin_api_key_on_plan">チャットではAPIキーのモデルも使えます(チャットのモデルメニューで選択)。音声などのプラン機能はプランを使います。</string>
     <string name="fdroid_download_note">これらは F-Droid ではなく各提供元から直接ダウンロードされるため、F-Droid による確認は行われていません。</string>
+    <string name="api_keys_local_info">自分のサーバー（Ollama、LM Studio、llama.cpp）の場合: API キーは空のままにします。PC で動かす場合は、localhost の代わりに Wi-Fi 上の PC のアドレスを入力します（例: http://192.168.1.20:11434/v1）。</string>
 </resources>

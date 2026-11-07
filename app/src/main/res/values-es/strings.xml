@@ -1774,7 +1774,7 @@
     <string name="setup_help">Ayuda</string>
     <string name="setup_help_info">La guía de Buddy, en GitHub. También puedes preguntar a cualquier agente cómo funciona Buddy.</string>
     <string name="signin_api_key">Usar una clave de API</string>
-    <string name="signin_api_base_bad">Escribe una dirección que empiece por https://</string>
+    <string name="signin_api_base_bad">Escribe una dirección que empiece por https:// (o http:// en este teléfono o en tu propia red)</string>
     <string name="account_plan_api_key_at">Clave de API · %1$s</string>
     <string name="models_via">%1$s vía %2$s</string>
     <string name="api_keys_remove_text">Su clave se borra de este teléfono. Los chats que usan sus modelos vuelven a Predeterminado.</string>
@@ -1885,4 +1885,5 @@
     <string name="signin_api_key_on">%1$s funciona con tus claves de API: elige un modelo en el menú de modelos de un chat, o su predeterminado en Claves de API.</string>
     <string name="signin_api_key_on_plan">Los chats también pueden usar los modelos de tus claves de API (elige uno en el menú de modelos de un chat). La voz y las demás funciones del plan usan tu plan.</string>
     <string name="fdroid_download_note">Estas descargas vienen de sus creadores, no de F-Droid, así que F-Droid no las ha revisado.</string>
+    <string name="api_keys_local_info">Para un servidor propio (Ollama, LM Studio, llama.cpp): deja vacía la clave de API. En un PC, pon su dirección en tu Wi-Fi en lugar de localhost, por ejemplo http://192.168.1.20:11434/v1.</string>
 </resources>

@@ -72,6 +72,12 @@ You need a 64-bit Android 11+ phone, plus a Claude, ChatGPT or Google account fo
 
 **Install blocked or "Restricted setting"?** See [Setup in detail](docs/GUIDE.md#setup-in-detail).
 
+## Local models
+
+Run the model on your own computer and nothing goes to an AI company. Start [Ollama](https://ollama.com), LM Studio or llama.cpp's server on a PC (for Ollama, set `OLLAMA_HOST=0.0.0.0` and a context of at least 24k tokens, e.g. `OLLAMA_CONTEXT_LENGTH=24576`, since the phone tools take about 7k). In Buddy: Settings → API keys → Add API key → **Ollama** (or LM Studio, llama.cpp), put the PC's address on your Wi-Fi instead of `localhost`, leave the key empty, and use it in an OpenCode chat. Plain `http://` works on your own network and over Tailscale.
+
+Tested with Qwen3 8B on an RTX 2060 Super: it reads the phone and uses the tools. The first answer of a chat takes longest, since the model first reads about 13k tokens of instructions and tool descriptions. Pick a model that's good at tool calling; small models (4B and below) struggle. A model running on the phone itself works too, but it's slow and makes the phone lag.
+
 ## Updating
 
 Install the new APK over the old one: chats, settings and sign-ins stay (don't uninstall first). You can also ask Buddy to *"update yourself"*, or let [Obtainium](https://obtainium.imranr.dev) do it ([how](docs/GUIDE.md#updating)).

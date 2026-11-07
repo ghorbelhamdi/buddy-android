@@ -1335,7 +1335,7 @@
     <string name="setup_help">मदद</string>
     <string name="setup_help_info">GitHub पर Buddy की गाइड। आप किसी भी एजेंट से भी पूछ सकते हैं कि Buddy कैसे काम करता है।</string>
     <string name="signin_api_key">इसके बजाय API कुंजी इस्तेमाल करें</string>
-    <string name="signin_api_base_bad">https:// से शुरू होने वाला पता डालें</string>
+    <string name="signin_api_base_bad">https:// से शुरू होने वाला पता डालें (या इस फ़ोन या अपने नेटवर्क पर http://)</string>
     <string name="account_plan_api_key_at">API कुंजी · %1$s</string>
     <string name="models_via">%2$s के ज़रिए %1$s</string>
     <string name="api_keys_remove_text">इसकी कुंजी इस फ़ोन से मिटा दी जाएगी। इसके मॉडल इस्तेमाल करने वाली चैट डिफ़ॉल्ट पर लौट जाएँगी।</string>
@@ -1446,4 +1446,5 @@
     <string name="signin_api_key_on">%1$s आपकी API कुंजियों पर चलता है: चैट के मॉडल मेनू में मॉडल चुनें, या API कुंजियाँ में उसका डिफ़ॉल्ट।</string>
     <string name="signin_api_key_on_plan">चैट आपकी API कुंजियों के मॉडल भी इस्तेमाल कर सकती हैं (चैट के मॉडल मेनू में चुनें)। आवाज़ और प्लान की बाकी सुविधाएँ आपके प्लान से चलती हैं।</string>
     <string name="fdroid_download_note">ये डाउनलोड इन्हें बनाने वालों से आते हैं, F-Droid से नहीं, इसलिए F-Droid ने इनकी जाँच नहीं की है।</string>
+    <string name="api_keys_local_info">अपने खुद के सर्वर (Ollama, LM Studio, llama.cpp) के लिए: API key खाली छोड़ें। PC पर, localhost की जगह अपने Wi-Fi पर उसका पता डालें, जैसे http://192.168.1.20:11434/v1।</string>
 </resources>

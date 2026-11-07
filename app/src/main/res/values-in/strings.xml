@@ -1776,7 +1776,7 @@
     <string name="setup_help">Bantuan</string>
     <string name="setup_help_info">Panduan Buddy di GitHub. Kamu juga bisa bertanya ke agen mana pun cara kerja Buddy.</string>
     <string name="signin_api_key">Gunakan kunci API saja</string>
-    <string name="signin_api_base_bad">Masukkan alamat yang diawali https://</string>
+    <string name="signin_api_base_bad">Masukkan alamat yang diawali https:// (atau http:// di ponsel ini atau jaringan Anda sendiri)</string>
     <string name="account_plan_api_key_at">Kunci API · %1$s</string>
     <string name="models_via">%1$s melalui %2$s</string>
     <string name="api_keys_remove_text">Kuncinya dihapus dari ponsel ini. Chat yang memakai modelnya kembali ke Default.</string>
@@ -1887,4 +1887,5 @@
     <string name="signin_api_key_on">%1$s berjalan dengan kunci API-mu: pilih model di menu model chat, atau default-nya di Kunci API.</string>
     <string name="signin_api_key_on_plan">Chat juga bisa memakai model kunci API-mu (pilih di menu model chat). Suara dan fitur paket lainnya memakai paketmu.</string>
     <string name="fdroid_download_note">Unduhan ini berasal dari pembuatnya, bukan dari F-Droid, jadi F-Droid belum memeriksanya.</string>
+    <string name="api_keys_local_info">Untuk server Anda sendiri (Ollama, LM Studio, llama.cpp): kosongkan kunci API. Di PC, ganti localhost dengan alamatnya di Wi-Fi Anda, misalnya http://192.168.1.20:11434/v1.</string>
 </resources>

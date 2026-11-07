@@ -1342,7 +1342,7 @@
     <string name="setup_help">Hilfe</string>
     <string name="setup_help_info">Buddys Anleitung auf GitHub. Du kannst auch jeden Agenten fragen, wie Buddy funktioniert.</string>
     <string name="signin_api_key">Stattdessen einen API-Schlüssel nutzen</string>
-    <string name="signin_api_base_bad">Gib eine Adresse ein, die mit https:// beginnt</string>
+    <string name="signin_api_base_bad">Gib eine Adresse ein, die mit https:// beginnt (oder http:// auf diesem Handy oder in deinem eigenen Netzwerk)</string>
     <string name="account_plan_api_key_at">API-Schlüssel · %1$s</string>
     <string name="models_via">%1$s über %2$s</string>
     <string name="api_keys_remove_text">Der Schlüssel wird von diesem Handy gelöscht. Chats, die seine Modelle nutzen, wechseln zurück zu Standard.</string>
@@ -1453,4 +1453,5 @@
     <string name="signin_api_key_on">%1$s läuft über deine API-Schlüssel: Wähle ein Modell im Modellmenü eines Chats oder den Standard unter API-Schlüssel.</string>
     <string name="signin_api_key_on_plan">Chats können auch die Modelle deiner API-Schlüssel nutzen (wähle eines im Modellmenü eines Chats). Sprache und die anderen Abo-Funktionen nutzen dein Abo.</string>
     <string name="fdroid_download_note">Diese Downloads kommen direkt von ihren Herstellern, nicht von F-Droid, daher hat F-Droid sie nicht geprüft.</string>
+    <string name="api_keys_local_info">Für einen eigenen Server (Ollama, LM Studio, llama.cpp): Lass den API-Schlüssel leer. Auf einem PC ersetze localhost durch seine Adresse im WLAN, z. B. http://192.168.1.20:11434/v1.</string>
 </resources>

@@ -1916,7 +1916,7 @@
     <string name="setup_help">Trợ giúp</string>
     <string name="setup_help_info">Hướng dẫn sử dụng Buddy, trên GitHub. Bạn cũng có thể hỏi bất kỳ agent nào về cách Buddy hoạt động.</string>
     <string name="signin_api_key">Dùng khóa API thay vào đó</string>
-    <string name="signin_api_base_bad">Nhập địa chỉ bắt đầu bằng https://</string>
+    <string name="signin_api_base_bad">Nhập địa chỉ bắt đầu bằng https:// (hoặc http:// trên điện thoại này hay mạng riêng của bạn)</string>
     <string name="account_plan_api_key_at">Khóa API · %1$s</string>
     <string name="models_via">%1$s qua %2$s</string>
     <string name="signin_api_keys">Khóa API</string>
@@ -2027,4 +2027,5 @@
     <string name="signin_api_key_on">%1$s chạy bằng khóa API của bạn: chọn mô hình trong bảng mô hình của cuộc trò chuyện, hoặc mặc định của nó trong mục Khóa API.</string>
     <string name="signin_api_key_on_plan">Các cuộc trò chuyện cũng có thể dùng mô hình từ khóa API của bạn (chọn trong bảng mô hình của cuộc trò chuyện). Giọng nói và các tính năng khác của gói vẫn dùng gói của bạn.</string>
     <string name="fdroid_download_note">Các tệp này tải trực tiếp từ nhà phát triển, không phải từ F-Droid, nên F-Droid chưa kiểm tra chúng.</string>
+    <string name="api_keys_local_info">Với máy chủ của riêng bạn (Ollama, LM Studio, llama.cpp): để trống khóa API. Nếu chạy trên PC, hãy thay localhost bằng địa chỉ của PC trong Wi-Fi, ví dụ http://192.168.1.20:11434/v1.</string>
 </resources>

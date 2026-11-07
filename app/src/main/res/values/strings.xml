@@ -1931,7 +1931,7 @@
     <string name="setup_help">Help</string>
     <string name="setup_help_info">Buddy\'s user guide, on GitHub. You can also ask any agent how Buddy works.</string>
     <string name="signin_api_key">Use an API key instead</string>
-    <string name="signin_api_base_bad">Enter an address that starts with https://</string>
+    <string name="signin_api_base_bad">Enter an address that starts with https:// (or http:// on this phone or your own network)</string>
     <string name="account_plan_api_key_at">API key · %1$s</string>
     <string name="models_via">%1$s via %2$s</string>
     <string name="signin_api_keys">API keys</string>
@@ -2043,4 +2043,6 @@
     <string name="signin_api_key_on_plan">Chats can also use your API keys\' models (pick one in a chat\'s model sheet). Voice and the other plan features use your plan.</string>
     <!-- F-Droid build only, after what Buddy downloads (its Linux, an agent, the browser): F-Droid requires saying these downloads skip its checks. -->
     <string name="fdroid_download_note">These come from their makers, not from F-Droid, so F-Droid hasn\'t checked them.</string>
+    <!-- API keys form, when a local server preset (Ollama, LM Studio, llama.cpp) is picked. Keep the address example as is. -->
+    <string name="api_keys_local_info">For a server of your own (Ollama, LM Studio, llama.cpp): leave the API key empty. On a PC, put its address on your Wi-Fi instead of localhost, like http://192.168.1.20:11434/v1.</string>
 </resources>

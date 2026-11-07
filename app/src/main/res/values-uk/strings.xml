@@ -1814,7 +1814,7 @@
     <string name="setup_help">Довідка</string>
     <string name="setup_help_info">Посібник Buddy на GitHub. Також можна запитати будь-якого агента, як працює Buddy.</string>
     <string name="signin_api_key">Використати ключ API</string>
-    <string name="signin_api_base_bad">Введіть адресу, що починається з https://</string>
+    <string name="signin_api_base_bad">Введіть адресу, що починається з https:// (або http:// на цьому телефоні чи у вашій мережі)</string>
     <string name="account_plan_api_key_at">Ключ API · %1$s</string>
     <string name="models_via">%1$s через %2$s</string>
     <string name="api_keys_remove_text">Ключ буде видалено з телефона. Чати, що використовують його моделі, повернуться до «За замовчуванням».</string>
@@ -1925,4 +1925,5 @@
     <string name="signin_api_key_on">%1$s працює на ваших API-ключах: виберіть модель у меню моделей чату або модель за замовчуванням у розділі «API-ключі».</string>
     <string name="signin_api_key_on_plan">Чати також можуть використовувати моделі ваших API-ключів (виберіть у меню моделей чату). Голос та інші функції підписки використовують вашу підписку.</string>
     <string name="fdroid_download_note">Ці завантаження надходять від їхніх авторів, а не з F-Droid, тож F-Droid їх не перевіряв.</string>
+    <string name="api_keys_local_info">Для власного сервера (Ollama, LM Studio, llama.cpp): залиште API-ключ порожнім. Якщо сервер на ПК, вкажіть його адресу у вашій мережі Wi-Fi замість localhost, наприклад http://192.168.1.20:11434/v1.</string>
 </resources>

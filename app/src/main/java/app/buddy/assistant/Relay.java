@@ -58,7 +58,7 @@ final class Relay {
             con.setInstanceFollowRedirects(false);
             if (anthropic) con.setRequestProperty("anthropic-version", "2023-06-01");
             if (xApiKey(anthropic, b)) con.setRequestProperty("x-api-key", key);
-            else con.setRequestProperty("Authorization", "Bearer " + key);
+            else if (!key.isEmpty()) con.setRequestProperty("Authorization", "Bearer " + key); // a local server needs none
             try {
                 int code = con.getResponseCode();
                 InputStream in = code >= 400 ? con.getErrorStream() : con.getInputStream();
@@ -125,7 +125,7 @@ final class Relay {
             con.setRequestProperty("Content-Type", "application/json");
             if (anthropic) con.setRequestProperty("anthropic-version", "2023-06-01");
             if (xApiKey(anthropic, url)) con.setRequestProperty("x-api-key", key);
-            else con.setRequestProperty("Authorization", "Bearer " + key);
+            else if (!key.isEmpty()) con.setRequestProperty("Authorization", "Bearer " + key); // a local server needs none
             try (OutputStream o = con.getOutputStream()) {
                 o.write(json.getBytes(StandardCharsets.UTF_8));
             }
@@ -233,7 +233,7 @@ final class Relay {
             con.setRequestProperty(n, h.getValue());
         }
         if (xApiKey(anthropic, base)) con.setRequestProperty("x-api-key", key);
-        else con.setRequestProperty("Authorization", "Bearer " + key);
+        else if (!key.isEmpty()) con.setRequestProperty("Authorization", "Bearer " + key); // a local server needs none
         if (body.length > 0) {
             con.setDoOutput(true);
             con.setFixedLengthStreamingMode(body.length);

@@ -1369,7 +1369,7 @@
     <string name="setup_help">Pomoc</string>
     <string name="setup_help_info">Przewodnik po Buddy na GitHubie. Możesz też zapytać dowolnego agenta, jak działa Buddy.</string>
     <string name="signin_api_key">Użyj klucza API</string>
-    <string name="signin_api_base_bad">Wpisz adres zaczynający się od https://</string>
+    <string name="signin_api_base_bad">Wpisz adres zaczynający się od https:// (lub http:// na tym telefonie albo w Twojej sieci)</string>
     <string name="account_plan_api_key_at">Klucz API · %1$s</string>
     <string name="models_via">%1$s przez %2$s</string>
     <string name="api_keys_remove_text">Jego klucz zostanie usunięty z tego telefonu. Czaty używające jego modeli wrócą do Domyślnego.</string>
@@ -1480,4 +1480,5 @@
     <string name="signin_api_key_on">%1$s działa na twoich kluczach API: wybierz model w menu modeli czatu albo domyślny w Kluczach API.</string>
     <string name="signin_api_key_on_plan">Czaty mogą też używać modeli z twoich kluczy API (wybierz jeden w menu modeli czatu). Głos i inne funkcje planu używają twojego planu.</string>
     <string name="fdroid_download_note">Te pliki pochodzą od ich twórców, nie z F-Droid, więc F-Droid ich nie sprawdził.</string>
+    <string name="api_keys_local_info">Dla własnego serwera (Ollama, LM Studio, llama.cpp): zostaw klucz API pusty. Na komputerze wpisz jego adres w Twojej sieci Wi-Fi zamiast localhost, np. http://192.168.1.20:11434/v1.</string>
 </resources>

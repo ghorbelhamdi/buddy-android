@@ -73,7 +73,27 @@ final class Providers {
             {"OpenRouter", "https://openrouter.ai/api", "https://openrouter.ai/api/v1", "chat"},
             {"Anthropic", "https://api.anthropic.com", "", ""},
             {"OpenAI", "", "https://api.openai.com/v1", ""},
+            // your own server: on this phone as given, or on a PC with its address on your network instead of localhost
+            {"Ollama", "", "http://localhost:11434/v1", ""},
+            {"LM Studio", "", "http://localhost:1234/v1", ""},
+            {"llama.cpp", "", "http://localhost:8080/v1", ""},
     };
+
+    /**
+     * An address on this phone or on the user's own network (private IPv4 ranges, Tailscale's 100.64/10, *.local):
+     * plain http is accepted there, and no API key is needed.
+     */
+    static boolean isLocal(String url) {
+        String h = url == null || url.isEmpty() ? null : android.net.Uri.parse(url).getHost();
+        if (h == null) return false;
+        h = h.toLowerCase(java.util.Locale.ROOT);
+        if (h.equals("localhost") || h.endsWith(".local")) return true;
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d+)\\.(\\d+)\\.\\d+\\.\\d+").matcher(h);
+        if (!m.matches()) return false;
+        int a = Integer.parseInt(m.group(1)), b = Integer.parseInt(m.group(2));
+        return a == 127 || a == 10 || (a == 192 && b == 168) || (a == 172 && b >= 16 && b <= 31)
+                || (a == 100 && b >= 64 && b <= 127);
+    }
 
     private static List<P> cache;
 
@@ -366,7 +386,7 @@ final class Providers {
                 else p.openai = base.isEmpty() ? "https://api.openai.com/v1" : base;
                 for (String[] pr : PRESETS) { // a known service: its name and both its addresses
                     String h = android.net.Uri.parse(!pr[2].isEmpty() ? pr[2] : pr[1]).getHost();
-                    if (h == null || !h.equals(p.host())) continue;
+                    if (h == null || !h.equals(p.host()) || isLocal(pr[2])) continue; // a local server isn't one service
                     p.name = pr[0];
                     if (p.anthropic.isEmpty()) p.anthropic = pr[1];
                     if (p.openai.isEmpty()) p.openai = pr[2];

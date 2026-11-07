@@ -1387,7 +1387,7 @@
     <string name="setup_help">المساعدة</string>
     <string name="setup_help_info">دليل Buddy على GitHub. يمكنك أيضًا سؤال أي وكيل عن طريقة عمل Buddy.</string>
     <string name="signin_api_key">استخدام مفتاح API بدلًا من ذلك</string>
-    <string name="signin_api_base_bad">أدخل عنوانًا يبدأ بـ https://</string>
+    <string name="signin_api_base_bad">أدخل عنوانًا يبدأ بـ https://‏ (أو http://‏ على هذا الهاتف أو على شبكتك الخاصة)</string>
     <string name="account_plan_api_key_at">مفتاح API · %1$s</string>
     <string name="models_via">%1$s عبر %2$s</string>
     <string name="api_keys_remove_text">يُحذف مفتاحها من هذا الهاتف. المحادثات التي تستخدم نماذجها تعود إلى الافتراضي.</string>
@@ -1498,4 +1498,5 @@
     <string name="signin_api_key_on">يعمل %1$s بمفاتيح API الخاصة بك: اختر نموذجًا من قائمة نماذج المحادثة، أو الافتراضي من مفاتيح API.</string>
     <string name="signin_api_key_on_plan">يمكن للمحادثات أيضًا استخدام نماذج مفاتيح API (اختر واحدًا من قائمة نماذج المحادثة). الصوت وميزات الاشتراك الأخرى تستخدم اشتراكك.</string>
     <string name="fdroid_download_note">هذه التنزيلات تأتي من صانعيها، لا من F-Droid، لذا لم يفحصها F-Droid.</string>
+    <string name="api_keys_local_info">لخادم خاص بك (Ollama أو LM Studio أو llama.cpp): اترك مفتاح API فارغًا. على الكمبيوتر، ضع عنوانه على شبكة Wi-Fi بدلًا من localhost، مثل http://192.168.1.20:11434/v1.</string>
 </resources>

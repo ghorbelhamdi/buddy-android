@@ -1343,7 +1343,7 @@
     <string name="setup_help">Yardım</string>
     <string name="setup_help_info">GitHub\'da Buddy kullanım kılavuzu. Buddy\'nin nasıl çalıştığını herhangi bir ajana da sorabilirsin.</string>
     <string name="signin_api_key">Bunun yerine API anahtarı kullan</string>
-    <string name="signin_api_base_bad">https:// ile başlayan bir adres gir</string>
+    <string name="signin_api_base_bad">https:// ile başlayan bir adres gir (bu telefonda veya kendi ağında http:// da olur)</string>
     <string name="account_plan_api_key_at">API anahtarı · %1$s</string>
     <string name="models_via">%2$s üzerinden %1$s</string>
     <string name="api_keys_remove_text">Anahtarı bu telefondan silinir. Modellerini kullanan sohbetler Varsayılan\'a döner.</string>
@@ -1454,4 +1454,5 @@
     <string name="signin_api_key_on">%1$s API anahtarlarınla çalışıyor: bir sohbetin model menüsünden model seç ya da varsayılanını API anahtarları altında belirle.</string>
     <string name="signin_api_key_on_plan">Sohbetler API anahtarlarının modellerini de kullanabilir (bir sohbetin model menüsünden seç). Ses ve diğer plan özellikleri planını kullanır.</string>
     <string name="fdroid_download_note">Bunlar F-Droid\'den değil, doğrudan yapımcılarından indirilir; bu yüzden F-Droid bunları denetlemedi.</string>
+    <string name="api_keys_local_info">Kendi sunucun için (Ollama, LM Studio, llama.cpp): API anahtarını boş bırak. Bilgisayardaysa localhost yerine Wi-Fi\'deki adresini yaz, örneğin http://192.168.1.20:11434/v1.</string>
 </resources>

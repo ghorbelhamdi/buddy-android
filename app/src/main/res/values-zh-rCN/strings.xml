@@ -1775,7 +1775,7 @@
     <string name="setup_help">帮助</string>
     <string name="setup_help_info">GitHub 上的 Buddy 使用指南。你也可以问任何智能体 Buddy 怎么用。</string>
     <string name="signin_api_key">改用 API 密钥</string>
-    <string name="signin_api_base_bad">请输入以 https:// 开头的地址</string>
+    <string name="signin_api_base_bad">请输入以 https:// 开头的地址（在本机或你自己的网络上也可用 http://）</string>
     <string name="account_plan_api_key_at">API 密钥 · %1$s</string>
     <string name="models_via">%1$s（经由 %2$s）</string>
     <string name="api_keys_remove_text">它的密钥将从这部手机上删除。使用其模型的对话会回到默认。</string>
@@ -1886,4 +1886,5 @@
     <string name="signin_api_key_on">%1$s 使用你的 API 密钥运行:在对话的模型菜单中选择模型,或在 API 密钥中设置默认。</string>
     <string name="signin_api_key_on_plan">对话也可以使用你的 API 密钥的模型(在对话的模型菜单中选择)。语音和其他订阅功能使用你的订阅。</string>
     <string name="fdroid_download_note">这些内容直接来自其开发者，而非 F-Droid，因此 F-Droid 未对其进行检查。</string>
+    <string name="api_keys_local_info">如果是你自己的服务器（Ollama、LM Studio、llama.cpp）：API 密钥留空。若在电脑上运行，请把 localhost 换成电脑在 Wi-Fi 中的地址，例如 http://192.168.1.20:11434/v1。</string>
 </resources>

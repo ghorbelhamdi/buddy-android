@@ -1,0 +1,3 @@
+• Your own model server works: Ollama, LM Studio and llama.cpp are in the service list, plain http:// is accepted on this phone and your own network (including Tailscale), and no API key is needed there
+• Saving your own server again reads its model list again, so models you've added show up
+• Clearer message when an address isn't accepted

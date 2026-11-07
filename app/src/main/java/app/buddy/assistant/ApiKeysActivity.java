@@ -179,6 +179,9 @@ public class ApiKeysActivity extends Screen {
         EditText key = field(getString(adding ? R.string.api_keys_key_hint : R.string.api_keys_key_keep_hint), true);
         EditText anthropic = field(getString(R.string.api_keys_anthropic_hint), false);
         EditText openai = field(getString(R.string.api_keys_openai_hint), false);
+        // for a server of your own: no key, and a PC's address instead of localhost
+        TextView localInfo = text(this, getString(R.string.api_keys_local_info), 13, MUTED);
+        localInfo.setVisibility(!adding && Providers.isLocal(p.openai.isEmpty() ? p.anthropic : p.openai) ? View.VISIBLE : View.GONE);
         if (adding) { // a known service fills in its addresses; Custom leaves them to the user
             LinearLayout menu = row(this);
             menu.setGravity(Gravity.CENTER_VERTICAL);
@@ -200,6 +203,7 @@ public class ApiKeysActivity extends Screen {
                     name.setText(known == null ? "" : known[0]);
                     anthropic.setText(known == null ? "" : known[1]);
                     openai.setText(known == null ? "" : known[2]);
+                    localInfo.setVisibility(known != null && Providers.isLocal(known[2]) ? View.VISIBLE : View.GONE);
                     return true;
                 });
                 pm.show();
@@ -216,6 +220,7 @@ public class ApiKeysActivity extends Screen {
         c.addView(anthropic, gap(8));
         c.addView(openai, gap(8));
         c.addView(text(this, getString(R.string.api_keys_addresses_info), 13, MUTED), gap(6));
+        c.addView(localInfo, gap(6));
         TextView status = text(this, "", 13, MUTED);
         status.setVisibility(View.GONE);
         c.addView(status, gap(8));
@@ -231,8 +236,9 @@ public class ApiKeysActivity extends Screen {
         checkNow.setOnClickListener(v -> {
             String k = key.getText().toString().trim();
             String an = anthropic.getText().toString().trim(), oa = openai.getText().toString().trim();
-            String useKey = !k.isEmpty() || adding ? k : Secrets.get(this, Providers.secretName(p.id));
-            if (useKey == null || useKey.isEmpty()) {
+            String saved = !k.isEmpty() || adding ? k : Secrets.get(this, Providers.secretName(p.id));
+            final String useKey = (saved == null || saved.isEmpty()) && localOnly(an, oa) ? "" : saved;
+            if (useKey == null || useKey.isEmpty() && !localOnly(an, oa)) {
                 key.requestFocus();
                 Toast.makeText(this, R.string.api_keys_need_key, Toast.LENGTH_SHORT).show();
                 return;
@@ -293,7 +299,7 @@ public class ApiKeysActivity extends Screen {
             String n = name.getText().toString().trim(), k = key.getText().toString().trim();
             String an = anthropic.getText().toString().trim(), oa = openai.getText().toString().trim();
             if (n.isEmpty()) n = !oa.isEmpty() || !an.isEmpty() ? hostName(!oa.isEmpty() ? oa : an) : "";
-            if (adding && k.isEmpty()) {
+            if (adding && k.isEmpty() && !localOnly(an, oa)) {
                 key.requestFocus();
                 Toast.makeText(this, R.string.api_keys_need_key, Toast.LENGTH_SHORT).show();
                 return;
@@ -306,7 +312,9 @@ public class ApiKeysActivity extends Screen {
                 Toast.makeText(this, R.string.signin_api_base_bad, Toast.LENGTH_LONG).show();
                 return;
             }
-            final String fn = n, useKey = k.isEmpty() ? Secrets.get(this, Providers.secretName(p.id)) : k;
+            // a local server without a key keeps an empty one, so the relay still finds the service
+            String old = adding ? "" : Secrets.get(this, Providers.secretName(p.id));
+            final String fn = n, useKey = !k.isEmpty() ? k : old != null ? old : localOnly(an, oa) ? "" : null;
             save.setEnabled(false);
             status.setVisibility(View.VISIBLE);
             status.setText(R.string.api_keys_saving);
@@ -314,8 +322,10 @@ public class ApiKeysActivity extends Screen {
             new Thread(() -> {
                 org.json.JSONArray models = null;
                 String err = null;
-                try { // a new name isn't a reason to ask the service again
-                    boolean same = !adding && k.isEmpty() && an.equals(p.anthropic) && oa.equals(p.openai) && p.models.length() > 0;
+                try { // a new name isn't a reason to ask a service again; a server of your own is, since it costs
+                    // nothing and you may have added models to it
+                    boolean same = !adding && k.isEmpty() && an.equals(p.anthropic) && oa.equals(p.openai) && p.models.length() > 0
+                            && !localOnly(an, oa);
                     models = same ? p.models : Providers.list(useKey, an, oa);
                 } catch (Exception e) {
                     err = e.getMessage();
@@ -334,7 +344,7 @@ public class ApiKeysActivity extends Screen {
                     q.openai = oa;
                     q.models = m;
                     try {
-                        Providers.save(this, q, k.isEmpty() ? null : k);
+                        Providers.save(this, q, !k.isEmpty() ? k : adding || old == null ? useKey : null);
                     } catch (Exception e) {
                         save.setEnabled(true);
                         status.setText(e.getMessage());
@@ -425,8 +435,14 @@ public class ApiKeysActivity extends Screen {
     }
 
     /** HTTPS, or this phone itself (a local proxy), or empty. */
+    /** https anywhere; plain http only on this phone or the user's own network (Providers.isLocal). */
     private static boolean addressOk(String b) {
-        return b.isEmpty() || b.startsWith("https://") || b.matches("http://(localhost|127\\.0\\.0\\.1)(:\\d+)?(/.*)?");
+        return b.isEmpty() || b.startsWith("https://") || b.startsWith("http://") && Providers.isLocal(b);
+    }
+
+    /** Every address given is on this phone or the user's network: a key is optional (local servers don't use one). */
+    private static boolean localOnly(String an, String oa) {
+        return !(an + oa).isEmpty() && (an.isEmpty() || Providers.isLocal(an)) && (oa.isEmpty() || Providers.isLocal(oa));
     }
 
     /** "https://api.example.com/v1" → "Example". */
