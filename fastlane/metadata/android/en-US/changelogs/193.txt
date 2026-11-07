@@ -1,0 +1,3 @@
+• Buddy's native parts (proot, talloc, libandroid-shmem) are now built from source kept in this repo, instead of from downloaded archives
+• F-Droid's version is reproducible: F-Droid can check its build against the one on GitHub and ship the same signed app, so you can switch between the two
+• No changes in the app itself

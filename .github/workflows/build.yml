@@ -23,6 +23,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          submodules: true # proot and libandroid-shmem (third_party/)
 
       - uses: actions/setup-java@v6
         with:
@@ -49,8 +51,9 @@ jobs:
           echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
           echo "BUDDY_KEYSTORE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
 
-      # The fdroid build is made by F-Droid from this source; building it here checks that it still compiles.
-      - name: Build release APKs (GitHub, and F-Droid's to check it)
+      # github: the release here. fdroid: F-Droid builds it from this source too, and ships this signed copy when its
+      # own build comes out identical (reproducible builds), so users can switch between the two.
+      - name: Build release APKs (GitHub and F-Droid)
         env:
           BUDDY_KEYSTORE_PASSWORD: ${{ secrets.BUDDY_KEYSTORE_PASSWORD }}
         run: ./gradlew --no-daemon assembleGithubRelease assembleFdroidRelease
@@ -62,6 +65,9 @@ jobs:
           cp "$apk" "dist/buddy-${GITHUB_REF_NAME//\//-}.apk"
           # fixed name too, so releases/latest/download/buddy.apk always gets the newest version
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then cp "$apk" dist/buddy.apk; fi
+          fd=$(find app/build/outputs/apk/fdroid/release -name '*.apk' | head -1)
+          cp "$fd" "dist/buddy-fdroid-${GITHUB_REF_NAME//\//-}.apk"
+          echo "FDROID_APK=$PWD/dist/buddy-fdroid-${GITHUB_REF_NAME//\//-}.apk" >> "$GITHUB_ENV"
           ls -l dist
 
       - uses: actions/upload-artifact@v7
@@ -80,3 +86,21 @@ jobs:
           else
             gh release create "$GITHUB_REF_NAME" dist/*.apk --title "Buddy $GITHUB_REF_NAME" --generate-notes
           fi
+
+      # What F-Droid will do: build the fdroid APK again, unsigned, somewhere else, and check it matches the signed one
+      # above but for the signature. After publishing, so a mismatch shows up red without holding the release back.
+      - uses: actions/checkout@v7
+        with:
+          submodules: true
+          path: rebuild-check # a second copy at another path, as F-Droid's build machine would have
+
+      - name: Check the F-Droid APK is reproducible
+        run: |
+          pip install --quiet apksigcopier
+          export PATH="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -n 1):$PATH" # apksigner
+          cd rebuild-check
+          ANDROID_NDK_HOME="$ANDROID_HOME/ndk/27.2.12479018" native/build.sh
+          env -u BUDDY_KEYSTORE ./gradlew --no-daemon assembleFdroidRelease
+          unsigned=$(find app/build/outputs/apk/fdroid/release -name '*.apk' | head -1)
+          apksigcopier compare --unsigned "$FDROID_APK" "$unsigned"
+          echo "The F-Droid APK is reproducible"

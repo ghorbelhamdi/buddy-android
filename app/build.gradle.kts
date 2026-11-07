@@ -47,9 +47,17 @@ android {
         create("fdroid") { dimension = "store" }
     }
 
+    // No Google-only dependency blob and no git details in the APK: F-Droid requires the first, and both keep the
+    // fdroid APK the same whoever builds it (F-Droid's reproducible build compares its APK with the one on GitHub).
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            vcsInfo.include = false
             if (keystorePath != null) signingConfig = signingConfigs.getByName("release")
         }
     }

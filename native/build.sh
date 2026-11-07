@@ -5,17 +5,16 @@
 #   libandroid-shmem.so               System V shared memory for PRoot's guests
 #   libbuddypty.so                    the terminal's pty helper (pty.c)
 # With ANDROID_NDK_HOME set it uses that NDK (CI); otherwise Termux's clang on the phone
-# (pkg install clang make unzip readelf). Sources are downloaded once and checked by SHA-256.
+# (pkg install clang make readelf). Sources: third_party/proot and third_party/libandroid-shmem (git submodules:
+# git submodule update --init) and talloc's three files in third_party/talloc. They're copied into build/ first, so
+# the build never changes them, and paths are mapped so the libraries come out the same wherever they're built
+# (F-Droid's reproducible build compares its APK with the one on GitHub).
 set -euo pipefail
 cd "$(dirname "$0")"
 HERE=$PWD
 API=30
-PROOT_VERSION=5.1.107.102
-PROOT_SHA256=30d12a6e2cc4147123756ff58edea262d3083bbc238c12d0ab9b39e3d1c40852
-TALLOC_VERSION=2.5.0
-TALLOC_SHA256=912afa237510ae542a7733998eb18a12bcda35ab6729c8e2ddb43e8d0ebab007
-SHMEM_VERSION=0.7
-SHMEM_SHA256=1e5ff8459bc0a8c229dd8a94b27d119987e09ef3414331c2b5ebfff20b98e867
+PROOT_VERSION=5.1.107.102 # third_party/proot is at this tag
+TP=$HERE/../third_party
 
 OUT=$HERE/../app/src/main/jniLibs/arm64-v8a
 WORK=$HERE/build
@@ -23,19 +22,13 @@ mkdir -p "$OUT" "$WORK/src" "$WORK/lib" "$WORK/include/sys"
 
 if [[ -n "${ANDROID_NDK_HOME:-}" ]]; then
   BIN=$(echo "$ANDROID_NDK_HOME"/toolchains/llvm/prebuilt/*/bin)
-  CC="$BIN/clang --target=aarch64-linux-android$API"
+  CC="$BIN/clang --target=aarch64-linux-android$API -ffile-prefix-map=$WORK=. -ffile-prefix-map=$HERE=native"
   STRIP=$BIN/llvm-strip OBJCOPY=$BIN/llvm-objcopy OBJDUMP=$BIN/llvm-objdump
 else
-  CC="clang --target=aarch64-linux-android$API"
+  CC="clang --target=aarch64-linux-android$API -ffile-prefix-map=$WORK=. -ffile-prefix-map=$HERE=native"
   STRIP=llvm-strip OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump
 fi
 LDPAGE=-Wl,-z,max-page-size=16384
-
-fetch() { # url file sha256
-  local f=$WORK/src/$2
-  if [[ ! -f $f ]]; then curl -fsSL -o "$f.part" "$1" && mv "$f.part" "$f"; fi
-  echo "$3  $f" | sha256sum -c --quiet || { rm -f "$f"; echo "checksum mismatch: $2" >&2; exit 1; }
-}
 
 # Termux's clang always adds its own library path; the app's libraries must not carry it.
 finish() { # built file, name in the APK
@@ -47,17 +40,17 @@ finish() { # built file, name in the APK
   echo "Built $2"
 }
 
-fetch "https://www.samba.org/ftp/talloc/talloc-$TALLOC_VERSION.tar.gz" "talloc-$TALLOC_VERSION.tar.gz" $TALLOC_SHA256
-fetch "https://github.com/termux/libandroid-shmem/archive/refs/tags/v$SHMEM_VERSION.tar.gz" "shmem-$SHMEM_VERSION.tar.gz" $SHMEM_SHA256
-fetch "https://github.com/termux/proot/archive/v$PROOT_VERSION.zip" "proot-$PROOT_VERSION.zip" $PROOT_SHA256
+[[ -f $TP/proot/src/GNUmakefile && -f $TP/libandroid-shmem/shmem.c ]] \
+  || { echo "third_party submodules missing: run git submodule update --init" >&2; exit 1; }
 cd "$WORK"
-rm -rf "talloc-$TALLOC_VERSION" "libandroid-shmem-$SHMEM_VERSION" "proot-$PROOT_VERSION"
-tar xzf "src/talloc-$TALLOC_VERSION.tar.gz"
-tar xzf "src/shmem-$SHMEM_VERSION.tar.gz"
-unzip -q "src/proot-$PROOT_VERSION.zip"
+rm -rf talloc libandroid-shmem proot
+cp -r "$TP/talloc" talloc
+cp -r "$TP/libandroid-shmem" libandroid-shmem
+cp -r "$TP/proot" proot
+rm -rf libandroid-shmem/.git proot/.git
 
 # talloc: one source file; talloc-config.h answers what its waf configure would have found on Android
-T=$WORK/talloc-$TALLOC_VERSION
+T=$WORK/talloc
 cp "$HERE/talloc-config.h" config.h
 $CC -fPIC -O2 -fvisibility=hidden -D__STDC_WANT_LIB_EXT1__=1 -D_GNU_SOURCE \
   -I. -I"$T" -I"$T/lib/replace" -c "$T/talloc.c" -o talloc.o
@@ -66,7 +59,7 @@ cp "$T/talloc.h" include/
 
 # libandroid-shmem (its own Makefile's flags). _PATH_TMP is Termux's addition to paths.h, which the NDK lacks: the
 # value Termux's clang gives it, so a build is the same with either compiler (it only names where keyed segments link).
-S=$WORK/libandroid-shmem-$SHMEM_VERSION
+S=$WORK/libandroid-shmem
 $CC -fpic -std=c11 -O2 -Wall '-D_PATH_TMP="/data/data/com.termux/files/usr/tmp/"' -c "$S/shmem.c" -o shmem.o
 $CC -shared -Wl,-soname,libandroid-shmem.so -Wl,--version-script="$S/exports.txt" $LDPAGE shmem.o \
   -o lib/libandroid-shmem.so -llog -landroid
@@ -74,18 +67,18 @@ cp "$S/shm.h" include/sys/shm.h
 
 # PRoot, as Termux builds it, with the loader as its own file (Buddy passes its path in PROOT_LOADER).
 # One source file gets string.h only through Termux's headers, so it's added for the NDK.
-sed -i '1i #include <string.h>' "proot-$PROOT_VERSION/src/extension/ashmem_memfd/ashmem_memfd.c"
+sed -i '1i #include <string.h>' "proot/src/extension/ashmem_memfd/ashmem_memfd.c"
 # CPPFLAGS/LDFLAGS go in the environment so the Makefile's own additions still apply. The loader links with its own
 # flags, and the NDK's linker would otherwise lay it out for 4 KB pages only.
 CPPFLAGS="-I$WORK/include -DARG_MAX=131072 -DVERSION=\\\"$PROOT_VERSION\\\"" LDFLAGS="-L$WORK/lib $LDPAGE" LOADER_LDFLAGS="$LDPAGE" \
-  make -s -C "proot-$PROOT_VERSION/src" proot loader/loader \
-  CC="$CC" LD="$CC" STRIP="$STRIP" OBJCOPY="$OBJCOPY" OBJDUMP="$OBJDUMP" HAS_LOADER_32BIT= \
+  make -s -C "proot/src" proot loader/loader \
+  GIT=false CC="$CC" LD="$CC" STRIP="$STRIP" OBJCOPY="$OBJCOPY" OBJDUMP="$OBJDUMP" HAS_LOADER_32BIT= \
   PROOT_WITH_LIBANDROID_SHMEM=true PROOT_UNBUNDLE_LOADER=/nonexistent
 
 finish lib/libtalloc.so libtalloc.so
 finish lib/libandroid-shmem.so libandroid-shmem.so
-finish "proot-$PROOT_VERSION/src/proot" libproot.so
-cp "proot-$PROOT_VERSION/src/loader/loader" "$OUT/libproot-loader.so" && $STRIP "$OUT/libproot-loader.so" && echo "Built libproot-loader.so"
+finish "proot/src/proot" libproot.so
+cp "proot/src/loader/loader" "$OUT/libproot-loader.so" && $STRIP "$OUT/libproot-loader.so" && echo "Built libproot-loader.so"
 
 # the pty helper; jni.h comes with the NDK, or with Termux's JDK on the phone
 JNI=()
