@@ -1455,4 +1455,17 @@
     <string name="signin_api_key_on_plan">Sohbetler API anahtarlarının modellerini de kullanabilir (bir sohbetin model menüsünden seç). Ses ve diğer plan özellikleri planını kullanır.</string>
     <string name="fdroid_download_note">Bunlar F-Droid\'den değil, doğrudan yapımcılarından indirilir; bu yüzden F-Droid bunları denetlemedi.</string>
     <string name="api_keys_local_info">Kendi sunucun için (Ollama, LM Studio, llama.cpp): API anahtarını boş bırak. Bilgisayardaysa localhost yerine Wi-Fi\'deki adresini yaz, örneğin http://192.168.1.20:11434/v1.</string>
+    <string name="main_section_pinned">Sabitlenenler</string>
+    <string name="main_section_archived">Arşiv (%1$d)</string>
+    <string name="chat_pinned_marker">Sabitlendi</string>
+    <string name="chat_menu_rename">Yeniden adlandır</string>
+    <string name="chat_menu_pin">En üste sabitle</string>
+    <string name="chat_menu_unpin">Sabitlemeyi kaldır</string>
+    <string name="chat_menu_archive">Arşivle</string>
+    <string name="chat_menu_unarchive">Arşivden çıkar</string>
+    <string name="chat_archived">Arşivlendi. Listenin en altında.</string>
+    <string name="chat_archived_scheduled">Arşivlendi. Zamanlanmış görevleri çalışmaya devam ediyor.</string>
+    <string name="chat_rename_title">Sohbeti yeniden adlandır</string>
+    <string name="chat_rename_hint">Boş: ilk mesajı</string>
+    <string name="chat_rename_save">Kaydet</string>
 </resources>

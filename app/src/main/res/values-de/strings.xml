@@ -1454,4 +1454,17 @@
     <string name="signin_api_key_on_plan">Chats können auch die Modelle deiner API-Schlüssel nutzen (wähle eines im Modellmenü eines Chats). Sprache und die anderen Abo-Funktionen nutzen dein Abo.</string>
     <string name="fdroid_download_note">Diese Downloads kommen direkt von ihren Herstellern, nicht von F-Droid, daher hat F-Droid sie nicht geprüft.</string>
     <string name="api_keys_local_info">Für einen eigenen Server (Ollama, LM Studio, llama.cpp): Lass den API-Schlüssel leer. Auf einem PC ersetze localhost durch seine Adresse im WLAN, z. B. http://192.168.1.20:11434/v1.</string>
+    <string name="main_section_pinned">Angeheftet</string>
+    <string name="main_section_archived">Archiviert (%1$d)</string>
+    <string name="chat_pinned_marker">Angeheftet</string>
+    <string name="chat_menu_rename">Umbenennen</string>
+    <string name="chat_menu_pin">Oben anheften</string>
+    <string name="chat_menu_unpin">Lösen</string>
+    <string name="chat_menu_archive">Archivieren</string>
+    <string name="chat_menu_unarchive">Aus dem Archiv holen</string>
+    <string name="chat_archived">Archiviert. Der Chat ist unten in der Liste.</string>
+    <string name="chat_archived_scheduled">Archiviert. Seine geplanten Aufgaben laufen weiter.</string>
+    <string name="chat_rename_title">Chat umbenennen</string>
+    <string name="chat_rename_hint">Leer: seine erste Nachricht</string>
+    <string name="chat_rename_save">Speichern</string>
 </resources>

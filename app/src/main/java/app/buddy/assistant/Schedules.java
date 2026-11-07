@@ -284,7 +284,7 @@ public final class Schedules extends BroadcastReceiver {
             if (!l.id.equals(id)) continue;
             cancelLater(c, s, l);
             s.later.remove(l);
-            ChatHub.get(c).sessions.save();
+            ChatHub.get(c).sessions.save(s);
             ChatHub.get(c).changed();
         }
     }
@@ -336,7 +336,7 @@ public final class Schedules extends BroadcastReceiver {
     static void setPaused(Context c, Sessions.Session s, boolean paused) {
         if (s.schedule == null) return;
         s.schedule.paused = paused;
-        ChatHub.get(c).sessions.save();
+        ChatHub.get(c).sessions.save(s);
         set(c, s);
         ChatHub.get(c).changed();
     }
@@ -349,7 +349,7 @@ public final class Schedules extends BroadcastReceiver {
         if (l.remind) { // a plain reminder: the user gets it, the agent doesn't run
             ChatHub hub = ChatHub.get(c);
             s.later.remove(l);
-            hub.sessions.save();
+            hub.sessions.save(s);
             hub.note(s, Bubble.Kind.STEP, c.getString(R.string.schedule_reminder_line, l.text));
             notice(c, s, c.getString(R.string.schedule_reminder_title), l.text);
             return;
@@ -393,7 +393,7 @@ public final class Schedules extends BroadcastReceiver {
                 waiting.remove(key);
                 if (l != null) {
                     s.later.remove(l); // sent once, whatever happens now
-                    hub.sessions.save();
+                    hub.sessions.save(s);
                     hub.changed();
                 }
                 if (skip != null) notice(app, s, app.getString(R.string.schedule_skipped_title, s.label()), skip);
@@ -632,7 +632,7 @@ public final class Schedules extends BroadcastReceiver {
         int i = 0;
         while (i < s.later.size() && s.later.get(i).at <= at) i++;
         s.later.add(i, l);
-        ChatHub.get(c).sessions.save();
+        ChatHub.get(c).sessions.save(s);
         setLater(c, s, l);
         ChatHub.get(c).changed();
         return "Scheduled " + l.id + " for " + english(at) + (l.remind ? ". It's a reminder: Buddy shows it to the user "

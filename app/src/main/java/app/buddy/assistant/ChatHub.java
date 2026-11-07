@@ -77,8 +77,10 @@ final class ChatHub {
             sessions.add(s, Bubble.Kind.STEP, app.getString(R.string.hub_interrupted), null);
         }
         // incognito chats don't outlive Buddy: they go, with what their agent kept of them
+        List<String> forgetting = new ArrayList<>();
         for (Sessions.Session s : new ArrayList<>(sessions.all)) {
             if (!s.incognito) continue;
+            forgetting.add(s.id); // its folder is the delete's to remove: it reads it first
             sessions.remove(s);
             StepLog.deleteChat(app, s.id);
             if (Linux.installed(app)) {
@@ -88,6 +90,68 @@ final class ChatHub {
                 }
             }
         }
+        pruneLinux(forgetting);
+    }
+
+    /**
+     * Removes the folders in Buddy's Linux of chats Buddy no longer has (before 2.2.26 the 21st chat dropped the oldest,
+     * but its folder stayed), once per version of Buddy. Only when every chat was read, so one that failed to read
+     * keeps its agent's session; chats being forgotten (incognito) keep theirs for their own delete, which reads it.
+     */
+    private void pruneLinux(List<String> forgetting) {
+        if (!sessions.complete || sessions.all.isEmpty() || !Linux.installed(app)) return;
+        if (Prefs.prunedFor(app) == BuildInfo.VERSION_CODE) return;
+        StringBuilder ids = new StringBuilder();
+        List<String> keep = new ArrayList<>(forgetting);
+        for (Sessions.Session s : sessions.all) keep.add(s.id);
+        for (String id : keep) {
+            if (!id.matches("[0-9a-f]{12}")) return; // not one Buddy made: better keep everything
+            if (ids.length() > 0) ids.append(',');
+            ids.append(id);
+        }
+        try {
+            Helper.run(app, "prune", ids.toString());
+            Prefs.setPrunedFor(app, BuildInfo.VERSION_CODE);
+        } catch (Exception ignored) {
+        }
+    }
+
+    /** A chat's name in the list; empty goes back to its first message's. */
+    void rename(Sessions.Session ses, String title) {
+        String t = title.trim().replace('\n', ' ');
+        if (t.isEmpty()) { // as it was named: the first message the chat still has (it keeps its last 150)
+            for (Sessions.Msg m : ses.messages) {
+                if (m.kind != Bubble.Kind.USER) continue;
+                t = Sessions.autoTitle(m.text, m.files);
+                break;
+            }
+        }
+        ses.title = t;
+        sessions.save(ses);
+        changed();
+    }
+
+    /** Pinned chats stay at the top of the list; pinning brings an archived chat back. */
+    void setPinned(Sessions.Session ses, boolean on) {
+        ses.pinned = on;
+        if (on) ses.archived = false;
+        sessions.save(ses);
+        changed();
+    }
+
+    /** An archived chat leaves the list, the bubble and sharing, and keeps its schedules and history. */
+    void setArchived(Sessions.Session ses, boolean on) {
+        ses.archived = on;
+        if (on) ses.pinned = false;
+        if (on && sessions.current == ses) { // the bubble shows the current chat: one that isn't archived
+            for (Sessions.Session s : sessions.all) {
+                if (s.archived) continue;
+                sessions.select(s);
+                break;
+            }
+        }
+        sessions.save(ses);
+        changed();
     }
 
     /** After a cut-off run: the agent checks what's done and goes on. */
@@ -207,11 +271,12 @@ final class ChatHub {
             return e.getMessage();
         }
         ses.interrupted = false;
+        if (!scheduled && !rule) ses.archived = false; // the user writing in an archived chat brings it back
         sessions.add(ses, Bubble.Kind.USER, text, hasFiles ? new ArrayList<>(files) : null);
         Sessions.Msg um = ses.messages.get(ses.messages.size() - 1);
         if (scheduled) {
             um.scheduled = true;
-            sessions.save();
+            sessions.save(ses);
         }
         for (Listener l : new ArrayList<>(listeners)) l.onMessage(ses, um);
         startRun(ses);
@@ -277,7 +342,7 @@ final class ChatHub {
     /** Turn a chat's Linux tools on or off; the next message uses them (a running one keeps what it started with). */
     void setDev(Sessions.Session ses, boolean on) {
         ses.dev = on;
-        sessions.save();
+        sessions.save(ses);
         changed();
     }
 
@@ -288,7 +353,7 @@ final class ChatHub {
     void setSchedule(Sessions.Session ses, Schedules.Plan plan) {
         ses.schedule = plan;
         if (plan == null && !ses.running) ses.allowed.clear();
-        sessions.save();
+        sessions.save(ses);
         Schedules.set(app, ses);
         changed();
     }
@@ -296,13 +361,13 @@ final class ChatHub {
     /** Long-task mode for a chat: the screen stays on while it works (see KeepAwake); a running one gets it at once. */
     void setIncognito(Sessions.Session ses, boolean on) {
         ses.incognito = on;
-        sessions.save();
+        sessions.save(ses);
         changed();
     }
 
     void setAwake(Sessions.Session ses, boolean on) {
         ses.awake = on;
-        sessions.save();
+        sessions.save(ses);
         changed();
     }
 
@@ -313,7 +378,7 @@ final class ChatHub {
     void setAllowed(Sessions.Session ses, String pkg, boolean on) {
         if (on) ses.allowed.add(pkg);
         else ses.allowed.remove(pkg);
-        if (ses.schedule != null) sessions.save();
+        if (ses.schedule != null) sessions.save(ses);
         changed();
     }
 
@@ -381,7 +446,7 @@ final class ChatHub {
                     String m = ev.optString("model", "");
                     if (!m.isEmpty() && !m.equals(ses.actualModel)) {
                         ses.actualModel = m;
-                        sessions.save();
+                        sessions.save(ses);
                         changed();
                     }
                 } else if ("status".equals(ev.optString("subtype"))) { // Claude Code: compacting the conversation
@@ -399,7 +464,7 @@ final class ChatHub {
                     String m = ev.optString("model", "");
                     if (!m.isEmpty() && !m.equals(ses.actualModel)) {
                         ses.actualModel = m;
-                        sessions.save();
+                        sessions.save(ses);
                     }
                 }
                 break;
@@ -453,7 +518,7 @@ final class ChatHub {
                         }
                     }
                     if (m != null && m.optLong("contextWindow") > 0) ses.ctxWindow = m.optLong("contextWindow");
-                    sessions.save();
+                    sessions.save(ses);
                 }
                 boolean error = ev.optBoolean("is_error") || !"success".equals(ev.optString("subtype", "success"));
                 String r = ev.optString("result", "").trim();
@@ -513,7 +578,7 @@ final class ChatHub {
             case "buddy_context": // Codex, after its turn (see buddy-run): how full the context is, and its size
                 if (ev.optLong("used") > 0) ses.ctxUsed = ev.optLong("used");
                 if (ev.optLong("window") > 0) ses.ctxWindow = ev.optLong("window");
-                sessions.save();
+                sessions.save(ses);
                 break;
             case "buddy_step": // a line from the helper under the steps (Antigravity: a refused step)
                 add(ses, Bubble.Kind.STEP, ev.optString("text"));
@@ -632,7 +697,7 @@ final class ChatHub {
     /** The user dismissed the offer to continue a cut-off run. */
     void dismissInterrupted(Sessions.Session ses) {
         ses.interrupted = false;
-        sessions.save();
+        sessions.save(ses);
         changed();
     }
 

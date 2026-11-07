@@ -39,7 +39,7 @@ The short version is in the [README](../README.md). This page has the details.
 
 The app has three tabs: **Chats**, **Sessions** and **Settings**.
 
-- **Chats:** start one with **New chat** (Claude Code, Codex, OpenCode, Antigravity or Grok; agents that aren't set up are greyed out), tap a chat to open it, long-press to delete it. Several chats can work at the same time.
+- **Chats:** start one with **New chat** (Claude Code, Codex, OpenCode, Antigravity or Grok; agents that aren't set up are greyed out), tap a chat to open it, long-press to **rename**, **pin** to the top, **archive** or delete it. Archived chats move to a folded **Archived** section at the bottom, out of the bubble and sharing; their scheduled tasks keep running, and writing in one brings it back. There's no limit on how many chats you keep. Several chats can work at the same time.
 - **Models:** tap the chip under a chat's title to pick the model for that chat (Opus, Sonnet, Haiku, Fable, Codex's own list, OpenCode's models including the free ones, Antigravity's and Grok's lists, or any model name). The conversation continues with the new model.
 - **Linux tools**: the chip next to the model shows whether the agent may work in Buddy's Linux in that chat (run commands, install packages, edit files, build apps); tap it to switch. **New chat** has the same switch. See [Linux tools](#linux-tools-building-apps).
 - **Photos and files:** tap the paperclip to take a photo, pick photos, or attach any file up to 25 MB.

@@ -1453,4 +1453,17 @@
     <string name="signin_api_key_on_plan">Chats kunnen ook de modellen van je API-sleutels gebruiken (kies er een in het modelmenu van een chat). Spraak en de andere abonnementsfuncties gebruiken je abonnement.</string>
     <string name="fdroid_download_note">Deze downloads komen van hun makers, niet van F-Droid, dus F-Droid heeft ze niet gecontroleerd.</string>
     <string name="api_keys_local_info">Voor een eigen server (Ollama, LM Studio, llama.cpp): laat de API-sleutel leeg. Op een pc vul je het adres op je wifi in plaats van localhost in, bijvoorbeeld http://192.168.1.20:11434/v1.</string>
+    <string name="main_section_pinned">Vastgezet</string>
+    <string name="main_section_archived">Gearchiveerd (%1$d)</string>
+    <string name="chat_pinned_marker">Vastgezet</string>
+    <string name="chat_menu_rename">Naam wijzigen</string>
+    <string name="chat_menu_pin">Bovenaan vastzetten</string>
+    <string name="chat_menu_unpin">Losmaken</string>
+    <string name="chat_menu_archive">Archiveren</string>
+    <string name="chat_menu_unarchive">Uit archief halen</string>
+    <string name="chat_archived">Gearchiveerd. Hij staat onderaan de lijst.</string>
+    <string name="chat_archived_scheduled">Gearchiveerd. De geplande taken blijven lopen.</string>
+    <string name="chat_rename_title">Chat hernoemen</string>
+    <string name="chat_rename_hint">Leeg: het eerste bericht</string>
+    <string name="chat_rename_save">Opslaan</string>
 </resources>

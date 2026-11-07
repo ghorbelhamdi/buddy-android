@@ -1,0 +1,4 @@
+• Rename, pin and archive chats: long-press a chat. Archived chats keep their scheduled tasks
+• No more 20-chat limit: Buddy no longer drops your oldest chats. Each chat is saved in its own file
+• Frees space taken by the folders of chats that were dropped before
+• The F-Droid build says where its updates come from

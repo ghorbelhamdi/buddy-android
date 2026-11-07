@@ -1447,4 +1447,17 @@
     <string name="signin_api_key_on_plan">चैट आपकी API कुंजियों के मॉडल भी इस्तेमाल कर सकती हैं (चैट के मॉडल मेनू में चुनें)। आवाज़ और प्लान की बाकी सुविधाएँ आपके प्लान से चलती हैं।</string>
     <string name="fdroid_download_note">ये डाउनलोड इन्हें बनाने वालों से आते हैं, F-Droid से नहीं, इसलिए F-Droid ने इनकी जाँच नहीं की है।</string>
     <string name="api_keys_local_info">अपने खुद के सर्वर (Ollama, LM Studio, llama.cpp) के लिए: API key खाली छोड़ें। PC पर, localhost की जगह अपने Wi-Fi पर उसका पता डालें, जैसे http://192.168.1.20:11434/v1।</string>
+    <string name="main_section_pinned">पिन की गई</string>
+    <string name="main_section_archived">संग्रहित (%1$d)</string>
+    <string name="chat_pinned_marker">पिन की गई</string>
+    <string name="chat_menu_rename">नाम बदलें</string>
+    <string name="chat_menu_pin">ऊपर पिन करें</string>
+    <string name="chat_menu_unpin">पिन हटाएँ</string>
+    <string name="chat_menu_archive">संग्रहित करें</string>
+    <string name="chat_menu_unarchive">संग्रह से निकालें</string>
+    <string name="chat_archived">संग्रहित। यह सूची में सबसे नीचे है।</string>
+    <string name="chat_archived_scheduled">संग्रहित। इसके शेड्यूल किए गए काम चलते रहेंगे।</string>
+    <string name="chat_rename_title">चैट का नाम बदलें</string>
+    <string name="chat_rename_hint">खाली: इसका पहला संदेश</string>
+    <string name="chat_rename_save">सहेजें</string>
 </resources>

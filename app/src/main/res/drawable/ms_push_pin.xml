@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A push pin (head, flared base and needle), drawn to match the Material Symbols icons. viewBox="0 -960 960 960" -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="960" android:viewportHeight="960">
+    <group android:translateY="960">
+        <path android:fillColor="#FFFFFFFF"
+            android:pathData="M320-840L640-840L640-780L600-780L600-560L680-480L680-400L515-400L515-140L480-80L445-140L445-400L280-400L280-480L360-560L360-780L320-780Z" />
+    </group>
+</vector>

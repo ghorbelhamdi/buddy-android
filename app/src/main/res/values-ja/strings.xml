@@ -1439,4 +1439,17 @@
     <string name="signin_api_key_on_plan">チャットではAPIキーのモデルも使えます(チャットのモデルメニューで選択)。音声などのプラン機能はプランを使います。</string>
     <string name="fdroid_download_note">これらは F-Droid ではなく各提供元から直接ダウンロードされるため、F-Droid による確認は行われていません。</string>
     <string name="api_keys_local_info">自分のサーバー（Ollama、LM Studio、llama.cpp）の場合: API キーは空のままにします。PC で動かす場合は、localhost の代わりに Wi-Fi 上の PC のアドレスを入力します（例: http://192.168.1.20:11434/v1）。</string>
+    <string name="main_section_pinned">固定済み</string>
+    <string name="main_section_archived">アーカイブ (%1$d)</string>
+    <string name="chat_pinned_marker">固定済み</string>
+    <string name="chat_menu_rename">名前を変更</string>
+    <string name="chat_menu_pin">一番上に固定</string>
+    <string name="chat_menu_unpin">固定を解除</string>
+    <string name="chat_menu_archive">アーカイブ</string>
+    <string name="chat_menu_unarchive">アーカイブから戻す</string>
+    <string name="chat_archived">アーカイブしました。リストの一番下にあります。</string>
+    <string name="chat_archived_scheduled">アーカイブしました。予定したタスクはそのまま動きます。</string>
+    <string name="chat_rename_title">チャットの名前を変更</string>
+    <string name="chat_rename_hint">空欄: 最初のメッセージ</string>
+    <string name="chat_rename_save">保存</string>
 </resources>

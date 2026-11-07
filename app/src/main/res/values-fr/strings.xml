@@ -1887,4 +1887,17 @@
     <string name="signin_api_key_on_plan">Les chats peuvent aussi utiliser les modèles de tes clés API (choisis-en un dans le menu des modèles d\'un chat). La voix et les autres fonctions de l\'abonnement utilisent ton abonnement.</string>
     <string name="fdroid_download_note">Ces téléchargements viennent de leurs auteurs, pas de F-Droid : F-Droid ne les a donc pas vérifiés.</string>
     <string name="api_keys_local_info">Pour ton propre serveur (Ollama, LM Studio, llama.cpp) : laisse la clé API vide. Sur un PC, mets son adresse sur ton Wi-Fi à la place de localhost, par exemple http://192.168.1.20:11434/v1.</string>
+    <string name="main_section_pinned">Épinglées</string>
+    <string name="main_section_archived">Archivées (%1$d)</string>
+    <string name="chat_pinned_marker">Épinglée</string>
+    <string name="chat_menu_rename">Renommer</string>
+    <string name="chat_menu_pin">Épingler en haut</string>
+    <string name="chat_menu_unpin">Désépingler</string>
+    <string name="chat_menu_archive">Archiver</string>
+    <string name="chat_menu_unarchive">Désarchiver</string>
+    <string name="chat_archived">Archivée. Elle est en bas de la liste.</string>
+    <string name="chat_archived_scheduled">Archivée. Ses tâches planifiées continuent.</string>
+    <string name="chat_rename_title">Renommer la discussion</string>
+    <string name="chat_rename_hint">Vide : son premier message</string>
+    <string name="chat_rename_save">Enregistrer</string>
 </resources>

@@ -132,6 +132,15 @@ final class Prefs {
         sp(c).edit().putBoolean("a11y_consent_v3", true).apply();
     }
 
+    /** The version of Buddy whose start last cleaned up the Linux folders of chats Buddy no longer has (ChatHub). */
+    static int prunedFor(Context c) {
+        return sp(c).getInt("pruned_for", 0);
+    }
+
+    static void setPrunedFor(Context c, int v) {
+        sp(c).edit().putInt("pruned_for", v).apply();
+    }
+
     static int helperVersion(Context c) {
         return sp(c).getInt("helper_version", 1);
     }

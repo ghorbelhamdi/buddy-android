@@ -1499,4 +1499,17 @@
     <string name="signin_api_key_on_plan">يمكن للمحادثات أيضًا استخدام نماذج مفاتيح API (اختر واحدًا من قائمة نماذج المحادثة). الصوت وميزات الاشتراك الأخرى تستخدم اشتراكك.</string>
     <string name="fdroid_download_note">هذه التنزيلات تأتي من صانعيها، لا من F-Droid، لذا لم يفحصها F-Droid.</string>
     <string name="api_keys_local_info">لخادم خاص بك (Ollama أو LM Studio أو llama.cpp): اترك مفتاح API فارغًا. على الكمبيوتر، ضع عنوانه على شبكة Wi-Fi بدلًا من localhost، مثل http://192.168.1.20:11434/v1.</string>
+    <string name="main_section_pinned">مثبّتة</string>
+    <string name="main_section_archived">المؤرشفة (%1$d)</string>
+    <string name="chat_pinned_marker">مثبّتة</string>
+    <string name="chat_menu_rename">إعادة التسمية</string>
+    <string name="chat_menu_pin">تثبيت في الأعلى</string>
+    <string name="chat_menu_unpin">إلغاء التثبيت</string>
+    <string name="chat_menu_archive">أرشفة</string>
+    <string name="chat_menu_unarchive">إلغاء الأرشفة</string>
+    <string name="chat_archived">تمت الأرشفة. ستجدها أسفل القائمة.</string>
+    <string name="chat_archived_scheduled">تمت الأرشفة. مهامها المجدولة تبقى تعمل.</string>
+    <string name="chat_rename_title">إعادة تسمية المحادثة</string>
+    <string name="chat_rename_hint">فارغ: أول رسالة فيها</string>
+    <string name="chat_rename_save">حفظ</string>
 </resources>

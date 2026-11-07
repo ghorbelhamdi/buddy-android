@@ -23,6 +23,8 @@ import static app.buddy.assistant.Ui.*;
 public class MainActivity extends Screen implements ChatHub.Listener, Account.Listener {
     private ChatHub hub;
     private LinearLayout list;
+    /** The Archived section is open (folded by default, each time the app starts). */
+    private boolean showArchived;
     private FrameLayout navSlot;
 
     @Override
@@ -209,22 +211,44 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
             for (String[] c : cards) list.addView(cardRow(c, bubble), full());
         }
 
-        List<Sessions.Session> working = new ArrayList<>(), recent = new ArrayList<>();
+        List<Sessions.Session> working = new ArrayList<>(), pinned = new ArrayList<>(), recent = new ArrayList<>(),
+                archived = new ArrayList<>();
         for (Sessions.Session ses : hub.sessions.all) {
             if (ses.running) working.add(ses);
-            else if (!ses.messages.isEmpty()) recent.add(ses); // hide untouched new chats
+            else if (ses.messages.isEmpty()) continue; // hide untouched new chats
+            else if (ses.archived) archived.add(ses);
+            else if (ses.pinned) pinned.add(ses);
+            else recent.add(ses);
         }
+        java.util.Collections.sort(pinned, (a, b) -> Long.compare(b.updated, a.updated));
         java.util.Collections.sort(recent, (a, b) -> Long.compare(b.updated, a.updated));
+        java.util.Collections.sort(archived, (a, b) -> Long.compare(b.updated, a.updated));
         if (bubble != null) java.util.Collections.sort(working, (a, b) -> Boolean.compare(bubble.waitingIn(b), bubble.waitingIn(a)));
         if (!working.isEmpty()) {
             list.addView(sectionHeader(getString(R.string.main_section_working), working.size()));
             for (Sessions.Session s : working) list.addView(chatRow(s), full());
         }
+        if (!pinned.isEmpty()) {
+            list.addView(sectionLabel(this, getString(R.string.main_section_pinned)));
+            for (Sessions.Session s : pinned) list.addView(chatRow(s), full());
+        }
         if (!recent.isEmpty()) {
             list.addView(sectionLabel(this, getString(R.string.main_section_recent)));
             for (Sessions.Session s : recent) list.addView(chatRow(s), full());
         }
-        if (working.isEmpty() && recent.isEmpty()) {
+        if (!archived.isEmpty()) { // folded: one row that opens it
+            LinearLayout head = listRow(this);
+            head.setGravity(Gravity.CENTER_VERTICAL);
+            head.addView(text(this, getString(R.string.main_section_archived, archived.size()), 14, MUTED), weight1());
+            head.addView(icon(this, showArchived ? R.drawable.ms_expand_less : R.drawable.ms_expand_more, MUTED, 22));
+            head.setOnClickListener(v -> {
+                showArchived = !showArchived;
+                render();
+            });
+            list.addView(head, full());
+            if (showArchived) for (Sessions.Session s : archived) list.addView(chatRow(s), full());
+        }
+        if (working.isEmpty() && pinned.isEmpty() && recent.isEmpty() && archived.isEmpty()) {
             LinearLayout empty = column(this);
             empty.setGravity(Gravity.CENTER_HORIZONTAL);
             empty.setPaddingRelative(dp(this, 32), dp(this, 64), dp(this, 32), 0);
@@ -280,6 +304,13 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
 
         LinearLayout first = row(this);
         first.addView(single(title(this, ses.label(), 15)), weight1());
+        if (ses.pinned && !ses.archived) {
+            android.widget.ImageView pin = icon(this, R.drawable.ms_push_pin, MUTED, 14);
+            pin.setContentDescription(getString(R.string.chat_pinned_marker));
+            LinearLayout.LayoutParams pp = new LinearLayout.LayoutParams(dp(this, 14), dp(this, 14));
+            pp.setMarginStart(dp(this, 8));
+            first.addView(pin, pp);
+        }
         if (ses.schedule != null) { // a scheduled task
             android.widget.ImageView clock = icon(this, R.drawable.ms_schedule, MUTED, 14);
             clock.setContentDescription(getString(R.string.schedule_marker));
@@ -328,11 +359,86 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         r.addView(col, weight1());
         r.setOnClickListener(v -> open(ses));
         r.setOnLongClickListener(v -> {
-            confirmSheet(this, getString(R.string.main_delete_title), ses.label(), getString(R.string.main_delete_action), true,
-                    () -> hub.delete(ses));
+            chatMenu(ses);
             return true;
         });
         return r;
+    }
+
+    /** A long press on a chat: rename, pin, archive or delete it. */
+    private void chatMenu(Sessions.Session ses) {
+        LinearLayout c = column(this);
+        TextView h = single(title(this, ses.label(), 18));
+        h.setPaddingRelative(0, 0, 0, dp(this, 8));
+        c.addView(h);
+        final Dialog[] d = new Dialog[1];
+        c.addView(menuRow(getString(R.string.chat_menu_rename), TEXT, () -> {
+            d[0].dismiss();
+            renameSheet(ses);
+        }), full());
+        if (!ses.archived) c.addView(menuRow(getString(ses.pinned ? R.string.chat_menu_unpin : R.string.chat_menu_pin), TEXT, () -> {
+            d[0].dismiss();
+            hub.setPinned(ses, !ses.pinned);
+        }), full());
+        c.addView(menuRow(getString(ses.archived ? R.string.chat_menu_unarchive : R.string.chat_menu_archive), TEXT, () -> {
+            d[0].dismiss();
+            hub.setArchived(ses, !ses.archived);
+            if (ses.archived) android.widget.Toast.makeText(this, ses.schedule != null || !ses.later.isEmpty()
+                    ? R.string.chat_archived_scheduled : R.string.chat_archived, android.widget.Toast.LENGTH_SHORT).show();
+        }), full());
+        c.addView(menuRow(getString(R.string.main_delete_action), ERR, () -> {
+            d[0].dismiss();
+            confirmSheet(this, getString(R.string.main_delete_title), ses.label(), getString(R.string.main_delete_action), true,
+                    () -> hub.delete(ses));
+        }), full());
+        d[0] = bottomSheet(this, c);
+        d[0].show();
+    }
+
+    private View menuRow(String label, int color, Runnable onTap) {
+        LinearLayout r = listRow(this);
+        r.setPaddingRelative(dp(this, 4), dp(this, 14), dp(this, 4), dp(this, 14));
+        r.addView(text(this, label, 16, color), weight1());
+        r.setOnClickListener(v -> onTap.run());
+        return r;
+    }
+
+    /** The chat's name: empty goes back to its first message. */
+    private void renameSheet(Sessions.Session ses) {
+        LinearLayout c = column(this);
+        c.addView(title(this, getString(R.string.chat_rename_title), 18));
+        android.widget.EditText name = new android.widget.EditText(this);
+        name.setText(ses.title);
+        name.setSelectAllOnFocus(true);
+        name.setHint(R.string.chat_rename_hint);
+        name.setHintTextColor(MUTED);
+        name.setTextColor(TEXT);
+        name.setTextSize(15);
+        name.setSingleLine(true);
+        name.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        name.setPaddingRelative(dp(this, 12), dp(this, 12), dp(this, 12), dp(this, 12));
+        name.setBackground(outlined(this, BG, 12, OUTLINE, 1));
+        LinearLayout.LayoutParams np = full();
+        np.topMargin = dp(this, 12);
+        c.addView(name, np);
+        android.widget.Button save = button(this, getString(R.string.chat_rename_save), true);
+        LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(this, 52));
+        sp.topMargin = dp(this, 14);
+        c.addView(save, sp);
+        Dialog d = bottomSheet(this, c);
+        save.setOnClickListener(v -> {
+            hub.rename(ses, name.getText().toString());
+            d.dismiss();
+        });
+        name.setOnEditorActionListener((v, id, ev) -> {
+            save.performClick();
+            return true;
+        });
+        android.view.Window w = d.getWindow();
+        if (w != null) w.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
+                | android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        d.show();
+        name.requestFocus();
     }
 
     private void newChatSheet() {

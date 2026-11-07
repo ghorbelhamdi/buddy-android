@@ -6,6 +6,7 @@
 #                                    run the agent on the message in that session, streaming events to the bubble
 #   buddy-run <token> stop <session>       stop that session's running request
 #   buddy-run <token> delete <session>     forget that session
+#   buddy-run <token> prune <id,id,...>    remove the folders of chats not in the list
 #   buddy-run <token> ping                 answer the app's setup check
 #   buddy-run <token> procs                list running Claude Code / Codex / OpenCode / Antigravity / Grok processes (buddy_procs)
 #   buddy-run <token> kill <pid>           stop a running Claude Code / Codex process and its children
@@ -13,7 +14,7 @@
 #   buddy-run <token> transcript <claude|codex> <file>   last messages of a session (buddy_transcript)
 #   buddy-run <token> adopt <session> <claude|codex> <agent-session-id>  continue that session as a Buddy chat
 # Every event sent to the bubble carries "buddy_session" so the app can route it.
-HELPER_VERSION=24
+HELPER_VERSION=25
 set -u
 export PATH=$HOME/.local/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # The claude launcher sets BUN_OPTIONS with a path relative to its folder; never inherit a stale one.
@@ -211,9 +212,24 @@ case "$CMD" in
     fi
     rm -rf "${S:?}"
     exit 0 ;;
+  prune)
+    # The folders of chats Buddy no longer has (dropped before 2.2.26, when Buddy kept 20 chats, or lost): the chats
+    # it has come as one comma-separated list. Never with an empty list, never a running chat's or one touched in the
+    # last hour (a chat being made), and only folders named as Buddy names chats.
+    KEEP=${3:-}
+    [[ "$KEEP" =~ ^[0-9a-f]{12}(,[0-9a-f]{12})*$ ]] || exit 2
+    for d in "$D"/sessions/*/; do
+      n=$(basename "$d")
+      [[ "$n" =~ ^[0-9a-f]{12}$ ]] || continue
+      case ",$KEEP," in *",$n,"*) continue ;; esac
+      [ -f "$d/pid" ] && kill -0 "$(cat "$d/pid")" 2>/dev/null && continue
+      [ -n "$(find "$d" -maxdepth 0 -mmin -60)" ] && continue
+      rm -rf "${d:?}"
+    done
+    exit 0 ;;
   ask) SID=${3:-}; BACKEND=${4:-claude}; DEV=${5:-0}; MSG=${6:-}; MODEL=${7:-}; FILES=${8:-}; EFFORT=${9:-}
     [[ "$EFFORT" =~ ^(low|medium|high|xhigh|max)$ ]] || EFFORT="" ;;
-  *) echo "usage: buddy-run <token> ask|stop|delete|ping ..." >&2; exit 2 ;;
+  *) echo "usage: buddy-run <token> ask|stop|delete|prune|ping ..." >&2; exit 2 ;;
 esac
 
 valid_sid "$SID" || exit 2

@@ -1887,4 +1887,17 @@
     <string name="signin_api_key_on_plan">Le chat possono usare anche i modelli delle tue chiavi API (scegline uno nel menu dei modelli di una chat). La voce e le altre funzioni del piano usano il tuo piano.</string>
     <string name="fdroid_download_note">Questi download arrivano dai loro autori, non da F-Droid, quindi F-Droid non li ha controllati.</string>
     <string name="api_keys_local_info">Per un tuo server (Ollama, LM Studio, llama.cpp): lascia vuota la chiave API. Su un PC, metti il suo indirizzo sul tuo Wi-Fi al posto di localhost, ad esempio http://192.168.1.20:11434/v1.</string>
+    <string name="main_section_pinned">Fissate</string>
+    <string name="main_section_archived">Archiviate (%1$d)</string>
+    <string name="chat_pinned_marker">Fissata</string>
+    <string name="chat_menu_rename">Rinomina</string>
+    <string name="chat_menu_pin">Fissa in alto</string>
+    <string name="chat_menu_unpin">Rimuovi dalle fissate</string>
+    <string name="chat_menu_archive">Archivia</string>
+    <string name="chat_menu_unarchive">Togli dall\'archivio</string>
+    <string name="chat_archived">Archiviata. È in fondo alla lista.</string>
+    <string name="chat_archived_scheduled">Archiviata. Le sue attività pianificate continuano.</string>
+    <string name="chat_rename_title">Rinomina chat</string>
+    <string name="chat_rename_hint">Vuoto: il suo primo messaggio</string>
+    <string name="chat_rename_save">Salva</string>
 </resources>

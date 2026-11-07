@@ -2045,4 +2045,18 @@
     <string name="fdroid_download_note">These come from their makers, not from F-Droid, so F-Droid hasn\'t checked them.</string>
     <!-- API keys form, when a local server preset (Ollama, LM Studio, llama.cpp) is picked. Keep the address example as is. -->
     <string name="api_keys_local_info">For a server of your own (Ollama, LM Studio, llama.cpp): leave the API key empty. On a PC, put its address on your Wi-Fi instead of localhost, like http://192.168.1.20:11434/v1.</string>
+    <!-- Chat list: pinned and archived chats, and the long-press menu on a chat (rename, pin, archive, delete). -->
+    <string name="main_section_pinned">Pinned</string>
+    <string name="main_section_archived">Archived (%1$d)</string>
+    <string name="chat_pinned_marker">Pinned</string>
+    <string name="chat_menu_rename">Rename</string>
+    <string name="chat_menu_pin">Pin to top</string>
+    <string name="chat_menu_unpin">Unpin</string>
+    <string name="chat_menu_archive">Archive</string>
+    <string name="chat_menu_unarchive">Unarchive</string>
+    <string name="chat_archived">Archived. It\'s at the bottom of the list.</string>
+    <string name="chat_archived_scheduled">Archived. Its scheduled tasks still run.</string>
+    <string name="chat_rename_title">Rename chat</string>
+    <string name="chat_rename_hint">Empty: its first message</string>
+    <string name="chat_rename_save">Save</string>
 </resources>

@@ -255,7 +255,11 @@ final class Tools {
                         + "(http://127.0.0.1:<port>/app.apk, e.g. from Termux). The user taps Install/Update themselves; "
                         + "call wait_for_install next.",
                 props().put("path", strProp("Full path of the .apk inside Buddy's Linux, or its http://127.0.0.1 URL")), "path"));
-        if (!Flavor.FDROID) { // F-Droid updates Buddy itself
+        if (Flavor.FDROID) { // F-Droid updates this build; the tool says where updates come from
+            t.put(tool("update_buddy",
+                    "Say how this Buddy gets its updates (it's the F-Droid build, which doesn't update itself). Use it when "
+                            + "the user asks to update Buddy or whether there's a new version.", props()));
+        } else {
             t.put(tool("update_buddy",
                     "Check whether a newer Buddy is out (the official GitHub release) and what's new; with install=true, "
                             + "download it and open Android's installer. Use it when the user asks to update Buddy or whether "
@@ -507,11 +511,29 @@ final class Tools {
         return answer.replace("call read_screen before going on", "call browser_read before going on");
     }
 
+    /**
+     * The F-Droid build's answer to "update Buddy": an F-Droid app that installed it updates it; a copy installed some
+     * other way (its APK from the GitHub release) gets no updates until the user installs the normal buddy.apk.
+     */
+    private String fdroidUpdates() {
+        String by = null;
+        try {
+            by = svc.getPackageManager().getInstallSourceInfo(svc.getPackageName()).getInstallingPackageName();
+        } catch (Exception ignored) {
+        }
+        boolean fdroid = by != null && (by.contains("fdroid") || by.equals("com.looker.droidify") || by.contains("neo_store"));
+        if (fdroid) return "This Buddy is from F-Droid, which updates it: the user checks for updates in their F-Droid app.";
+        return "This is Buddy's F-Droid build, but no F-Droid app installed it (" + (by == null ? "installed from a file" : "installed by " + by)
+                + "), so nothing updates it. Tell the user: install the latest buddy.apk from "
+                + "https://github.com/ghorbelhamdi/buddy-android/releases/latest over it (chats and settings stay, and that one "
+                + "updates itself), or get Buddy from F-Droid.";
+    }
+
     /** update_buddy, install_apk and wait_for_install. */
     private String installs(String name, JSONObject a) throws Exception {
         switch (name) {
             case "update_buddy":
-                if (Flavor.FDROID) return "This Buddy is from F-Droid, which updates it: check for updates in the F-Droid app.";
+                if (Flavor.FDROID) return fdroidUpdates();
                 return updateBuddy(a.optBoolean("install", false));
             case "install_apk":
                 return installApk(a.getString("path"));

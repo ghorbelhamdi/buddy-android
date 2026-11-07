@@ -1887,4 +1887,17 @@
     <string name="signin_api_key_on_plan">对话也可以使用你的 API 密钥的模型(在对话的模型菜单中选择)。语音和其他订阅功能使用你的订阅。</string>
     <string name="fdroid_download_note">这些内容直接来自其开发者，而非 F-Droid，因此 F-Droid 未对其进行检查。</string>
     <string name="api_keys_local_info">如果是你自己的服务器（Ollama、LM Studio、llama.cpp）：API 密钥留空。若在电脑上运行，请把 localhost 换成电脑在 Wi-Fi 中的地址，例如 http://192.168.1.20:11434/v1。</string>
+    <string name="main_section_pinned">已置顶</string>
+    <string name="main_section_archived">已归档 (%1$d)</string>
+    <string name="chat_pinned_marker">已置顶</string>
+    <string name="chat_menu_rename">重命名</string>
+    <string name="chat_menu_pin">置顶</string>
+    <string name="chat_menu_unpin">取消置顶</string>
+    <string name="chat_menu_archive">归档</string>
+    <string name="chat_menu_unarchive">取消归档</string>
+    <string name="chat_archived">已归档。它在列表底部。</string>
+    <string name="chat_archived_scheduled">已归档。它的计划任务仍会运行。</string>
+    <string name="chat_rename_title">重命名聊天</string>
+    <string name="chat_rename_hint">留空：使用第一条消息</string>
+    <string name="chat_rename_save">保存</string>
 </resources>

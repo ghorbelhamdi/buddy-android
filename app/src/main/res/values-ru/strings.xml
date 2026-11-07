@@ -1926,4 +1926,17 @@
     <string name="signin_api_key_on_plan">Чаты также могут использовать модели ваших API-ключей (выберите в меню моделей чата). Голос и другие функции подписки используют вашу подписку.</string>
     <string name="fdroid_download_note">Эти загрузки приходят от их авторов, а не из F-Droid, поэтому F-Droid их не проверял.</string>
     <string name="api_keys_local_info">Для своего сервера (Ollama, LM Studio, llama.cpp): оставьте API-ключ пустым. Если сервер на ПК, укажите его адрес в вашей сети Wi-Fi вместо localhost, например http://192.168.1.20:11434/v1.</string>
+    <string name="main_section_pinned">Закреплённые</string>
+    <string name="main_section_archived">Архив (%1$d)</string>
+    <string name="chat_pinned_marker">Закреплён</string>
+    <string name="chat_menu_rename">Переименовать</string>
+    <string name="chat_menu_pin">Закрепить сверху</string>
+    <string name="chat_menu_unpin">Открепить</string>
+    <string name="chat_menu_archive">В архив</string>
+    <string name="chat_menu_unarchive">Вернуть из архива</string>
+    <string name="chat_archived">Чат в архиве. Он внизу списка.</string>
+    <string name="chat_archived_scheduled">Чат в архиве. Его запланированные задачи продолжают работать.</string>
+    <string name="chat_rename_title">Переименовать чат</string>
+    <string name="chat_rename_hint">Пусто: первое сообщение</string>
+    <string name="chat_rename_save">Сохранить</string>
 </resources>

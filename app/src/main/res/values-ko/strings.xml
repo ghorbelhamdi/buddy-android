@@ -1438,4 +1438,17 @@
     <string name="signin_api_key_on_plan">채팅에서 API 키의 모델도 쓸 수 있습니다(채팅의 모델 메뉴에서 선택). 음성 등 플랜 기능은 플랜을 사용합니다.</string>
     <string name="fdroid_download_note">이 파일들은 F-Droid가 아닌 각 제작사에서 직접 받으므로 F-Droid가 확인하지 않았습니다.</string>
     <string name="api_keys_local_info">직접 운영하는 서버(Ollama, LM Studio, llama.cpp)라면 API 키는 비워 두세요. PC에서 실행한다면 localhost 대신 Wi-Fi에서의 PC 주소를 넣으세요. 예: http://192.168.1.20:11434/v1</string>
+    <string name="main_section_pinned">고정됨</string>
+    <string name="main_section_archived">보관됨 (%1$d)</string>
+    <string name="chat_pinned_marker">고정됨</string>
+    <string name="chat_menu_rename">이름 바꾸기</string>
+    <string name="chat_menu_pin">맨 위에 고정</string>
+    <string name="chat_menu_unpin">고정 해제</string>
+    <string name="chat_menu_archive">보관</string>
+    <string name="chat_menu_unarchive">보관 해제</string>
+    <string name="chat_archived">보관했습니다. 목록 맨 아래에 있습니다.</string>
+    <string name="chat_archived_scheduled">보관했습니다. 예약한 작업은 계속 실행됩니다.</string>
+    <string name="chat_rename_title">채팅 이름 바꾸기</string>
+    <string name="chat_rename_hint">비워 두면: 첫 메시지</string>
+    <string name="chat_rename_save">저장</string>
 </resources>

@@ -1481,4 +1481,17 @@
     <string name="signin_api_key_on_plan">Czaty mogą też używać modeli z twoich kluczy API (wybierz jeden w menu modeli czatu). Głos i inne funkcje planu używają twojego planu.</string>
     <string name="fdroid_download_note">Te pliki pochodzą od ich twórców, nie z F-Droid, więc F-Droid ich nie sprawdził.</string>
     <string name="api_keys_local_info">Dla własnego serwera (Ollama, LM Studio, llama.cpp): zostaw klucz API pusty. Na komputerze wpisz jego adres w Twojej sieci Wi-Fi zamiast localhost, np. http://192.168.1.20:11434/v1.</string>
+    <string name="main_section_pinned">Przypięte</string>
+    <string name="main_section_archived">Zarchiwizowane (%1$d)</string>
+    <string name="chat_pinned_marker">Przypięty</string>
+    <string name="chat_menu_rename">Zmień nazwę</string>
+    <string name="chat_menu_pin">Przypnij na górze</string>
+    <string name="chat_menu_unpin">Odepnij</string>
+    <string name="chat_menu_archive">Archiwizuj</string>
+    <string name="chat_menu_unarchive">Przywróć z archiwum</string>
+    <string name="chat_archived">Zarchiwizowano. Czat jest na dole listy.</string>
+    <string name="chat_archived_scheduled">Zarchiwizowano. Zaplanowane zadania nadal działają.</string>
+    <string name="chat_rename_title">Zmień nazwę czatu</string>
+    <string name="chat_rename_hint">Puste: pierwsza wiadomość</string>
+    <string name="chat_rename_save">Zapisz</string>
 </resources>

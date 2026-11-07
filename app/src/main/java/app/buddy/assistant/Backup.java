@@ -62,6 +62,7 @@ final class Backup {
                 z.putNextEntry(new ZipEntry("prefs/" + p + ".xml"));
                 z.write(xml.getBytes("UTF-8"));
             }
+            addTree(z, new File(c.getFilesDir(), "chats"), "files/chats/");
             addTree(z, new File(c.getFilesDir(), "attachments"), "files/attachments/");
             File face = new File(c.getFilesDir(), "face.png");
             if (face.isFile()) addFile(z, face, "files/face.png");
@@ -123,6 +124,15 @@ final class Backup {
         }
         File face = new File(staging, "files/face.png");
         if (face.isFile()) copyFile(face, new File(c.getFilesDir(), "face.png"));
+        // the chats are the backup's: its chat files (2.2.26 on), or none, and then the chats in its settings (before);
+        // the chats in memory save nothing more until the restart, so they can't write over them
+        ChatHub.get(c).sessions.freeze();
+        File chats = new File(c.getFilesDir(), "chats");
+        Linux.deleteTree(chats);
+        chats.mkdirs();
+        File savedChats = new File(staging, "files/chats");
+        File[] cs = savedChats.listFiles();
+        if (cs != null) for (File f : cs) if (f.isFile() && f.getName().endsWith(".json")) copyFile(f, new File(chats, f.getName()));
         // this phone's own token, keys' services and choices stay; the rest is the backup's
         String token = Prefs.token(c), providers = Prefs.providers(c);
         java.util.Map<String, String> defaults = new java.util.HashMap<>();

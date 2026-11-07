@@ -66,8 +66,9 @@ jobs:
           # fixed name too, so releases/latest/download/buddy.apk always gets the newest version
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then cp "$apk" dist/buddy.apk; fi
           fd=$(find app/build/outputs/apk/fdroid/release -name '*.apk' | head -1)
-          cp "$fd" "dist/buddy-fdroid-${GITHUB_REF_NAME//\//-}.apk"
-          echo "FDROID_APK=$PWD/dist/buddy-fdroid-${GITHUB_REF_NAME//\//-}.apk" >> "$GITHUB_ENV"
+          # named so nobody picks it by mistake: it doesn't update itself (F-Droid's Binaries line must match this name)
+          cp "$fd" "dist/fdroid-check-only-${GITHUB_REF_NAME//\//-}.apk"
+          echo "FDROID_APK=$PWD/dist/fdroid-check-only-${GITHUB_REF_NAME//\//-}.apk" >> "$GITHUB_ENV"
           ls -l dist
 
       - uses: actions/upload-artifact@v7
@@ -86,6 +87,13 @@ jobs:
           else
             gh release create "$GITHUB_REF_NAME" dist/*.apk --title "Buddy $GITHUB_REF_NAME" --generate-notes
           fi
+          # which of the APKs to download, at the end of the notes (once)
+          notes=$(gh release view "$GITHUB_REF_NAME" --json body -q .body)
+          case "$notes" in
+            *"Which file?"*) ;;
+            *) printf '%s\n\n%s\n' "$notes" "**Which file?** Download \`buddy.apk\`: it updates itself. \`fdroid-check-only-$GITHUB_REF_NAME.apk\` is only there for F-Droid's reproducible-build check, and doesn't update itself." \
+                 | gh release edit "$GITHUB_REF_NAME" --notes-file - ;;
+          esac
 
       # What F-Droid will do: build the fdroid APK again, unsigned, somewhere else, and check it matches the signed one
       # above but for the signature. After publishing, so a mismatch shows up red without holding the release back.

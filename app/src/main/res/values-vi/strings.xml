@@ -2028,4 +2028,17 @@
     <string name="signin_api_key_on_plan">Các cuộc trò chuyện cũng có thể dùng mô hình từ khóa API của bạn (chọn trong bảng mô hình của cuộc trò chuyện). Giọng nói và các tính năng khác của gói vẫn dùng gói của bạn.</string>
     <string name="fdroid_download_note">Các tệp này tải trực tiếp từ nhà phát triển, không phải từ F-Droid, nên F-Droid chưa kiểm tra chúng.</string>
     <string name="api_keys_local_info">Với máy chủ của riêng bạn (Ollama, LM Studio, llama.cpp): để trống khóa API. Nếu chạy trên PC, hãy thay localhost bằng địa chỉ của PC trong Wi-Fi, ví dụ http://192.168.1.20:11434/v1.</string>
+    <string name="main_section_pinned">Đã ghim</string>
+    <string name="main_section_archived">Đã lưu trữ (%1$d)</string>
+    <string name="chat_pinned_marker">Đã ghim</string>
+    <string name="chat_menu_rename">Đổi tên</string>
+    <string name="chat_menu_pin">Ghim lên đầu</string>
+    <string name="chat_menu_unpin">Bỏ ghim</string>
+    <string name="chat_menu_archive">Lưu trữ</string>
+    <string name="chat_menu_unarchive">Bỏ lưu trữ</string>
+    <string name="chat_archived">Đã lưu trữ. Cuộc trò chuyện nằm ở cuối danh sách.</string>
+    <string name="chat_archived_scheduled">Đã lưu trữ. Các tác vụ đã lên lịch vẫn chạy.</string>
+    <string name="chat_rename_title">Đổi tên cuộc trò chuyện</string>
+    <string name="chat_rename_hint">Để trống: tin nhắn đầu tiên</string>
+    <string name="chat_rename_save">Lưu</string>
 </resources>

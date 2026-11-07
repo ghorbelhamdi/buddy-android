@@ -1832,9 +1832,17 @@ final class Bubble implements ChatHub.Listener {
             renderNewChat();
             return;
         }
-        // chats with a card waiting for the user first
-        java.util.List<Sessions.Session> list = new java.util.ArrayList<>(sessions.all);
-        java.util.Collections.sort(list, (a, b) -> Boolean.compare(waitingIn(b), waitingIn(a)));
+        // chats with a card waiting for the user first, then pinned ones, then the most recent (archived ones stay out,
+        // and the list stops at 30 since there's no limit on chats any more)
+        java.util.List<Sessions.Session> list = new java.util.ArrayList<>();
+        int recent = 0;
+        for (Sessions.Session s : sessions.all) { // most recent first
+            if (s.archived && !waitingIn(s)) continue;
+            if (!s.pinned && !waitingIn(s) && !s.running && ++recent > 30) continue;
+            list.add(s);
+        }
+        java.util.Collections.sort(list, (a, b) -> waitingIn(a) != waitingIn(b) ? Boolean.compare(waitingIn(b), waitingIn(a))
+                : Boolean.compare(b.pinned, a.pinned));
         for (final Sessions.Session ses : list) sessionList.addView(chatRow(ses), new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
     }
