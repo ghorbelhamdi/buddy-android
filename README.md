@@ -76,7 +76,7 @@ You need a 64-bit Android 11+ phone, plus a Claude, ChatGPT or Google account fo
 
 Run the model on your own computer and nothing goes to an AI company. Start [Ollama](https://ollama.com), LM Studio or llama.cpp's server on a PC (for Ollama, set `OLLAMA_HOST=0.0.0.0` and a context of at least 24k tokens, e.g. `OLLAMA_CONTEXT_LENGTH=24576`, since the phone tools take about 7k). In Buddy: Settings → API keys → Add API key → **Ollama** (or LM Studio, llama.cpp), put the PC's address on your Wi-Fi instead of `localhost`, leave the key empty, and use it in an OpenCode chat. Plain `http://` works on your own network and over Tailscale.
 
-Tested with Qwen3 8B on an RTX 2060 Super: it reads the phone and uses the tools. The first answer of a chat takes longest, since the model first reads about 13k tokens of instructions and tool descriptions. Pick a model that's good at tool calling; small models (4B and below) struggle. A model running on the phone itself works too, but it's slow and makes the phone lag.
+What to expect, from tests on an RTX 2060 Super (8 GB): Qwen3 8B and Qwen3 4B handle simple one-step requests, like the battery level or the phone's status. Multi-step tasks on the screen are another matter: in a calculator test the 4B tapped the wrong buttons and then said it had worked. For real tasks, use a bigger model that's good at tool calling. The first answer of a chat takes longest, since the model first reads about 13k tokens of instructions and tool descriptions. A model running on the phone itself works too, but it's slow and makes the phone lag.
 
 ## Updating
 
