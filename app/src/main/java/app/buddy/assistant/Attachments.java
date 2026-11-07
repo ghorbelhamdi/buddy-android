@@ -171,6 +171,33 @@ final class Attachments {
         return BitmapFactory.decodeFile(f.getPath(), o);
     }
 
+    /** Plays an animated GIF in iv at the size of its still (from thumb), only while iv is in a window; keeps the still otherwise. */
+    static void playGif(Context c, String id, android.widget.ImageView iv, Bitmap still) {
+        File f = file(c, id);
+        if (still == null || f == null || !id.toLowerCase(Locale.ROOT).endsWith(".gif")) return;
+        final int w = still.getWidth(), h = still.getHeight();
+        try {
+            android.graphics.drawable.Drawable d = android.graphics.ImageDecoder.decodeDrawable(
+                    android.graphics.ImageDecoder.createSource(f), (dec, info, src) -> dec.setTargetSize(w, h));
+            if (!(d instanceof android.graphics.drawable.AnimatedImageDrawable)) return;
+            final android.graphics.drawable.AnimatedImageDrawable a = (android.graphics.drawable.AnimatedImageDrawable) d;
+            iv.setImageDrawable(a);
+            a.start();
+            iv.addOnAttachStateChangeListener(new android.view.View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(android.view.View v) {
+                    a.start();
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(android.view.View v) {
+                    a.stop();
+                }
+            });
+        } catch (Exception ignored) { // not readable as a GIF: the still stays
+        }
+    }
+
     /** Forget attachments older than 30 days. */
     static void cleanup(Context c) {
         long cutoff = System.currentTimeMillis() - 30L * 24 * 3600 * 1000;

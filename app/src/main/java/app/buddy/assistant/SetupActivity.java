@@ -201,9 +201,9 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         steps[1] = step(getString(R.string.setup_step_install_title, acc.name()),
                 installed ? getString(R.string.setup_step_install_done, acc.name())
                         : acc.step == Account.Step.INSTALLING ? acc.detail
-                        : getString(acc.claude() ? R.string.setup_step_install_claude : acc.opencode()
+                        : Ui.downloadNote(this, getString(acc.claude() ? R.string.setup_step_install_claude : acc.opencode()
                         ? R.string.setup_step_install_opencode : acc.grok() ? R.string.setup_step_install_grok
-                        : R.string.setup_step_install_codex, acc.name()),
+                        : R.string.setup_step_install_codex, acc.name())),
                 installed, installed || acc.step == Account.Step.INSTALLING ? null : getString(R.string.setup_install),
                 v -> openAgent(backend), null, null);
 
@@ -677,7 +677,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                     if (!on) Voice.stopSpeaking();
                 }), full());
         ex.addView(divider(), lineParams());
-        if (!Flavor.PLAY) { // the Play build is updated by Play
+        if (!Flavor.FDROID) { // F-Droid updates its build itself
             ex.addView(switchRow(this, getString(R.string.setup_update_notices), getString(R.string.setup_update_notices_info),
                     Prefs.updateNotices(this), on -> {
                 Prefs.setUpdateNotices(this, on);
@@ -722,20 +722,6 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         check.setOnClickListener(v -> startActivity(new Intent(this, CheckActivity.class)));
         ex.addView(check, full());
         ex.addView(divider(), lineParams());
-        // the Play version (closed testing): rate it there; the GitHub version no longer points to Play, which turned
-        // Buddy down for production
-        if (Flavor.PLAY) {
-            LinearLayout play = listRow(this);
-            play.setGravity(Gravity.CENTER_VERTICAL);
-            LinearLayout gp = column(this);
-            gp.addView(title(this, getString(R.string.setup_play_rate), 15));
-            gp.addView(text(this, getString(R.string.setup_play_rate_info), 13, MUTED), topGap(2));
-            play.addView(gp, weight1());
-            play.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
-            play.setOnClickListener(v -> openPlay());
-            ex.addView(play, full());
-            ex.addView(divider(), lineParams());
-        }
         LinearLayout rules = listRow(this);
         rules.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout rt = column(this);
@@ -1073,7 +1059,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         browserShown = Browser.state + Browser.detail;
         list.addView(sectionLabel(this, getString(R.string.browser_section)));
         LinearLayout bc = card();
-        bc.addView(switchRow(this, getString(R.string.browser_switch), getString(R.string.browser_switch_info),
+        bc.addView(switchRow(this, getString(R.string.browser_switch), Ui.downloadNote(this, getString(R.string.browser_switch_info)),
                 Prefs.browser(this), on -> {
             Prefs.setBrowser(this, on);
             if (on) Browser.install(this); // the download, now rather than in the middle of a task
@@ -1351,16 +1337,6 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
 
     private void openAppInfo(String pkg) {
         startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + pkg)));
-    }
-
-    /** Buddy's Play listing: in the Play Store app, or the web page without it. */
-    private void openPlay() {
-        try {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=app.buddy.assistant"))
-                    .setPackage("com.android.vending"));
-        } catch (Exception e) {
-            openUrl(BuildInfo.PLAY_URL);
-        }
     }
 
     private void openUrl(String url) {

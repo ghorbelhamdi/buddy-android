@@ -1317,10 +1317,6 @@
     <string name="hub_tool_cancel_scheduled">Anuluje zaplanowaną wiadomość</string>
     <string name="later_title">Wiadomość agenta na %1$s</string>
     <string name="later_cancel">Anuluj wiadomość</string>
-    <string name="setup_play_rate">Oceń Buddy w Google Play</string>
-    <string name="setup_play_rate_info">Opinia pomaga innym znaleźć Buddy.</string>
-    <string name="setup_play_get">Buddy w Google Play</string>
-    <string name="setup_play_get_info">Aktualizacje przychodzą przez Play, ale ta wersja nie instaluje plików APK. To osobna instalacja: najpierw odinstaluj tę wersję.</string>
     <string name="share_label">Zapytaj Buddy</string>
     <string name="share_title">Udostępnij Buddy</string>
     <string name="share_new_chat">Nowy czat z %1$s</string>
@@ -1483,4 +1479,5 @@
     <string name="setup_switch_default_title">Domyślny mózg</string>
     <string name="signin_api_key_on">%1$s działa na twoich kluczach API: wybierz model w menu modeli czatu albo domyślny w Kluczach API.</string>
     <string name="signin_api_key_on_plan">Czaty mogą też używać modeli z twoich kluczy API (wybierz jeden w menu modeli czatu). Głos i inne funkcje planu używają twojego planu.</string>
+    <string name="fdroid_download_note">Te pliki pochodzą od ich twórców, nie z F-Droid, więc F-Droid ich nie sprawdził.</string>
 </resources>

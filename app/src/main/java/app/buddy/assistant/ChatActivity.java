@@ -32,7 +32,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     private ScrollView scroll;
     private TextView title, chipText, stripText;
     private UsageGauge usage;
-    /** The Linux tools chip beside the model chip (none in the Play build). */
+    /** The Linux tools chip beside the model chip. */
     private LinearLayout linux;
     /** The empty-chat hint, while the chat has no messages. */
     private TextView hint;
@@ -1514,7 +1514,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             messages.addView(col, p);
             return;
         }
-        show(m.kind, m.text);
+        if (!m.text.isEmpty() || m.files.isEmpty()) show(m.kind, m.text);
         if (m.kind == Bubble.Kind.BUDDY) { // pictures the reply names (see ChatHub.pictures), under it
             for (String id : m.files) {
                 LinearLayout.LayoutParams fp = wrap();
@@ -1672,6 +1672,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             android.graphics.Bitmap b = Attachments.thumb(this, id, side);
             if (b != null) iv.setImageBitmap(b);
             else iv.setBackground(rounded(this, CARD2, 14));
+            if (inThread) Attachments.playGif(this, id, iv, b);
             iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
             iv.setClipToOutline(true);
             iv.setOutlineProvider(new android.view.ViewOutlineProvider() {

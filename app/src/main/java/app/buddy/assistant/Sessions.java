@@ -32,7 +32,12 @@ final class Sessions {
             this.files = files == null ? new ArrayList<>() : files;
         }
 
-        /** Text for places that can't show attachments (bubble panel, previews). */
+        /** For a chat list row: a reply's words only, without the names of its pictures; empty if it has none. */
+        String preview() {
+            return kind == Bubble.Kind.BUDDY ? text : label();
+        }
+
+        /** Text for places that can't show attachments (bubble panel). */
         String label() {
             if (files.isEmpty()) return text;
             String n = files.size() == 1 ? "📎 " + Attachments.name(files.get(0))

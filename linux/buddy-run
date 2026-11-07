@@ -13,7 +13,7 @@
 #   buddy-run <token> transcript <claude|codex> <file>   last messages of a session (buddy_transcript)
 #   buddy-run <token> adopt <session> <claude|codex> <agent-session-id>  continue that session as a Buddy chat
 # Every event sent to the bubble carries "buddy_session" so the app can route it.
-HELPER_VERSION=23
+HELPER_VERSION=24
 set -u
 export PATH=$HOME/.local/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # The claude launcher sets BUN_OPTIONS with a path relative to its folder; never inherit a stale one.
@@ -394,6 +394,8 @@ run_codex() {
 
 # Translate Codex's JSONL events into the Claude Code stream format the bubble understands.
 stream_codex() {
+  local pics_since="$S/codex-pictures-since"
+  : > "$pics_since"
   while IFS= read -r line; do
     [ -z "$line" ] && continue
     tid=$(printf '%s' "$line" | jq -r 'select(.type=="thread.started") | .thread_id // empty' 2>/dev/null)
@@ -402,6 +404,11 @@ stream_codex() {
     if [ "$(printf '%s' "$line" | jq -r '.type // empty' 2>/dev/null)" = turn.completed ] && [ -s "$S/codex-thread" ]; then
       local log model
       log=$(find "$HOME/.codex/sessions" -name "rollout-*$(cat "$S/codex-thread").jsonl" 2>/dev/null | head -1)
+      # pictures its image tool made this turn: it often doesn't name them, so the chat is told here
+      find "$HOME/.codex/generated_images/$(cat "$S/codex-thread")" -type f -newer "$pics_since" 2>/dev/null | sort \
+        | jq -Rsc --arg s "$SID" 'split("\n") | map(select(length > 0)) | select(length > 0)
+            | {type:"buddy_pictures", paths:., buddy_session:$s}' 2>/dev/null | post
+      : > "$pics_since"
       model=$([ -n "$log" ] && grep '"turn_context"' "$log" | tail -1 | jq -r '.payload.model // empty' 2>/dev/null)
       [ -n "$model" ] && jq -cn --arg m "$model" --arg s "$SID" '{type:"system", subtype:"model", model:$m, buddy_session:$s}' | post
       # how full the context is and its size, from the same token_count

@@ -1867,10 +1867,6 @@
     <string name="hub_tool_cancel_scheduled">Đang hủy một tin nhắn đã lên lịch</string>
     <string name="later_title">Tin nhắn của agent lúc %1$s</string>
     <string name="later_cancel">Hủy tin nhắn</string>
-    <string name="setup_play_rate">Đánh giá Buddy trên Google Play</string>
-    <string name="setup_play_rate_info">Một bài đánh giá giúp người khác tìm thấy Buddy.</string>
-    <string name="setup_play_get">Buddy trên Google Play</string>
-    <string name="setup_play_get_info">Bản cập nhật đến qua Play, nhưng bản đó không cài được APK. Đây là bản cài riêng: hãy gỡ phiên bản này trước.</string>
     <string name="share_label">Hỏi Buddy</string>
     <string name="share_title">Chia sẻ với Buddy</string>
     <string name="share_new_chat">Trò chuyện mới với %1$s</string>
@@ -2030,4 +2026,5 @@
     <string name="setup_switch_default_title">Agent mặc định</string>
     <string name="signin_api_key_on">%1$s chạy bằng khóa API của bạn: chọn mô hình trong bảng mô hình của cuộc trò chuyện, hoặc mặc định của nó trong mục Khóa API.</string>
     <string name="signin_api_key_on_plan">Các cuộc trò chuyện cũng có thể dùng mô hình từ khóa API của bạn (chọn trong bảng mô hình của cuộc trò chuyện). Giọng nói và các tính năng khác của gói vẫn dùng gói của bạn.</string>
+    <string name="fdroid_download_note">Các tệp này tải trực tiếp từ nhà phát triển, không phải từ F-Droid, nên F-Droid chưa kiểm tra chúng.</string>
 </resources>

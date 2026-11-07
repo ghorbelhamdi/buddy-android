@@ -543,6 +543,14 @@ final class Ui {
             "\\[([^\\[\\]\\n]+)\\]\\((https?://[^\\s()]*(?:\\([^\\s()]*\\)[^\\s()]*)*)\\)");
 
     /** The same in plain text, for one-line previews: [text](url) becomes text, **bold** bold, and so on. */
+    /**
+     * What Buddy downloads, with F-Droid's notice in its build: downloaded programs (Buddy's Linux, the agents, the
+     * browser) come from their makers, not from F-Droid, and F-Droid asks that users know this before they agree.
+     */
+    static String downloadNote(Context c, String s) {
+        return Flavor.FDROID ? s + "\n" + c.getString(R.string.fdroid_download_note) : s;
+    }
+
     static String linkText(String text) {
         return markdown(text, null).toString();
     }

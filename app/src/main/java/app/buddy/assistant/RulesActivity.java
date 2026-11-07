@@ -121,7 +121,7 @@ public class RulesActivity extends Screen {
             head.addView(wt, weight1());
             warn.addView(head);
             String why = getString(R.string.rules_access_off_text);
-            boolean restricted = !Flavor.PLAY && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU;
+            boolean restricted = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU;
             if (restricted) why += "\n\n" + getString(R.string.setup_step_a11y_restricted);
             warn.addView(text(this, why, 13, MUTED), gap(6));
             LinearLayout btns = row(this);

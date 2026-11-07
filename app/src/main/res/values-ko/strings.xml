@@ -1277,10 +1277,6 @@
     <string name="hub_tool_cancel_scheduled">예약된 메시지 취소 중</string>
     <string name="later_title">%1$s 에이전트 메시지</string>
     <string name="later_cancel">메시지 취소</string>
-    <string name="setup_play_rate">Google Play에서 Buddy 평가하기</string>
-    <string name="setup_play_rate_info">리뷰는 다른 사람이 Buddy를 찾는 데 도움이 됩니다.</string>
-    <string name="setup_play_get">Google Play의 Buddy</string>
-    <string name="setup_play_get_info">업데이트는 Play로 받지만 APK는 설치할 수 없습니다. 별도 설치이므로 먼저 이 버전을 제거하세요.</string>
     <string name="share_label">Buddy에게 묻기</string>
     <string name="share_title">Buddy와 공유</string>
     <string name="share_new_chat">%1$s와 새 채팅</string>
@@ -1440,4 +1436,5 @@
     <string name="setup_switch_default_title">기본 두뇌</string>
     <string name="signin_api_key_on">%1$s은(는) API 키로 실행됩니다. 채팅의 모델 메뉴에서 모델을 고르거나 API 키에서 기본값을 정하세요.</string>
     <string name="signin_api_key_on_plan">채팅에서 API 키의 모델도 쓸 수 있습니다(채팅의 모델 메뉴에서 선택). 음성 등 플랜 기능은 플랜을 사용합니다.</string>
+    <string name="fdroid_download_note">이 파일들은 F-Droid가 아닌 각 제작사에서 직접 받으므로 F-Droid가 확인하지 않았습니다.</string>
 </resources>

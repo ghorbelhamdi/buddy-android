@@ -67,7 +67,7 @@ final class Prefs {
 
     /** Notify when a new Buddy release is out (checked about once a day). */
     static boolean updateNotices(Context c) {
-        return !Flavor.PLAY && sp(c).getBoolean("update_notices", true);
+        return !Flavor.FDROID && sp(c).getBoolean("update_notices", true);
     }
 
     static void setUpdateNotices(Context c, boolean on) {
@@ -415,8 +415,8 @@ final class Prefs {
     }
 
     /**
-     * The background browser (Browser): off until the user turns it on. Never in the Play build for now: it downloads
-     * and runs a whole browser (Chromium from Alpine), which Play's policies on downloaded executable code may not allow.
+     * The background browser (Browser): off until the user turns it on. Turning it on downloads and runs a whole browser
+     * (Chromium from Alpine).
      */
     static boolean browser(Context c) {
         return sp(c).getBoolean("browser", false);

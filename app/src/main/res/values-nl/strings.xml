@@ -1291,10 +1291,6 @@
     <string name="hub_tool_cancel_scheduled">Annuleert een gepland bericht</string>
     <string name="later_title">Bericht van de agent voor %1$s</string>
     <string name="later_cancel">Bericht annuleren</string>
-    <string name="setup_play_rate">Beoordeel Buddy op Google Play</string>
-    <string name="setup_play_rate_info">Een review helpt anderen Buddy te vinden.</string>
-    <string name="setup_play_get">Buddy op Google Play</string>
-    <string name="setup_play_get_info">Updates komen via Play, maar die versie installeert geen APK’s. Het is een aparte installatie: verwijder eerst deze versie.</string>
     <string name="share_label">Vraag Buddy</string>
     <string name="share_title">Delen met Buddy</string>
     <string name="share_new_chat">Nieuwe chat met %1$s</string>
@@ -1455,4 +1451,5 @@
     <string name="setup_switch_default_title">Standaardbrein</string>
     <string name="signin_api_key_on">%1$s draait op je API-sleutels: kies een model in het modelmenu van een chat, of de standaard onder API-sleutels.</string>
     <string name="signin_api_key_on_plan">Chats kunnen ook de modellen van je API-sleutels gebruiken (kies er een in het modelmenu van een chat). Spraak en de andere abonnementsfuncties gebruiken je abonnement.</string>
+    <string name="fdroid_download_note">Deze downloads komen van hun makers, niet van F-Droid, dus F-Droid heeft ze niet gecontroleerd.</string>
 </resources>

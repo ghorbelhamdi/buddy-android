@@ -105,10 +105,8 @@ final class PhoneTools {
                         .put("location", Tools.strProp("Optional: where"))
                         .put("notes", Tools.strProp("Optional: description")),
                 "title", "start"));
-        if (!Flavor.PLAY) {
-            t.put(Tools.tool("location", "The phone's current location: latitude, longitude, accuracy and the address "
-                    + "when known. Buddy asks the user first, every time.", Tools.props()));
-        }
+        t.put(Tools.tool("location", "The phone's current location: latitude, longitude, accuracy and the address "
+                + "when known. Buddy asks the user first, every time.", Tools.props()));
     }
 
     JSONObject call(String name, JSONObject a, boolean ruleRun) throws Exception {
@@ -527,7 +525,6 @@ final class PhoneTools {
     // ------------------------------------------------------------- location
 
     private String location() throws Exception {
-        if (Flavor.PLAY) return "Location isn't available in this build of Buddy.";
         String answer = svc.askConfirm(svc.getString(R.string.tools_card_location), false);
         if (!answer.startsWith("APPROVED")) return "Not shared. " + answer;
         if (svc.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED

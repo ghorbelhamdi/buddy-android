@@ -1727,10 +1727,6 @@
     <string name="hub_tool_cancel_scheduled">Membatalkan pesan terjadwal</string>
     <string name="later_title">Pesan agen untuk %1$s</string>
     <string name="later_cancel">Batalkan pesan</string>
-    <string name="setup_play_rate">Beri nilai Buddy di Google Play</string>
-    <string name="setup_play_rate_info">Ulasan membantu orang lain menemukan Buddy.</string>
-    <string name="setup_play_get">Buddy di Google Play</string>
-    <string name="setup_play_get_info">Pembaruan datang lewat Play, tetapi versi itu tidak memasang APK. Itu pemasangan terpisah: copot dulu versi ini.</string>
     <string name="share_label">Tanya Buddy</string>
     <string name="share_title">Bagikan ke Buddy</string>
     <string name="share_new_chat">Chat baru dengan %1$s</string>
@@ -1890,4 +1886,5 @@
     <string name="setup_switch_default_title">Otak default</string>
     <string name="signin_api_key_on">%1$s berjalan dengan kunci API-mu: pilih model di menu model chat, atau default-nya di Kunci API.</string>
     <string name="signin_api_key_on_plan">Chat juga bisa memakai model kunci API-mu (pilih di menu model chat). Suara dan fitur paket lainnya memakai paketmu.</string>
+    <string name="fdroid_download_note">Unduhan ini berasal dari pembuatnya, bukan dari F-Droid, jadi F-Droid belum memeriksanya.</string>
 </resources>

@@ -1881,10 +1881,6 @@
     <string name="later_title">Agent’s message for %1$s</string>
     <string name="later_cancel">Cancel message</string>
     <string name="later_item" translatable="false">%1$s · %2$s</string>
-    <string name="setup_play_rate">Rate Buddy on Google Play</string>
-    <string name="setup_play_rate_info">A review helps others find Buddy.</string>
-    <string name="setup_play_get">Buddy on Google Play</string>
-    <string name="setup_play_get_info">Updates come through Play, but it can\'t install APKs. It\'s a separate install: uninstall this version first.</string>
     <string name="share_label">Ask Buddy</string>
     <string name="share_title">Share with Buddy</string>
     <string name="share_new_chat">New chat with %1$s</string>
@@ -2045,4 +2041,6 @@
     <string name="setup_switch_default_title">Default brain</string>
     <string name="signin_api_key_on">%1$s runs on your API keys: pick a model in a chat\'s model sheet, or its default under API keys.</string>
     <string name="signin_api_key_on_plan">Chats can also use your API keys\' models (pick one in a chat\'s model sheet). Voice and the other plan features use your plan.</string>
+    <!-- F-Droid build only, after what Buddy downloads (its Linux, an agent, the browser): F-Droid requires saying these downloads skip its checks. -->
+    <string name="fdroid_download_note">These come from their makers, not from F-Droid, so F-Droid hasn\'t checked them.</string>
 </resources>

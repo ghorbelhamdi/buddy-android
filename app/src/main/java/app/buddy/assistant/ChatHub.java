@@ -476,6 +476,24 @@ final class ChatHub {
                 }
                 break;
             }
+            case "buddy_pictures": { // Codex: pictures its image tool made, which the reply may not name
+                // a reply this turn already showed a picture, often a copy saved in the project: not the same one twice
+                boolean shown = false;
+                for (int i = ses.messages.size() - 1; i >= 0 && !shown; i--) {
+                    Sessions.Msg m = ses.messages.get(i);
+                    if (m.kind == Bubble.Kind.USER) break;
+                    shown = m.kind == Bubble.Kind.BUDDY && !m.files.isEmpty();
+                }
+                if (shown) break;
+                JSONArray paths = ev.optJSONArray("paths");
+                List<String> files = new ArrayList<>();
+                for (int i = 0; paths != null && i < paths.length() && files.size() < 4; i++) {
+                    String file = picture(paths.optString(i));
+                    if (file != null) files.add(file);
+                }
+                if (!files.isEmpty()) add(ses, Bubble.Kind.BUDDY, "", files);
+                break;
+            }
             case "buddy_error": {
                 if (ses.outcome == null) ses.outcome = "failed";
                 String text = ev.optString("text", app.getString(R.string.hub_something_wrong));
@@ -722,7 +740,7 @@ final class ChatHub {
         sessions.add(ses, kind, text, files);
         if (kind == Bubble.Kind.BUDDY && !viewing.contains(ses)) ses.unread = true;
         // not during a live voice call: the voice tells the user itself
-        if (kind == Bubble.Kind.BUDDY && Prefs.speakReplies(app) && !CodexLive.on()) Voice.speak(app, text);
+        if (kind == Bubble.Kind.BUDDY && !text.isEmpty() && Prefs.speakReplies(app) && !CodexLive.on()) Voice.speak(app, text);
         Sessions.Msg m = ses.messages.get(ses.messages.size() - 1);
         for (Listener l : new ArrayList<>(listeners)) l.onMessage(ses, m);
     }
@@ -743,17 +761,25 @@ final class ChatHub {
         do {
             String path = ("~".equals(m.group(1)) ? "/root" : m.group(1)) + m.group(2);
             if (!seen.add(path)) continue;
-            try {
-                java.io.File root = Linux.root(app).getCanonicalFile(), f = new java.io.File(root, path).getCanonicalFile();
-                if (!f.getPath().startsWith(root.getPath() + "/") || !f.isFile() || f.length() > Attachments.MAX_BYTES) continue;
-                android.graphics.BitmapFactory.Options b = new android.graphics.BitmapFactory.Options();
-                b.inJustDecodeBounds = true;
-                android.graphics.BitmapFactory.decodeFile(f.getPath(), b);
-                if (b.outWidth > 0) out.add(Attachments.importFile(app, f));
-            } catch (Exception ignored) { // not there (yet), or unreadable: the path stays in the text
-            }
+            String file = picture(path);
+            if (file != null) out.add(file);
         } while (out.size() < 4 && m.find());
         return out;
+    }
+
+    /** A picture inside Buddy's Linux, never through a link out of it, copied to the attachments; null if it can't be. */
+    private String picture(String path) {
+        try {
+            if (!Linux.installed(app)) return null;
+            java.io.File root = Linux.root(app).getCanonicalFile(), f = new java.io.File(root, path).getCanonicalFile();
+            if (!f.getPath().startsWith(root.getPath() + "/") || !f.isFile() || f.length() > Attachments.MAX_BYTES) return null;
+            android.graphics.BitmapFactory.Options b = new android.graphics.BitmapFactory.Options();
+            b.inJustDecodeBounds = true;
+            android.graphics.BitmapFactory.decodeFile(f.getPath(), b);
+            return b.outWidth > 0 ? Attachments.importFile(app, f) : null;
+        } catch (Exception ignored) { // not there (yet), or unreadable: the path stays in the text
+            return null;
+        }
     }
 
     private boolean wasRunning;

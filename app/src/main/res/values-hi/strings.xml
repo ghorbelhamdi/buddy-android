@@ -1285,10 +1285,6 @@
     <string name="hub_tool_cancel_scheduled">शेड्यूल किया गया संदेश रद्द कर रहा है</string>
     <string name="later_title">%1$s के लिए एजेंट का संदेश</string>
     <string name="later_cancel">संदेश रद्द करें</string>
-    <string name="setup_play_rate">Google Play पर Buddy को रेट करें</string>
-    <string name="setup_play_rate_info">आपकी समीक्षा दूसरों को Buddy ढूँढने में मदद करती है।</string>
-    <string name="setup_play_get">Google Play पर Buddy</string>
-    <string name="setup_play_get_info">अपडेट Play से आते हैं, पर वह APK इंस्टॉल नहीं करता। यह अलग इंस्टॉल है: पहले यह वर्शन अनइंस्टॉल करें।</string>
     <string name="share_label">Buddy से पूछें</string>
     <string name="share_title">Buddy के साथ शेयर करें</string>
     <string name="share_new_chat">%1$s के साथ नई चैट</string>
@@ -1449,4 +1445,5 @@
     <string name="setup_switch_default_title">डिफ़ॉल्ट दिमाग</string>
     <string name="signin_api_key_on">%1$s आपकी API कुंजियों पर चलता है: चैट के मॉडल मेनू में मॉडल चुनें, या API कुंजियाँ में उसका डिफ़ॉल्ट।</string>
     <string name="signin_api_key_on_plan">चैट आपकी API कुंजियों के मॉडल भी इस्तेमाल कर सकती हैं (चैट के मॉडल मेनू में चुनें)। आवाज़ और प्लान की बाकी सुविधाएँ आपके प्लान से चलती हैं।</string>
+    <string name="fdroid_download_note">ये डाउनलोड इन्हें बनाने वालों से आते हैं, F-Droid से नहीं, इसलिए F-Droid ने इनकी जाँच नहीं की है।</string>
 </resources>

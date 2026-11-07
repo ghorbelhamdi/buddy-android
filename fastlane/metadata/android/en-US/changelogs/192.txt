@@ -1,0 +1,4 @@
+• Pictures Codex makes with its image tool now show in the chat, even when its reply doesn't name them
+• GIFs play in the chat
+• The bubble shows pictures too
+• Ready for F-Droid: a build without the self-updater, and a note before downloads that they come from their makers, not from F-Droid

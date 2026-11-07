@@ -69,7 +69,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     private final Runnable updateCheck = new Runnable() {
         @Override
         public void run() {
-            if (!Flavor.PLAY) Updates.maybeCheck(BuddyService.this);
+            if (!Flavor.FDROID) Updates.maybeCheck(BuddyService.this);
             main.postDelayed(this, 6 * 3600_000L);
         }
     };

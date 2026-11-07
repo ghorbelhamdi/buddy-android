@@ -1278,10 +1278,6 @@
     <string name="hub_tool_cancel_scheduled">予約メッセージを取り消し中</string>
     <string name="later_title">%1$s のエージェントのメッセージ</string>
     <string name="later_cancel">メッセージを取り消す</string>
-    <string name="setup_play_rate">Google Play で Buddy を評価</string>
-    <string name="setup_play_rate_info">レビューは他の人が Buddy を見つける助けになります。</string>
-    <string name="setup_play_get">Google Play の Buddy</string>
-    <string name="setup_play_get_info">更新は Play から届きますが、APK はインストールできません。別のインストールなので、先にこのバージョンをアンインストールしてください。</string>
     <string name="share_label">Buddy に聞く</string>
     <string name="share_title">Buddy と共有</string>
     <string name="share_new_chat">%1$s で新しいチャット</string>
@@ -1441,4 +1437,5 @@
     <string name="setup_switch_default_title">既定の頭脳</string>
     <string name="signin_api_key_on">%1$s はAPIキーで動いています。チャットのモデルメニューでモデルを選ぶか、APIキーでデフォルトを設定してください。</string>
     <string name="signin_api_key_on_plan">チャットではAPIキーのモデルも使えます(チャットのモデルメニューで選択)。音声などのプラン機能はプランを使います。</string>
+    <string name="fdroid_download_note">これらは F-Droid ではなく各提供元から直接ダウンロードされるため、F-Droid による確認は行われていません。</string>
 </resources>

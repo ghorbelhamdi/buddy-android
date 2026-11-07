@@ -1762,10 +1762,6 @@
     <string name="hub_tool_cancel_scheduled">Отменяет запланированное сообщение</string>
     <string name="later_title">Сообщение агента на %1$s</string>
     <string name="later_cancel">Отменить сообщение</string>
-    <string name="setup_play_rate">Оценить Buddy в Google Play</string>
-    <string name="setup_play_rate_info">Отзыв помогает другим найти Buddy.</string>
-    <string name="setup_play_get">Buddy в Google Play</string>
-    <string name="setup_play_get_info">Обновления приходят через Play, но эта версия не устанавливает APK. Это отдельная установка: сначала удалите эту версию.</string>
     <string name="share_label">Спросить Buddy</string>
     <string name="share_title">Поделиться с Buddy</string>
     <string name="share_new_chat">Новый чат с %1$s</string>
@@ -1928,4 +1924,5 @@
     <string name="setup_switch_default_title">Мозг по умолчанию</string>
     <string name="signin_api_key_on">%1$s работает на ваших API-ключах: выберите модель в меню моделей чата или модель по умолчанию в разделе «API-ключи».</string>
     <string name="signin_api_key_on_plan">Чаты также могут использовать модели ваших API-ключей (выберите в меню моделей чата). Голос и другие функции подписки используют вашу подписку.</string>
+    <string name="fdroid_download_note">Эти загрузки приходят от их авторов, а не из F-Droid, поэтому F-Droid их не проверял.</string>
 </resources>

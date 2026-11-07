@@ -249,27 +249,27 @@ final class Tools {
         t.put(tool("list_scheduled", "List the messages scheduled in this chat with schedule_message.", props()));
         t.put(tool("cancel_scheduled", "Cancel a message scheduled with schedule_message.",
                 props().put("id", strProp("Its id, from schedule_message or list_scheduled")), "id"));
-        if (!Flavor.PLAY) { // Play updates Buddy itself and doesn't allow installing other APKs
-            t.put(tool("install_apk",
-                    "(Needs Linux tools) Open Android's installer for an APK built in Buddy's Linux, e.g. "
-                            + "/root/.buddy/work/myapp/build/app.apk, or served by another app on this phone at a local URL "
-                            + "(http://127.0.0.1:<port>/app.apk, e.g. from Termux). The user taps Install/Update themselves; "
-                            + "call wait_for_install next.",
-                    props().put("path", strProp("Full path of the .apk inside Buddy's Linux, or its http://127.0.0.1 URL")), "path"));
+        t.put(tool("install_apk",
+                "(Needs Linux tools) Open Android's installer for an APK built in Buddy's Linux, e.g. "
+                        + "/root/.buddy/work/myapp/build/app.apk, or served by another app on this phone at a local URL "
+                        + "(http://127.0.0.1:<port>/app.apk, e.g. from Termux). The user taps Install/Update themselves; "
+                        + "call wait_for_install next.",
+                props().put("path", strProp("Full path of the .apk inside Buddy's Linux, or its http://127.0.0.1 URL")), "path"));
+        if (!Flavor.FDROID) { // F-Droid updates Buddy itself
             t.put(tool("update_buddy",
                     "Check whether a newer Buddy is out (the official GitHub release) and what's new; with install=true, "
                             + "download it and open Android's installer. Use it when the user asks to update Buddy or whether "
                             + "there's a new version. Only the user can tap Update.",
                     props().put("install", boolProp("true: download the update and open the installer (after the user said yes)"))));
-            t.put(tool("wait_for_install",
-                    "After opening the Android installer for an APK, wait until the user has tapped Install/Update and confirmed. "
-                            + "Returns as soon as the package is installed (at least min_version_code if given), or early if the "
-                            + "installer is no longer on screen, or after the timeout. Use this instead of shell polling loops.",
-                    props().put("package", strProp("Package name, e.g. com.buddyapps.flappy"))
-                            .put("min_version_code", intProp("Wait for at least this versionCode (for updates)"))
-                            .put("timeout_s", intProp("Default 120, max 300")),
-                    "package"));
         }
+        t.put(tool("wait_for_install",
+                "After opening the Android installer for an APK, wait until the user has tapped Install/Update and confirmed. "
+                        + "Returns as soon as the package is installed (at least min_version_code if given), or early if the "
+                        + "installer is no longer on screen, or after the timeout. Use this instead of shell polling loops.",
+                props().put("package", strProp("Package name, e.g. com.buddyapps.flappy"))
+                        .put("min_version_code", intProp("Wait for at least this versionCode (for updates)"))
+                        .put("timeout_s", intProp("Default 120, max 300")),
+                "package"));
         PhoneTools.list(t); // the clipboard, alarms, sharing, Downloads, status, camera, location
         if (Browser.available(svc)) BrowserTools.list(t); // the background browser (Settings)
         return t;
@@ -511,10 +511,9 @@ final class Tools {
     private String installs(String name, JSONObject a) throws Exception {
         switch (name) {
             case "update_buddy":
-                if (Flavor.PLAY) return "Buddy updates through Google Play.";
+                if (Flavor.FDROID) return "This Buddy is from F-Droid, which updates it: check for updates in the F-Droid app.";
                 return updateBuddy(a.optBoolean("install", false));
             case "install_apk":
-                if (Flavor.PLAY) return "Installing APKs isn't available in Buddy from Google Play.";
                 return installApk(a.getString("path"));
             default:
                 svc.installWaits++;

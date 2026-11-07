@@ -49,10 +49,11 @@ jobs:
           echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
           echo "BUDDY_KEYSTORE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
 
-      - name: Build release APK (GitHub) and bundle (Google Play)
+      # The fdroid build is made by F-Droid from this source; building it here checks that it still compiles.
+      - name: Build release APKs (GitHub, and F-Droid's to check it)
         env:
           BUDDY_KEYSTORE_PASSWORD: ${{ secrets.BUDDY_KEYSTORE_PASSWORD }}
-        run: ./gradlew --no-daemon assembleGithubRelease bundlePlayRelease
+        run: ./gradlew --no-daemon assembleGithubRelease assembleFdroidRelease
 
       - name: Collect APK
         run: |
@@ -67,15 +68,6 @@ jobs:
         with:
           name: buddy-apk
           path: dist/*.apk
-
-      # The Play bundle is never attached to the GitHub release (see below).
-      - uses: actions/upload-artifact@v7
-        with:
-          name: buddy-play-aab
-          path: app/build/outputs/bundle/playRelease/*.aab
-
-      # No automatic upload to Google Play: Play turned Buddy down (its accessibility policy), so releases are on
-      # GitHub only. The bundle above is still built and kept as an artifact, for a manual upload if that changes.
 
       - name: Publish GitHub release
         if: startsWith(github.ref, 'refs/tags/v')

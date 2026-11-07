@@ -1877,8 +1877,8 @@ final class Bubble implements ChatHub.Listener {
             String last = "";
             for (int i = ses.messages.size() - 1; i >= 0; i--) {
                 Sessions.Msg m = ses.messages.get(i);
-                if (m.kind == Kind.BUDDY || m.kind == Kind.USER) {
-                    String t = Ui.linkText(m.label()).replace('\n', ' ');
+                if ((m.kind == Kind.BUDDY || m.kind == Kind.USER) && !m.preview().isEmpty()) {
+                    String t = Ui.linkText(m.preview()).replace('\n', ' ');
                     last = m.kind == Kind.USER ? svc.getString(R.string.bubble_chat_row_you, t) : t;
                     break;
                 }
@@ -1990,7 +1990,7 @@ final class Bubble implements ChatHub.Listener {
             messages.addView(hint, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT));
         }
-        for (Sessions.Msg m : ses.messages) showMessage(m.kind, m.label());
+        for (Sessions.Msg m : ses.messages) showMessage(m);
         if (log != null && !ses.running) log.finish();
         input.setHint(svc.getString(R.string.bubble_input_hint, ses.brainName()));
         updateViewing();
@@ -2069,7 +2069,7 @@ final class Bubble implements ChatHub.Listener {
 
     @Override
     public void onMessage(Sessions.Session ses, Sessions.Msg msg) {
-        if (ses == sessions.current && renderedFor == ses) showMessage(msg.kind, msg.label());
+        if (ses == sessions.current && renderedFor == ses) showMessage(msg);
         if (msg.kind == Kind.BUDDY && !(expanded && ses == sessions.current && !showingList)) vibrate(30);
     }
 
@@ -2704,6 +2704,67 @@ final class Bubble implements ChatHub.Listener {
 
     /** The open run of tool steps (grouped like the chat screen's log), or null. */
     private StepLog log;
+
+    /** A message with its pictures, as in the chat screen: under a reply, above what the user wrote. Other files by name. */
+    private void showMessage(Sessions.Msg m) {
+        java.util.List<String> pictures = new java.util.ArrayList<>();
+        boolean otherFiles = false;
+        for (String id : m.files) {
+            if (Attachments.isImage(id)) pictures.add(id);
+            else otherFiles = true;
+        }
+        if (pictures.isEmpty() || otherFiles) {
+            showMessage(m.kind, m.label());
+            return;
+        }
+        boolean user = m.kind == Kind.USER;
+        if (!user && !m.text.isEmpty()) showMessage(m.kind, m.text);
+        for (String id : pictures) showPicture(id, user);
+        if (user && !m.text.isEmpty()) showMessage(m.kind, m.text);
+        scrollToEnd();
+    }
+
+    private void showPicture(final String id, boolean user) {
+        if (log != null) {
+            log.finish();
+            log = null;
+        }
+        View hint = messages.findViewWithTag("hint");
+        if (hint != null) messages.removeView(hint);
+        ImageView iv = new ImageView(svc);
+        int side = dp(160);
+        android.graphics.Bitmap b = Attachments.thumb(svc, id, side);
+        if (b == null) return;
+        iv.setImageBitmap(b);
+        Attachments.playGif(svc, id, iv, b);
+        iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        iv.setClipToOutline(true);
+        iv.setOutlineProvider(new android.view.ViewOutlineProvider() {
+            @Override
+            public void getOutline(View view, android.graphics.Outline o) {
+                o.setRoundRect(0, 0, view.getWidth(), view.getHeight(), dp(16));
+            }
+        });
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(side,
+                b.getWidth() > 0 ? Math.min(dp(220), side * b.getHeight() / b.getWidth()) : side);
+        p.topMargin = dp(6);
+        if (user) p.gravity = Gravity.END;
+        else p.setMarginStart(dp(32));
+        iv.setOnClickListener(x -> openPicture(id));
+        messages.addView(iv, p);
+    }
+
+    private void openPicture(String id) {
+        collapse();
+        android.net.Uri u = FilesProvider.attachmentUri(id);
+        try {
+            svc.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW)
+                    .setDataAndType(u, svc.getContentResolver().getType(u))
+                    .addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION | android.content.Intent.FLAG_ACTIVITY_NEW_TASK));
+        } catch (Exception e) {
+            Toast.makeText(svc, svc.getString(R.string.chat_no_app_for_file, Attachments.name(id)), Toast.LENGTH_SHORT).show();
+        }
+    }
 
     private void showMessage(Kind kind, String text) {
         if (text == null) return;

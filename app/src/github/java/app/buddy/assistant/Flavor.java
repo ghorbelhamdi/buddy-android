@@ -1,8 +1,8 @@
 package app.buddy.assistant;
 
-/** The GitHub build: everything, including self-updates and APK installs. */
+/** The GitHub build: updates itself from GitHub releases. */
 final class Flavor {
-    static final boolean PLAY = false;
+    static final boolean FDROID = false;
 
     private Flavor() {
     }

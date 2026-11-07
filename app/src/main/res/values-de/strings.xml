@@ -1292,10 +1292,6 @@
     <string name="hub_tool_cancel_scheduled">Entfernt eine geplante Nachricht</string>
     <string name="later_title">Nachricht des Agenten für %1$s</string>
     <string name="later_cancel">Nachricht abbrechen</string>
-    <string name="setup_play_rate">Buddy bei Google Play bewerten</string>
-    <string name="setup_play_rate_info">Eine Bewertung hilft anderen, Buddy zu finden.</string>
-    <string name="setup_play_get">Buddy bei Google Play</string>
-    <string name="setup_play_get_info">Updates kommen über Play, aber diese Version installiert keine APKs. Sie wird separat installiert: Deinstalliere zuerst diese Version.</string>
     <string name="share_label">Buddy fragen</string>
     <string name="share_title">Mit Buddy teilen</string>
     <string name="share_new_chat">Neuer Chat mit %1$s</string>
@@ -1456,4 +1452,5 @@
     <string name="setup_switch_default_title">Standard-Gehirn</string>
     <string name="signin_api_key_on">%1$s läuft über deine API-Schlüssel: Wähle ein Modell im Modellmenü eines Chats oder den Standard unter API-Schlüssel.</string>
     <string name="signin_api_key_on_plan">Chats können auch die Modelle deiner API-Schlüssel nutzen (wähle eines im Modellmenü eines Chats). Sprache und die anderen Abo-Funktionen nutzen dein Abo.</string>
+    <string name="fdroid_download_note">Diese Downloads kommen direkt von ihren Herstellern, nicht von F-Droid, daher hat F-Droid sie nicht geprüft.</string>
 </resources>

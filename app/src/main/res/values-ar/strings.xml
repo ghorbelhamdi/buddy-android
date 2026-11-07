@@ -1333,10 +1333,6 @@
     <string name="hub_tool_cancel_scheduled">يلغي رسالة مجدولة</string>
     <string name="later_title">رسالة الوكيل في %1$s</string>
     <string name="later_cancel">إلغاء الرسالة</string>
-    <string name="setup_play_rate">قيّم Buddy على Google Play</string>
-    <string name="setup_play_rate_info">تقييمك يساعد الآخرين على إيجاد Buddy.</string>
-    <string name="setup_play_get">Buddy على Google Play</string>
-    <string name="setup_play_get_info">تصل التحديثات عبر Play، لكنه لا يثبّت ملفات APK. إنه تثبيت منفصل: أزل هذا الإصدار أولًا.</string>
     <string name="share_label">اسأل Buddy</string>
     <string name="share_title">مشاركة مع Buddy</string>
     <string name="share_new_chat">محادثة جديدة مع %1$s</string>
@@ -1501,4 +1497,5 @@
     <string name="setup_switch_default_title">العقل الافتراضي</string>
     <string name="signin_api_key_on">يعمل %1$s بمفاتيح API الخاصة بك: اختر نموذجًا من قائمة نماذج المحادثة، أو الافتراضي من مفاتيح API.</string>
     <string name="signin_api_key_on_plan">يمكن للمحادثات أيضًا استخدام نماذج مفاتيح API (اختر واحدًا من قائمة نماذج المحادثة). الصوت وميزات الاشتراك الأخرى تستخدم اشتراكك.</string>
+    <string name="fdroid_download_note">هذه التنزيلات تأتي من صانعيها، لا من F-Droid، لذا لم يفحصها F-Droid.</string>
 </resources>

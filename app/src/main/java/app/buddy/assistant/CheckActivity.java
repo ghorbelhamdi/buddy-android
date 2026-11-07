@@ -275,7 +275,7 @@ public class CheckActivity extends Screen {
     }
 
     private static String buddy() {
-        return BuildInfo.VERSION + " (" + (Flavor.PLAY ? "Play" : "GitHub") + ")";
+        return BuildInfo.VERSION + " (" + (Flavor.FDROID ? "F-Droid" : "GitHub") + ")";
     }
 
     /** Agents that are installed, with their versions. */

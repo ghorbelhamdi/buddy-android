@@ -1293,10 +1293,6 @@
     <string name="hub_tool_cancel_scheduled">Planlanmış bir mesajı iptal ediyor</string>
     <string name="later_title">%1$s için ajanın mesajı</string>
     <string name="later_cancel">Mesajı iptal et</string>
-    <string name="setup_play_rate">Buddy\'yi Google Play\'de değerlendir</string>
-    <string name="setup_play_rate_info">Bir yorum, başkalarının Buddy\'yi bulmasına yardım eder.</string>
-    <string name="setup_play_get">Google Play\'de Buddy</string>
-    <string name="setup_play_get_info">Güncellemeler Play\'den gelir ama o sürüm APK yükleyemez. Ayrı bir kurulumdur: önce bu sürümü kaldırın.</string>
     <string name="share_label">Buddy\'ye sor</string>
     <string name="share_title">Buddy ile paylaş</string>
     <string name="share_new_chat">%1$s ile yeni sohbet</string>
@@ -1457,4 +1453,5 @@
     <string name="setup_switch_default_title">Varsayılan beyin</string>
     <string name="signin_api_key_on">%1$s API anahtarlarınla çalışıyor: bir sohbetin model menüsünden model seç ya da varsayılanını API anahtarları altında belirle.</string>
     <string name="signin_api_key_on_plan">Sohbetler API anahtarlarının modellerini de kullanabilir (bir sohbetin model menüsünden seç). Ses ve diğer plan özellikleri planını kullanır.</string>
+    <string name="fdroid_download_note">Bunlar F-Droid\'den değil, doğrudan yapımcılarından indirilir; bu yüzden F-Droid bunları denetlemedi.</string>
 </resources>

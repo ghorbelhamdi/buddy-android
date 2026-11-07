@@ -311,8 +311,8 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
             String last = "";
             for (int i = ses.messages.size() - 1; i >= 0; i--) {
                 Sessions.Msg m = ses.messages.get(i);
-                if (m.kind == Bubble.Kind.BUDDY || m.kind == Bubble.Kind.USER) {
-                    String preview = Ui.linkText(m.label()).replace('\n', ' ');
+                if ((m.kind == Bubble.Kind.BUDDY || m.kind == Bubble.Kind.USER) && !m.preview().isEmpty()) {
+                    String preview = Ui.linkText(m.preview()).replace('\n', ' ');
                     last = m.kind == Bubble.Kind.USER ? getString(R.string.main_chat_last_you, preview) : preview;
                     break;
                 }

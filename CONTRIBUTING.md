@@ -14,7 +14,7 @@ See [For developers](README.md#for-developers) in the README: `./gradlew assembl
 
 `bash linux/test/run.sh` feeds recorded runs of each agent (`linux/test/fixtures`) through `linux/buddy-run` and compares the events. CI runs it too.
 
-There are two flavors: `github` (the full app) and `play` (without self-updates and developer mode, as Google Play requires).
+There are two flavors: `github` (the release on GitHub, which updates itself) and `fdroid` (the same app without the self-updater: F-Droid builds, signs and updates it).
 
 ## Translations
 

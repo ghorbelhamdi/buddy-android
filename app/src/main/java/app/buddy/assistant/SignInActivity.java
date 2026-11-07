@@ -106,11 +106,11 @@ public class SignInActivity extends Screen implements Account.Listener {
                         : acc.agy() ? R.string.signin_install_sub_agy
                         : acc.grok() ? R.string.signin_install_sub_grok
                         : R.string.signin_install_sub_codex), false);
-                note(getString(acc.claude() ? R.string.signin_install_size_claude
+                note(Ui.downloadNote(this, getString(acc.claude() ? R.string.signin_install_size_claude
                         : acc.opencode() ? R.string.signin_install_size_opencode
                         : acc.agy() ? R.string.signin_install_size_agy
                         : acc.grok() ? R.string.signin_install_size_grok
-                        : R.string.signin_install_size_codex));
+                        : R.string.signin_install_size_codex)));
                 primary(getString(R.string.signin_install, acc.name()), v -> acc.install(this));
                 break;
             case INSTALLING:

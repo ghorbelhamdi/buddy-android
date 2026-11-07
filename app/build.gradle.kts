@@ -39,12 +39,12 @@ android {
         }
     }
 
-    // github: the release on GitHub (self-updates, APK installs, developer mode).
-    // play: the Google Play build, without those (Play's policies). Same package, same key.
+    // github: the release on GitHub, which updates itself from GitHub releases.
+    // fdroid: built and signed by F-Droid from this source; the same app without the self-updater (F-Droid updates it).
     flavorDimensions += "store"
     productFlavors {
         create("github") { dimension = "store" }
-        create("play") { dimension = "store" }
+        create("fdroid") { dimension = "store" }
     }
 
     buildTypes {

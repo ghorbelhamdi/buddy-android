@@ -1725,10 +1725,6 @@
     <string name="hub_tool_cancel_scheduled">Annulation d’un message programmé</string>
     <string name="later_title">Message de l’agent pour %1$s</string>
     <string name="later_cancel">Annuler le message</string>
-    <string name="setup_play_rate">Noter Buddy sur Google Play</string>
-    <string name="setup_play_rate_info">Un avis aide d’autres personnes à trouver Buddy.</string>
-    <string name="setup_play_get">Buddy sur Google Play</string>
-    <string name="setup_play_get_info">Les mises à jour passent par Play, mais cette version n’installe pas d’APK. C’est une installation à part : désinstallez d’abord cette version.</string>
     <string name="share_label">Demander à Buddy</string>
     <string name="share_title">Partager avec Buddy</string>
     <string name="share_new_chat">Nouvelle discussion avec %1$s</string>
@@ -1889,4 +1885,5 @@
     <string name="setup_switch_default_title">Cerveau par défaut</string>
     <string name="signin_api_key_on">%1$s fonctionne avec tes clés API : choisis un modèle dans le menu des modèles d\'un chat, ou son défaut dans Clés API.</string>
     <string name="signin_api_key_on_plan">Les chats peuvent aussi utiliser les modèles de tes clés API (choisis-en un dans le menu des modèles d\'un chat). La voix et les autres fonctions de l\'abonnement utilisent ton abonnement.</string>
+    <string name="fdroid_download_note">Ces téléchargements viennent de leurs auteurs, pas de F-Droid : F-Droid ne les a donc pas vérifiés.</string>
 </resources>

@@ -352,10 +352,10 @@ public class OnboardingActivity extends Screen implements Account.Listener {
             if (!signed) {
                 TextView how = text(this, installing ? acc.detail
                         : acc.step == Account.Step.ERROR ? acc.detail
-                        : getString(installed ? (acc.claude() ? R.string.onboarding_agent_sign_in_claude : acc.opencode()
+                        : installed ? getString(acc.claude() ? R.string.onboarding_agent_sign_in_claude : acc.opencode()
                         ? R.string.onboarding_agent_checking_opencode : acc.agy() ? R.string.onboarding_agent_sign_in_agy
                         : acc.grok() ? R.string.onboarding_agent_sign_in_grok : R.string.onboarding_agent_sign_in_codex)
-                        : (acc.claude() ? R.string.onboarding_agent_download_claude
+                        : Ui.downloadNote(this, getString(acc.claude() ? R.string.onboarding_agent_download_claude
                         : acc.opencode() ? R.string.onboarding_agent_download_opencode
                         : acc.agy() ? R.string.onboarding_agent_download_agy
                         : acc.grok() ? R.string.onboarding_agent_download_grok
