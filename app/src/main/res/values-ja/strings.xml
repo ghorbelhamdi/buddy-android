@@ -216,6 +216,7 @@
     <string name="menu_resume">再開</string>
     <string name="menu_pause">一時停止</string>
     <string name="menu_add_instruction">指示を追加</string>
+    <string name="menu_end_live">ライブ音声を終了</string>
     <string name="menu_stop_voice">音声停止</string>
     <string name="bubble_talk">話す</string>
     <string name="menu_open_chat">チャット</string>
@@ -457,6 +458,7 @@
     <string name="hub_still_working_attachments">このチャットはまだ実行中です。完了してから添付ファイルを送信してください。</string>
     <string name="hub_thinking">考え中…</string>
     <string name="hub_still_waiting">まだモデルの応答を待っています…</string>
+    <string name="hub_still_reading_local">読み込み中… 自分のコンピューターで動くモデルは、特に最初の回答に数分かかることがあります。</string>
     <string name="hub_no_answer">モデルから応答がありませんでした。混み合っている可能性があります。もう一度試すか、チャット上部で別のモデルを選んでください。</string>
     <string name="hub_model_set">モデル：%1$s</string>
     <string name="hub_effort_set">思考レベル：%1$s</string>
@@ -538,6 +540,7 @@
     <string name="steps_run_live">%1$s · これまで %2$d ステップ</string>
     <string name="steps_context">コンテキスト %1$s</string>
     <string name="steps_no_actions">この実行ではスマートフォンの操作はありませんでした。</string>
+    <string name="steps_earlier">それ以前の%1$d件のステップは表示していません。</string>
     <string name="steps_done">完了</string>
     <string name="steps_failed">失敗</string>
     <string name="steps_stopped">停止</string>
@@ -864,6 +867,13 @@
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">音声</string>
+    <string name="setup_assist">Buddyをスマホのアシスタントにしたとき</string>
+    <string name="setup_assist_info">Androidの設定 → アプリ → デフォルトのアプリ → デジタルアシスタントアプリでBuddyを選びます。電源ボタンを長押しするとBuddyが起動します：話すは依頼を1回送信、ライブ音声は音声での会話を開始します（Codexへのログインが必要。ない場合は話す）。</string>
+    <string name="setup_live_agent">ライブ音声で使うエージェント</string>
+    <string name="setup_live_agent_default">デフォルト</string>
+    <string name="setup_live_agent_info">バブルや電源ボタンの長押しから始めるライブ音声は、このエージェントで新しいチャットを開きます。デフォルトは既定のエージェント（現在は%1$s）です。</string>
+    <string name="setup_live_continue">最後のチャットを続ける</string>
+    <string name="setup_live_continue_info">オン：ライブ音声はそのエージェントとの最新のチャットを続けます。オフ：毎回新しいチャット。</string>
     <string name="setup_voice_input">音声入力</string>
     <string name="setup_voice_phone">端末</string>
     <string name="setup_voice_input_claude">Claude のプランで使える Claude Code の音声入力です。精度が非常に高く、英語、フランス語、ドイツ語、スペイン語、イタリア語、ポルトガル語、オランダ語、トルコ語、ロシア語、日本語などに対応していますが、アラビア語には対応していません。アラビア語の場合、Buddy は端末の音声認識を使用します。少し間を置くと文字が表示されます。</string>
@@ -925,6 +935,9 @@
     <string name="setup_panel_full">全画面</string>
     <string name="setup_panel_compact">コンパクト</string>
     <string name="setup_panel_size_info">「全画面」は画面の端から端まで広がります。「コンパクト」は小さめで画面の端を空けるので、端からのジェスチャーも引き続き使えます。</string>
+    <string name="setup_action_limit">1回のタスクの操作数</string>
+    <string name="setup_action_limit_none">制限なし</string>
+    <string name="setup_action_limit_info">暴走したタスクがプランを使い切らないよう、この回数のタップ・入力・スクロールでタスクを止めます。同じ操作が6回続いた場合は常に止めます。</string>
     <string name="setup_tap_to_talk_info">1 回タップするとマイクがオンになります。話して少し間を置くと送信されます。バブルを長押しすると、チャットなどを開けます。</string>
     <string name="setup_read_aloud">返信を読み上げる</string>
     <string name="setup_read_aloud_info">エージェントの返信を、「音声」で選んだ声で Buddy が読み上げます。</string>

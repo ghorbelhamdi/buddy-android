@@ -486,6 +486,29 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             inRow++;
         }
         while (chipRow != null && inRow++ < 3) chipRow.addView(new View(this), new LinearLayout.LayoutParams(0, 1, 1));
+        // what long-pressing power does once Buddy is the phone's assistant app (AssistActivity)
+        vc.addView(fieldLabel(getString(R.string.setup_assist), null), topGap(16));
+        vc.addView(segmented(this, new String[][]{{"talk", getString(R.string.bubble_talk)},
+                {"live", getString(R.string.live_option)}}, Prefs.assistMode(this), false, v -> {
+            Prefs.setAssistMode(this, v);
+            render();
+        }), topGap(10));
+        vc.addView(text(this, getString(R.string.setup_assist_info), 13, MUTED), topGap(8));
+        // the agent of the new chat that live voice starts from the hold menu or the power button
+        vc.addView(fieldLabel(getString(R.string.setup_live_agent), null), topGap(16));
+        vc.addView(segmented(this, new String[][]{{"", getString(R.string.setup_live_agent_default)},
+                        {"claude", "Claude Code"}, {"codex", "Codex"}, {"opencode", "OpenCode"}, {"agy", "Antigravity"},
+                        {"grok", "Grok"}}, Prefs.liveAgent(this), false, v -> {
+                    Prefs.setLiveAgent(this, v);
+                    render();
+                }, notReady(), v -> {
+                    Toast.makeText(this, getString(R.string.setup_set_up_first, Account.nameOf(v)), Toast.LENGTH_SHORT).show();
+                    openAgent(v);
+                }), topGap(10));
+        vc.addView(text(this, getString(R.string.setup_live_agent_info, Account.nameOf(Prefs.backend(this))), 13, MUTED),
+                topGap(8));
+        vc.addView(switchRow(this, getString(R.string.setup_live_continue), getString(R.string.setup_live_continue_info),
+                Prefs.liveContinue(this), on -> Prefs.setLiveContinue(this, on)), topGap(8));
         addCard(vc);
 
         // --------------------------------------------------- background browser
@@ -669,6 +692,14 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             render();
         }), topGap(10));
         tap.addView(text(this, getString(R.string.setup_panel_size_info), 13, MUTED), topGap(8));
+        // how many phone actions a task may use before Buddy stops it (issue #16)
+        tap.addView(title(this, getString(R.string.setup_action_limit), 15), topGap(18));
+        tap.addView(segmented(this, new String[][]{{"60", "60"}, {"200", "200"},
+                {"none", getString(R.string.setup_action_limit_none)}}, Prefs.actionLimit(this), false, v -> {
+            Prefs.setActionLimit(this, v);
+            render();
+        }), topGap(10));
+        tap.addView(text(this, getString(R.string.setup_action_limit_info), 13, MUTED), topGap(8));
         ex.addView(tap, full());
         ex.addView(divider(), lineParams());
         ex.addView(switchRow(this, getString(R.string.setup_read_aloud), getString(R.string.setup_read_aloud_info),

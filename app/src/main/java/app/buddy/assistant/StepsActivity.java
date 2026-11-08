@@ -84,8 +84,10 @@ public class StepsActivity extends Screen {
             body.addView(text(this, getString(R.string.steps_no_actions), 13, MUTED), gap(4));
             return;
         }
+        int skip = Math.max(0, actions - SHOWN), seen = 0; // a long run: its latest steps (one view each)
+        if (skip > 0) body.addView(text(this, getString(R.string.steps_earlier, skip), 13, MUTED), gap(4));
         for (String l : lines) {
-            if (l.trim().isEmpty()) continue;
+            if (l.trim().isEmpty() || seen++ < skip) continue;
             try {
                 JSONObject s = new JSONObject(l);
                 body.addView(step(dir, s, start), gap(6));
@@ -93,6 +95,9 @@ public class StepsActivity extends Screen {
             }
         }
     }
+
+    /** Steps shown per run. */
+    private static final int SHOWN = 100;
 
     private String outcome(String o) {
         return getString("failed".equals(o) ? R.string.steps_failed : "stopped".equals(o) ? R.string.steps_stopped

@@ -297,6 +297,7 @@
     <string name="menu_pause">Pausar</string>
     <!-- Dictate an extra instruction for the agent while it works. -->
     <string name="menu_add_instruction">Instrucción</string>
+    <string name="menu_end_live">Terminar voz en directo</string>
     <!-- Stops Buddy reading a reply aloud. -->
     <string name="menu_stop_voice">Silenciar</string>
     <!-- Verb: starts voice input to the agent. A hold-menu label (keep under ~12 characters) and the chat panel's
@@ -629,6 +630,7 @@
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">Pensando…</string>
     <string name="hub_still_waiting">Todavía esperando la respuesta del modelo…</string>
+    <string name="hub_still_reading_local">Sigue leyendo… Un modelo en tu propio ordenador puede tardar unos minutos, sobre todo en la primera respuesta.</string>
     <!-- "the top of the chat" = the model chip under the chat title. -->
     <string name="hub_no_answer">El modelo no respondió. Puede que esté ocupado: inténtalo de nuevo o elige otro modelo en la parte superior del chat.</string>
     <!-- After picking a model for the chat. %1$s = model name. -->
@@ -735,6 +737,7 @@
     <string name="steps_run_live">%1$s · %2$d pasos hasta ahora</string>
     <string name="steps_context">contexto %1$s</string>
     <string name="steps_no_actions">No hubo acciones en el teléfono en esta ejecución.</string>
+    <string name="steps_earlier">%1$d pasos anteriores no se muestran.</string>
     <string name="steps_done">terminada</string>
     <string name="steps_failed">fallida</string>
     <string name="steps_stopped">detenida</string>
@@ -1186,6 +1189,13 @@
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Voz</string>
+    <string name="setup_assist">Cuando Buddy es el asistente del teléfono</string>
+    <string name="setup_assist_info">Elige Buddy en Ajustes de Android → Aplicaciones → Aplicaciones predeterminadas → Aplicación de asistente digital. Al mantener pulsado el botón de encendido se abre Buddy: Hablar envía una petición, Voz en directo inicia una conversación hablada (necesita Codex con sesión iniciada; si no, es Hablar).</string>
+    <string name="setup_live_agent">Voz en directo usa</string>
+    <string name="setup_live_agent_default">Predeterminado</string>
+    <string name="setup_live_agent_info">La voz en directo desde la burbuja mantenida o el botón de encendido abre un chat nuevo con este agente. Predeterminado es tu agente predeterminado (ahora %1$s).</string>
+    <string name="setup_live_continue">Seguir el último chat</string>
+    <string name="setup_live_continue_info">Activado: la voz en directo continúa tu último chat con ese agente. Desactivado: un chat nuevo cada vez.</string>
     <string name="setup_voice_input">Entrada de voz</string>
     <!-- Option next to Claude and ChatGPT: the phone's own speech engine. Keep short. -->
     <string name="setup_voice_phone">Teléfono</string>
@@ -1262,6 +1272,9 @@
     <string name="setup_panel_full">Grande</string>
     <string name="setup_panel_compact">Compacto</string>
     <string name="setup_panel_size_info">Grande ocupa la pantalla de borde a borde. Compacto es más pequeño y deja libres los bordes de la pantalla, para que los gestos laterales sigan funcionando.</string>
+    <string name="setup_action_limit">Acciones por tarea</string>
+    <string name="setup_action_limit_none">Sin límite</string>
+    <string name="setup_action_limit_info">Una tarea se detiene tras este número de toques, escritura y desplazamientos, para que una tarea descontrolada no gaste tu plan. La misma acción 6 veces seguidas siempre la detiene.</string>
     <string name="setup_tap_to_talk_info">Un toque abre el micrófono: di lo que quieras y se enviará cuando hagas una pausa. Mantén presionada la burbuja para ver el chat y más.</string>
     <string name="setup_read_aloud">Leer respuestas en voz alta</string>
     <string name="setup_read_aloud_info">Buddy lee en voz alta las respuestas de los agentes, con la voz que elijas en la sección Voz.</string>

@@ -25,6 +25,11 @@ final class Providers {
         /** The models the pickers show (empty: all of them; OpenRouter lists hundreds). */
         java.util.Set<String> shown = new java.util.LinkedHashSet<>();
 
+        /** A server on this phone or the user's own network (Ollama, LM Studio, llama.cpp…). */
+        boolean local() {
+            return isLocal(openai.isEmpty() ? anthropic : openai);
+        }
+
         P(String id) {
             this.id = id;
         }
@@ -179,14 +184,27 @@ final class Providers {
         return ref.startsWith("@") && ref.indexOf('/') > 0 ? ref.substring(1, ref.indexOf('/')) : "";
     }
 
-    /** Saves the list (no keys) and gives Buddy's Linux one file per service: its kind of address and its models. */
-    private static void store(Context c) throws Exception {
+    /** The files for Buddy's Linux again as this build writes them (a field added since), once at start. */
+    static void rewrite(Context c) {
+        try {
+            store(c);
+        } catch (Exception ignored) {
+        }
+    }
+
+    /**
+     * Saves the list (no keys) and gives Buddy's Linux one file per service: its kind of address and its models. Each
+     * file is replaced in place and only a removed service's goes, so a run starting meanwhile always finds its file.
+     */
+    private static synchronized void store(Context c) throws Exception {
         JSONArray a = new JSONArray();
         for (P p : all()) a.put(json(p).put("models", p.models));
         Prefs.setProviders(c, a.toString());
         File dir = new File(Linux.root(c), "root/.buddy/providers");
+        java.util.Set<String> keep = new java.util.HashSet<>();
+        for (P p : all()) keep.add(p.id + ".json");
         File[] old = dir.listFiles();
-        if (old != null) for (File f : old) f.delete();
+        if (old != null) for (File f : old) if (!keep.contains(f.getName())) f.delete();
         if (!Linux.installed(c)) return;
         dir.mkdirs();
         for (P p : all()) {
@@ -199,6 +217,8 @@ final class Providers {
             Linux.write(new File(dir, p.id + ".json"), new JSONObject().put("name", p.name)
                     .put("anthropic", !p.anthropic.isEmpty())
                     .put("openai", p.openai.isEmpty() ? "" : "responses")
+                    .put("openai_own", !p.openai.isEmpty() && Relay.isOpenAi(p.openai)) // Codex keeps its extras there
+                    .put("local", p.local()) // a model on the user's computer: the agents wait longer for it
                     .put("models", windows).toString());
         }
     }
@@ -212,7 +232,9 @@ final class Providers {
     static void fetch(Context c, P p) throws Exception {
         String key = Secrets.get(c, secretName(p.id));
         if (key == null) return;
-        p.models = list(key, p.anthropic, p.openai);
+        JSONArray m = list(key, p.anthropic, p.openai);
+        if (m.toString().equals(p.models.toString())) return; // nothing new: the files stay as they are
+        p.models = m;
         store(c);
     }
 
@@ -311,25 +333,57 @@ final class Providers {
         return null;
     }
 
-    /** Fresh model lists for every service, at most every 10 minutes (in the background). */
     static void refresh(Context c) {
+        refresh(c, null);
+    }
+
+    /**
+     * Fresh model lists, in the background: a server on the user's own computer or network each time (a model pulled
+     * there a minute ago shows up; asking costs nothing), online services at most every 10 minutes. changed runs on
+     * the main thread when a list came back different, so an open picker can show it.
+     */
+    static void refresh(Context c, Runnable changed) {
         long now = System.currentTimeMillis();
+        List<P> todo = new ArrayList<>();
         synchronized (Providers.class) {
-            if (now - refreshedAt < 600_000 || all().isEmpty()) return;
-            refreshedAt = now;
+            boolean online = now - refreshedAt >= 600_000, local = now - localRefreshedAt >= 5_000;
+            if (online) refreshedAt = now;
+            if (local) localRefreshedAt = now;
+            for (P p : all()) if (p.local() ? local : online) todo.add(p);
+            // a picker opened while a fetch runs (one started as the screen came back): it hears how that one ends
+            if (changed != null && (inFlight > 0 || !todo.isEmpty())) waiting.add(changed);
+            if (todo.isEmpty()) return;
+            inFlight++;
         }
         final Context app = c.getApplicationContext();
         new Thread(() -> {
-            for (P p : new ArrayList<>(all())) {
+            boolean any = false;
+            for (P p : todo) {
+                String before = p.models.toString();
                 try {
                     fetch(app, p);
                 } catch (Exception ignored) { // the list stays as it was
                 }
+                any |= !before.equals(p.models.toString());
             }
+            List<Runnable> tell = new ArrayList<>();
+            synchronized (Providers.class) {
+                fetchedNew |= any;
+                if (--inFlight == 0) {
+                    if (fetchedNew) tell.addAll(waiting);
+                    waiting.clear();
+                    fetchedNew = false;
+                }
+            }
+            android.os.Handler main = new android.os.Handler(android.os.Looper.getMainLooper());
+            for (Runnable r : tell) main.post(r);
         }, "providers").start();
     }
 
-    private static long refreshedAt;
+    private static long refreshedAt, localRefreshedAt;
+    private static int inFlight;
+    private static boolean fetchedNew;
+    private static final List<Runnable> waiting = new ArrayList<>();
 
     /**
      * For a Claude Code run outside a chat (the smart reviewer) when Claude Code has no plan: the relay settings for

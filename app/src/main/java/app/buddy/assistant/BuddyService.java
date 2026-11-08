@@ -87,6 +87,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         new Thread(() -> Attachments.cleanup(this)).start();
         new Thread(() -> { // API key services: the key saved per agent by earlier builds, then fresh model lists
             Providers.migrate(this);
+            Providers.rewrite(this); // fields added by this build, before any run reads them
             Providers.refresh(this);
         }, "providers").start();
         tools = new Tools(this);

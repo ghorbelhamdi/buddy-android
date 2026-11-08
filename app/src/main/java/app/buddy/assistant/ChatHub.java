@@ -22,6 +22,8 @@ final class ChatHub {
     private static final long NO_RESPONSE_MS = 30000;
     /** After this long with nothing from the agent, the run is given up on. */
     private static final long GIVE_UP_MS = 180000;
+    /** A model on the user's own computer can read for minutes before its first word (no GPU big enough). */
+    private static final long LOCAL_GIVE_UP_MS = 15 * 60_000;
     private static final String TOOL_PREFIX = "mcp__phone__";
     private static ChatHub instance;
 
@@ -284,15 +286,18 @@ final class ChatHub {
         ses.status = app.getString(R.string.hub_thinking);
         changed();
         final int id = ses.runId;
+        Providers.P lp = Providers.of(Models.effective(ses));
+        final boolean local = lp != null && lp.local();
+        final long giveUp = local ? LOCAL_GIVE_UP_MS : GIVE_UP_MS;
         // the agent is running but its model can be slow (free models especially): say so, keep waiting
         main.postDelayed(() -> {
             if (ses.running && id == ses.runId && SystemClock.elapsedRealtime() - ses.lastEventAt >= NO_RESPONSE_MS - 100) {
-                add(ses, Bubble.Kind.STEP, app.getString(R.string.hub_still_waiting));
+                add(ses, Bubble.Kind.STEP, app.getString(local ? R.string.hub_still_reading_local : R.string.hub_still_waiting));
                 changed();
             }
         }, NO_RESPONSE_MS);
         main.postDelayed(() -> {
-            if (ses.running && id == ses.runId && SystemClock.elapsedRealtime() - ses.lastEventAt >= GIVE_UP_MS - 100) {
+            if (ses.running && id == ses.runId && SystemClock.elapsedRealtime() - ses.lastEventAt >= giveUp - 100) {
                 ses.running = false;
                 String err = lastError(ses);
                 add(ses, Bubble.Kind.ERROR, app.getString(R.string.hub_no_answer) + (err.isEmpty() ? "" : "\n\n"
@@ -302,7 +307,7 @@ final class ChatHub {
                 runEnded(ses);
                 changed();
             }
-        }, GIVE_UP_MS);
+        }, giveUp);
         return null;
     }
 

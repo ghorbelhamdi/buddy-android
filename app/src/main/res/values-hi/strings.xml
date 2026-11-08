@@ -217,6 +217,7 @@
     <string name="menu_resume">फिर शुरू करें</string>
     <string name="menu_pause">पॉज़ करें</string>
     <string name="menu_add_instruction">निर्देश जोड़ें</string>
+    <string name="menu_end_live">लाइव आवाज़ बंद करें</string>
     <string name="menu_stop_voice">आवाज़ रोकें</string>
     <string name="bubble_talk">बोलें</string>
     <string name="menu_open_chat">चैट खोलें</string>
@@ -461,6 +462,7 @@
     <string name="hub_still_working_attachments">यह चैट अभी काम कर रही है. काम पूरा होने पर अटैचमेंट भेजें.</string>
     <string name="hub_thinking">सोच रहा है…</string>
     <string name="hub_still_waiting">मॉडल के जवाब का अब भी इंतज़ार है…</string>
+    <string name="hub_still_reading_local">अभी पढ़ रहा है… आपके अपने कंप्यूटर पर चलने वाले मॉडल को कुछ मिनट लग सकते हैं, ख़ासकर पहले जवाब में।</string>
     <string name="hub_no_answer">मॉडल ने जवाब नहीं दिया. हो सकता है वह व्यस्त हो: फिर से कोशिश करें या चैट में सबसे ऊपर से कोई दूसरा मॉडल चुनें.</string>
     <string name="hub_model_set">मॉडल: %1$s</string>
     <string name="hub_effort_set">प्रयास: %1$s</string>
@@ -543,6 +545,7 @@
     <string name="steps_run_live">%1$s · अब तक %2$d चरण</string>
     <string name="steps_context">संदर्भ %1$s</string>
     <string name="steps_no_actions">इस बार फ़ोन पर कोई कार्रवाई नहीं हुई.</string>
+    <string name="steps_earlier">%1$d पिछले कदम नहीं दिखाए गए।</string>
     <string name="steps_done">पूरा हुआ</string>
     <string name="steps_failed">विफल</string>
     <string name="steps_stopped">रोका गया</string>
@@ -868,6 +871,13 @@
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">आवाज़</string>
+    <string name="setup_assist">जब Buddy फ़ोन का असिस्टेंट हो</string>
+    <string name="setup_assist_info">Android की सेटिंग → ऐप्स → डिफ़ॉल्ट ऐप्स → डिजिटल असिस्टेंट ऐप में Buddy चुनें। फिर पावर बटन देर तक दबाने पर Buddy शुरू होगा: बोलें एक अनुरोध भेजता है, लाइव आवाज़ बोलकर बातचीत शुरू करता है (इसके लिए Codex में साइन इन चाहिए, वरना बोलें)।</string>
+    <string name="setup_live_agent">लाइव आवाज़ इस्तेमाल करती है</string>
+    <string name="setup_live_agent_default">डिफ़ॉल्ट</string>
+    <string name="setup_live_agent_info">बबल या पावर बटन दबाकर रखने से शुरू हुई लाइव आवाज़ इस एजेंट के साथ नई चैट शुरू करती है। डिफ़ॉल्ट आपका डिफ़ॉल्ट एजेंट है (अभी %1$s)।</string>
+    <string name="setup_live_continue">आख़िरी चैट जारी रखें</string>
+    <string name="setup_live_continue_info">चालू: लाइव आवाज़ उस एजेंट के साथ आपकी सबसे नई चैट जारी रखती है। बंद: हर बार नई चैट।</string>
     <string name="setup_voice_input">वॉइस इनपुट</string>
     <string name="setup_voice_phone">फ़ोन</string>
     <string name="setup_voice_input_claude">आपके Claude प्लान पर Claude Code की डिक्टेशन सुविधा: बहुत सटीक. यह अंग्रेज़ी, फ़्रेंच, जर्मन, स्पैनिश, इटैलियन, पुर्तगाली, डच, तुर्की, रूसी, जापानी और कई दूसरी भाषाओं में काम करती है, लेकिन अरबी में नहीं: अरबी के लिए Buddy फ़ोन की बोली पहचानने की सुविधा इस्तेमाल करता है. आपके रुकने पर शब्द दिखते हैं.</string>
@@ -931,6 +941,9 @@
     <string name="setup_panel_full">पूरा</string>
     <string name="setup_panel_compact">कॉम्पैक्ट</string>
     <string name="setup_panel_size_info">“पूरा” किनारे से किनारे तक फैला रहता है. “कॉम्पैक्ट” छोटा है और स्क्रीन के किनारों से दूर रहता है, ताकि साइड जेस्चर काम करते रहें.</string>
+    <string name="setup_action_limit">हर काम में फ़ोन ऐक्शन</string>
+    <string name="setup_action_limit_none">कोई सीमा नहीं</string>
+    <string name="setup_action_limit_info">इतने टैप, टाइपिंग और स्क्रॉल के बाद काम रुक जाता है, ताकि बेकाबू काम आपका प्लान खत्म न कर दे। एक ही ऐक्शन लगातार 6 बार होने पर वह हमेशा रुकता है।</string>
     <string name="setup_tap_to_talk_info">एक टैप से माइक खुल जाता है: जो चाहिए वह बोलें, आपके रुकने पर इसे भेज दिया जाएगा. चैट और दूसरे विकल्पों के लिए बबल को दबाकर रखें.</string>
     <string name="setup_read_aloud">जवाब पढ़कर सुनाएं</string>
     <string name="setup_read_aloud_info">Buddy एजेंटों के जवाब उस आवाज़ में पढ़कर सुनाता है, जो आप “आवाज़” में चुनते हैं.</string>

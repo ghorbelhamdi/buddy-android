@@ -19,7 +19,10 @@ import org.json.JSONObject;
  * deleted with the chat, never for an incognito chat. Screens an app protects come out black.
  */
 final class StepLog {
-    private static final int KEEP_RUNS = 3, MAX_STEPS = 80, SHORT_SIDE = 360;
+    /** Steps kept per run (a runaway can't fill the phone), and screenshots: the latest ones (space). */
+    private static final int KEEP_RUNS = 3, MAX_STEPS = 500, MAX_SHOTS = 80, SHORT_SIDE = 360;
+    /** Screenshots not taken yet: fast steps (do_steps) skip theirs rather than queue up behind the screen. */
+    private static final java.util.concurrent.atomic.AtomicInteger pending = new java.util.concurrent.atomic.AtomicInteger();
     /** The folder of each chat's run in progress. */
     private static final Map<String, File> current = new ConcurrentHashMap<>();
     private static final Map<String, Integer> counts = new ConcurrentHashMap<>();
@@ -82,8 +85,17 @@ final class StepLog {
             }
         } catch (Exception ignored) {
         }
-        File shot = new File(d, n + ".jpg");
-        shots.execute(() -> shoot(svc, shot));
+        File shot = new File(d, n + ".jpg"), old = new File(d, (n - MAX_SHOTS) + ".jpg");
+        if (pending.get() >= 2) return; // the screen moves faster than screenshots: this step goes without
+        pending.incrementAndGet();
+        shots.execute(() -> {
+            try {
+                shoot(svc, shot);
+                if (n > MAX_SHOTS) old.delete(); // a long run (Settings: 200 or no limit) keeps its latest screenshots
+            } finally {
+                pending.decrementAndGet();
+            }
+        });
     }
 
     /** A small JPEG of the screen, a moment after the action (the screen needs it to settle). */

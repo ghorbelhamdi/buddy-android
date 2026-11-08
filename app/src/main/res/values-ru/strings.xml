@@ -304,6 +304,7 @@
     <string name="menu_pause">Пауза</string>
     <!-- Dictate an extra instruction for the agent while it works. -->
     <string name="menu_add_instruction">Дополнить</string>
+    <string name="menu_end_live">Завершить живой голос</string>
     <!-- Stops Buddy reading a reply aloud. -->
     <string name="menu_stop_voice">Выкл. голос</string>
     <!-- Verb: starts voice input to the agent. A hold-menu label (keep under ~12 characters) and the chat panel's
@@ -642,6 +643,7 @@
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">Думает…</string>
     <string name="hub_still_waiting">Всё ещё ждём ответа модели…</string>
+    <string name="hub_still_reading_local">Всё ещё читает… Модели на вашем компьютере может понадобиться несколько минут, особенно для первого ответа.</string>
     <!-- "the top of the chat" = the model chip under the chat title. -->
     <string name="hub_no_answer">Модель не ответила. Возможно, она перегружена: попробуйте ещё раз или выберите другую модель вверху чата.</string>
     <!-- After picking a model for the chat. %1$s = model name. -->
@@ -750,6 +752,7 @@
     <string name="steps_run_live">%1$s · пока шагов: %2$d</string>
     <string name="steps_context">контекст %1$s</string>
     <string name="steps_no_actions">В этом запуске не было действий на телефоне.</string>
+    <string name="steps_earlier">Ранние шаги не показаны: %1$d.</string>
     <string name="steps_done">завершён</string>
     <string name="steps_failed">с ошибкой</string>
     <string name="steps_stopped">остановлен</string>
@@ -1205,6 +1208,13 @@
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Голос</string>
+    <string name="setup_assist">Когда Buddy — ассистент телефона</string>
+    <string name="setup_assist_info">Выберите Buddy в Настройках Android → Приложения → Приложения по умолчанию → Цифровой помощник. Долгое нажатие кнопки питания запустит Buddy: «Говорить» отправляет один запрос, «Живой голос» начинает разговор голосом (нужен вход в Codex, иначе «Говорить»).</string>
+    <string name="setup_live_agent">Живой голос использует</string>
+    <string name="setup_live_agent_default">По умолчанию</string>
+    <string name="setup_live_agent_info">Живой голос, запущенный удержанием пузыря или кнопки питания, открывает новый чат с этим агентом. «По умолчанию» — ваш агент по умолчанию (сейчас %1$s).</string>
+    <string name="setup_live_continue">Продолжать последний чат</string>
+    <string name="setup_live_continue_info">Вкл.: живой голос продолжает ваш последний чат с этим агентом. Выкл.: каждый раз новый чат.</string>
     <string name="setup_voice_input">Голосовой ввод</string>
     <!-- Option next to Claude and ChatGPT: the phone's own speech engine. Keep short. -->
     <string name="setup_voice_phone">Телефон</string>
@@ -1294,6 +1304,9 @@
     <!-- Choice: a smaller panel. Keep it short. -->
     <string name="setup_panel_compact">Компактный</string>
     <string name="setup_panel_size_info">«Полный» — от края до края. «Компактный» — панель меньше и не заходит на края экрана, так что боковые жесты продолжают работать.</string>
+    <string name="setup_action_limit">Действий за задачу</string>
+    <string name="setup_action_limit_none">Без ограничений</string>
+    <string name="setup_action_limit_info">Задача останавливается после стольких нажатий, вводов и прокруток, чтобы вышедшая из-под контроля задача не израсходовала ваш план. Одно и то же действие 6 раз подряд всегда её останавливает.</string>
     <!-- Explains the "Talk" choice of setup_tap_action. -->
     <string name="setup_tap_to_talk_info">Одно нажатие включает микрофон: скажите, что нужно, и сообщение отправится, когда вы сделаете паузу. Удерживайте пузырёк, чтобы открыть чат и не только.</string>
     <string name="setup_read_aloud">Читать ответы вслух</string>

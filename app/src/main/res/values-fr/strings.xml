@@ -298,6 +298,7 @@
     <string name="menu_pause">Pause</string>
     <!-- Dictate an extra instruction for the agent while it works. -->
     <string name="menu_add_instruction">Consigne</string>
+    <string name="menu_end_live">Terminer la voix en direct</string>
     <!-- Stops Buddy reading a reply aloud. -->
     <string name="menu_stop_voice">Silence</string>
     <!-- Verb: starts voice input to the agent. A hold-menu label (keep under ~12 characters) and the chat panel's
@@ -630,6 +631,7 @@
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">Réflexion…</string>
     <string name="hub_still_waiting">Toujours en attente de la réponse du modèle…</string>
+    <string name="hub_still_reading_local">Lecture en cours… Un modèle sur ton propre ordinateur peut prendre quelques minutes, surtout pour la première réponse.</string>
     <!-- "the top of the chat" = the model chip under the chat title. -->
     <string name="hub_no_answer">Le modèle n\'a pas répondu. Il est peut-être occupé : réessayez ou choisissez un autre modèle en haut de la discussion.</string>
     <!-- After picking a model for the chat. %1$s = model name. -->
@@ -736,6 +738,7 @@
     <string name="steps_run_live">%1$s · %2$d étapes jusqu\'ici</string>
     <string name="steps_context">contexte %1$s</string>
     <string name="steps_no_actions">Aucune action sur le téléphone lors de cette exécution.</string>
+    <string name="steps_earlier">%1$d étapes précédentes non affichées.</string>
     <string name="steps_done">terminée</string>
     <string name="steps_failed">échouée</string>
     <string name="steps_stopped">arrêtée</string>
@@ -1187,6 +1190,13 @@
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Voix</string>
+    <string name="setup_assist">Quand Buddy est l’assistant du téléphone</string>
+    <string name="setup_assist_info">Choisis Buddy dans Paramètres Android → Applications → Applications par défaut → Application d’assistant numérique. Un appui long sur le bouton marche/arrêt lance alors Buddy : Parler envoie une demande, Voix en direct lance une conversation parlée (Codex doit être connecté, sinon c’est Parler).</string>
+    <string name="setup_live_agent">La voix en direct utilise</string>
+    <string name="setup_live_agent_default">Par défaut</string>
+    <string name="setup_live_agent_info">La voix en direct lancée en maintenant la bulle ou le bouton marche/arrêt ouvre un nouveau chat avec cet agent. Par défaut, c’est ton agent par défaut (actuellement %1$s).</string>
+    <string name="setup_live_continue">Reprendre le dernier chat</string>
+    <string name="setup_live_continue_info">Activé : la voix en direct reprend ton dernier chat avec cet agent. Désactivé : un nouveau chat à chaque fois.</string>
     <string name="setup_voice_input">Saisie vocale</string>
     <!-- Option next to Claude and ChatGPT: the phone's own speech engine. Keep short. -->
     <string name="setup_voice_phone">Téléphone</string>
@@ -1263,6 +1273,9 @@
     <string name="setup_panel_full">Grand</string>
     <string name="setup_panel_compact">Compact</string>
     <string name="setup_panel_size_info">L\'option Grand s\'étend d\'un bord à l\'autre de l\'écran. L\'option Compact est plus petite et laisse les bords libres, pour que les gestes latéraux fonctionnent toujours.</string>
+    <string name="setup_action_limit">Actions par tâche</string>
+    <string name="setup_action_limit_none">Sans limite</string>
+    <string name="setup_action_limit_info">Une tâche s’arrête après ce nombre d’appuis, de saisies et de défilements, pour qu’une tâche qui s’emballe n’épuise pas ton forfait. La même action 6 fois d’affilée l’arrête toujours.</string>
     <string name="setup_tap_to_talk_info">Un appui ouvre le micro : dites ce que vous voulez, le message part dès que vous marquez une pause. Appuyez longuement sur la bulle pour la discussion et plus encore.</string>
     <string name="setup_read_aloud">Lire les réponses à voix haute</string>
     <string name="setup_read_aloud_info">Buddy lit les réponses des agents à voix haute, avec la voix que vous choisissez dans la section Voix.</string>

@@ -620,8 +620,11 @@ final class Tools {
     /** Actions that go over a list or a page: doing them again and again is normal, not a loop. */
     private static final java.util.Set<String> REPEATS_OK = new java.util.HashSet<>(java.util.Arrays.asList(
             "scroll", "swipe", "browser_scroll"));
-    /** A run stops after this many actions, or the same action this many times in a row: a runaway loop spends the plan. */
-    private static final int MAX_STEPS = 60, MAX_REPEATS = 6;
+    /**
+     * A run stops after the same action this many times in a row, and after Prefs.maxActions actions unless the user
+     * chose no limit: a runaway loop spends the plan.
+     */
+    private static final int MAX_REPEATS = 6;
     /** Per Buddy chat in its current run: {actions, the same action in a row}, and the last action. */
     private static final java.util.Map<String, int[]> steps = new java.util.concurrent.ConcurrentHashMap<>();
     private static final java.util.Map<String, String> lastStep = new java.util.concurrent.ConcurrentHashMap<>();
@@ -642,21 +645,28 @@ final class Tools {
         int[] n = steps.computeIfAbsent(chat, k -> new int[2]);
         String step = name + " " + a;
         boolean same = step.equals(lastStep.put(chat, step)) && !REPEATS_OK.contains(name);
+        int max = Prefs.maxActions(svc);
         synchronized (n) {
-            if (n[0] >= MAX_STEPS || n[1] >= MAX_REPEATS) return stopped(n[0] >= MAX_STEPS);
+            boolean capped = max > 0 && n[0] >= max;
+            if (capped && n[0] > max) { // the limit was lowered in Settings during the run: the chat says so once
+                n[0] = max;
+                noteInChat(chat, svc.getString(R.string.tools_step_cap, max));
+            }
+            if (capped || n[1] >= MAX_REPEATS) return stopped(capped ? n[0] : 0);
             n[0]++;
             n[1] = same ? n[1] + 1 : 1;
-            if (n[0] == MAX_STEPS) noteInChat(chat, svc.getString(R.string.tools_step_cap, MAX_STEPS));
+            if (max > 0 && n[0] == max) noteInChat(chat, svc.getString(R.string.tools_step_cap, max));
             else if (n[1] == MAX_REPEATS) {
                 noteInChat(chat, svc.getString(R.string.tools_step_loop, MAX_REPEATS));
-                return stopped(false);
+                return stopped(0);
             }
         }
         return null;
     }
 
-    private static String stopped(boolean cap) {
-        return "STOPPED by Buddy: " + (cap ? "this run has used its " + MAX_STEPS + " phone actions"
+    /** cap: the actions used when the run hit its limit, 0 when it stopped on a loop. */
+    private static String stopped(int cap) {
+        return "STOPPED by Buddy: " + (cap > 0 ? "this run has used its " + cap + " phone actions"
                 : "the same action " + MAX_REPEATS + " times in a row looks like a loop")
                 + ". Don't try more actions; tell the user what's done and what's left. They can tell you to go on.";
     }

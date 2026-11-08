@@ -223,6 +223,7 @@
     <string name="menu_resume">Devam et</string>
     <string name="menu_pause">Duraklat</string>
     <string name="menu_add_instruction">Talimat ekle</string>
+    <string name="menu_end_live">Canlı sesi bitir</string>
     <string name="menu_stop_voice">Sesi durdur</string>
     <string name="bubble_talk">Konuş</string>
     <string name="menu_open_chat">Sohbeti aç</string>
@@ -467,6 +468,7 @@
     <string name="hub_still_working_attachments">Bu sohbet hâlâ çalışıyor. Ekleri iş bitince gönderin.</string>
     <string name="hub_thinking">Düşünüyor…</string>
     <string name="hub_still_waiting">Modelin yanıtı hâlâ bekleniyor…</string>
+    <string name="hub_still_reading_local">Hâlâ okuyor… Kendi bilgisayarındaki bir model, özellikle ilk yanıtta birkaç dakika sürebilir.</string>
     <string name="hub_no_answer">Model yanıt vermedi. Meşgul olabilir: tekrar deneyin veya sohbetin üst kısmından başka bir model seçin.</string>
     <string name="hub_model_set">Model: %1$s</string>
     <string name="hub_effort_set">Çaba: %1$s</string>
@@ -549,6 +551,7 @@
     <string name="steps_run_live">%1$s · şu ana kadar %2$d adım</string>
     <string name="steps_context">bağlam %1$s</string>
     <string name="steps_no_actions">Bu çalıştırmada telefonda işlem yapılmadı.</string>
+    <string name="steps_earlier">Önceki %1$d adım gösterilmiyor.</string>
     <string name="steps_done">tamamlandı</string>
     <string name="steps_failed">başarısız</string>
     <string name="steps_stopped">durduruldu</string>
@@ -877,6 +880,13 @@
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Ses</string>
+    <string name="setup_assist">Buddy telefonun asistanı olduğunda</string>
+    <string name="setup_assist_info">Android Ayarları → Uygulamalar → Varsayılan uygulamalar → Dijital asistan uygulaması\'ndan Buddy\'yi seç. Güç tuşuna uzun basınca Buddy başlar: Konuş tek bir istek gönderir, Canlı ses sesli bir sohbet başlatır (Codex\'te oturum açık olmalı, yoksa Konuş).</string>
+    <string name="setup_live_agent">Canlı ses şunu kullanır</string>
+    <string name="setup_live_agent_default">Varsayılan</string>
+    <string name="setup_live_agent_info">Baloncuğa veya güç tuşuna uzun basarak başlatılan canlı ses bu ajanla yeni bir sohbet açar. Varsayılan, varsayılan ajanındır (şu an %1$s).</string>
+    <string name="setup_live_continue">Son sohbete devam et</string>
+    <string name="setup_live_continue_info">Açık: canlı ses o ajanla son sohbetine devam eder. Kapalı: her seferinde yeni sohbet.</string>
     <string name="setup_voice_input">Sesle giriş</string>
     <string name="setup_voice_phone">Telefon</string>
     <string name="setup_voice_input_claude">Claude planınızla Claude Code\'un dikte özelliği: çok doğru. İngilizce, Fransızca, Almanca, İspanyolca, İtalyanca, Portekizce, Felemenkçe, Türkçe, Rusça, Japonca ve daha fazlasını destekler, ancak Arapçayı desteklemez: Arapça için Buddy telefonun tanıyıcısını kullanır. Siz duraklayınca kelimeler görünür.</string>
@@ -940,6 +950,9 @@
     <string name="setup_panel_full">Tam ekran</string>
     <string name="setup_panel_compact">Kompakt</string>
     <string name="setup_panel_size_info">Tam ekran, kenardan kenara uzanır. Kompakt daha küçüktür ve ekran kenarlarından uzak durur; böylece kenar hareketleri çalışmaya devam eder.</string>
+    <string name="setup_action_limit">Görev başına işlem</string>
+    <string name="setup_action_limit_none">Sınırsız</string>
+    <string name="setup_action_limit_info">Kontrolden çıkan bir görev planını tüketmesin diye görev bu kadar dokunma, yazma ve kaydırmadan sonra durur. Aynı işlemin art arda 6 kez yapılması onu her zaman durdurur.</string>
     <string name="setup_tap_to_talk_info">Tek dokunuş mikrofonu açar: ne istediğinizi söyleyin, duraklayınca gönderilir. Sohbet ve daha fazlası için baloncuğa uzun basın.</string>
     <string name="setup_read_aloud">Yanıtları sesli oku</string>
     <string name="setup_read_aloud_info">Buddy, ajanların yanıtlarını Ses bölümünde seçtiğiniz sesle okur.</string>

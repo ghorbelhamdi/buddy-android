@@ -229,6 +229,7 @@
     <string name="menu_resume">استئناف</string>
     <string name="menu_pause">إيقاف مؤقت</string>
     <string name="menu_add_instruction">إضافة توجيه</string>
+    <string name="menu_end_live">إنهاء الصوت المباشر</string>
     <string name="menu_stop_voice">إيقاف الصوت</string>
     <string name="bubble_talk">تحدّث</string>
     <string name="menu_open_chat">فتح المحادثة</string>
@@ -485,6 +486,7 @@
     <string name="hub_still_working_attachments">لا تزال هذه المحادثة قيد العمل. أرسل المرفقات عند انتهائها.</string>
     <string name="hub_thinking">جارٍ التفكير…</string>
     <string name="hub_still_waiting">لم يردّ النموذج بعد…</string>
+    <string name="hub_still_reading_local">ما زال يقرأ… قد يستغرق نموذج على حاسوبك بضع دقائق، خاصة للإجابة الأولى.</string>
     <string name="hub_no_answer">لم يردّ النموذج. قد يكون مشغولًا: حاول مرة أخرى، أو اختر نموذجًا آخر من أعلى المحادثة.</string>
     <string name="hub_model_set">النموذج: %1$s</string>
     <string name="hub_effort_set">مستوى الجهد: %1$s</string>
@@ -571,6 +573,7 @@
     <string name="steps_run_live">%1$s · الخطوات حتى الآن: %2$d</string>
     <string name="steps_context">السياق %1$s</string>
     <string name="steps_no_actions">لا توجد إجراءات على الهاتف في هذا التشغيل.</string>
+    <string name="steps_earlier">لا تظهر %1$d خطوة سابقة.</string>
     <string name="steps_done">اكتمل</string>
     <string name="steps_failed">فشل</string>
     <string name="steps_stopped">توقف</string>
@@ -904,6 +907,13 @@
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">الصوت</string>
+    <string name="setup_assist">عندما يكون Buddy مساعد الهاتف</string>
+    <string name="setup_assist_info">اختر Buddy في إعدادات أندرويد ← التطبيقات ← التطبيقات الافتراضية ← تطبيق المساعد الرقمي. بعدها يبدأ Buddy عند الضغط المطوّل على زر التشغيل: «تحدّث» يرسل طلبًا واحدًا، و«صوت مباشر» يبدأ محادثة منطوقة (يحتاج تسجيل الدخول إلى Codex، وإلا يكون «تحدّث»).</string>
+    <string name="setup_live_agent">الصوت المباشر يستخدم</string>
+    <string name="setup_live_agent_default">الافتراضي</string>
+    <string name="setup_live_agent_info">الصوت المباشر من الضغط المطوّل على الفقاعة أو زر التشغيل يبدأ محادثة جديدة مع هذا الوكيل. الافتراضي هو وكيلك الافتراضي (حاليًا %1$s).</string>
+    <string name="setup_live_continue">متابعة آخر محادثة</string>
+    <string name="setup_live_continue_info">مفعّل: يكمل الصوت المباشر آخر محادثة مع هذا الوكيل. معطّل: محادثة جديدة في كل مرة.</string>
     <string name="setup_voice_input">الإدخال الصوتي</string>
     <string name="setup_voice_phone">الهاتف</string>
     <string name="setup_voice_input_claude">الإملاء الصوتي في Claude Code باستخدام اشتراكك في Claude: دقيق جدًا. يدعم الإنجليزية والفرنسية والألمانية والإسبانية والإيطالية والبرتغالية والهولندية والتركية والروسية واليابانية وغيرها، لكنه لا يدعم العربية: فللعربية يستخدم Buddy أداة التعرّف على الكلام في الهاتف. تظهر الكلمات عندما تتوقف عن الكلام.</string>
@@ -975,6 +985,9 @@
     <string name="setup_panel_full">كامل</string>
     <string name="setup_panel_compact">مضغوط</string>
     <string name="setup_panel_size_info">«كامل» يمتد من الحافة إلى الحافة. أما «مضغوط» فهو أصغر ويبتعد عن حواف الشاشة، لتظل الإيماءات الجانبية تعمل.</string>
+    <string name="setup_action_limit">إجراءات الهاتف لكل مهمة</string>
+    <string name="setup_action_limit_none">بلا حد</string>
+    <string name="setup_action_limit_info">تتوقف المهمة بعد هذا العدد من النقرات والكتابة والتمرير، حتى لا تستهلك مهمة خارجة عن السيطرة خطتك. تكرار الإجراء نفسه 6 مرات متتالية يوقفها دائمًا.</string>
     <string name="setup_tap_to_talk_info">تفتح نقرة واحدة الميكروفون: قل ما تريد وسيُرسَل عندما تتوقف عن الكلام. اضغط مطولًا على الفقاعة لفتح المحادثة والمزيد.</string>
     <string name="setup_read_aloud">قراءة الردود بصوت عالٍ</string>
     <string name="setup_read_aloud_info">يقرأ Buddy ردود الوكلاء بصوت عالٍ، بالصوت الذي تختاره في قسم «الصوت».</string>

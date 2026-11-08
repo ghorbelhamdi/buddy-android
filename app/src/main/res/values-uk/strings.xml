@@ -304,6 +304,7 @@
     <string name="menu_pause">Пауза</string>
     <!-- Dictate an extra instruction for the agent while it works. -->
     <string name="menu_add_instruction">Уточнити</string>
+    <string name="menu_end_live">Завершити живий голос</string>
     <!-- Stops Buddy reading a reply aloud. -->
     <string name="menu_stop_voice">Вимк. голос</string>
     <!-- Verb: starts voice input to the agent. A hold-menu label (keep under ~12 characters) and the chat panel's
@@ -642,6 +643,7 @@
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">Думаю…</string>
     <string name="hub_still_waiting">Досі чекаю на відповідь моделі…</string>
+    <string name="hub_still_reading_local">Ще читає… Моделі на вашому комп\'ютері може знадобитися кілька хвилин, особливо для першої відповіді.</string>
     <!-- "the top of the chat" = the model chip under the chat title. -->
     <string name="hub_no_answer">Модель не відповіла. Можливо, вона зайнята: спробуйте ще раз або виберіть іншу модель угорі чату.</string>
     <!-- After picking a model for the chat. %1$s = model name. -->
@@ -750,6 +752,7 @@
     <string name="steps_run_live">%1$s · поки кроків: %2$d</string>
     <string name="steps_context">контекст %1$s</string>
     <string name="steps_no_actions">У цьому запуску не було дій на телефоні.</string>
+    <string name="steps_earlier">Ранні кроки не показано: %1$d.</string>
     <string name="steps_done">завершено</string>
     <string name="steps_failed">помилка</string>
     <string name="steps_stopped">зупинено</string>
@@ -1205,6 +1208,13 @@
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Голос</string>
+    <string name="setup_assist">Коли Buddy — асистент телефона</string>
+    <string name="setup_assist_info">Виберіть Buddy в Налаштуваннях Android → Додатки → Додатки за умовчанням → Цифровий помічник. Довге натискання кнопки живлення запустить Buddy: «Говорити» надсилає один запит, «Живий голос» починає розмову голосом (потрібен вхід у Codex, інакше «Говорити»).</string>
+    <string name="setup_live_agent">Живий голос використовує</string>
+    <string name="setup_live_agent_default">За замовчуванням</string>
+    <string name="setup_live_agent_info">Живий голос, запущений утриманням бульбашки чи кнопки живлення, відкриває новий чат із цим агентом. «За замовчуванням» — ваш агент за замовчуванням (зараз %1$s).</string>
+    <string name="setup_live_continue">Продовжувати останній чат</string>
+    <string name="setup_live_continue_info">Увімк.: живий голос продовжує ваш останній чат із цим агентом. Вимк.: щоразу новий чат.</string>
     <string name="setup_voice_input">Голосове введення</string>
     <!-- Option next to Claude and ChatGPT: the phone's own speech engine. Keep short. -->
     <string name="setup_voice_phone">Телефон</string>
@@ -1294,6 +1304,9 @@
     <!-- Choice: a smaller panel. Keep it short. -->
     <string name="setup_panel_compact">Компактний</string>
     <string name="setup_panel_size_info">«Повний» — від краю до краю. «Компактний» — панель менша й не заходить на краї екрана, тож бічні жести й далі працюють.</string>
+    <string name="setup_action_limit">Дій за завдання</string>
+    <string name="setup_action_limit_none">Без обмежень</string>
+    <string name="setup_action_limit_info">Завдання зупиняється після стількох натискань, введень і прокручувань, щоб завдання, що вийшло з-під контролю, не витратило ваш план. Та сама дія 6 разів поспіль завжди його зупиняє.</string>
     <!-- Explains the "Talk" choice of setup_tap_action. -->
     <string name="setup_tap_to_talk_info">Одне натискання вмикає мікрофон: скажіть, що потрібно, і повідомлення надішлеться, коли ви зробите паузу. Утримуйте бульбашку, щоб відкрити чат та інші дії.</string>
     <string name="setup_read_aloud">Читати відповіді вголос</string>

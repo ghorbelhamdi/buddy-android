@@ -229,6 +229,7 @@
     <string name="menu_resume">Wznów</string>
     <string name="menu_pause">Wstrzymaj</string>
     <string name="menu_add_instruction">Dodaj uwagę</string>
+    <string name="menu_end_live">Zakończ głos na żywo</string>
     <string name="menu_stop_voice">Wycisz głos</string>
     <string name="bubble_talk">Mów</string>
     <string name="menu_open_chat">Otwórz czat</string>
@@ -479,6 +480,7 @@
     <string name="hub_still_working_attachments">Ten czat wciąż pracuje. Wyślij załączniki, gdy skończy.</string>
     <string name="hub_thinking">Myślę…</string>
     <string name="hub_still_waiting">Wciąż czekam na odpowiedź modelu…</string>
+    <string name="hub_still_reading_local">Wciąż czyta… Model na twoim komputerze może potrzebować kilku minut, zwłaszcza na pierwszą odpowiedź.</string>
     <string name="hub_no_answer">Model nie odpowiedział. Może być zajęty: spróbuj ponownie albo wybierz inny model u góry czatu.</string>
     <string name="hub_model_set">Model: %1$s</string>
     <string name="hub_effort_set">Wysiłek: %1$s</string>
@@ -563,6 +565,7 @@
     <string name="steps_run_live">%1$s · kroki do tej pory: %2$d</string>
     <string name="steps_context">kontekst %1$s</string>
     <string name="steps_no_actions">Brak działań na telefonie w tym uruchomieniu.</string>
+    <string name="steps_earlier">Nie pokazano %1$d wcześniejszych kroków.</string>
     <string name="steps_done">gotowe</string>
     <string name="steps_failed">nieudane</string>
     <string name="steps_stopped">zatrzymane</string>
@@ -895,6 +898,13 @@
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Głos</string>
+    <string name="setup_assist">Gdy Buddy jest asystentem telefonu</string>
+    <string name="setup_assist_info">Wybierz Buddy w Ustawieniach Androida → Aplikacje → Aplikacje domyślne → Aplikacja asystenta cyfrowego. Przytrzymanie przycisku zasilania uruchomi wtedy Buddy: Mów wysyła jedną prośbę, Głos na żywo zaczyna rozmowę głosową (wymaga zalogowanego Codex, inaczej Mów).</string>
+    <string name="setup_live_agent">Głos na żywo używa</string>
+    <string name="setup_live_agent_default">Domyślny</string>
+    <string name="setup_live_agent_info">Głos na żywo z przytrzymanej bańki lub przycisku zasilania zaczyna nowy czat z tym agentem. Domyślny to twój domyślny agent (teraz %1$s).</string>
+    <string name="setup_live_continue">Kontynuuj ostatni czat</string>
+    <string name="setup_live_continue_info">Wł.: głos na żywo wraca do twojego ostatniego czatu z tym agentem. Wył.: za każdym razem nowy czat.</string>
     <string name="setup_voice_input">Wprowadzanie głosowe</string>
     <string name="setup_voice_phone">Telefon</string>
     <string name="setup_voice_input_claude">Dyktowanie Claude Code w ramach planu Claude: bardzo dokładne. Obsługuje angielski, francuski, niemiecki, hiszpański, włoski, portugalski, niderlandzki, turecki, rosyjski, japoński i inne języki, ale nie arabski – dla arabskiego Buddy używa rozpoznawania mowy w telefonie. Tekst pojawia się, gdy robisz pauzę.</string>
@@ -962,6 +972,9 @@
     <string name="setup_panel_full">Pełny</string>
     <string name="setup_panel_compact">Kompaktowy</string>
     <string name="setup_panel_size_info">Pełny sięga od krawędzi do krawędzi. Kompaktowy jest mniejszy i nie zachodzi na krawędzie ekranu, więc gesty z boku nadal działają.</string>
+    <string name="setup_action_limit">Działania na zadanie</string>
+    <string name="setup_action_limit_none">Bez limitu</string>
+    <string name="setup_action_limit_info">Zadanie zatrzymuje się po tylu dotknięciach, wpisaniach i przewinięciach, żeby zadanie, które wymknęło się spod kontroli, nie zużyło twojego planu. To samo działanie 6 razy z rzędu zawsze je zatrzymuje.</string>
     <string name="setup_tap_to_talk_info">Jedno kliknięcie włącza mikrofon: powiedz, czego chcesz, a wiadomość wyśle się, gdy zrobisz pauzę. Przytrzymaj dymek, by otworzyć czat i inne opcje.</string>
     <string name="setup_read_aloud">Czytaj odpowiedzi na głos</string>
     <string name="setup_read_aloud_info">Buddy czyta na głos odpowiedzi agentów, używając głosu wybranego w sekcji Głos.</string>

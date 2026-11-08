@@ -119,7 +119,15 @@ final class RadialMenu {
         p.gravity = Gravity.TOP | Gravity.START;
         p.x = originX;
         p.y = originY;
-        wm.addView(win, p);
+        try {
+            wm.addView(win, p);
+        } catch (RuntimeException e) { // the accessibility service restarted meanwhile: its window token is gone
+            win = null;
+            Runnable r = onClosed;
+            onClosed = null;
+            if (r != null) r.run(); // the bubble scales back as after any menu
+            return;
+        }
         glow.start();
     }
 
@@ -162,10 +170,16 @@ final class RadialMenu {
     void peek(int cx, int cy, boolean onRight, List<Action> list) {
         if (win != null) return;
         open(cx, cy, onRight, list, null);
+        if (win == null) return; // couldn't be shown: no hint this time
         final FrameLayout w = win;
         WindowManager.LayoutParams p = (WindowManager.LayoutParams) w.getLayoutParams();
         p.flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
-        wm.updateViewLayout(w, p);
+        try {
+            wm.updateViewLayout(w, p);
+        } catch (RuntimeException e) { // gone meanwhile, as in open()
+            close(false);
+            return;
+        }
         // only half way out, smaller
         for (int i = 0; i < items.size(); i++) {
             View it = items.get(i);

@@ -220,6 +220,7 @@
     <string name="menu_resume">Fortsetzen</string>
     <string name="menu_pause">Pausieren</string>
     <string name="menu_add_instruction">Ergänzen</string>
+    <string name="menu_end_live">Live-Stimme beenden</string>
     <string name="menu_stop_voice">Stimme aus</string>
     <string name="bubble_talk">Sprechen</string>
     <string name="menu_open_chat">Chat öffnen</string>
@@ -464,6 +465,7 @@
     <string name="hub_still_working_attachments">In diesem Chat läuft noch eine Aufgabe. Sende Anhänge, wenn sie fertig ist.</string>
     <string name="hub_thinking">Denkt nach…</string>
     <string name="hub_still_waiting">Wartet noch auf die Antwort des Modells…</string>
+    <string name="hub_still_reading_local">Liest noch… Ein Modell auf deinem eigenen Computer kann ein paar Minuten brauchen, vor allem für die erste Antwort.</string>
     <string name="hub_no_answer">Das Modell hat nicht geantwortet. Vielleicht ist es ausgelastet: Versuche es noch einmal oder wähle oben im Chat ein anderes Modell.</string>
     <string name="hub_model_set">Modell: %1$s</string>
     <string name="hub_effort_set">Aufwand: %1$s</string>
@@ -546,6 +548,7 @@
     <string name="steps_run_live">%1$s · bisher %2$d Schritte</string>
     <string name="steps_context">Kontext %1$s</string>
     <string name="steps_no_actions">Keine Aktionen auf dem Handy in diesem Durchlauf.</string>
+    <string name="steps_earlier">%1$d frühere Schritte nicht angezeigt.</string>
     <string name="steps_done">fertig</string>
     <string name="steps_failed">fehlgeschlagen</string>
     <string name="steps_stopped">gestoppt</string>
@@ -874,6 +877,13 @@
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Stimme</string>
+    <string name="setup_assist">Wenn Buddy der Assistent des Handys ist</string>
+    <string name="setup_assist_info">Wähle Buddy in Androids Einstellungen → Apps → Standard-Apps → App für digitalen Assistenten. Langes Drücken der Ein-/Aus-Taste startet dann Buddy: Sprechen schickt eine Anfrage, Live-Stimme startet ein gesprochenes Gespräch (braucht ein angemeldetes Codex, sonst Sprechen).</string>
+    <string name="setup_live_agent">Live-Stimme nutzt</string>
+    <string name="setup_live_agent_default">Standard</string>
+    <string name="setup_live_agent_info">Live-Stimme über die gehaltene Blase oder die Ein-/Aus-Taste startet einen neuen Chat mit diesem Agenten. Standard ist dein Standard-Agent (gerade %1$s).</string>
+    <string name="setup_live_continue">Letzten Chat fortsetzen</string>
+    <string name="setup_live_continue_info">An: Live-Stimme macht im neuesten Chat mit diesem Agenten weiter. Aus: jedes Mal ein neuer Chat.</string>
     <string name="setup_voice_input">Spracheingabe</string>
     <string name="setup_voice_phone">Gerät</string>
     <string name="setup_voice_input_claude">Die Diktierfunktion von Claude Code über dein Claude-Abo: sehr genau. Unterstützt Englisch, Französisch, Deutsch, Spanisch, Italienisch, Portugiesisch, Niederländisch, Türkisch, Russisch, Japanisch und mehr, aber kein Arabisch: Dafür nutzt Buddy die Spracherkennung des Smartphones. Der Text erscheint, sobald du eine Pause machst.</string>
@@ -937,6 +947,9 @@
     <string name="setup_panel_full">Groß</string>
     <string name="setup_panel_compact">Kompakt</string>
     <string name="setup_panel_size_info">„Groß“ reicht von Rand zu Rand. „Kompakt“ ist kleiner und hält Abstand zu den Bildschirmrändern, damit Wischgesten am Rand weiterhin funktionieren.</string>
+    <string name="setup_action_limit">Aktionen pro Aufgabe</string>
+    <string name="setup_action_limit_none">Ohne Limit</string>
+    <string name="setup_action_limit_info">Eine Aufgabe stoppt nach so vielen Tipp-, Eingabe- und Scrollaktionen, damit eine außer Kontrolle geratene Aufgabe nicht dein Kontingent aufbraucht. Dieselbe Aktion 6-mal hintereinander stoppt sie immer.</string>
     <string name="setup_tap_to_talk_info">Einmal tippen öffnet das Mikrofon: Sag, was du möchtest, und es wird gesendet, sobald du eine Pause machst. Halte die Bubble gedrückt für den Chat und mehr.</string>
     <string name="setup_read_aloud">Antworten vorlesen</string>
     <string name="setup_read_aloud_info">Buddy liest die Antworten der Agenten vor, mit der Stimme, die du unter „Stimme“ auswählst.</string>

@@ -220,10 +220,20 @@ final class Relay {
             return;
         }
         String rest = parts.length == 3 ? "/" + parts[2] : "";
+        // Codex sends MCP tools grouped as "namespace" tools, which only OpenAI's own API knows; other services
+        // drop them and the model never sees the phone tools. Those get them as plain tools, and calls back as Codex
+        // wants them (flat name → namespace + name).
+        Map<String, String[]> flat = null;
+        if (!anthropic && rest.startsWith("/responses") && !isOpenAi(base) && body.length > 0) {
+            flat = new java.util.HashMap<>();
+            byte[] b = flattenTools(body, flat);
+            if (flat.isEmpty()) flat = null;
+            else body = b;
+        }
         HttpURLConnection con = (HttpURLConnection) new URL(trim(base) + rest).openConnection();
         con.setRequestMethod(method);
         con.setConnectTimeout(30_000);
-        con.setReadTimeout(10 * 60_000);
+        con.setReadTimeout((Providers.isLocal(base) ? 15 : 10) * 60_000); // a local model can read for long (ChatHub waits as long)
         con.setInstanceFollowRedirects(false);
         for (Map.Entry<String, String> h : headers.entrySet()) {
             String n = h.getKey();
@@ -264,6 +274,15 @@ final class Relay {
                     out.write("\r\n".getBytes(StandardCharsets.US_ASCII));
                     out.flush();
                 }
+            } else if (in != null && flat != null) {
+                String type = con.getContentType();
+                if (type != null && type.contains("json")) { // not streamed: the whole reply, however it's laid out
+                    byte[] b = unflatten(read(in), flat).getBytes(StandardCharsets.UTF_8);
+                    out.write((Integer.toHexString(b.length) + "\r\n").getBytes(StandardCharsets.US_ASCII));
+                    out.write(b);
+                    out.write("\r\n".getBytes(StandardCharsets.US_ASCII));
+                    out.flush();
+                } else unflattenStream(in, out, flat);
             } else if (in != null) {
                 byte[] buf = new byte[16 * 1024];
                 int n;
@@ -279,6 +298,103 @@ final class Relay {
         }
         out.write("0\r\n\r\n".getBytes(StandardCharsets.US_ASCII));
         out.flush();
+    }
+
+    /** OpenAI's own API, which knows Codex's namespace tools. */
+    static boolean isOpenAi(String base) {
+        String h = Uri.parse(base).getHost();
+        return h != null && (h.equals("api.openai.com") || h.endsWith(".openai.azure.com"));
+    }
+
+    /** A Codex request with its namespace tools (and earlier calls to them) made plain; flat: plain name → {namespace, name}. */
+    static byte[] flattenTools(byte[] body, Map<String, String[]> flat) {
+        try {
+            org.json.JSONObject req = new org.json.JSONObject(new String(body, StandardCharsets.UTF_8));
+            org.json.JSONArray tools = req.optJSONArray("tools");
+            if (tools == null) return body;
+            org.json.JSONArray out = new org.json.JSONArray();
+            for (int i = 0; i < tools.length(); i++) {
+                org.json.JSONObject t = tools.optJSONObject(i);
+                if (t == null || !"namespace".equals(t.optString("type"))) {
+                    out.put(t);
+                    continue;
+                }
+                String ns = t.optString("name");
+                org.json.JSONArray sub = t.optJSONArray("tools");
+                for (int j = 0; sub != null && j < sub.length(); j++) {
+                    org.json.JSONObject f = sub.optJSONObject(j);
+                    if (f == null) continue;
+                    String name = f.optString("name"), plain = plainName(ns, name);
+                    flat.put(plain, new String[]{ns, name});
+                    org.json.JSONObject g = new org.json.JSONObject(f.toString()).put("type", "function").put("name", plain);
+                    g.remove("defer_loading");
+                    out.put(g);
+                }
+            }
+            if (flat.isEmpty()) return body;
+            req.put("tools", out);
+            org.json.JSONArray input = req.optJSONArray("input");
+            for (int i = 0; input != null && i < input.length(); i++) {
+                org.json.JSONObject it = input.optJSONObject(i);
+                if (it != null && it.has("namespace") && it.optString("type").endsWith("_call")) {
+                    it.put("name", plainName(it.optString("namespace"), it.optString("name")));
+                    it.remove("namespace");
+                }
+            }
+            return req.toString().getBytes(StandardCharsets.UTF_8);
+        } catch (org.json.JSONException e) {
+            return body; // not what Codex sends: passed on as it is
+        }
+    }
+
+    /** mcp__phone + open_app → mcp__phone__open_app (Codex's apps already start their names with "_"). */
+    private static String plainName(String ns, String name) {
+        String n = name.startsWith("_") ? ns + name : ns + "__" + name;
+        // OpenAI-style services take names of up to 64 characters
+        return n.length() <= 64 ? n : n.substring(0, 55) + "_" + Integer.toHexString(n.hashCode() & 0xfffffff);
+    }
+
+    /** The reply's events, line by line, with each call to a flattened tool given back its namespace. */
+    private static void unflattenStream(InputStream in, OutputStream out, Map<String, String[]> flat) throws Exception {
+        java.io.BufferedReader r = new java.io.BufferedReader(new java.io.InputStreamReader(in, StandardCharsets.UTF_8));
+        StringBuilder chunk = new StringBuilder();
+        String line;
+        while ((line = r.readLine()) != null) {
+            if (line.startsWith("data:")) line = "data: " + unflatten(line.substring(5).trim(), flat);
+            chunk.append(line).append('\n');
+            if (line.isEmpty() || !r.ready()) { // an event ends: send it on now
+                byte[] b = chunk.toString().getBytes(StandardCharsets.UTF_8);
+                out.write((Integer.toHexString(b.length) + "\r\n").getBytes(StandardCharsets.US_ASCII));
+                out.write(b);
+                out.write("\r\n".getBytes(StandardCharsets.US_ASCII));
+                out.flush();
+                chunk.setLength(0);
+            }
+        }
+    }
+
+    static String unflatten(String json, Map<String, String[]> flat) {
+        if (!json.contains("_call\"") || !json.contains("\"name\"")) return json; // argument deltas carry no name
+        try {
+            org.json.JSONObject o = new org.json.JSONObject(json);
+            boolean[] changed = {false};
+            fix(o.optJSONObject("item"), flat, changed);
+            org.json.JSONObject resp = o.optJSONObject("response");
+            org.json.JSONArray items = resp != null ? resp.optJSONArray("output") : o.optJSONArray("output");
+            for (int i = 0; items != null && i < items.length(); i++) fix(items.optJSONObject(i), flat, changed);
+            return changed[0] ? o.toString() : json;
+        } catch (org.json.JSONException e) {
+            return json;
+        }
+    }
+
+    private static void fix(org.json.JSONObject item, Map<String, String[]> flat, boolean[] changed)
+            throws org.json.JSONException {
+        if (item == null || item.has("namespace")) return;
+        String[] real = flat.get(item.optString("name"));
+        if (real == null) return;
+        item.put("namespace", real[0]).put("name", real[1]);
+        changed[0] = true;
     }
 
     private static void error(OutputStream out, int code, String message) throws Exception {

@@ -365,6 +365,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         if (ses == null || isFinishing()) return;
         hub.addListener(this);
         resumed = true;
+        Providers.refresh(this); // fresh model lists before the picker opens (a local server's every time)
         Browser.addListener(this);
         Waiting.listener = waitingChanged;
         hub.setViewing(ses, true);
@@ -484,14 +485,18 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
 
     /** Pick this chat's model; the conversation continues with the new one. */
     private void chooseModel() {
-        Models.refresh(this);
+        final Dialog[] d = new Dialog[1];
+        Models.refresh(this, () -> { // a service's list changed meanwhile (a model just pulled in Ollama): show it
+            if (d[0] == null || !d[0].isShowing() || isFinishing()) return;
+            d[0].dismiss();
+            chooseModel();
+        });
         LinearLayout c = column(this);
         TextView h = title(this, getString(R.string.chat_model_title, ses.brainName()), 18);
         c.addView(h);
         TextView sub = text(this, getString(R.string.chat_model_subtitle), 13, MUTED);
         sub.setPaddingRelative(0, dp(this, 2), 0, dp(this, 10));
         c.addView(sub);
-        final Dialog[] d = new Dialog[1];
         int ctx = Models.contextPercent(ses);
         if (ctx >= 0) { // how full the conversation is; Claude Code can also compact it on request
             c.addView(sectionLabel(this, getString(R.string.chat_context)));

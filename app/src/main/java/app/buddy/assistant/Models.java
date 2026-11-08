@@ -44,7 +44,12 @@ final class Models {
     /** Re-reads the agents' model lists (new free OpenCode models appear often) when the picker opens, at most every
      *  10 minutes; the helper's answer updates the lists. The API key services' lists too. */
     static void refresh(android.content.Context c) {
-        Providers.refresh(c);
+        refresh(c, null);
+    }
+
+    /** changed: an API key service's list came back different (see Providers.refresh). */
+    static void refresh(android.content.Context c, Runnable changed) {
+        Providers.refresh(c, changed);
         long now = System.currentTimeMillis();
         if (now - refreshedAt < 600_000 || !Linux.installed(c)) return;
         refreshedAt = now;

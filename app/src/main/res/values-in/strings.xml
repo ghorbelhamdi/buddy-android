@@ -295,6 +295,7 @@
     <string name="menu_pause">Jeda</string>
     <!-- Dictate an extra instruction for the agent while it works. -->
     <string name="menu_add_instruction">Beri arahan</string>
+    <string name="menu_end_live">Akhiri suara langsung</string>
     <!-- Stops Buddy reading a reply aloud. -->
     <string name="menu_stop_voice">Bisukan</string>
     <!-- Verb: starts voice input to the agent. A hold-menu label (keep under ~12 characters) and the chat panel's
@@ -624,6 +625,7 @@
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">Berpikir…</string>
     <string name="hub_still_waiting">Masih menunggu jawaban model…</string>
+    <string name="hub_still_reading_local">Masih membaca… Model di komputermu sendiri bisa butuh beberapa menit, terutama untuk jawaban pertama.</string>
     <!-- "the top of the chat" = the model chip under the chat title. -->
     <string name="hub_no_answer">Model tidak menjawab. Mungkin sedang sibuk: coba lagi, atau pilih model lain di bagian atas chat.</string>
     <!-- After picking a model for the chat. %1$s = model name. -->
@@ -729,6 +731,7 @@
     <string name="steps_run_live">%1$s · %2$d langkah sejauh ini</string>
     <string name="steps_context">konteks %1$s</string>
     <string name="steps_no_actions">Tidak ada tindakan di ponsel dalam eksekusi ini.</string>
+    <string name="steps_earlier">%1$d langkah sebelumnya tidak ditampilkan.</string>
     <string name="steps_done">selesai</string>
     <string name="steps_failed">gagal</string>
     <string name="steps_stopped">dihentikan</string>
@@ -1178,6 +1181,13 @@
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Suara</string>
+    <string name="setup_assist">Saat Buddy jadi asisten ponsel</string>
+    <string name="setup_assist_info">Pilih Buddy di Setelan Android → Aplikasi → Aplikasi default → Aplikasi asisten digital. Menekan lama tombol daya lalu memulai Buddy: Bicara mengirim satu permintaan, Suara langsung memulai percakapan lisan (perlu Codex masuk; jika tidak, jadi Bicara).</string>
+    <string name="setup_live_agent">Suara langsung memakai</string>
+    <string name="setup_live_agent_default">Default</string>
+    <string name="setup_live_agent_info">Suara langsung dari menahan gelembung atau tombol daya memulai chat baru dengan agen ini. Default adalah agen default-mu (sekarang %1$s).</string>
+    <string name="setup_live_continue">Lanjutkan chat terakhir</string>
+    <string name="setup_live_continue_info">Aktif: suara langsung melanjutkan chat terbarumu dengan agen itu. Nonaktif: chat baru setiap kali.</string>
     <string name="setup_voice_input">Input suara</string>
     <!-- Option next to Claude and ChatGPT: the phone's own speech engine. Keep short. -->
     <string name="setup_voice_phone">Ponsel</string>
@@ -1261,6 +1271,9 @@
     <!-- Choice: a smaller panel. Keep it short. -->
     <string name="setup_panel_compact">Ringkas</string>
     <string name="setup_panel_size_info">Layar penuh membentang dari tepi ke tepi. Ringkas lebih kecil dan tidak menutupi tepi layar, sehingga gestur samping tetap berfungsi.</string>
+    <string name="setup_action_limit">Tindakan per tugas</string>
+    <string name="setup_action_limit_none">Tanpa batas</string>
+    <string name="setup_action_limit_info">Tugas berhenti setelah sekian ketukan, ketikan, dan guliran, agar tugas yang lepas kendali tidak menghabiskan paketmu. Tindakan yang sama 6 kali berturut-turut selalu menghentikannya.</string>
     <!-- Explains the "Talk" choice of setup_tap_action. -->
     <string name="setup_tap_to_talk_info">Satu ketukan membuka mikrofon: ucapkan keinginan Anda dan pesan terkirim saat Anda berhenti sejenak. Tekan lama balon untuk membuka chat dan lainnya.</string>
     <string name="setup_read_aloud">Bacakan balasan</string>

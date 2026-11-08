@@ -300,6 +300,7 @@
     <string name="menu_pause">Tạm dừng</string>
     <!-- Dictate an extra instruction for the agent while it works. -->
     <string name="menu_add_instruction">Thêm lời dặn</string>
+    <string name="menu_end_live">Kết thúc giọng nói trực tiếp</string>
     <!-- Stops Buddy reading a reply aloud. -->
     <string name="menu_stop_voice">Tắt giọng</string>
     <!-- Verb: starts voice input to the agent. A hold-menu label (keep under ~12 characters) and the chat panel's
@@ -674,6 +675,7 @@
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">Đang suy nghĩ…</string>
     <string name="hub_still_waiting">Vẫn đang chờ mô hình trả lời…</string>
+    <string name="hub_still_reading_local">Vẫn đang đọc… Mô hình chạy trên máy tính của bạn có thể mất vài phút, nhất là cho câu trả lời đầu tiên.</string>
     <!-- "the top of the chat" = the model chip under the chat title. -->
     <string name="hub_no_answer">Mô hình không trả lời. Có thể nó đang bận: hãy thử lại, hoặc chọn mô hình khác ở đầu cuộc trò chuyện.</string>
     <!-- After picking a model for the chat. %1$s = model name. -->
@@ -779,6 +781,7 @@
     <string name="steps_run_live">%1$s · %2$d bước đến giờ</string>
     <string name="steps_context">ngữ cảnh %1$s</string>
     <string name="steps_no_actions">Lần chạy này không có thao tác nào trên điện thoại.</string>
+    <string name="steps_earlier">Không hiển thị %1$d bước trước đó.</string>
     <string name="steps_done">xong</string>
     <string name="steps_failed">thất bại</string>
     <string name="steps_stopped">đã dừng</string>
@@ -1241,6 +1244,13 @@
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Giọng nói</string>
+    <string name="setup_assist">Khi Buddy là trợ lý của điện thoại</string>
+    <string name="setup_assist_info">Chọn Buddy trong Cài đặt Android → Ứng dụng → Ứng dụng mặc định → Ứng dụng trợ lý kỹ thuật số. Nhấn giữ nút nguồn sẽ mở Buddy: Nói gửi một yêu cầu, Giọng nói trực tiếp bắt đầu cuộc trò chuyện bằng giọng (cần đăng nhập Codex; nếu không thì là Nói).</string>
+    <string name="setup_live_agent">Giọng nói trực tiếp dùng</string>
+    <string name="setup_live_agent_default">Mặc định</string>
+    <string name="setup_live_agent_info">Giọng nói trực tiếp khi giữ bong bóng hoặc nút nguồn sẽ mở cuộc trò chuyện mới với tác tử này. Mặc định là tác tử mặc định của bạn (hiện là %1$s).</string>
+    <string name="setup_live_continue">Tiếp tục cuộc trò chuyện gần nhất</string>
+    <string name="setup_live_continue_info">Bật: giọng nói trực tiếp tiếp tục cuộc trò chuyện mới nhất với tác tử đó. Tắt: mỗi lần một cuộc trò chuyện mới.</string>
     <string name="setup_voice_input">Nhập bằng giọng nói</string>
     <!-- Option next to Claude and ChatGPT: the phone's own speech engine. Keep short. -->
     <string name="setup_voice_phone">Điện thoại</string>
@@ -1329,6 +1339,9 @@
     <!-- Choice: a smaller panel. Keep it short. -->
     <string name="setup_panel_compact">Gọn</string>
     <string name="setup_panel_size_info">Đầy đủ trải từ mép này sang mép kia. Gọn thì nhỏ hơn và chừa các mép màn hình, nên cử chỉ vuốt cạnh vẫn hoạt động.</string>
+    <string name="setup_action_limit">Số thao tác mỗi việc</string>
+    <string name="setup_action_limit_none">Không giới hạn</string>
+    <string name="setup_action_limit_info">Một việc sẽ dừng sau chừng này lần chạm, nhập và cuộn, để việc chạy mất kiểm soát không dùng hết gói của bạn. Cùng một thao tác 6 lần liền luôn khiến nó dừng.</string>
     <!-- Explains the "Talk" choice of setup_tap_action. -->
     <string name="setup_tap_to_talk_info">Nhấn một lần là mở micrô: nói điều bạn muốn và tin nhắn sẽ được gửi khi bạn ngừng nói. Giữ bong bóng để mở trò chuyện và hơn nữa.</string>
     <string name="setup_read_aloud">Đọc to câu trả lời</string>

@@ -295,6 +295,7 @@
     <string name="menu_pause">暂停</string>
     <!-- Dictate an extra instruction for the agent while it works. -->
     <string name="menu_add_instruction">补充指令</string>
+    <string name="menu_end_live">结束实时语音</string>
     <!-- Stops Buddy reading a reply aloud. -->
     <string name="menu_stop_voice">停止朗读</string>
     <!-- Verb: starts voice input to the agent. A hold-menu label (keep under ~12 characters) and the chat panel's
@@ -624,6 +625,7 @@
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">正在思考…</string>
     <string name="hub_still_waiting">仍在等待模型回复…</string>
+    <string name="hub_still_reading_local">仍在读取… 在你自己电脑上运行的模型可能需要几分钟，尤其是第一次回答。</string>
     <!-- "the top of the chat" = the model chip under the chat title. -->
     <string name="hub_no_answer">模型没有回复，可能正忙。请重试，或在对话顶部选择其他模型。</string>
     <!-- After picking a model for the chat. %1$s = model name. -->
@@ -729,6 +731,7 @@
     <string name="steps_run_live">%1$s · 目前 %2$d 步</string>
     <string name="steps_context">上下文 %1$s</string>
     <string name="steps_no_actions">这次运行没有在手机上执行操作。</string>
+    <string name="steps_earlier">未显示之前的 %1$d 个步骤。</string>
     <string name="steps_done">已完成</string>
     <string name="steps_failed">失败</string>
     <string name="steps_stopped">已停止</string>
@@ -1178,6 +1181,13 @@
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">语音</string>
+    <string name="setup_assist">当 Buddy 是手机的助理时</string>
+    <string name="setup_assist_info">在 Android 设置 → 应用 → 默认应用 → 数字助理应用中选择 Buddy。之后长按电源键会启动 Buddy：“说话”发送一个请求，“实时语音”开始语音对话（需要登录 Codex，否则就是“说话”）。</string>
+    <string name="setup_live_agent">实时语音使用</string>
+    <string name="setup_live_agent_default">默认</string>
+    <string name="setup_live_agent_info">长按气泡或电源键开始的实时语音会用这个代理开启新对话。默认即你的默认代理（当前为 %1$s）。</string>
+    <string name="setup_live_continue">继续上一个对话</string>
+    <string name="setup_live_continue_info">开启：实时语音继续你与该代理的最近一个对话。关闭：每次新建对话。</string>
     <string name="setup_voice_input">语音输入</string>
     <!-- Option next to Claude and ChatGPT: the phone's own speech engine. Keep short. -->
     <string name="setup_voice_phone">手机</string>
@@ -1261,6 +1271,9 @@
     <!-- Choice: a smaller panel. Keep it short. -->
     <string name="setup_panel_compact">紧凑</string>
     <string name="setup_panel_size_info">“全屏”会铺满整个屏幕。“紧凑”更小，并会避开屏幕边缘，因此侧边手势仍可正常使用。</string>
+    <string name="setup_action_limit">每个任务的手机操作数</string>
+    <string name="setup_action_limit_none">不限</string>
+    <string name="setup_action_limit_info">任务在这么多次点按、输入和滚动后停止，以免失控的任务耗尽你的套餐额度。连续 6 次相同操作总会让它停止。</string>
     <!-- Explains the "Talk" choice of setup_tap_action. -->
     <string name="setup_tap_to_talk_info">点按一下即可打开麦克风：说出你的需求，停顿时就会发送。长按气泡可打开对话及更多操作。</string>
     <string name="setup_read_aloud">朗读回复</string>

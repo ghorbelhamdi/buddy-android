@@ -114,6 +114,11 @@ final class CodexLive {
         return ses != null;
     }
 
+    /** The chat the call is in, or null. */
+    static Sessions.Session session() {
+        return ses;
+    }
+
     static boolean on(Sessions.Session s) {
         return s != null && s == ses;
     }

@@ -926,6 +926,8 @@ final class Bubble implements ChatHub.Listener {
 
     void expand() {
         if (expanded) return;
+        Sessions.Session call = CodexLive.session(); // during a live call the bubble opens its chat (unless a chat
+        if (call != null && call != sessions.current && pendingConfirm == null) hub.select(call); // asks for an OK)
         expanded = true;
         svc.marks().setPanelOpen(true);
         root.setVisibility(View.VISIBLE);
@@ -1442,7 +1444,10 @@ final class Bubble implements ChatHub.Listener {
         if (hub.runningCount() > 0) acts.add(new RadialMenu.Action(R.drawable.ms_mic, svc.getString(R.string.menu_add_instruction), false, this::dictateNote));
         if (Voice.isSpeaking()) acts.add(new RadialMenu.Action(R.drawable.ms_volume_off, svc.getString(R.string.menu_stop_voice), false, Voice::stopSpeaking));
         // listens with the chat closed, like Tap the bubble to talk (opening the chat first lost the mic)
-        if (hub.runningCount() == 0) acts.add(new RadialMenu.Action(R.drawable.ms_mic, svc.getString(R.string.bubble_talk), false, this::talk));
+        if (hub.runningCount() == 0 && !CodexLive.on()) acts.add(new RadialMenu.Action(R.drawable.ms_mic, svc.getString(R.string.bubble_talk), false, this::talk));
+        // the spoken conversation (CodexLive) next to Talk's one request; ended from here too
+        if (CodexLive.on()) acts.add(new RadialMenu.Action(R.drawable.ms_graphic_eq, svc.getString(R.string.menu_end_live), true, () -> CodexLive.end(null)));
+        else if (hub.runningCount() == 0 && liveReady()) acts.add(new RadialMenu.Action(R.drawable.ms_graphic_eq, svc.getString(R.string.live_option), false, this::goLive));
         acts.add(new RadialMenu.Action(R.drawable.ms_forum, svc.getString(R.string.menu_open_chat), false, this::expand));
         acts.add(new RadialMenu.Action(R.drawable.ms_close, svc.getString(R.string.menu_hide), false, this::dismissToNotification));
         int[] loc = new int[2];
@@ -1506,6 +1511,44 @@ final class Bubble implements ChatHub.Listener {
 
     private boolean talkListening;
     private VoiceWaves waves;
+
+    /** Buddy as the phone's assistant (AssistActivity): listen now, or show what's waiting or running. */
+    void assist() {
+        if (pendingConfirm != null || hub.runningCount() > 0 || CodexLive.on()) expand();
+        else if ("live".equals(Prefs.assistMode(svc)) && liveReady()) goLive();
+        else if (expanded || root.getVisibility() != View.VISIBLE) { // panel open, or hidden (dragged onto ✕):
+            expand();                                                  // the chat's own mic listens
+            if (!Voice.listening()) toggleMic();
+        } else if (!talkListening) talk();
+    }
+
+    /** Live voice can start: it goes through Codex, which must be signed in (see CodexLive.available). */
+    private boolean liveReady() {
+        return SetupState.planSignedIn(svc, "codex");
+    }
+
+    /**
+     * Live voice from the hold menu or the assistant, with its agent (Settings → Voice → Live voice uses), not
+     * whichever chat was last open (maybe another agent, or a slow local model): its latest chat when the user chose
+     * to continue, otherwise a new one. Its bar shows.
+     */
+    private void goLive() {
+        String agent = Prefs.liveAgent(svc);
+        if (agent.isEmpty()) agent = Prefs.backend(svc);
+        Sessions.Session last = null;
+        if (Prefs.liveContinue(svc)) {
+            for (Sessions.Session s : new java.util.ArrayList<>(sessions.all)) { // most recent first
+                if (s.backend.equals(agent) && !s.archived && !s.incognito && !s.running && !s.title.startsWith("⚡ ")) {
+                    last = s; // not a notification rule's chat (⚡), nor one at work
+                    break;
+                }
+            }
+        }
+        if (last != null) hub.select(last);
+        else hub.create(agent); // and selected
+        expand();
+        startLive();
+    }
 
     /** Listen without opening the chat: waves under the bubble, the words beside it, sent when you pause. */
     private void talk() {
@@ -1761,7 +1804,9 @@ final class Bubble implements ChatHub.Listener {
         TextView ml = Ui.sectionLabel(svc, svc.getString(R.string.bubble_model));
         ml.setPaddingRelative(dp(8), dp(16), 0, dp(4));
         sessionList.addView(ml);
-        Models.refresh(svc);
+        Models.refresh(svc, () -> { // a service's list changed meanwhile: the picker again, with it
+            if (pickingModel) renderSessionList();
+        });
         for (final String[] o : Models.options(ses.backend, true)) {
             if (o[0] == null) { // an API key service's models
                 TextView sl = Ui.sectionLabel(svc, o[1]);
@@ -3245,7 +3290,7 @@ final class Bubble implements ChatHub.Listener {
                         // the chat in the app, or the panel; a waiting card always opens the panel
                         String action = Prefs.tapAction(svc);
                         if (pendingConfirm != null) expand();
-                        else if ("talk".equals(action) && hub.runningCount() == 0) talk();
+                        else if ("talk".equals(action) && hub.runningCount() == 0 && !CodexLive.on()) talk();
                         else if ("app".equals(action)) openInApp(false);
                         else expand();
                     }

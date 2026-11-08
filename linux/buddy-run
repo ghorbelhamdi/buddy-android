@@ -14,7 +14,7 @@
 #   buddy-run <token> transcript <claude|codex> <file>   last messages of a session (buddy_transcript)
 #   buddy-run <token> adopt <session> <claude|codex> <agent-session-id>  continue that session as a Buddy chat
 # Every event sent to the bubble carries "buddy_session" so the app can route it.
-HELPER_VERSION=25
+HELPER_VERSION=26
 set -u
 export PATH=$HOME/.local/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # The claude launcher sets BUN_OPTIONS with a path relative to its folder; never inherit a stale one.
@@ -386,8 +386,15 @@ run_codex() {
   # an API key service: through the relay, over plain requests (no WebSocket, which other services refuse), with the
   # real context size
   if [ -n "$SVC" ]; then
+    # another service than OpenAI's own: none of the ChatGPT plan's extras (apps, sub-agents, goals), which its
+    # models weren't made for, and whose ~200 KB of tool descriptions swamp a local model
+    [ "$(jq -r '.openai_own // false' "$D/providers/$SVC.json" 2>/dev/null)" = true ] \
+      || cfg+=(-c features.apps=false -c features.multi_agent=false -c features.goals=false -c features.tool_suggest=false)
+    # a model on the user's own computer can read for many minutes before its first word: 15, as Buddy waits
+    local idle=""
+    [ "$(jq -r '.local // false' "$D/providers/$SVC.json" 2>/dev/null)" = true ] && idle=',stream_idle_timeout_ms=900000'
     cfg+=(-c 'model_provider="buddy-key"'
-      -c 'model_providers.buddy-key={name="API key",base_url="'"$URL/llm/$SVC/o"'",wire_api="responses",env_key="BUDDY_TOKEN",supports_websockets=false}')
+      -c 'model_providers.buddy-key={name="API key",base_url="'"$URL/llm/$SVC/o"'",wire_api="responses",env_key="BUDDY_TOKEN",supports_websockets=false'"$idle"'}')
     local win
     win=$(svc_window)
     [ -n "$win" ] && cfg+=(-c "model_context_window=$win")
@@ -473,7 +480,8 @@ phone_long_press, phone_type_text, phone_scroll, phone_swipe, phone_press, phone
 phone_screenshot, phone_wait, phone_confirm, phone_ask, phone_notify, phone_reply_notification, phone_schedule_message, phone_list_scheduled, phone_cancel_scheduled, phone_update_buddy, phone_install_apk and phone_wait_for_install\
 $([ "$BROWSER" = 1 ] && printf '%s' ", and for the background browser phone_browser_open, phone_browser_read, phone_browser_click, \
 phone_browser_type, phone_browser_scroll, phone_browser_screenshot, phone_browser_back and phone_browser_tabs"). Always call them by \
-these exact names; they are available in every message of this chat." > "$S/system.md"
+these exact names. Right at the start of a chat they can still be connecting: if one answers that there is no such \
+tool, it's not missing, call it again in your next step." > "$S/system.md"
   local cfg v2=0
   oc2 && v2=1
   # OpenCode 2 ignores instructions given through OPENCODE_CONFIG_CONTENT (the model never saw this prompt),
@@ -496,8 +504,9 @@ these exact names; they are available in every message of this chat." > "$S/syst
   # an API key service: a provider of its own, pointed at the relay (OpenAI-style when it has that address)
   if [ -n "$SVC" ]; then
     cfg=$(jq -c --argjson c "$cfg" --arg url "$URL/llm/$SVC" --arg t "$TOKEN" --arg id "buddy-$SVC" '
-      (if .openai != "" then {npm:"@ai-sdk/openai-compatible", options:{baseURL:($url + "/o"), apiKey:$t}}
-       else {npm:"@ai-sdk/anthropic", options:{baseURL:($url + "/a/v1"), apiKey:$t}} end) as $p
+      (if .local == true then {timeout:900000} else {} end) as $wait   # a local model: 15 minutes, as Buddy waits
+      | (if .openai != "" then {npm:"@ai-sdk/openai-compatible", options:({baseURL:($url + "/o"), apiKey:$t} + $wait)}
+       else {npm:"@ai-sdk/anthropic", options:({baseURL:($url + "/a/v1"), apiKey:$t} + $wait)} end) as $p
       | $c + {provider:{($id):($p + {name:.name, models:(.models | with_entries(.value = ({name:.value.name}
           + (if .value.window > 0 then {limit:{context:.value.window, output:([.value.window / 4, 32000] | min | floor)}}
              else {} end))))})}}' "$D/providers/$SVC.json") || return 1

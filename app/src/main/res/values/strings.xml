@@ -304,6 +304,7 @@
     <string name="menu_pause">Pause</string>
     <!-- Dictate an extra instruction for the agent while it works. -->
     <string name="menu_add_instruction">Add instruction</string>
+    <string name="menu_end_live">End live voice</string>
     <!-- Stops Buddy reading a reply aloud. -->
     <string name="menu_stop_voice">Stop voice</string>
     <!-- Verb: starts voice input to the agent. A hold-menu label (keep under ~12 characters) and the chat panel's
@@ -681,6 +682,7 @@
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">Thinking…</string>
     <string name="hub_still_waiting">Still waiting for the model to answer…</string>
+    <string name="hub_still_reading_local">Still reading… A model on your own computer can take a few minutes, mostly for the first answer.</string>
     <!-- "the top of the chat" = the model chip under the chat title. -->
     <string name="hub_no_answer">The model didn\'t answer. It may be busy: try again, or pick another model at the top of the chat.</string>
     <!-- After picking a model for the chat. %1$s = model name. -->
@@ -787,6 +789,7 @@
     <string name="steps_run_live">%1$s · %2$d steps so far</string>
     <string name="steps_context">context %1$s</string>
     <string name="steps_no_actions">No phone actions in this run.</string>
+    <string name="steps_earlier">%1$d earlier steps not shown.</string>
     <string name="steps_done">done</string>
     <string name="steps_failed">failed</string>
     <string name="steps_stopped">stopped</string>
@@ -1251,6 +1254,13 @@
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Voice</string>
+    <string name="setup_assist">When Buddy is the phone\'s assistant</string>
+    <string name="setup_assist_info">Pick Buddy in Android\'s Settings → Apps → Default apps → Digital assistant app. Long-pressing the power button then starts Buddy: Talk sends one request, Live voice starts a spoken conversation (it needs Codex signed in; otherwise it\'s Talk).</string>
+    <string name="setup_live_agent">Live voice uses</string>
+    <string name="setup_live_agent_default">Default</string>
+    <string name="setup_live_agent_info">Live voice from holding the bubble or the power button starts a new chat with this agent. Default is your default agent (now %1$s).</string>
+    <string name="setup_live_continue">Continue the last chat</string>
+    <string name="setup_live_continue_info">On: live voice picks up your latest chat with that agent. Off: a new chat each time.</string>
     <string name="setup_voice_input">Voice input</string>
     <!-- Option next to Claude and ChatGPT: the phone's own speech engine. Keep short. -->
     <string name="setup_voice_phone">Phone</string>
@@ -1341,6 +1351,9 @@
     <!-- Choice: a smaller panel. Keep it short. -->
     <string name="setup_panel_compact">Compact</string>
     <string name="setup_panel_size_info">Full goes edge to edge. Compact is smaller and keeps clear of the screen edges, so side gestures keep working.</string>
+    <string name="setup_action_limit">Phone actions per task</string>
+    <string name="setup_action_limit_none">No limit</string>
+    <string name="setup_action_limit_info">A task stops after this many taps, typing and scrolls, so a runaway task can\'t use up your plan. The same action 6 times in a row always stops it.</string>
     <!-- Explains the "Talk" choice of setup_tap_action. -->
     <string name="setup_tap_to_talk_info">One tap opens the mic: say what you want and it sends when you pause. Hold the bubble for the chat and more.</string>
     <string name="setup_read_aloud">Read replies aloud</string>

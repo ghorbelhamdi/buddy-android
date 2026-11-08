@@ -89,6 +89,7 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         if (isFinishing()) return;
         hub.addListener(this);
         Waiting.listener = waitingChanged;
+        Providers.refresh(this); // fresh model lists before a picker opens (a local server's every time)
         render();
         Account.addListener(this);
         Account.CLAUDE.refresh(this);

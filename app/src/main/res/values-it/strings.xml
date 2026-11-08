@@ -298,6 +298,7 @@
     <string name="menu_pause">Pausa</string>
     <!-- Dictate an extra instruction for the agent while it works. -->
     <string name="menu_add_instruction">Istruzione</string>
+    <string name="menu_end_live">Termina voce dal vivo</string>
     <!-- Stops Buddy reading a reply aloud. -->
     <string name="menu_stop_voice">Ferma voce</string>
     <!-- Verb: starts voice input to the agent. A hold-menu label (keep under ~12 characters) and the chat panel's
@@ -630,6 +631,7 @@
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">Sta pensando…</string>
     <string name="hub_still_waiting">Ancora in attesa della risposta del modello…</string>
+    <string name="hub_still_reading_local">Sta ancora leggendo… Un modello sul tuo computer può impiegare qualche minuto, soprattutto per la prima risposta.</string>
     <!-- "the top of the chat" = the model chip under the chat title. -->
     <string name="hub_no_answer">Il modello non ha risposto. Potrebbe essere occupato: riprova o scegli un altro modello in cima alla chat.</string>
     <!-- After picking a model for the chat. %1$s = model name. -->
@@ -736,6 +738,7 @@
     <string name="steps_run_live">%1$s · %2$d passi finora</string>
     <string name="steps_context">contesto %1$s</string>
     <string name="steps_no_actions">Nessuna azione sul telefono in questa esecuzione.</string>
+    <string name="steps_earlier">%1$d passaggi precedenti non mostrati.</string>
     <string name="steps_done">completata</string>
     <string name="steps_failed">non riuscita</string>
     <string name="steps_stopped">interrotta</string>
@@ -1187,6 +1190,13 @@
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Voce</string>
+    <string name="setup_assist">Quando Buddy è l’assistente del telefono</string>
+    <string name="setup_assist_info">Scegli Buddy in Impostazioni di Android → App → App predefinite → App assistente digitale. Tenendo premuto il tasto di accensione si avvia Buddy: Parla invia una richiesta, Voce dal vivo avvia una conversazione parlata (serve Codex con accesso, altrimenti è Parla).</string>
+    <string name="setup_live_agent">La voce dal vivo usa</string>
+    <string name="setup_live_agent_default">Predefinito</string>
+    <string name="setup_live_agent_info">La voce dal vivo avviata tenendo premuta la bolla o il tasto di accensione apre una nuova chat con questo agente. Predefinito è il tuo agente predefinito (ora %1$s).</string>
+    <string name="setup_live_continue">Continua l’ultima chat</string>
+    <string name="setup_live_continue_info">Attivo: la voce dal vivo riprende la tua ultima chat con quell’agente. Disattivo: una chat nuova ogni volta.</string>
     <string name="setup_voice_input">Input vocale</string>
     <!-- Option next to Claude and ChatGPT: the phone's own speech engine. Keep short. -->
     <string name="setup_voice_phone">Telefono</string>
@@ -1263,6 +1273,9 @@
     <string name="setup_panel_full">Grande</string>
     <string name="setup_panel_compact">Compatto</string>
     <string name="setup_panel_size_info">Grande occupa lo schermo da bordo a bordo. Compatto è più piccolo e lascia liberi i bordi dello schermo, così i gesti laterali continuano a funzionare.</string>
+    <string name="setup_action_limit">Azioni per attività</string>
+    <string name="setup_action_limit_none">Nessun limite</string>
+    <string name="setup_action_limit_info">Un’attività si ferma dopo questo numero di tocchi, digitazioni e scorrimenti, perché un’attività fuori controllo non consumi il tuo piano. La stessa azione 6 volte di fila la ferma sempre.</string>
     <string name="setup_tap_to_talk_info">Un tocco apre il microfono: di\' cosa vuoi e il messaggio parte quando fai una pausa. Tieni premuta la bolla per la chat e altro.</string>
     <string name="setup_read_aloud">Leggi le risposte ad alta voce</string>
     <string name="setup_read_aloud_info">Buddy legge ad alta voce le risposte degli agenti, con la voce che scegli nella sezione Voce.</string>

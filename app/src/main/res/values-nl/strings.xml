@@ -220,6 +220,7 @@
     <string name="menu_resume">Hervatten</string>
     <string name="menu_pause">Pauzeren</string>
     <string name="menu_add_instruction">Aanvullen</string>
+    <string name="menu_end_live">Live stem beëindigen</string>
     <string name="menu_stop_voice">Stem uit</string>
     <string name="bubble_talk">Spreken</string>
     <string name="menu_open_chat">Chat openen</string>
@@ -464,6 +465,7 @@
     <string name="hub_still_working_attachments">Deze chat is nog bezig. Stuur bijlagen als hij klaar is.</string>
     <string name="hub_thinking">Denkt na…</string>
     <string name="hub_still_waiting">Wacht nog op antwoord van het model…</string>
+    <string name="hub_still_reading_local">Nog aan het lezen… Een model op je eigen computer kan een paar minuten nodig hebben, vooral voor het eerste antwoord.</string>
     <string name="hub_no_answer">Het model heeft niet geantwoord. Misschien is het overbelast: probeer het opnieuw of kies bovenaan de chat een ander model.</string>
     <string name="hub_model_set">Model: %1$s</string>
     <string name="hub_effort_set">Inspanning: %1$s</string>
@@ -546,6 +548,7 @@
     <string name="steps_run_live">%1$s · tot nu toe %2$d stappen</string>
     <string name="steps_context">context %1$s</string>
     <string name="steps_no_actions">Geen acties op de telefoon in deze uitvoering.</string>
+    <string name="steps_earlier">%1$d eerdere stappen niet getoond.</string>
     <string name="steps_done">klaar</string>
     <string name="steps_failed">mislukt</string>
     <string name="steps_stopped">gestopt</string>
@@ -874,6 +877,13 @@
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Spraak</string>
+    <string name="setup_assist">Als Buddy de assistent van je telefoon is</string>
+    <string name="setup_assist_info">Kies Buddy in Androids Instellingen → Apps → Standaard-apps → App voor digitale assistent. Lang op de aan/uit-knop drukken start dan Buddy: Spreken stuurt één verzoek, Live stem start een gesproken gesprek (Codex moet ingelogd zijn, anders is het Spreken).</string>
+    <string name="setup_live_agent">Live stem gebruikt</string>
+    <string name="setup_live_agent_default">Standaard</string>
+    <string name="setup_live_agent_info">Live stem via de vastgehouden bubbel of de aan/uit-knop start een nieuwe chat met deze agent. Standaard is je standaardagent (nu %1$s).</string>
+    <string name="setup_live_continue">Laatste chat voortzetten</string>
+    <string name="setup_live_continue_info">Aan: live stem gaat verder in je laatste chat met die agent. Uit: elke keer een nieuwe chat.</string>
     <string name="setup_voice_input">Spraakinvoer</string>
     <string name="setup_voice_phone">Telefoon</string>
     <string name="setup_voice_input_claude">De dicteerfunctie van Claude Code via je Claude-abonnement: zeer nauwkeurig. Ondersteunt Engels, Frans, Duits, Spaans, Italiaans, Portugees, Nederlands, Turks, Russisch, Japans en meer, maar geen Arabisch: daarvoor gebruikt Buddy de spraakherkenning van de telefoon. De woorden verschijnen als je even pauzeert.</string>
@@ -937,6 +947,9 @@
     <string name="setup_panel_full">Volledig</string>
     <string name="setup_panel_compact">Compact</string>
     <string name="setup_panel_size_info">Volledig loopt van rand tot rand. Compact is kleiner en blijft uit de buurt van de schermranden, zodat veeggebaren vanaf de zijkant blijven werken.</string>
+    <string name="setup_action_limit">Acties per taak</string>
+    <string name="setup_action_limit_none">Geen limiet</string>
+    <string name="setup_action_limit_info">Een taak stopt na zoveel tikken, typen en scrollen, zodat een op hol geslagen taak je abonnement niet opmaakt. Dezelfde actie 6 keer achter elkaar stopt hem altijd.</string>
     <string name="setup_tap_to_talk_info">Eén tik opent de microfoon: zeg wat je wilt en het wordt verzonden zodra je pauzeert. Houd de bubbel ingedrukt voor de chat en meer.</string>
     <string name="setup_read_aloud">Antwoorden voorlezen</string>
     <string name="setup_read_aloud_info">Buddy leest de antwoorden van de agents voor, met de stem die je kiest onder Spraak.</string>

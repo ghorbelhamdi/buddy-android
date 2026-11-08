@@ -73,6 +73,21 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
+        <!-- Buddy as the digital assistant app (long-press power, corner swipe): starts listening, no wake word.
+             A task of its own: in Buddy's, the system would bring Buddy's main screen to the front with it. -->
+        <activity
+            android:name=".AssistActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.NoDisplay">
+            <intent-filter>
+                <action android:name="android.intent.action.ASSIST" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <!-- "Share to Buddy": photos, files, links and text from any app, into a new or recent chat -->
         <activity
             android:name=".ShareActivity"

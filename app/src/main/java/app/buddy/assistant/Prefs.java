@@ -180,6 +180,49 @@ final class Prefs {
         sp(c).edit().putString("panel_size", size).apply();
     }
 
+    /** The agent of the chat live voice starts from the hold menu or the power button; "" for the default agent. */
+    static String liveAgent(Context c) {
+        String a = sp(c).getString("live_agent", "");
+        return Account.known(a) ? a : "";
+    }
+
+    static void setLiveAgent(Context c, String agent) {
+        sp(c).edit().putString("live_agent", agent).apply();
+    }
+
+    /** That live voice continues the latest chat with its agent instead of starting a new one. */
+    static boolean liveContinue(Context c) {
+        return sp(c).getBoolean("live_continue", false);
+    }
+
+    static void setLiveContinue(Context c, boolean on) {
+        sp(c).edit().putBoolean("live_continue", on).apply();
+    }
+
+    /** Buddy as the phone's assistant (long-press power): "talk" (one request, as Tap to talk) or "live" (live voice). */
+    static String assistMode(Context c) {
+        return sp(c).getString("assist_mode", "talk");
+    }
+
+    static void setAssistMode(Context c, String mode) {
+        sp(c).edit().putString("assist_mode", mode).apply();
+    }
+
+    /** Phone actions a chat's run may use before Buddy stops it (issue #16): "60" (default), "200" or "none". */
+    static String actionLimit(Context c) {
+        return sp(c).getString("action_limit", "60");
+    }
+
+    static void setActionLimit(Context c, String limit) {
+        sp(c).edit().putString("action_limit", limit).apply();
+    }
+
+    /** The limit as a number, 0 for none. */
+    static int maxActions(Context c) {
+        String v = actionLimit(c);
+        return "none".equals(v) ? 0 : "200".equals(v) ? 200 : 60;
+    }
+
     /** Buddy's face on the bubble and in the chats: "buddy" (the drawn one) or "picture" (one the user picked). */
     static String face(Context c) {
         return sp(c).getString("face", "buddy");

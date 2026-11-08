@@ -440,12 +440,16 @@ final class Ui {
 
     /** services: also the API key services' models (not for runs outside a chat, like the reviewer's). */
     static void modelSheet(Activity a, String backend, String current, String defaultHint, boolean services, Pick l) {
-        Models.refresh(a);
+        final Dialog[] d = new Dialog[1];
+        Models.refresh(a, () -> { // a service's list changed meanwhile: the sheet again, with it
+            if (d[0] == null || !d[0].isShowing() || a.isFinishing()) return;
+            d[0].dismiss();
+            modelSheet(a, backend, current, defaultHint, services, l);
+        });
         LinearLayout c = column(a);
         TextView h = title(a, a.getString(R.string.chat_model_title, Account.nameOf(backend)), 18);
         h.setPaddingRelative(0, 0, 0, dp(a, 8));
         c.addView(h);
-        final Dialog[] d = new Dialog[1];
         boolean known = false;
         for (final String[] o : Models.options(backend, services)) {
             if (o[0] == null) { // an API key service's models
