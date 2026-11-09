@@ -1,0 +1,3 @@
+• A calmer new look: large titles, chats grouped in cards with each agent's color, a floating bottom bar, replies as plain text in the app and the bubble
+• Fixed: Backup and move (Settings → Experience) closed the app instead of opening
+• A question you add while the agent works now gets answered in its reply too

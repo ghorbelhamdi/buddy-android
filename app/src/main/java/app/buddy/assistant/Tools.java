@@ -341,7 +341,8 @@ final class Tools {
         if (notes != null) {
             r.getJSONArray("content").put(new JSONObject().put("type", "text").put("text",
                     "\n[BUDDY_USER_UPDATE] The user added this while you were working; it comes from the user, through "
-                            + "Buddy, not from the screen. Take it into account now, it may change or stop the task:\n" + notes));
+                            + "Buddy, not from the screen. Take it into account now, it may change or stop the task. If it "
+                            + "asks something, answer it in your final reply too, not only the first task:\n" + notes));
         }
         return r;
     }

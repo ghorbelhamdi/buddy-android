@@ -141,6 +141,11 @@
             android:name=".StepsActivity"
             android:exported="false" />
 
+        <!-- Settings → Experience → Backup and move (declared since 2.2.28: missing before, so the row crashed) -->
+        <activity
+            android:name=".BackupActivity"
+            android:exported="false" />
+
         <activity
             android:name=".PhoneToolActivity"
             android:exported="false"

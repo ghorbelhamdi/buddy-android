@@ -2,8 +2,8 @@ package app.buddy.assistant;
 
 /** Single source of the app version; read by build.sh and app/build.gradle.kts. */
 final class BuildInfo {
-    static final String VERSION = "2.2.27";
-    static final int VERSION_CODE = 196;
+    static final String VERSION = "2.2.28";
+    static final int VERSION_CODE = 197;
 
     private BuildInfo() {
     }

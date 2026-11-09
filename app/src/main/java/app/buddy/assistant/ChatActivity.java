@@ -212,7 +212,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         attach.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
         attach.setOnClickListener(v -> attachSheet());
         pill.addView(attach);
-        pill.setBackground(outlined(this, CARD, 26, OUTLINE, 1));
+        pill.setBackground(outlined(this, CARD, 28, LINE, 1));
         RichEditText field = new RichEditText(this);
         field.onImages(this::addFiles); // pasted, or from the keyboard's clipboard (issue #6)
         input = field;
@@ -1288,7 +1288,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         if (ask == null) return;
         LinearLayout card = column(this);
         card.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));
-        card.setBackground(outlined(this, CARD, 18, Theme.withAlpha(ACCENT, 0x73), 1));
+        card.setBackground(outlined(this, CARD, 20, Theme.withAlpha(ACCENT, 0x73), 1));
         LinearLayout hr = row(this);
         hr.addView(icon(this, R.drawable.ms_shield_person, ACCENT_TEXT, 18));
         TextView lab = text(this, getString(options != null ? R.string.chat_card_question : R.string.chat_card_needs_ok), 12, ACCENT_TEXT);
@@ -1523,7 +1523,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         if (m.kind == Bubble.Kind.BUDDY) { // pictures the reply names (see ChatHub.pictures), under it
             for (String id : m.files) {
                 LinearLayout.LayoutParams fp = wrap();
-                fp.setMarginStart(dp(this, 32));
+                fp.setMarginStart(dp(this, 4));
                 fp.topMargin = dp(this, 6);
                 messages.addView(attachmentView(id, true), fp);
             }
@@ -1750,29 +1750,17 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 v = tv;
                 break;
             }
-            case BUDDY: {
-                LinearLayout r = row(this);
-                r.setGravity(Gravity.BOTTOM);
-                FrameLayout av = new FrameLayout(this);
-                av.setBackground(oval(ACCENT_SOFT));
-                ImageView face = new ImageView(this);
-                Face.set(face, R.drawable.bubble_face);
-                int fs = dp(this, Face.size(this, 20, 24));
-                av.addView(face, new FrameLayout.LayoutParams(fs, fs, Gravity.CENTER));
-                LinearLayout.LayoutParams avp = new LinearLayout.LayoutParams(dp(this, 24), dp(this, 24));
-                avp.setMarginEnd(dp(this, 8));
-                r.addView(av, avp);
+            case BUDDY: { // Buddy 3: replies read as plain text on the page, no bubble
                 TextView tv = text(this, text, 15, TEXT);
                 tv.setTextIsSelectable(true);
                 tv.setText(Ui.markdown(text, null)); // **bold**, lists, `code`, [text](url) as a link…
                 links(tv);
                 Ui.copyWithLinks(tv);
-                tv.setLineSpacing(0, 1.15f);
-                tv.setMaxWidth(maxBubble - dp(this, 32));
-                tv.setBackground(corners(this, CARD, 20, 20, 20, 6));
-                tv.setPaddingRelative(dp(this, 14), dp(this, 10), dp(this, 14), dp(this, 10));
-                r.addView(tv);
-                v = r;
+                tv.setLineSpacing(0, 1.25f);
+                tv.setPaddingRelative(dp(this, 4), dp(this, 2), dp(this, 4), dp(this, 2));
+                p.width = LinearLayout.LayoutParams.MATCH_PARENT;
+                p.topMargin = dp(this, 14);
+                v = tv;
                 break;
             }
             default: { // ERROR
@@ -1819,18 +1807,23 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         int n;
         boolean open, live, userToggled;
         View lastMark;
+        /** The header's mark: a spinner while the run works, a check once it's done (as each step's). */
+        final FrameLayout headMark = new FrameLayout(ChatActivity.this);
 
         ToolLog() {
-            view.setBackground(outlined(ChatActivity.this, 0x00000000, 14, LINE, 1));
+            view.setBackground(rounded(ChatActivity.this, CARD, 16));
+            view.setClipToOutline(true);
             LinearLayout head = row(ChatActivity.this);
-            head.setPaddingRelative(dp(ChatActivity.this, 12), dp(ChatActivity.this, 10), dp(ChatActivity.this, 8), dp(ChatActivity.this, 10));
             head.setBackgroundResource(ripple(ChatActivity.this, false));
-            head.addView(icon(ChatActivity.this, R.drawable.ms_terminal, MUTED, 16));
-            count = monoText(ChatActivity.this, "", 12, MUTED);
+            head.setPaddingRelative(dp(ChatActivity.this, 14), dp(ChatActivity.this, 10), dp(ChatActivity.this, 10), dp(ChatActivity.this, 10));
+            head.addView(headMark, new LinearLayout.LayoutParams(dp(ChatActivity.this, 16), dp(ChatActivity.this, 16)));
+            paintHead();
+            count = text(ChatActivity.this, "", 13, MUTED);
             count.setPaddingRelative(dp(ChatActivity.this, 8), 0, 0, 0);
             head.addView(count, weight1());
             // "View steps": what each action did, with a picture of the screen after it (see StepLog)
-            TextView steps = monoText(ChatActivity.this, getString(R.string.steps_view), 12, ACCENT_TEXT);
+            TextView steps = text(ChatActivity.this, getString(R.string.steps_view), 13, ACCENT_TEXT);
+            steps.setTypeface(sans(ChatActivity.this, 600));
             steps.setPaddingRelative(dp(ChatActivity.this, 8), dp(ChatActivity.this, 2), dp(ChatActivity.this, 8), dp(ChatActivity.this, 2));
             steps.setOnClickListener(v -> startActivity(new android.content.Intent(ChatActivity.this, StepsActivity.class)
                     .putExtra("id", ses.id)));
@@ -1842,7 +1835,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 setOpen(!open);
             });
             view.addView(head, full());
-            rows.setPaddingRelative(dp(ChatActivity.this, 12), 0, dp(ChatActivity.this, 12), dp(ChatActivity.this, 10));
+            rows.setPaddingRelative(dp(ChatActivity.this, 14), 0, dp(ChatActivity.this, 14), dp(ChatActivity.this, 12));
             view.addView(rows, full());
             setOpen(false);
         }
@@ -1901,10 +1894,18 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             }
         }
 
+        private void paintHead() {
+            headMark.removeAllViews();
+            View v = live ? spinner(ChatActivity.this, 14) : icon(ChatActivity.this, R.drawable.ms_check, OK, 16);
+            int sz = dp(ChatActivity.this, live ? 14 : 16);
+            headMark.addView(v, new FrameLayout.LayoutParams(sz, sz, Gravity.CENTER));
+        }
+
         void setLive(boolean on) {
             if (live == on) return;
             live = on;
             paintLast();
+            paintHead();
             if (!userToggled) setOpen(on);
         }
 

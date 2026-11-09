@@ -65,29 +65,32 @@ final class Theme {
         applied = key;
 
         if (dark) {
+            // Buddy 3: soft layered surfaces (BG < CARD < CARD2); NAV is the floating nav pill
             switch (surface) {
                 case "neutral":
-                    set(0xFF141414, 0xFF222222, 0xFF383838, 0xFF1C1C1C, 0xFF0B0B0B);
+                    set(0xFF121212, 0xFF1D1D1C, 0xFF2A2A29, 0xFF242423, 0xFF0B0B0B);
                     break;
                 case "black":
-                    set(0xFF000000, 0xFF161514, 0xFF2C2A28, 0xFF0A0A0A, 0xFF000000);
+                    set(0xFF000000, 0xFF151413, 0xFF262420, 0xFF1C1B19, 0xFF000000);
                     break;
-                default: // warm, the original palette
-                    set(0xFF171513, 0xFF24211E, 0xFF3A3632, 0xFF1E1B19, 0xFF0F0E0D);
+                default: // warm, the original tone
+                    set(0xFF121110, 0xFF1D1B19, 0xFF2A2724, 0xFF24221F, 0xFF0F0E0D);
             }
-            Ui.TEXT = 0xFFF4EFE6;
-            Ui.MUTED = 0xFFA39E95;
+            Ui.TEXT = 0xFFF3EFE8;
+            Ui.TEXT2 = 0xFFC9C3B9;
+            Ui.MUTED = 0xFFA39D93;
             Ui.OK = 0xFF5CC08A;
-            Ui.ERR = 0xFFE58A7A;
-            Ui.USER = blend(accent, Ui.BG, 0.24f);
+            Ui.ERR = 0xFFF0A090;
+            Ui.USER = blend(accent, Ui.BG, 0.32f);
         } else {
-            if ("neutral".equals(surface)) set(0xFFF5F5F4, 0xFFFFFFFF, 0xFFE7E7E5, 0xFFEFEFEE, 0xFF1C1C1C);
-            else set(0xFFF7F3EE, 0xFFFFFFFF, 0xFFECE5DD, 0xFFF1EBE4, 0xFF24211E);
-            Ui.TEXT = 0xFF221E1A;
-            Ui.MUTED = 0xFF6F675F;
+            if ("neutral".equals(surface)) set(0xFFF4F4F3, 0xFFFFFFFF, 0xFFEAEAE8, 0xFFFFFFFF, 0xFF1C1C1C);
+            else set(0xFFF6F2EC, 0xFFFFFFFF, 0xFFEEE7DE, 0xFFFFFFFF, 0xFF24211E);
+            Ui.TEXT = 0xFF1F1B17;
+            Ui.TEXT2 = 0xFF4A443D;
+            Ui.MUTED = 0xFF6B635A;
             Ui.OK = 0xFF2F9E66;
             Ui.ERR = 0xFFC5483A;
-            Ui.USER = blend(accent, Ui.CARD, 0.2f);
+            Ui.USER = blend(accent, Ui.CARD, 0.22f);
         }
         Ui.ACCENT = accent;
         Ui.ON_ACCENT = luminance(accent) > 0.45 ? 0xFF1A1714 : 0xFFFFFFFF;
@@ -114,7 +117,7 @@ final class Theme {
         load(a);
         Window w = a.getWindow();
         w.setStatusBarColor(Ui.BG);
-        w.setNavigationBarColor(Ui.NAV);
+        w.setNavigationBarColor(Ui.BG); // the nav floats as a pill on BG
         int flags = w.getDecorView().getSystemUiVisibility();
         if (Ui.DARK) {
             flags &= ~(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);

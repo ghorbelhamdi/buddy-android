@@ -176,8 +176,10 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
 
         LinearLayout head = column(this);
         head.setPaddingRelative(dp(this, 20), dp(this, 8), dp(this, 20), dp(this, 4));
-        head.addView(title(this, getString(R.string.setup_settings_title), 28));
-        TextView sub = text(this, getString(R.string.setup_settings_subtitle), 14, MUTED);
+        TextView big = largeTitle(this, getString(R.string.setup_settings_title));
+        big.setPaddingRelative(0, dp(this, 12), 0, 0);
+        head.addView(big);
+        TextView sub = text(this, getString(R.string.setup_settings_subtitle), 14, TEXT2);
         sub.setPaddingRelative(0, dp(this, 4), 0, 0);
         head.addView(sub);
         list.addView(head, full());
@@ -1055,13 +1057,14 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
 
     private LinearLayout card() {
         LinearLayout c = column(this);
-        c.setBackground(rounded(this, CARD, 16));
+        c.setBackground(rounded(this, CARD, 20));
+        c.setClipToOutline(true);
         return c;
     }
 
     private void addCard(View c) {
         LinearLayout.LayoutParams p = full();
-        p.setMargins(dp(this, 16), dp(this, 6), dp(this, 16), 0);
+        p.setMargins(dp(this, 16), dp(this, 4), dp(this, 16), 0);
         list.addView(c, p);
     }
 

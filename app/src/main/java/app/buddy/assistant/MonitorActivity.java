@@ -58,8 +58,10 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
 
         LinearLayout head = column(this);
         head.setPaddingRelative(dp(this, 20), dp(this, 8), dp(this, 20), dp(this, 4));
-        head.addView(title(this, getString(R.string.monitor_title), 28));
-        TextView sub = text(this, getString(R.string.monitor_subtitle), 14, MUTED);
+        TextView big = largeTitle(this, getString(R.string.monitor_title)); // as Chats and Settings
+        big.setPaddingRelative(0, dp(this, 12), 0, 0);
+        head.addView(big);
+        TextView sub = text(this, getString(R.string.monitor_subtitle), 14, TEXT2);
         sub.setPaddingRelative(0, dp(this, 4), 0, 0);
         head.addView(sub);
         list.addView(head, full());
@@ -67,7 +69,7 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
         // a shell in Buddy's Linux
         LinearLayout tc = row(this);
         tc.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 12), dp(this, 14));
-        tc.setBackground(rounded(this, CARD, 16));
+        tc.setBackground(rounded(this, CARD, 20));
         tc.setForeground(getDrawable(ripple(this, false)));
         android.widget.FrameLayout ti = new android.widget.FrameLayout(this);
         ti.setBackground(rounded(this, CODE, 12));
@@ -203,7 +205,7 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
 
             LinearLayout card = column(this);
             card.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));
-            card.setBackground(rounded(this, CARD, 16));
+            card.setBackground(rounded(this, CARD, 20));
             LinearLayout first = row(this);
             first.addView(single(title(this, where, 15)), weight1());
             TextView el = monoText(this, DateUtils.formatElapsedTime(p.optLong("seconds")), 12, MUTED);

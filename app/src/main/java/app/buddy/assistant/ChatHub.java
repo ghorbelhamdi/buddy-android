@@ -689,7 +689,7 @@ final class ChatHub {
     private void sendNoteAsMessage(Sessions.Session ses, String text) {
         try {
             Helper.run(app, "ask", ses.id, ses.backend, devArg(ses),
-                    "(Added while you were working:) " + text, model(ses), "", ses.effort);
+                    "(Added while you were working; if it asks something, answer it:) " + text, model(ses), "", ses.effort);
         } catch (Exception e) {
             add(ses, Bubble.Kind.ERROR, e.getMessage());
             return;

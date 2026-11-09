@@ -2802,7 +2802,7 @@ final class Bubble implements ChatHub.Listener {
                 b.getWidth() > 0 ? Math.min(dp(220), side * b.getHeight() / b.getWidth()) : side);
         p.topMargin = dp(6);
         if (user) p.gravity = Gravity.END;
-        else p.setMarginStart(dp(32));
+        else p.setMarginStart(dp(4)); // in line with the reply's text (no avatar since Buddy 3)
         iv.setOnClickListener(x -> openPicture(id));
         messages.addView(iv, p);
     }
@@ -2855,29 +2855,17 @@ final class Bubble implements ChatHub.Listener {
                 v = tv;
                 break;
             }
-            case BUDDY: {
-                LinearLayout r = new LinearLayout(svc);
-                r.setGravity(Gravity.BOTTOM);
-                FrameLayout av = new FrameLayout(svc);
-                av.setBackground(Ui.oval(Ui.ACCENT_SOFT));
-                ImageView f = new ImageView(svc);
-                Face.set(f, R.drawable.bubble_face);
-                int fs = dp(Face.size(svc, 20, 24));
-                av.addView(f, new FrameLayout.LayoutParams(fs, fs, Gravity.CENTER));
-                LinearLayout.LayoutParams avp = new LinearLayout.LayoutParams(dp(24), dp(24));
-                avp.setMarginEnd(dp(8));
-                r.addView(av, avp);
+            case BUDDY: { // Buddy 3: replies read as plain text in the panel, as in the app's chat
                 TextView tv = Ui.text(svc, text, 15, Ui.TEXT);
                 CharSequence md = Ui.markdown(text, this::collapse); // **bold**, lists, `code`, [text](url) as a link…
                 tv.setText(md);
-                tv.setLineSpacing(0, 1.15f);
-                tv.setBackground(Ui.corners(svc, Ui.CARD, 20, 20, 20, 6));
-                tv.setPaddingRelative(dp(14), dp(10), dp(14), dp(10));
+                tv.setLineSpacing(0, 1.25f);
+                tv.setPaddingRelative(dp(4), dp(2), dp(4), dp(2));
                 Ui.linkifyForService(tv, this::collapse);
                 copyOnLongPress(tv, Ui.linkCopy(md, 0, md.length())); // as shown, links as "text (address)"
-                r.addView(tv);
-                p.setMarginEnd(dp(24));
-                v = r;
+                p.width = LinearLayout.LayoutParams.MATCH_PARENT;
+                p.topMargin = dp(14);
+                v = tv;
                 break;
             }
             default: { // ERROR
@@ -2971,16 +2959,20 @@ final class Bubble implements ChatHub.Listener {
         int n;
         boolean open, live, userToggled;
         FrameLayout lastMark;
+        /** The header's mark: a spinner while the run works, a check once it's done (as each step's). */
+        final FrameLayout headMark = new FrameLayout(svc);
 
         StepLog() {
             view.setOrientation(LinearLayout.VERTICAL);
             rows.setOrientation(LinearLayout.VERTICAL);
-            view.setBackground(rounded(0x00000000, 14, Ui.OUTLINE, 1));
+            view.setBackground(rounded(Ui.CARD, 16, Ui.CARD, 0)); // Buddy 3: a filled card, as in the app
+            view.setClipToOutline(true);
             LinearLayout head = new LinearLayout(svc);
             head.setGravity(Gravity.CENTER_VERTICAL);
-            head.setPaddingRelative(dp(12), dp(9), dp(8), dp(9));
-            head.addView(Ui.icon(svc, R.drawable.ms_terminal, Ui.MUTED, 16));
-            count = Ui.monoText(svc, "", 12, Ui.MUTED);
+            head.setPaddingRelative(dp(14), dp(10), dp(10), dp(10));
+            head.addView(headMark, new LinearLayout.LayoutParams(dp(16), dp(16)));
+            mark(headMark, false);
+            count = Ui.text(svc, "", 13, Ui.MUTED);
             count.setPaddingRelative(dp(8), 0, 0, 0);
             head.addView(count, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
             chevron = Ui.icon(svc, R.drawable.ms_expand_more, Ui.MUTED, 18);
@@ -2990,7 +2982,7 @@ final class Bubble implements ChatHub.Listener {
                 setOpen(!open);
             });
             view.addView(head);
-            rows.setPaddingRelative(dp(12), 0, dp(12), dp(8));
+            rows.setPaddingRelative(dp(14), 0, dp(14), dp(12));
             view.addView(rows);
             setOpen(false);
         }
@@ -3040,6 +3032,7 @@ final class Bubble implements ChatHub.Listener {
             if (live == on) return;
             live = on;
             if (lastMark != null) mark(lastMark, on);
+            mark(headMark, on);
             if (!userToggled) setOpen(on);
         }
 
