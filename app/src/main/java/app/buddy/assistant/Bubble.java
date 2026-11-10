@@ -2267,7 +2267,7 @@ final class Bubble implements ChatHub.Listener {
         if (changing) endChange();
         confirmCard.setVisibility(View.GONE);
         if (cardChat != null && !"opencode".equals(cardChat.backend)) {
-            hub.note(cardChat, Kind.STEP, svc.getString(R.string.card_note_auto_approved, clip(confirmText.getText().toString(), 80)));
+            hub.note(cardChat, Kind.STEP, svc.getString(R.string.card_note_auto_approved, confirmText.getText().toString().trim()));
         }
         if (cb != null) cb.onAutoApproved();
         refreshStatus();
@@ -2344,6 +2344,92 @@ final class Bubble implements ChatHub.Listener {
         applyEnabled();
         if (card.countdown > 0) startCountdown(card.countdown);
         hub.changed();
+        speakCard(card);
+    }
+
+    // ------------------------------------------------------------ cards by voice (issue #27)
+
+    /**
+     * With "Read replies aloud" on, a card is read aloud too (someone using the phone without looking at it would
+     * not know the agent is waiting). With "Answer cards by voice" on as well, Buddy then listens for the answer:
+     * "approve" or "deny" for an approval, an option or the user's own words for a question. Not while the phone is
+     * locked: there an approval takes the fingerprint.
+     */
+    private void speakCard(final Card card) {
+        if (!Prefs.speakReplies(svc) || CodexLive.on()) return;
+        String said = card.options == null ? svc.getString(R.string.voice_card_approval, card.text)
+                : svc.getString(R.string.voice_card_question, card.text, android.text.TextUtils.join(", ", card.options));
+        final boolean answer = Prefs.voiceCards(svc);
+        if (answer && card.options == null) said += " " + svc.getString(R.string.voice_card_hint);
+        Voice.speak(svc, said);
+        if (!answer) return;
+        final ConfirmCallback cb = card.cb;
+        final long from = SystemClock.elapsedRealtime();
+        root.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (pendingConfirm != cb) return; // answered by hand meanwhile
+                long waited = SystemClock.elapsedRealtime() - from;
+                if ((Voice.isSpeaking() || waited < 2500) && waited < 120_000) { // until it's read out
+                    root.postDelayed(this, 300);
+                    return;
+                }
+                listenForCard(card, 0);
+            }
+        }, 1200);
+    }
+
+    private void listenForCard(final Card card, final int tries) {
+        final ConfirmCallback cb = card.cb;
+        if (pendingConfirm != cb || Triggers.locked(svc) || changing) return;
+        Voice.listen(svc, new Voice.Listener() {
+            @Override
+            public void onPartial(String text) {
+            }
+
+            @Override
+            public void onFinal(String text) {
+                if (pendingConfirm != cb || Triggers.locked(svc)) return;
+                String heard = " " + text.toLowerCase(Ui.locale(svc)).replaceAll("[\\p{Punct}¿¡。、，！？]+", " ").replaceAll("\\s+", " ").trim() + " ";
+                if (card.options != null) { // an option by its words, or what was said as the user's own answer
+                    for (String o : card.options) {
+                        String opt = " " + o.toLowerCase(Ui.locale(svc)).replaceAll("[\\p{Punct}]+", " ").replaceAll("\\s+", " ").trim() + " ";
+                        if (opt.trim().length() > 0 && heard.contains(opt)) {
+                            answerOption(o);
+                            return;
+                        }
+                    }
+                    answerOption(text.trim());
+                    return;
+                }
+                boolean yes = heardOne(heard, R.string.voice_card_yes), no = heardOne(heard, R.string.voice_card_no);
+                if (yes != no) answerConfirm(yes);
+                else if (tries < 2) { // neither, or both: asked once more, never guessed
+                    Voice.speak(svc, svc.getString(R.string.voice_card_hint));
+                    root.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (pendingConfirm != cb) return;
+                            if (Voice.isSpeaking()) root.postDelayed(this, 300);
+                            else listenForCard(card, tries + 1);
+                        }
+                    }, 1500);
+                }
+            }
+
+            @Override
+            public void onEnd(String message) { // silence: the card goes on waiting, as without voice
+            }
+        });
+    }
+
+    /** Is one of the words or phrases of that list (comma-separated, in the app's language) in what was heard? */
+    private boolean heardOne(String heard, int list) {
+        for (String w : svc.getString(list).split(",")) {
+            String x = w.trim().toLowerCase(Ui.locale(svc));
+            if (!x.isEmpty() && heard.contains(" " + x + " ")) return true;
+        }
+        return false;
     }
 
     /** The card was answered or taken down: the next waiting one, if any, shows (a deleted chat's is denied). */
@@ -2505,7 +2591,7 @@ final class Bubble implements ChatHub.Listener {
         confirmCard.setVisibility(View.GONE);
         if (cardChat != null && !"opencode".equals(cardChat.backend)) {
             hub.note(cardChat, Kind.STEP, asking ? svc.getString(R.string.card_note_skipped)
-                    : approved ? svc.getString(R.string.card_note_approved, clip(confirmText.getText().toString(), 80))
+                    : approved ? svc.getString(R.string.card_note_approved, confirmText.getText().toString().trim())
                     : svc.getString(R.string.card_note_denied));
         }
         if (cb != null) cb.onAnswer(approved, null);
@@ -3066,8 +3152,9 @@ final class Bubble implements ChatHub.Listener {
             sb.setSpan(new android.text.style.ForegroundColorSpan(Ui.TEXT), 0, name.length(), 0);
             sb.append(arg);
             t.setText(sb);
-            t.setMaxLines(3);
+            t.setMaxLines(3); // the panel is small: a tap on a longer step shows all of it
             t.setEllipsize(TextUtils.TruncateAt.END);
+            r.setOnClickListener(v -> t.setMaxLines(t.getMaxLines() == 3 ? Integer.MAX_VALUE : 3));
             t.setPaddingRelative(dp(8), 0, 0, 0);
             r.addView(t, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
             copyOnLongPress(r, step);

@@ -438,6 +438,7 @@
     <string name="card_countdown">Approves itself in %1$d s · Tap to stop</string>
     <!-- Note in the chat when the countdown ran out. Keep the mark ✓ and the space after it. %1$s = what was approved (shortened). -->
     <string name="card_note_auto_approved">✓ Approved after the countdown: %1$s</string>
+    <string name="card_note_rule_approved">✓ Approved by your rule, without asking: %1$s</string>
     <!-- Note in the chat after the user tapped the countdown to stop it: the card now waits for them. -->
     <string name="card_note_countdown_stopped">Countdown stopped: waiting for your OK</string>
 
@@ -679,6 +680,7 @@
     <!-- After "Continue in Buddy" on an earlier session. %1$s = agent name. -->
     <string name="hub_continuing">Continuing an earlier %1$s session. If it\'s still open in a terminal, close it there first.</string>
     <string name="hub_still_working_attachments">This chat is still working. Send attachments when it\'s done.</string>
+    <string name="hub_service_off">%1$s is switched off (Settings → API keys). Switch it on, or pick another model for this chat.</string>
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">Thinking…</string>
     <string name="hub_still_waiting">Still waiting for the model to answer…</string>
@@ -1366,6 +1368,13 @@
     <string name="setup_read_aloud">Read replies aloud</string>
     <!-- "Voice" = the Settings section of that name (setup_voice). -->
     <string name="setup_read_aloud_info">Buddy reads the agents\' replies out loud, in the voice you pick under Voice.</string>
+    <string name="setup_voice_cards">Answer cards by voice</string>
+    <string name="setup_voice_cards_info">After a card is read aloud, Buddy listens: say “approve” or “deny”, or the option you want. Needs “Read replies aloud”. Not while the phone is locked. Anyone within earshot could answer.</string>
+    <string name="voice_card_approval">Buddy needs your OK. %1$s</string>
+    <string name="voice_card_question">Buddy asks: %1$s Options: %2$s</string>
+    <string name="voice_card_hint">Say approve or deny.</string>
+    <string name="voice_card_yes">approve,approved,yes,okay,ok,go ahead,do it</string>
+    <string name="voice_card_no">deny,denied,no,stop,cancel,don\'t</string>
     <string name="setup_update_notices">Update notices</string>
     <string name="setup_update_notices_info">Buddy checks GitHub once a day and notifies you when a new version is out.</string>
     <string name="setup_check_updates">Check for updates</string>
@@ -1696,6 +1705,7 @@
     <string name="rules_words_summary">With “%1$s”</string>
     <!-- Small tag on a rule in the list: its approval cards wait for the user. -->
     <string name="rules_tag_ask">Asks you first</string>
+    <string name="rules_tag_now">Sends without asking</string>
     <!-- Small tag on a rule in the list: its approval cards approve themselves. %1$s = the countdown, e.g. 30 s. -->
     <string name="rules_tag_countdown">Countdown %1$s</string>
     <!-- Small tag on a rule that is switched off. -->
@@ -1779,8 +1789,10 @@
     <string name="rules_approval_ask">Ask me</string>
     <!-- Choice: the rule's approval cards approve themselves after a countdown. Keep it short. -->
     <string name="rules_approval_countdown">Countdown</string>
+    <string name="rules_approval_now">Don\'t ask</string>
     <string name="rules_approval_ask_info">Approval cards wait for you, as in any chat.</string>
     <string name="rules_approval_countdown_info">When the countdown ends, the card approves itself unless you tap to stop it. That only works for sending a message, after a second AI checks it against your rule. Paying, buying, deleting and opening links always wait for you.</string>
+    <string name="rules_approval_now_info">Messages are sent right away, without a card, once a second AI has checked them against your rule. If it objects, the card waits for you. Paying, buying, deleting and opening links always wait for you.</string>
     <!-- Under the countdown explanation, tappable (opens App permissions). %1$s = the reviewer, e.g. Claude Code · Haiku. -->
     <string name="rules_checker">Second AI: %1$s. Tap to change it in App permissions.</string>
     <!-- In the model picker of a rule, the first choice ("Default"), described. -->
@@ -2021,6 +2033,9 @@
     <!-- At the top of a chat whose start an older Buddy dropped: a tap fetches it from the agent's own record of the conversation. Then, when there was nothing to fetch. -->
     <string name="chat_earlier_load">Load earlier messages</string>
     <string name="chat_earlier_none">No earlier messages found.</string>
+    <string name="chat_earlier_gone">Earlier messages are no longer kept: a chat holds its latest %1$d.</string>
+    <!-- Button in a notification rule's chat: the agent looks at that conversation again now, for messages that came without a notification. Keep short. -->
+    <string name="rules_recheck">Check again</string>
     <string name="setup_help">Help</string>
     <string name="setup_help_info">Buddy\'s user guide, on GitHub. You can also ask any agent how Buddy works.</string>
     <string name="signin_api_key">Use an API key instead</string>
@@ -2035,7 +2050,42 @@
     <string name="api_keys_add">Add API key</string>
     <string name="api_keys_models">%1$s · %2$d models</string>
     <string name="api_keys_for">For %1$s</string>
-    <string name="api_keys_defaults">Chats on Default</string>
+    <string name="api_keys_use">Use this service</string>
+    <string name="api_keys_use_info">Off: the key stays saved, but no chat or agent uses it.</string>
+    <string name="api_keys_off">Off</string>
+    <string name="search_title">Search chats</string>
+    <string name="search_hint">Search chats</string>
+    <string name="search_clear">Clear</string>
+    <string name="search_info">Finds chats by their title and by what was said in them, archived chats too. Everything is searched here on your phone.</string>
+    <string name="search_none">No chat has “%1$s”.</string>
+    <string name="search_archived">Archived</string>
+    <string name="search_found">Chats found: %1$d</string>
+    <string name="search_messages">Messages: %1$d</string>
+    <string name="mcp_title">MCP servers</string>
+    <string name="mcp_row_none">Tools from your own servers</string>
+    <string name="mcp_intro">Connect your own MCP servers, and every agent gets their tools next to the phone\'s. A server is reached by its address, over the internet or your own network. Keys are stored encrypted on this phone and never reach the agents: Buddy adds them to each call.</string>
+    <string name="mcp_none">No servers yet.</string>
+    <string name="mcp_add">Add a server</string>
+    <string name="mcp_import">Import a list</string>
+    <string name="mcp_export">Copy the list</string>
+    <string name="mcp_exported">Copied, without the keys.</string>
+    <string name="mcp_note">These tools run outside your phone, so Buddy\'s approval cards don\'t cover them: add only servers you trust. They aren\'t used when a notification rule runs.</string>
+    <string name="mcp_name_hint">Name (letters and digits)</string>
+    <string name="mcp_url_hint">Address (https://…/mcp)</string>
+    <string name="mcp_key_hint">Key or token (optional)</string>
+    <string name="mcp_key_info">A key is sent as “Authorization: Bearer …”. If the server wants another header, write it out: X-Api-Key: your-key</string>
+    <string name="mcp_use">Use this server</string>
+    <string name="mcp_use_info">Off: it stays saved, but no agent gets its tools.</string>
+    <string name="mcp_save">Check and save</string>
+    <string name="mcp_checking">Asking the server for its tools…</string>
+    <string name="mcp_saved">%1$s saved · tools: %2$d</string>
+    <string name="mcp_tools_count">Tools: %1$d</string>
+    <string name="mcp_remove_text">Its key is deleted from this phone.</string>
+    <string name="mcp_need_name">Give it a name.</string>
+    <string name="mcp_name_taken">That name is taken.</string>
+    <string name="mcp_import_info">Paste a list as other apps keep it (“mcpServers”). Servers with an address are added; ones that run as a command on a computer are skipped.</string>
+    <string name="mcp_imported">Added: %1$d · skipped: %2$d</string>
+    <string name="api_keys_defaults">Default model</string>
     <string name="api_keys_defaults_info">What a chat uses when its model is Default. Its own default runs on the agent\'s plan.</string>
     <string name="api_keys_own_default">Its own default</string>
     <string name="api_keys_name_hint">Name</string>

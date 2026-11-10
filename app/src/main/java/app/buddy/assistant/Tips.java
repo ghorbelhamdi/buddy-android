@@ -36,7 +36,10 @@ final class Tips {
         try {
             String s = new String(Files.readAllBytes(f.toPath()), StandardCharsets.UTF_8).trim();
             if (s.isEmpty()) return "";
-            if (s.length() > MAX_CHARS) s = s.substring(0, MAX_CHARS) + "…";
+            if (s.length() > MAX_CHARS) {
+                s = s.substring(0, MAX_CHARS) + "…\n(Cut: the first " + MAX_CHARS + " of " + s.length()
+                        + " characters. The file has the rest; keep it short.)";
+            }
             return "\n\nTIPS for " + name + " (notes from earlier runs, in ~/.buddy/tips/" + name + ".md):\n" + s + "\n";
         } catch (Exception e) {
             return "";

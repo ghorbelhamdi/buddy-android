@@ -56,7 +56,7 @@ import java.util.Map;
  */
 public final class Shell {
     /** Raised when the protocol changes: Buddy restarts a helper that answers another number. */
-    static final int VERSION = 3;
+    static final int VERSION = 8;
     /** A chat's display goes when nothing was asked of it for this long (Buddy keeps the ones in use alive). */
     private static final long IDLE_MS = 10 * 60_000;
 
@@ -66,10 +66,17 @@ public final class Shell {
         Image latest;
         int id, w, h;
         long used = SystemClock.uptimeMillis();
+        /** Asleep between runs (see rest), and how it looked just before: what "frame" shows meanwhile. */
+        volatile boolean resting;
+        volatile Bitmap still;
+        /** When the chat last acted on it or said it's still at work (looking at it doesn't count). */
+        volatile long active = SystemClock.uptimeMillis();
     }
 
     private static final Map<String, Screen> screens = new HashMap<>();
     private static DisplayManager dm;
+    /** Why this phone gives the helper no display manager (then there are no screens of its own), or null. */
+    private static String noDisplays;
     private static Handler frames;
     private static Object inputManager;
     private static Method inject, setDisplayId;
@@ -81,7 +88,14 @@ public final class Shell {
         final int port = Integer.parseInt(a[0]);
         final String token = a[1];
         Looper.prepareMainLooper();
-        dm = displayManager();
+        try {
+            dm = displayManager();
+        } catch (Throwable e) { // an Android version or a maker's build that differs: the commands still work, and "open" says why
+            Throwable cause = e instanceof java.lang.reflect.InvocationTargetException && e.getCause() != null ? e.getCause() : e;
+            noDisplays = String.valueOf(cause);
+            System.err.println("BUDDY_SHELL no displays: " + noDisplays);
+            cause.printStackTrace();
+        }
         HandlerThread ht = new HandlerThread("frames");
         ht.start();
         frames = new Handler(ht.getLooper());
@@ -114,12 +128,21 @@ public final class Shell {
                 main.postDelayed(this, 30_000);
             }
         }, 30_000);
+        main.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                keepResting();
+                main.postDelayed(this, 5_000);
+            }
+        }, 5_000);
         System.out.println("BUDDY_SHELL " + VERSION + " " + android.os.Process.myPid());
         System.out.flush();
         Looper.loop();
     }
 
     /** A DisplayManager that acts as the shell user: there is no app here, so its context is the system's, renamed. */
+    // (this runs under app_process as the shell user, not in the app: the hidden-API rules lint checks don't apply)
+    @android.annotation.SuppressLint({"BlockedPrivateApi", "SoonBlockedPrivateApi", "DiscouragedPrivateApi", "PrivateApi"})
     private static DisplayManager displayManager() throws Exception {
         Class<?> at = Class.forName("android.app.ActivityThread");
         Constructor<?> c = at.getDeclaredConstructor();
@@ -131,6 +154,20 @@ public final class Shell {
         Field sys = at.getDeclaredField("mSystemThread");
         sys.setAccessible(true);
         sys.setBoolean(thread, true);
+        // Samsung's framework asks the thread for its configuration while the system context is made (issue #23:
+        // a NullPointerException in ActivityThread.getConfiguration on a Galaxy S24, Android 17). A thread made this
+        // way has no configuration controller yet (attach() makes it, and isn't run here): give it one. Android 12+.
+        try {
+            Field cc = at.getDeclaredField("mConfigurationController");
+            cc.setAccessible(true);
+            if (cc.get(thread) == null) {
+                Constructor<?> make = Class.forName("android.app.ConfigurationController")
+                        .getDeclaredConstructor(Class.forName("android.app.ActivityThreadInternal"));
+                make.setAccessible(true);
+                cc.set(thread, make.newInstance(thread));
+            }
+        } catch (Throwable ignored) { // an Android without it doesn't need it
+        }
         Context system = (Context) at.getMethod("getSystemContext").invoke(thread);
         Context ctx = new ContextWrapper(system) {
             @Override
@@ -213,8 +250,8 @@ public final class Shell {
 
     private static String run(String[] a) throws Exception {
         switch (a[0]) {
-            case "ping":
-                return VERSION + " " + android.os.Process.myPid();
+            case "ping": // version, pid, and what's wrong with it if anything
+                return VERSION + " " + android.os.Process.myPid() + (noDisplays == null ? "" : " nodisplays " + noDisplays);
             case "open": // open <chat> <w> <h> <dpi>: the chat's display, made now if it has none → its id
                 return String.valueOf(open(a[1], Integer.parseInt(a[2]), Integer.parseInt(a[3]), Integer.parseInt(a[4])).id);
             case "close":
@@ -230,17 +267,20 @@ public final class Shell {
                 }
                 return b.toString();
             }
+            case "rest": // the chat's run ended: its display sleeps until the next
+                rest(screen(a[1]));
+                return "";
             case "keep": // the chat is still at work: its display stays
-                screen(a[1]);
+                screen(a[1]).active = SystemClock.uptimeMillis();
                 return "";
             case "start": { // start <chat> <component>: the app's screen, on the chat's display
-                Screen s = screen(a[1]);
+                Screen s = awake(a[1]);
                 component(a[2]);
                 return am("start", "--display", String.valueOf(s.id), "-n", a[2], "-a", "android.intent.action.MAIN",
                         "-c", "android.intent.category.LAUNCHER");
             }
             case "view": { // view <chat> <uri> [package]: a link, opened on the chat's display
-                Screen s = screen(a[1]);
+                Screen s = awake(a[1]);
                 List<String> c = new ArrayList<>(java.util.Arrays.asList("start", "--display", String.valueOf(s.id),
                         "-a", "android.intent.action.VIEW", "-d", a[2]));
                 if (a.length > 3 && !a[3].isEmpty()) {
@@ -255,7 +295,7 @@ public final class Shell {
                 return am("start", "--display", "0", "-n", a[1], "-a", "android.intent.action.MAIN",
                         "-c", "android.intent.category.LAUNCHER");
             case "gesture": { // gesture <chat> <ms> x,y x,y …: one finger along the points in that time (a tap: one point)
-                Screen s = screen(a[1]);
+                Screen s = awake(a[1]);
                 long ms = Long.parseLong(a[2]);
                 float[] xs = new float[a.length - 3], ys = new float[a.length - 3];
                 for (int i = 3; i < a.length; i++) {
@@ -267,12 +307,12 @@ public final class Shell {
                 return "";
             }
             case "key": { // key <chat> <keycode>
-                Screen s = screen(a[1]);
+                Screen s = awake(a[1]);
                 key(s.id, Integer.parseInt(a[2]));
                 return "";
             }
             case "text": { // text <chat> <text>: typed as keys (what a keyboard can type; Buddy sets other text itself)
-                Screen s = screen(a[1]);
+                Screen s = awake(a[1]);
                 KeyEvent[] events = KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD).getEvents(a[2].toCharArray());
                 if (events == null) throw new IllegalArgumentException("can't be typed as keys");
                 for (KeyEvent e : events) inject(e, s.id);
@@ -315,8 +355,57 @@ public final class Shell {
             if (s == null) throw new IllegalStateException("no display");
             s.used = SystemClock.uptimeMillis();
         }
+        return s;
+    }
+
+    /** The chat's display, for acting on it: awake (see wake). Looking at it (frame) and keeping it don't wake it. */
+    private static Screen awake(String chat) {
+        Screen s = screen(chat);
+        s.active = SystemClock.uptimeMillis();
         wake(s);
         return s;
+    }
+
+    /**
+     * The chat's run is over: its display goes to sleep until the next one. An app left open and awake there counts
+     * as on screen: a messenger showing a conversation marks what comes in as read and posts no notification for
+     * it, so the user missed messages (and a notification rule its trigger). Asleep, the app is stopped as it is
+     * when the phone's screen is off, and wakes where it was.
+     */
+    private static void rest(Screen s) throws Exception {
+        if (wakeDisplay == null) wake(s); // (it looks the power service up)
+        if (power == null) return;
+        if (!s.resting) s.still = shot(s); // asleep it draws nothing: the chat's small picture keeps this one
+        s.resting = true;
+        sleep(s);
+    }
+
+    /**
+     * Asleep for real, not dozing (the flag): a dozing display keeps its app resumed, as if someone were looking at
+     * it, and that is exactly what must end. Seen on Android 16: dozing left the activity RESUMED, this stops it.
+     */
+    private static void sleep(Screen s) throws Exception {
+        power.getClass().getMethod("goToSleepWithDisplayId", int.class, long.class, int.class, int.class)
+                .invoke(power, s.id, SystemClock.uptimeMillis(), 0 /* an application asked */, 1 /* no doze */);
+    }
+
+    /** A display nobody acted on or kept for this long rests by itself (Buddy keeps a working chat's every 2 minutes). */
+    private static final long UNATTENDED_MS = 5 * 60_000;
+
+    /** Something else woke a resting display (Android wakes displays for reasons of its own): back to sleep. */
+    private static void keepResting() {
+        List<Screen> all;
+        synchronized (screens) {
+            all = new ArrayList<>(screens.values());
+        }
+        for (Screen s : all) {
+            try {
+                if (s.resting && power != null && Boolean.TRUE.equals(interactive.invoke(power, s.id))) sleep(s);
+                // nobody said the run ended (Buddy was restarted or updated mid-run): no app stays awake for good
+                else if (!s.resting && SystemClock.uptimeMillis() - s.active > UNATTENDED_MS) rest(s);
+            } catch (Throwable ignored) {
+            }
+        }
     }
 
     private static Object power;
@@ -330,6 +419,8 @@ public final class Shell {
      * power service: the display's own state goes on saying "on".
      */
     private static void wake(Screen s) {
+        s.resting = false;
+        s.still = null;
         try {
             if (wakeDisplay == null) {
                 Class<?> sm = Class.forName("android.os.ServiceManager");
@@ -351,14 +442,16 @@ public final class Shell {
 
     private static Screen open(String chat, int w, int h, int dpi) throws Exception {
         if (!chat.matches("[A-Za-z0-9_-]{1,64}")) throw new IllegalArgumentException("bad chat");
+        if (dm == null) throw new IllegalStateException("this phone doesn't let the helper make a screen of its own (" + noDisplays + ")");
         synchronized (screens) {
             Screen old = screens.get(chat);
             if (old != null) {
                 old.used = SystemClock.uptimeMillis();
+                old.active = old.used;
                 wake(old);
                 return old;
             }
-            if (screens.size() >= 4) throw new IllegalStateException("too many displays");
+            if (screens.size() >= 4) throw new IllegalStateException("four chats already work in the background, the most at once: wait for one to finish");
             if (w < 200 || h < 200 || w > 4096 || h > 4096 || dpi < 80 || dpi > 800) throw new IllegalArgumentException("bad size");
             final Screen s = new Screen();
             s.w = w;
@@ -439,21 +532,27 @@ public final class Shell {
     /** What the chat's display shows now, as JPEG, at most maxWidth wide (0: as it is). Empty when nothing was drawn yet. */
     private static byte[] frame(String chat, int maxWidth, int quality) {
         Screen s = screen(chat);
-        Bitmap b;
-        synchronized (s) {
-            if (s.latest == null) return new byte[0];
-            Image.Plane p = s.latest.getPlanes()[0];
-            int rowW = p.getRowStride() / p.getPixelStride();
-            Bitmap full = Bitmap.createBitmap(rowW, s.h, Bitmap.Config.ARGB_8888);
-            p.getBuffer().rewind();
-            full.copyPixelsFromBuffer(p.getBuffer());
-            b = rowW == s.w ? full : Bitmap.createBitmap(full, 0, 0, s.w, s.h);
-        }
+        Bitmap still = s.still;
+        Bitmap b = s.resting && still != null ? still : shot(s);
+        if (b == null) return new byte[0];
         if (maxWidth > 0 && b.getWidth() > maxWidth)
             b = Bitmap.createScaledBitmap(b, maxWidth, Math.round(b.getHeight() * (maxWidth / (float) b.getWidth())), true);
         ByteArrayOutputStream o = new ByteArrayOutputStream();
         b.compress(Bitmap.CompressFormat.JPEG, Math.max(10, Math.min(100, quality)), o);
         return o.toByteArray();
+    }
+
+    /** What the display shows now, or null before its first picture. */
+    private static Bitmap shot(Screen s) {
+        synchronized (s) {
+            if (s.latest == null) return null;
+            Image.Plane p = s.latest.getPlanes()[0];
+            int rowW = p.getRowStride() / p.getPixelStride();
+            Bitmap full = Bitmap.createBitmap(rowW, s.h, Bitmap.Config.ARGB_8888);
+            p.getBuffer().rewind();
+            full.copyPixelsFromBuffer(p.getBuffer());
+            return rowW == s.w ? full : Bitmap.createBitmap(full, 0, 0, s.w, s.h);
+        }
     }
 
     private static String am(String... args) throws Exception {
@@ -479,6 +578,7 @@ public final class Shell {
         final Process p = new ProcessBuilder("sh", "-c", command).redirectErrorStream(true).start();
         p.getOutputStream().close();
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        final boolean[] cut = new boolean[1];
         Thread reader = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -491,6 +591,7 @@ public final class Shell {
                                 byte[] all = out.toByteArray();
                                 out.reset();
                                 out.write(all, all.length - 200_000, 200_000);
+                                cut[0] = true;
                             }
                         }
                     }
@@ -506,8 +607,11 @@ public final class Shell {
         synchronized (out) {
             text = out.toByteArray();
         }
+        boolean less = cut[0] || text.length > 200_000;
         if (text.length > 200_000) text = java.util.Arrays.copyOfRange(text, text.length - 200_000, text.length);
-        byte[] head = ((done ? p.exitValue() : -1) + "\n").getBytes(StandardCharsets.UTF_8);
+        // never quietly: whoever reads the output knows its start is missing
+        byte[] head = ((done ? p.exitValue() : -1) + "\n" + (less ? "(Only the last 200,000 bytes of the output follow; "
+                + "the start was dropped. Send long output to a file to keep all of it.)\n" : "")).getBytes(StandardCharsets.UTF_8);
         byte[] all = new byte[head.length + text.length];
         System.arraycopy(head, 0, all, 0, head.length);
         System.arraycopy(text, 0, all, head.length, text.length);

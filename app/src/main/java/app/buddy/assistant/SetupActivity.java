@@ -346,6 +346,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 }), topGap(12));
         for (Account a : Account.ALL) ag.addView(agentRow(a.agent), topGap(a == Account.CLAUDE ? 12 : 4));
         ag.addView(apiKeysRow(), topGap(4));
+        ag.addView(mcpRow(), topGap(4));
         ag.addView(skillsRow(), topGap(4));
         ag.addView(navRow(R.drawable.ms_terminal, "GitHub", GitHub.login == null || GitHub.login.isEmpty()
                 ? getString(R.string.github_row_none) : "@" + GitHub.login, GitHub.login != null && !GitHub.login.isEmpty(),
@@ -701,6 +702,9 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                     Prefs.setSpeakReplies(this, on);
                     if (!on) Voice.stopSpeaking();
                 }), full());
+        ex.addView(divider(), lineParams());
+        ex.addView(switchRow(this, getString(R.string.setup_voice_cards), getString(R.string.setup_voice_cards_info),
+                Prefs.voiceCards(this), on -> Prefs.setVoiceCards(this, on)), full());
         ex.addView(divider(), lineParams());
         if (!Flavor.FDROID) { // F-Droid updates its build itself
             ex.addView(switchRow(this, getString(R.string.setup_update_notices), getString(R.string.setup_update_notices_info),
@@ -1339,6 +1343,15 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
         r.setOnClickListener(v -> openAgent(agent));
         return r;
+    }
+
+    /** Settings → MCP servers: the user's own servers, whose tools the agents get next to the phone's. */
+    private View mcpRow() {
+        List<String> names = new ArrayList<>();
+        for (McpServers.S s : McpServers.all()) if (s.on) names.add(s.id);
+        return navRow(R.drawable.ms_layers, getString(R.string.mcp_title), names.isEmpty()
+                ? getString(R.string.mcp_row_none) : android.text.TextUtils.join(", ", names), !names.isEmpty(),
+                McpServersActivity.class);
     }
 
     /** Settings → API keys: other services' models for Claude Code, Codex and OpenCode. */

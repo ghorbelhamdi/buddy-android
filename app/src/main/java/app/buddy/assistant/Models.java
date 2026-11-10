@@ -100,7 +100,7 @@ final class Models {
         if (d.isEmpty()) return "";
         if (!d.startsWith("@")) return d; // one of the agent's own models (issue #20)
         Providers.P p = Providers.of(d);
-        if (p == null || !p.fits(backend)) return "";
+        if (p == null || p.off || !p.fits(backend)) return ""; // gone, or switched off for now
         String m = Providers.model(d);
         return Providers.ref(p, m.isEmpty() ? p.defaultModel() : m);
     }

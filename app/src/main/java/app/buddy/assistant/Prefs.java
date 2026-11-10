@@ -285,6 +285,15 @@ final class Prefs {
         sp(c).edit().putBoolean("speak", on).apply();
     }
 
+    /** After a card is read aloud, listen for the answer ("approve", "deny", an option). Off unless switched on. */
+    static boolean voiceCards(Context c) {
+        return sp(c).getBoolean("voice_cards", false);
+    }
+
+    static void setVoiceCards(Context c, boolean on) {
+        sp(c).edit().putBoolean("voice_cards", on).apply();
+    }
+
     static boolean hadReply(Context c) {
         return sp(c).getBoolean("had_reply", false);
     }
@@ -458,6 +467,15 @@ final class Prefs {
 
     static void setProviders(Context c, String json) {
         sp(c).edit().putString("providers", json).apply();
+    }
+
+    /** The user's own MCP servers (see McpServers), without their keys. */
+    static String mcpServers(Context c) {
+        return sp(c).getString("mcp_servers", "[]");
+    }
+
+    static void setMcpServers(Context c, String json) {
+        sp(c).edit().putString("mcp_servers", json).apply();
     }
 
     /** What a chat on Default uses with this agent: "" (the agent's own default, on its plan) or "@service/model". */

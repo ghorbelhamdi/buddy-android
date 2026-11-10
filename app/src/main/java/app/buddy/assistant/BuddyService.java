@@ -90,6 +90,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         new Thread(() -> { // API key services: the key saved per agent by earlier builds, then fresh model lists
             Providers.migrate(this);
             Providers.rewrite(this); // fields added by this build, before any run reads them
+            McpServers.rewrite(this);
             Providers.refresh(this);
         }, "providers").start();
         tools = new Tools(this);
@@ -831,6 +832,24 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     static final String AUTO_APPROVED = "APPROVED after the countdown: the user didn't stop it, though they may not be "
             + "watching. Go ahead with this, and only this.";
 
+    /** How a message that needs no card (a notification rule set to "Don't ask") is approved, after the second check. */
+    static final String RULE_APPROVED = "APPROVED by the user's rule: it sends messages without asking them, and a second "
+            + "AI checked this one against the rule. Nobody may be watching. Go ahead with this, and only this.";
+
+    /** Was it approved without the user (a rule's countdown, or its "Don't ask")? Such an OK covers sending only. */
+    static boolean selfApproved(String answer) {
+        return AUTO_APPROVED.equals(answer) || RULE_APPROVED.equals(answer);
+    }
+
+    /** A rule set to "Don't ask" let this through: the chat says so. */
+    private void noteRuleApproved(String chat, String summary) {
+        runOnMain(() -> {
+            ChatHub hub = ChatHub.get(this);
+            Sessions.Session s = chat == null ? null : hub.sessions.find(chat);
+            if (s != null) hub.note(s, Bubble.Kind.STEP, getString(R.string.card_note_rule_approved, summary.trim()));
+        });
+    }
+
     /** Blocks the calling (tool) thread until the user answers in the bubble. */
     String askConfirm(final String summary) throws InterruptedException {
         return askConfirm(summary, false);
@@ -859,14 +878,20 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         final String chat = McpServer.CALLER_CHAT.get();
         boolean rule = Triggers.ruleRun(chat);
         int cd = canAuto ? Triggers.countdown(chat) : 0;
+        boolean now = canAuto && Triggers.instant(chat); // the rule's "Don't ask": no card when the second check agrees
         String shown = summary;
-        if (cd > 0) { // a second agent checks it against the rule first; if it objects, the card waits for the user
+        if (cd > 0 || now) { // a second agent checks it against the rule first; if it objects, the card waits for the user
             showStatus(getString(R.string.rules_status_checking));
             String why = Triggers.review(this, chat, summary);
             if (why != null) {
                 cd = 0;
+                now = false;
                 shown = getString(R.string.tools_card_detail, summary, why);
             }
+        }
+        if (now) {
+            noteRuleApproved(chat, summary);
+            return RULE_APPROVED;
         }
         if (rule && cd == 0 && Triggers.locked(this)) return NOT_NOW;
         String answer = card(shown, chat, cd, rule ? (cd + 60) * 1000L : Math.max(5 * 60_000L, (cd + 60) * 1000L), null);
@@ -876,23 +901,30 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
 
     /**
      * A notification rule's reply, for the user's OK, without making everything else wait on them: a countdown card
-     * after the second check, or else a card that waits a minute at most, and only while the phone is in use.
+     * after the second check (no card at all when the rule says "Don't ask"), or else a card that waits a minute at
+     * most, and only while the phone is in use.
      * Returns askConfirm's answers, LATER + the second check's objection ("" if none) when the user didn't answer in
      * time, or STALE when stale turns true first (they wrote again, or the user answered them).
      */
     String askRuleReply(String summary, String chat, java.util.function.BooleanSupplier stale) throws InterruptedException {
         int cd = Triggers.countdown(chat);
+        boolean now = Triggers.instant(chat);
         String shown = summary, why = "";
-        if (cd > 0) {
+        if (cd > 0 || now) {
             showStatus(getString(R.string.rules_status_checking));
             String objection = Triggers.review(this, chat, summary);
             if (objection != null) {
                 cd = 0;
+                now = false;
                 why = objection;
                 shown = getString(R.string.tools_card_detail, summary, objection);
             }
         }
         if (stale.getAsBoolean()) return STALE;
+        if (now) {
+            noteRuleApproved(chat, summary);
+            return RULE_APPROVED;
+        }
         if (cd == 0 && Triggers.locked(this)) return LATER + why;
         String answer = card(shown, chat, cd, (cd + 60) * 1000L, stale);
         if (TIMED_OUT.equals(answer)) return LATER + why;

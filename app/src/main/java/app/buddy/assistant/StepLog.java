@@ -20,7 +20,7 @@ import org.json.JSONObject;
  */
 final class StepLog {
     /** Steps kept per run (a runaway can't fill the phone), and screenshots: the latest ones (space). */
-    private static final int KEEP_RUNS = 3, MAX_STEPS = 500, MAX_SHOTS = 80, SHORT_SIDE = 360;
+    private static final int KEEP_RUNS = 3, MAX_SHOTS = 80, SHORT_SIDE = 360;
     /** Screenshots not taken yet: fast steps (do_steps) skip theirs rather than queue up behind the screen. */
     private static final java.util.concurrent.atomic.AtomicInteger pending = new java.util.concurrent.atomic.AtomicInteger();
     /** The folder of each chat's run in progress. */
@@ -67,17 +67,16 @@ final class StepLog {
     }
 
     /** One action of a chat's run, and a screenshot of how the screen looks right after it. */
-    static void record(BuddyService svc, String chat, String tool, JSONObject args, String result) {
+    static void record(BuddyService svc, String chat, String tool, JSONObject args, String result, boolean picture) {
         File d = chat == null ? null : current.get(chat);
         if (d == null) return;
         int n = counts.merge(chat, 1, Integer::sum);
-        if (n > MAX_STEPS) return;
         try {
-            String label = ChatHub.describeTool(tool, args);
+            String label = ChatHub.describeTool(tool, args, true); // whole: the reply it sent, the command it ran
             String first = result == null ? "" : result.trim();
             int nl = first.indexOf('\n');
             if (nl > 0) first = first.substring(0, nl);
-            if (first.length() > 160) first = first.substring(0, 157) + "…";
+            if (first.length() > 400) first = first.substring(0, 399) + "…";
             String line = new JSONObject().put("n", n).put("t", System.currentTimeMillis()).put("tool", tool)
                     .put("label", label == null ? tool : label).put("result", first).toString() + "\n";
             try (FileOutputStream o = new FileOutputStream(new File(d, "steps.jsonl"), true)) {
@@ -85,6 +84,7 @@ final class StepLog {
             }
         } catch (Exception ignored) {
         }
+        if (!picture) return;
         File shot = new File(d, n + ".jpg"), old = new File(d, (n - MAX_SHOTS) + ".jpg");
         if (pending.get() >= 2) return; // the screen moves faster than screenshots: this step goes without
         pending.incrementAndGet();

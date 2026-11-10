@@ -28,7 +28,10 @@ final class Rules {
         String instruction = "";
         /** The agent that runs it (claude, codex, opencode or grok), and its model ("" for the agent's default). */
         String backend = "claude", model = "";
-        /** Before acting: "ask" (approval cards wait for the user) or "countdown" (they approve themselves). */
+        /**
+         * Before acting: "ask" (approval cards wait for the user), "countdown" (they approve themselves) or "now" (a
+         * message goes without a card). The last two cover sending a message only, after the second check.
+         */
         String approval = "ask";
         int seconds = 30;
         /** Most runs an hour for one conversation, and three times as many for the whole rule; 0 for no limit. */
@@ -60,6 +63,11 @@ final class Rules {
 
         boolean countdown() {
             return "countdown".equals(approval);
+        }
+
+        /** Messages go right away, without a card. */
+        boolean now() {
+            return "now".equals(approval);
         }
 
         /** Does a notification from this app match the rule's sender and words? */

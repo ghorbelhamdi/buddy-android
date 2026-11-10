@@ -14,7 +14,7 @@
 #   buddy-run <token> transcript <claude|codex> <file>   last messages of a session (buddy_transcript)
 #   buddy-run <token> adopt <session> <claude|codex> <agent-session-id>  continue that session as a Buddy chat
 # Every event sent to the bubble carries "buddy_session" so the app can route it.
-HELPER_VERSION=27
+HELPER_VERSION=29
 set -u
 export PATH=$HOME/.local/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # The claude launcher sets BUN_OPTIONS with a path relative to its folder; never inherit a stale one.
@@ -342,15 +342,33 @@ link_skills() {
   return 0
 }
 
+# The user's own MCP servers that are switched on (Settings, MCP servers), as [{name, tools, sigs}]. An agent reaches
+# each one on Buddy itself ($URL/mcpx/<name>, with Buddy's token): Buddy passes the calls on with the server's key,
+# which never enters Linux. None in a notification rule's run (it works for someone else's message).
+mcp_extra() {
+  if [ "${DEV:-}" = rule ] || [ ! -s "$D/mcp-servers.json" ]; then echo '[]'; return; fi
+  jq -c '[.[] | select((.name // "") | test("^[a-z0-9_]{1,32}$")) | select(.name != "phone")]' "$D/mcp-servers.json" 2>/dev/null || echo '[]'
+}
+# A line for the agents that list MCP tools only by file (agy, grok): the other servers and their tools.
+mcp_extra_note() {
+  jq -r 'map(select((.sigs // "") != "") | "\"" + .name + "\": " + .sigs) | if length > 0 then
+    " The user also set up these MCP servers of their own; use their tools when the request calls for them: " + join("; ") + "."
+    else "" end' <<<"$EXTRA" 2>/dev/null
+}
+
+EXTRA=$(mcp_extra)
+
 # ---------------------------------------------------------------- Claude Code
 run_claude() {
-  local mcp tools
-  mcp=$(jq -cn --arg url "$URL/mcp?chat=$SID" --arg auth "Bearer $TOKEN" \
-    '{mcpServers:{phone:{type:"http",url:$url,headers:{Authorization:$auth},timeout:600000}}}')
+  local mcp tools n
+  mcp=$(jq -cn --arg url "$URL/mcp?chat=$SID" --arg base "$URL/mcpx/" --arg auth "Bearer $TOKEN" --argjson x "$EXTRA" \
+    '{mcpServers:({phone:{type:"http",url:$url,headers:{Authorization:$auth},timeout:600000}}
+      + ($x | map({key:.name, value:{type:"http",url:($base + .name),headers:{Authorization:$auth},timeout:600000}}) | from_entries))}')
   link_skills
   tools=("mcp__phone" "WebSearch" "WebFetch" "Read(/$S/files/**)" "Read(/$D/GUIDE.md)" "Skill"
     "Read(/$HOME/.agents/skills/**)" "Read(/$HOME/.claude/skills/**)")
   [ "$DEV" = rule ] && tools=("mcp__phone")
+  for n in $(jq -r '.[].name' <<<"$EXTRA"); do tools+=("mcp__$n"); done
   local deny=()
   [ "$DEV" = rule ] && deny=(--disallowedTools "Bash" "WebFetch" "WebSearch" "Write" "Edit" "NotebookEdit" "Skill")
   [ "$DEV" = 1 ] && tools+=("Bash" "Read" "Write" "Edit" "Glob" "Grep" "Skill")
@@ -393,6 +411,13 @@ run_codex() {
     -c 'mcp_servers.phone.bearer_token_env_var="BUDDY_TOKEN"'
     -c 'mcp_servers.phone.default_tools_approval_mode="approve"'
     -c 'mcp_servers.phone.tool_timeout_sec=600')
+  local n
+  for n in $(jq -r '.[].name' <<<"$EXTRA"); do
+    cfg+=(-c 'mcp_servers.'"$n"'.url="'"$URL"'/mcpx/'"$n"'"'
+      -c 'mcp_servers.'"$n"'.bearer_token_env_var="BUDDY_TOKEN"'
+      -c 'mcp_servers.'"$n"'.default_tools_approval_mode="approve"'
+      -c 'mcp_servers.'"$n"'.tool_timeout_sec=600')
+  done
   # Linux tools off (and a rule's run): no shell at all, as for Claude Code, not even read-only commands
   local sandbox=(--sandbox read-only --disable shell_tool --disable unified_exec)
   # developer mode: the whole of Buddy's Linux, like Claude Code's Bash and OpenCode (so apk add works too)
@@ -510,10 +535,12 @@ tool, it's not missing, call it again in your next step." > "$S/system.md"
     fi
   fi
   # OpenCode 2 only takes codemode under mcp.servers; without it the phone tools hide behind one "execute" tool
-  cfg=$(jq -cn --arg url "$URL/mcp?chat=$SID" --arg auth "Bearer $TOKEN" --arg sys "$S/system.md" --arg dev "$DEV" --arg v2 "$v2" '
+  cfg=$(jq -cn --arg url "$URL/mcp?chat=$SID" --arg base "$URL/mcpx/" --arg auth "Bearer $TOKEN" --arg sys "$S/system.md" \
+    --arg dev "$DEV" --arg v2 "$v2" --argjson x "$EXTRA" '
     {type:"remote", url:$url, headers:{Authorization:$auth}, oauth:false} as $phone
-    | (if $v2 == "1" then {mcp:{servers:{phone:($phone + {codemode:false, timeout:{execution:600000}})}}}
-       else {mcp:{phone:($phone + {timeout:600000})}} end)
+    | ({phone:$phone} + ($x | map({key:.name, value:($phone + {url:($base + .name)})}) | from_entries)) as $all
+    | (if $v2 == "1" then {mcp:{servers:($all | map_values(. + {codemode:false, timeout:{execution:600000}}))}}
+       else {mcp:($all | map_values(. + {timeout:600000}))} end)
     + {instructions:[$sys], autoupdate:false, share:"disabled"}
     + (if $dev == "1" then {} elif $dev == "rule" then {permission:{bash:"ask", edit:"ask", webfetch:"ask"}}
        else {permission:{bash:"ask", edit:"ask"}} end)')
@@ -614,8 +641,10 @@ run_agy() {
     [ -e "$f" ] && [ "${f##*/}" != mcp_config.json ] && ln -sfn "$f" "$h/.gemini/config/${f##*/}"
   done
   ( umask 077
-    jq -n --arg url "$URL/mcp?chat=$SID" --arg auth "Bearer $TOKEN" \
-      '{mcpServers:{phone:{url:$url, headers:{Authorization:$auth}, timeoutSeconds:600}}}' > "$h/.gemini/config/mcp_config.json" )
+    jq -n --arg url "$URL/mcp?chat=$SID" --arg base "$URL/mcpx/" --arg auth "Bearer $TOKEN" --argjson x "$EXTRA" \
+      '{mcpServers:({phone:{url:$url, headers:{Authorization:$auth}, timeoutSeconds:600}}
+        + ($x | map({key:.name, value:{url:($base + .name), headers:{Authorization:$auth}, timeoutSeconds:600}}) | from_entries))}' \
+      > "$h/.gemini/config/mcp_config.json" )
   # the phone's tools as the server lists them (a newer Buddy may have more); the known list if that fails
   list=$(curl -s -m 10 -X POST -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
     -H 'Accept: application/json, text/event-stream' --data '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' \
@@ -627,7 +656,9 @@ run_agy() {
     | keys_unsorted | map(. as $k | if ($req | index($k)) != null then $k else $k + "?" end) | join(", ")) + ")"]
     | join(", ")' <<<"$list" 2>/dev/null)
   jq -n --argjson t "${tools:-$AGY_PHONE_TOOLS}" --arg files "$S/files" --arg brain "$h/.gemini/antigravity-cli/brain" \
-    '{permissions:{allow:([$t[] | "mcp(phone/\(.))"] + ["read_file(\($files))", "read_file(\($brain))"])}}' \
+    --argjson x "$EXTRA" \
+    '{permissions:{allow:([$t[] | "mcp(phone/\(.))"] + [$x[] | .name as $n | (.tools // [])[] | "mcp(\($n)/\(.))"]
+      + ["read_file(\($files))", "read_file(\($brain))"])}}' \
     > "$h/.gemini/antigravity-cli/settings.json"
   local prompt=$MSG args names note
   # agy has no system-prompt flag, so Buddy's instructions lead a new conversation's first message (as for Codex).
@@ -637,7 +668,7 @@ run_agy() {
   note="In this app the phone tools are on the MCP server named \"phone\". Call them right away with call_mcp_tool \
 (ServerName \"phone\", the ToolName and its Arguments as listed here; ? marks an optional one): $sigs. You don't need \
 to read their descriptions first; only if an argument is unclear, read_file \
-$h/.gemini/antigravity-cli/mcp/phone/<tool>.json."
+$h/.gemini/antigravity-cli/mcp/phone/<tool>.json.$(mcp_extra_note)"
   [ "$DEV" = 1 ] || note="$note Shell commands are not available in this chat; don't try them."
   [ -s "$S/agy-conversation" ] || prompt="$SYSTEM"$'\n\n'"$note"$'\n\n---\n\nUser message from the Buddy bubble:\n'"$MSG"
   args=(-p "$prompt" --output-format stream-json)
@@ -785,6 +816,10 @@ run_grok() {
         !skip && !/^disabled_mcp_servers/' "$g/config.toml" 2>/dev/null
       printf '\n[mcp_servers.phone]\nurl = "%s"\ntool_timeout_sec = 600\n\n[mcp_servers.phone.headers]\nAuthorization = "Bearer %s"\n' \
         "$URL/mcp?chat=$SID" "$TOKEN"
+      for n in $(jq -r '.[].name' <<<"$EXTRA"); do
+        printf '\n[mcp_servers.%s]\nurl = "%s"\ntool_timeout_sec = 600\n\n[mcp_servers.%s.headers]\nAuthorization = "Bearer %s"\n' \
+          "$n" "$URL/mcpx/$n" "$n" "$TOKEN"
+      done
       if [ "$DEV" != 1 ]; then
         printf '\n[skills]\ndisabled = [%s]\n\n[compat.codex]\nskills = false\nhooks = false\n' \
           "$(grok_bundled_skills | sed 's/.*/"&"/' | paste -sd, -)"
@@ -798,10 +833,11 @@ run_grok() {
     | join(", ")' 2>/dev/null)
   note="In this app the phone tools are on the MCP server named \"phone\". Call them right away with use_tool \
 (tool_name \"phone__<tool>\", e.g. phone__read_screen, and tool_input with its arguments${sigs:+ as listed here; ? marks an \
-optional one: $sigs}). You don't need search_tool for them."
+optional one: $sigs}). You don't need search_tool for them.$(mcp_extra_note | sed 's/use their tools/call them with use_tool as "<server>__<tool>"/')"
   [ "$DEV" = 1 ] || note="$note Shell commands are not available in this chat; don't try them."
   # --rules adds Buddy's instructions to grok's own, on every run (as --append-system-prompt does for Claude Code)
   local args=(-p "$MSG" --output-format streaming-messages-json --rules "$SYSTEM"$'\n\n'"$note" --allow 'MCPTool(phone__*)')
+  for n in $(jq -r '.[].name' <<<"$EXTRA"); do args+=(--allow "MCPTool(${n}__*)"); done
   case "$DEV" in
     1) args+=(--always-approve) ;;
     rule) args+=(--tools use_tool --disable-web-search) ;;  # use_tool and search_tool: the phone only
@@ -949,7 +985,9 @@ tools (call_mcp_tool, ServerName \"phone\") and finish the user's request."
     name="Claude Code"
   fi
   if [ "$status" -ne 0 ] && [ "$status" -ne 143 ] && [ -s "$S/last-error.log" ]; then
-    event buddy_error "$name failed: $(tail -c 400 "$S/last-error.log")"
+    # the agent's own words: all of them, unless it wrote pages (then the end, and a mark that there was more)
+    more=""; [ "$(wc -c < "$S/last-error.log")" -gt 4000 ] && more="… "
+    event buddy_error "$name failed: $more$(tail -c 4000 "$S/last-error.log")"
   fi
 ) &
 echo $! > "$S/pid"

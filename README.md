@@ -43,7 +43,7 @@ https://github.com/user-attachments/assets/d07936fc-4788-4ab5-a105-31b3e9aeba4f
 | **Uses your apps** | Messages, shopping, smart home, settings: anything on screen. Add instructions while it works. |
 | **Asks first** | Approve, Deny or Change before anything is sent, posted, bought or deleted. |
 | **Shows you how** | "Show me how to turn on dark mode": it points at each step and waits for your tap. |
-| **Acts on notifications** | "When a customer asks on WhatsApp, reply with our opening hours", with your OK or a countdown you can stop. |
+| **Acts on notifications** | "When a customer asks on WhatsApp, reply with our opening hours", with your OK, a countdown you can stop, or right away. |
 | **Voice** | Talk to it and have replies read aloud. |
 | **Background mode** | The agent works in your apps on a screen of its own that you don't see, while you keep using your phone. Set up once with the phone's own Wireless debugging, no computer; watch it live in the chat. Optional: let it run `adb shell` commands on the phone, each one approved by you. |
 | **Background browser** | Web pages in a browser inside Buddy, without taking over your screen, even while the phone is locked. Watch and use it live in the chat; it marks what you need to do (sign in, a captcha) and never types your passwords. |

@@ -91,8 +91,11 @@ public class ApiKeysActivity extends Screen {
         r.setPaddingRelative(dp(this, 14), dp(this, 12), dp(this, 10), dp(this, 12));
         r.setBackground(outlined(this, CARD, 16, OUTLINE, 1));
         LinearLayout t = column(this);
-        t.addView(title(this, p.name, 15));
-        t.addView(single(monoText(this, getString(R.string.api_keys_models, p.host(), p.offered().length()), 12, MUTED)));
+        TextView nm = title(this, p.name, 15);
+        if (p.off) nm.setTextColor(MUTED);
+        t.addView(nm);
+        t.addView(single(monoText(this, (p.off ? getString(R.string.api_keys_off) + " · " : "")
+                + getString(R.string.api_keys_models, p.host(), p.offered().length()), 12, MUTED)));
         List<String> names = new ArrayList<>();
         for (String a : AGENTS) if (p.fits(a)) names.add(Account.nameOf(a));
         t.addView(text(this, getString(R.string.api_keys_for, android.text.TextUtils.join(", ", names)), 12, MUTED));
@@ -188,6 +191,13 @@ public class ApiKeysActivity extends Screen {
             name.setText(p.name);
             anthropic.setText(p.anthropic);
             openai.setText(p.openai);
+            // off: the key stays saved, nothing uses it
+            LinearLayout use = switchRow(this, getString(R.string.api_keys_use), getString(R.string.api_keys_use_info), !p.off, on -> {
+                Providers.setOff(this, p, !on);
+                render();
+            });
+            use.setPaddingRelative(0, dp(this, 8), 0, dp(this, 4));
+            c.addView(use, gap(8));
         }
         c.addView(name, gap(12));
         c.addView(key, gap(8));

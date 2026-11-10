@@ -24,6 +24,8 @@ final class Providers {
         String model = "";
         /** The models the pickers show (empty: all of them; OpenRouter lists hundreds). */
         java.util.Set<String> shown = new java.util.LinkedHashSet<>();
+        /** Switched off by the user: its key stays saved, but no chat or agent uses it and Buddy doesn't call it. */
+        boolean off;
 
         /** A server on this phone or the user's own network (Ollama, LM Studio, llama.cpp…). */
         boolean local() {
@@ -117,6 +119,7 @@ final class Providers {
                 p.anthropic = o.optString("anthropic");
                 p.openai = o.optString("openai");
                 p.model = o.optString("model");
+                p.off = o.optBoolean("off");
                 JSONArray m = o.optJSONArray("models");
                 if (m != null) p.models = m;
                 JSONArray sh = o.optJSONArray("shown");
@@ -133,10 +136,24 @@ final class Providers {
         return null;
     }
 
+    /** The services this agent can use now: the ones that fit it and aren't switched off. */
     static synchronized List<P> forAgent(String agent) {
         List<P> out = new ArrayList<>();
-        for (P p : all()) if (p.fits(agent)) out.add(p);
+        for (P p : all()) if (!p.off && p.fits(agent)) out.add(p);
         return out;
+    }
+
+    /**
+     * Switches a service off or on again (Settings → API keys). Off, its key and settings stay, but the pickers
+     * don't offer it, an agent that used it by default goes back to its own (and returns to it when it's on again),
+     * a chat set to one of its models says so instead of running, and Buddy doesn't ask it for its models.
+     */
+    static synchronized void setOff(Context c, P p, boolean off) {
+        p.off = off;
+        try {
+            store(c);
+        } catch (Exception ignored) {
+        }
     }
 
     /** A chat's model when it's a service's: "@id/model". */
@@ -225,7 +242,7 @@ final class Providers {
 
     private static JSONObject json(P p) throws Exception {
         return new JSONObject().put("id", p.id).put("name", p.name).put("anthropic", p.anthropic).put("openai", p.openai)
-               .put("model", p.model).put("shown", new JSONArray(p.shown));
+               .put("model", p.model).put("shown", new JSONArray(p.shown)).put("off", p.off);
     }
 
     /** Asks the service for its models (OpenAI-style address first: it lists more) and keeps them. */
@@ -349,7 +366,7 @@ final class Providers {
             boolean online = now - refreshedAt >= 600_000, local = now - localRefreshedAt >= 5_000;
             if (online) refreshedAt = now;
             if (local) localRefreshedAt = now;
-            for (P p : all()) if (p.local() ? local : online) todo.add(p);
+            for (P p : all()) if (!p.off && (p.local() ? local : online)) todo.add(p);
             // a picker opened while a fetch runs (one started as the screen came back): it hears how that one ends
             if (changed != null && (inFlight > 0 || !todo.isEmpty())) waiting.add(changed);
             if (todo.isEmpty()) return;

@@ -63,6 +63,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     /** The background browser's live card, while this chat has a tab there. */
     private BrowserPanel browser;
     private BackgroundPanel backgroundPanel;
+    private Button recheck;
     private boolean resumed;
 
     @Override
@@ -175,6 +176,20 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         messages.setPaddingRelative(dp(this, 16), dp(this, 8), dp(this, 16), dp(this, 12));
         scroll.addView(messages);
         root.addView(scroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
+
+        // a notification rule's chat: "Check again" has the agent look at the conversation now (see Triggers.recheck)
+        recheck = button(this, getString(R.string.rules_recheck), false);
+        recheck.setMinHeight(dp(this, 40));
+        recheck.setMinimumHeight(dp(this, 40));
+        recheck.setVisibility(View.GONE);
+        recheck.setOnClickListener(v -> {
+            String err = Triggers.recheck(this, ses);
+            if (err != null) android.widget.Toast.makeText(this, err, android.widget.Toast.LENGTH_LONG).show();
+        });
+        LinearLayout.LayoutParams rcp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 40));
+        rcp.gravity = Gravity.CENTER_HORIZONTAL;
+        rcp.bottomMargin = dp(this, 8);
+        root.addView(recheck, rcp);
 
         // inline approval card (when an agent asks for an OK)
         approval = protect(column(this)); // the inline approval card: only the user answers it
@@ -323,6 +338,12 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         frame.addView(root);
         setContentView(frame);
 
+        // from Search: the message that has the words, shown and marked for a moment
+        int find = state == null ? getIntent().getIntExtra("find", -1) : -1;
+        if (find >= 0 && find < ses.messages.size()) {
+            found = ses.messages.get(find);
+            shownBack = Math.max(shownBack, ses.messages.size() - find + 3);
+        }
         showAll();
         String draft = getIntent().getStringExtra("draft");
         if (draft != null && state == null) {
@@ -366,6 +387,13 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             });
             messages.addView(earlier, full());
         }
+        if (from == 0 && ses.cut && !ChatHub.canRestore(ses)) {
+            // its start is gone (a chat keeps its latest messages) and this agent keeps no record to bring it back from
+            TextView gone = text(this, getString(R.string.chat_earlier_gone, Sessions.MAX_MESSAGES), 13, MUTED);
+            gone.setGravity(Gravity.CENTER);
+            gone.setPaddingRelative(dp(this, 16), dp(this, 12), dp(this, 16), dp(this, 12));
+            messages.addView(gone, full());
+        }
         if (from == 0 && ChatHub.canRestore(ses)) {
             // its start was dropped by the old limit on a chat's length: the agent's own record still has it
             final TextView load = text(this, getString(R.string.chat_earlier_load), 14, ACCENT_TEXT);
@@ -386,9 +414,41 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             });
             messages.addView(load, full());
         }
-        for (Sessions.Msg m : new java.util.ArrayList<>(ses.messages.subList(from, ses.messages.size()))) show(m);
+        foundView = null;
+        for (Sessions.Msg m : new java.util.ArrayList<>(ses.messages.subList(from, ses.messages.size()))) {
+            show(m);
+            if (m == found && messages.getChildCount() > 0) foundView = messages.getChildAt(messages.getChildCount() - 1);
+        }
         if (log != null && !ses.running) log.finish();
         lastShown = lastMsg();
+    }
+
+    /** The message a search led here for, and its view: scrolled to and marked once, when the screen first shows. */
+    private Sessions.Msg found;
+    private View foundView;
+
+    /** Brings the found message into view (a little below the top) and tints it for a moment. */
+    private void showFound() {
+        final View v = foundView;
+        found = null;
+        foundView = null;
+        if (v == null) return;
+        scroll.post(() -> {
+            scroll.scrollTo(0, Math.max(0, v.getTop() - dp(this, 72)));
+            final android.graphics.drawable.ColorDrawable mark = new android.graphics.drawable.ColorDrawable(ACCENT);
+            mark.setAlpha(0);
+            v.setForeground(mark);
+            android.animation.ValueAnimator a = android.animation.ValueAnimator.ofInt(0, 90, 90, 0);
+            a.setDuration(2200);
+            a.addUpdateListener(x -> mark.setAlpha((Integer) x.getAnimatedValue()));
+            a.addListener(new android.animation.AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(android.animation.Animator animation) {
+                    v.setForeground(null);
+                }
+            });
+            a.start();
+        });
     }
 
     /** How far back the chat is shown: this many of its latest messages (more with each "Show earlier messages"). */
@@ -428,7 +488,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         }
         if (lastMsg() != lastShown) showAll(); // messages came in while this screen was hidden
         refresh();
-        scrollToEnd();
+        if (found != null && foundView != null) showFound(); // opened from Search: at the message, not the end
+        else scrollToEnd();
     }
 
     @Override
@@ -1270,6 +1331,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
 
     private void refresh() {
         if (backgroundPanel != null) backgroundPanel.setShown(resumed);
+        if (recheck != null) recheck.setVisibility(Triggers.canRecheck(this, ses) ? View.VISIBLE : View.GONE);
         boolean speak = Prefs.speakReplies(this);
         speaker.setImageResource(speak ? R.drawable.ms_volume_up : R.drawable.ms_volume_off);
         speaker.setImageTintList(ColorStateList.valueOf(speak ? ACCENT : MUTED));
@@ -1917,9 +1979,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             android.text.SpannableStringBuilder sb = new android.text.SpannableStringBuilder(name);
             sb.setSpan(new android.text.style.ForegroundColorSpan(TEXT), 0, name.length(), 0);
             sb.append(arg);
-            t.setText(sb);
-            t.setMaxLines(3);
-            t.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            t.setText(sb); // whole: what was typed, sent or run is read here
             t.setPaddingRelative(dp(ChatActivity.this, 8), 0, 0, 0);
             r.addView(t, weight1());
             copyOnLongPress(r, step);

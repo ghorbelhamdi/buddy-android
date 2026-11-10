@@ -224,7 +224,10 @@ final class Sessions {
 
     void add(Session s, Bubble.Kind kind, String text, List<String> files) {
         s.messages.add(new Msg(kind, text, files));
-        while (s.messages.size() > MAX_MESSAGES) s.messages.remove(0);
+        while (s.messages.size() > MAX_MESSAGES) {
+            s.messages.remove(0);
+            s.cut = true; // the chat says so, and offers the agent's own record of the start where there is one
+        }
         s.updated = System.currentTimeMillis();
         if (kind == Bubble.Kind.USER && s.title.isEmpty()) s.title = autoTitle(text, files);
         // keep most recently used first

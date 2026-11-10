@@ -39,6 +39,8 @@ final class Background {
     static final String KEY = "bg:";
     /** Where the helper listens (this phone only). */
     static final int PORT = 8771;
+    /** Where the helper's own output goes (the shell user's folder): read back when it doesn't start. */
+    private static final String LOG = "/data/local/tmp/buddy-helper.log";
     /** Buddy's adb keeps a server of its own: another app's (Termux's) on the usual port has other keys. */
     private static final String ADB = "export HOME=/root ANDROID_ADB_SERVER_PORT=5138; ";
     private static final String SECURE = "android.permission.WRITE_SECURE_SETTINGS";
@@ -114,6 +116,21 @@ final class Background {
         new Thread(() -> {
             try {
                 call(c, "close\t" + chat);
+            } catch (IOException ignored) {
+            }
+        }).start();
+    }
+
+    /**
+     * The chat's run ended: its display sleeps until the next tool call wakes it. An app left awake there counts as
+     * on screen, so a messenger would mark new messages read and post no notification (which notification rules wait
+     * for).
+     */
+    static void rest(final Context c, final String chat) {
+        if (!displays.containsKey(chat)) return;
+        new Thread(() -> {
+            try {
+                call(c, "rest\t" + chat);
             } catch (IOException ignored) {
             }
         }).start();
@@ -327,8 +344,27 @@ final class Background {
                 }
                 sleep(300);
             }
-            return out.contains("PORT=") ? "its helper didn't start"
+            return out.contains("PORT=") ? "its helper didn't start" + said(out)
                     : "Buddy isn't paired with this phone's Wireless debugging any more (Settings → Background mode → Set up)";
+        }
+    }
+
+    /** What the helper itself printed before it gave up (launch's output after LOG=), as ": …", or "". */
+    private static String said(String out) {
+        int at = out.indexOf("LOG=");
+        String log = at < 0 ? "" : out.substring(at + 4).trim();
+        if (log.length() > 1200) log = "…" + log.substring(log.length() - 1200);
+        return log.isEmpty() ? " (it printed nothing)" : ": " + log;
+    }
+
+    /** What the running helper says is wrong with it (this phone gives it no screens of its own), or null. */
+    static String problem(Context c) {
+        try {
+            String p = call(c, "ping").trim();
+            int at = p.indexOf(" nodisplays ");
+            return at < 0 ? null : "this phone doesn't let the helper make a screen of its own (" + p.substring(at + 12) + ")";
+        } catch (IOException e) {
+            return null;
         }
     }
 
@@ -348,12 +384,13 @@ final class Background {
         // line (which names the helper further on), and killed it before the new helper started
         String helper = "pkill -f '^app_process.*assistant.Shell'; CLASSPATH=" + c.getPackageCodePath()
                 + " setsid app_process / " + Shell.class.getName() + " " + PORT + " " + Prefs.backgroundToken(c)
-                + " >/dev/null 2>&1 </dev/null &";
+                + " >" + LOG + " 2>&1 </dev/null &";
         String script = ADB + "adb start-server >/dev/null 2>&1; for p in" + list + "; do "
                 + "timeout 8 adb connect 127.0.0.1:$p >/dev/null 2>&1; "
                 + "if [ \"$(timeout 5 adb -s 127.0.0.1:$p get-state 2>/dev/null)\" = device ]; then echo PORT=$p; "
                 + "adb -s 127.0.0.1:$p shell \"pm grant " + c.getPackageName() + " " + SECURE + "\" >/dev/null 2>&1; "
-                + "adb -s 127.0.0.1:$p shell \"" + helper + "\"; sleep 1; break; fi; "
+                + "adb -s 127.0.0.1:$p shell \"" + helper + "\"; sleep 2; echo LOG=; "
+                + "adb -s 127.0.0.1:$p shell \"tail -c 1500 " + LOG + "\" 2>&1; break; fi; "
                 + "adb disconnect 127.0.0.1:$p >/dev/null 2>&1; done; adb kill-server >/dev/null 2>&1";
         try {
             String out = Linux.exec(c, script, 150);

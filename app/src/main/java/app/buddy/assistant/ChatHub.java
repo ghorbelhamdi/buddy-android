@@ -236,6 +236,14 @@ final class ChatHub {
     }
 
     /**
+     * "Check again" in a rule's chat (see Triggers.recheck): the user's own run, but over other people's messages, so
+     * without shell, files or web like a rule's.
+     */
+    String sendRecheck(Sessions.Session ses, String shown, String prompt) {
+        return send(ses, shown, null, prompt, false, true);
+    }
+
+    /**
      * A scheduled task's run (see Schedules): the user's saved message, shown as theirs and marked "Scheduled", with
      * the chat's own settings (Linux tools included). The agent gets it with a line saying when and why it came.
      */
@@ -261,6 +269,8 @@ final class ChatHub {
         }
         boolean hasFiles = files != null && !files.isEmpty();
         if (text.isEmpty() && !hasFiles) return null;
+        Providers.P service = Providers.of(ses.model); // the chat's own pick: said, not quietly swapped for another model
+        if (service != null && service.off) return app.getString(R.string.hub_service_off, service.name);
         String forAgent = prompt != null ? prompt : text.isEmpty() && hasFiles ? "Have a look at what I attached." : text;
         BuddyService svc = BuddyService.get();
         // only the user's own message lifts a Stop: a queued rule run must not undo it
@@ -319,7 +329,7 @@ final class ChatHub {
     private String lastError(Sessions.Session ses) {
         java.io.File f = new java.io.File(Linux.root(app), "root/.buddy/sessions/" + ses.id + "/last-error.log");
         try (java.io.RandomAccessFile r = new java.io.RandomAccessFile(f, "r")) {
-            long n = Math.min(r.length(), 300);
+            long n = Math.min(r.length(), 4000);
             byte[] b = new byte[(int) n];
             r.seek(r.length() - n);
             r.readFully(b);
@@ -586,7 +596,7 @@ final class ChatHub {
                     } else if ("tool_use".equals(c.optString("type"))) {
                         String step = describeTool(c.optString("name"), c.optJSONObject("input"));
                         if (step != null) {
-                            add(ses, Bubble.Kind.STEP, step);
+                            add(ses, Bubble.Kind.STEP, describeTool(c.optString("name"), c.optJSONObject("input"), true));
                             ses.status = step;
                             String n = c.optString("name");
                             if (n.equals(TOOL_PREFIX + "confirm") || n.equals(TOOL_PREFIX + "ask")) CodexLive.agentWaiting(ses, step, c.optJSONObject("input"));
@@ -641,7 +651,7 @@ final class ChatHub {
                 if (shown) break;
                 JSONArray paths = ev.optJSONArray("paths");
                 List<String> files = new ArrayList<>();
-                for (int i = 0; paths != null && i < paths.length() && files.size() < 4; i++) {
+                for (int i = 0; paths != null && i < paths.length(); i++) {
                     String file = picture(paths.optString(i));
                     if (file != null) files.add(file);
                 }
@@ -877,6 +887,7 @@ final class ChatHub {
     private void runEnded(Sessions.Session ses) {
         Prefs.setBusy(app, ses.id, false);
         StepLog.runEnded(app, ses);
+        if (ses.background) Background.rest(app, ses.id); // its apps aren't "on screen" between runs
         if (ses.schedule == null) ses.allowed.clear(); // a scheduled chat keeps them for its next scheduled run
         CodexLive.agentDone(ses, ses.outcome, !ses.lastReply.isEmpty());
         // a quiet scheduled run that found nothing new ends without a notification (a failed one always says so)
@@ -922,7 +933,7 @@ final class ChatHub {
             if (!seen.add(path)) continue;
             String file = picture(path);
             if (file != null) out.add(file);
-        } while (out.size() < 4 && m.find());
+        } while (m.find());
         return out;
     }
 
@@ -964,6 +975,15 @@ final class ChatHub {
     }
 
     static String describeTool(String name, JSONObject in) {
+        return describeTool(name, in, false);
+    }
+
+    /**
+     * full: for the chat, where a step is shown whole: what the agent types, sends, asks or gets approved, and the
+     * commands and scripts it runs (the user reads there what was done in their name). The short form is for the
+     * status line and the steps list.
+     */
+    static String describeTool(String name, JSONObject in, boolean full) {
         if (in == null) in = new JSONObject();
         String n = name.startsWith(TOOL_PREFIX) ? name.substring(TOOL_PREFIX.length()) : name;
         switch (n) {
@@ -972,7 +992,7 @@ final class ChatHub {
             case "tap": return in.has("element") ? BuddyApp.str(R.string.hub_tool_tap_element, in.optInt("element"))
                     : BuddyApp.str(R.string.hub_tool_tap_point, in.optInt("x"), in.optInt("y"));
             case "long_press": return BuddyApp.str(R.string.hub_tool_long_press);
-            case "type_text": return BuddyApp.str(R.string.hub_tool_type, clip(in.optString("text"), 40));
+            case "type_text": return BuddyApp.str(R.string.hub_tool_type, said(full, in.optString("text"), 40));
             case "scroll": {
                 String d = in.optString("direction"); // the tool's enum values get whole translated lines
                 switch (d) {
@@ -997,8 +1017,8 @@ final class ChatHub {
             }
             case "open_app": return BuddyApp.str(R.string.hub_tool_open_app, in.optString("app"));
             case "list_apps": return BuddyApp.str(R.string.hub_tool_list_apps);
-            case "open_url": return BuddyApp.str(R.string.hub_tool_open_url, clip(in.optString("url"), 40));
-            case "phone_shell": return BuddyApp.str(R.string.hub_tool_phone_shell, clip(in.optString("command"), 60));
+            case "open_url": return BuddyApp.str(R.string.hub_tool_open_url, said(full, in.optString("url"), 40));
+            case "phone_shell": return BuddyApp.str(R.string.hub_tool_phone_shell, said(full, in.optString("command"), 60));
             case "wait":
             case "ToolSearch":
             case "TodoWrite":
@@ -1006,10 +1026,10 @@ final class ChatHub {
             case "confirm": {
                 // OpenCode reports a step only once it's done, so its approval step carries the answer (_answer)
                 String ans = in.optString("_answer", "");
-                if (ans.startsWith("APPROVED")) return BuddyApp.str(R.string.hub_tool_approved, clip(in.optString("summary"), 80));
+                if (ans.startsWith("APPROVED")) return BuddyApp.str(R.string.hub_tool_approved, said(full, in.optString("summary"), 80));
                 if (ans.startsWith("CHANGES")) {
                     int a = ans.indexOf('“'), b = ans.lastIndexOf('”');
-                    return a >= 0 && b > a ? BuddyApp.str(R.string.hub_tool_change_requested_text, clip(ans.substring(a + 1, b), 80))
+                    return a >= 0 && b > a ? BuddyApp.str(R.string.hub_tool_change_requested_text, said(full, ans.substring(a + 1, b), 80))
                             : BuddyApp.str(R.string.hub_tool_change_requested);
                 }
                 if (ans.startsWith("DENIED")) return BuddyApp.str(R.string.hub_tool_denied);
@@ -1019,11 +1039,11 @@ final class ChatHub {
                 String ans = in.optString("_answer", ""); // OpenCode, as for confirm
                 if (ans.startsWith("ANSWER")) {
                     int a = ans.indexOf('“'), b = ans.lastIndexOf('”');
-                    return a >= 0 && b > a ? BuddyApp.str(R.string.hub_tool_answered_text, clip(ans.substring(a + 1, b), 80))
+                    return a >= 0 && b > a ? BuddyApp.str(R.string.hub_tool_answered_text, said(full, ans.substring(a + 1, b), 80))
                             : BuddyApp.str(R.string.hub_tool_answered);
                 }
                 if (ans.startsWith("NO ANSWER")) return BuddyApp.str(R.string.hub_tool_question_skipped);
-                return BuddyApp.str(R.string.hub_tool_asking, clip(in.optString("question"), 80));
+                return BuddyApp.str(R.string.hub_tool_asking, said(full, in.optString("question"), 80));
             }
             case "point_out": {
                 JSONArray marks = in.optJSONArray("marks");
@@ -1033,19 +1053,19 @@ final class ChatHub {
                     String l = m == null ? "" : m.optString("label", "").trim();
                     if (!l.isEmpty()) labels.append(labels.length() > 0 ? ", " : "").append(l);
                 }
-                return labels.length() > 0 ? BuddyApp.str(R.string.hub_tool_point_out, clip(labels.toString(), 60))
+                return labels.length() > 0 ? BuddyApp.str(R.string.hub_tool_point_out, said(full, labels.toString(), 60))
                         : BuddyApp.str(R.string.hub_tool_point_out_any);
             }
             case "update_buddy": return BuddyApp.str(in.optBoolean("install") ? R.string.hub_tool_update_download : R.string.hub_tool_update_check);
             case "notify": return in.optString("text");
-            case "schedule_message": return BuddyApp.str(R.string.hub_tool_schedule_message, clip(in.optString("message"), 40));
+            case "schedule_message": return BuddyApp.str(R.string.hub_tool_schedule_message, said(full, in.optString("message"), 40));
             case "list_scheduled": return BuddyApp.str(R.string.hub_tool_list_scheduled);
             case "cancel_scheduled": return BuddyApp.str(R.string.hub_tool_cancel_scheduled);
-            case "reply_notification": return BuddyApp.str(R.string.hub_tool_reply_notification, clip(in.optString("text"), 40));
-            case "browser_open": return BuddyApp.str(R.string.hub_tool_browser_open, clip(in.optString("url"), 40));
+            case "reply_notification": return BuddyApp.str(R.string.hub_tool_reply_notification, said(full, in.optString("text"), 40));
+            case "browser_open": return BuddyApp.str(R.string.hub_tool_browser_open, said(full, in.optString("url"), 40));
             case "browser_read": return BuddyApp.str(R.string.hub_tool_browser_read);
             case "browser_click": return BuddyApp.str(R.string.hub_tool_browser_click, in.optInt("ref"));
-            case "browser_type": return BuddyApp.str(R.string.hub_tool_browser_type, clip(in.optString("text"), 40));
+            case "browser_type": return BuddyApp.str(R.string.hub_tool_browser_type, said(full, in.optString("text"), 40));
             case "browser_scroll": return BuddyApp.str(R.string.hub_tool_browser_scroll);
             case "browser_screenshot": return BuddyApp.str(R.string.hub_tool_browser_screenshot);
             case "browser_back": return BuddyApp.str(R.string.hub_tool_browser_back);
@@ -1055,31 +1075,42 @@ final class ChatHub {
             case "set_alarm": return BuddyApp.str(R.string.hub_tool_set_alarm, in.optString("time"));
             case "set_timer": return BuddyApp.str(R.string.hub_tool_set_timer);
             case "share": return BuddyApp.str(R.string.hub_tool_share);
-            case "save_to_downloads": return BuddyApp.str(R.string.hub_tool_save_downloads, clip(in.optString("path").replaceAll(".*/", ""), 40));
+            case "save_to_downloads": return BuddyApp.str(R.string.hub_tool_save_downloads, said(full, in.optString("path").replaceAll(".*/", ""), 40));
             case "device_status": return BuddyApp.str(R.string.hub_tool_device_status);
             case "take_photo": return BuddyApp.str(R.string.hub_tool_take_photo);
             case "location": return BuddyApp.str(R.string.hub_tool_location);
             case "notifications": return BuddyApp.str(R.string.hub_tool_notifications);
             case "media": return BuddyApp.str(R.string.hub_tool_media);
             case "calendar_events": return BuddyApp.str(R.string.hub_tool_calendar_events);
-            case "add_calendar_event": return BuddyApp.str(R.string.hub_tool_add_event, clip(in.optString("title"), 40));
+            case "add_calendar_event": return BuddyApp.str(R.string.hub_tool_add_event, said(full, in.optString("title"), 40));
             case "wait_for": return BuddyApp.str(R.string.hub_tool_wait_for);
             case "do_steps": {
                 JSONArray st = in.optJSONArray("steps");
                 return BuddyApp.str(R.string.hub_tool_do_steps, st == null ? 0 : st.length());
             }
             case "collect": return BuddyApp.str(R.string.hub_tool_collect);
-            case "find": return BuddyApp.str(R.string.hub_tool_find, clip(in.optString("text"), 40));
-            case "WebSearch": return BuddyApp.str(R.string.hub_tool_web_search, clip(in.optString("query"), 40));
-            case "WebFetch": return BuddyApp.str(R.string.hub_tool_web_fetch, clip(in.optString("url"), 40));
-            case "Bash": return in.has("command") ? BuddyApp.str(R.string.hub_tool_command, clip(in.optString("command"), 40))
+            case "find": return BuddyApp.str(R.string.hub_tool_find, said(full, in.optString("text"), 40));
+            case "WebSearch": return BuddyApp.str(R.string.hub_tool_web_search, said(full, in.optString("query"), 40));
+            case "WebFetch": return BuddyApp.str(R.string.hub_tool_web_fetch, said(full, in.optString("url"), 40));
+            case "Bash": return in.has("command") ? BuddyApp.str(R.string.hub_tool_command, said(full, in.optString("command"), 40))
                     : BuddyApp.str(R.string.hub_tool_command_any);
             case "Edit":
-            case "Write": return in.has("file_path") ? BuddyApp.str(R.string.hub_tool_edit, clip(in.optString("file_path").replaceAll(".*/", ""), 40))
+            case "Write": return in.has("file_path") ? BuddyApp.str(R.string.hub_tool_edit, said(full, in.optString("file_path").replaceAll(".*/", ""), 40))
                     : BuddyApp.str(R.string.hub_tool_edit_any);
-            case "Read": return BuddyApp.str(R.string.hub_tool_read_file, clip(in.optString("file_path").replaceAll(".*/", ""), 40));
-            default: return BuddyApp.str(R.string.hub_tool_other, n);
+            case "Read": return BuddyApp.str(R.string.hub_tool_read_file, said(full, in.optString("file_path").replaceAll(".*/", ""), 40));
+            default: {
+                // a tool of one of the user's own MCP servers: which server, which tool, and what was sent to it
+                java.util.regex.Matcher m = java.util.regex.Pattern.compile("^mcp__([A-Za-z0-9_-]+?)__(.+)$").matcher(n);
+                if (!m.find()) return BuddyApp.str(R.string.hub_tool_other, n);
+                return BuddyApp.str(R.string.hub_tool_other, m.group(1) + " · " + m.group(2))
+                        + (in.length() == 0 ? "" : " " + said(full, in.toString(), 60));
+            }
         }
+    }
+
+    /** A step's text (a message, a command, an address): whole for the chat, else clipped to n. */
+    private static String said(boolean full, String s, int n) {
+        return full ? s.trim() : clip(s, n);
     }
 
     static String clip(String s, int n) {

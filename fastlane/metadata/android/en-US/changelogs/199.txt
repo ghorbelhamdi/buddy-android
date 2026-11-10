@@ -1,0 +1,4 @@
+• Background mode: starts on Samsung phones (helper crash fixed); an app on a chat's own screen is really stopped between runs, so notification rules get its messages again
+• Notification rules: "Check again", and "Don't ask" to reply with no approval card
+• New: chat search, your own MCP servers, cards read aloud and answered by voice, a switch to turn a saved API key off
+• Chats show replies, approvals and commands in full

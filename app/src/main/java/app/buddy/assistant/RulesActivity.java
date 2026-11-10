@@ -196,7 +196,7 @@ public class RulesActivity extends Screen {
         String tag = (r.on ? "" : getString(R.string.rules_tag_off) + " · ") + Account.nameOf(r.backend)
                 + (r.model.isEmpty() ? "" : " · " + Models.label(r.backend, r.model)) + " · "
                 + (r.countdown() ? getString(R.string.rules_tag_countdown, Rules.Rule.duration(this, r.seconds))
-                : getString(R.string.rules_tag_ask)) + " · "
+                : r.now() ? getString(R.string.rules_tag_now) : getString(R.string.rules_tag_ask)) + " · "
                 + (r.limit == 0 ? getString(R.string.rules_tag_no_limit) : getString(R.string.rules_tag_limit, r.limit));
         TextView tg = monoText(this, tag, 12, r.on ? ACCENT_TEXT : MUTED);
         tg.setPaddingRelative(0, dp(this, 4), 0, 0);
@@ -363,7 +363,8 @@ public class RulesActivity extends Screen {
         approvalSlot.removeAllViews();
         LinearLayout box = column(this);
         box.addView(segmented(this, new String[][]{{"ask", getString(R.string.rules_approval_ask)},
-                {"countdown", getString(R.string.rules_approval_countdown)}}, draft.approval, false, v -> {
+                {"countdown", getString(R.string.rules_approval_countdown)},
+                {"now", getString(R.string.rules_approval_now)}}, draft.approval, false, v -> {
             draft.approval = v;
             renderApproval();
         }), full());
@@ -378,8 +379,8 @@ public class RulesActivity extends Screen {
             }), gap(8));
         }
         box.addView(text(this, getString(draft.countdown() ? R.string.rules_approval_countdown_info
-                : R.string.rules_approval_ask_info), 12, MUTED), gap(8));
-        if (draft.countdown()) { // which second AI checks the replies, and where to change it
+                : draft.now() ? R.string.rules_approval_now_info : R.string.rules_approval_ask_info), 12, MUTED), gap(8));
+        if (draft.countdown() || draft.now()) { // which second AI checks the replies, and where to change it
             String harness = Reviewer.harness(this, draft.backend);
             String who = harness == null ? null : Account.nameOf(harness) + " · " + ("claude".equals(harness)
                     && Prefs.reviewerModel(this, harness).isEmpty() ? "Haiku" : Models.label(harness, Prefs.reviewerModel(this, harness)));

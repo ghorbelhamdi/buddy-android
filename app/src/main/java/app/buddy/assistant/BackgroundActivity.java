@@ -166,9 +166,11 @@ public class BackgroundActivity extends Screen {
         body.addView(start, big(14));
         Runnable check = () -> new Thread(() -> {
             boolean alive = Background.alive(this);
+            String problem = alive ? Background.problem(this) : null;
             runOnUiThread(() -> {
                 status.setText(alive ? R.string.background_ready : R.string.background_paired);
-                info.setText(alive ? R.string.background_ready_info : R.string.background_asleep);
+                if (problem != null) info.setText(getString(R.string.background_failed, problem));
+                else info.setText(alive ? R.string.background_ready_info : R.string.background_asleep);
                 start.setVisibility(alive ? View.GONE : View.VISIBLE);
                 start.setEnabled(true);
             });
@@ -189,6 +191,7 @@ public class BackgroundActivity extends Screen {
                         status.setText(R.string.background_ready);
                         info.setText(R.string.background_ready_info);
                         start.setVisibility(View.GONE);
+                        check.run(); // it runs, but may say this phone gives it no screens
                     }
                 });
             }).start();

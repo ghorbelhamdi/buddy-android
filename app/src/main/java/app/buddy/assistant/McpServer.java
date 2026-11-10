@@ -136,7 +136,25 @@ final class McpServer {
                     headers.put(line.substring(0, c).trim().toLowerCase(Locale.ROOT), line.substring(c + 1).trim());
                 }
             }
-            byte[] body = readBody(in, headers);
+            // Anthropic-style clients (OpenCode's) send the token they were given as x-api-key: the relay takes that too
+            boolean relay = path.startsWith(Relay.PATH);
+            String xKey = relay ? headers.get("x-api-key") : null;
+            boolean known = authorized(headers.get("authorization")) || xKey != null && authorized("Bearer " + xKey);
+            // an agent's API request carries the chat's pictures every time: tens of MB in a long chat
+            String length = headers.get("content-length");
+            if (relay && known && length != null && !Relay.rewrites(rawPath)) {
+                // straight on to the service as it comes in: the relay has no size limit of its own
+                Relay.handle(BuddyApp.context(), method, rawPath, headers, null, in, Long.parseLong(length.trim()), out);
+                return;
+            }
+            byte[] body;
+            try {
+                body = readBody(in, headers, relay && known ? RELAY_BODY : BODY);
+            } catch (TooLarge e) { // read to its end, so the caller gets the answer instead of a dropped connection
+                if (relay && known) Relay.tooLarge(out, e.size, RELAY_BODY);
+                else send(out, 413, null, null);
+                return;
+            }
             CALLER_GONE.set(() -> gone(s, in));
 
             if ("/ssh-key".equals(path) && "POST".equals(method)) {
@@ -149,9 +167,7 @@ final class McpServer {
                 return;
             }
 
-            // Anthropic-style clients (OpenCode's) send the token they were given as x-api-key: the relay takes that too
-            String xKey = path.startsWith(Relay.PATH) ? headers.get("x-api-key") : null;
-            if (!authorized(headers.get("authorization")) && !(xKey != null && authorized("Bearer " + xKey))) {
+            if (!known) {
                 send(out, 401, "application/json", "{\"error\":\"unauthorized\"}");
                 return;
             }
@@ -189,6 +205,9 @@ final class McpServer {
                 java.io.File f = handler.attachment(path.substring(6));
                 if (f == null || !f.isFile()) send(out, 404, null, null);
                 else sendFile(out, f);
+            } else if (path.startsWith(McpServers.PATH)) {
+                // an agent's call to one of the user's own MCP servers: on to it with its key (see McpServers)
+                McpServers.relay(BuddyApp.context(), method, rawPath, headers, body, out);
             } else if (path.startsWith(Relay.PATH)) {
                 // an agent's API request with Buddy's token: on to the service with the real key (see Relay)
                 Relay.handle(BuddyApp.context(), method, rawPath, headers, body, out);
@@ -325,10 +344,26 @@ final class McpServer {
         return buf.toString("UTF-8");
     }
 
-    private static byte[] readBody(InputStream in, Map<String, String> headers) throws IOException {
-        ByteArrayOutputStream body = new ByteArrayOutputStream();
+    /** The most a request may carry: Buddy's own calls, and an agent's API request on its way to a service (see Relay). */
+    private static final int BODY = 8 * 1024 * 1024, RELAY_BODY = 32 * 1024 * 1024;
+    /** Past this a body isn't even read to its end: the connection just closes. */
+    private static final long DRAIN_MAX = 256L * 1024 * 1024;
+
+    /** The request's body is over its limit. It was read to its end and thrown away, so an answer still gets through. */
+    private static final class TooLarge extends IOException {
+        final long size;
+
+        TooLarge(long size) {
+            super("body too large: " + size);
+            this.size = size;
+        }
+    }
+
+    private static byte[] readBody(InputStream in, Map<String, String> headers, int max) throws IOException {
         String te = headers.get("transfer-encoding");
         if (te != null && te.toLowerCase(Locale.ROOT).contains("chunked")) {
+            ByteArrayOutputStream body = new ByteArrayOutputStream();
+            long total = 0;
             while (true) {
                 String sizeLine = readLine(in);
                 if (sizeLine == null) break;
@@ -339,23 +374,52 @@ final class McpServer {
                     while ((l = readLine(in)) != null && !l.isEmpty()) { /* trailers */ }
                     break;
                 }
-                readFully(in, body, size);
+                if (size < 0) throw new IOException("bad chunk");
+                total += size;
+                if (total > DRAIN_MAX) throw new IOException("body too large");
+                if (total > max) {
+                    body.reset();
+                    skip(in, size);
+                } else readFully(in, body, size);
                 readLine(in);
             }
-        } else {
-            String cl = headers.get("content-length");
-            if (cl != null) readFully(in, body, Integer.parseInt(cl.trim()));
+            if (total > max) throw new TooLarge(total);
+            return body.toByteArray();
         }
-        return body.toByteArray();
+        String cl = headers.get("content-length");
+        if (cl == null) return new byte[0];
+        long n = Long.parseLong(cl.trim());
+        if (n < 0 || n > DRAIN_MAX) throw new IOException("body too large");
+        if (n > max) {
+            skip(in, n);
+            throw new TooLarge(n);
+        }
+        byte[] body = new byte[(int) n]; // in one piece: a large request isn't held twice
+        int at = 0;
+        while (at < body.length) {
+            int r = in.read(body, at, body.length - at);
+            if (r == -1) throw new IOException("unexpected end of body");
+            at += r;
+        }
+        return body;
     }
 
     private static void readFully(InputStream in, ByteArrayOutputStream out, int n) throws IOException {
-        if (n > 8 * 1024 * 1024) throw new IOException("body too large");
         byte[] buf = new byte[8192];
         while (n > 0) {
             int r = in.read(buf, 0, Math.min(buf.length, n));
             if (r == -1) throw new IOException("unexpected end of body");
             out.write(buf, 0, r);
+            n -= r;
+        }
+    }
+
+    /** Reads n bytes and throws them away. */
+    private static void skip(InputStream in, long n) throws IOException {
+        byte[] buf = new byte[64 * 1024];
+        while (n > 0) {
+            int r = in.read(buf, 0, (int) Math.min(buf.length, n));
+            if (r == -1) throw new IOException("unexpected end of body");
             n -= r;
         }
     }

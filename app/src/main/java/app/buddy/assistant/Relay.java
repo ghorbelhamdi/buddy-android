@@ -207,15 +207,39 @@ final class Relay {
         return out;
     }
 
+    /**
+     * Does the relay change this request's body (see handle)? Then it needs all of it in memory; any other request's
+     * body goes on to the service as it comes in, whatever its size.
+     */
+    static boolean rewrites(String rawPath) {
+        String[] parts = rawPath.substring(PATH.length()).split("/", 3);
+        Providers.P p = parts.length >= 2 ? Providers.find(parts[0]) : null;
+        if (p == null || !"o".equals(parts[1])) return false;
+        return parts.length == 3 && ("/" + parts[2]).startsWith("/responses") && !isOpenAi(p.openai);
+    }
+
     /** rawPath: /llm/deepseek/a/v1/messages?beta=true. Already checked to carry Buddy's token. */
     static void handle(Context c, String method, String rawPath, Map<String, String> headers, byte[] body,
                        OutputStream out) throws Exception {
+        handle(c, method, rawPath, headers, body, null, body.length, out);
+    }
+
+    /** As above; with body null, the request's body (length bytes) is still to be read, and goes on as it comes. */
+    static void handle(Context c, String method, String rawPath, Map<String, String> headers, byte[] body,
+                       InputStream from, long length, OutputStream out) throws Exception {
         String[] parts = rawPath.substring(PATH.length()).split("/", 3);
         Providers.P p = parts.length >= 2 ? Providers.find(parts[0]) : null;
         boolean anthropic = parts.length >= 2 && "a".equals(parts[1]);
         String base = p == null ? "" : anthropic ? p.anthropic : "o".equals(parts[1]) ? p.openai : "";
         String key = p == null ? null : Secrets.get(c, Providers.secretName(p.id));
+        if (p != null && p.off) { // the user switched this service off (Settings → API keys): nothing goes to it
+            if (body == null) drain(from, length);
+            error(out, 403, "permission_error", p.name + " is switched off in Buddy. Switch it on in Buddy's Settings, "
+                    + "under API keys, or pick another model for this chat.");
+            return;
+        }
         if (key == null || base.isEmpty()) {
+            if (body == null) drain(from, length); // the caller reads the answer only once its request is through
             error(out, 401, "No API key saved in Buddy for this service. Add one in Buddy's Settings, under API keys.");
             return;
         }
@@ -224,7 +248,7 @@ final class Relay {
         // drop them and the model never sees the phone tools. Those get them as plain tools, and calls back as Codex
         // wants them (flat name → namespace + name).
         Map<String, String[]> flat = null;
-        if (!anthropic && rest.startsWith("/responses") && !isOpenAi(base) && body.length > 0) {
+        if (body != null && !anthropic && rest.startsWith("/responses") && !isOpenAi(base) && body.length > 0) {
             flat = new java.util.HashMap<>();
             byte[] b = flattenTools(body, flat);
             if (flat.isEmpty()) flat = null;
@@ -244,11 +268,26 @@ final class Relay {
         }
         if (xApiKey(anthropic, base)) con.setRequestProperty("x-api-key", key);
         else if (!key.isEmpty()) con.setRequestProperty("Authorization", "Bearer " + key); // a local server needs none
-        if (body.length > 0) {
+        if (body != null && body.length > 0) {
             con.setDoOutput(true);
             con.setFixedLengthStreamingMode(body.length);
             try (OutputStream o = con.getOutputStream()) {
                 o.write(body);
+            }
+        } else if (body == null && length > 0) { // as it comes in: a chat's pictures make a request tens of MB
+            con.setDoOutput(true);
+            con.setFixedLengthStreamingMode(length);
+            long left = length;
+            try (OutputStream o = con.getOutputStream()) {
+                byte[] buf = new byte[64 * 1024];
+                while (left > 0) {
+                    int n = from.read(buf, 0, (int) Math.min(buf.length, left));
+                    if (n == -1) throw new java.io.IOException("unexpected end of body");
+                    o.write(buf, 0, n);
+                    left -= n;
+                }
+            } catch (java.io.IOException e) { // the service hung up early (it answers "too large" that way): its answer follows
+                if (left > 0) drain(from, left);
             }
         }
         int code = con.getResponseCode();
@@ -397,9 +436,36 @@ final class Relay {
         changed[0] = true;
     }
 
+    /**
+     * An agent's request was larger than the relay passes on (and than the services take). The agent shows this to
+     * the user as its own API error, so it says what helps.
+     */
+    static void tooLarge(OutputStream out, long size, int max) throws Exception {
+        error(out, 413, "request_too_large", "This request is " + (size >> 20) + " MB; Buddy has to rewrite requests to this "
+                + "service and can do that up to " + (max >> 20) + " MB. A chat's pictures travel with every request: "
+                + "use Compact now in the chat, or start a new chat.");
+    }
+
+    /** Reads n bytes and throws them away. */
+    private static void drain(InputStream in, long n) {
+        try {
+            byte[] buf = new byte[64 * 1024];
+            while (n > 0) {
+                int r = in.read(buf, 0, (int) Math.min(buf.length, n));
+                if (r == -1) return;
+                n -= r;
+            }
+        } catch (java.io.IOException ignored) {
+        }
+    }
+
     private static void error(OutputStream out, int code, String message) throws Exception {
+        error(out, code, "authentication_error", message);
+    }
+
+    private static void error(OutputStream out, int code, String type, String message) throws Exception {
         byte[] b = new org.json.JSONObject().put("type", "error").put("error", new org.json.JSONObject()
-                .put("type", "authentication_error").put("message", message)).toString().getBytes(StandardCharsets.UTF_8);
+                .put("type", type).put("message", message)).toString().getBytes(StandardCharsets.UTF_8);
         out.write(("HTTP/1.1 " + code + " Error\r\nContent-Type: application/json\r\nContent-Length: " + b.length
                 + "\r\nConnection: close\r\n\r\n").getBytes(StandardCharsets.US_ASCII));
         out.write(b);

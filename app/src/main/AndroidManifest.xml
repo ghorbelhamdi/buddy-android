@@ -156,6 +156,14 @@
             android:exported="false" />
 
         <activity
+            android:name=".SearchActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".McpServersActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".PhoneToolActivity"
             android:exported="false"
             android:excludeFromRecents="true"

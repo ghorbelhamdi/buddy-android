@@ -433,6 +433,7 @@
     <string name="card_countdown">Tự đồng ý sau %1$d giây · Nhấn để dừng</string>
     <!-- Note in the chat when the countdown ran out. Keep the mark ✓ and the space after it. %1$s = what was approved (shortened). -->
     <string name="card_note_auto_approved">✓ Đã đồng ý sau khi đếm ngược: %1$s</string>
+    <string name="card_note_rule_approved">✓ Quy tắc của bạn đã duyệt, không hỏi: %1$s</string>
     <!-- Note in the chat after the user tapped the countdown to stop it: the card now waits for them. -->
     <string name="card_note_countdown_stopped">Đã dừng đếm ngược: đang chờ bạn đồng ý</string>
 
@@ -672,6 +673,7 @@
     <!-- After "Continue in Buddy" on an earlier session. %1$s = agent name. -->
     <string name="hub_continuing">Đang tiếp tục một phiên %1$s trước đó. Nếu phiên đó vẫn mở trong terminal, hãy đóng nó ở đó trước.</string>
     <string name="hub_still_working_attachments">Cuộc trò chuyện này vẫn đang làm việc. Hãy gửi tệp đính kèm khi nó xong.</string>
+    <string name="hub_service_off">%1$s đang tắt (Cài đặt → Khóa API). Hãy bật lại, hoặc chọn mô hình khác cho cuộc trò chuyện này.</string>
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">Đang suy nghĩ…</string>
     <string name="hub_still_waiting">Vẫn đang chờ mô hình trả lời…</string>
@@ -1349,6 +1351,13 @@
     <string name="setup_read_aloud">Đọc to câu trả lời</string>
     <!-- "Voice" = the Settings section of that name (setup_voice). -->
     <string name="setup_read_aloud_info">Buddy đọc to câu trả lời của agent, bằng giọng bạn chọn trong mục Giọng nói.</string>
+    <string name="setup_voice_cards">Trả lời thẻ bằng giọng nói</string>
+    <string name="setup_voice_cards_info">Sau khi đọc to một thẻ, Buddy sẽ lắng nghe: hãy nói “đồng ý” hoặc “từ chối”, hoặc lựa chọn bạn muốn. Cần bật “Đọc to câu trả lời”. Không hoạt động khi điện thoại bị khóa. Bất kỳ ai trong tầm nghe đều có thể trả lời.</string>
+    <string name="voice_card_approval">Buddy cần bạn đồng ý. %1$s</string>
+    <string name="voice_card_question">Buddy hỏi: %1$s Lựa chọn: %2$s</string>
+    <string name="voice_card_hint">Hãy nói đồng ý hoặc từ chối.</string>
+    <string name="voice_card_yes">đồng ý,chấp thuận,có,được,ok,làm đi</string>
+    <string name="voice_card_no">từ chối,không,dừng,hủy,đừng</string>
     <string name="setup_update_notices">Thông báo cập nhật</string>
     <string name="setup_update_notices_info">Buddy kiểm tra GitHub mỗi ngày một lần và báo cho bạn khi có phiên bản mới.</string>
     <string name="setup_check_updates">Kiểm tra cập nhật</string>
@@ -1678,6 +1687,7 @@
     <string name="rules_words_summary">Có “%1$s”</string>
     <!-- Small tag on a rule in the list: its approval cards wait for the user. -->
     <string name="rules_tag_ask">Hỏi bạn trước</string>
+    <string name="rules_tag_now">Gửi mà không hỏi</string>
     <!-- Small tag on a rule in the list: its approval cards approve themselves. %1$s = the countdown, e.g. 30 s. -->
     <string name="rules_tag_countdown">Đếm ngược %1$s</string>
     <!-- Small tag on a rule that is switched off. -->
@@ -1761,8 +1771,10 @@
     <string name="rules_approval_ask">Hỏi tôi</string>
     <!-- Choice: the rule's approval cards approve themselves after a countdown. Keep it short. -->
     <string name="rules_approval_countdown">Đếm ngược</string>
+    <string name="rules_approval_now">Không hỏi</string>
     <string name="rules_approval_ask_info">Thẻ duyệt sẽ chờ bạn, như trong mọi cuộc trò chuyện.</string>
     <string name="rules_approval_countdown_info">Khi đếm ngược kết thúc, thẻ sẽ tự đồng ý trừ khi bạn nhấn để dừng. Việc này chỉ áp dụng khi gửi tin nhắn, sau khi một AI thứ hai kiểm tra nó theo quy tắc của bạn. Thanh toán, mua, xóa và mở liên kết luôn chờ bạn.</string>
+    <string name="rules_approval_now_info">Tin nhắn được gửi ngay, không có thẻ, sau khi một AI thứ hai kiểm tra chúng theo quy tắc của bạn. Nếu AI đó phản đối, thẻ sẽ chờ bạn. Thanh toán, mua hàng, xóa và mở liên kết luôn chờ bạn.</string>
     <!-- Under the countdown explanation, tappable (opens App permissions). %1$s = the reviewer, e.g. Claude Code · Haiku. -->
     <string name="rules_checker">AI thứ hai: %1$s. Nhấn để đổi trong Quyền ứng dụng.</string>
     <!-- In the model picker of a rule, the first choice ("Default"), described. -->
@@ -1973,6 +1985,8 @@
     <string name="chat_earlier">Hiển thị tin nhắn trước đó</string>
     <string name="chat_earlier_load">Tải tin nhắn trước đó</string>
     <string name="chat_earlier_none">Không tìm thấy tin nhắn nào trước đó.</string>
+    <string name="chat_earlier_gone">Các tin nhắn cũ hơn không còn được lưu: một cuộc trò chuyện giữ %1$d tin nhắn mới nhất.</string>
+    <string name="rules_recheck">Kiểm tra lại</string>
     <string name="setup_help">Trợ giúp</string>
     <string name="setup_help_info">Hướng dẫn sử dụng Buddy, trên GitHub. Bạn cũng có thể hỏi bất kỳ agent nào về cách Buddy hoạt động.</string>
     <string name="signin_api_key">Dùng khóa API thay vào đó</string>
@@ -1987,7 +2001,42 @@
     <string name="api_keys_add">Thêm khóa API</string>
     <string name="api_keys_models">%1$s · %2$d mô hình</string>
     <string name="api_keys_for">Cho %1$s</string>
-    <string name="api_keys_defaults">Trò chuyện dùng Mặc định</string>
+    <string name="api_keys_use">Dùng dịch vụ này</string>
+    <string name="api_keys_use_info">Tắt: khóa vẫn được lưu, nhưng không cuộc trò chuyện hay tác nhân nào dùng nó.</string>
+    <string name="api_keys_off">Tắt</string>
+    <string name="search_title">Tìm trong cuộc trò chuyện</string>
+    <string name="search_hint">Tìm trong cuộc trò chuyện</string>
+    <string name="search_clear">Xóa</string>
+    <string name="search_info">Tìm cuộc trò chuyện theo tiêu đề và theo nội dung đã nói trong đó, kể cả các cuộc đã lưu trữ. Mọi thứ được tìm ngay tại đây, trên điện thoại của bạn.</string>
+    <string name="search_none">Không cuộc trò chuyện nào có “%1$s”.</string>
+    <string name="search_archived">Đã lưu trữ</string>
+    <string name="search_found">Số cuộc trò chuyện tìm thấy: %1$d</string>
+    <string name="search_messages">Tin nhắn: %1$d</string>
+    <string name="mcp_title">Máy chủ MCP</string>
+    <string name="mcp_row_none">Công cụ từ máy chủ của riêng bạn</string>
+    <string name="mcp_intro">Kết nối các máy chủ MCP của riêng bạn, và mọi tác nhân sẽ có công cụ của chúng bên cạnh công cụ của điện thoại. Máy chủ được truy cập qua địa chỉ của nó, qua internet hoặc mạng riêng của bạn. Khóa được lưu mã hóa trên điện thoại này và không bao giờ đến tay các tác nhân: Buddy thêm khóa vào từng lệnh gọi.</string>
+    <string name="mcp_none">Chưa có máy chủ nào.</string>
+    <string name="mcp_add">Thêm máy chủ</string>
+    <string name="mcp_import">Nhập danh sách</string>
+    <string name="mcp_export">Sao chép danh sách</string>
+    <string name="mcp_exported">Đã sao chép, không kèm khóa.</string>
+    <string name="mcp_note">Các công cụ này chạy bên ngoài điện thoại của bạn, nên thẻ phê duyệt của Buddy không áp dụng cho chúng: chỉ thêm máy chủ bạn tin tưởng. Chúng không được dùng khi một quy tắc thông báo chạy.</string>
+    <string name="mcp_name_hint">Tên (chữ cái và chữ số)</string>
+    <string name="mcp_url_hint">Địa chỉ (https://…/mcp)</string>
+    <string name="mcp_key_hint">Khóa hoặc mã thông báo (không bắt buộc)</string>
+    <string name="mcp_key_info">Khóa được gửi dưới dạng “Authorization: Bearer …”. Nếu máy chủ cần tiêu đề khác, hãy viết đầy đủ: X-Api-Key: khóa-của-bạn</string>
+    <string name="mcp_use">Dùng máy chủ này</string>
+    <string name="mcp_use_info">Tắt: vẫn được lưu, nhưng không tác nhân nào nhận công cụ của nó.</string>
+    <string name="mcp_save">Kiểm tra và lưu</string>
+    <string name="mcp_checking">Đang hỏi máy chủ về các công cụ…</string>
+    <string name="mcp_saved">Đã lưu %1$s · công cụ: %2$d</string>
+    <string name="mcp_tools_count">Công cụ: %1$d</string>
+    <string name="mcp_remove_text">Khóa của nó sẽ bị xóa khỏi điện thoại này.</string>
+    <string name="mcp_need_name">Hãy đặt tên cho nó.</string>
+    <string name="mcp_name_taken">Tên này đã được dùng.</string>
+    <string name="mcp_import_info">Dán danh sách theo cách các ứng dụng khác lưu (“mcpServers”). Máy chủ có địa chỉ sẽ được thêm; máy chủ chạy như một lệnh trên máy tính sẽ bị bỏ qua.</string>
+    <string name="mcp_imported">Đã thêm: %1$d · bỏ qua: %2$d</string>
+    <string name="api_keys_defaults">Mô hình mặc định</string>
     <string name="api_keys_defaults_info">Mô hình một cuộc trò chuyện dùng khi mô hình của nó là Mặc định. Mặc định riêng của agent chạy bằng gói của agent.</string>
     <string name="api_keys_own_default">Mặc định riêng của agent</string>
     <string name="api_keys_name_hint">Tên</string>
