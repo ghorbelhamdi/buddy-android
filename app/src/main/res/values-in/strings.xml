@@ -879,6 +879,11 @@
     <string name="signin_with_chatgpt">Login dengan ChatGPT</string>
     <string name="signin_with_google">Login dengan Google</string>
     <string name="signin_with_grok">Login dengan Grok</string>
+    <string name="signin_token">Gunakan token</string>
+    <string name="signin_token_title">Token Claude Code</string>
+    <string name="signin_token_info">Tempel token yang ditampilkan “claude setup-token” di komputer; awalannya sk-ant-oat. Token ini cukup untuk chat. Input suara dan Remote Control memerlukan login penuh.</string>
+    <string name="signin_token_wrong">Itu bukan token Claude Code. Kunci API (sk-ant-api…) dimasukkan di Setelan → Kunci API.</string>
+    <string name="signin_token_on">Sudah login dengan token: cukup untuk chat. Input suara dan Remote Control memerlukan login penuh.</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <string name="signin_other_device">Login di perangkat lain</string>
     <!-- Button (ChatGPT): sign in by entering a one-time code on another device. -->
@@ -1271,9 +1276,6 @@
     <!-- Choice: a smaller panel. Keep it short. -->
     <string name="setup_panel_compact">Ringkas</string>
     <string name="setup_panel_size_info">Layar penuh membentang dari tepi ke tepi. Ringkas lebih kecil dan tidak menutupi tepi layar, sehingga gestur samping tetap berfungsi.</string>
-    <string name="setup_action_limit">Tindakan per tugas</string>
-    <string name="setup_action_limit_none">Tanpa batas</string>
-    <string name="setup_action_limit_info">Tugas berhenti setelah sekian ketukan, ketikan, dan guliran, agar tugas yang lepas kendali tidak menghabiskan paketmu. Tindakan yang sama 6 kali berturut-turut selalu menghentikannya.</string>
     <!-- Explains the "Talk" choice of setup_tap_action. -->
     <string name="setup_tap_to_talk_info">Satu ketukan membuka mikrofon: ucapkan keinginan Anda dan pesan terkirim saat Anda berhenti sejenak. Tekan lama balon untuk membuka chat dan lainnya.</string>
     <string name="setup_read_aloud">Bacakan balasan</string>
@@ -1784,8 +1786,53 @@
     <plurals name="check_failed">
         <item quantity="other">%1$d pemeriksaan gagal</item>
     </plurals>
-    <string name="tools_step_cap">Dihentikan setelah %1$d tindakan berturut-turut, agar tugas yang lepas kendali tidak menghabiskan paketmu. Suruh lanjut jika perlu.</string>
     <string name="tools_step_loop">Dihentikan: melakukan hal yang sama %1$d kali berturut-turut, sepertinya berulang terus.</string>
+    <!-- Background mode -->
+    <string name="background_title">Mode latar belakang</string>
+    <string name="background_row">Agen bekerja di layarnya sendiri selagi Anda memakai ponsel</string>
+    <string name="background_intro">Dalam mode latar belakang, agen bekerja di layarnya sendiri yang tidak Anda lihat. Layar, keyboard, dan tombol Kembali tetap milik Anda, dan agen terus bekerja saat ponsel terkunci.</string>
+    <string name="background_how">Android hanya mengizinkan Proses debug nirkabel membuat layar seperti itu, jadi Buddy menyambungkan diri dengannya satu kali, langsung di ponsel ini. Tidak perlu komputer.</string>
+    <string name="background_step1">1. Ketuk Siapkan. Buddy membuka Opsi developer dan mencarikan Proses debug nirkabel untuk Anda.</string>
+    <string name="background_step2">2. Buddy mengaktifkan Proses debug nirkabel (Wi-Fi harus terhubung) dan membuka “Sambungkan perangkat dengan kode penyambungan”.</string>
+    <string name="background_step3">3. Buddy membaca kodenya, menyambungkan, lalu membawa Anda kembali ke sini. Jika terhenti di suatu langkah, lakukan langkah itu sendiri dan Buddy akan melanjutkan.</string>
+    <string name="background_setup">Siapkan</string>
+    <string name="background_open_options">Buka Opsi developer</string>
+    <string name="background_installing">Mengambil adb untuk Linux Buddy…</string>
+    <string name="background_waiting">Menunggu “Sambungkan perangkat dengan kode penyambungan” di Proses debug nirkabel…</string>
+    <string name="background_pairing">Menyambungkan…</string>
+    <string name="background_starting">Memulai pembantu…</string>
+    <string name="background_ready">Siap</string>
+    <string name="background_ready_info">Aktifkan per chat: Opsi chat → Bekerja di latar belakang.</string>
+    <string name="background_paired">Tersambung</string>
+    <string name="background_asleep">Pembantunya tidak berjalan. Pembantu dimulai bersama tugas latar belakang pertama, atau sekarang. Setelah ponsel dimulai ulang, ketuk Mulai sekarang: Buddy mengaktifkan Proses debug nirkabel untuk itu (Wi-Fi harus terhubung).</string>
+    <string name="background_start_now">Mulai sekarang</string>
+    <string name="background_failed">Tidak berhasil: %1$s</string>
+    <string name="background_needs_linux">Mode latar belakang memerlukan Linux Buddy. Instal agen dulu.</string>
+    <string name="background_needs_dev">Aktifkan Opsi developer dulu: Setelan → Tentang ponsel → ketuk Nomor build 7 kali.</string>
+    <string name="background_needs_service">Aktifkan layanan aksesibilitas Buddy dulu.</string>
+    <string name="background_no_dialog">Buddy tidak melihat dialog penyambungan tepat waktu. Coba lagi.</string>
+    <string name="background_remove">Hapus</string>
+    <string name="background_remove_text">Buddy melupakan penyambungan dan menghentikan pembantunya. Chat kembali bekerja di layar asli.</string>
+    <string name="background_default">Chat baru bekerja di latar belakang</string>
+    <string name="background_default_info">Setiap chat tetap punya tombolnya sendiri di Opsi chat.</string>
+    <string name="background_security">Proses debug nirkabel memungkinkan perangkat yang tersambung mengendalikan ponsel ini. Buddy hanya menyambungkan dirinya sendiri, di ponsel ini, dan pembantunya hanya mendengarkan di sini.</string>
+    <string name="background_brought">Dipindahkan ke layar Anda: langkah ini memerlukan Anda. Mode latar belakang kini nonaktif untuk chat ini.</string>
+    <string name="chat_background">Bekerja di latar belakang</string>
+    <string name="chat_background_info">Agen memakai layarnya sendiri dan Anda tetap bisa memakai ponsel. Langkah yang memerlukan Anda, seperti login, akan muncul di layar Anda.</string>
+    <string name="background_preview">Layar latar belakang</string>
+    <string name="background_show">Tampilkan di layar saya</string>
+    <string name="background_usb_note">Buddy juga mengaktifkan Proses debug USB. Dengan begitu, pembantu tetap berjalan saat Wi-Fi terputus dan Android menonaktifkan Proses debug nirkabel. Biarkan tetap aktif.</string>
+    <string name="background_shell">Perintah ponsel</string>
+    <string name="background_shell_switch">Agen boleh menjalankan perintah di ponsel</string>
+    <string name="background_shell_info">Di chat dengan alat Linux, agen bisa menjalankan perintah langsung di ponsel, seperti “adb shell”: menginstal dan membuka aplikasi, mengubah setelan, membaca log dan file. Pesan atau halaman web yang dibacanya bisa mencoba menipunya agar menjalankan perintah.</string>
+    <string name="background_shell_ask">Tanya sebelum setiap perintah</string>
+    <string name="background_shell_ask_info">Kartu persetujuan menampilkan perintahnya lebih dulu. Tanpa itu, tidak ada yang menghalangi agen yang tertipu dari ponsel Anda: sebuah perintah bahkan bisa mengetuk kartu persetujuan.</string>
+    <string name="tools_card_shell">Jalankan di ponsel:\n%1$s</string>
+    <string name="activity_shell">Menjalankan perintah ponsel</string>
+    <string name="hub_tool_phone_shell">Perintah ponsel: %1$s</string>
+    <string name="chat_earlier">Tampilkan pesan sebelumnya</string>
+    <string name="chat_earlier_load">Muat pesan sebelumnya</string>
+    <string name="chat_earlier_none">Tidak ada pesan sebelumnya.</string>
     <string name="setup_help">Bantuan</string>
     <string name="setup_help_info">Panduan Buddy di GitHub. Kamu juga bisa bertanya ke agen mana pun cara kerja Buddy.</string>
     <string name="signin_api_key">Gunakan kunci API saja</string>

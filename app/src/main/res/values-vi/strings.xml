@@ -931,6 +931,11 @@
     <string name="signin_with_chatgpt">Đăng nhập bằng ChatGPT</string>
     <string name="signin_with_google">Đăng nhập bằng Google</string>
     <string name="signin_with_grok">Đăng nhập bằng Grok</string>
+    <string name="signin_token">Dùng token</string>
+    <string name="signin_token_title">Token Claude Code</string>
+    <string name="signin_token_info">Dán token mà lệnh “claude setup-token” in ra trên máy tính; token bắt đầu bằng sk-ant-oat. Token này đủ cho các cuộc trò chuyện. Nhập bằng giọng nói và Remote Control cần đăng nhập đầy đủ.</string>
+    <string name="signin_token_wrong">Đây không phải token Claude Code. Khóa API (sk-ant-api…) thì nhập trong Cài đặt → Khóa API.</string>
+    <string name="signin_token_on">Đã đăng nhập bằng token: đủ cho các cuộc trò chuyện. Nhập bằng giọng nói và Remote Control cần đăng nhập đầy đủ.</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <string name="signin_other_device">Đăng nhập trên thiết bị khác</string>
     <!-- Button (ChatGPT): sign in by entering a one-time code on another device. -->
@@ -1339,9 +1344,6 @@
     <!-- Choice: a smaller panel. Keep it short. -->
     <string name="setup_panel_compact">Gọn</string>
     <string name="setup_panel_size_info">Đầy đủ trải từ mép này sang mép kia. Gọn thì nhỏ hơn và chừa các mép màn hình, nên cử chỉ vuốt cạnh vẫn hoạt động.</string>
-    <string name="setup_action_limit">Số thao tác mỗi việc</string>
-    <string name="setup_action_limit_none">Không giới hạn</string>
-    <string name="setup_action_limit_info">Một việc sẽ dừng sau chừng này lần chạm, nhập và cuộn, để việc chạy mất kiểm soát không dùng hết gói của bạn. Cùng một thao tác 6 lần liền luôn khiến nó dừng.</string>
     <!-- Explains the "Talk" choice of setup_tap_action. -->
     <string name="setup_tap_to_talk_info">Nhấn một lần là mở micrô: nói điều bạn muốn và tin nhắn sẽ được gửi khi bạn ngừng nói. Giữ bong bóng để mở trò chuyện và hơn nữa.</string>
     <string name="setup_read_aloud">Đọc to câu trả lời</string>
@@ -1924,8 +1926,53 @@
     <plurals name="check_failed">
         <item quantity="other">%1$d mục kiểm tra không đạt</item>
     </plurals>
-    <string name="tools_step_cap">Đã dừng sau %1$d thao tác trên điện thoại liền một lúc, để một việc chạy mất kiểm soát không dùng hết gói của bạn. Hãy bảo nó làm tiếp nếu cần.</string>
     <string name="tools_step_loop">Đã dừng: nó làm cùng một việc %1$d lần liên tiếp, có vẻ như bị lặp.</string>
+    <!-- Background mode -->
+    <string name="background_title">Chế độ nền</string>
+    <string name="background_row">Agent làm việc trên màn hình riêng trong khi bạn dùng điện thoại</string>
+    <string name="background_intro">Ở chế độ nền, agent làm việc trên một màn hình riêng mà bạn không nhìn thấy. Màn hình, bàn phím và nút Quay lại vẫn là của bạn, và agent vẫn chạy tiếp khi điện thoại đã khóa.</string>
+    <string name="background_how">Android chỉ cho phép tính năng Gỡ lỗi qua Wi-Fi tạo màn hình như vậy, nên Buddy ghép nối với tính năng này một lần, ngay trên điện thoại này. Không cần máy tính.</string>
+    <string name="background_step1">1. Nhấn Thiết lập. Buddy mở Tuỳ chọn cho nhà phát triển và tìm Gỡ lỗi qua Wi-Fi giúp bạn.</string>
+    <string name="background_step2">2. Buddy bật Gỡ lỗi qua Wi-Fi (phải đang kết nối Wi-Fi) và mở “Ghép nối thiết bị bằng mã ghép nối”.</string>
+    <string name="background_step3">3. Buddy đọc mã, ghép nối rồi đưa bạn về lại đây. Nếu bị dừng ở đâu đó, bạn tự làm bước ấy và Buddy sẽ làm tiếp.</string>
+    <string name="background_setup">Thiết lập</string>
+    <string name="background_open_options">Mở Tuỳ chọn cho nhà phát triển</string>
+    <string name="background_installing">Đang tải adb cho Linux của Buddy…</string>
+    <string name="background_waiting">Đang chờ “Ghép nối thiết bị bằng mã ghép nối” trong Gỡ lỗi qua Wi-Fi…</string>
+    <string name="background_pairing">Đang ghép nối…</string>
+    <string name="background_starting">Đang khởi động trình trợ giúp…</string>
+    <string name="background_ready">Sẵn sàng</string>
+    <string name="background_ready_info">Bật cho từng cuộc trò chuyện: Tùy chọn trò chuyện → Làm việc ở chế độ nền.</string>
+    <string name="background_paired">Đã ghép nối</string>
+    <string name="background_asleep">Trình trợ giúp chưa chạy. Nó sẽ khởi động cùng việc chạy nền đầu tiên, hoặc ngay bây giờ. Sau khi khởi động lại điện thoại, hãy nhấn Khởi động ngay: Buddy sẽ bật Gỡ lỗi qua Wi-Fi để làm việc đó (phải đang kết nối Wi-Fi).</string>
+    <string name="background_start_now">Khởi động ngay</string>
+    <string name="background_failed">Không thành công: %1$s</string>
+    <string name="background_needs_linux">Chế độ nền cần Linux của Buddy. Hãy cài một agent trước.</string>
+    <string name="background_needs_dev">Hãy bật Tuỳ chọn cho nhà phát triển trước: Cài đặt → Giới thiệu về thiết bị → nhấn Số bản dựng 7 lần.</string>
+    <string name="background_needs_service">Hãy bật dịch vụ hỗ trợ tiếp cận của Buddy trước.</string>
+    <string name="background_no_dialog">Buddy không kịp thấy hộp thoại ghép nối. Hãy thử lại.</string>
+    <string name="background_remove">Gỡ</string>
+    <string name="background_remove_text">Buddy sẽ quên ghép nối và dừng trình trợ giúp. Các cuộc trò chuyện lại làm việc trên màn hình thật.</string>
+    <string name="background_default">Cuộc trò chuyện mới làm việc ở chế độ nền</string>
+    <string name="background_default_info">Mỗi cuộc trò chuyện vẫn có công tắc riêng trong Tùy chọn trò chuyện.</string>
+    <string name="background_security">Gỡ lỗi qua Wi-Fi cho phép các thiết bị đã ghép nối điều khiển điện thoại này. Buddy chỉ ghép nối chính nó, ngay trên điện thoại này, và trình trợ giúp của nó chỉ nhận kết nối tại đây.</string>
+    <string name="background_brought">Đã chuyển sang màn hình của bạn: bước này cần bạn. Chế độ nền hiện đã tắt cho cuộc trò chuyện này.</string>
+    <string name="chat_background">Làm việc ở chế độ nền</string>
+    <string name="chat_background_info">Agent dùng một màn hình riêng, còn bạn vẫn dùng điện thoại như thường. Bước nào cần bạn, như đăng nhập, sẽ hiện trên màn hình của bạn.</string>
+    <string name="background_preview">Màn hình chạy nền</string>
+    <string name="background_show">Hiện trên màn hình của tôi</string>
+    <string name="background_usb_note">Buddy cũng bật Gỡ lỗi qua USB. Nhờ đó, trình trợ giúp vẫn chạy khi mất Wi-Fi và Android tắt Gỡ lỗi qua Wi-Fi. Hãy cứ để bật.</string>
+    <string name="background_shell">Lệnh trên điện thoại</string>
+    <string name="background_shell_switch">Agent được chạy lệnh trên điện thoại</string>
+    <string name="background_shell_info">Trong các cuộc trò chuyện có công cụ Linux, agent có thể chạy lệnh ngay trên điện thoại, giống như “adb shell”: cài và mở ứng dụng, đổi cài đặt, đọc nhật ký và tệp. Một tin nhắn hoặc trang web mà nó đọc có thể tìm cách lừa nó chạy lệnh.</string>
+    <string name="background_shell_ask">Hỏi trước mỗi lệnh</string>
+    <string name="background_shell_ask_info">Thẻ duyệt sẽ hiện lệnh trước. Nếu không có thẻ này, không gì ngăn giữa một agent bị lừa và điện thoại của bạn: một lệnh thậm chí có thể nhấn vào thẻ duyệt.</string>
+    <string name="tools_card_shell">Chạy trên điện thoại:\n%1$s</string>
+    <string name="activity_shell">Đang chạy lệnh trên điện thoại</string>
+    <string name="hub_tool_phone_shell">Lệnh trên điện thoại: %1$s</string>
+    <string name="chat_earlier">Hiển thị tin nhắn trước đó</string>
+    <string name="chat_earlier_load">Tải tin nhắn trước đó</string>
+    <string name="chat_earlier_none">Không tìm thấy tin nhắn nào trước đó.</string>
     <string name="setup_help">Trợ giúp</string>
     <string name="setup_help_info">Hướng dẫn sử dụng Buddy, trên GitHub. Bạn cũng có thể hỏi bất kỳ agent nào về cách Buddy hoạt động.</string>
     <string name="signin_api_key">Dùng khóa API thay vào đó</string>

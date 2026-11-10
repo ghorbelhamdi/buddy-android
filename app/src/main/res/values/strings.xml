@@ -941,6 +941,16 @@
     <string name="signin_with_google">Sign in with Google</string>
     <string name="signin_with_grok">Sign in with Grok</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
+    <!-- Button on Claude Code's sign-in screen: sign in by pasting a token instead. Keep short. -->
+    <string name="signin_token">Use a token</string>
+    <!-- Title of its sheet. -->
+    <string name="signin_token_title">Claude Code token</string>
+    <!-- "claude setup-token" is a command and "sk-ant-oat" the start of the token: keep both as they are. -->
+    <string name="signin_token_info">Paste the token that “claude setup-token” prints on a computer; it starts with sk-ant-oat. It covers chats. Voice input and Remote Control need the full sign-in.</string>
+    <!-- Under the field when what was pasted isn't such a token. "API keys" is the name of Buddy's settings screen (api_keys_title). -->
+    <string name="signin_token_wrong">That\'s not a Claude Code token. An API key (sk-ant-api…) goes under Settings → API keys.</string>
+    <!-- On the signed-in screen when it's a token. -->
+    <string name="signin_token_on">Signed in with a token: it covers chats. Voice input and Remote Control need the full sign-in.</string>
     <string name="signin_other_device">Sign in on another device</string>
     <!-- Button (ChatGPT): sign in by entering a one-time code on another device. -->
     <string name="signin_with_code">Sign in with a code</string>
@@ -1351,9 +1361,6 @@
     <!-- Choice: a smaller panel. Keep it short. -->
     <string name="setup_panel_compact">Compact</string>
     <string name="setup_panel_size_info">Full goes edge to edge. Compact is smaller and keeps clear of the screen edges, so side gestures keep working.</string>
-    <string name="setup_action_limit">Phone actions per task</string>
-    <string name="setup_action_limit_none">No limit</string>
-    <string name="setup_action_limit_info">A task stops after this many taps, typing and scrolls, so a runaway task can\'t use up your plan. The same action 6 times in a row always stops it.</string>
     <!-- Explains the "Talk" choice of setup_tap_action. -->
     <string name="setup_tap_to_talk_info">One tap opens the mic: say what you want and it sends when you pause. Hold the bubble for the chat and more.</string>
     <string name="setup_read_aloud">Read replies aloud</string>
@@ -1939,8 +1946,81 @@
         <item quantity="one">%1$d check failed</item>
         <item quantity="other">%1$d checks failed</item>
     </plurals>
-    <string name="tools_step_cap">Stopped after %1$d phone actions in one go, so a runaway task can\'t use up your plan. Tell it to go on if it should.</string>
     <string name="tools_step_loop">Stopped: it did the same thing %1$d times in a row, which looks like a loop.</string>
+    <!-- ===== Background mode (BackgroundActivity, Background): an agent works on a screen of its own that the user doesn't see ===== -->
+    <!-- Title of the screen and of its row in Settings. Keep short. -->
+    <string name="background_title">Background mode</string>
+    <!-- Under that row in Settings. -->
+    <string name="background_row">Agents work on a screen of their own while you use your phone</string>
+    <string name="background_intro">In background mode an agent works on a screen of its own that you don\'t see. You keep your screen, your keyboard and your Back button, and it goes on while the phone is locked.</string>
+    <!-- "Wireless debugging" is Android's name of that developer option: use the name this language's Android shows. -->
+    <string name="background_how">Android lets only Wireless debugging make such a screen, so Buddy pairs with it once, here on this phone. No computer needed.</string>
+    <!-- The three steps of the set-up. "Developer options", "Wireless debugging", "Build number" and "Pair device with pairing code" are Android's own names: use the ones this language's Android shows. -->
+    <string name="background_step1">1. Tap Set up. Buddy opens Developer options and finds Wireless debugging for you.</string>
+    <string name="background_step2">2. It turns Wireless debugging on (Wi-Fi must be connected) and opens “Pair device with pairing code”.</string>
+    <string name="background_step3">3. It reads the code, pairs, and brings you back here. If it stops somewhere, do that step yourself and Buddy carries on.</string>
+    <!-- Button: starts the set-up. -->
+    <string name="background_setup">Set up</string>
+    <!-- Button while the set-up waits: opens Android's Developer options again. -->
+    <string name="background_open_options">Open Developer options</string>
+    <!-- Progress lines of the set-up. adb is a program's name. -->
+    <string name="background_installing">Getting adb for Buddy\'s Linux…</string>
+    <string name="background_waiting">Waiting for “Pair device with pairing code” in Wireless debugging…</string>
+    <string name="background_pairing">Pairing…</string>
+    <string name="background_starting">Starting the helper…</string>
+    <!-- State: set up and its helper is running. -->
+    <string name="background_ready">Ready</string>
+    <string name="background_ready_info">Turn it on per chat: Chat options → Work in the background.</string>
+    <!-- State: set up, but the helper isn't running (after a restart of the phone). -->
+    <string name="background_paired">Paired</string>
+    <string name="background_asleep">Its helper isn\'t running. It starts with the first background task, or now. After a restart of the phone, tap Start now: Buddy switches Wireless debugging on for it (Wi-Fi must be connected).</string>
+    <!-- Button: starts the helper. -->
+    <string name="background_start_now">Start now</string>
+    <!-- %1$s = what went wrong (may be in English). -->
+    <string name="background_failed">It didn\'t work: %1$s</string>
+    <string name="background_needs_linux">Background mode needs Buddy\'s Linux. Install an agent first.</string>
+    <!-- "Developer options", "About device" and "Build number" are Android's own names: use the ones this language's Android shows. -->
+    <string name="background_needs_dev">Turn on Developer options first: Settings → About device → tap Build number 7 times.</string>
+    <string name="background_needs_service">Turn on Buddy\'s accessibility service first.</string>
+    <string name="background_no_dialog">Buddy didn\'t see the pairing dialog in time. Try again.</string>
+    <!-- Button, and the title of its confirmation: undoes the set-up. -->
+    <string name="background_remove">Remove</string>
+    <string name="background_remove_text">Buddy forgets the pairing and stops its helper. Chats work on the real screen again.</string>
+    <!-- Switch on the Background mode screen. -->
+    <string name="background_default">New chats work in the background</string>
+    <string name="background_default_info">Each chat still has its own switch in Chat options.</string>
+    <!-- "USB debugging" is Android's name of that developer option: use the name this language's Android shows. -->
+    <string name="background_usb_note">Buddy also turns on USB debugging. With it, the helper keeps running when Wi-Fi drops and Android switches Wireless debugging off. Leave it on.</string>
+    <string name="background_security">Wireless debugging lets paired devices control this phone. Buddy pairs only itself, on this phone, and its helper listens only here.</string>
+    <!-- Note in the chat when a step needs the user and the app moves from the background screen to the real one. -->
+    <string name="background_brought">Moved to your screen: this step needs you. Background mode is off for this chat now.</string>
+    <!-- Section title on the Background mode screen: commands the agent runs on the phone itself. Keep short. -->
+    <string name="background_shell">Phone commands</string>
+    <!-- Switch under it. "Linux tools" is the name of Buddy's chat option (chat_linux_tools). -->
+    <string name="background_shell_switch">Agents may run commands on the phone</string>
+    <!-- "adb shell" is a program's name. -->
+    <string name="background_shell_info">In chats with Linux tools, the agent can run commands on the phone itself, as “adb shell” does: install and start apps, change settings, read logs and files. A message or web page it reads could try to trick it into running one.</string>
+    <!-- Second switch, shown while the first is on. -->
+    <string name="background_shell_ask">Ask before each command</string>
+    <string name="background_shell_ask_info">An approval card shows the command first. Without it, nothing stands between a tricked agent and your phone: a command can even tap an approval card.</string>
+    <!-- Approval card for a phone command; %1$s = the command line. -->
+    <string name="tools_card_shell">Run on the phone:\n%1$s</string>
+    <!-- In the bubble while a phone command runs. Keep short. -->
+    <string name="activity_shell">Running a phone command</string>
+    <!-- A step in the chat; %1$s = the command line, shortened. -->
+    <string name="hub_tool_phone_shell">Phone command: %1$s</string>
+    <!-- Switch in Chat options. "it" = the chat's agent. -->
+    <string name="chat_background">Work in the background</string>
+    <string name="chat_background_info">The agent uses a screen of its own and you keep using your phone. A step that needs you, like a sign-in, comes to your screen.</string>
+    <!-- Read by TalkBack: the small live picture of the background screen in a chat. -->
+    <string name="background_preview">Background screen</string>
+    <!-- Button under that picture: the app moves to the real screen and the chat goes on there. -->
+    <string name="background_show">Show on my screen</string>
+    <!-- At the top of a long chat: a tap shows the messages before the ones on screen. -->
+    <string name="chat_earlier">Show earlier messages</string>
+    <!-- At the top of a chat whose start an older Buddy dropped: a tap fetches it from the agent's own record of the conversation. Then, when there was nothing to fetch. -->
+    <string name="chat_earlier_load">Load earlier messages</string>
+    <string name="chat_earlier_none">No earlier messages found.</string>
     <string name="setup_help">Help</string>
     <string name="setup_help_info">Buddy\'s user guide, on GitHub. You can also ask any agent how Buddy works.</string>
     <string name="signin_api_key">Use an API key instead</string>

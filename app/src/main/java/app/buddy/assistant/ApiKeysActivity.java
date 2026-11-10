@@ -119,35 +119,9 @@ public class ApiKeysActivity extends Screen {
         return r;
     }
 
-    /** The agent's own default, or one of its services' models. */
+    /** The agent's own default, one of its own models, or one of its services' (the same sheet as Settings has). */
     private void pickDefault(String agent) {
-        LinearLayout c = column(this);
-        TextView h = title(this, getString(R.string.chat_model_title, Account.nameOf(agent)), 18);
-        h.setPaddingRelative(0, 0, 0, dp(this, 8));
-        c.addView(h);
-        final Dialog[] d = new Dialog[1];
-        String now = Models.agentDefault(agent);
-        c.addView(pickRow(getString(R.string.api_keys_own_default), Models.defaultHint(agent), now.isEmpty(), () -> {
-            d[0].dismiss();
-            setDefault(agent, "");
-        }), full());
-        for (Providers.P p : Providers.forAgent(agent)) {
-            TextView sl = sectionLabel(this, p.name);
-            sl.setPaddingRelative(0, dp(this, 14), 0, dp(this, 2));
-            c.addView(sl);
-            org.json.JSONArray models = p.offered();
-            for (int i = 0; i < models.length(); i++) {
-                String id = models.optJSONObject(i).optString("id");
-                String ref = Providers.ref(p, id);
-                c.addView(pickRow(models.optJSONObject(i).optString("name"), Models.detail(agent, ref, ""),
-                        ref.equals(now), () -> {
-                            d[0].dismiss();
-                            setDefault(agent, ref);
-                        }), full());
-            }
-        }
-        d[0] = bottomSheet(this, c);
-        d[0].show();
+        Ui.pickDefault(this, agent, this::render);
     }
 
     private LinearLayout pickRow(String name, String sub, boolean on, Runnable l) {
@@ -353,7 +327,7 @@ public class ApiKeysActivity extends Screen {
                     // an agent with no plan uses its first service by default, so its chats run
                     for (String a : AGENTS) {
                         if (q.fits(a) && Prefs.agentDefault(this, a).isEmpty() && !"opencode".equals(a)
-                                && !SetupState.planSignedIn(this, a)) Prefs.setAgentDefault(this, a, Providers.ref(q, q.defaultModel()));
+                                && !SetupState.ownModels(this, a)) Prefs.setAgentDefault(this, a, Providers.ref(q, q.defaultModel()));
                     }
                     d.dismiss();
                     refreshAgents();

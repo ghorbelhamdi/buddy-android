@@ -17,7 +17,13 @@ import java.util.UUID;
  * hides one from the list instead.
  */
 final class Sessions {
-    static final int MAX_MESSAGES = 150;
+    /**
+     * How much of a chat Buddy keeps (the agent has its own record of all of it). It was 150 until 2.2.28, which a long
+     * task fills in one go: the start of the conversation was gone from the screen.
+     */
+    static final int MAX_MESSAGES = 2000;
+    /** How many of a chat's latest messages a screen shows at first; "Show earlier messages" adds as many again. */
+    static final int PAGE = 150;
 
     static final class Msg {
         final Bubble.Kind kind;
@@ -73,6 +79,13 @@ final class Sessions {
         boolean dev;
         /** Long-task mode: the screen stays on while this chat works, and its end is a notification (see KeepAwake). */
         boolean awake;
+        /** Background mode: the agent works on a display of its own, the user keeps the screen (see Background). */
+        boolean background;
+        /**
+         * Its start may be missing: it had hit the 150 messages Buddy kept until 2.2.28. The chat then offers to load
+         * the earlier ones from its agent's own record (see ChatHub.restoreEarlier), once.
+         */
+        boolean cut;
         /** Pinned to the top of the chat list. */
         boolean pinned;
         /** Archived: out of the chat list (it has an Archived section), the bubble and sharing; its schedules still run. */
@@ -160,6 +173,7 @@ final class Sessions {
     Session create(String backend, boolean select, boolean dev) {
         Session s = new Session(UUID.randomUUID().toString().replace("-", "").substring(0, 12), backend);
         s.dev = dev;
+        s.background = Prefs.backgroundPaired(app) && Prefs.backgroundDefault(app);
         all.add(0, s);
         if (select || current == null || !all.contains(current)) current = s;
         save(s);
@@ -321,8 +335,8 @@ final class Sessions {
         }
         JSONObject o = new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model)
                 .put("effort", s.effort).put("actual_model", s.actualModel).put("ctx_used", s.ctxUsed).put("ctx_window", s.ctxWindow)
-                .put("interrupted", s.interrupted).put("incognito", s.incognito).put("dev", s.dev).put("awake", s.awake)
-                .put("pinned", s.pinned).put("archived", s.archived).put("updated", s.updated).put("messages", msgs);
+                .put("interrupted", s.interrupted).put("incognito", s.incognito).put("dev", s.dev).put("awake", s.awake).put("background", s.background)
+                .put("pinned", s.pinned).put("archived", s.archived).put("updated", s.updated).put("cut", s.cut).put("messages", msgs);
         if (s.schedule != null) {
             JSONArray ok;
             synchronized (s.allowed) {
@@ -353,6 +367,7 @@ final class Sessions {
         older[0] |= !o.has("dev");
         s.dev = o.optBoolean("dev", Prefs.devMode(app));
         s.awake = o.optBoolean("awake");
+        s.background = o.optBoolean("background");
         s.pinned = o.optBoolean("pinned");
         s.archived = o.optBoolean("archived");
         s.schedule = Schedules.Plan.of(o.optJSONObject("schedule"));
@@ -365,6 +380,8 @@ final class Sessions {
         }
         s.updated = o.optLong("updated");
         JSONArray msgs = o.optJSONArray("messages");
+        // saved before 2.3 and as long as chats got then: older messages were dropped
+        s.cut = o.has("cut") ? o.optBoolean("cut") : msgs != null && msgs.length() >= 150;
         if (msgs != null) for (int j = 0; j < msgs.length(); j++) {
             JSONObject m = msgs.getJSONObject(j);
             List<String> files = new ArrayList<>();

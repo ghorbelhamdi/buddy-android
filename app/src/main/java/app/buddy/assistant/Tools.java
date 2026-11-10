@@ -249,6 +249,16 @@ final class Tools {
         t.put(tool("list_scheduled", "List the messages scheduled in this chat with schedule_message.", props()));
         t.put(tool("cancel_scheduled", "Cancel a message scheduled with schedule_message.",
                 props().put("id", strProp("Its id, from schedule_message or list_scheduled")), "id"));
+        t.put(tool("phone_shell",
+                "(Needs Linux tools in this chat, and the user's switch Settings > Background mode > Phone commands) Run a "
+                        + "command line on the phone itself, as Android's shell user (what `adb shell` gives): pm, am, "
+                        + "settings, dumpsys, logcat -d, getprop, files under /sdcard. Returns its exit code and output "
+                        + "(the last 20,000 characters). The user approves each command on a card first, unless they "
+                        + "turned that off. This is not Buddy's Linux: your own shell is for files there. To use the "
+                        + "screen, use the phone tools (tap, type_text, ...), not `input`. Never use it to get around "
+                        + "an approval card, a BLOCKED answer or a step the user has to do themselves.",
+                props().put("command", strProp("The command line (run by sh -c)"))
+                        .put("timeout_s", intProp("Default 60, max 300")), "command"));
         t.put(tool("install_apk",
                 "(Needs Linux tools) Open Android's installer for an APK built in Buddy's Linux, e.g. "
                         + "/root/.buddy/work/myapp/build/app.apk, or served by another app on this phone at a local URL "
@@ -348,21 +358,33 @@ final class Tools {
     }
 
     private JSONObject call0(String name, JSONObject a) throws Exception {
+        DISPLAY.remove(); // this thread's last call may have been a background chat's
         String revoked = svc.controlRevoked();
         if (revoked != null && !"notify".equals(name)) return text(revoked);
         String capped = countStep(name, a);
         if (capped != null) return text(capped);
         if (name.startsWith("browser_")) { // the background browser: it doesn't need the phone's screen
-            svc.onToolActivity(name);
+            svc.onToolActivity(name, false);
             return browser.call(name, a);
         }
+        // a chat in background mode works on a display of its own: it needs no unlocked screen and no turn at it
+        if (SCREEN.contains(name) && Background.on(svc, McpServer.CALLER_CHAT.get())) {
+            if ("point_out".equals(name)) return text(toScreen("point_out marks things on the user's screen"));
+            try {
+                DISPLAY.set(Background.display(svc, McpServer.CALLER_CHAT.get()));
+            } catch (Background.Unavailable e) {
+                return text("Background mode is on for this chat, but it can't be used right now: " + e.getMessage()
+                        + ". Tell the user that. They can also turn background mode off for this chat (Chat options), "
+                        + "and then you work on the real screen.");
+            }
+        }
         // locked or dark, the screen shows nothing to read or tap: say so instead of acting blind
-        if (SCREEN.contains(name) && Triggers.locked(svc)) {
+        if (SCREEN.contains(name) && !background() && Triggers.locked(svc)) {
             // a scheduled task's run asks the user to unlock and waits a little for them (null: unlocked, go on)
             String locked = Schedules.awaitUnlock(svc, McpServer.CALLER_CHAT.get(), name);
             if (locked != null) return text(locked);
         }
-        if (SCREEN.contains(name) && Triggers.locked(svc)) {
+        if (SCREEN.contains(name) && !background() && Triggers.locked(svc)) {
             return text(Browser.available(svc) && !ruleRun()
                     ? "Phone is locked: only notification replies and the background browser work until the user unlocks. "
                     + "For web pages use the browser_* tools; for anything else, tell the user to unlock the phone."
@@ -372,13 +394,13 @@ final class Tools {
         // asking the user, posting a note, pointing something out and answering in a notification go on while paused;
         // operating the phone waits
         if (!"confirm".equals(name) && !"ask".equals(name) && !"notify".equals(name) && !"reply_notification".equals(name)
-                && !"point_out".equals(name) && !SCHEDULING.contains(name)) {
+                && !"point_out".equals(name) && !SCHEDULING.contains(name) && !background()) {
             String held = svc.awaitResume(name);
             if (held != null) return text(held);
         }
-        svc.onToolActivity(name);
+        svc.onToolActivity(name, background());
         String step = activity(name, a);
-        if (step != null) svc.showActivity(step, null);
+        if (step != null) svc.showActivity(step, pictureKey());
         if (ACTIONS.contains(name)) svc.runOnMain(() -> svc.marks().clear()); // the screen is about to change
         if (PhoneTools.NAMES.contains(name)) return phone.call(name, a, ruleRun());
         switch (name) {
@@ -439,7 +461,11 @@ final class Tools {
                 if (options.size() < 2) return text("Give 2 to 4 options. The user can always type their own answer.");
                 JSONArray inBrowser = a.optJSONArray("browser_highlight");
                 if (inBrowser != null && inBrowser.length() > 0) return text(askInBrowser(a.getString("question"), options, inBrowser));
-                List<Marks.Mark> marks = marks(a.optJSONArray("highlight"));
+                JSONArray hl = a.optJSONArray("highlight");
+                if (hl != null && hl.length() > 0 && Background.on(svc, McpServer.CALLER_CHAT.get())
+                        && Background.displayOf(McpServer.CALLER_CHAT.get()) != Display.DEFAULT_DISPLAY)
+                    return text(toScreen("the user has to do this step on the app themselves"));
+                List<Marks.Mark> marks = marks(hl);
                 // when every mark is a tap or a switch, seeing them all done answers the question; typing has no clear
                 // end, so a question with a field waits for the user's answer
                 boolean closes = !marks.isEmpty();
@@ -455,6 +481,8 @@ final class Tools {
                     if (!marks.isEmpty()) svc.runOnMain(() -> svc.marks().clear());
                 }
             }
+            case "phone_shell":
+                return text(phoneShell(a));
             case "point_out":
                 return text(pointOut(a));
             case "update_buddy":
@@ -528,6 +556,52 @@ final class Tools {
                 + "), so nothing updates it. Tell the user: install the latest buddy.apk from "
                 + "https://github.com/ghorbelhamdi/buddy-android/releases/latest over it (chats and settings stay, and that one "
                 + "updates itself), or get Buddy from F-Droid.";
+    }
+
+    /**
+     * Commands that touch the screen or Buddy itself: the phone tools do the first with Buddy's checks (a raw touch
+     * could tap an approval card), and the second is the user's alone. A tripwire for the plain cases, not a wall:
+     * a command line can hide what it does, which is why each one goes to the user first unless they turned that off.
+     */
+    private static final java.util.regex.Pattern SHELL_NO = java.util.regex.Pattern.compile(
+            "(?:^|[\\s;&|(`])(?:/system/bin/)?(?:input|sendevent|monkey|uiautomator)(?:\\s|$)|cmd\\s+input"
+                    + "|app\\.buddy\\.assistant|enabled_accessibility_services|accessibility_enabled");
+
+    /** phone_shell (issue #22): a command line on the phone itself, through background mode's helper. */
+    private String phoneShell(JSONObject a) throws Exception {
+        String chat = McpServer.CALLER_CHAT.get();
+        if (ruleRun()) return "Not available in a notification rule's run. Tell the user what's needed instead.";
+        if (!Prefs.phoneShell(svc) || !Background.setUp(svc)) {
+            return "Phone commands are off. Only the user turns them on: Settings → Background mode → Phone commands "
+                    + "(background mode has to be set up there first). Tell them that if the task needs it; otherwise "
+                    + "use the phone tools.";
+        }
+        if (!ChatHub.get(svc).devFor(chat)) {
+            return "Phone commands need Linux tools in this chat. Ask the user to turn them on in the chat's header (the "
+                    + "Linux tools chip under its title), wait until they say it's done, then try again.";
+        }
+        String cmd = a.getString("command").trim();
+        if (cmd.isEmpty()) return "Give the command.";
+        if (cmd.length() > 4000) return "That command is too long (4,000 characters at most). Put a script in a file under /sdcard and run that.";
+        if (SHELL_NO.matcher(cmd).find()) {
+            return "BLOCKED: phone commands don't touch the screen or Buddy itself. For taps, typing and swipes use the "
+                    + "phone tools, which ask the user where they should; Buddy's own settings are the user's.";
+        }
+        int secs = Math.max(1, Math.min(300, a.optInt("timeout_s", 60)));
+        if (Prefs.phoneShellAsk(svc) && !Guard.takeApproval(false, cmd)) {
+            String answer = svc.askConfirm(svc.getString(R.string.tools_card_shell, cmd), false);
+            if (!answer.startsWith("APPROVED")) return "Not run. " + answer;
+        }
+        svc.showActivity(svc.getString(R.string.activity_shell), null);
+        String[] r;
+        try {
+            r = Background.exec(svc, cmd, secs);
+        } catch (Background.Unavailable e) {
+            return "The command couldn't be run: " + e.getMessage() + ".";
+        }
+        String out = r[1].length() > 20_000 ? "…" + r[1].substring(r[1].length() - 20_000) : r[1];
+        return ("-1".equals(r[0]) ? "Stopped after " + secs + " s without finishing." : "Exit code " + r[0] + ".")
+                + (out.trim().isEmpty() ? " No output." : "\n" + out);
     }
 
     /** update_buddy, install_apk and wait_for_install. */
@@ -622,11 +696,11 @@ final class Tools {
     private static final java.util.Set<String> REPEATS_OK = new java.util.HashSet<>(java.util.Arrays.asList(
             "scroll", "swipe", "browser_scroll"));
     /**
-     * A run stops after the same action this many times in a row, and after Prefs.maxActions actions unless the user
-     * chose no limit: a runaway loop spends the plan.
+     * A run stops after the same action this many times in a row: a loop spends the plan. There's no limit on the
+     * number of actions (there was one, 60, until 2.2.28: it mostly cut real long tasks short).
      */
     private static final int MAX_REPEATS = 6;
-    /** Per Buddy chat in its current run: {actions, the same action in a row}, and the last action. */
+    /** Per Buddy chat in its current run: how often the same action came in a row, and the last action. */
     private static final java.util.Map<String, int[]> steps = new java.util.concurrent.ConcurrentHashMap<>();
     private static final java.util.Map<String, String> lastStep = new java.util.concurrent.ConcurrentHashMap<>();
 
@@ -643,34 +717,22 @@ final class Tools {
     private String countStep(String name, JSONObject a) {
         String chat = McpServer.CALLER_CHAT.get();
         if (chat == null || !COUNTED.contains(name)) return null;
-        int[] n = steps.computeIfAbsent(chat, k -> new int[2]);
+        int[] n = steps.computeIfAbsent(chat, k -> new int[1]);
         String step = name + " " + a;
         boolean same = step.equals(lastStep.put(chat, step)) && !REPEATS_OK.contains(name);
-        int max = Prefs.maxActions(svc);
         synchronized (n) {
-            boolean capped = max > 0 && n[0] >= max;
-            if (capped && n[0] > max) { // the limit was lowered in Settings during the run: the chat says so once
-                n[0] = max;
-                noteInChat(chat, svc.getString(R.string.tools_step_cap, max));
-            }
-            if (capped || n[1] >= MAX_REPEATS) return stopped(capped ? n[0] : 0);
-            n[0]++;
-            n[1] = same ? n[1] + 1 : 1;
-            if (max > 0 && n[0] == max) noteInChat(chat, svc.getString(R.string.tools_step_cap, max));
-            else if (n[1] == MAX_REPEATS) {
+            if (n[0] >= MAX_REPEATS) return STOPPED;
+            n[0] = same ? n[0] + 1 : 1;
+            if (n[0] == MAX_REPEATS) {
                 noteInChat(chat, svc.getString(R.string.tools_step_loop, MAX_REPEATS));
-                return stopped(0);
+                return STOPPED;
             }
         }
         return null;
     }
 
-    /** cap: the actions used when the run hit its limit, 0 when it stopped on a loop. */
-    private static String stopped(int cap) {
-        return "STOPPED by Buddy: " + (cap > 0 ? "this run has used its " + cap + " phone actions"
-                : "the same action " + MAX_REPEATS + " times in a row looks like a loop")
-                + ". Don't try more actions; tell the user what's done and what's left. They can tell you to go on.";
-    }
+    private static final String STOPPED = "STOPPED by Buddy: the same action " + MAX_REPEATS + " times in a row looks"
+            + " like a loop. Don't try more actions; tell the user what's done and what's left. They can tell you to go on.";
 
     private static final java.util.Set<String> SCREEN = new java.util.HashSet<>(java.util.Arrays.asList(
             "read_screen", "tap", "long_press", "type_text", "scroll", "swipe", "press", "open_app", "open_url",
@@ -787,16 +849,66 @@ final class Tools {
                 + "Don't reply; just say so.";
     }
 
+    // ---------------------------------------------------------- background mode: the chat's own display
+
+    /** The display this call works on, set when it starts: a background chat's own (see Background), else unset. */
+    private static final ThreadLocal<Integer> DISPLAY = new ThreadLocal<>();
+
+    private static int display() {
+        Integer d = DISPLAY.get();
+        return d == null ? Display.DEFAULT_DISPLAY : d;
+    }
+
+    /** Does this call work on a background chat's display instead of the real screen? */
+    private static boolean background() {
+        return display() != Display.DEFAULT_DISPLAY;
+    }
+
+    /** For the bubble's live picture: a background chat's steps show its own screen, not the phone's (see Bubble). */
+    private static String pictureKey() {
+        return background() ? Background.KEY + McpServer.CALLER_CHAT.get() : null;
+    }
+
+    /** The windows this call reads and touches: the real screen's, or those on the chat's display. */
+    private List<AccessibilityWindowInfo> windows() {
+        int d = display();
+        if (d == Display.DEFAULT_DISPLAY) return svc.getWindows();
+        List<AccessibilityWindowInfo> l = svc.getWindowsOnAllDisplays().get(d);
+        return l == null ? new ArrayList<>() : l;
+    }
+
+    /**
+     * A step that needs the user's eyes or fingers on the app (ask's highlight, point_out): the app comes to the real
+     * screen and the chat works there from now on. What the agent is told to do next.
+     */
+    private String toScreen(String why) {
+        Sessions.Session ses = ChatHub.get(svc).sessions.find(McpServer.CALLER_CHAT.get());
+        if (ses == null) return "Not available.";
+        final String[] app = {Background.bringToScreen(svc, ses)};
+        DISPLAY.remove();
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException ignored) {
+        }
+        noteInChat(ses.id, svc.getString(R.string.background_brought));
+        return "This chat was working in the background, on a screen the user can't see, and " + why + ". So Buddy moved "
+                + (app[0] == null ? "the chat" : app[0]) + " to the user's real screen and turned background mode off for "
+                + "this chat: from now on you work on the real screen. Element ids changed: call read_screen, then do "
+                + "this step again.";
+    }
+
     // ---------------------------------------------------------- read_screen
 
     private String readScreen() {
         DisplayMetrics dm = svc.getResources().getDisplayMetrics();
         StringBuilder sb = new StringBuilder();
         sb.append("Screen ").append(dm.widthPixels).append('x').append(dm.heightPixels).append(" px\n");
+        if (background()) sb.append("This is the chat's background screen: the user doesn't see it and keeps using their "
+                + "phone meanwhile. It starts empty; open_app and open_url put an app on it.\n");
         synchronized (lock) {
             for (AccessibilityNodeInfo n : lastNodes) n.recycle();
             lastNodes.clear();
-            List<AccessibilityWindowInfo> windows = svc.getWindows();
+            List<AccessibilityWindowInfo> windows = windows();
             boolean keyboard = false;
             String app = null; // the app in front, for its tips
             for (AccessibilityWindowInfo w : windows) {
@@ -935,7 +1047,7 @@ final class Tools {
 
     /** What lies over element n at x, y so that a tap there wouldn't reach it, or null when nothing does. */
     private String coveredBy(AccessibilityNodeInfo n, int x, int y) {
-        List<AccessibilityWindowInfo> windows = svc.getWindows();
+        List<AccessibilityWindowInfo> windows = windows();
         for (AccessibilityWindowInfo w : windows) {
             if (w.getId() != n.getWindowId()) continue;
             for (Cover c : coversAbove(windows, w)) if (c.area.contains(x, y)) return c.name;
@@ -1011,7 +1123,7 @@ final class Tools {
     /** What the apps on screen show now (Buddy's own windows left out), in reading order. */
     private List<String> visibleTexts() {
         List<String> out = new ArrayList<>();
-        for (AccessibilityWindowInfo w : svc.getWindows()) {
+        for (AccessibilityWindowInfo w : windows()) {
             if (w.getType() != AccessibilityWindowInfo.TYPE_APPLICATION && w.getType() != AccessibilityWindowInfo.TYPE_SYSTEM) continue;
             AccessibilityNodeInfo root = w.getRoot();
             if (root == null || svc.getPackageName().contentEquals(String.valueOf(root.getPackageName()))) continue;
@@ -1034,7 +1146,7 @@ final class Tools {
         String want = q.trim().toLowerCase(Locale.ROOT);
         if (want.isEmpty()) return null;
         AccessibilityNodeInfo[] best = new AccessibilityNodeInfo[2]; // exact, contains
-        for (AccessibilityWindowInfo w : svc.getWindows()) {
+        for (AccessibilityWindowInfo w : windows()) {
             if (w.getType() != AccessibilityWindowInfo.TYPE_APPLICATION && w.getType() != AccessibilityWindowInfo.TYPE_SYSTEM) continue;
             AccessibilityNodeInfo root = w.getRoot();
             if (root == null || svc.getPackageName().contentEquals(String.valueOf(root.getPackageName()))) continue;
@@ -1330,13 +1442,13 @@ final class Tools {
                     + "would land on that instead. Close it or scroll the element into the clear, then read_screen. To tap what's "
                     + "there on purpose, give x and y.";
         }
-        AccessibilityNodeInfo hit = Guard.nodeAt(svc.getWindows(), x, y);
+        AccessibilityNodeInfo hit = Guard.nodeAt(windows(), x, y);
         String blocked = guard(n, hit);
         if (blocked != null) return blocked;
         String label = Guard.buttonLabel(n != null ? n : hit);
         svc.showActivity(label == null ? svc.getString(R.string.activity_tapping_plain)
-                : svc.getString(R.string.activity_tapping, label), null);
-        Path p = new Path();
+                : svc.getString(R.string.activity_tapping, label), pictureKey());
+        Stroke p = new Stroke();
         p.moveTo(x, y);
         String note = otherButtonNote(n, hit);
         String before = beforeAction();
@@ -1390,7 +1502,7 @@ final class Tools {
         DisplayMetrics dm = svc.getResources().getDisplayMetrics();
         StringBuilder b = new StringBuilder();
         Rect r = new Rect();
-        for (AccessibilityWindowInfo w : svc.getWindows()) {
+        for (AccessibilityWindowInfo w : windows()) {
             int type = w.getType();
             if (type == AccessibilityWindowInfo.TYPE_INPUT_METHOD) {
                 b.append("keyboard\n");
@@ -1477,7 +1589,7 @@ final class Tools {
             if (svc.bubble() != null) svc.bubble().setStatus(svc.getString(R.string.tools_status_checking_tap));
         });
         Reviewer.Decision d = Reviewer.review(svc, harness, cx == null ? null : cx[1], cx == null ? null : cx[2],
-                what + (app == null ? "" : " in " + app), Reviewer.screen(svc.getWindows(), target));
+                what + (app == null ? "" : " in " + app), Reviewer.screen(windows(), target));
         if ("allow".equals(d.decision)) return null;
         // the run rule covers the reviewer's "ask" on a routine step: not a risky button, not a password field
         boolean byRule = "ask".equals(d.decision) && target != null && Guard.riskyLabel(target) == null && !target.isPassword()
@@ -1616,7 +1728,7 @@ final class Tools {
     /** The focused text field, or the only visible text field when nothing has focus. */
     private AccessibilityNodeInfo findFocusedInput() {
         List<AccessibilityNodeInfo> editable = new ArrayList<>();
-        for (AccessibilityWindowInfo w : svc.getWindows()) {
+        for (AccessibilityWindowInfo w : windows()) {
             if (w.getType() == AccessibilityWindowInfo.TYPE_ACCESSIBILITY_OVERLAY
                     || w.getType() == AccessibilityWindowInfo.TYPE_INPUT_METHOD) continue;
             AccessibilityNodeInfo root = w.getRoot();
@@ -1656,7 +1768,7 @@ final class Tools {
         }
         String blocked = guardStroke(n, xy);
         if (blocked != null) return blocked;
-        Path p = new Path();
+        Stroke p = new Stroke();
         p.moveTo(xy[0], xy[1]);
         p.lineTo(xy[2], xy[3]);
         String before = beforeAction();
@@ -1673,9 +1785,9 @@ final class Tools {
         // A stroke too short to scroll anything lands as a tap, so it gets every check a tap gets
         int slop = ViewConfiguration.get(svc).getScaledTouchSlop();
         boolean tap = Math.hypot(x2 - x1, y2 - y1) <= slop;
-        String blocked = tap ? guard(null, Guard.nodeAt(svc.getWindows(), x1, y1)) : guardStroke(null, x1, y1, x2, y2);
+        String blocked = tap ? guard(null, Guard.nodeAt(windows(), x1, y1)) : guardStroke(null, x1, y1, x2, y2);
         if (blocked != null) return blocked;
-        Path p = new Path();
+        Stroke p = new Stroke();
         p.moveTo(x1, y1);
         p.lineTo(x2, y2);
         long d = Math.max(50, Math.min(3000, a.optLong("duration_ms", 300)));
@@ -1693,12 +1805,34 @@ final class Tools {
             return "BLOCKED: a card is waiting for the user's answer. Wait for it; don't touch the screen.";
         }
         boolean off = element != null && Guard.offLimits(svc, element);
-        List<AccessibilityWindowInfo> windows = svc.getWindows();
+        List<AccessibilityWindowInfo> windows = windows();
         for (int i = 0; !off && i + 1 < xy.length; i += 2) off = Guard.offLimits(svc, Guard.nodeAt(windows, xy[i], xy[i + 1]));
         return off ? "BLOCKED: that's one of Buddy's own screens. Only the user touches those." : null;
     }
 
-    private boolean gesture(Path path, long durationMs) throws InterruptedException {
+    /** A finger's path that also remembers its points: the helper of background mode takes points, not a Path. */
+    private static final class Stroke extends Path {
+        final List<float[]> points = new ArrayList<>();
+
+        @Override
+        public void moveTo(float x, float y) {
+            super.moveTo(x, y);
+            points.add(new float[]{x, y});
+        }
+
+        @Override
+        public void lineTo(float x, float y) {
+            super.lineTo(x, y);
+            points.add(new float[]{x, y});
+        }
+    }
+
+    private boolean gesture(Stroke path, long durationMs) throws InterruptedException {
+        if (background()) { // the helper touches the chat's display; nothing of the real screen is in the way
+            boolean ok = Background.gesture(svc, McpServer.CALLER_CHAT.get(), path.points, durationMs);
+            Thread.sleep(250);
+            return ok;
+        }
         svc.setBubblePassThrough(true);
         try {
             final CountDownLatch done = new CountDownLatch(1);
@@ -1729,6 +1863,18 @@ final class Tools {
     }
 
     private String press(String button) {
+        if (background()) {
+            if (!"back".equals(button)) return "In background mode there's only Back: Home, Recents and the notification "
+                    + "shade belong to the user's real screen. Use open_app to switch apps.";
+            String before = beforeAction();
+            try {
+                Background.call(svc, "key\t" + McpServer.CALLER_CHAT.get() + "\t" + android.view.KeyEvent.KEYCODE_BACK);
+                Thread.sleep(500);
+            } catch (Exception e) {
+                return "Could not press back: " + e.getMessage();
+            }
+            return "Pressed back." + afterAction(before, 500);
+        }
         int action;
         switch (button) {
             case "back": action = AccessibilityService.GLOBAL_ACTION_BACK; break;
@@ -1785,6 +1931,16 @@ final class Tools {
             return "BLOCKED: agents can't open Buddy itself. Only the user uses Buddy's screens.";
         Intent launch = pm.getLaunchIntentForPackage(best);
         if (launch == null) return "App " + bestLabel + " cannot be launched.";
+        if (background()) {
+            if (launch.getComponent() == null) return "App " + bestLabel + " cannot be launched.";
+            try {
+                Background.call(svc, "start\t" + McpServer.CALLER_CHAT.get() + "\t" + launch.getComponent().flattenToString());
+            } catch (java.io.IOException e) {
+                return "Could not open " + bestLabel + " in the background: " + e.getMessage();
+            }
+            Thread.sleep(1500);
+            return "Opened " + bestLabel + " (" + best + ") on this chat's background screen. Call read_screen to see it.";
+        }
         launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
         svc.startActivity(launch);
         Thread.sleep(1500);
@@ -1801,7 +1957,7 @@ final class Tools {
 
     /** Is an installer / Play Protect dialog what the user is looking at? */
     private boolean installerOnScreen() {
-        for (AccessibilityWindowInfo w : svc.getWindows()) {
+        for (AccessibilityWindowInfo w : windows()) {
             AccessibilityNodeInfo r = w.getRoot();
             if (r == null || r.getPackageName() == null) continue;
             String p = r.getPackageName().toString();
@@ -1933,12 +2089,28 @@ final class Tools {
         if (to != null && to.activityInfo != null && svc.getPackageName().equals(to.activityInfo.packageName)
                 && !Prefs.agentsTapBuddy(svc))
             return "BLOCKED: that link opens Buddy itself. Only the user uses Buddy's screens.";
+        if (background()) {
+            if (url.indexOf('\t') >= 0 || url.indexOf('\n') >= 0) return "That's not a link.";
+            try {
+                Background.call(svc, "view\t" + McpServer.CALLER_CHAT.get() + "\t" + url);
+            } catch (java.io.IOException e) {
+                return "Could not open " + url + " in the background: " + e.getMessage();
+            }
+            Thread.sleep(1500);
+            return "Opened " + url + " on this chat's background screen. Call read_screen to see it.";
+        }
         svc.startActivity(i);
         Thread.sleep(1500);
         return "Opened " + url + ". Call read_screen to see it.";
     }
 
     private JSONObject screenshot() throws Exception {
+        if (background()) {
+            byte[] jpg = Background.frame(svc, McpServer.CALLER_CHAT.get(), 0, 92);
+            Bitmap full = jpg == null ? null : android.graphics.BitmapFactory.decodeByteArray(jpg, 0, jpg.length);
+            if (full == null) return text("The background screen shows nothing yet. Open an app with open_app first.");
+            return picture(full);
+        }
         try {
             return screenshotOnce();
         } catch (IllegalStateException e) { // too soon after "View steps" took its own: once more, a second later
@@ -1981,6 +2153,11 @@ final class Tools {
         }
         Bitmap full = shot.get();
         if (full == null) throw new IllegalStateException(error.get() != null ? error.get() : "Screenshot timed out.");
+        return picture(full);
+    }
+
+    /** A screenshot as the tool's answer: scaled down, with how to turn its coordinates into the screen's. */
+    private JSONObject picture(Bitmap full) throws JSONException {
         float scale = Math.min(1f, (float) SCREENSHOT_SHORT_SIDE / Math.min(full.getWidth(), full.getHeight()));
         Bitmap small = scale < 1f
                 ? Bitmap.createScaledBitmap(full, Math.round(full.getWidth() * scale), Math.round(full.getHeight() * scale), true)

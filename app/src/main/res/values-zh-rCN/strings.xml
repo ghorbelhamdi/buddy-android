@@ -879,6 +879,11 @@
     <string name="signin_with_chatgpt">使用 ChatGPT 登录</string>
     <string name="signin_with_google">使用 Google 登录</string>
     <string name="signin_with_grok">使用 Grok 登录</string>
+    <string name="signin_token">使用令牌</string>
+    <string name="signin_token_title">Claude Code 令牌</string>
+    <string name="signin_token_info">粘贴在电脑上运行“claude setup-token”后显示的令牌，它以 sk-ant-oat 开头。令牌可用于对话。语音输入和远程控制需要完整登录。</string>
+    <string name="signin_token_wrong">这不是 Claude Code 令牌。API 密钥（sk-ant-api…）请在“设置 → API 密钥”中添加。</string>
+    <string name="signin_token_on">已使用令牌登录：可用于对话。语音输入和远程控制需要完整登录。</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <string name="signin_other_device">在其他设备上登录</string>
     <!-- Button (ChatGPT): sign in by entering a one-time code on another device. -->
@@ -1271,9 +1276,6 @@
     <!-- Choice: a smaller panel. Keep it short. -->
     <string name="setup_panel_compact">紧凑</string>
     <string name="setup_panel_size_info">“全屏”会铺满整个屏幕。“紧凑”更小，并会避开屏幕边缘，因此侧边手势仍可正常使用。</string>
-    <string name="setup_action_limit">每个任务的手机操作数</string>
-    <string name="setup_action_limit_none">不限</string>
-    <string name="setup_action_limit_info">任务在这么多次点按、输入和滚动后停止，以免失控的任务耗尽你的套餐额度。连续 6 次相同操作总会让它停止。</string>
     <!-- Explains the "Talk" choice of setup_tap_action. -->
     <string name="setup_tap_to_talk_info">点按一下即可打开麦克风：说出你的需求，停顿时就会发送。长按气泡可打开对话及更多操作。</string>
     <string name="setup_read_aloud">朗读回复</string>
@@ -1783,8 +1785,53 @@
     <plurals name="check_failed">
         <item quantity="other">%1$d 项检查未通过</item>
     </plurals>
-    <string name="tools_step_cap">已连续执行 %1$d 次手机操作后停止，以免失控的任务耗尽你的套餐额度。如需继续，请告诉它。</string>
     <string name="tools_step_loop">已停止：它连续 %1$d 次做同一件事，看起来陷入了循环。</string>
+    <!-- Background mode -->
+    <string name="background_title">后台模式</string>
+    <string name="background_row">智能体在自己的屏幕上工作，你照常使用手机</string>
+    <string name="background_intro">在后台模式下，智能体在一块你看不到的独立屏幕上工作。你的屏幕、键盘和返回键仍归你使用，手机锁定后它也会继续工作。</string>
+    <string name="background_how">Android 只允许通过“无线调试”创建这样的屏幕，所以 Buddy 会在这部手机上与它配对一次。不需要电脑。</string>
+    <string name="background_step1">1. 点按“开始设置”。Buddy 会打开“开发者选项”，并替你找到“无线调试”。</string>
+    <string name="background_step2">2. 它会开启“无线调试”（需已连接 Wi-Fi），并打开“使用配对码配对设备”。</string>
+    <string name="background_step3">3. 它会读取配对码、完成配对，然后带你回到这里。如果它在哪一步停住了，你自己完成那一步，Buddy 会接着做。</string>
+    <string name="background_setup">开始设置</string>
+    <string name="background_open_options">打开开发者选项</string>
+    <string name="background_installing">正在为 Buddy 的 Linux 获取 adb…</string>
+    <string name="background_waiting">正在等待“无线调试”中的“使用配对码配对设备”…</string>
+    <string name="background_pairing">正在配对…</string>
+    <string name="background_starting">正在启动助手程序…</string>
+    <string name="background_ready">就绪</string>
+    <string name="background_ready_info">可按对话开启：对话选项 → 在后台工作。</string>
+    <string name="background_paired">已配对</string>
+    <string name="background_asleep">助手程序没有在运行。它会随第一个后台任务启动，也可以现在启动。手机重启后，请点按“立即启动”：Buddy 会为此开启“无线调试”（需已连接 Wi-Fi）。</string>
+    <string name="background_start_now">立即启动</string>
+    <string name="background_failed">没有成功：%1$s</string>
+    <string name="background_needs_linux">后台模式需要 Buddy 的 Linux。请先安装一个智能体。</string>
+    <string name="background_needs_dev">请先开启“开发者选项”：设置 → 关于本机 → 连续点按“Build 号”（或“版本号”）7 次。</string>
+    <string name="background_needs_service">请先开启 Buddy 的无障碍服务。</string>
+    <string name="background_no_dialog">Buddy 没能及时看到配对对话框。请重试。</string>
+    <string name="background_remove">移除</string>
+    <string name="background_remove_text">Buddy 会忘记这次配对并停止助手程序。对话将重新在真实屏幕上工作。</string>
+    <string name="background_default">新对话在后台工作</string>
+    <string name="background_default_info">每个对话在“对话选项”中仍有自己的开关。</string>
+    <string name="background_security">“无线调试”允许已配对的设备控制这部手机。Buddy 只配对它自己，而且就在这部手机上；它的助手程序也只在本机监听。</string>
+    <string name="background_brought">已移到你的屏幕：这一步需要你来做。这个对话的后台模式现已关闭。</string>
+    <string name="chat_background">在后台工作</string>
+    <string name="chat_background_info">智能体使用自己的屏幕，你可以继续使用手机。需要你来做的步骤（例如登录）会出现在你的屏幕上。</string>
+    <string name="background_preview">后台屏幕</string>
+    <string name="background_show">显示到我的屏幕</string>
+    <string name="background_usb_note">Buddy 还会开启“USB 调试”。有了它，即使 Wi-Fi 断开、Android 关闭了“无线调试”，助手程序也能继续运行。请保持开启。</string>
+    <string name="background_shell">手机命令</string>
+    <string name="background_shell_switch">允许智能体在手机上运行命令</string>
+    <string name="background_shell_info">在开启了 Linux 工具的对话中，智能体可以像“adb shell”那样直接在手机上运行命令：安装和启动应用、更改设置、读取日志和文件。它读到的消息或网页可能会诱骗它运行命令。</string>
+    <string name="background_shell_ask">每条命令前先询问</string>
+    <string name="background_shell_ask_info">确认卡片会先显示这条命令。没有它，被诱骗的智能体和你的手机之间就毫无阻挡：一条命令甚至可以点按确认卡片。</string>
+    <string name="tools_card_shell">在手机上运行：\n%1$s</string>
+    <string name="activity_shell">正在运行手机命令</string>
+    <string name="hub_tool_phone_shell">手机命令：%1$s</string>
+    <string name="chat_earlier">显示更早的消息</string>
+    <string name="chat_earlier_load">加载更早的消息</string>
+    <string name="chat_earlier_none">未找到更早的消息。</string>
     <string name="setup_help">帮助</string>
     <string name="setup_help_info">GitHub 上的 Buddy 使用指南。你也可以问任何智能体 Buddy 怎么用。</string>
     <string name="signin_api_key">改用 API 密钥</string>

@@ -13,6 +13,7 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.os.Bundle;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
@@ -843,7 +844,16 @@ final class Triggers implements ChatHub.Listener {
      * A card waits for the user while the phone is locked or its screen is off. The bubble stays out of sight there
      * (approving needs the phone unlocked), so a notification says so and opens the chat, where the card is too.
      */
-    static void approvalShown(Context c, String chat, String summary, int seconds) {
+    /** Sent by the notification's Approve and Deny (see approvalShown); BuddyService hears it. */
+    static final String ACTION_CARD = "app.buddy.assistant.CARD";
+
+    /**
+     * approval: the card asks Approve or Deny (not a question), so the notification offers both right there, on the
+     * lock screen too. Deny works as it is; Approve makes Android ask for the fingerprint or PIN first (Android 12+;
+     * before that there's no way to demand it, so there Approve stays in the chat). options: a question's answers, up
+     * to three (a notification holds no more buttons), each behind the fingerprint or PIN as well.
+     */
+    static void approvalShown(Context c, String chat, String summary, int seconds, boolean approval, java.util.List<String> options) {
         if (!locked(c)) return;
         new Handler(Looper.getMainLooper()).post(() -> { // chats are read on the main thread
             Job j = chat == null ? null : active.get(chat);
@@ -854,7 +864,7 @@ final class Triggers implements ChatHub.Listener {
             NotificationManager nm = c.getSystemService(NotificationManager.class);
             nm.createNotificationChannel(new NotificationChannel(APPROVALS, c.getString(R.string.approvals_channel),
                     NotificationManager.IMPORTANCE_HIGH));
-            Notification n = new Notification.Builder(c, APPROVALS)
+            Notification.Builder b = new Notification.Builder(c, APPROVALS)
                     .setSmallIcon(R.drawable.ic_launcher_monochrome)
                     .setContentTitle(title)
                     .setContentText(text)
@@ -862,13 +872,39 @@ final class Triggers implements ChatHub.Listener {
                     .setContentIntent(s != null ? openChat(c, chat) : PendingIntent.getActivity(c, 0,
                             new Intent(c, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), PendingIntent.FLAG_IMMUTABLE))
                     .setCategory(Notification.CATEGORY_REMINDER)
-                    .setAutoCancel(true)
-                    .build();
+                    // what it asks may be private (a message's text): a lock screen that hides such things shows this
+                    .setPublicVersion(new Notification.Builder(c, APPROVALS).setSmallIcon(R.drawable.ic_launcher_monochrome)
+                            .setContentTitle(c.getString(R.string.card_locked_title, c.getString(R.string.app_name))).build())
+                    .setAutoCancel(true);
+            if (approval) {
+                int id = String.valueOf(chat).hashCode();
+                if (Build.VERSION.SDK_INT >= 31) {
+                    b.addAction(new Notification.Action.Builder(null, c.getString(R.string.card_approve), cardAnswer(c, chat, summary, true, id))
+                            .setAuthenticationRequired(true).build());
+                }
+                b.addAction(new Notification.Action.Builder(null, c.getString(R.string.card_deny), cardAnswer(c, chat, summary, false, id)).build());
+            }
+            if (!approval && options != null && options.size() <= 3 && Build.VERSION.SDK_INT >= 31) {
+                int id = String.valueOf(chat).hashCode(), k = 0;
+                for (String o : options) {
+                    PendingIntent pi = PendingIntent.getBroadcast(c, id * 8 + 2 + k++, new Intent(ACTION_CARD)
+                            .setPackage(c.getPackageName()).putExtra("chat", chat).putExtra("text", summary).putExtra("option", o),
+                            PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+                    b.addAction(new Notification.Action.Builder(null, o, pi).setAuthenticationRequired(true).build());
+                }
+            }
+            Notification n = b.build();
             try {
                 nm.notify("rule_ok", String.valueOf(chat).hashCode(), n);
             } catch (SecurityException ignored) {
             }
         });
+    }
+
+    private static PendingIntent cardAnswer(Context c, String chat, String text, boolean ok, int id) {
+        return PendingIntent.getBroadcast(c, id * 8 + (ok ? 1 : 0), new Intent(ACTION_CARD).setPackage(c.getPackageName())
+                .putExtra("chat", chat).putExtra("text", text).putExtra("ok", ok),
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     static void approvalDone(Context c, String chat) {
@@ -987,8 +1023,9 @@ final class Triggers implements ChatHub.Listener {
 
     /** The phone is locked or its screen is off: the user isn't looking at it. */
     static boolean locked(Context c) {
-        return c.getSystemService(KeyguardManager.class).isKeyguardLocked()
-                || !c.getSystemService(PowerManager.class).isInteractive();
+        // the screen's own state, not PowerManager.isInteractive: that stays true while a background chat's display
+        // (a power group of its own) is awake
+        return c.getSystemService(KeyguardManager.class).isKeyguardLocked() || !BuddyService.screenOn(c);
     }
 
     /** The agent and an approval countdown keep working with the screen off. */

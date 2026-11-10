@@ -90,7 +90,7 @@ final class StepLog {
         pending.incrementAndGet();
         shots.execute(() -> {
             try {
-                shoot(svc, shot);
+                shoot(svc, chat, shot);
                 if (n > MAX_SHOTS) old.delete(); // a long run (Settings: 200 or no limit) keeps its latest screenshots
             } finally {
                 pending.decrementAndGet();
@@ -99,9 +99,17 @@ final class StepLog {
     }
 
     /** A small JPEG of the screen, a moment after the action (the screen needs it to settle). */
-    private static void shoot(BuddyService svc, File out) {
+    private static void shoot(BuddyService svc, String chat, File out) {
         try {
             Thread.sleep(600);
+            if (Background.on(svc, chat) && Background.displayOf(chat) != Display.DEFAULT_DISPLAY) {
+                // a background chat's steps happen on its own display: the picture comes from there
+                byte[] jpg = Background.frame(svc, chat, SHORT_SIDE, 60);
+                if (jpg != null) try (FileOutputStream o = new FileOutputStream(out)) {
+                    o.write(jpg);
+                }
+                return;
+            }
             java.util.concurrent.CountDownLatch done = new java.util.concurrent.CountDownLatch(1);
             svc.takeScreenshot(Display.DEFAULT_DISPLAY, svc.getMainExecutor(), new AccessibilityService.TakeScreenshotCallback() {
                 @Override

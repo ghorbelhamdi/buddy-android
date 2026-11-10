@@ -481,6 +481,51 @@ final class Ui {
     }
 
     /**
+     * Settings → Chats on Default (issue #20): for each agent that's signed in, what a chat uses while its model is
+     * "Default": the agent's own default, one of its models, or an API key service's.
+     */
+    static void defaultsSheet(Activity a) {
+        LinearLayout c = column(a);
+        c.addView(title(a, a.getString(R.string.api_keys_defaults), 18));
+        TextView info = text(a, a.getString(R.string.api_keys_defaults_info), 13, MUTED);
+        info.setPaddingRelative(0, dp(a, 4), 0, dp(a, 8));
+        c.addView(info);
+        final Dialog[] d = new Dialog[1];
+        for (Account acc : Account.ALL) {
+            final String agent = acc.agent;
+            if (!SetupState.signedIn(a, agent)) continue;
+            LinearLayout r = row(a);
+            r.setGravity(Gravity.CENTER_VERTICAL);
+            r.setPaddingRelative(0, dp(a, 8), 0, dp(a, 8));
+            r.setBackgroundResource(ripple(a, false));
+            r.addView(agentTile(a, agent));
+            LinearLayout t = column(a);
+            t.setPaddingRelative(dp(a, 12), 0, dp(a, 8), 0);
+            t.addView(title(a, Account.nameOf(agent), 15));
+            String now = Models.agentDefault(agent);
+            t.addView(single(monoText(a, now.isEmpty() ? a.getString(R.string.api_keys_own_default) : Models.label(agent, now), 12, MUTED)));
+            r.addView(t, weight1());
+            r.addView(icon(a, R.drawable.ms_chevron_right, MUTED, 22));
+            r.setOnClickListener(v -> {
+                d[0].dismiss();
+                pickDefault(a, agent, () -> defaultsSheet(a));
+            });
+            c.addView(r, full());
+        }
+        d[0] = bottomSheet(a, c);
+        d[0].show();
+    }
+
+    /** The model sheet, for an agent's default: "" is the agent's own default. after: once one is picked. */
+    static void pickDefault(Activity a, String agent, Runnable after) {
+        modelSheet(a, agent, Models.agentDefault(agent), Models.defaultHint(agent), pick -> {
+            Prefs.setAgentDefault(a, agent, pick);
+            ChatHub.get(a).changed();
+            if (after != null) after.run();
+        });
+    }
+
+    /**
      * Pick a model for an agent: its list ("" first, described by defaultHint) or any model name typed in. The pick goes
      * to l; nothing happens if the sheet is closed.
      */
@@ -528,9 +573,7 @@ final class Ui {
         LinearLayout other = row(a);
         other.setPaddingRelative(0, dp(a, 10), 0, 0);
         final android.widget.EditText et = new android.widget.EditText(a);
-        et.setHint(a.getString(R.string.chat_model_other_hint, "claude".equals(backend) ? "claude-opus-5-5"
-                : "opencode".equals(backend) ? "anthropic/claude-sonnet-5-5" : "agy".equals(backend) ? "gemini-3.8-flash-high"
-                : "grok".equals(backend) ? "grok-4.7" : "gpt-6.1-sol"));
+        et.setHint(a.getString(R.string.chat_model_other_hint, Models.example(backend)));
         et.setHintTextColor(MUTED);
         et.setTextColor(TEXT);
         et.setTextSize(14);
@@ -919,6 +962,89 @@ final class Ui {
             onYes.run();
         });
         d.show();
+    }
+
+    /**
+     * A sheet showing a long text someone else wrote (a message an agent scheduled), with one action: the text sits in
+     * its own card, and long web addresses are shortened to "site/…/last part" links, since whole ones wrap into
+     * ragged lines that are hard to read. "Close" leaves it as it is.
+     */
+    static void messageSheet(Activity a, String title, String message, String action, boolean destructive, Runnable onYes) {
+        LinearLayout c = column(a);
+        c.addView(title(a, title, 18));
+        TextView m = text(a, "", 14, TEXT);
+        m.setText(shortLinks(message));
+        m.setLinkTextColor(ACCENT_TEXT);
+        m.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
+        m.setLineSpacing(dp(a, 3), 1f);
+        // fill each line: Android's default evens the lines of a paragraph out, which ends them well short of the edge
+        m.setBreakStrategy(android.graphics.text.LineBreaker.BREAK_STRATEGY_SIMPLE);
+        m.setHyphenationFrequency(android.text.Layout.HYPHENATION_FREQUENCY_NONE);
+        m.setBackground(rounded(a, BG, 16));
+        m.setPaddingRelative(dp(a, 14), dp(a, 12), dp(a, 14), dp(a, 12));
+        LinearLayout.LayoutParams mp = full();
+        mp.topMargin = dp(a, 12);
+        mp.bottomMargin = dp(a, 18);
+        c.addView(m, mp);
+        LinearLayout btns = row(a);
+        Button no = button(a, a.getString(R.string.bubble_close), false);
+        Button yes = button(a, action, !destructive);
+        if (destructive) {
+            yes.setTextColor(ERR);
+            yes.setBackground(rounded(a, ERR_SOFT, 12));
+        }
+        btns.addView(no, new LinearLayout.LayoutParams(0, dp(a, 48), 1));
+        LinearLayout.LayoutParams yp = new LinearLayout.LayoutParams(0, dp(a, 48), 1);
+        yp.setMarginStart(dp(a, 10));
+        btns.addView(yes, yp);
+        c.addView(btns, full());
+        Dialog d = bottomSheet(a, c);
+        no.setOnClickListener(v -> d.dismiss());
+        yes.setOnClickListener(v -> {
+            d.dismiss();
+            onYes.run();
+        });
+        d.show();
+    }
+
+    private static final java.util.regex.Pattern WEB = java.util.regex.Pattern.compile("https?://[^\\s<>\"]+");
+
+    /** The text with each web address over 40 characters shown as "site/…/last part"; every address opens on a tap. */
+    static CharSequence shortLinks(String text) {
+        android.text.SpannableStringBuilder out = new android.text.SpannableStringBuilder();
+        java.util.regex.Matcher m = WEB.matcher(text);
+        int at = 0;
+        while (m.find()) {
+            String url = m.group();
+            while (!url.isEmpty() && ").,;:!?'".indexOf(url.charAt(url.length() - 1)) >= 0) url = url.substring(0, url.length() - 1);
+            if (url.length() < 12) continue;
+            out.append(text, at, m.start());
+            String shown = url.replaceFirst("^https?://(www\\.)?", "");
+            if (url.length() > 40) shown = shortLink(shown);
+            int from = out.length();
+            out.append(shown);
+            out.setSpan(new LinkSpan(url, null), from, out.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            at = m.start() + url.length();
+        }
+        out.append(text, at, text.length());
+        return out;
+    }
+
+    /** "site.com/a/b/c/page?id=x" → "site.com/…/page?id=x": the site and where it ends up, long parts cut. */
+    static String shortLink(String address) {
+        int q = address.indexOf('?'), h = address.indexOf('#');
+        int end = q < 0 ? (h < 0 ? address.length() : h) : (h < 0 ? q : Math.min(q, h));
+        String path = address.substring(0, end), rest = address.substring(end);
+        while (path.endsWith("/")) path = path.substring(0, path.length() - 1);
+        int slash = path.indexOf('/');
+        if (slash < 0) return path + cut(rest, 32);
+        String host = path.substring(0, slash), last = path.substring(path.lastIndexOf('/') + 1);
+        boolean deep = path.lastIndexOf('/') > slash;
+        return host + (deep ? "/…/" : "/") + cut(last, 28) + cut(rest, 32);
+    }
+
+    private static String cut(String s, int max) {
+        return s.length() <= max ? s : s.substring(0, max - 1) + "…";
     }
 
     // ---------------------------------------------------------------- bottom nav

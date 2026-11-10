@@ -77,6 +77,11 @@ final class Account {
     volatile String updateNote = "";
     /** Signed in with the plan itself (Claude, ChatGPT): what voice, Remote Control and the ChatGPT app need. */
     volatile boolean planIn = true;
+    /**
+     * Claude Code is signed in with a token (`claude setup-token`, issue #19), not the full sign-in: its own models
+     * run chats, but voice and Remote Control, which need the full sign-in, don't.
+     */
+    volatile boolean token;
     /** Claude Code or Codex can use an API key service (Settings → API keys), with or without the plan. */
     volatile boolean apiKey;
     /** A failed install's own output, behind Details when detail says it in plain words ("" otherwise). */
@@ -144,7 +149,10 @@ final class Account {
         // remembered, so screens can show progress right away before the next check finishes
         if (a != null && (s == Step.NEED_INSTALL || s == Step.SIGNED_OUT || s == Step.SIGNED_IN)) {
             Prefs.setAgentState(a, agent, s.name());
-            if (s == Step.SIGNED_IN) Prefs.setAgentPlan(a, agent, planIn);
+            if (s == Step.SIGNED_IN) {
+                Prefs.setAgentPlan(a, agent, planIn);
+                Prefs.setAgentToken(a, agent, token);
+            }
         }
         main.post(() -> {
             for (Listener l : new ArrayList<>(listeners)) l.onAccountChanged();
@@ -186,7 +194,9 @@ final class Account {
                     }
                     JSONObject j = new JSONObject(out.substring(from, to + 1));
                     // signed in = the plan, or an API key service it can use (or both)
-                    planIn = j.optBoolean("loggedIn") && !"api_key".equals(j.optString("authMethod"));
+                    // a token (in Claude Code's settings, see useToken) signs it in for chats only
+                    token = j.optBoolean("loggedIn") && "oauth_token".equals(j.optString("authMethod"));
+                    planIn = j.optBoolean("loggedIn") && !"api_key".equals(j.optString("authMethod")) && !token;
                     apiKey = !Providers.forAgent(agent).isEmpty();
                     if (planIn || apiKey || j.optBoolean("loggedIn")) {
                         email = planIn ? j.optString("email", j.optString("emailAddress", "")) : "";
@@ -224,7 +234,7 @@ final class Account {
                         }
                         if (a.length() > 0) {
                             Prefs.setOpencodeModels(app, a.toString());
-                            Models.setOpencode(a.toString());
+                            Models.set("opencode", a.toString());
                         }
                     }
                 } else if (agy()) {
@@ -257,7 +267,7 @@ final class Account {
                         if (a.length() > 0) {
                             agyModelsAt = now;
                             Prefs.setAgyModels(app, a.toString());
-                            Models.setAgy(a.toString());
+                            Models.set("agy", a.toString());
                         }
                     } else {
                         set(Step.SIGNED_OUT, "");
@@ -294,7 +304,7 @@ final class Account {
                         if (a.length() > 0) {
                             grokModelsAt = now;
                             Prefs.setGrokModels(app, a.toString());
-                            Models.setGrok(a.toString());
+                            Models.set("grok", a.toString());
                         }
                     } else {
                         set(Step.SIGNED_OUT, "");
@@ -604,6 +614,32 @@ final class Account {
         if (login != null) login.destroy();
     }
 
+    /** Is this a token `claude setup-token` makes (they start "sk-ant-oat")? An API key isn't. */
+    static boolean looksLikeToken(String t) {
+        return t != null && t.matches("sk-ant-oat[0-9A-Za-z_-]{16,}");
+    }
+
+    private static final String CLAUDE_SETTINGS = "f=$HOME/.claude/settings.json; mkdir -p $HOME/.claude; [ -s $f ] || echo '{}' > $f; ";
+
+    /**
+     * Signs Claude Code in with a token from `claude setup-token` (issue #19): Claude Code reads it from the env part of
+     * its own settings file, in chats and in the terminal alike. It lives in Buddy's Linux, as the full sign-in's
+     * credentials do.
+     */
+    void useToken(Context c, final String t) {
+        if (!claude() || !looksLikeToken(t)) return;
+        final Context app = c.getApplicationContext();
+        set(Step.CHECKING, "");
+        new Thread(() -> {
+            try {
+                Linux.exec(app, CLAUDE_SETTINGS + "jq --arg t '" + t + "' '.env.CLAUDE_CODE_OAUTH_TOKEN=$t' $f > $f.new"
+                        + " && mv $f.new $f && chmod 600 $f", 60);
+            } catch (Exception ignored) {
+            }
+            refresh(app);
+        }).start();
+    }
+
     /** Signs out of the plan (or the account). API key services stay (Settings → API keys). */
     void logout(Context c) {
         final Context app = c.getApplicationContext();
@@ -612,6 +648,9 @@ final class Account {
                 if (agy()) Linux.exec(app, "rm -f " + AGY_TOKEN, 60); // agy only signs out from its own screen (/logout)
                 else if (grok()) Linux.exec(app, GROK_BIN + " logout", 60);
                 else if (!opencode()) Linux.exec(app, claude() ? "claude auth logout" : "codex logout", 60);
+                // a token signs Claude Code in as well: signing out takes it away too
+                if (claude()) Linux.exec(app, CLAUDE_SETTINGS + "jq 'del(.env.CLAUDE_CODE_OAUTH_TOKEN) | if (.env // {}) == {} "
+                        + "then del(.env) else . end' $f > $f.new && mv $f.new $f", 60);
             } catch (Exception ignored) {
             }
             refresh(app);

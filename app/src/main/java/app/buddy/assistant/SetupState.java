@@ -47,6 +47,11 @@ final class SetupState {
         return signedIn(c, agent) && Prefs.agentPlan(c, agent);
     }
 
+    /** The agent's own models can run chats: it's signed in with its plan, or (Claude Code) with a token. */
+    static boolean ownModels(Context c, String agent) {
+        return signedIn(c, agent) && (Prefs.agentPlan(c, agent) || Prefs.agentToken(c, agent));
+    }
+
     int count() {
         int n = 0;
         for (boolean d : done) if (d) n++;

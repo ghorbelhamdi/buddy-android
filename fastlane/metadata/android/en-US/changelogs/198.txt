@@ -1,0 +1,6 @@
+• New: Background mode. An agent works in your apps on a screen of its own while you keep using your phone. One-time setup with the phone's own Wireless debugging, no computer
+• Optional phone commands (adb shell) for agents, each approved by you
+• Approve or deny from the lock screen
+• Your own default model per agent; Claude Code sign-in with a token
+• Long chats keep their start; your messages show Markdown
+• No limit on phone actions per task

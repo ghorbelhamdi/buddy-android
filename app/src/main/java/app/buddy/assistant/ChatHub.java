@@ -370,6 +370,90 @@ final class ChatHub {
         changed();
     }
 
+    /** Can this chat's missing start be looked up? Claude Code and Codex keep a record Buddy can read. */
+    static boolean canRestore(Sessions.Session ses) {
+        return ses.cut && ("claude".equals(ses.backend) || "codex".equals(ses.backend));
+    }
+
+    /**
+     * A chat that lost its start to the old 150-message limit gets it back from its agent's own record of the
+     * conversation (Claude Code's or Codex's session file in Buddy's Linux): what the user and the agent said before
+     * the first message Buddy still has. The tool steps of that part aren't rebuilt, only the words. done gets how
+     * many messages came back (0: none found), on the main thread.
+     */
+    void restoreEarlier(final Sessions.Session ses, final java.util.function.IntConsumer done) {
+        final boolean codex = "codex".equals(ses.backend);
+        final List<String> have = new ArrayList<>(); // Buddy's first messages with words, as "U…" or "B…"
+        for (Sessions.Msg m : ses.messages) {
+            if (m.kind != Bubble.Kind.USER && m.kind != Bubble.Kind.BUDDY || m.text.trim().length() < 8) continue;
+            have.add((m.kind == Bubble.Kind.USER ? "U" : "B") + key(m.text));
+            if (have.size() >= 8) break;
+        }
+        new Thread(() -> {
+            final List<Sessions.Msg> early = new ArrayList<>();
+            try {
+                String dir = "$HOME/.buddy/sessions/" + ses.id;
+                String words = codex
+                        ? "select(.type==\"response_item\" and .payload.type==\"message\" and (.payload.role==\"user\" or "
+                        + ".payload.role==\"assistant\")) | {role:.payload.role, text:([.payload.content[]? | .text // empty] | join(\"\\n\"))}"
+                        : "select(.type==\"user\" or .type==\"assistant\") | {role:.message.role, text:(if (.message.content|type)==\"string\" "
+                        + "then .message.content else ([.message.content[]? | select(.type==\"text\") | .text] | join(\"\\n\")) end)}";
+                String find = codex
+                        ? "id=$(cat " + dir + "/codex-thread 2>/dev/null); f=$(find $HOME/.codex/sessions -name \"*$id.jsonl\" 2>/dev/null | head -1); "
+                        : "id=$(cat " + dir + "/claude-session 2>/dev/null); f=$(ls $HOME/.claude/projects/*/$id.jsonl 2>/dev/null | head -1); ";
+                Linux.exec(app, find + "[ -n \"$id\" ] && [ -f \"$f\" ] && jq -c '" + words
+                        + " | select(.text != \"\" and (.text|startswith(\"<\")|not))' \"$f\" 2>/dev/null"
+                        + " | jq -cs 'map(.text |= .[0:8000])' > " + dir + "/history.json", 180);
+                java.io.File f = new java.io.File(Linux.root(app), "root/.buddy/sessions/" + ses.id + "/history.json");
+                byte[] b = java.nio.file.Files.readAllBytes(f.toPath());
+                f.delete();
+                JSONArray all = new JSONArray(new String(b, java.nio.charset.StandardCharsets.UTF_8));
+                List<String> keys = new ArrayList<>();
+                for (int i = 0; i < all.length(); i++) {
+                    JSONObject o = all.getJSONObject(i);
+                    keys.add(("user".equals(o.optString("role")) ? "U" : "B") + key(o.optString("text")));
+                }
+                // where Buddy's part begins in the record: its first message with words (or, if that one reads
+                // differently there, the next ones, minus those before them)
+                int from = -1;
+                for (int j = 0; j < have.size() && from < 0; j++) {
+                    int i = keys.indexOf(have.get(j));
+                    if (i >= 0) from = Math.max(0, i - j);
+                }
+                for (int i = 0; i < from; i++) {
+                    JSONObject o = all.getJSONObject(i);
+                    early.add(new Sessions.Msg("user".equals(o.optString("role")) ? Bubble.Kind.USER : Bubble.Kind.BUDDY,
+                            o.optString("text")));
+                }
+            } catch (Exception ignored) { // no record any more, or one that can't be read: nothing comes back
+            }
+            main.post(() -> {
+                if (sessions.find(ses.id) == null) return;
+                int room = Math.max(0, Sessions.MAX_MESSAGES - ses.messages.size());
+                List<Sessions.Msg> add = early.size() > room ? early.subList(early.size() - room, early.size()) : early;
+                ses.messages.addAll(0, add);
+                ses.cut = false;
+                sessions.save(ses);
+                changed();
+                done.accept(add.size());
+            });
+        }).start();
+    }
+
+    /** A message's words for comparing Buddy's copy with the agent's record: the start, spaces evened out. */
+    private static String key(String text) {
+        String t = text.trim().replaceAll("\\s+", " ");
+        return t.length() > 160 ? t.substring(0, 160) : t;
+    }
+
+    /** Background mode for a chat; switched off, its display goes (with what's on it). */
+    void setBackground(Sessions.Session ses, boolean on) {
+        ses.background = on;
+        sessions.save(ses);
+        if (!on) Background.close(BuddyApp.context(), ses.id);
+        changed();
+    }
+
     void setAwake(Sessions.Session ses, boolean on) {
         ses.awake = on;
         sessions.save(ses);
@@ -682,7 +766,9 @@ final class ChatHub {
         String eff = Models.effective(ses); // the chat's pick, or a service the agent uses by default
         if (!eff.isEmpty() || !"opencode".equals(ses.backend)) return eff;
         String plan = Account.OPENCODE.plan;
-        return plan.isEmpty() || plan.equals("free models") ? "opencode/big-pickle" : "";
+        // the quick free model (OpenCode's own free default took 36 s for a "Hi"), while OpenCode still lists it
+        return (plan.isEmpty() || plan.equals("free models")) && Models.has("opencode", "opencode/big-pickle")
+                ? "opencode/big-pickle" : "";
     }
 
     /** A note that arrived too late for the run: becomes the next message (already shown in the chat). */
@@ -795,7 +881,10 @@ final class ChatHub {
         CodexLive.agentDone(ses, ses.outcome, !ses.lastReply.isEmpty());
         // a quiet scheduled run that found nothing new ends without a notification (a failed one always says so)
         boolean quiet = ses.quietRun && ses.quietSaid && ses.outcome == null;
-        if ((ses.awake || ses.scheduledRun) && !quiet) KeepAwake.notifyEnded(app, ses);
+        // nobody is looking: the phone is locked, or the chat worked in the background and isn't the one on screen.
+        // Then its end is a notification too, as for a long task's or a scheduled one's
+        boolean away = Triggers.locked(app) || (ses.background && !viewing.contains(ses));
+        if ((ses.awake || ses.scheduledRun || away) && !quiet) KeepAwake.notifyEnded(app, ses);
         ses.scheduledRun = false;
         ses.quietRun = false;
         ses.quietSaid = false;
@@ -909,6 +998,7 @@ final class ChatHub {
             case "open_app": return BuddyApp.str(R.string.hub_tool_open_app, in.optString("app"));
             case "list_apps": return BuddyApp.str(R.string.hub_tool_list_apps);
             case "open_url": return BuddyApp.str(R.string.hub_tool_open_url, clip(in.optString("url"), 40));
+            case "phone_shell": return BuddyApp.str(R.string.hub_tool_phone_shell, clip(in.optString("command"), 60));
             case "wait":
             case "ToolSearch":
             case "TodoWrite":

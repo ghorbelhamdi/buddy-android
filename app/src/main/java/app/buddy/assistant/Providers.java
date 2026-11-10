@@ -390,7 +390,7 @@ final class Providers {
      * its default service (or the first it can use), every model name mapped to that service's model. "" otherwise.
      */
     static String claudeEnv(Context c) {
-        if (SetupState.planSignedIn(c, "claude")) return "";
+        if (SetupState.ownModels(c, "claude")) return "";
         P p = of(Models.agentDefault("claude"));
         if (p == null && !forAgent("claude").isEmpty()) p = forAgent("claude").get(0);
         if (p == null) return "";
@@ -454,7 +454,7 @@ final class Providers {
                 if (!model.isEmpty()) {
                     p.model = model;
                     Prefs.setAgentDefault(c, agent, ref(p, model));
-                } else if (!Prefs.agentPlan(c, agent)) {
+                } else if (!Prefs.agentPlan(c, agent) && !Prefs.agentToken(c, agent)) {
                     Prefs.setAgentDefault(c, agent, ref(p, ""));
                 }
                 save(c, p, key);

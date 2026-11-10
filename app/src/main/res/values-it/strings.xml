@@ -887,6 +887,11 @@
     <string name="signin_with_chatgpt">Accedi con ChatGPT</string>
     <string name="signin_with_google">Accedi con Google</string>
     <string name="signin_with_grok">Accedi con Grok</string>
+    <string name="signin_token">Usa un token</string>
+    <string name="signin_token_title">Token Claude Code</string>
+    <string name="signin_token_info">Incolla il token che «claude setup-token» mostra su un computer; inizia con sk-ant-oat. Basta per le chat. L\'input vocale e Remote Control richiedono l\'accesso completo.</string>
+    <string name="signin_token_wrong">Non è un token Claude Code. Una chiave API (sk-ant-api…) va in Impostazioni → Chiavi API.</string>
+    <string name="signin_token_on">Accesso effettuato con un token: basta per le chat. L\'input vocale e Remote Control richiedono l\'accesso completo.</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <string name="signin_other_device">Accedi da un altro dispositivo</string>
     <!-- Button (ChatGPT): sign in by entering a one-time code on another device. -->
@@ -1273,9 +1278,6 @@
     <string name="setup_panel_full">Grande</string>
     <string name="setup_panel_compact">Compatto</string>
     <string name="setup_panel_size_info">Grande occupa lo schermo da bordo a bordo. Compatto è più piccolo e lascia liberi i bordi dello schermo, così i gesti laterali continuano a funzionare.</string>
-    <string name="setup_action_limit">Azioni per attività</string>
-    <string name="setup_action_limit_none">Nessun limite</string>
-    <string name="setup_action_limit_info">Un’attività si ferma dopo questo numero di tocchi, digitazioni e scorrimenti, perché un’attività fuori controllo non consumi il tuo piano. La stessa azione 6 volte di fila la ferma sempre.</string>
     <string name="setup_tap_to_talk_info">Un tocco apre il microfono: di\' cosa vuoi e il messaggio parte quando fai una pausa. Tieni premuta la bolla per la chat e altro.</string>
     <string name="setup_read_aloud">Leggi le risposte ad alta voce</string>
     <string name="setup_read_aloud_info">Buddy legge ad alta voce le risposte degli agenti, con la voce che scegli nella sezione Voce.</string>
@@ -1783,8 +1785,53 @@
         <item quantity="one">%1$d controllo non riuscito</item>
         <item quantity="other">%1$d controlli non riusciti</item>
     </plurals>
-    <string name="tools_step_cap">Fermato dopo %1$d azioni di fila sul telefono, perché un’attività fuori controllo non consumi il tuo piano. Digli di continuare se serve.</string>
     <string name="tools_step_loop">Fermato: ha fatto la stessa cosa %1$d volte di fila, sembra un ciclo.</string>
+    <!-- Background mode -->
+    <string name="background_title">Modalità background</string>
+    <string name="background_row">Gli agenti lavorano su uno schermo tutto loro mentre usi il telefono</string>
+    <string name="background_intro">In modalità background un agente lavora su uno schermo tutto suo, che tu non vedi. A te restano lo schermo, la tastiera e il tasto Indietro, e l\'agente va avanti anche con il telefono bloccato.</string>
+    <string name="background_how">Android permette di creare uno schermo così solo a Debug wireless, quindi Buddy si accoppia una volta sola, qui su questo telefono. Non serve un computer.</string>
+    <string name="background_step1">1. Tocca Configura. Buddy apre Opzioni sviluppatore e trova Debug wireless per te.</string>
+    <string name="background_step2">2. Attiva Debug wireless (il Wi-Fi deve essere connesso) e apre «Accoppia dispositivo con codice di accoppiamento».</string>
+    <string name="background_step3">3. Legge il codice, si accoppia e ti riporta qui. Se si ferma da qualche parte, fai tu quel passaggio e Buddy va avanti.</string>
+    <string name="background_setup">Configura</string>
+    <string name="background_open_options">Apri Opzioni sviluppatore</string>
+    <string name="background_installing">Download di adb per il Linux di Buddy…</string>
+    <string name="background_waiting">In attesa di «Accoppia dispositivo con codice di accoppiamento» in Debug wireless…</string>
+    <string name="background_pairing">Accoppiamento…</string>
+    <string name="background_starting">Avvio del programma di supporto…</string>
+    <string name="background_ready">Pronta</string>
+    <string name="background_ready_info">Attivala chat per chat: Opzioni della chat → Lavora in background.</string>
+    <string name="background_paired">Accoppiato</string>
+    <string name="background_asleep">Il suo programma di supporto non è in esecuzione. Parte con il primo compito in background, oppure subito. Dopo un riavvio del telefono tocca Avvia ora: Buddy attiva Debug wireless per farlo partire (il Wi-Fi deve essere connesso).</string>
+    <string name="background_start_now">Avvia ora</string>
+    <string name="background_failed">Non ha funzionato: %1$s</string>
+    <string name="background_needs_linux">La modalità background ha bisogno del Linux di Buddy. Installa prima un agente.</string>
+    <string name="background_needs_dev">Attiva prima Opzioni sviluppatore: Impostazioni → Informazioni sullo smartphone → tocca 7 volte Numero build.</string>
+    <string name="background_needs_service">Attiva prima il servizio di accessibilità di Buddy.</string>
+    <string name="background_no_dialog">Buddy non ha visto in tempo la finestra di accoppiamento. Riprova.</string>
+    <string name="background_remove">Rimuovi</string>
+    <string name="background_remove_text">Buddy dimentica l\'accoppiamento e ferma il suo programma di supporto. Le chat tornano a lavorare sullo schermo vero.</string>
+    <string name="background_default">Le nuove chat lavorano in background</string>
+    <string name="background_default_info">Ogni chat ha comunque il suo interruttore in Opzioni della chat.</string>
+    <string name="background_security">Debug wireless permette ai dispositivi accoppiati di controllare questo telefono. Buddy accoppia solo se stesso, su questo telefono, e il suo programma di supporto ascolta solo qui.</string>
+    <string name="background_brought">Ora è sul tuo schermo: questo passaggio ha bisogno di te. La modalità background adesso è disattivata per questa chat.</string>
+    <string name="chat_background">Lavora in background</string>
+    <string name="chat_background_info">L\'agente usa uno schermo tutto suo e tu continui a usare il telefono. Un passaggio che ha bisogno di te, come un accesso, arriva sul tuo schermo.</string>
+    <string name="background_preview">Schermo in background</string>
+    <string name="background_show">Mostra sul mio schermo</string>
+    <string name="background_usb_note">Buddy attiva anche Debug USB. Così il programma di supporto resta in esecuzione quando il Wi-Fi cade e Android disattiva Debug wireless. Lascialo attivo.</string>
+    <string name="background_shell">Comandi sul telefono</string>
+    <string name="background_shell_switch">Gli agenti possono eseguire comandi sul telefono</string>
+    <string name="background_shell_info">Nelle chat con gli strumenti Linux, l\'agente può eseguire comandi direttamente sul telefono, come fa «adb shell»: installare e avviare app, cambiare impostazioni, leggere log e file. Un messaggio o una pagina web che legge potrebbe cercare di indurlo a eseguirne uno.</string>
+    <string name="background_shell_ask">Chiedi prima di ogni comando</string>
+    <string name="background_shell_ask_info">Una scheda di approvazione mostra prima il comando. Senza, non c\'è niente tra un agente ingannato e il tuo telefono: un comando può perfino toccare una scheda di approvazione.</string>
+    <string name="tools_card_shell">Eseguire sul telefono:\n%1$s</string>
+    <string name="activity_shell">Esegue un comando sul telefono</string>
+    <string name="hub_tool_phone_shell">Comando sul telefono: %1$s</string>
+    <string name="chat_earlier">Mostra i messaggi precedenti</string>
+    <string name="chat_earlier_load">Carica i messaggi precedenti</string>
+    <string name="chat_earlier_none">Nessun messaggio precedente trovato.</string>
     <string name="setup_help">Aiuto</string>
     <string name="setup_help_info">La guida di Buddy, su GitHub. Puoi anche chiedere a qualsiasi agente come funziona Buddy.</string>
     <string name="signin_api_key">Usa invece una chiave API</string>

@@ -694,14 +694,6 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             render();
         }), topGap(10));
         tap.addView(text(this, getString(R.string.setup_panel_size_info), 13, MUTED), topGap(8));
-        // how many phone actions a task may use before Buddy stops it (issue #16)
-        tap.addView(title(this, getString(R.string.setup_action_limit), 15), topGap(18));
-        tap.addView(segmented(this, new String[][]{{"60", "60"}, {"200", "200"},
-                {"none", getString(R.string.setup_action_limit_none)}}, Prefs.actionLimit(this), false, v -> {
-            Prefs.setActionLimit(this, v);
-            render();
-        }), topGap(10));
-        tap.addView(text(this, getString(R.string.setup_action_limit_info), 13, MUTED), topGap(8));
         ex.addView(tap, full());
         ex.addView(divider(), lineParams());
         ex.addView(switchRow(this, getString(R.string.setup_read_aloud), getString(R.string.setup_read_aloud_info),
@@ -802,6 +794,22 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 SchedulesActivity.class);
         sch.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
         ex.addView(sch, full());
+        // what a chat on Default uses, per agent (issue #20; API keys has the same rows for its services)
+        List<String> defaults = new ArrayList<>();
+        for (Account one : Account.ALL) {
+            String d = Models.agentDefault(one.agent);
+            if (!d.isEmpty()) defaults.add(Account.nameOf(one.agent) + ": " + Models.label(one.agent, d));
+        }
+        View dm = navRow(R.drawable.ms_tune, getString(R.string.api_keys_defaults), defaults.isEmpty()
+                ? getString(R.string.api_keys_own_default) : android.text.TextUtils.join(" · ", defaults), !defaults.isEmpty(),
+                SetupActivity.class);
+        dm.setOnClickListener(v -> defaultsSheet(this)); // a sheet, not a screen
+        dm.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
+        ex.addView(dm, full());
+        View bgm = navRow(R.drawable.ms_layers, getString(R.string.background_title), getString(R.string.background_row), false,
+                BackgroundActivity.class);
+        bgm.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
+        ex.addView(bgm, full());
         View bk = navRow(R.drawable.ms_backup, getString(R.string.backup_title), getString(R.string.backup_row), false,
                 BackupActivity.class);
         bk.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
@@ -1267,7 +1275,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
     private void useInstead(String agent, Providers.P misfit) {
         Prefs.setBackend(this, agent);
         Providers.P key = misfit == null || Providers.forAgent(agent).isEmpty() ? null : Providers.forAgent(agent).get(0);
-        if (key != null && key.fits(agent) && ("opencode".equals(agent) || !SetupState.planSignedIn(this, agent))) {
+        if (key != null && key.fits(agent) && ("opencode".equals(agent) || !SetupState.ownModels(this, agent))) {
             Prefs.setAgentDefault(this, agent, Providers.ref(key, key.defaultModel()));
             ChatHub.get(this).changed();
         }

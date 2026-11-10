@@ -14,7 +14,7 @@
 #   buddy-run <token> transcript <claude|codex> <file>   last messages of a session (buddy_transcript)
 #   buddy-run <token> adopt <session> <claude|codex> <agent-session-id>  continue that session as a Buddy chat
 # Every event sent to the bubble carries "buddy_session" so the app can route it.
-HELPER_VERSION=26
+HELPER_VERSION=27
 set -u
 export PATH=$HOME/.local/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # The claude launcher sets BUN_OPTIONS with a path relative to its folder; never inherit a stale one.
@@ -74,7 +74,23 @@ case "$CMD" in
       { [ -s "$HOME/.codex/auth.json" ] || grep -qs '"openai":"responses"' "$D"/providers/*.json; } && echo codex
       have opencode && echo opencode; [ -s "$HOME/.gemini/antigravity-cli/antigravity-oauth-token" ] && echo agy
       [ -s "$HOME/.grok/auth.json" ] && echo grok; } | paste -sd, -)
-    cm=$(jq -c '[.models[] | select(.visibility == "list") | [.slug, .display_name]]' "$HOME/.codex/models_cache.json" 2>/dev/null)
+    # Claude Code's own model list (what its /model shows), asked from Claude Code itself over its control protocol:
+    # about 3 s, sends no message. Rows [id, name, effort levels]; the "default" row tells which model its default is.
+    # On failure the last good list is kept.
+    if have claude; then
+      printf '%s\n' '{"type":"control_request","request_id":"buddy","request":{"subtype":"initialize"}}' \
+        | (cd "$D" && timeout 60 claude -p --input-format stream-json --output-format stream-json --verbose 2>/dev/null) \
+        | jq -c 'select(.type == "control_response") | [.response.response.models[]?] as $m
+            | {d: ([$m[] | select(.value == "default") | .resolvedModel // ""][0] // ""),
+               l: (reduce ($m[] | select(.value != "default")) as $x ([];
+                    ($x.resolvedModel // $x.value) as $id
+                    | if any(.[]; .[0] == $id) then . else . + [[$id, ($x.displayName // $id), (($x.supportedEffortLevels // []) | join(","))]] end))}
+            | select(.l | length > 0)' 2>/dev/null | head -n 1 >"$D/claude-models.new"
+      [ -s "$D/claude-models.new" ] && mv "$D/claude-models.new" "$D/claude-models"
+    fi
+    lm=$(jq -c '.l' "$D/claude-models" 2>/dev/null)
+    ld=$(jq -r '.d' "$D/claude-models" 2>/dev/null)
+    cm=$(jq -c '[.models[] | select(.visibility == "list") | [.slug, .display_name, ([.supported_reasoning_levels[]?.effort] | join(","))]]' "$HOME/.codex/models_cache.json" 2>/dev/null)
     # OpenCode's model list (a second or two; a background refresh got killed when the helper exited, so the list
     # never updated and new free models didn't show). On failure the last good list is kept.
     have opencode && timeout 30 opencode models $(oc2 && echo --standalone) >"$D/opencode-models.new" 2>/dev/null \
@@ -93,8 +109,8 @@ case "$CMD" in
     gm=$(jq -Rsc 'split("\n") | map(capture("^\\s*[*-]\\s+(?<id>[A-Za-z0-9._-]+)") | [.id, .id])' "$D/grok-models" 2>/dev/null)
     om=$(jq -Rsc 'split("\n") | map(select(test("^[A-Za-z0-9._-]+/\\S+$"))) | map([., (split("/") | .[1:] | join("/"))])' "$D/opencode-models" 2>/dev/null)
     jq -cn --arg s "${agents:-none}" --arg g "${signed:-none}" --argjson v "$HELPER_VERSION" --argjson cm "${cm:-[]}" \
-      --argjson om "${om:-[]}" --argjson am "${am:-[]}" --argjson gm "${gm:-[]}" \
-      '{type:"buddy_pong",text:$s,signed:$g,helper:$v,codex_models:$cm,opencode_models:$om,agy_models:$am,grok_models:$gm}' | post
+      --argjson om "${om:-[]}" --argjson am "${am:-[]}" --argjson gm "${gm:-[]}" --argjson lm "${lm:-[]}" --arg ld "${ld:-}" \
+      '{type:"buddy_pong",text:$s,signed:$g,helper:$v,claude_models:$lm,claude_default:$ld,codex_models:$cm,opencode_models:$om,agy_models:$am,grok_models:$gm}' | post
     exit 0 ;;
   procs)
     # map every process started by a Buddy chat to that chat
@@ -228,7 +244,7 @@ case "$CMD" in
     done
     exit 0 ;;
   ask) SID=${3:-}; BACKEND=${4:-claude}; DEV=${5:-0}; MSG=${6:-}; MODEL=${7:-}; FILES=${8:-}; EFFORT=${9:-}
-    [[ "$EFFORT" =~ ^(low|medium|high|xhigh|max)$ ]] || EFFORT="" ;;
+    [[ "$EFFORT" =~ ^[a-z]{1,16}$ ]] || EFFORT="" ;; # the agent's own level names, whatever they are
   *) echo "usage: buddy-run <token> ask|stop|delete|prune|ping ..." >&2; exit 2 ;;
 esac
 

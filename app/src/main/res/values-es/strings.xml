@@ -886,6 +886,11 @@
     <string name="signin_with_chatgpt">Iniciar sesión con ChatGPT</string>
     <string name="signin_with_google">Iniciar sesión con Google</string>
     <string name="signin_with_grok">Iniciar sesión con Grok</string>
+    <string name="signin_token">Usar un token</string>
+    <string name="signin_token_title">Token de Claude Code</string>
+    <string name="signin_token_info">Pega el token que “claude setup-token” muestra en un ordenador; empieza por sk-ant-oat. Sirve para los chats. La entrada de voz y Control remoto necesitan el inicio de sesión completo.</string>
+    <string name="signin_token_wrong">Eso no es un token de Claude Code. Una clave de API (sk-ant-api…) va en Ajustes → Claves de API.</string>
+    <string name="signin_token_on">Sesión iniciada con un token: sirve para los chats. La entrada de voz y Control remoto necesitan el inicio de sesión completo.</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <string name="signin_other_device">Iniciar sesión en otro dispositivo</string>
     <!-- Button (ChatGPT): sign in by entering a one-time code on another device. -->
@@ -1272,9 +1277,6 @@
     <string name="setup_panel_full">Grande</string>
     <string name="setup_panel_compact">Compacto</string>
     <string name="setup_panel_size_info">Grande ocupa la pantalla de borde a borde. Compacto es más pequeño y deja libres los bordes de la pantalla, para que los gestos laterales sigan funcionando.</string>
-    <string name="setup_action_limit">Acciones por tarea</string>
-    <string name="setup_action_limit_none">Sin límite</string>
-    <string name="setup_action_limit_info">Una tarea se detiene tras este número de toques, escritura y desplazamientos, para que una tarea descontrolada no gaste tu plan. La misma acción 6 veces seguidas siempre la detiene.</string>
     <string name="setup_tap_to_talk_info">Un toque abre el micrófono: di lo que quieras y se enviará cuando hagas una pausa. Mantén presionada la burbuja para ver el chat y más.</string>
     <string name="setup_read_aloud">Leer respuestas en voz alta</string>
     <string name="setup_read_aloud_info">Buddy lee en voz alta las respuestas de los agentes, con la voz que elijas en la sección Voz.</string>
@@ -1782,8 +1784,53 @@
         <item quantity="one">Falló %1$d comprobación</item>
         <item quantity="other">Fallaron %1$d comprobaciones</item>
     </plurals>
-    <string name="tools_step_cap">Se detuvo tras %1$d acciones seguidas en el teléfono, para que una tarea descontrolada no gaste tu plan. Dile que siga si hace falta.</string>
     <string name="tools_step_loop">Se detuvo: hizo lo mismo %1$d veces seguidas, lo que parece un bucle.</string>
+    <!-- Background mode -->
+    <string name="background_title">Modo en segundo plano</string>
+    <string name="background_row">Los agentes trabajan en una pantalla propia mientras usas tu teléfono</string>
+    <string name="background_intro">En el modo en segundo plano, un agente trabaja en una pantalla propia que tú no ves. Sigues teniendo tu pantalla, tu teclado y tu botón Atrás, y el agente continúa aunque el teléfono esté bloqueado.</string>
+    <string name="background_how">Android solo permite crear una pantalla así con Depuración inalámbrica, por eso Buddy se empareja con ella una vez, aquí mismo, en este teléfono. No hace falta ordenador.</string>
+    <string name="background_step1">1. Toca Configurar. Buddy abre Opciones para desarrolladores y busca Depuración inalámbrica por ti.</string>
+    <string name="background_step2">2. Activa Depuración inalámbrica (el Wi-Fi debe estar conectado) y abre “Emparejar dispositivo con código de sincronización”.</string>
+    <string name="background_step3">3. Lee el código, se empareja y te trae de vuelta aquí. Si se detiene en algún punto, haz ese paso tú y Buddy sigue.</string>
+    <string name="background_setup">Configurar</string>
+    <string name="background_open_options">Abrir Opciones para desarrolladores</string>
+    <string name="background_installing">Obteniendo adb para el Linux de Buddy…</string>
+    <string name="background_waiting">Esperando “Emparejar dispositivo con código de sincronización” en Depuración inalámbrica…</string>
+    <string name="background_pairing">Emparejando…</string>
+    <string name="background_starting">Iniciando el ayudante…</string>
+    <string name="background_ready">Listo</string>
+    <string name="background_ready_info">Actívalo en cada chat: Opciones del chat → Trabajar en segundo plano.</string>
+    <string name="background_paired">Emparejado</string>
+    <string name="background_asleep">Su ayudante no está en marcha. Se inicia con la primera tarea en segundo plano, o ahora. Después de reiniciar el teléfono, toca Iniciar ahora: Buddy activa Depuración inalámbrica para ello (el Wi-Fi debe estar conectado).</string>
+    <string name="background_start_now">Iniciar ahora</string>
+    <string name="background_failed">No funcionó: %1$s</string>
+    <string name="background_needs_linux">El modo en segundo plano necesita el Linux de Buddy. Instala primero un agente.</string>
+    <string name="background_needs_dev">Activa primero Opciones para desarrolladores: Ajustes → Información del teléfono → toca Número de compilación 7 veces.</string>
+    <string name="background_needs_service">Activa primero el servicio de accesibilidad de Buddy.</string>
+    <string name="background_no_dialog">Buddy no vio a tiempo el cuadro de emparejamiento. Inténtalo de nuevo.</string>
+    <string name="background_remove">Quitar</string>
+    <string name="background_remove_text">Buddy olvida el emparejamiento y detiene su ayudante. Los chats vuelven a trabajar en la pantalla real.</string>
+    <string name="background_default">Los chats nuevos trabajan en segundo plano</string>
+    <string name="background_default_info">Cada chat sigue teniendo su propio interruptor en Opciones del chat.</string>
+    <string name="background_security">Depuración inalámbrica permite que los dispositivos emparejados controlen este teléfono. Buddy solo se empareja a sí mismo, en este teléfono, y su ayudante solo escucha aquí.</string>
+    <string name="background_brought">Pasó a tu pantalla: este paso te necesita. El modo en segundo plano queda desactivado en este chat.</string>
+    <string name="chat_background">Trabajar en segundo plano</string>
+    <string name="chat_background_info">El agente usa una pantalla propia y tú sigues usando tu teléfono. Un paso que te necesita, como un inicio de sesión, pasa a tu pantalla.</string>
+    <string name="background_preview">Pantalla en segundo plano</string>
+    <string name="background_show">Mostrar en mi pantalla</string>
+    <string name="background_usb_note">Buddy también activa Depuración por USB. Con ella, el ayudante sigue en marcha cuando se cae el Wi-Fi y Android desactiva Depuración inalámbrica. Déjala activada.</string>
+    <string name="background_shell">Comandos del teléfono</string>
+    <string name="background_shell_switch">Los agentes pueden ejecutar comandos en el teléfono</string>
+    <string name="background_shell_info">En los chats con herramientas de Linux, el agente puede ejecutar comandos en el propio teléfono, como hace “adb shell”: instalar y abrir apps, cambiar ajustes, leer registros y archivos. Un mensaje o una página web que lea podría intentar engañarlo para que ejecute alguno.</string>
+    <string name="background_shell_ask">Preguntar antes de cada comando</string>
+    <string name="background_shell_ask_info">Una tarjeta de aprobación muestra primero el comando. Sin ella, nada se interpone entre un agente engañado y tu teléfono: un comando puede incluso tocar una tarjeta de aprobación.</string>
+    <string name="tools_card_shell">Ejecutar en el teléfono:\n%1$s</string>
+    <string name="activity_shell">Ejecutando un comando en el teléfono</string>
+    <string name="hub_tool_phone_shell">Comando en el teléfono: %1$s</string>
+    <string name="chat_earlier">Mostrar mensajes anteriores</string>
+    <string name="chat_earlier_load">Cargar mensajes anteriores</string>
+    <string name="chat_earlier_none">No se encontraron mensajes anteriores.</string>
     <string name="setup_help">Ayuda</string>
     <string name="setup_help_info">La guía de Buddy, en GitHub. También puedes preguntar a cualquier agente cómo funciona Buddy.</string>
     <string name="signin_api_key">Usar una clave de API</string>

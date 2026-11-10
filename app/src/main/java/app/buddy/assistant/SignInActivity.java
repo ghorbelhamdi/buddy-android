@@ -135,6 +135,7 @@ public class SignInActivity extends Screen implements Account.Listener {
                     pasteOpen = true;
                     acc.startLogin(this, true);
                 });
+                if (acc.claude()) secondary(getString(R.string.signin_token), v -> tokenSheet()); // issue #19
                 if (acc.claude() || "codex".equals(acc.agent)) secondary(getString(R.string.signin_api_key), v -> apiKeys());
                 break;
             case WAITING_BROWSER:
@@ -178,10 +179,11 @@ public class SignInActivity extends Screen implements Account.Listener {
                 if (keys && acc.apiKey) { // chats can use the services' models; the plan, if signed in, stays for the rest
                     note(getString(acc.planIn ? R.string.signin_api_key_on_plan : R.string.signin_api_key_on, acc.name()));
                 }
+                if (acc.token) note(getString(R.string.signin_token_on));
                 primary(getString(R.string.signin_done), v -> finish());
                 updateButton();
                 if (keys) secondary(getString(R.string.signin_api_keys), v -> apiKeys());
-                if (acc.planIn || !keys) {
+                if (acc.planIn || acc.token || !keys) {
                     secondary(getString(R.string.signin_sign_out), v -> confirmSheet(this, getString(R.string.signin_sign_out_title, acc.name()),
                             getString(R.string.signin_sign_out_text, acc.name()), getString(R.string.signin_sign_out), true,
                             () -> acc.logout(this)));
@@ -372,6 +374,46 @@ public class SignInActivity extends Screen implements Account.Listener {
      * Claude Code or Codex with an API key (and, for a compatible service, its base URL) instead of the plan. Billed to
      * the key's account; the key stays in Buddy's private storage.
      */
+    /** A token from `claude setup-token`, pasted (issue #19): for someone who has the token but not the sign-in. */
+    private void tokenSheet() {
+        LinearLayout c = protect(column(this));
+        c.addView(title(this, getString(R.string.signin_token_title), 18));
+        TextView info = text(this, getString(R.string.signin_token_info), 13, MUTED);
+        info.setPaddingRelative(0, dp(this, 6), 0, dp(this, 12));
+        c.addView(info);
+        final android.widget.EditText et = new android.widget.EditText(this);
+        et.setHint("sk-ant-oat01-…");
+        et.setHintTextColor(MUTED);
+        et.setTextColor(TEXT);
+        et.setTextSize(14);
+        et.setTypeface(android.graphics.Typeface.MONOSPACE);
+        et.setSingleLine(true);
+        et.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                | android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        et.setBackground(outlined(this, CARD, 12, OUTLINE, 1));
+        et.setPaddingRelative(dp(this, 12), dp(this, 12), dp(this, 12), dp(this, 12));
+        c.addView(et, full());
+        final TextView wrong = text(this, getString(R.string.signin_token_wrong), 13, ERR);
+        wrong.setPaddingRelative(0, dp(this, 8), 0, 0);
+        wrong.setVisibility(View.GONE);
+        c.addView(wrong);
+        Button save = button(this, getString(R.string.api_keys_save), true);
+        LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(this, 48));
+        sp.topMargin = dp(this, 14);
+        c.addView(save, sp);
+        final android.app.Dialog d = bottomSheet(this, c);
+        save.setOnClickListener(v -> {
+            String t = et.getText().toString().trim();
+            if (!Account.looksLikeToken(t)) {
+                wrong.setVisibility(View.VISIBLE);
+                return;
+            }
+            d.dismiss();
+            acc.useToken(this, t);
+        });
+        d.show();
+    }
+
     private void apiKeys() {
         startActivity(new Intent(this, ApiKeysActivity.class));
     }

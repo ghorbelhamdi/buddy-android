@@ -27,6 +27,65 @@ final class Prefs {
         return t;
     }
 
+    /** Background mode: Buddy's adb is paired with this phone's Wireless debugging (see Background). */
+    static boolean backgroundPaired(Context c) {
+        return sp(c).getBoolean("bg_paired", false);
+    }
+
+    static void setBackgroundPaired(Context c, boolean paired) {
+        sp(c).edit().putBoolean("bg_paired", paired).apply();
+    }
+
+    /** The secret the background helper is started with and asks for; generated once per install. */
+    static synchronized String backgroundToken(Context c) {
+        String t = sp(c).getString("bg_token", null);
+        if (t == null) {
+            byte[] b = new byte[24];
+            new SecureRandom().nextBytes(b);
+            StringBuilder sb = new StringBuilder();
+            for (byte x : b) sb.append(String.format("%02x", x));
+            t = sb.toString();
+            sp(c).edit().putString("bg_token", t).apply();
+        }
+        return t;
+    }
+
+    /** New chats start in background mode (each chat has its own switch in Chat options). */
+    static boolean backgroundDefault(Context c) {
+        return sp(c).getBoolean("bg_default", false);
+    }
+
+    static void setBackgroundDefault(Context c, boolean on) {
+        sp(c).edit().putBoolean("bg_default", on).apply();
+    }
+
+    /** Phone commands (issue #22): agents in chats with Linux tools may run commands on the phone itself. Off unless the user turns it on. */
+    static boolean phoneShell(Context c) {
+        return sp(c).getBoolean("bg_shell", false);
+    }
+
+    static void setPhoneShell(Context c, boolean on) {
+        sp(c).edit().putBoolean("bg_shell", on).apply();
+    }
+
+    /** An approval card shows each phone command first. On unless the user turns it off. */
+    static boolean phoneShellAsk(Context c) {
+        return sp(c).getBoolean("bg_shell_ask", true);
+    }
+
+    static void setPhoneShellAsk(Context c, boolean on) {
+        sp(c).edit().putBoolean("bg_shell_ask", on).apply();
+    }
+
+    /** The port Wireless debugging had when Buddy last reached it (tried first next time). */
+    static int backgroundAdbPort(Context c) {
+        return sp(c).getInt("bg_adb_port", 0);
+    }
+
+    static void setBackgroundAdbPort(Context c, int port) {
+        sp(c).edit().putInt("bg_adb_port", port).apply();
+    }
+
     static int[] bubblePos(Context c) {
         return new int[]{sp(c).getInt("bx", -1), sp(c).getInt("by", 400)};
     }
@@ -208,21 +267,6 @@ final class Prefs {
         sp(c).edit().putString("assist_mode", mode).apply();
     }
 
-    /** Phone actions a chat's run may use before Buddy stops it (issue #16): "60" (default), "200" or "none". */
-    static String actionLimit(Context c) {
-        return sp(c).getString("action_limit", "60");
-    }
-
-    static void setActionLimit(Context c, String limit) {
-        sp(c).edit().putString("action_limit", limit).apply();
-    }
-
-    /** The limit as a number, 0 for none. */
-    static int maxActions(Context c) {
-        String v = actionLimit(c);
-        return "none".equals(v) ? 0 : "200".equals(v) ? 200 : 60;
-    }
-
     /** Buddy's face on the bubble and in the chats: "buddy" (the drawn one) or "picture" (one the user picked). */
     static String face(Context c) {
         return sp(c).getString("face", "buddy");
@@ -294,7 +338,21 @@ final class Prefs {
         sp(c).edit().putString("signed", s).apply();
     }
 
-    /** Codex's model list from its cache in Buddy's Linux, as JSON [[slug, name], …]. */
+    /** Claude Code's model list as it reports it itself, as JSON [[id, name, efforts], …]. */
+    static String claudeModels(Context c) {
+        return sp(c).getString("claude_models", "[]");
+    }
+
+    /** The model Claude Code's default is (an id), "" when it hasn't said. */
+    static String claudeDefault(Context c) {
+        return sp(c).getString("claude_default", "");
+    }
+
+    static void setClaudeModels(Context c, String json, String defaultId) {
+        sp(c).edit().putString("claude_models", json).putString("claude_default", defaultId).apply();
+    }
+
+    /** Codex's model list from its cache in Buddy's Linux, as JSON [[slug, name, efforts], …]. */
     static String codexModels(Context c) {
         return sp(c).getString("codex_models", "[]");
     }
@@ -428,6 +486,15 @@ final class Prefs {
     /** The agent is signed in with its plan (not only an API key): plan-only features (voice…) need it. */
     static boolean agentPlan(Context c, String agent) {
         return sp(c).getBoolean("agent_plan_" + agent, true);
+    }
+
+    /** Claude Code is signed in with a setup token: its own models run chats, the plan-only features don't. */
+    static boolean agentToken(Context c, String agent) {
+        return sp(c).getBoolean("agent_token_" + agent, false);
+    }
+
+    static void setAgentToken(Context c, String agent, boolean token) {
+        sp(c).edit().putBoolean("agent_token_" + agent, token).apply();
     }
 
     static void setAgentPlan(Context c, String agent, boolean plan) {

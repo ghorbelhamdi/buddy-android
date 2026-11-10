@@ -192,6 +192,7 @@ final class Bubble implements ChatHub.Listener {
         if (hub != null) hub.removeListener(this);
         if (thumbWatching != null) Browser.unwatch(thumbWatching, thumb);
         thumbWatching = null;
+        backgroundPoll = null;
         if (thumbWindow != null) {
             try {
                 wm.removeView(thumbWindow);
@@ -2043,7 +2044,9 @@ final class Bubble implements ChatHub.Listener {
             messages.addView(hint, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT));
         }
-        for (Sessions.Msg m : ses.messages) showMessage(m);
+        // the panel is the quick view: a long chat's latest part (all of it is in the app, a page at a time)
+        int from = Math.max(0, ses.messages.size() - Sessions.PAGE);
+        for (Sessions.Msg m : new java.util.ArrayList<>(ses.messages.subList(from, ses.messages.size()))) showMessage(m);
         if (log != null && !ses.running) log.finish();
         input.setHint(svc.getString(R.string.bubble_input_hint, ses.brainName()));
         updateViewing();
@@ -2473,6 +2476,27 @@ final class Bubble implements ChatHub.Listener {
         showNext();
     }
 
+    /**
+     * An answer from the card's notification (the lock screen): Approve or Deny, or one of a question's options. It
+     * answers only the card it was made for: the one showing now, of that chat and with that text.
+     */
+    void answerFromNotice(String chat, String text, boolean approved, String option) {
+        if (pendingConfirm == null || shownCard == null || text == null) return;
+        if (!java.util.Objects.equals(shownCard.chat, chat) || !shownCard.text.equals(text)) return;
+        if (option != null) {
+            if (asking && askOptions != null && askOptions.contains(option)) answerOption(option);
+        } else if (!asking) {
+            answerConfirm(approved);
+        }
+    }
+
+    /** The screen went dark with a card waiting: it gets its notification (see Triggers.approvalShown). */
+    void noticeWaitingCard() {
+        if (pendingConfirm == null || shownCard == null) return;
+        Triggers.approvalShown(svc, shownCard.chat, shownCard.text, 0, !asking && shownCard.open,
+                asking && shownCard.open ? askOptions : null);
+    }
+
     private void answerConfirm(boolean approved) {
         ConfirmCallback cb = pendingConfirm;
         pendingConfirm = null;
@@ -2617,6 +2641,12 @@ final class Bubble implements ChatHub.Listener {
             @Override
             public void open() {
                 if (thumbTab == null) return;
+                if (thumbTab.startsWith(Background.KEY)) { // a background chat's screen: its chat has the bigger picture
+                    svc.startActivity(new android.content.Intent(svc, ChatActivity.class)
+                            .putExtra("id", thumbTab.substring(Background.KEY.length()))
+                            .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK));
+                    return;
+                }
                 svc.startActivity(new android.content.Intent(svc, BrowserActivity.class).putExtra("key", thumbTab)
                         .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK));
             }
@@ -2650,16 +2680,39 @@ final class Bubble implements ChatHub.Listener {
         boolean moving = faceDragging() || (windowAnim != null && windowAnim.isRunning());
         boolean on = thumbTab != null && !thumbTab.equals(thumbHidden) && !thumbTab.equals(BrowserActivity.front)
                 && !expanded && !locked && !moving && root.getVisibility() == View.VISIBLE
-                && pill.getVisibility() == View.VISIBLE && Browser.available(svc);
+                && pill.getVisibility() == View.VISIBLE
+                && (thumbTab.startsWith(Background.KEY) || Browser.available(svc));
         if (on) on = placeThumb();
         thumbWindow.setVisibility(on ? View.VISIBLE : View.GONE);
         String want = on ? thumbTab : null;
         if (java.util.Objects.equals(want, thumbWatching)) return;
         if (thumbWatching != null) Browser.unwatch(thumbWatching, thumb);
+        backgroundPoll = null;
         thumbWatching = want;
         if (want == null) return;
         thumb.clear();
-        Browser.watch(svc, want, thumb);
+        if (want.startsWith(Background.KEY)) watchBackground(want.substring(Background.KEY.length()));
+        else Browser.watch(svc, want, thumb);
+    }
+
+    /** The poll that feeds the thumbnail a background chat's screen; another one, or null, ends it. */
+    private Runnable backgroundPoll;
+
+    private void watchBackground(final String chat) {
+        backgroundPoll = new Runnable() {
+            @Override
+            public void run() {
+                if (backgroundPoll != this) return;
+                final Runnable me = this;
+                new Thread(() -> {
+                    byte[] jpg = Background.frame(svc, chat, 480, 70);
+                    android.graphics.Bitmap b = jpg == null ? null : android.graphics.BitmapFactory.decodeByteArray(jpg, 0, jpg.length);
+                    if (b != null && backgroundPoll == me) thumb.onFrame(b, b.getWidth(), b.getHeight());
+                }).start();
+                root.postDelayed(this, 700);
+            }
+        };
+        root.post(backgroundPoll);
     }
 
     /**
@@ -2847,6 +2900,7 @@ final class Bubble implements ChatHub.Listener {
         switch (kind) {
             case USER: {
                 TextView tv = Ui.text(svc, text, 15, Ui.TEXT);
+                tv.setText(Ui.markdown(text, this::collapse)); // the user's own Markdown, as in the app's chat
                 tv.setBackground(Ui.corners(svc, Ui.USER, 20, 20, 6, 20));
                 tv.setPaddingRelative(dp(14), dp(10), dp(14), dp(10));
                 Ui.linkifyForService(tv, this::collapse);
@@ -2881,7 +2935,7 @@ final class Bubble implements ChatHub.Listener {
         }
         copyOnLongPress(v, text);
         messages.addView(v, p);
-        while (messages.getChildCount() > Sessions.MAX_MESSAGES) messages.removeViewAt(0);
+        while (messages.getChildCount() > Sessions.PAGE) messages.removeViewAt(0);
         scrollToEnd();
     }
 

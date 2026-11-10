@@ -2,39 +2,15 @@ package app.buddy.assistant;
 
 /** Models offered per agent. "" means the agent's own default. */
 final class Models {
-    static final String[][] CLAUDE = {
-            {"", "Default"},
-            {"claude-opus-5-5", "Opus 5.5"},
-            {"claude-sonnet-5-5", "Sonnet 5.5"},
-            {"claude-haiku-5-5", "Haiku 5.5"},
-            {"claude-haiku-4-5-20251001", "Haiku 4.5"},
-            {"claude-fable-5-1", "Fable 5.1"},
-    };
-    /** Used until the helper reports Codex's own model list. */
-    static final String[][] CODEX = {
-            {"", "Default"},
-            {"gpt-6.1-sol", "GPT-6.1-Sol"},
-            {"gpt-6-astra", "GPT-6-Astra"},
-            {"gpt-6-luna", "GPT-6-Luna"},
-    };
-    /** Used until OpenCode reports its own list (`opencode models`, which includes the free ones). */
-    static final String[][] OPENCODE = {
-            {"", "Default"},
-            {"opencode/big-pickle", "opencode/big-pickle"},
-    };
-    /** Used until Antigravity reports its own list (`agy models`, which depends on the plan). */
-    static final String[][] AGY = {
-            {"", "Default"},
-            {"gemini-3.8-flash-high", "Gemini 3.8 Flash (High)"},
-            {"gemini-3.8-flash-medium", "Gemini 3.8 Flash (Medium)"},
-            {"gemini-3.8-flash-low", "Gemini 3.8 Flash (Low)"},
-    };
-    /** Used until Grok reports its own list (`grok models`). */
-    static final String[][] GROK = {
-            {"", "Default"},
-            {"grok-4.7", "grok-4.7"},
-    };
-    private static String[][] codexLive, opencodeLive, agyLive, grokLive;
+    /**
+     * Each agent's own models as the agent itself reported them (the helper's ping): rows {id, name, effort levels
+     * ("low,high", "" when it has none or didn't say)}, "" (its default) first. Nothing is built in: a model that
+     * comes out tomorrow shows up as soon as the agent knows it.
+     */
+    private static final java.util.Map<String, String[][]> live = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final String[][] NONE = {{"", "Default", ""}};
+    /** The model Claude Code's own default is right now (an id), "" until it has said. */
+    private static volatile String claudeDefault = "";
 
     private Models() {
     }
@@ -59,13 +35,37 @@ final class Models {
         }
     }
 
-    /** The agent's own models (its plan's, or OpenCode's), "" (its default) first. */
+    private static String key(String backend) {
+        return "codex".equals(backend) || "opencode".equals(backend) || "agy".equals(backend) || "grok".equals(backend)
+                ? backend : "claude";
+    }
+
+    /** The agent's own models (its plan's, or OpenCode's), "" (its default) first; only that until it has reported. */
     static String[][] forBackend(String backend) {
-        if ("opencode".equals(backend)) return withDefault(opencodeLive != null ? opencodeLive : OPENCODE);
-        if ("agy".equals(backend)) return withDefault(agyLive != null ? agyLive : AGY);
-        if ("grok".equals(backend)) return withDefault(grokLive != null ? grokLive : GROK);
-        if (!"codex".equals(backend)) return withDefault(CLAUDE);
-        return withDefault(codexLive != null ? codexLive : CODEX);
+        String[][] l = live.get(key(backend));
+        return withDefault(l != null ? l : NONE);
+    }
+
+    /** Does the agent's own list have this model? */
+    static boolean has(String backend, String id) {
+        return row(backend, id) != null;
+    }
+
+    /** A real model id of this agent, as an example for the "other" field ("…" until it has reported). */
+    static String example(String backend) {
+        String[][] l = live.get(key(backend));
+        return l != null && l.length > 1 ? l[1][0] : "…";
+    }
+
+    /** The row of a model in the agent's list; a dated id ("claude-opus-5-5-20261001") finds its undated row. */
+    private static String[] row(String backend, String id) {
+        String[][] l = live.get(key(backend));
+        if (l == null || id == null || id.isEmpty()) return null;
+        for (String[] m : l) if (m[0].equals(id)) return m;
+        String[] best = null; // the longest match: "claude-opus-5-5-2026…" is Opus 5.5's, not Opus 5's
+        for (String[] m : l)
+            if (!m[0].isEmpty() && id.startsWith(m[0] + "-") && (best == null || m[0].length() > best[0].length())) best = m;
+        return best;
     }
 
     /**
@@ -76,7 +76,7 @@ final class Models {
     static java.util.List<String[]> options(String backend, boolean services) {
         java.util.List<String[]> out = new java.util.ArrayList<>();
         String[][] own = forBackend(backend);
-        boolean plan = !("claude".equals(backend) || "codex".equals(backend)) || SetupState.planSignedIn(BuddyApp.context(), backend);
+        boolean plan = !("claude".equals(backend) || "codex".equals(backend)) || SetupState.ownModels(BuddyApp.context(), backend);
         for (String[] m : own) if (m[0].isEmpty() || plan) out.add(m);
         if (!services) return out;
         for (Providers.P p : Providers.forAgent(backend)) {
@@ -91,9 +91,14 @@ final class Models {
         return out;
     }
 
-    /** What a chat on Default uses with this agent: "" (its plan's default) or "@service/model". */
+    /**
+     * What a chat on Default uses with this agent, as the user set it (Settings → Chats on Default): "" (the agent's
+     * own default), one of the agent's own models, or "@service/model".
+     */
     static String agentDefault(String backend) {
         String d = Prefs.agentDefault(BuddyApp.context(), backend);
+        if (d.isEmpty()) return "";
+        if (!d.startsWith("@")) return d; // one of the agent's own models (issue #20)
         Providers.P p = Providers.of(d);
         if (p == null || !p.fits(backend)) return "";
         String m = Providers.model(d);
@@ -145,44 +150,25 @@ final class Models {
         return m;
     }
 
-    /** OpenCode's models as JSON [[id, name], …] ("provider/model" for both). */
-    static void setOpencode(String json) {
-        String[][] m = parse(json);
-        if (m != null) opencodeLive = m;
-    }
-
-    /** Antigravity's models as JSON [[id, name], …]. */
-    static void setAgy(String json) {
-        String[][] m = parse(json);
-        if (m != null) agyLive = m;
-    }
-
-    /** Grok's models as JSON [[id, name], …] (its ids are its names). */
-    static void setGrok(String json) {
-        String[][] m = parse(json);
-        if (m != null) grokLive = m;
-    }
-
-    /** Codex's model list as reported by the helper: JSON [[slug, name], …]. */
-    static void setCodex(String json) {
-        String[][] m = parse(json);
-        if (m != null) codexLive = m;
-    }
-
-    private static String[][] parse(String json) {
+    /** An agent's model list as it reported it: JSON [[id, name, efforts?], …]. An empty or broken one changes nothing. */
+    static void set(String backend, String json) {
         try {
             org.json.JSONArray a = new org.json.JSONArray(json);
-            if (a.length() == 0) return null;
+            if (a.length() == 0) return;
             String[][] m = new String[a.length() + 1][];
-            m[0] = new String[]{"", "Default"};
+            m[0] = NONE[0];
             for (int i = 0; i < a.length(); i++) {
                 org.json.JSONArray e = a.getJSONArray(i);
-                m[i + 1] = new String[]{e.getString(0), e.getString(1)};
+                m[i + 1] = new String[]{e.getString(0), e.getString(1), e.optString(2, "")};
             }
-            return m;
+            live.put(key(backend), m);
         } catch (Exception ignored) {
-            return null;
         }
+    }
+
+    /** What Claude Code's default model is right now (an id from its own list). */
+    static void setClaudeDefault(String id) {
+        if (id != null && !id.isEmpty()) claudeDefault = id;
     }
 
     /**
@@ -190,30 +176,63 @@ final class Models {
      * A service model that lists its levels (DeepSeek: low, high, max) keeps only those, besides Auto.
      */
     static String[][] efforts(Sessions.Session s) {
-        String[][] all = agentEfforts(s.backend);
         String ref = effective(s);
         Providers.P p = Providers.of(ref);
-        org.json.JSONObject m = p == null ? null : p.modelInfo(Providers.model(ref));
-        org.json.JSONArray e = m == null ? null : m.optJSONArray("efforts");
-        if (all == null || e == null || e.length() == 0) return all;
-        java.util.Set<String> has = new java.util.HashSet<>();
-        for (int j = 0; j < e.length(); j++) has.add(e.optString(j));
-        java.util.List<String[]> out = new java.util.ArrayList<>();
-        for (String[] x : all) if (x[0].isEmpty() || has.contains(x[0])) out.add(x);
-        return out.toArray(new String[0][]);
+        java.util.List<String> levels;
+        if (p != null) {
+            // a service's model: what the agent accepts at all, less what the service says the model lacks
+            levels = agentEfforts(s.backend);
+            org.json.JSONObject m = p.modelInfo(Providers.model(ref));
+            org.json.JSONArray e = m == null ? null : m.optJSONArray("efforts");
+            if (e != null && e.length() > 0) {
+                java.util.Set<String> has = new java.util.HashSet<>();
+                for (int j = 0; j < e.length(); j++) has.add(e.optString(j));
+                levels.retainAll(has);
+            }
+        } else {
+            // the agent's own: the chat's model, or the one its default is (as far as it has said)
+            String id = !ref.isEmpty() ? ref : !s.actualModel.isEmpty() ? s.actualModel : defaultId(s.backend);
+            String[] row = row(s.backend, id);
+            levels = row != null ? split(row[2]) : agentEfforts(s.backend);
+        }
+        if (levels.isEmpty()) return null;
+        String[][] out = new String[levels.size() + 1][];
+        out[0] = new String[]{"", BuddyApp.str(R.string.models_effort_auto)};
+        for (int i = 0; i < levels.size(); i++) out[i + 1] = new String[]{levels.get(i), effortLabel(levels.get(i))};
+        return out;
     }
 
-    private static String[][] agentEfforts(String backend) {
-        if ("claude".equals(backend)) return new String[][]{{"", BuddyApp.str(R.string.models_effort_auto)},
-                {"low", BuddyApp.str(R.string.models_effort_low)}, {"medium", BuddyApp.str(R.string.models_effort_medium)},
-                {"high", BuddyApp.str(R.string.models_effort_high)}, {"xhigh", BuddyApp.str(R.string.models_effort_xhigh)},
-                {"max", BuddyApp.str(R.string.models_effort_max)}};
-        if ("codex".equals(backend)) return new String[][]{{"", BuddyApp.str(R.string.models_effort_auto)},
-                {"low", BuddyApp.str(R.string.models_effort_low)}, {"medium", BuddyApp.str(R.string.models_effort_medium)},
-                {"high", BuddyApp.str(R.string.models_effort_high)}};
-        // OpenCode: effort ("variants") depends on the model; Antigravity's model ids include it; Grok's depends on the
-        // model too (it lists no levels)
-        return null;
+    /** The agent's default model, where known: Claude Code says which; the others list theirs first. */
+    private static String defaultId(String backend) {
+        if ("claude".equals(key(backend)) && !claudeDefault.isEmpty()) return claudeDefault;
+        String[][] l = live.get(key(backend));
+        return l != null && l.length > 1 ? l[1][0] : "";
+    }
+
+    /** Every effort level any of the agent's models reported, in the agent's order (none: Buddy can't set it). */
+    private static java.util.List<String> agentEfforts(String backend) {
+        java.util.List<String> out = new java.util.ArrayList<>();
+        String[][] l = live.get(key(backend));
+        if (l != null) for (String[] m : l) for (String e : split(m[2])) if (!out.contains(e)) out.add(e);
+        return out;
+    }
+
+    private static java.util.List<String> split(String levels) {
+        java.util.List<String> out = new java.util.ArrayList<>();
+        for (String e : levels.split(",")) if (!e.isEmpty()) out.add(e);
+        return out;
+    }
+
+    /** A level's name: translated for the ones Buddy knows, the agent's own word for a new one ("ultra" → "Ultra"). */
+    private static String effortLabel(String e) {
+        switch (e) {
+            case "low": return BuddyApp.str(R.string.models_effort_low);
+            case "medium": return BuddyApp.str(R.string.models_effort_medium);
+            case "high": return BuddyApp.str(R.string.models_effort_high);
+            case "xhigh": return BuddyApp.str(R.string.models_effort_xhigh);
+            case "max": return BuddyApp.str(R.string.models_effort_max);
+            default: return Character.toUpperCase(e.charAt(0)) + e.substring(1);
+        }
     }
 
     /** "agent · model · effort" for a chat's chip. */
@@ -235,7 +254,7 @@ final class Models {
         String eff = effective(s);
         Providers.P p = Providers.of(eff);
         if (p != null) return BuddyApp.str(R.string.models_via, serviceModelName(p, Providers.model(eff)), p.name);
-        if (!s.model.isEmpty()) return label(s.backend, s.model);
+        if (!eff.isEmpty()) return label(s.backend, eff); // the chat's pick, or the user's default for the agent
         if (!s.actualModel.isEmpty()) return BuddyApp.str(R.string.models_name_default, nameOf(s.backend, s.actualModel));
         return BuddyApp.str(R.string.models_default_model);
     }
@@ -250,12 +269,15 @@ final class Models {
         String d = agentDefault(s.backend);
         Providers.P p = Providers.of(d);
         if (p != null) return BuddyApp.str(R.string.models_via, Providers.model(d), p.name);
+        if (!d.isEmpty()) return label(s.backend, d);
         if (!s.actualModel.isEmpty()) return BuddyApp.str(R.string.models_default_now, nameOf(s.backend, s.actualModel));
         return defaultHint(s.backend);
     }
 
     /** What the agent's own default is, before it has said. */
     static String defaultHint(String backend) {
+        if ("claude".equals(backend) && !claudeDefault.isEmpty())
+            return BuddyApp.str(R.string.models_default_now, nameOf(backend, claudeDefault));
         if ("claude".equals(backend)) return BuddyApp.str(R.string.models_default_claude);
         if ("codex".equals(backend)) return BuddyApp.str(R.string.models_default_codex);
         if ("agy".equals(backend)) return BuddyApp.str(R.string.models_default_agy);
@@ -269,19 +291,20 @@ final class Models {
         return l.equals(id) ? pretty(id) : l;
     }
 
-    /** "claude-opus-5-5-20261001" → "Opus 5.5"; other ids as they are. */
+    /** "claude-opus-5-5-20261001" → "Opus 5.5", "claude-fable-6" → "Fable 6" (any family); other ids as they are. */
     static String pretty(String id) {
         java.util.regex.Matcher m = java.util.regex.Pattern
-                .compile("claude-(opus|sonnet|haiku|fable)-(\\d+)-(\\d+)").matcher(id);
-        if (m.find()) return Character.toUpperCase(m.group(1).charAt(0)) + m.group(1).substring(1) + " " + m.group(2) + "." + m.group(3);
-        return id;
+                .compile("^claude-([a-z]+)-(\\d{1,2})(?:-(\\d{1,2}))?(?:-\\d{6,})?$").matcher(id);
+        if (!m.find()) return id;
+        return Character.toUpperCase(m.group(1).charAt(0)) + m.group(1).substring(1) + " " + m.group(2)
+                + (m.group(3) == null ? "" : "." + m.group(3));
     }
 
     static String label(String backend, String model) {
         if (model == null || model.isEmpty()) return BuddyApp.str(R.string.models_default);
         Providers.P p = Providers.of(model);
         if (p != null) return BuddyApp.str(R.string.models_via, serviceModelName(p, Providers.model(model)), p.name);
-        for (String[] m : forBackend(backend)) if (m[0].equals(model)) return m[1];
-        return model;
+        String[] row = row(backend, model);
+        return row != null ? row[1] : pretty(model);
     }
 }

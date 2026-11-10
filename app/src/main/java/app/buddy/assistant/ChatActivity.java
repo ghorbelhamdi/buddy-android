@@ -62,6 +62,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     private static final int REQ_CAMERA = 21, REQ_PHOTOS = 22, REQ_FILES = 23;
     /** The background browser's live card, while this chat has a tab there. */
     private BrowserPanel browser;
+    private BackgroundPanel backgroundPanel;
     private boolean resumed;
 
     @Override
@@ -162,6 +163,12 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         bwp.leftMargin = bwp.rightMargin = dp(this, 12);
         bwp.topMargin = dp(this, 8);
         root.addView(browser, bwp);
+
+        backgroundPanel = new BackgroundPanel(this, ses);
+        LinearLayout.LayoutParams bgp = full();
+        bgp.leftMargin = bgp.rightMargin = dp(this, 12);
+        bgp.topMargin = dp(this, 8);
+        root.addView(backgroundPanel, bgp);
 
         scroll = new ScrollView(this);
         messages = column(this);
@@ -342,10 +349,50 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             hint.setPaddingRelative(dp(this, 24), dp(this, 40), dp(this, 24), 0);
             messages.addView(hint, full());
         }
-        for (Sessions.Msg m : ses.messages) show(m);
+        // the latest ones; a long chat's earlier ones come a page at a time (drawing thousands at once is slow)
+        int from = Math.max(0, ses.messages.size() - shownBack);
+        if (from > 0) {
+            TextView earlier = text(this, getString(R.string.chat_earlier), 14, ACCENT_TEXT);
+            earlier.setTypeface(sans(this, 600));
+            earlier.setGravity(Gravity.CENTER);
+            earlier.setPaddingRelative(dp(this, 16), dp(this, 12), dp(this, 16), dp(this, 12));
+            earlier.setBackgroundResource(ripple(this, false));
+            earlier.setOnClickListener(v -> {
+                final int height = messages.getHeight(), y = scroll.getScrollY();
+                shownBack += Sessions.PAGE;
+                showAll();
+                // stay on the message that was at the top: the earlier ones grow above it
+                messages.post(() -> scroll.scrollTo(0, y + messages.getHeight() - height));
+            });
+            messages.addView(earlier, full());
+        }
+        if (from == 0 && ChatHub.canRestore(ses)) {
+            // its start was dropped by the old limit on a chat's length: the agent's own record still has it
+            final TextView load = text(this, getString(R.string.chat_earlier_load), 14, ACCENT_TEXT);
+            load.setTypeface(sans(this, 600));
+            load.setGravity(Gravity.CENTER);
+            load.setPaddingRelative(dp(this, 16), dp(this, 12), dp(this, 16), dp(this, 12));
+            load.setBackgroundResource(ripple(this, false));
+            load.setOnClickListener(v -> {
+                load.setEnabled(false);
+                load.setTextColor(MUTED);
+                hub.restoreEarlier(ses, n -> {
+                    if (isFinishing()) return;
+                    if (n == 0) android.widget.Toast.makeText(this, R.string.chat_earlier_none, android.widget.Toast.LENGTH_SHORT).show();
+                    shownBack = Math.max(shownBack, Sessions.PAGE); // the newest page stays; the rest comes with "Show earlier"
+                    showAll();
+                    scrollToEnd();
+                });
+            });
+            messages.addView(load, full());
+        }
+        for (Sessions.Msg m : new java.util.ArrayList<>(ses.messages.subList(from, ses.messages.size()))) show(m);
         if (log != null && !ses.running) log.finish();
         lastShown = lastMsg();
     }
+
+    /** How far back the chat is shown: this many of its latest messages (more with each "Show earlier messages"). */
+    private int shownBack = Sessions.PAGE;
 
     /** The empty-chat hint mentions Linux tools when the chat has them. */
     private String hintText() {
@@ -396,6 +443,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         resumed = false;
         Browser.removeListener(this);
         if (browser != null) browser.setShown(false);
+        if (backgroundPanel != null) backgroundPanel.setShown(false);
         if (Waiting.listener == waitingChanged) Waiting.listener = null;
         super.onPause();
     }
@@ -560,9 +608,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         LinearLayout other = row(this);
         other.setPaddingRelative(0, dp(this, 10), 0, 0);
         final EditText et = new EditText(this);
-        et.setHint(getString(R.string.chat_model_other_hint, "claude".equals(ses.backend) ? "claude-opus-5-5"
-                : "opencode".equals(ses.backend) ? "anthropic/claude-sonnet-5-5" : "agy".equals(ses.backend) ? "gemini-3.8-flash-high"
-                : "grok".equals(ses.backend) ? "grok-4.7" : "gpt-6.1-sol"));
+        et.setHint(getString(R.string.chat_model_other_hint, Models.example(ses.backend)));
         et.setHintTextColor(MUTED);
         et.setTextColor(TEXT);
         et.setTextSize(14);
@@ -633,6 +679,12 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 ses.awake, on -> hub.setAwake(ses, on));
         sw.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
         c.addView(sw, full());
+        if (Background.setUp(this)) {
+            LinearLayout bg = switchRow(this, getString(R.string.chat_background), getString(R.string.chat_background_info),
+                    ses.background, on -> hub.setBackground(ses, on));
+            bg.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
+            c.addView(bg, full());
+        }
         LinearLayout inc = switchRow(this, getString(R.string.chat_incognito), getString(R.string.chat_incognito_info),
                 ses.incognito, on -> hub.setIncognito(ses, on));
         inc.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
@@ -1204,7 +1256,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             t.setSingleLine(true);
             t.setEllipsize(android.text.TextUtils.TruncateAt.END);
             t.setPaddingRelative(dp(this, 8), 0, dp(this, 4), 0);
-            t.setOnClickListener(v -> confirmSheet(this, getString(R.string.later_title, Schedules.when(this, l.at)), l.text,
+            t.setOnClickListener(v -> messageSheet(this, getString(R.string.later_title, Schedules.when(this, l.at)), l.text,
                     getString(R.string.later_cancel), true, () -> Schedules.cancelLater(this, ses, l.id)));
             r.addView(t, weight1());
             ImageButton x = iconButton(this, R.drawable.ms_close, getString(R.string.later_cancel), MUTED);
@@ -1217,6 +1269,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     }
 
     private void refresh() {
+        if (backgroundPanel != null) backgroundPanel.setShown(resumed);
         boolean speak = Prefs.speakReplies(this);
         speaker.setImageResource(speak ? R.drawable.ms_volume_up : R.drawable.ms_volume_off);
         speaker.setImageTintList(ColorStateList.valueOf(speak ? ACCENT : MUTED));
@@ -1741,6 +1794,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         switch (kind) {
             case USER: {
                 TextView tv = text(this, text, 15, TEXT);
+                tv.setText(Ui.markdown(text, null)); // what the user wrote in Markdown shows as such too (issue #21)
                 links(tv);
                 tv.setMaxWidth(maxBubble);
                 tv.setBackground(corners(this, USER, 20, 20, 6, 20));
@@ -1776,7 +1830,6 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             }
         }
         messages.addView(v, p);
-        while (messages.getChildCount() > Sessions.MAX_MESSAGES) messages.removeViewAt(0);
     }
 
     /** Web links and email addresses become tappable (selectable text stays selectable). */

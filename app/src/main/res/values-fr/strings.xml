@@ -887,6 +887,11 @@
     <string name="signin_with_chatgpt">Se connecter avec ChatGPT</string>
     <string name="signin_with_google">Se connecter avec Google</string>
     <string name="signin_with_grok">Se connecter avec Grok</string>
+    <string name="signin_token">Utiliser un token</string>
+    <string name="signin_token_title">Token Claude Code</string>
+    <string name="signin_token_info">Collez le token que « claude setup-token » affiche sur un ordinateur ; il commence par sk-ant-oat. Il suffit pour les discussions. La saisie vocale et Remote Control nécessitent la connexion complète.</string>
+    <string name="signin_token_wrong">Ce n\'est pas un token Claude Code. Une clé API (sk-ant-api…) se saisit dans Paramètres → Clés API.</string>
+    <string name="signin_token_on">Connecté avec un token : il suffit pour les discussions. La saisie vocale et Remote Control nécessitent la connexion complète.</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <string name="signin_other_device">Se connecter sur un autre appareil</string>
     <!-- Button (ChatGPT): sign in by entering a one-time code on another device. -->
@@ -1273,9 +1278,6 @@
     <string name="setup_panel_full">Grand</string>
     <string name="setup_panel_compact">Compact</string>
     <string name="setup_panel_size_info">L\'option Grand s\'étend d\'un bord à l\'autre de l\'écran. L\'option Compact est plus petite et laisse les bords libres, pour que les gestes latéraux fonctionnent toujours.</string>
-    <string name="setup_action_limit">Actions par tâche</string>
-    <string name="setup_action_limit_none">Sans limite</string>
-    <string name="setup_action_limit_info">Une tâche s’arrête après ce nombre d’appuis, de saisies et de défilements, pour qu’une tâche qui s’emballe n’épuise pas ton forfait. La même action 6 fois d’affilée l’arrête toujours.</string>
     <string name="setup_tap_to_talk_info">Un appui ouvre le micro : dites ce que vous voulez, le message part dès que vous marquez une pause. Appuyez longuement sur la bulle pour la discussion et plus encore.</string>
     <string name="setup_read_aloud">Lire les réponses à voix haute</string>
     <string name="setup_read_aloud_info">Buddy lit les réponses des agents à voix haute, avec la voix que vous choisissez dans la section Voix.</string>
@@ -1783,8 +1785,53 @@
         <item quantity="one">%1$d vérification a échoué</item>
         <item quantity="other">%1$d vérifications ont échoué</item>
     </plurals>
-    <string name="tools_step_cap">Arrêté après %1$d actions d’affilée sur le téléphone, pour qu’une tâche qui s’emballe n’épuise pas ton forfait. Dis-lui de continuer si besoin.</string>
     <string name="tools_step_loop">Arrêté : il a fait la même chose %1$d fois de suite, ce qui ressemble à une boucle.</string>
+    <!-- Background mode -->
+    <string name="background_title">Mode arrière-plan</string>
+    <string name="background_row">Les agents travaillent sur leur propre écran pendant que vous utilisez votre téléphone</string>
+    <string name="background_intro">En mode arrière-plan, un agent travaille sur son propre écran, que vous ne voyez pas. Vous gardez votre écran, votre clavier et votre bouton Retour, et il continue même quand le téléphone est verrouillé.</string>
+    <string name="background_how">Android ne permet de créer un tel écran qu\'avec le Débogage sans fil. Buddy s\'y associe donc une fois, ici, sur ce téléphone. Pas besoin d\'ordinateur.</string>
+    <string name="background_step1">1. Appuyez sur Configurer. Buddy ouvre les Options pour les développeurs et trouve le Débogage sans fil pour vous.</string>
+    <string name="background_step2">2. Il active le Débogage sans fil (le Wi-Fi doit être connecté) et ouvre « Associer l\'appareil avec un code d\'association ».</string>
+    <string name="background_step3">3. Il lit le code, s\'associe et vous ramène ici. S\'il s\'arrête quelque part, faites cette étape vous-même et Buddy reprend.</string>
+    <string name="background_setup">Configurer</string>
+    <string name="background_open_options">Ouvrir les Options pour les développeurs</string>
+    <string name="background_installing">Récupération d\'adb pour le Linux de Buddy…</string>
+    <string name="background_waiting">En attente de « Associer l\'appareil avec un code d\'association » dans Débogage sans fil…</string>
+    <string name="background_pairing">Association…</string>
+    <string name="background_starting">Démarrage du programme auxiliaire…</string>
+    <string name="background_ready">Prêt</string>
+    <string name="background_ready_info">Activez-le pour chaque discussion : Options de la discussion → Travailler en arrière-plan.</string>
+    <string name="background_paired">Associé</string>
+    <string name="background_asleep">Son programme auxiliaire ne tourne pas. Il démarre avec la première tâche en arrière-plan, ou maintenant. Après un redémarrage du téléphone, appuyez sur Démarrer maintenant : Buddy active le Débogage sans fil pour cela (le Wi-Fi doit être connecté).</string>
+    <string name="background_start_now">Démarrer maintenant</string>
+    <string name="background_failed">Ça n\'a pas marché : %1$s</string>
+    <string name="background_needs_linux">Le mode arrière-plan a besoin du Linux de Buddy. Installez d\'abord un agent.</string>
+    <string name="background_needs_dev">Activez d\'abord les Options pour les développeurs : Paramètres → À propos du téléphone → appuyez 7 fois sur Numéro de build.</string>
+    <string name="background_needs_service">Activez d\'abord le service d\'accessibilité de Buddy.</string>
+    <string name="background_no_dialog">Buddy n\'a pas vu la fenêtre d\'association à temps. Réessayez.</string>
+    <string name="background_remove">Supprimer</string>
+    <string name="background_remove_text">Buddy oublie l\'association et arrête son programme auxiliaire. Les discussions travaillent de nouveau sur le vrai écran.</string>
+    <string name="background_default">Les nouvelles discussions travaillent en arrière-plan</string>
+    <string name="background_default_info">Chaque discussion garde son propre interrupteur dans Options de la discussion.</string>
+    <string name="background_security">Le Débogage sans fil permet aux appareils associés de contrôler ce téléphone. Buddy n\'associe que lui-même, sur ce téléphone, et son programme auxiliaire n\'écoute qu\'ici.</string>
+    <string name="background_brought">Passé sur votre écran : cette étape a besoin de vous. Le mode arrière-plan est maintenant désactivé pour cette discussion.</string>
+    <string name="chat_background">Travailler en arrière-plan</string>
+    <string name="chat_background_info">L\'agent utilise son propre écran et vous continuez à utiliser votre téléphone. Une étape qui a besoin de vous, comme une connexion, arrive sur votre écran.</string>
+    <string name="background_preview">Écran d\'arrière-plan</string>
+    <string name="background_show">Afficher sur mon écran</string>
+    <string name="background_usb_note">Buddy active aussi le Débogage USB. Grâce à lui, le programme auxiliaire continue de tourner quand le Wi-Fi se coupe et qu\'Android désactive le Débogage sans fil. Laissez-le activé.</string>
+    <string name="background_shell">Commandes sur le téléphone</string>
+    <string name="background_shell_switch">Les agents peuvent exécuter des commandes sur le téléphone</string>
+    <string name="background_shell_info">Dans les discussions avec les outils Linux, l\'agent peut exécuter des commandes sur le téléphone lui-même, comme le fait « adb shell » : installer et lancer des applis, modifier des réglages, lire des journaux et des fichiers. Un message ou une page Web qu\'il lit pourrait tenter de le pousser à en exécuter une.</string>
+    <string name="background_shell_ask">Demander avant chaque commande</string>
+    <string name="background_shell_ask_info">Une carte d\'approbation affiche d\'abord la commande. Sans elle, rien ne sépare un agent manipulé de votre téléphone : une commande peut même appuyer sur une carte d\'approbation.</string>
+    <string name="tools_card_shell">Exécuter sur le téléphone :\n%1$s</string>
+    <string name="activity_shell">Exécute une commande sur le téléphone</string>
+    <string name="hub_tool_phone_shell">Commande sur le téléphone : %1$s</string>
+    <string name="chat_earlier">Afficher les messages précédents</string>
+    <string name="chat_earlier_load">Charger les messages précédents</string>
+    <string name="chat_earlier_none">Aucun message précédent trouvé.</string>
     <string name="setup_help">Aide</string>
     <string name="setup_help_info">Le guide de Buddy, sur GitHub. Tu peux aussi demander à n’importe quel agent comment Buddy fonctionne.</string>
     <string name="signin_api_key">Utiliser plutôt une clé API</string>

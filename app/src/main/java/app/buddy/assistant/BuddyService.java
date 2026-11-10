@@ -80,10 +80,12 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         instance = this;
         Theme.load(this);
         orientation = getResources().getConfiguration().orientation;
-        Models.setCodex(Prefs.codexModels(this));
-        Models.setOpencode(Prefs.opencodeModels(this));
-        Models.setAgy(Prefs.agyModels(this));
-        Models.setGrok(Prefs.grokModels(this));
+        Models.set("claude", Prefs.claudeModels(this));
+        Models.setClaudeDefault(Prefs.claudeDefault(this));
+        Models.set("codex", Prefs.codexModels(this));
+        Models.set("opencode", Prefs.opencodeModels(this));
+        Models.set("agy", Prefs.agyModels(this));
+        Models.set("grok", Prefs.grokModels(this));
         new Thread(() -> Attachments.cleanup(this)).start();
         new Thread(() -> { // API key services: the key saved per agent by earlier builds, then fresh model lists
             Providers.migrate(this);
@@ -105,6 +107,13 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         f.addAction(Intent.ACTION_SCREEN_ON);
         f.addAction(Intent.ACTION_USER_PRESENT);
         registerReceiver(lockReceiver, f);
+        // The same from the screen itself. A background chat's display has a power state of its own, and while one is
+        // up Android may not announce that the real screen went off: the bubble would then stay on the lock screen.
+        getSystemService(android.hardware.display.DisplayManager.class).registerDisplayListener(screenListener, main);
+        // Approve and Deny on an approval's notification (the lock screen's way to answer a card)
+        IntentFilter cards = new IntentFilter(Triggers.ACTION_CARD);
+        if (android.os.Build.VERSION.SDK_INT >= 33) registerReceiver(cardReceiver, cards, Context.RECEIVER_NOT_EXPORTED);
+        else registerReceiver(cardReceiver, cards);
         bubble.setLocked(getSystemService(KeyguardManager.class).isKeyguardLocked());
         if (!Prefs.onboarded(this)) main.postDelayed(this::showGuide, 600);
         main.postDelayed(() -> RemoteSession.ensure(this), 4000);
@@ -129,8 +138,65 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             keepAwake.update(); // locked: the screen may sleep; unlocked: a long task keeps it on again
             if (bubble == null) return;
             if (Intent.ACTION_USER_PRESENT.equals(i.getAction())) bubble.setLocked(false);
-            else if (Intent.ACTION_SCREEN_OFF.equals(i.getAction())) bubble.setLocked(true);
+            else if (Intent.ACTION_SCREEN_OFF.equals(i.getAction())) {
+                bubble.setLocked(true);
+                bubble.noticeWaitingCard(); // a card that was on screen when it went dark: its notification now
+            }
             else bubble.setLocked(getSystemService(KeyguardManager.class).isKeyguardLocked());
+        }
+    };
+
+    private boolean screenWasOn = true;
+    private long lockCheckedAt;
+
+    /** Is the phone's own screen on (not off, and not the always-on display)? */
+    static boolean screenOn(Context c) {
+        android.view.Display d = c.getSystemService(android.hardware.display.DisplayManager.class)
+                .getDisplay(android.view.Display.DEFAULT_DISPLAY);
+        return d == null || d.getState() == android.view.Display.STATE_ON;
+    }
+
+    private final android.hardware.display.DisplayManager.DisplayListener screenListener =
+            new android.hardware.display.DisplayManager.DisplayListener() {
+                @Override
+                public void onDisplayAdded(int id) {
+                }
+
+                @Override
+                public void onDisplayRemoved(int id) {
+                }
+
+                @Override
+                public void onDisplayChanged(int id) {
+                    if (id != android.view.Display.DEFAULT_DISPLAY || bubble == null) return;
+                    boolean on = screenOn(BuddyService.this);
+                    if (on == screenWasOn) return;
+                    screenWasOn = on;
+                    keepAwake.update();
+                    if (on) {
+                        bubble.setLocked(getSystemService(KeyguardManager.class).isKeyguardLocked());
+                    } else {
+                        bubble.setLocked(true);
+                        bubble.noticeWaitingCard();
+                    }
+                }
+            };
+
+    /** The lock screen came or went (seen in the windows changing): the bubble follows, whoever did or didn't say so. */
+    private void recheckLock() {
+        long now = android.os.SystemClock.uptimeMillis();
+        if (now - lockCheckedAt < 400) return;
+        lockCheckedAt = now;
+        bubble.setLocked(!screenOn(this) || getSystemService(KeyguardManager.class).isKeyguardLocked());
+    }
+
+    private final BroadcastReceiver cardReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context c, Intent i) {
+            // only Buddy's own notification can send this (the receiver isn't exported, the intent names the package)
+            if (bubble != null) bubble.answerFromNotice(i.getStringExtra("chat"), i.getStringExtra("text"),
+                    i.getBooleanExtra("ok", false), i.getStringExtra("option"));
+            Triggers.approvalDone(BuddyService.this, i.getStringExtra("chat"));
         }
     };
 
@@ -147,6 +213,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             return;
         }
         if (type != AccessibilityEvent.TYPE_WINDOWS_CHANGED && type != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return;
+        recheckLock();
         int top = 0;
         AccessibilityWindowInfo app = null;
         for (AccessibilityWindowInfo w : getWindows()) {
@@ -231,6 +298,8 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     public void onDestroy() {
         try {
             unregisterReceiver(lockReceiver);
+            unregisterReceiver(cardReceiver);
+            getSystemService(android.hardware.display.DisplayManager.class).unregisterDisplayListener(screenListener);
         } catch (Exception ignored) {
         }
         RemoteSession.stop();
@@ -436,25 +505,31 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             Prefs.setHelperStatus(this, event.optString("text"));
             Prefs.setHelperVersion(this, event.optInt("helper", 1));
             if (event.has("signed")) Prefs.setSignedAgents(this, event.optString("signed"));
+            org.json.JSONArray lm = event.optJSONArray("claude_models");
+            if (lm != null && lm.length() > 0) {
+                Prefs.setClaudeModels(this, lm.toString(), event.optString("claude_default"));
+                Models.set("claude", lm.toString());
+                Models.setClaudeDefault(event.optString("claude_default"));
+            }
             org.json.JSONArray cm = event.optJSONArray("codex_models");
             if (cm != null && cm.length() > 0) {
                 Prefs.setCodexModels(this, cm.toString());
-                Models.setCodex(cm.toString());
+                Models.set("codex", cm.toString());
             }
             org.json.JSONArray om = event.optJSONArray("opencode_models");
             if (om != null && om.length() > 0) {
                 Prefs.setOpencodeModels(this, om.toString());
-                Models.setOpencode(om.toString());
+                Models.set("opencode", om.toString());
             }
             org.json.JSONArray am = event.optJSONArray("agy_models");
             if (am != null && am.length() > 0) {
                 Prefs.setAgyModels(this, am.toString());
-                Models.setAgy(am.toString());
+                Models.set("agy", am.toString());
             }
             org.json.JSONArray gm = event.optJSONArray("grok_models");
             if (gm != null && gm.length() > 0) {
                 Prefs.setGrokModels(this, gm.toString());
-                Models.setGrok(gm.toString());
+                Models.set("grok", gm.toString());
             }
             return;
         }
@@ -468,7 +543,8 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
 
     // ------------------------------------------- called from tool threads
 
-    void onToolActivity(final String tool) {
+    /** background: the call works on a background chat's own display, not on the phone's screen. */
+    void onToolActivity(final String tool, final boolean background) {
         main.post(() -> {
             bubble.onToolActivity(tool);
             // asking for approval, asking a question, posting a note, pointing something out or answering in a
@@ -479,7 +555,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
                     && !Tools.SCHEDULING.contains(tool)
                     // installing: Android's installer asks the user, the agent doesn't touch the screen
                     && !"update_buddy".equals(tool) && !"install_apk".equals(tool) && !"wait_for_install".equals(tool)
-                    && !tool.startsWith("browser_")) { // the background browser isn't the phone
+                    && !tool.startsWith("browser_") && !background) { // neither of those is the phone's screen
                 control.onActivity();
             }
         });
@@ -850,7 +926,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             }
         };
         main.post(() -> bubble.askConfirm(text, chat, countdown, cb));
-        Triggers.approvalShown(this, chat, text, countdown);
+        Triggers.approvalShown(this, chat, text, countdown, true, null);
         String ended = null;
         try {
             java.util.function.BooleanSupplier gone = McpServer.CALLER_GONE.get();
@@ -902,7 +978,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             done.countDown();
         };
         main.post(() -> bubble.askQuestion(question, options, chat, handsOn, cb));
-        Triggers.approvalShown(this, chat, question, 0);
+        Triggers.approvalShown(this, chat, question, 0, false, handsOn ? null : options);
         boolean answered;
         try {
             answered = awaitAnswer(done, rule ? 60_000L : 5 * 60_000L, stepDone);

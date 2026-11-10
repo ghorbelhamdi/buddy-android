@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Background mode only: never asked of the user; Buddy's own adb grants it when they pair it with Wireless
+         debugging, so Buddy can switch Wireless debugging on again after a restart of the phone. -->
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -140,6 +143,12 @@
         <activity
             android:name=".StepsActivity"
             android:exported="false" />
+
+        <!-- Settings → Experience → Background mode: pairing with Wireless debugging, the helper's state -->
+        <activity
+            android:name=".BackgroundActivity"
+            android:exported="false"
+            android:launchMode="singleTop" />
 
         <!-- Settings → Experience → Backup and move (declared since 2.2.28: missing before, so the row crashed) -->
         <activity

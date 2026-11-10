@@ -903,6 +903,11 @@
     <string name="signin_with_chatgpt">Войти через ChatGPT</string>
     <string name="signin_with_google">Войти через Google</string>
     <string name="signin_with_grok">Войти через Grok</string>
+    <string name="signin_token">Использовать токен</string>
+    <string name="signin_token_title">Токен Claude Code</string>
+    <string name="signin_token_info">Вставьте токен, который команда «claude setup-token» выводит на компьютере; он начинается с sk-ant-oat. Его достаточно для чатов. Для голосового ввода и Remote Control нужен полный вход.</string>
+    <string name="signin_token_wrong">Это не токен Claude Code. API-ключ (sk-ant-api…) указывается в разделе Настройки → API-ключи.</string>
+    <string name="signin_token_on">Вход выполнен по токену: его достаточно для чатов. Для голосового ввода и Remote Control нужен полный вход.</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <string name="signin_other_device">Войти на другом устройстве</string>
     <!-- Button (ChatGPT): sign in by entering a one-time code on another device. -->
@@ -1304,9 +1309,6 @@
     <!-- Choice: a smaller panel. Keep it short. -->
     <string name="setup_panel_compact">Компактный</string>
     <string name="setup_panel_size_info">«Полный» — от края до края. «Компактный» — панель меньше и не заходит на края экрана, так что боковые жесты продолжают работать.</string>
-    <string name="setup_action_limit">Действий за задачу</string>
-    <string name="setup_action_limit_none">Без ограничений</string>
-    <string name="setup_action_limit_info">Задача останавливается после стольких нажатий, вводов и прокруток, чтобы вышедшая из-под контроля задача не израсходовала ваш план. Одно и то же действие 6 раз подряд всегда её останавливает.</string>
     <!-- Explains the "Talk" choice of setup_tap_action. -->
     <string name="setup_tap_to_talk_info">Одно нажатие включает микрофон: скажите, что нужно, и сообщение отправится, когда вы сделаете паузу. Удерживайте пузырёк, чтобы открыть чат и не только.</string>
     <string name="setup_read_aloud">Читать ответы вслух</string>
@@ -1822,8 +1824,53 @@
         <item quantity="many">%1$d проверок не прошли</item>
         <item quantity="other">%1$d проверки не прошли</item>
     </plurals>
-    <string name="tools_step_cap">Остановлено после %1$d действий подряд, чтобы вышедшая из-под контроля задача не израсходовала ваш план. Скажите продолжить, если нужно.</string>
     <string name="tools_step_loop">Остановлено: одно и то же действие %1$d раз подряд похоже на зацикливание.</string>
+    <!-- Background mode -->
+    <string name="background_title">Фоновый режим</string>
+    <string name="background_row">Агенты работают на отдельном экране, пока вы пользуетесь телефоном</string>
+    <string name="background_intro">В фоновом режиме агент работает на отдельном экране, которого вы не видите. Ваш экран, клавиатура и кнопка «Назад» остаются у вас, а работа продолжается и на заблокированном телефоне.</string>
+    <string name="background_how">Android позволяет создать такой экран только через функцию «Отладка по Wi-Fi», поэтому Buddy один раз подключается к ней прямо на этом телефоне. Компьютер не нужен.</string>
+    <string name="background_step1">1. Нажмите «Настроить». Buddy откроет раздел «Для разработчиков» и сам найдёт пункт «Отладка по Wi-Fi».</string>
+    <string name="background_step2">2. Buddy включит отладку по Wi-Fi (телефон должен быть подключён к Wi-Fi) и откроет «Подключить устройство с помощью кода подключения».</string>
+    <string name="background_step3">3. Он считает код, подключится и вернёт вас сюда. Если он где-то остановится, сделайте этот шаг сами — Buddy продолжит.</string>
+    <string name="background_setup">Настроить</string>
+    <string name="background_open_options">Открыть «Для разработчиков»</string>
+    <string name="background_installing">Загружаем adb для встроенного Linux…</string>
+    <string name="background_waiting">Ждём «Подключить устройство с помощью кода подключения» в разделе «Отладка по Wi-Fi»…</string>
+    <string name="background_pairing">Подключаемся…</string>
+    <string name="background_starting">Запускаем вспомогательную программу…</string>
+    <string name="background_ready">Готово</string>
+    <string name="background_ready_info">Включается для каждого чата отдельно: Настройки чата → Работать в фоне.</string>
+    <string name="background_paired">Подключено</string>
+    <string name="background_asleep">Вспомогательная программа не запущена. Она запустится с первой фоновой задачей или прямо сейчас. После перезагрузки телефона нажмите «Запустить сейчас»: Buddy сам включит для этого отладку по Wi-Fi (телефон должен быть подключён к Wi-Fi).</string>
+    <string name="background_start_now">Запустить сейчас</string>
+    <string name="background_failed">Не получилось: %1$s</string>
+    <string name="background_needs_linux">Фоновому режиму нужен встроенный Linux. Сначала установите агента.</string>
+    <string name="background_needs_dev">Сначала включите раздел «Для разработчиков»: Настройки → Об устройстве → нажмите «Номер сборки» 7 раз.</string>
+    <string name="background_needs_service">Сначала включите сервис специальных возможностей Buddy.</string>
+    <string name="background_no_dialog">Buddy не успел увидеть окно подключения. Попробуйте ещё раз.</string>
+    <string name="background_remove">Удалить</string>
+    <string name="background_remove_text">Buddy забудет подключение и остановит вспомогательную программу. Чаты снова будут работать на настоящем экране.</string>
+    <string name="background_default">Новые чаты работают в фоне</string>
+    <string name="background_default_info">У каждого чата по-прежнему есть свой переключатель в настройках чата.</string>
+    <string name="background_security">«Отладка по Wi-Fi» позволяет подключённым устройствам управлять этим телефоном. Buddy подключает только себя, на этом же телефоне, а его вспомогательная программа принимает соединения только здесь.</string>
+    <string name="background_brought">Перенесено на ваш экран: этот шаг нужно сделать вам. Фоновый режим для этого чата теперь выключен.</string>
+    <string name="chat_background">Работать в фоне</string>
+    <string name="chat_background_info">Агент работает на отдельном экране, а вы продолжаете пользоваться телефоном. Шаг, где нужны вы, например вход в аккаунт, появится на вашем экране.</string>
+    <string name="background_preview">Фоновый экран</string>
+    <string name="background_show">Показать на моём экране</string>
+    <string name="background_usb_note">Buddy также включает отладку по USB. С ней вспомогательная программа продолжает работать, когда Wi-Fi пропадает и Android выключает отладку по Wi-Fi. Не выключайте её.</string>
+    <string name="background_shell">Команды на телефоне</string>
+    <string name="background_shell_switch">Агенты могут выполнять команды на телефоне</string>
+    <string name="background_shell_info">В чатах с инструментами Linux агент может выполнять команды прямо на телефоне, как это делает «adb shell»: устанавливать и запускать приложения, менять настройки, читать журналы и файлы. Сообщение или веб-страница, которые он читает, могут попытаться обманом заставить его выполнить команду.</string>
+    <string name="background_shell_ask">Спрашивать перед каждой командой</string>
+    <string name="background_shell_ask_info">Сначала команду показывает карточка подтверждения. Без неё между обманутым агентом и вашим телефоном ничего не стоит: команда может нажать даже на карточку подтверждения.</string>
+    <string name="tools_card_shell">Выполнить на телефоне:\n%1$s</string>
+    <string name="activity_shell">Выполняет команду на телефоне</string>
+    <string name="hub_tool_phone_shell">Команда на телефоне: %1$s</string>
+    <string name="chat_earlier">Показать предыдущие сообщения</string>
+    <string name="chat_earlier_load">Загрузить предыдущие сообщения</string>
+    <string name="chat_earlier_none">Предыдущих сообщений не найдено.</string>
     <string name="setup_help">Справка</string>
     <string name="setup_help_info">Руководство по Buddy на GitHub. Можно также спросить любого агента, как работает Buddy.</string>
     <string name="signin_api_key">Использовать ключ API</string>
