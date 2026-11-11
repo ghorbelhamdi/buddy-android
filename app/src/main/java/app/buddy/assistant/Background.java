@@ -436,6 +436,89 @@ final class Background {
         return out;
     }
 
+    /**
+     * Where to pair: the port the dialog shows, or, when it shows none, the one the phone announces on the local
+     * network for pairing (as adb on a computer finds it), then the other ports listening on this phone that could
+     * be it. The first that takes the code is the one; at most six are tried.
+     */
+    private static List<Integer> pairingPorts(Context c, String shown) {
+        List<Integer> out = new ArrayList<>();
+        if (shown != null) {
+            out.add(Integer.parseInt(shown));
+            return out;
+        }
+        int announced = announcedPairingPort(c, 6000);
+        if (announced > 0) out.add(announced);
+        int connect = Prefs.backgroundAdbPort(c);
+        for (int p : adbPorts(c)) if (p != connect && !out.contains(p) && out.size() < 6) out.add(p);
+        return out;
+    }
+
+    /** The port this phone announces for pairing (_adb-tls-pairing._tcp), or 0 when none shows up in time. */
+    private static int announcedPairingPort(Context c, long ms) {
+        final android.net.nsd.NsdManager nsd = (android.net.nsd.NsdManager) c.getSystemService(Context.NSD_SERVICE);
+        if (nsd == null) return 0;
+        final int[] port = {0};
+        final java.util.concurrent.CountDownLatch done = new java.util.concurrent.CountDownLatch(1);
+        android.net.nsd.NsdManager.DiscoveryListener l = new android.net.nsd.NsdManager.DiscoveryListener() {
+            @Override
+            public void onServiceFound(android.net.nsd.NsdServiceInfo info) {
+                try {
+                    nsd.resolveService(info, new android.net.nsd.NsdManager.ResolveListener() {
+                        @Override
+                        public void onResolveFailed(android.net.nsd.NsdServiceInfo i, int error) {
+                        }
+
+                        @Override
+                        public void onServiceResolved(android.net.nsd.NsdServiceInfo i) {
+                            try { // this phone's own, not another device pairing on the same network
+                                java.net.InetAddress host = i.getHost();
+                                if (host != null && !host.isLoopbackAddress()
+                                        && java.net.NetworkInterface.getByInetAddress(host) == null) return;
+                            } catch (Exception ignored) {
+                            }
+                            port[0] = i.getPort();
+                            done.countDown();
+                        }
+                    });
+                } catch (Exception ignored) {
+                }
+            }
+
+            @Override
+            public void onServiceLost(android.net.nsd.NsdServiceInfo info) {
+            }
+
+            @Override
+            public void onDiscoveryStarted(String type) {
+            }
+
+            @Override
+            public void onDiscoveryStopped(String type) {
+            }
+
+            @Override
+            public void onStartDiscoveryFailed(String type, int error) {
+                done.countDown();
+            }
+
+            @Override
+            public void onStopDiscoveryFailed(String type, int error) {
+            }
+        };
+        try {
+            nsd.discoverServices("_adb-tls-pairing._tcp", android.net.nsd.NsdManager.PROTOCOL_DNS_SD, l);
+            done.await(ms, TimeUnit.MILLISECONDS);
+        } catch (Exception ignored) {
+        } finally {
+            try {
+                nsd.stopServiceDiscovery(l);
+            } catch (Exception ignored) {
+            }
+        }
+        return port[0];
+    }
+
     /** Wireless debugging on or off, if Buddy was given the right to (granted over adb when it paired). */
     private static boolean wirelessDebugging(Context c, boolean on) {
         if (c.checkSelfPermission(SECURE) != PackageManager.PERMISSION_GRANTED) return false;
@@ -500,10 +583,8 @@ final class Background {
                     set(Step.FAILED, out.trim());
                     return;
                 }
-                // Only a hint, never a reason to stop: a Pixel on Android 17 read 0 here with Developer options on
-                // (issue #29), and the set-up refused to begin. Whether they're on shows when Buddy opens them.
-                final boolean devSaysOff = android.provider.Settings.Global.getInt(svc.getContentResolver(),
-                        android.provider.Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) == 0;
+                // (Settings.Global.DEVELOPMENT_SETTINGS_ENABLED isn't asked: a Pixel on Android 17 answers 0 with
+                // Developer options on, issue #29. Whether they're on shows when Buddy opens them.)
                 waitUntil = System.currentTimeMillis() + 5 * 60_000;
                 set(Step.WAITING, "");
                 // Buddy goes there itself; wherever that stops short, the user does the step and it carries on
@@ -521,13 +602,20 @@ final class Background {
                 if (step != Step.WAITING) return; // cancelled
                 if (found == null) { // the likeliest reason comes along when the phone says Developer options are off
                     set(Step.FAILED, svc.getString(R.string.background_no_dialog)
-                            + (devSaysOff ? "\n" + svc.getString(R.string.background_needs_dev) : ""));
+                            + (walkStopped.isEmpty() ? "" : "\n(" + walkStopped + ")"));
                     return;
                 }
                 set(Step.PAIRING, "");
-                String paired = Linux.exec(svc, ADB + "adb start-server >/dev/null 2>&1; "
-                        + "timeout 30 adb pair 127.0.0.1:" + found[1] + " " + found[0] + " 2>&1 | tail -2; "
-                        + "adb kill-server >/dev/null 2>&1", 90);
+                StringBuilder tryPorts = new StringBuilder();
+                for (int port : pairingPorts(svc, found[1])) tryPorts.append(' ').append(port);
+                if (tryPorts.length() == 0) {
+                    set(Step.FAILED, svc.getString(R.string.background_no_dialog) + "\n(no pairing port found)");
+                    return;
+                }
+                String paired = Linux.exec(svc, ADB + "adb start-server >/dev/null 2>&1; for p in" + tryPorts + "; do "
+                        + "r=$(timeout 15 adb pair 127.0.0.1:$p " + found[0] + " 2>&1 | tail -2); echo \"$p: $r\"; "
+                        + "case \"$r\" in *'Successfully paired'*) break;; esac; done; "
+                        + "adb kill-server >/dev/null 2>&1", 150);
                 if (!paired.contains("Successfully paired")) {
                     set(Step.FAILED, paired.trim());
                     return;
@@ -642,43 +730,61 @@ final class Background {
      * isn't found this stops and the user goes on by hand (the set-up's loop sees the pairing dialog either way).
      * Returns the port Wireless debugging shows for connecting, 0 when it didn't get that far.
      */
+    /** Where Buddy's own walk through Settings stopped short, for the error the user reports ("" when it didn't). */
+    private static volatile String walkStopped = "";
+
+    private static int stopped(String where) {
+        walkStopped = where;
+        return 0;
+    }
+
     private static int openWireless(final BuddyService svc, boolean pairToo) {
+        walkStopped = "";
         final String wireless = settingsLabel(svc, "enable_adb_wireless"), pair = settingsLabel(svc, "adb_pair_method_code_title");
         svc.runOnMain(() -> {
             try {
+                // Android's own Settings scrolls to a row named this way and marks it (its key has been the same since
+                // Android 11); a maker's Settings that doesn't know the extras just opens the page
+                android.os.Bundle row = new android.os.Bundle();
+                row.putString(":settings:fragment_args_key", "toggle_adb_wireless");
                 svc.startActivity(new android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS)
+                        .putExtra(":settings:fragment_args_key", "toggle_adb_wireless")
+                        .putExtra(":settings:show_fragment_args", row)
                         .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP));
             } catch (Exception ignored) {
             }
         });
-        if (wireless == null || pair == null) return 0;
-        if (await(svc, n -> n.isScrollable(), 5000) == null) return 0;
+        if (wireless == null || pair == null) return stopped("Settings has no text named " + (wireless == null ? "enable_adb_wireless" : "adb_pair_method_code_title"));
+        if (await(svc, n -> n.isScrollable(), 5000) == null) return stopped("Developer options didn't open as a list");
         sleep(500);
         AccessibilityNodeInfo title = null;
         for (int i = 0; i < 40 && going() && title == null; i++) {
             title = inSettings(svc, text(wireless));
             if (title != null) break;
-            AccessibilityNodeInfo list = inSettings(svc, n -> n.isScrollable());
+            // the list itself: on stock Android the page's collapsing title bar is scrollable too, comes first, and
+            // answers "scrolled" for ever without moving the list (issue #29, a Pixel)
+            AccessibilityNodeInfo list = inSettings(svc, n -> n.isScrollable() && isList(n));
+            if (list == null) list = inSettings(svc, n -> n.isScrollable());
             if (list == null || !list.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD)) break;
             sleep(450);
         }
-        if (title == null) return 0;
+        if (title == null) return stopped("no row named \"" + wireless + "\" in Developer options");
         sleep(400); // the list comes to rest
         title = inSettings(svc, text(wireless));
-        if (title == null) return 0;
+        if (title == null) return stopped("the row \"" + wireless + "\" went out of sight");
         AccessibilityNodeInfo row = title, sw = null;
         for (int i = 0; i < 4 && row != null && sw == null; i++, row = row.getParent()) sw = first(row, n -> n.isCheckable(), 0);
         if (sw != null && !sw.isChecked()) {
-            if (!sw.isEnabled() || !click(sw)) return 0; // no Wi-Fi: the user sees why
+            if (!sw.isEnabled() || !click(sw)) return stopped("the switch of \"" + wireless + "\" can't be turned on (no Wi-Fi?)"); // the user sees why
             AccessibilityNodeInfo allow = await(svc, n -> "android:id/button1".equals(n.getViewIdResourceName()), 4000);
             if (allow != null) click(allow);
             sleep(1500);
             title = inSettings(svc, text(wireless));
-            if (title == null) return 0;
+            if (title == null) return stopped("the row \"" + wireless + "\" was gone after switching it on");
         }
-        if (!click(title)) return 0;
+        if (!click(title)) return stopped("the row \"" + wireless + "\" took no tap");
         AccessibilityNodeInfo code = await(svc, text(pair), 6000);
-        if (code == null) return 0;
+        if (code == null) return stopped("no \"" + pair + "\" on the " + wireless + " screen");
         // this screen also shows the port to connect to: no need to look for it
         int port = 0;
         AccessibilityNodeInfo address = inSettings(svc, n -> n.getText() != null && ADDRESS.matcher(n.getText().toString().trim()).matches());
@@ -691,10 +797,19 @@ final class Background {
         return port;
     }
 
+    private static boolean isList(AccessibilityNodeInfo n) {
+        String cls = String.valueOf(n.getClassName()), id = String.valueOf(n.getViewIdResourceName());
+        return cls.endsWith("RecyclerView") || cls.endsWith("ListView") || id.endsWith(":id/recycler_view") || id.endsWith(":id/list");
+    }
+
     private static final Pattern CODE = Pattern.compile("^\\d{6}$");
     private static final Pattern ADDRESS = Pattern.compile("^(?:\\d{1,3}\\.){3}\\d{1,3}:(\\d{4,5})$");
 
-    /** {code, port} when Settings shows its "Pair with device" dialog right now, else null. */
+    /**
+     * {code, port} when Settings shows its "Pair with device" dialog right now, else null. The port is null when the
+     * dialog doesn't show it: Android 17 moved the address to a page of its own (issue #29), so it's found another
+     * way (see pairingPorts).
+     */
     private static String[] pairingDialog(BuddyService svc) {
         try {
             for (AccessibilityWindowInfo w : svc.getWindows()) {
@@ -702,7 +817,7 @@ final class Background {
                 if (root == null || !"com.android.settings".contentEquals(String.valueOf(root.getPackageName()))) continue;
                 String[] found = new String[2];
                 scan(root, found, 0);
-                if (found[0] != null && found[1] != null) return found;
+                if (found[0] != null) return found;
             }
         } catch (Exception ignored) {
         }
@@ -713,10 +828,14 @@ final class Background {
         if (n == null || depth > 30) return;
         CharSequence t = n.getText();
         if (t != null) {
-            String s = t.toString().trim();
+            String s = t.toString().trim(), id = String.valueOf(n.getViewIdResourceName());
             if (CODE.matcher(s).matches()) found[0] = s;
             Matcher m = ADDRESS.matcher(s);
             if (m.matches()) found[1] = m.group(1);
+            else if (id.endsWith(":id/ip_addr")) { // the dialog's own address field, whatever kind of address it shows
+                Matcher last = Pattern.compile(":(\\d{4,5})$").matcher(s);
+                if (last.find()) found[1] = last.group(1);
+            }
         }
         for (int i = 0; i < n.getChildCount(); i++) scan(n.getChild(i), found, depth + 1);
     }

@@ -1,0 +1,2 @@
+• Background mode set-up on stock Android (Pixel): Buddy now gets to Wireless debugging by itself, and pairs on Android 17, where the pairing dialog no longer shows the port
+• If the set-up stops, the error says at which step
