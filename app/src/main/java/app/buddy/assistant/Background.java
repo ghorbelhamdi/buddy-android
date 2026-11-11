@@ -500,11 +500,10 @@ final class Background {
                     set(Step.FAILED, out.trim());
                     return;
                 }
-                if (android.provider.Settings.Global.getInt(svc.getContentResolver(),
-                        android.provider.Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) == 0) {
-                    set(Step.FAILED, svc.getString(R.string.background_needs_dev));
-                    return;
-                }
+                // Only a hint, never a reason to stop: a Pixel on Android 17 read 0 here with Developer options on
+                // (issue #29), and the set-up refused to begin. Whether they're on shows when Buddy opens them.
+                final boolean devSaysOff = android.provider.Settings.Global.getInt(svc.getContentResolver(),
+                        android.provider.Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) == 0;
                 waitUntil = System.currentTimeMillis() + 5 * 60_000;
                 set(Step.WAITING, "");
                 // Buddy goes there itself; wherever that stops short, the user does the step and it carries on
@@ -520,8 +519,9 @@ final class Background {
                     found = pairingDialog(svc);
                 }
                 if (step != Step.WAITING) return; // cancelled
-                if (found == null) {
-                    set(Step.FAILED, svc.getString(R.string.background_no_dialog));
+                if (found == null) { // the likeliest reason comes along when the phone says Developer options are off
+                    set(Step.FAILED, svc.getString(R.string.background_no_dialog)
+                            + (devSaysOff ? "\n" + svc.getString(R.string.background_needs_dev) : ""));
                     return;
                 }
                 set(Step.PAIRING, "");

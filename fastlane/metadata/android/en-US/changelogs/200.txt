@@ -1,0 +1,1 @@
+• Background mode: the set-up no longer stops with "Turn on Developer options first" on phones that have them on (seen on a Pixel 10 Pro with Android 17)
