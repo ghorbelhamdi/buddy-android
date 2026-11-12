@@ -972,7 +972,7 @@
     <string name="setup_dev_mode">Linux-Tools in neuen Chats</string>
     <string name="setup_dev_mode_info">Mit Linux-Tools darf der Agent Befehle ausführen, Pakete installieren und Dateien in ~/.buddy/work bearbeiten, also Apps bauen. Neue Chats starten mit dieser Einstellung; jeder Chat kann sie unter seinem Titel ändern.</string>
     <string name="setup_agents_tap">Agenten auf Buddys Bildschirmen tippen lassen</string>
-    <string name="setup_agents_tap_info">Zum Testen von Buddy mit einem Agenten (zum Beispiel Claude Code in Termux mit den Smartphone-Tools). Die Bubble, Freigabekarten, App-Berechtigungen und diese Schalter bleiben gesperrt.</string>
+    <string name="setup_agents_tap_info">Zum Testen von Buddy mit einem Agenten (zum Beispiel Claude Code in Termux mit den Handy-Tools). Agenten können dann die Chatliste, einen Chat und diesen Einstellungsbildschirm bedienen. Alles, was bestimmt, was sie dürfen, bleibt bei dir: die Blase, Freigabekarten, Linux-Tools, Chat-Optionen und Zeitpläne sowie die Bildschirme für App-Berechtigungen, Schlüssel, Regeln, Skills, Hintergrundmodus und Backup.</string>
     <string name="setup_dev_mode_warning">Lieber ausgeschaltet lassen und Linux-Tools nur in den Chats einschalten, die sie brauchen. Sind sie an, könnte eine bösartige Nachricht oder Webseite auf dem Bildschirm versuchen, den Agenten zum Ausführen von Befehlen zu verleiten. Freigabekarten schützen weiterhin Senden, Posten, Kaufen und Löschen.</string>
 
     <!-- Settings screen: footer links. -->
@@ -1292,7 +1292,6 @@
     <string name="browser_backspace">Ein Zeichen löschen</string>
     <string name="bubble_browser_thumb">Live-Ansicht des Hintergrund-Browsers. Tippen, um ihn im Vollbild zu öffnen.</string>
     <string name="bubble_browser_thumb_hide">Ausblenden</string>
-    <string name="bubble_pill_show_page">%1$s · tippe, um die Seite zu zeigen</string>
     <string name="browser_type_hint">In die Seite schreiben</string>
     <string name="browser_enter">Enter</string>
     <string name="browser_dialog">Die Seite fragt: %1$s</string>
@@ -1393,6 +1392,14 @@
     <string name="background_remove_text">Buddy vergisst die Kopplung und beendet seinen Helfer. Chats arbeiten wieder auf dem echten Bildschirm.</string>
     <string name="background_default">Neue Chats arbeiten im Hintergrund</string>
     <string name="background_default_info">Jeder Chat hat weiterhin seinen eigenen Schalter in den Chat-Optionen.</string>
+    <string name="chat_bg_connected">Verbunden</string>
+    <string name="chat_bg_disconnected">Nicht verbunden</string>
+    <string name="chat_bg_not_set_up">Nicht eingerichtet</string>
+    <string name="chat_bg_checking">Wird geprüft…</string>
+    <string name="chat_bg_pair_again">Erneut koppeln</string>
+    <string name="chat_bg_more">Weitere Einstellungen</string>
+    <string name="chat_bg_connected_info">Agenten in Hintergrund-Chats können auf einem eigenen Bildschirm arbeiten.</string>
+    <string name="chat_bg_setup_info">Lässt einen Agenten auf einem eigenen Bildschirm in deinen Apps arbeiten, während du dein Handy benutzt. Die Einrichtung dauert etwa eine Minute und braucht WLAN.</string>
     <string name="background_security">Über „Debugging über WLAN“ können gekoppelte Geräte dieses Handy steuern. Buddy koppelt nur sich selbst, auf diesem Handy, und sein Helfer lauscht nur hier.</string>
     <string name="background_brought">Auf deinen Bildschirm geholt: Dieser Schritt braucht dich. Der Hintergrundmodus ist für diesen Chat jetzt aus.</string>
     <string name="chat_background">Im Hintergrund arbeiten</string>

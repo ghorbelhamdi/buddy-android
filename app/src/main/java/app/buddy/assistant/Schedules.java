@@ -425,7 +425,12 @@ public final class Schedules extends BroadcastReceiver {
                 : "[BUDDY_SCHEDULED] The user set this chat to send the message below " + s.schedule.english()
                 + ", and Buddy sent it now on its own: they may not be watching. Do it as if they had just typed it; "
                 + "approval cards still wait for them.\n");
-        if (locked) {
+        if (locked && Background.on(app, s.id)) {
+            // this chat works on a screen of its own: the lock doesn't stop its phone tools (issue #35: told
+            // otherwise, the agent gave up without trying)
+            prompt.append("The phone is locked right now, but this chat works in the background, on a screen of its ")
+                    .append("own: the phone tools work there as usual. Only an approval or a question waits for the user.\n");
+        } else if (locked) {
             prompt.append("The phone is locked right now. The background browser and Linux tools work as usual; a ")
                     .append("phone tool that needs the screen asks the user to unlock and waits for them, so use the ")
                     .append("screen only when the task needs it.\n");

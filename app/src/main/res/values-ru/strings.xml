@@ -1336,7 +1336,7 @@
     <string name="setup_dev_mode_info">С инструментами Linux агент может выполнять команды, устанавливать пакеты и изменять файлы в ~/.buddy/work, чтобы собирать приложения. Новые чаты получают это значение; в каждом чате его можно изменить под названием чата.</string>
     <string name="setup_agents_tap">Разрешить агентам нажимать на экранах Buddy</string>
     <!-- "App permissions" is the name of a screen in Buddy. -->
-    <string name="setup_agents_tap_info">Для тестирования Buddy с помощью агента (например, Claude Code в Termux с инструментами телефона). Пузырёк, карточки подтверждения, «Разрешения для приложений» и эти переключатели остаются недоступны.</string>
+    <string name="setup_agents_tap_info">Для тестирования Buddy с агентом (например, Claude Code в Termux с инструментами телефона). Тогда агенты могут пользоваться списком чатов, чатом и этим экраном настроек. Всё, что определяет, что им разрешено, остаётся за вами: пузырёк, карточки подтверждения, инструменты Linux, параметры чата и расписания, а также экраны разрешений приложений, ключей, правил, навыков, фонового режима и резервной копии.</string>
     <!-- Warning shown while Linux tools in new chats (setup_dev_mode) is on. -->
     <string name="setup_dev_mode_warning">Лучше оставить это выключенным и включать инструменты Linux только в тех чатах, где они нужны. Когда они включены, вредоносное сообщение или веб-страница на экране могут попытаться обманом заставить агента выполнить команды. Отправка, публикация, покупки и удаление по-прежнему защищены карточками подтверждения.</string>
 
@@ -1762,7 +1762,6 @@
     <string name="browser_backspace">Удалить символ</string>
     <string name="bubble_browser_thumb">Живой вид фонового браузера. Нажмите, чтобы открыть его во весь экран.</string>
     <string name="bubble_browser_thumb_hide">Скрыть</string>
-    <string name="bubble_pill_show_page">%1$s · нажмите, чтобы показать страницу</string>
     <string name="browser_type_hint">Введите текст для страницы</string>
     <string name="browser_enter">Enter</string>
     <string name="browser_dialog">Страница спрашивает: %1$s</string>
@@ -1865,6 +1864,14 @@
     <string name="background_remove_text">Buddy забудет подключение и остановит вспомогательную программу. Чаты снова будут работать на настоящем экране.</string>
     <string name="background_default">Новые чаты работают в фоне</string>
     <string name="background_default_info">У каждого чата по-прежнему есть свой переключатель в настройках чата.</string>
+    <string name="chat_bg_connected">Подключено</string>
+    <string name="chat_bg_disconnected">Не подключено</string>
+    <string name="chat_bg_not_set_up">Не настроено</string>
+    <string name="chat_bg_checking">Проверка…</string>
+    <string name="chat_bg_pair_again">Выполнить сопряжение снова</string>
+    <string name="chat_bg_more">Другие настройки</string>
+    <string name="chat_bg_connected_info">Агенты в фоновых чатах могут работать на собственном экране.</string>
+    <string name="chat_bg_setup_info">Позволяет агенту работать в ваших приложениях на собственном экране, пока вы пользуетесь телефоном. Настройка занимает около минуты и требует Wi-Fi.</string>
     <string name="background_security">«Отладка по Wi-Fi» позволяет подключённым устройствам управлять этим телефоном. Buddy подключает только себя, на этом же телефоне, а его вспомогательная программа принимает соединения только здесь.</string>
     <string name="background_brought">Перенесено на ваш экран: этот шаг нужно сделать вам. Фоновый режим для этого чата теперь выключен.</string>
     <string name="chat_background">Работать в фоне</string>

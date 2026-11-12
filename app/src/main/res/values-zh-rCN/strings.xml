@@ -1303,7 +1303,7 @@
     <string name="setup_dev_mode_info">开启 Linux 工具后，智能体可以运行命令、安装软件包，并编辑 ~/.buddy/work 中的文件，从而能够开发应用。新对话会以此设置开始；每个对话都可以在标题下方单独更改。</string>
     <string name="setup_agents_tap">允许智能体点按 Buddy 的界面</string>
     <!-- "App permissions" is the name of a screen in Buddy. -->
-    <string name="setup_agents_tap_info">用于借助智能体测试 Buddy（例如在 Termux 中使用带手机工具的 Claude Code）。气泡、确认卡片、“应用权限”和这些开关仍禁止智能体点按。</string>
+    <string name="setup_agents_tap_info">用于让智能体测试 Buddy（例如 Termux 中带手机工具的 Claude Code）。开启后，智能体可以使用对话列表、对话和这个设置界面。凡是决定它们能做什么的部分仍只归你操作：气泡、批准卡片、Linux 工具、对话选项和定时任务，以及应用权限、密钥、规则、技能、后台模式和备份等界面。</string>
     <!-- Warning shown while Linux tools in new chats (setup_dev_mode) is on. -->
     <string name="setup_dev_mode_warning">日常使用时最好保持关闭，只在需要的对话中开启 Linux 工具。开启后，屏幕上的恶意消息或网页可能会诱骗智能体运行命令。发送、发布、购买和删除仍受确认卡片保护。</string>
 
@@ -1726,7 +1726,6 @@
     <string name="browser_backspace">删除一个字符</string>
     <string name="bubble_browser_thumb">后台浏览器的实时画面。点按即可全屏打开。</string>
     <string name="bubble_browser_thumb_hide">隐藏</string>
-    <string name="bubble_pill_show_page">%1$s · 点按以显示页面</string>
     <string name="browser_type_hint">在页面中输入</string>
     <string name="browser_enter">Enter</string>
     <string name="browser_dialog">页面询问：%1$s</string>
@@ -1826,6 +1825,14 @@
     <string name="background_remove_text">Buddy 会忘记这次配对并停止助手程序。对话将重新在真实屏幕上工作。</string>
     <string name="background_default">新对话在后台工作</string>
     <string name="background_default_info">每个对话在“对话选项”中仍有自己的开关。</string>
+    <string name="chat_bg_connected">已连接</string>
+    <string name="chat_bg_disconnected">未连接</string>
+    <string name="chat_bg_not_set_up">未设置</string>
+    <string name="chat_bg_checking">正在检查…</string>
+    <string name="chat_bg_pair_again">重新配对</string>
+    <string name="chat_bg_more">更多设置</string>
+    <string name="chat_bg_connected_info">后台聊天中的代理可以在自己的屏幕上工作。</string>
+    <string name="chat_bg_setup_info">让代理在自己的屏幕上操作你的应用，同时你照常使用手机。设置大约需要一分钟，并且需要 Wi-Fi。</string>
     <string name="background_security">“无线调试”允许已配对的设备控制这部手机。Buddy 只配对它自己，而且就在这部手机上；它的助手程序也只在本机监听。</string>
     <string name="background_brought">已移到你的屏幕：这一步需要你来做。这个对话的后台模式现已关闭。</string>
     <string name="chat_background">在后台工作</string>

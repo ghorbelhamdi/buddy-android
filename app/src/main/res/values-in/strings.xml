@@ -1303,7 +1303,7 @@
     <string name="setup_dev_mode_info">Dengan alat Linux, agen dapat menjalankan perintah, menginstal paket, dan mengedit file di ~/.buddy/work, sehingga bisa membuat aplikasi. Chat baru dimulai dengan setelan ini; setiap chat bisa mengubahnya di bawah judulnya.</string>
     <string name="setup_agents_tap">Izinkan agen mengetuk layar Buddy</string>
     <!-- "App permissions" is the name of a screen in Buddy. -->
-    <string name="setup_agents_tap_info">Untuk menguji Buddy dengan agen (misalnya Claude Code di Termux dengan alat ponsel). Balon, kartu persetujuan, Izin aplikasi, dan tombol-tombol ini tetap tidak bisa diketuk agen.</string>
+    <string name="setup_agents_tap_info">Untuk menguji Buddy dengan agen (misalnya Claude Code di Termux dengan alat ponsel). Agen kemudian dapat memakai daftar chat, sebuah chat, dan layar Setelan ini. Semua yang menentukan apa yang boleh mereka lakukan tetap milik Anda: gelembung, kartu persetujuan, alat Linux, opsi chat dan jadwal, serta layar izin aplikasi, kunci, aturan, skill, mode latar belakang, dan cadangan.</string>
     <!-- Warning shown while Linux tools in new chats (setup_dev_mode) is on. -->
     <string name="setup_dev_mode_warning">Sebaiknya biarkan nonaktif dan aktifkan alat Linux hanya di chat yang membutuhkannya. Saat aktif, pesan atau halaman web berbahaya di layar bisa mencoba menipu agen agar menjalankan perintah. Kartu persetujuan tetap menjaga pengiriman, posting, pembelian, dan penghapusan.</string>
 
@@ -1727,7 +1727,6 @@
     <string name="browser_backspace">Hapus satu karakter</string>
     <string name="bubble_browser_thumb">Tampilan langsung browser latar belakang. Ketuk untuk membukanya di layar penuh.</string>
     <string name="bubble_browser_thumb_hide">Sembunyikan</string>
-    <string name="bubble_pill_show_page">%1$s · ketuk untuk menampilkan halaman</string>
     <string name="browser_type_hint">Ketik di halaman</string>
     <string name="browser_enter">Enter</string>
     <string name="browser_dialog">Halaman bertanya: %1$s</string>
@@ -1827,6 +1826,14 @@
     <string name="background_remove_text">Buddy melupakan penyambungan dan menghentikan pembantunya. Chat kembali bekerja di layar asli.</string>
     <string name="background_default">Chat baru bekerja di latar belakang</string>
     <string name="background_default_info">Setiap chat tetap punya tombolnya sendiri di Opsi chat.</string>
+    <string name="chat_bg_connected">Terhubung</string>
+    <string name="chat_bg_disconnected">Tidak terhubung</string>
+    <string name="chat_bg_not_set_up">Belum disiapkan</string>
+    <string name="chat_bg_checking">Memeriksa…</string>
+    <string name="chat_bg_pair_again">Sandingkan lagi</string>
+    <string name="chat_bg_more">Setelan lainnya</string>
+    <string name="chat_bg_connected_info">Agen di chat latar belakang dapat bekerja di layarnya sendiri.</string>
+    <string name="chat_bg_setup_info">Memungkinkan agen bekerja di aplikasi Anda pada layarnya sendiri saat Anda memakai ponsel. Penyiapan butuh sekitar satu menit dan memerlukan Wi-Fi.</string>
     <string name="background_security">Proses debug nirkabel memungkinkan perangkat yang tersambung mengendalikan ponsel ini. Buddy hanya menyambungkan dirinya sendiri, di ponsel ini, dan pembantunya hanya mendengarkan di sini.</string>
     <string name="background_brought">Dipindahkan ke layar Anda: langkah ini memerlukan Anda. Mode latar belakang kini nonaktif untuk chat ini.</string>
     <string name="chat_background">Bekerja di latar belakang</string>

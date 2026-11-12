@@ -868,6 +868,9 @@ final class ChatHub {
         }, 8000);
     }
 
+    /** After its run a background chat's screen stays this long (for a follow-up, or Show on my screen), then closes. */
+    private static final long BACKGROUND_RELEASE_MS = 60_000;
+
     private void startRun(Sessions.Session ses) {
         ses.running = true;
         ses.outcome = null;
@@ -887,7 +890,18 @@ final class ChatHub {
     private void runEnded(Sessions.Session ses) {
         Prefs.setBusy(app, ses.id, false);
         StepLog.runEnded(app, ses);
-        if (ses.background) Background.rest(app, ses.id); // its apps aren't "on screen" between runs
+        if (ses.background) {
+            Background.rest(app, ses.id); // its apps aren't "on screen" between runs
+            // and a minute later, unless the chat works again, its screen goes and its apps with it: an app left
+            // there isn't on the user's screen either, and the chat kept showing it as if it still worked there
+            final int run = ses.runId;
+            main.postDelayed(() -> {
+                if (!ses.running && ses.runId == run) {
+                    Background.close(app, ses.id);
+                    changed();
+                }
+            }, BACKGROUND_RELEASE_MS);
+        }
         if (ses.schedule == null) ses.allowed.clear(); // a scheduled chat keeps them for its next scheduled run
         CodexLive.agentDone(ses, ses.outcome, !ses.lastReply.isEmpty());
         // a quiet scheduled run that found nothing new ends without a notification (a failed one always says so)

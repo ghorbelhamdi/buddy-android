@@ -1010,7 +1010,7 @@
     <string name="setup_dev_mode">أدوات Linux في المحادثات الجديدة</string>
     <string name="setup_dev_mode_info">تتيح أدوات Linux للوكيل تنفيذ الأوامر وتثبيت الحزم وتعديل الملفات في &#x200E;~/.buddy/work، ليتمكن من إنشاء التطبيقات. تبدأ المحادثات الجديدة بهذا الإعداد، ويمكن تغييره لكل محادثة أسفل عنوانها.</string>
     <string name="setup_agents_tap">السماح للوكلاء بالنقر على شاشات Buddy</string>
-    <string name="setup_agents_tap_info">لاختبار Buddy باستخدام وكيل (مثل Claude Code في Termux مع أدوات الهاتف). تظل الفقاعة وبطاقات الموافقة و«أذونات التطبيقات» وهذه المفاتيح خارج نطاق الوصول.</string>
+    <string name="setup_agents_tap_info">لاختبار Buddy مع وكيل (مثل Claude Code في Termux مع أدوات الهاتف). عندها يستطيع الوكلاء استخدام قائمة المحادثات ومحادثة وشاشة الإعدادات هذه. وكل ما يحدد ما يُسمح لهم به يبقى لك: الفقاعة وبطاقات الموافقة وأدوات Linux وخيارات المحادثة والجداول، وشاشات أذونات التطبيقات والمفاتيح والقواعد والمهارات ووضع الخلفية والنسخ الاحتياطي.</string>
     <string name="setup_dev_mode_warning">الأفضل إبقاؤه متوقفًا وتفعيل أدوات Linux في المحادثات التي تحتاجها فقط. عند تفعيلها، قد تحاول رسالة أو صفحة ويب ضارة على الشاشة خداع الوكيل لتنفيذ أوامر. وتظل بطاقات الموافقة تحمي عمليات الإرسال والنشر والشراء والحذف.</string>
 
     <!-- Settings screen: footer links. -->
@@ -1333,7 +1333,6 @@
     <string name="browser_backspace">حذف حرف</string>
     <string name="bubble_browser_thumb">عرض مباشر للمتصفح في الخلفية. انقر لفتحه بملء الشاشة.</string>
     <string name="bubble_browser_thumb_hide">إخفاء</string>
-    <string name="bubble_pill_show_page">%1$s · انقر لعرض الصفحة</string>
     <string name="browser_type_hint">اكتب في الصفحة</string>
     <string name="browser_enter">إدخال</string>
     <string name="browser_dialog">تسأل الصفحة: %1$s</string>
@@ -1438,6 +1437,14 @@
     <string name="background_remove_text">ينسى Buddy الإقران ويوقف برنامجه المساعد. تعود المحادثات إلى العمل على الشاشة الحقيقية.</string>
     <string name="background_default">المحادثات الجديدة تعمل في الخلفية</string>
     <string name="background_default_info">يبقى لكل محادثة مفتاحها الخاص في خيارات المحادثة.</string>
+    <string name="chat_bg_connected">متصل</string>
+    <string name="chat_bg_disconnected">غير متصل</string>
+    <string name="chat_bg_not_set_up">غير مُعَدّ</string>
+    <string name="chat_bg_checking">جارٍ التحقق…</string>
+    <string name="chat_bg_pair_again">الاقتران مجددًا</string>
+    <string name="chat_bg_more">إعدادات أخرى</string>
+    <string name="chat_bg_connected_info">يمكن للوكلاء في محادثات الخلفية العمل على شاشة خاصة بهم.</string>
+    <string name="chat_bg_setup_info">يتيح للوكيل العمل في تطبيقاتك على شاشة خاصة به بينما تستخدم هاتفك. يستغرق الإعداد نحو دقيقة ويحتاج إلى Wi-Fi.</string>
     <string name="background_security">يتيح «تصحيح الأخطاء اللاسلكي» للأجهزة المقترنة التحكم في هذا الهاتف. يقرن Buddy نفسه فقط، على هذا الهاتف، وبرنامجه المساعد لا يستمع إلا هنا.</string>
     <string name="background_brought">تم النقل إلى شاشتك: هذه الخطوة تحتاج إليك. وضع الخلفية متوقف الآن لهذه المحادثة.</string>
     <string name="chat_background">العمل في الخلفية</string>

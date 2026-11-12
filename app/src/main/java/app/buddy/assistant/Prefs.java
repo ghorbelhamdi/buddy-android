@@ -59,6 +59,33 @@ final class Prefs {
         sp(c).edit().putBoolean("bg_default", on).apply();
     }
 
+    /** The bubble's live picture is tiny, inside the pill (the user dragged it off a side, issue #36), until they tap it. */
+    static boolean thumbMini(Context c) {
+        return sp(c).getBoolean("thumb_mini", false);
+    }
+
+    static void setThumbMini(Context c, boolean mini) {
+        sp(c).edit().putBoolean("thumb_mini", mini).apply();
+    }
+
+    /** How wide the bubble's live picture is, as a share of the screen's width (the user resizes it, issue #36). */
+    static float thumbScale(Context c) {
+        return sp(c).getFloat("thumb_scale", 0.4f);
+    }
+
+    static void setThumbScale(Context c, float scale) {
+        sp(c).edit().putFloat("thumb_scale", scale).apply();
+    }
+
+    /** Where the user put the bubble's live picture: its left and top as shares of the screen (x < 0: under the bubble's pill). */
+    static float[] thumbPlace(Context c) {
+        return new float[]{sp(c).getFloat("thumb_x", -1f), sp(c).getFloat("thumb_y", -1f)};
+    }
+
+    static void setThumbPlace(Context c, float x, float y) {
+        sp(c).edit().putFloat("thumb_x", x).putFloat("thumb_y", y).apply();
+    }
+
     /** Phone commands (issue #22): agents in chats with Linux tools may run commands on the phone itself. Off unless the user turns it on. */
     static boolean phoneShell(Context c) {
         return sp(c).getBoolean("bg_shell", false);

@@ -101,6 +101,16 @@ final class Helper {
             text += (text.isEmpty() ? "" : "\n") + "Buttons the user marked \"Never ask\" (tap them without confirming "
                     + "when the task calls for it):\n" + never;
         }
+        if (Prefs.agentsTapBuddy(c)) {
+            text += (text.isEmpty() ? "" : "\n") + "The user switched on \"Let agents tap Buddy's screens\" in Buddy's "
+                    + "Settings. So, unlike the rule above, you may open Buddy and use its screens when the user asks: "
+                    + "the Chats list, a chat, and the main Settings screen. These parts stay the user's own, and a tap "
+                    + "there answers BLOCKED: the bubble and its cards, approval cards, a chat's Linux tools chip and "
+                    + "Chat options (with its scheduled task), and the screens for App permissions, API keys, MCP "
+                    + "servers, Notification rules, Scheduled, Skills, Background mode, Backup, GitHub and sign-in. "
+                    + "When the user asks for something there, say it's theirs to do; that isn't them asking you to "
+                    + "break a rule.\n";
+        }
         File f = new File(Linux.root(c), "root/.buddy/permissions.md");
         try {
             if (text.isEmpty()) {

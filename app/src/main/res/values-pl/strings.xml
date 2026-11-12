@@ -997,7 +997,7 @@
     <string name="setup_dev_mode">Narzędzia Linux w nowych czatach</string>
     <string name="setup_dev_mode_info">Z narzędziami Linux agent może uruchamiać polecenia, instalować pakiety i edytować pliki w ~/.buddy/work, by tworzyć aplikacje. Nowe czaty dostają to ustawienie; każdy czat może je zmienić pod swoim tytułem.</string>
     <string name="setup_agents_tap">Pozwól agentom klikać ekrany Buddy</string>
-    <string name="setup_agents_tap_info">Do testowania Buddy z agentem (np. Claude Code w Termux z narzędziami telefonu). Dymek, karty zatwierdzenia, Uprawnienia aplikacji i te przełączniki pozostają niedostępne.</string>
+    <string name="setup_agents_tap_info">Do testowania Buddy\'ego z agentem (na przykład Claude Code w Termuksie z narzędziami telefonu). Agenci mogą wtedy używać listy czatów, czatu i tego ekranu Ustawień. Wszystko, co decyduje o tym, co im wolno, pozostaje twoje: dymek, karty zatwierdzania, narzędzia Linux, opcje czatu i harmonogramy oraz ekrany uprawnień aplikacji, kluczy, reguł, umiejętności, trybu w tle i kopii zapasowej.</string>
     <string name="setup_dev_mode_warning">Najlepiej zostaw to wyłączone i włączaj narzędzia Linux tylko w czatach, które ich potrzebują. Gdy są włączone, złośliwa wiadomość lub strona na ekranie może próbować nakłonić agenta do uruchomienia poleceń. Karty zatwierdzenia nadal chronią wysyłanie, publikowanie, kupowanie i usuwanie.</string>
 
     <!-- Settings screen: footer links. -->
@@ -1317,7 +1317,6 @@
     <string name="browser_backspace">Usuń znak</string>
     <string name="bubble_browser_thumb">Podgląd na żywo przeglądarki w tle. Dotknij, aby otworzyć ją na pełnym ekranie.</string>
     <string name="bubble_browser_thumb_hide">Ukryj</string>
-    <string name="bubble_pill_show_page">%1$s · dotknij, aby pokazać stronę</string>
     <string name="browser_type_hint">Pisz na stronie</string>
     <string name="browser_enter">Enter</string>
     <string name="browser_dialog">Strona pyta: %1$s</string>
@@ -1420,6 +1419,14 @@
     <string name="background_remove_text">Buddy zapomni parowanie i zatrzyma pomocnika. Czaty znów będą pracować na prawdziwym ekranie.</string>
     <string name="background_default">Nowe czaty pracują w tle</string>
     <string name="background_default_info">Każdy czat nadal ma własny przełącznik w Opcjach czatu.</string>
+    <string name="chat_bg_connected">Połączono</string>
+    <string name="chat_bg_disconnected">Brak połączenia</string>
+    <string name="chat_bg_not_set_up">Nie skonfigurowano</string>
+    <string name="chat_bg_checking">Sprawdzanie…</string>
+    <string name="chat_bg_pair_again">Sparuj ponownie</string>
+    <string name="chat_bg_more">Więcej ustawień</string>
+    <string name="chat_bg_connected_info">Agenci w czatach w tle mogą pracować na własnym ekranie.</string>
+    <string name="chat_bg_setup_info">Pozwala agentowi pracować w Twoich aplikacjach na własnym ekranie, gdy korzystasz z telefonu. Konfiguracja trwa około minuty i wymaga Wi-Fi.</string>
     <string name="background_security">Debugowanie bezprzewodowe pozwala sparowanym urządzeniom sterować tym telefonem. Buddy paruje tylko siebie, na tym telefonie, a jego pomocnik nasłuchuje tylko tutaj.</string>
     <string name="background_brought">Przeniesiono na twój ekran: ten krok wymaga ciebie. Tryb w tle jest teraz wyłączony w tym czacie.</string>
     <string name="chat_background">Pracuj w tle</string>

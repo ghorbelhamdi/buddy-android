@@ -975,7 +975,7 @@
     <string name="setup_dev_mode">Yeni sohbetlerde Linux araçları</string>
     <string name="setup_dev_mode_info">Linux araçlarıyla ajan komut çalıştırabilir, paket yükleyebilir ve ~/.buddy/work içindeki dosyaları düzenleyebilir; böylece uygulama geliştirebilir. Yeni sohbetler bu ayarla başlar; her sohbet bunu kendi başlığının altından değiştirebilir.</string>
     <string name="setup_agents_tap">Ajanların Buddy ekranlarına dokunmasına izin ver</string>
-    <string name="setup_agents_tap_info">Buddy\'yi bir ajanla test etmek için (örneğin telefon araçlarıyla Termux\'ta Claude Code). Baloncuk, onay kartları, Uygulama izinleri ve bu anahtarlar erişime kapalı kalır.</string>
+    <string name="setup_agents_tap_info">Buddy\'yi bir ajanla test etmek için (örneğin Termux\'ta telefon araçlarıyla Claude Code). Ajanlar o zaman sohbet listesini, bir sohbeti ve bu Ayarlar ekranını kullanabilir. Neye izinli olduklarını belirleyen her şey sizde kalır: balon, onay kartları, Linux araçları, sohbet seçenekleri ve zamanlamalar ile uygulama izinleri, anahtarlar, kurallar, beceriler, arka plan modu ve yedekleme ekranları.</string>
     <string name="setup_dev_mode_warning">Kapalı tutmanız daha iyi olur: Linux araçlarını yalnızca ihtiyaç duyan sohbetlerde açın. Açıkken ekrandaki kötü amaçlı bir mesaj veya web sayfası, ajanı komut çalıştırmaya kandırmaya çalışabilir. Onay kartları gönderme, paylaşma, satın alma ve silme işlemlerini korumaya devam eder.</string>
 
     <!-- Settings screen: footer links. -->
@@ -1293,7 +1293,6 @@
     <string name="browser_backspace">Bir karakter sil</string>
     <string name="bubble_browser_thumb">Arka plan tarayıcısının canlı görünümü. Tam ekran açmak için dokunun.</string>
     <string name="bubble_browser_thumb_hide">Gizle</string>
-    <string name="bubble_pill_show_page">%1$s · sayfayı göstermek için dokunun</string>
     <string name="browser_type_hint">Sayfaya yazın</string>
     <string name="browser_enter">Enter</string>
     <string name="browser_dialog">Sayfa soruyor: %1$s</string>
@@ -1394,6 +1393,14 @@
     <string name="background_remove_text">Buddy eşlemeyi unutur ve yardımcısını durdurur. Sohbetler yeniden gerçek ekranda çalışır.</string>
     <string name="background_default">Yeni sohbetler arka planda çalışır</string>
     <string name="background_default_info">Her sohbetin Sohbet seçenekleri\'nde yine kendi anahtarı vardır.</string>
+    <string name="chat_bg_connected">Bağlı</string>
+    <string name="chat_bg_disconnected">Bağlı değil</string>
+    <string name="chat_bg_not_set_up">Kurulmadı</string>
+    <string name="chat_bg_checking">Kontrol ediliyor…</string>
+    <string name="chat_bg_pair_again">Yeniden eşle</string>
+    <string name="chat_bg_more">Diğer ayarlar</string>
+    <string name="chat_bg_connected_info">Arka plan sohbetlerindeki ajanlar kendi ekranlarında çalışabilir.</string>
+    <string name="chat_bg_setup_info">Siz telefonunuzu kullanırken ajanın uygulamalarınızda kendi ekranında çalışmasını sağlar. Kurulum yaklaşık bir dakika sürer ve Wi-Fi gerekir.</string>
     <string name="background_security">Kablosuz hata ayıklama, eşlenen cihazların bu telefonu kontrol etmesine izin verir. Buddy yalnızca kendini, bu telefonun üzerinde eşler ve yardımcısı yalnızca burayı dinler.</string>
     <string name="background_brought">Ekranınıza taşındı: bu adımı sizin yapmanız gerekiyor. Arka plan modu bu sohbet için artık kapalı.</string>
     <string name="chat_background">Arka planda çalış</string>

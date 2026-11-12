@@ -1,0 +1,4 @@
+• Background mode: a dot in each chat (and the bubble) shows if it's connected; tap it to connect, set up or pair again
+• The live picture by the bubble can be moved, resized, and shrunk into the status line
+• A minute after a reply, the chat's hidden screen closes and lets its apps go
+• Fixed: touches refused when two chats worked in the background, scheduled tasks while locked, approval cards naming the wrong app

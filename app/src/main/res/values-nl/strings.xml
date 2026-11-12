@@ -972,7 +972,7 @@
     <string name="setup_dev_mode">Linux-tools in nieuwe chats</string>
     <string name="setup_dev_mode_info">Met Linux-tools mag de agent opdrachten uitvoeren, pakketten installeren en bestanden bewerken in ~/.buddy/work, zodat hij apps kan bouwen. Nieuwe chats beginnen met deze instelling; elke chat kan die onder zijn titel wijzigen.</string>
     <string name="setup_agents_tap">Agents laten tikken op Buddy\'s schermen</string>
-    <string name="setup_agents_tap_info">Om Buddy te testen met een agent (bijvoorbeeld Claude Code in Termux met de telefoontools). De bubbel, goedkeuringskaarten, App-rechten en deze schakelaars blijven verboden terrein.</string>
+    <string name="setup_agents_tap_info">Om Buddy met een agent te testen (bijvoorbeeld Claude Code in Termux met de telefoontools). Agents kunnen dan de chatlijst, een chat en dit instellingenscherm gebruiken. Alles wat bepaalt wat ze mogen, blijft van jou: de bubbel, goedkeuringskaarten, Linux-tools, chatopties en planningen, en de schermen voor app-machtigingen, sleutels, regels, skills, achtergrondmodus en back-up.</string>
     <string name="setup_dev_mode_warning">Laat dit liever uit en zet Linux-tools alleen aan in de chats die ze nodig hebben. Als ze aanstaan, kan een kwaadwillend bericht of een kwaadwillende webpagina op het scherm proberen de agent te misleiden zodat hij opdrachten uitvoert. Goedkeuringskaarten bewaken nog steeds verzenden, plaatsen, kopen en verwijderen.</string>
 
     <!-- Settings screen: footer links. -->
@@ -1291,7 +1291,6 @@
     <string name="browser_backspace">Teken wissen</string>
     <string name="bubble_browser_thumb">Live weergave van de achtergrondbrowser. Tik om hem op volledig scherm te openen.</string>
     <string name="bubble_browser_thumb_hide">Verbergen</string>
-    <string name="bubble_pill_show_page">%1$s · tik om de pagina te tonen</string>
     <string name="browser_type_hint">Typ in de pagina</string>
     <string name="browser_enter">Enter</string>
     <string name="browser_dialog">De pagina vraagt: %1$s</string>
@@ -1392,6 +1391,14 @@
     <string name="background_remove_text">Buddy vergeet de koppeling en stopt de helper. Chats werken weer op het echte scherm.</string>
     <string name="background_default">Nieuwe chats werken op de achtergrond</string>
     <string name="background_default_info">Elke chat heeft nog steeds een eigen schakelaar in Chatopties.</string>
+    <string name="chat_bg_connected">Verbonden</string>
+    <string name="chat_bg_disconnected">Niet verbonden</string>
+    <string name="chat_bg_not_set_up">Niet ingesteld</string>
+    <string name="chat_bg_checking">Controleren…</string>
+    <string name="chat_bg_pair_again">Opnieuw koppelen</string>
+    <string name="chat_bg_more">Meer instellingen</string>
+    <string name="chat_bg_connected_info">Agents in achtergrondchats kunnen op een eigen scherm werken.</string>
+    <string name="chat_bg_setup_info">Laat een agent op een eigen scherm in je apps werken terwijl jij je telefoon gebruikt. Instellen duurt ongeveer een minuut en vereist wifi.</string>
     <string name="background_security">Met Draadloze foutopsporing kunnen gekoppelde apparaten deze telefoon bedienen. Buddy koppelt alleen zichzelf, op deze telefoon, en de helper luistert alleen hier.</string>
     <string name="background_brought">Naar je scherm verplaatst: deze stap heeft jou nodig. De achtergrondmodus staat nu uit voor deze chat.</string>
     <string name="chat_background">Op de achtergrond werken</string>

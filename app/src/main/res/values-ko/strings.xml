@@ -960,7 +960,7 @@
     <string name="setup_dev_mode">새 채팅의 Linux 도구</string>
     <string name="setup_dev_mode_info">Linux 도구를 켜면 에이전트가 명령을 실행하고 패키지를 설치하고 ~/.buddy/work의 파일을 편집할 수 있어서, 앱을 빌드할 수 있어요. 새 채팅은 이 설정으로 시작하고, 채팅마다 제목 아래에서 바꿀 수 있어요.</string>
     <string name="setup_agents_tap">에이전트가 Buddy 화면을 탭하도록 허용</string>
-    <string name="setup_agents_tap_info">에이전트로 Buddy를 테스트할 때 사용해요(예: 휴대전화 도구를 쓰는 Termux의 Claude Code). 버블, 승인 카드, ‘앱 권한’, 이 스위치들은 계속 조작할 수 없어요.</string>
+    <string name="setup_agents_tap_info">에이전트로 Buddy를 테스트하기 위한 설정입니다(예: Termux의 Claude Code와 휴대전화 도구). 켜면 에이전트가 채팅 목록, 채팅, 이 설정 화면을 사용할 수 있습니다. 에이전트가 무엇을 할 수 있는지 정하는 부분은 계속 사용자만 조작합니다: 버블, 승인 카드, Linux 도구, 채팅 옵션과 예약, 그리고 앱 권한·키·규칙·스킬·백그라운드 모드·백업 화면입니다.</string>
     <string name="setup_dev_mode_warning">평소에는 꺼 두고, 필요한 채팅에서만 Linux 도구를 켜세요. 켜 두면 화면에 표시된 악성 메시지나 웹페이지가 에이전트를 속여 명령을 실행하게 할 수 있어요. 보내기, 게시, 구매, 삭제는 여전히 승인 카드로 보호돼요.</string>
 
     <!-- Settings screen: footer links. -->
@@ -1277,7 +1277,6 @@
     <string name="browser_backspace">한 글자 지우기</string>
     <string name="bubble_browser_thumb">백그라운드 브라우저 실시간 화면. 탭하면 전체 화면으로 열립니다.</string>
     <string name="bubble_browser_thumb_hide">숨기기</string>
-    <string name="bubble_pill_show_page">%1$s · 탭하여 페이지 보기</string>
     <string name="browser_type_hint">페이지에 입력</string>
     <string name="browser_enter">Enter</string>
     <string name="browser_dialog">페이지의 질문: %1$s</string>
@@ -1377,6 +1376,14 @@
     <string name="background_remove_text">Buddy가 페어링 정보를 지우고 도우미를 중지해요. 채팅은 다시 실제 화면에서 작업해요.</string>
     <string name="background_default">새 채팅은 백그라운드에서 작업</string>
     <string name="background_default_info">채팅마다 채팅 옵션에 자체 스위치가 그대로 있어요.</string>
+    <string name="chat_bg_connected">연결됨</string>
+    <string name="chat_bg_disconnected">연결 안 됨</string>
+    <string name="chat_bg_not_set_up">설정 안 됨</string>
+    <string name="chat_bg_checking">확인 중…</string>
+    <string name="chat_bg_pair_again">다시 페어링</string>
+    <string name="chat_bg_more">설정 더 보기</string>
+    <string name="chat_bg_connected_info">백그라운드 채팅의 에이전트가 자체 화면에서 작업할 수 있습니다.</string>
+    <string name="chat_bg_setup_info">휴대전화를 사용하는 동안 에이전트가 자체 화면에서 앱을 다룹니다. 설정은 1분 정도 걸리며 Wi-Fi가 필요합니다.</string>
     <string name="background_security">‘무선 디버깅’을 켜면 페어링된 기기가 이 휴대전화를 제어할 수 있어요. Buddy는 이 휴대전화에서 자기 자신만 페어링하고, 도우미도 이 휴대전화 안의 연결만 받아요.</string>
     <string name="background_brought">내 화면으로 옮겼어요: 이 단계는 직접 해야 해요. 이제 이 채팅의 백그라운드 모드는 꺼졌어요.</string>
     <string name="chat_background">백그라운드에서 작업하기</string>

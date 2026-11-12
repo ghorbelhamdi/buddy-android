@@ -960,7 +960,7 @@
     <string name="setup_dev_mode">新しいチャットの Linux ツール</string>
     <string name="setup_dev_mode_info">Linux ツールを使うと、エージェントがコマンドの実行、パッケージのインストール、~/.buddy/work 内のファイル編集を行えるため、アプリのビルドもできます。新しいチャットはこの設定で始まり、各チャットのタイトルの下で変更できます。</string>
     <string name="setup_agents_tap">エージェントによる Buddy の画面操作を許可</string>
-    <string name="setup_agents_tap_info">エージェントを使って Buddy をテストするための設定です（例：スマートフォンツールを使う Termux の Claude Code）。バブル、承認カード、「アプリの権限」、これらのスイッチは引き続き操作できません。</string>
+    <string name="setup_agents_tap_info">エージェントで Buddy をテストするための設定です（例：Termux の Claude Code とスマートフォン用ツール）。オンにすると、エージェントはチャット一覧、チャット、この設定画面を操作できます。エージェントに何を許すかを決める部分は、引き続きあなただけが操作できます。吹き出し、承認カード、Linux ツール、チャットのオプションとスケジュール、アプリの権限・キー・ルール・スキル・バックグラウンドモード・バックアップの各画面です。</string>
     <string name="setup_dev_mode_warning">普段はオフにして、必要なチャットでだけ Linux ツールをオンにしてください。オンのときは、画面上の悪意のあるメッセージやウェブページが、エージェントをだましてコマンドを実行させようとするおそれがあります。送信、投稿、購入、削除は引き続き承認カードで保護されます。</string>
 
     <!-- Settings screen: footer links. -->
@@ -1278,7 +1278,6 @@
     <string name="browser_backspace">1 文字削除</string>
     <string name="bubble_browser_thumb">バックグラウンドブラウザのライブ表示。タップすると全画面で開きます。</string>
     <string name="bubble_browser_thumb_hide">非表示</string>
-    <string name="bubble_pill_show_page">%1$s · タップしてページを表示</string>
     <string name="browser_type_hint">ページに入力</string>
     <string name="browser_enter">Enter</string>
     <string name="browser_dialog">ページからの確認：%1$s</string>
@@ -1378,6 +1377,14 @@
     <string name="background_remove_text">Buddy はペア設定を破棄し、ヘルパーを停止します。チャットは再び実際の画面で作業します。</string>
     <string name="background_default">新しいチャットはバックグラウンドで作業する</string>
     <string name="background_default_info">チャットごとのスイッチは、これまでどおりチャットのオプションにあります。</string>
+    <string name="chat_bg_connected">接続中</string>
+    <string name="chat_bg_disconnected">未接続</string>
+    <string name="chat_bg_not_set_up">未設定</string>
+    <string name="chat_bg_checking">確認中…</string>
+    <string name="chat_bg_pair_again">もう一度ペア設定</string>
+    <string name="chat_bg_more">その他の設定</string>
+    <string name="chat_bg_connected_info">バックグラウンドのチャットのエージェントは専用の画面で作業できます。</string>
+    <string name="chat_bg_setup_info">スマホを使っている間、エージェントが専用の画面でアプリを操作します。セットアップは約1分で、Wi-Fi が必要です。</string>
     <string name="background_security">「ワイヤレス デバッグ」では、ペア設定したデバイスがこのスマートフォンを操作できます。Buddy がペア設定するのはこのスマートフォン上の Buddy 自身だけで、ヘルパーもこのスマートフォン内からの接続しか受け付けません。</string>
     <string name="background_brought">あなたの画面に移しました：この手順はあなたの操作が必要です。このチャットのバックグラウンド モードはオフになりました。</string>
     <string name="chat_background">バックグラウンドで作業する</string>

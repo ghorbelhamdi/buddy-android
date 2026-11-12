@@ -966,7 +966,7 @@
     <string name="setup_dev_mode">नई चैट में Linux टूल</string>
     <string name="setup_dev_mode_info">Linux टूल से एजेंट कमांड चला सकता है, पैकेज इंस्टॉल कर सकता है और ~/.buddy/work में फ़ाइलों में बदलाव कर सकता है, ताकि वह ऐप बना सके. नई चैट इसी सेटिंग के साथ शुरू होती हैं; हर चैट में इसे उसके टाइटल के नीचे बदला जा सकता है.</string>
     <string name="setup_agents_tap">एजेंट को Buddy की स्क्रीन पर टैप करने दें</string>
-    <string name="setup_agents_tap_info">किसी एजेंट के साथ Buddy की टेस्टिंग के लिए (जैसे, फ़ोन टूल के साथ Termux में Claude Code). बबल, मंज़ूरी कार्ड, ऐप अनुमतियां और ये स्विच उसकी पहुंच से बाहर रहते हैं.</string>
+    <string name="setup_agents_tap_info">किसी एजेंट के साथ Buddy को परखने के लिए (उदाहरण के लिए Termux में फ़ोन टूल के साथ Claude Code)। तब एजेंट चैट सूची, कोई चैट और यह सेटिंग स्क्रीन इस्तेमाल कर सकते हैं। जो कुछ भी तय करता है कि वे क्या कर सकते हैं, वह आपका ही रहता है: बबल, स्वीकृति कार्ड, Linux टूल, चैट विकल्प और शेड्यूल, और ऐप अनुमतियों, कुंजियों, नियमों, स्किल, बैकग्राउंड मोड और बैकअप की स्क्रीन।</string>
     <string name="setup_dev_mode_warning">इसे बंद रखना बेहतर है: Linux टूल सिर्फ़ उन चैट में चालू करें जिनमें उनकी ज़रूरत हो. इनके चालू रहने पर, स्क्रीन पर दिखने वाला कोई नुकसान पहुंचाने वाला मैसेज या वेब पेज, एजेंट को धोखे से कमांड चलाने के लिए उकसा सकता है. भेजने, पोस्ट करने, खरीदने और मिटाने से पहले मंज़ूरी कार्ड तब भी दिखते हैं.</string>
 
     <!-- Settings screen: footer links. -->
@@ -1285,7 +1285,6 @@
     <string name="browser_backspace">एक अक्षर मिटाएं</string>
     <string name="bubble_browser_thumb">बैकग्राउंड ब्राउज़र का लाइव व्यू। फ़ुल स्क्रीन में खोलने के लिए टैप करें।</string>
     <string name="bubble_browser_thumb_hide">छिपाएँ</string>
-    <string name="bubble_pill_show_page">%1$s · पेज देखने के लिए टैप करें</string>
     <string name="browser_type_hint">पेज में टाइप करें</string>
     <string name="browser_enter">Enter</string>
     <string name="browser_dialog">पेज पूछ रहा है: %1$s</string>
@@ -1386,6 +1385,14 @@
     <string name="background_remove_text">Buddy पेयरिंग भूल जाता है और अपना हेल्पर बंद कर देता है. चैट फिर से असली स्क्रीन पर काम करती हैं.</string>
     <string name="background_default">नई चैट बैकग्राउंड में काम करती हैं</string>
     <string name="background_default_info">हर चैट का अपना स्विच अब भी “चैट के विकल्प” में रहता है.</string>
+    <string name="chat_bg_connected">कनेक्ट है</string>
+    <string name="chat_bg_disconnected">कनेक्ट नहीं है</string>
+    <string name="chat_bg_not_set_up">सेट अप नहीं है</string>
+    <string name="chat_bg_checking">जाँच हो रही है…</string>
+    <string name="chat_bg_pair_again">फिर से पेयर करें</string>
+    <string name="chat_bg_more">और सेटिंग्स</string>
+    <string name="chat_bg_connected_info">बैकग्राउंड चैट के एजेंट अपनी अलग स्क्रीन पर काम कर सकते हैं।</string>
+    <string name="chat_bg_setup_info">जब आप फ़ोन इस्तेमाल करते हैं, तब एजेंट अपनी अलग स्क्रीन पर आपके ऐप्स में काम करता है। सेट-अप में लगभग एक मिनट लगता है और Wi-Fi चाहिए।</string>
     <string name="background_security">“वॉयरलेस डीबगिंग” से पेयर किए गए डिवाइस इस फ़ोन को कंट्रोल कर सकते हैं. Buddy सिर्फ़ खुद को पेयर करता है, इसी फ़ोन पर, और इसका हेल्पर सिर्फ़ यहीं सुनता है.</string>
     <string name="background_brought">आपकी स्क्रीन पर लाया गया: इस चरण के लिए आपकी ज़रूरत है. इस चैट के लिए बैकग्राउंड मोड अब बंद है.</string>
     <string name="chat_background">बैकग्राउंड में काम करें</string>

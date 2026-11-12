@@ -1302,7 +1302,7 @@
     <string name="setup_dev_mode_info">Con las herramientas de Linux, el agente puede ejecutar comandos, instalar paquetes y editar archivos en ~/.buddy/work, para crear apps. Los chats nuevos empiezan con este ajuste; cada chat puede cambiarlo bajo su título.</string>
     <string name="setup_agents_tap">Permitir que los agentes toquen las pantallas de Buddy</string>
     <!-- "App permissions" is the name of a screen in Buddy. -->
-    <string name="setup_agents_tap_info">Para probar Buddy con un agente (por ejemplo, Claude Code en Termux con las herramientas del teléfono). La burbuja, las tarjetas de aprobación, Permisos de apps y estas opciones siguen fuera de su alcance.</string>
+    <string name="setup_agents_tap_info">Para probar Buddy con un agente (por ejemplo, Claude Code en Termux con las herramientas del teléfono). Los agentes pueden usar entonces la lista de chats, un chat y esta pantalla de Ajustes. Todo lo que decide qué pueden hacer sigue siendo tuyo: la burbuja, las tarjetas de aprobación, las herramientas de Linux, las opciones del chat y las tareas programadas, y las pantallas de permisos de apps, claves, reglas, habilidades, modo en segundo plano y copia de seguridad.</string>
     <!-- Warning shown while Linux tools in new chats (setup_dev_mode) is on. -->
     <string name="setup_dev_mode_warning">Mejor déjalo desactivado y activa las herramientas de Linux solo en los chats que las necesiten. Cuando están activadas, un mensaje o una página web maliciosos en pantalla podrían intentar engañar al agente para que ejecute comandos. Las tarjetas de aprobación siguen protegiendo los envíos, las publicaciones, las compras y las eliminaciones.</string>
 
@@ -1724,7 +1724,6 @@
     <string name="browser_backspace">Borrar un carácter</string>
     <string name="bubble_browser_thumb">Vista en directo del navegador en segundo plano. Toca para abrirlo en pantalla completa.</string>
     <string name="bubble_browser_thumb_hide">Ocultar</string>
-    <string name="bubble_pill_show_page">%1$s · toca para ver la página</string>
     <string name="browser_type_hint">Escribe en la página</string>
     <string name="browser_enter">Intro</string>
     <string name="browser_dialog">La página pregunta: %1$s</string>
@@ -1825,6 +1824,14 @@
     <string name="background_remove_text">Buddy olvida el emparejamiento y detiene su ayudante. Los chats vuelven a trabajar en la pantalla real.</string>
     <string name="background_default">Los chats nuevos trabajan en segundo plano</string>
     <string name="background_default_info">Cada chat sigue teniendo su propio interruptor en Opciones del chat.</string>
+    <string name="chat_bg_connected">Conectado</string>
+    <string name="chat_bg_disconnected">Sin conexión</string>
+    <string name="chat_bg_not_set_up">Sin configurar</string>
+    <string name="chat_bg_checking">Comprobando…</string>
+    <string name="chat_bg_pair_again">Vincular de nuevo</string>
+    <string name="chat_bg_more">Más ajustes</string>
+    <string name="chat_bg_connected_info">Los agentes de los chats en segundo plano pueden trabajar en una pantalla propia.</string>
+    <string name="chat_bg_setup_info">Permite que un agente trabaje en tus apps en una pantalla propia mientras usas el teléfono. La configuración tarda un minuto y necesita Wi-Fi.</string>
     <string name="background_security">Depuración inalámbrica permite que los dispositivos emparejados controlen este teléfono. Buddy solo se empareja a sí mismo, en este teléfono, y su ayudante solo escucha aquí.</string>
     <string name="background_brought">Pasó a tu pantalla: este paso te necesita. El modo en segundo plano queda desactivado en este chat.</string>
     <string name="chat_background">Trabajar en segundo plano</string>

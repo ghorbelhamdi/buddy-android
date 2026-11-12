@@ -284,10 +284,7 @@ final class Bubble implements ChatHub.Listener {
         });
         pill.setOnClickListener(v -> { // paused, the pill is the Resume button
             if (svc.paused() && pendingConfirm == null) svc.resume();
-            else if (thumbTab != null && thumbTab.equals(thumbHidden)) { // browsing with the thumbnail swiped away: back
-                thumbHidden = null;
-                updateThumb();
-            } else expand();
+            else expand();
         });
 
         face.setOnTouchListener(new DragListener());
@@ -355,6 +352,20 @@ final class Bubble implements ChatHub.Listener {
         LinearLayout.LayoutParams ltp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         ltp.setMarginStart(dp(6));
         chips.addView(tag, ltp);
+        // background mode at a glance, as on the chat screen: green connected, red not; a tap connects or opens its sheet
+        LinearLayout bg = new LinearLayout(svc);
+        bg.setGravity(Gravity.CENTER_VERTICAL);
+        bg.setPaddingRelative(dp(7), dp(3), dp(7), dp(3));
+        bg.addView(Ui.dot(svc, Ui.MUTED, 7));
+        LinearLayout.LayoutParams bip = new LinearLayout.LayoutParams(dp(14), dp(14));
+        bip.setMarginStart(dp(4));
+        bg.addView(Ui.icon(svc, R.drawable.ms_layers, Ui.MUTED, 14), bip);
+        bg.setOnClickListener(v -> backgroundChipTapped());
+        bg.setVisibility(View.GONE);
+        bgChip = bg;
+        LinearLayout.LayoutParams bcp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        bcp.setMarginStart(dp(6));
+        chips.addView(bg, bcp);
         LinearLayout.LayoutParams chp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         chp.topMargin = dp(3);
         titles.addView(chips, chp);
@@ -2073,6 +2084,9 @@ final class Bubble implements ChatHub.Listener {
         subtitle.setText(Models.summary(ses));
         modelChip.setVisibility(showingList ? View.GONE : View.VISIBLE);
         linuxTag.setVisibility(!showingList && ses.dev ? View.VISIBLE : View.GONE);
+        bgChip.setVisibility(!showingList && Linux.installed(svc) ? View.VISIBLE : View.GONE);
+        paintBackgroundChip();
+        checkBackground(false);
         boolean working = !showingList && (ses.running || controlling);
         strip.setVisibility(working ? View.VISIBLE : View.GONE);
         stripText.setText(!ses.status.isEmpty() ? ses.status
@@ -2629,11 +2643,6 @@ final class Bubble implements ChatHub.Listener {
         activityBrowser = browserTab != null;
         activityTab = browserTab;
         activityAt = android.os.SystemClock.elapsedRealtime();
-        if (browserTab != null && browserTab.equals(thumbHidden)) {
-            // swiped away for the rest of the run: a step after a long break is a new one
-            if (activityAt - thumbHiddenAt > THUMB_RUN_GAP_MS) thumbHidden = null;
-            else thumbHiddenAt = activityAt;
-        }
         svc.mainHandler().removeCallbacks(activityExpired);
         svc.mainHandler().postDelayed(activityExpired, ACTIVITY_MS + 100);
         refreshStatus();
@@ -2667,9 +2676,6 @@ final class Bubble implements ChatHub.Listener {
             text = activity;
         }
         thumbTab = browsing && !paused && pendingConfirm == null ? activityTab : null;
-        // its thumbnail swiped away: tapping the pill brings it back, so the pill says so
-        if (thumbTab != null && thumbTab.equals(thumbHidden) && text != null)
-            text = svc.getString(R.string.bubble_pill_show_page, text);
         // working, but not on the screen (the background browser, Linux tools, thinking): the phone is the user's, so
         // the pill says so above the status and the ring is calm; on the screen (ControlIndicator) the look stays loud
         boolean background = !paused && !controlling && (running || browsing) && pendingConfirm == null;
@@ -2712,10 +2718,12 @@ final class Bubble implements ChatHub.Listener {
     private WindowManager.LayoutParams thumbLp;
     private BrowserThumb thumb;
     /** The tab the pill says an agent browses now, the one being watched, and the one the user swiped away (when). */
-    private String thumbTab, thumbWatching, thumbHidden;
-    private long thumbHiddenAt;
-    /** Browsing again after this long without a step is another run: its thumbnail shows again. */
-    private static final long THUMB_RUN_GAP_MS = 60_000;
+    private String thumbTab, thumbWatching;
+    /**
+     * Made tiny by the user (dragged off a side): the picture sits inside the pill, next to its text, until a tap on
+     * it brings it back. Kept (Prefs.thumbMini), so it starts the way the user last left it.
+     */
+    private boolean thumbMini;
 
     /**
      * A window of its own (in the bubble's, the space under the face beside it would take the app's touches), added
@@ -2738,12 +2746,75 @@ final class Bubble implements ChatHub.Listener {
             }
 
             @Override
-            public void dismiss() {
-                thumbHidden = thumbTab;
-                thumbHiddenAt = SystemClock.elapsedRealtime();
+            public void dismiss() { // not gone: tiny, in the pill
+                thumbMini = true;
+                Prefs.setThumbMini(svc, true);
                 updateThumb();
             }
+
+            @Override
+            public void restore() {
+                thumbMini = false;
+                Prefs.setThumbMini(svc, false);
+                updateThumb();
+            }
+
+            @Override
+            public void drag(float dx, float dy) {
+                if (!thumbDragging) { // taken from where it is now, wherever that was counted from
+                    int[] at = new int[2];
+                    thumbWindow.getLocationOnScreen(at);
+                    thumbDragX = at[0];
+                    thumbDragY = thumbLp.y;
+                    thumbDragging = true;
+                }
+                thumbLp.gravity = Gravity.TOP | Gravity.START;
+                thumbLp.x = Math.round(thumbDragX + dx);
+                thumbLp.y = Math.round(thumbDragY + dy);
+                try {
+                    wm.updateViewLayout(thumbWindow, thumbLp);
+                } catch (Exception ignored) {
+                }
+            }
+
+            @Override
+            public void drop(float dx, float dy, boolean cancelled) {
+                if (!thumbDragging) return;
+                thumbDragging = false;
+                Rect all = wm.getCurrentWindowMetrics().getBounds();
+                int x = Math.round(thumbDragX + dx), y = Math.round(thumbDragY + dy), mid = x + thumbLp.width / 2;
+                if (!cancelled && (mid < all.left || mid > all.right)) { // dragged off a side: hidden for this run
+                    dismiss();
+                    return;
+                }
+                int[] home = thumbHome(thumbLp.width);
+                if (home != null && Math.abs(x - home[0]) < dp(28) && Math.abs(y - home[1]) < dp(28)) {
+                    thumbX = thumbY = -1; // let go at its place under the pill: it goes with the bubble again
+                } else {
+                    thumbX = x / (float) Math.max(1, all.width());
+                    thumbY = y / (float) Math.max(1, all.height());
+                }
+                Prefs.setThumbPlace(svc, thumbX, thumbY);
+                updateThumb();
+            }
+
+            @Override
+            public void resize(int width) {
+                int full = usable().width();
+                if (full <= 0) return;
+                float scale = Math.max(THUMB_MIN, Math.min(THUMB_MAX, width / (float) full));
+                if (Math.abs(scale - thumbScale) < 0.004f) return;
+                thumbScale = scale;
+                placeThumb();
+                root.removeCallbacks(saveThumbScale); // kept once the finger rests
+                root.postDelayed(saveThumbScale, 400);
+            }
         });
+        thumbScale = Prefs.thumbScale(svc);
+        thumbMini = Prefs.thumbMini(svc);
+        float[] place = Prefs.thumbPlace(svc);
+        thumbX = place[0];
+        thumbY = place[1];
         thumbWindow.addView(thumb, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT));
         thumbWindow.setVisibility(View.GONE);
@@ -2764,11 +2835,12 @@ final class Bubble implements ChatHub.Listener {
     private void updateThumb() {
         if (thumbWindow == null) return;
         boolean moving = faceDragging() || (windowAnim != null && windowAnim.isRunning());
-        boolean on = thumbTab != null && !thumbTab.equals(thumbHidden) && !thumbTab.equals(BrowserActivity.front)
+        boolean on = thumbTab != null && !thumbTab.equals(BrowserActivity.front)
                 && !expanded && !locked && !moving && root.getVisibility() == View.VISIBLE
                 && pill.getVisibility() == View.VISIBLE
                 && (thumbTab.startsWith(Background.KEY) || Browser.available(svc));
         if (on) on = placeThumb();
+        if (!on || !thumbMini) pillRoom(0, false);
         thumbWindow.setVisibility(on ? View.VISIBLE : View.GONE);
         String want = on ? thumbTab : null;
         if (java.util.Objects.equals(want, thumbWatching)) return;
@@ -2805,22 +2877,86 @@ final class Bubble implements ChatHub.Listener {
      * Under the pill, on the bubble's side like the pill: about 40% of the screen's width at the page's shape, smaller
      * if it would run off the bottom. False: no room.
      */
+    /** The picture's width as a share of the screen's: the user's own (Prefs.thumbScale), within these. */
+    private static final float THUMB_MIN = 0.16f, THUMB_MAX = 0.62f;
+    private float thumbScale = 0.4f;
+    private final Runnable saveThumbScale = new Runnable() {
+        @Override
+        public void run() {
+            Prefs.setThumbScale(svc, thumbScale);
+        }
+    };
+
+    /** The user's own place for the picture (shares of the screen; x < 0: under the pill, with the bubble). */
+    private float thumbX = -1, thumbY = -1;
+    private boolean thumbDragging;
+    private float thumbDragX, thumbDragY;
+
+    /** Where the picture sits under the pill, as left and top from the screen's corner; null before the pill's layout. */
+    private int[] thumbHome(int w) {
+        if (pill.getHeight() == 0) return null;
+        boolean right = (lp.gravity & Gravity.HORIZONTAL_GRAVITY_MASK) == Gravity.END;
+        int fromEdge = lp.x + (right ? root.getWidth() - pill.getRight() : pill.getLeft());
+        int width = wm.getCurrentWindowMetrics().getBounds().width();
+        return new int[]{right ? width - fromEdge - w : fromEdge, lp.y + pill.getBottom() + dp(6)};
+    }
+
+    private int pillRoomPx;
+    private boolean pillRoomRight;
+
+    /** Room inside the pill, at one end, for the tiny picture (0: none): its text moves over. */
+    private void pillRoom(int px, boolean right) {
+        if (px == pillRoomPx && (px == 0 || right == pillRoomRight)) return;
+        pillRoomPx = px;
+        pillRoomRight = right;
+        pill.setMinHeight(px > 0 ? dp(48) : 0);
+        pill.setGravity(Gravity.CENTER_VERTICAL);
+        pill.setPadding(dp(12) + (right ? 0 : px), dp(8), dp(12) + (right ? px : 0), dp(8));
+    }
+
     private boolean placeThumb() {
+        if (thumbDragging) return true; // it follows the finger meanwhile
         if (pill.getHeight() == 0) return false; // not laid out yet: its layout listener comes back here
         Rect usable = usable();
         boolean right = (lp.gravity & Gravity.HORIZONTAL_GRAVITY_MASK) == Gravity.END;
+        thumb.setMini(thumbMini);
+        if (thumbMini) { // tiny, inside the pill at the end the full picture hangs from
+            int mh = dp(40), mw = mh * Browser.WIDTH / Browser.HEIGHT;
+            pillRoom(mw + dp(6), right);
+            thumbLp.width = mw;
+            thumbLp.height = mh;
+            thumbLp.gravity = Gravity.TOP | (right ? Gravity.END : Gravity.START);
+            thumbLp.x = lp.x + (right ? root.getWidth() - pill.getRight() : pill.getLeft()) + dp(6);
+            thumbLp.y = lp.y + pill.getTop() + Math.max(dp(3), (pill.getHeight() - mh) / 2);
+            try {
+                wm.updateViewLayout(thumbWindow, thumbLp);
+            } catch (Exception ignored) {
+            }
+            return true;
+        }
+        boolean free = thumbX >= 0;
         int[] loc = new int[2];
         root.getLocationOnScreen(loc);
         int below = pill.getBottom() + dp(6);
-        int w = Math.min(usable.width() * 2 / 5, (usable.bottom - loc[1] - below - dp(12)) * Browser.WIDTH / Browser.HEIGHT);
-        if (w < dp(72)) return false;
+        int room = free ? usable.height() - dp(12) : usable.bottom - loc[1] - below - dp(12);
+        int w = Math.min(Math.round(usable.width() * thumbScale), room * Browser.WIDTH / Browser.HEIGHT);
+        if (w < dp(56)) return false;
         int h = w * Browser.HEIGHT / Browser.WIDTH;
         thumbLp.width = w;
         thumbLp.height = h;
-        thumbLp.gravity = Gravity.TOP | (right ? Gravity.END : Gravity.START);
-        // the pill's edge by the face: from the window's right edge when the bubble is on the right
-        thumbLp.x = lp.x + (right ? root.getWidth() - pill.getRight() : pill.getLeft());
-        thumbLp.y = lp.y + below;
+        if (free) { // where the user put it, kept on the screen
+            Rect all = wm.getCurrentWindowMetrics().getBounds();
+            thumbLp.gravity = Gravity.TOP | Gravity.START;
+            thumbLp.x = Math.max(usable.left, Math.min(usable.right - w, Math.round(thumbX * all.width())));
+            thumbLp.y = Math.max(0, Math.min(usable.bottom - usable.top - h, Math.round(thumbY * all.height())));
+            thumb.setGripLeft(false);
+        } else {
+            thumb.setGripLeft(right);
+            thumbLp.gravity = Gravity.TOP | (right ? Gravity.END : Gravity.START);
+            // the pill's edge by the face: from the window's right edge when the bubble is on the right
+            thumbLp.x = lp.x + (right ? root.getWidth() - pill.getRight() : pill.getLeft());
+            thumbLp.y = lp.y + below;
+        }
         try {
             wm.updateViewLayout(thumbWindow, thumbLp);
         } catch (Exception ignored) {
@@ -3197,6 +3333,51 @@ final class Bubble implements ChatHub.Listener {
     private View modelChip;
     /** The Linux tools tag beside the model chip, while the chat has them (switched in the app's chat screen). */
     private View linuxTag;
+    private LinearLayout bgChip;
+    /** -1 not asked yet, 0 not set up, 1 paired but its helper isn't running, 2 connected (as in ChatActivity). */
+    private volatile int bgState = -1;
+    private long bgCheckedAt;
+
+    private void checkBackground(boolean now) {
+        long t = SystemClock.elapsedRealtime();
+        if (!now && t - bgCheckedAt < 4000) return;
+        bgCheckedAt = t;
+        new Thread(() -> {
+            int st = !Background.setUp(svc) ? 0 : Background.alive(svc) ? 2 : 1;
+            svc.runOnMain(() -> {
+                bgState = st;
+                paintBackgroundChip();
+            });
+        }).start();
+    }
+
+    private void paintBackgroundChip() {
+        if (bgChip == null) return;
+        Sessions.Session ses = sessions.current;
+        boolean on = ses != null && ses.background && bgState != 0;
+        bgChip.getChildAt(0).setBackground(Ui.oval(bgState == 2 ? Ui.OK : bgState == 1 ? Ui.ERR : Ui.MUTED));
+        ((ImageView) bgChip.getChildAt(1)).setImageTintList(android.content.res.ColorStateList.valueOf(on ? Ui.ACCENT_TEXT : Ui.MUTED));
+        bgChip.setBackground(Ui.rounded(svc, on ? Ui.ACCENT_SOFT : Ui.CARD, 14));
+        bgChip.setContentDescription(svc.getString(R.string.background_title) + ": " + svc.getString(
+                bgState == 2 ? R.string.chat_bg_connected : bgState == 1 ? R.string.chat_bg_disconnected
+                        : bgState == 0 ? R.string.chat_bg_not_set_up : R.string.chat_bg_checking));
+    }
+
+    /**
+     * Opens the chat with its Background mode sheet, which connects by itself when the helper isn't running (connecting
+     * may walk Settings, which can't happen under the open bubble).
+     */
+    private void backgroundChipTapped() {
+        openBackgroundSheet();
+    }
+
+    private void openBackgroundSheet() {
+        if (sessions.current == null) return;
+        svc.startActivity(new android.content.Intent(svc, ChatActivity.class).putExtra("id", sessions.current.id)
+                .putExtra("background", true).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                        | android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP));
+        collapse();
+    }
     private LinearLayout strip;
 
     /** A small header icon (20dp glyph in a 36dp target), in the app's muted style. */
@@ -3345,18 +3526,23 @@ final class Bubble implements ChatHub.Listener {
                         face.removeCallbacks(hold);
                         holdRing.cancel();
                         dragging = true;
-                        // Switch to left-anchored coordinates for free dragging.
+                        // Switch to left-anchored coordinates for free dragging. On the right the bubble is laid out
+                        // mirrored (face at the window's right end, the status line to its left); unmirrored, the face
+                        // sits at the left end. The window is placed so the face stays under the finger: with the
+                        // status line showing, it used to jump left by that line's width.
                         int[] loc = new int[2];
                         face.getLocationOnScreen(loc);
-                        lp.gravity = Gravity.TOP | Gravity.START;
-                        collapsed.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
-                        startX = loc[0];
-                        // where the face's centre is relative to the window position, in screen pixels
                         int[] rootLoc = new int[2];
                         root.getLocationOnScreen(rootLoc);
-                        faceOffX = loc[0] - rootLoc[0] + face.getWidth() / 2;
+                        boolean mirrored = collapsed.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
+                        int faceLeft = loc[0] - rootLoc[0];
+                        if (mirrored) faceLeft = Math.max(0, root.getWidth() - faceLeft - face.getWidth());
+                        lp.gravity = Gravity.TOP | Gravity.START;
+                        collapsed.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
+                        // where the face's centre is relative to the window position, in screen pixels
+                        faceOffX = faceLeft + face.getWidth() / 2;
                         faceOffY = loc[1] - rootLoc[1] + face.getHeight() / 2;
-                        startX = rootLoc[0];
+                        startX = loc[0] - faceLeft;
                         lpToScreenY = rootLoc[1] - startY; // window y vs screen y (status bar, insets)
                         if (windowAnim != null) windowAnim.cancel();
                         showFace(R.drawable.bubble_face_fired);
@@ -3409,7 +3595,9 @@ final class Bubble implements ChatHub.Listener {
                         setWorking(!svc.paused() && (running || controlling), true);
                         // fling to the nearest edge with a little bounce
                         final boolean right = lp.x + faceOffX > screen().width() / 2;
-                        int edgeX = right ? screen().width() - root.getWidth() - dp(6) : dp(6);
+                        // on the right it is mirrored again at the end: the window goes where the face will be then,
+                        // whatever else (the status line) makes it wider than the face
+                        int edgeX = right ? screen().width() - dp(6) - 2 * faceOffX : dp(6);
                         final int y = Math.max(dp(40), Math.min(lp.y, screen().height() - dp(160)));
                         animateWindowTo(edgeX, y, 340, new OvershootInterpolator(1.4f), () -> {
                             Prefs.saveBubblePos(svc, right ? 1 : 0, lp.y);

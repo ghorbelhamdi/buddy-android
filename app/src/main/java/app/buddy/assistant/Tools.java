@@ -437,18 +437,18 @@ final class Tools {
                 return text("Waited " + ms + " ms.");
             }
             case "confirm": {
-                if (!ruleRun() && Guard.autonomous(svc, svc.foregroundPkg())) {
+                if (!ruleRun() && Guard.autonomous(svc, frontPkg())) {
                     // no card in an app the user trusts; not counted as approval for a tap in another app
-                    return text("APPROVED automatically: the user trusts " + svc.foregroundAppName() + ", so work on "
+                    return text("APPROVED automatically: the user trusts " + frontName() + ", so work on "
                             + "your own there without calling confirm. Apps on Hard or Smart still ask the user.");
                 }
                 String summary = a.getString("summary");
-                if (!ruleRun() && Guard.routineText(summary) && Guard.runRule(svc, svc.foregroundPkg())) {
+                if (!ruleRun() && Guard.routineText(summary) && Guard.runRule(svc, frontPkg())) {
                     // the user allowed this app until the run ends: as after a countdown, it covers sending, nothing more
                     Guard.approved(summary, true);
                     noteInChat(McpServer.CALLER_CHAT.get(), svc.getString(R.string.run_rule_approved, summary));
                     return text("APPROVED by the user's rule for this run: they allowed routine steps in "
-                            + svc.foregroundAppName() + " without asking. Go ahead with this, and only this. Paying, "
+                            + frontName() + " without asking. Go ahead with this, and only this. Paying, "
                             + "buying, deleting, installing, passwords and security settings still need their OK.");
                 }
                 String answer = svc.askConfirm(summary, true);
@@ -1195,7 +1195,7 @@ final class Tools {
             if (!text.isEmpty()) ok = joined.contains(text.toLowerCase(Locale.ROOT));
             if (ok && !gone.isEmpty()) ok = !joined.contains(gone.toLowerCase(Locale.ROOT));
             if (ok && !app.isEmpty()) {
-                String pkg = svc.foregroundPkg(), name = svc.foregroundAppName();
+                String pkg = frontPkg(), name = frontName();
                 ok = app.equals(pkg) || (name != null && name.toLowerCase(Locale.ROOT).contains(app.toLowerCase(Locale.ROOT)));
             }
             long t = android.os.SystemClock.elapsedRealtime();
@@ -1209,7 +1209,7 @@ final class Tools {
                 return String.format(Locale.ROOT, "TIMED OUT after %.1f s: %s", (t - start) / 1000.0,
                         !text.isEmpty() && !joined.contains(text.toLowerCase(Locale.ROOT)) ? "\"" + text + "\" didn't appear."
                                 : !gone.isEmpty() && joined.contains(gone.toLowerCase(Locale.ROOT)) ? "\"" + gone + "\" is still there."
-                                : !app.isEmpty() ? app + " isn't in front (" + svc.foregroundAppName() + " is)." : "the screen kept changing.");
+                                : !app.isEmpty() ? app + " isn't in front (" + frontName() + " is)." : "the screen kept changing.");
             }
             Thread.sleep(250);
         }
@@ -1237,7 +1237,7 @@ final class Tools {
             JSONObject st = steps.getJSONObject(i);
             String action = st.optString("action");
             String tool = "type".equals(action) ? "type_text" : action;
-            String before = svc.foregroundPkg();
+            String before = frontPkg();
             String held = svc.awaitResume(tool);
             if (held != null) {
                 out.append(i + 1).append(". stopped: ").append(held).append('\n');
@@ -1323,10 +1323,10 @@ final class Tools {
             out.append('\n');
             if (stop) break;
             done++;
-            String after = svc.foregroundPkg();
+            String after = frontPkg();
             if (!"open_app".equals(action) && !"press".equals(action) && after != null && before != null && !after.equals(before)
                     && i + 1 < steps.length()) {
-                out.append("Stopped: ").append(svc.foregroundAppName()).append(" came to the front.\n");
+                out.append("Stopped: ").append(frontName()).append(" came to the front.\n");
                 break;
             }
         }
@@ -1341,7 +1341,7 @@ final class Tools {
         if (a.has("element")) sc.put("element", a.getInt("element"));
         java.util.LinkedHashSet<String> seen = new java.util.LinkedHashSet<>();
         List<List<String>> pages = new ArrayList<>(); // in screen order; reversed at the end when going up
-        String app = svc.foregroundPkg();
+        String app = frontPkg();
         int scrolls = 0, quiet = 0;
         for (List<String> page = visibleTexts(); ; page = visibleTexts()) {
             List<String> fresh = new ArrayList<>();
@@ -1349,7 +1349,7 @@ final class Tools {
             pages.add(fresh);
             quiet = fresh.isEmpty() ? quiet + 1 : 0;
             if (quiet >= 2 || scrolls >= max || seen.size() > 1500) break;
-            if (app != null && !app.equals(svc.foregroundPkg())) break;
+            if (app != null && !app.equals(frontPkg())) break;
             String capped = countStep("scroll", sc);
             if (capped != null) return capped;
             String r = scroll(sc);
@@ -1554,7 +1554,7 @@ final class Tools {
             return "BLOCKED: a card is waiting for the user's answer. Wait for it; don't tap anything.";
         }
         if (Guard.offLimits(svc, hit) || (element != null && Guard.offLimits(svc, element))) {
-            return "BLOCKED: that's one of Buddy's own screens. Only the user taps those.";
+            return ownScreen("taps");
         }
         AccessibilityNodeInfo target = element != null ? element : hit;
         if (target == null) return null;
@@ -1562,7 +1562,7 @@ final class Tools {
         String mode = mode(pkg);
         if ("trust".equals(mode)) return null;
         String label = Guard.buttonLabel(target);
-        String app = svc.foregroundAppName();
+        String app = frontName();
         Guard.remember(svc, label, pkg, app);
         if (!ruleRun() && Guard.listed(svc, "allow", label, pkg)) return null; // the user said: never ask for this one
         AccessibilityNodeInfo field = findFocusedInput();
@@ -1587,7 +1587,7 @@ final class Tools {
      */
     private String review(String what, java.util.function.Function<String, String> card, AccessibilityNodeInfo target,
                           String draft) throws InterruptedException {
-        String app = svc.foregroundAppName();
+        String app = frontName();
         final String[][] ctx = new String[1][];
         final CountDownLatch got = new CountDownLatch(1);
         svc.runOnMain(() -> {
@@ -1629,7 +1629,7 @@ final class Tools {
                                boolean byRule) throws InterruptedException {
         // a send's detail is the message itself: an approval for another text doesn't cover it (a card asks instead)
         if (Guard.takeApproval(send, send ? detail : null)) return null;
-        String app = svc.foregroundAppName();
+        String app = frontName();
         if (byRule) {
             noteInChat(McpServer.CALLER_CHAT.get(), svc.getString(R.string.run_rule_approved, card.apply(app)));
             return null;
@@ -1642,6 +1642,39 @@ final class Tools {
         if (answer.startsWith("CHANGES")) return "Not tapped: the user wants changes first. " + answer;
         return "BLOCKED by Buddy's safety rule: the user did not approve “" + what + "”. Don't retry it; "
                 + "ask the user what they want.";
+    }
+
+    /**
+     * Why a touch on Buddy itself didn't happen. With "Let agents tap Buddy's screens" on, only some parts are still
+     * the user's: the answer says so, or the agent takes the whole of Buddy for forbidden (issue #33).
+     */
+    private String ownScreen(String verb) {
+        if (!Prefs.agentsTapBuddy(svc)) return "BLOCKED: that's one of Buddy's own screens. Only the user " + verb + " those.";
+        return "BLOCKED: this part of Buddy stays the user's own, also with \"Let agents tap Buddy's screens\" on: the "
+                + "bubble, approval cards, the Linux tools chip, Chat options and schedules, and the settings screens for "
+                + "permissions, keys, rules, skills, background mode and backup. Only the user " + verb + " those. Other "
+                + "parts of Buddy (the Chats list, a chat, the main Settings screen) are open to you.";
+    }
+
+    /**
+     * The app the calling chat works in: the one on its own screen for a background chat, else the one in front on
+     * the phone's screen. Never the user's own app for a background chat: its name stood on approval cards (a shop's
+     * button "in" the game the user was playing), and its Trust setting decided what the agent's app may do.
+     */
+    private String frontPkg() {
+        return background() ? Background.appOn(svc, McpServer.CALLER_CHAT.get()) : svc.foregroundPkg();
+    }
+
+    private String frontName() {
+        if (!background()) return svc.foregroundAppName();
+        String pkg = frontPkg();
+        if (pkg == null) return null;
+        try {
+            android.content.pm.PackageManager pm = svc.getPackageManager();
+            return pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)).toString();
+        } catch (Exception e) {
+            return pkg;
+        }
     }
 
     private static String str(CharSequence s) {
@@ -1663,7 +1696,7 @@ final class Tools {
         if (target == null) target = findFocusedInput();
         if (target == null)
             throw new IllegalStateException("No text field is focused. Tap the text field first, then type.");
-        if (Guard.offLimits(svc, target)) return "BLOCKED: that's Buddy's own screen. Only the user types there.";
+        if (Guard.offLimits(svc, target)) return ownScreen("types in");
         if (!target.isFocused()) target.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
         String value = text;
         CharSequence cur = target.isShowingHintText() ? null : target.getText();
@@ -1820,7 +1853,7 @@ final class Tools {
         boolean off = element != null && Guard.offLimits(svc, element);
         List<AccessibilityWindowInfo> windows = windows();
         for (int i = 0; !off && i + 1 < xy.length; i += 2) off = Guard.offLimits(svc, Guard.nodeAt(windows, xy[i], xy[i + 1]));
-        return off ? "BLOCKED: that's one of Buddy's own screens. Only the user touches those." : null;
+        return off ? ownScreen("touches") : null;
     }
 
     /** A finger's path that also remembers its points: the helper of background mode takes points, not a Path. */

@@ -1375,7 +1375,7 @@
     <string name="setup_dev_mode_info">Công cụ Linux cho agent chạy lệnh, cài gói và sửa tệp trong ~/.buddy/work, nên nó có thể dựng ứng dụng. Các cuộc trò chuyện mới bắt đầu với cài đặt này; mỗi cuộc trò chuyện có thể đổi nó dưới tiêu đề.</string>
     <string name="setup_agents_tap">Cho agent nhấn vào màn hình của Buddy</string>
     <!-- "App permissions" is the name of a screen in Buddy. -->
-    <string name="setup_agents_tap_info">Để thử Buddy bằng một agent (ví dụ Claude Code trong Termux có công cụ điện thoại). Bong bóng, thẻ duyệt, Quyền ứng dụng và các công tắc này vẫn bị cấm chạm.</string>
+    <string name="setup_agents_tap_info">Để thử Buddy với một tác nhân (ví dụ Claude Code trong Termux với các công cụ điện thoại). Khi đó các tác nhân có thể dùng danh sách trò chuyện, một cuộc trò chuyện và màn hình Cài đặt này. Mọi thứ quyết định chúng được làm gì vẫn là của bạn: bong bóng, thẻ phê duyệt, công cụ Linux, tùy chọn trò chuyện và lịch, cùng các màn hình quyền ứng dụng, khóa, quy tắc, kỹ năng, chế độ nền và sao lưu.</string>
     <!-- Warning shown while Linux tools in new chats (setup_dev_mode) is on. -->
     <string name="setup_dev_mode_warning">Tốt nhất nên tắt: chỉ bật công cụ Linux trong những cuộc trò chuyện cần đến. Khi bật, một tin nhắn hoặc trang web độc hại trên màn hình có thể tìm cách lừa agent chạy lệnh. Thẻ duyệt vẫn bảo vệ việc gửi, đăng, mua và xóa.</string>
 
@@ -1852,7 +1852,6 @@
     <!-- The small live picture of the browser under the bubble's status while an agent browses (for screen readers), and the action that hides it (a sideways swipe does too). -->
     <string name="bubble_browser_thumb">Hình trực tiếp của trình duyệt nền. Nhấn để mở toàn màn hình.</string>
     <string name="bubble_browser_thumb_hide">Ẩn</string>
-    <string name="bubble_pill_show_page">%1$s · nhấn để xem trang</string>
     <!-- Hint of the text field under the page: what the user types goes into the page. -->
     <string name="browser_type_hint">Gõ vào trang</string>
     <!-- Button: the keyboard's Enter key, for the page. -->
@@ -1967,6 +1966,14 @@
     <string name="background_remove_text">Buddy sẽ quên ghép nối và dừng trình trợ giúp. Các cuộc trò chuyện lại làm việc trên màn hình thật.</string>
     <string name="background_default">Cuộc trò chuyện mới làm việc ở chế độ nền</string>
     <string name="background_default_info">Mỗi cuộc trò chuyện vẫn có công tắc riêng trong Tùy chọn trò chuyện.</string>
+    <string name="chat_bg_connected">Đã kết nối</string>
+    <string name="chat_bg_disconnected">Chưa kết nối</string>
+    <string name="chat_bg_not_set_up">Chưa thiết lập</string>
+    <string name="chat_bg_checking">Đang kiểm tra…</string>
+    <string name="chat_bg_pair_again">Ghép nối lại</string>
+    <string name="chat_bg_more">Cài đặt khác</string>
+    <string name="chat_bg_connected_info">Tác nhân trong các cuộc trò chuyện nền có thể làm việc trên màn hình riêng.</string>
+    <string name="chat_bg_setup_info">Cho phép tác nhân làm việc trong ứng dụng của bạn trên màn hình riêng trong khi bạn dùng điện thoại. Thiết lập mất khoảng một phút và cần Wi-Fi.</string>
     <string name="background_security">Gỡ lỗi qua Wi-Fi cho phép các thiết bị đã ghép nối điều khiển điện thoại này. Buddy chỉ ghép nối chính nó, ngay trên điện thoại này, và trình trợ giúp của nó chỉ nhận kết nối tại đây.</string>
     <string name="background_brought">Đã chuyển sang màn hình của bạn: bước này cần bạn. Chế độ nền hiện đã tắt cho cuộc trò chuyện này.</string>
     <string name="chat_background">Làm việc ở chế độ nền</string>

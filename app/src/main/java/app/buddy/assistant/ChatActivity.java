@@ -105,6 +105,20 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         LinearLayout.LayoutParams lp = wrap();
         lp.setMarginStart(dp(this, 6));
         chips.addView(linux, lp);
+        // background mode at a glance: a dot says whether its helper is connected; a tap connects or sets it up from here
+        bgChip = protect(row(this)); // only the user connects, pairs or switches it
+        bgChip.setGravity(Gravity.CENTER_VERTICAL);
+        bgChip.setPaddingRelative(dp(this, 7), dp(this, 3), dp(this, 7), dp(this, 3));
+        bgChip.addView(dot(this, MUTED, 7));
+        ImageView bgIcon = icon(this, R.drawable.ms_layers, MUTED, 14);
+        LinearLayout.LayoutParams bip = new LinearLayout.LayoutParams(dp(this, 14), dp(this, 14));
+        bip.setMarginStart(dp(this, 4));
+        bgChip.addView(bgIcon, bip);
+        bgChip.setOnClickListener(v -> backgroundSheet());
+        bgChip.setVisibility(Linux.installed(this) ? View.VISIBLE : View.GONE);
+        LinearLayout.LayoutParams bcp = wrap();
+        bcp.setMarginStart(dp(this, 6));
+        chips.addView(bgChip, bcp);
         LinearLayout.LayoutParams cp = wrap();
         cp.topMargin = dp(this, 3);
         titles.addView(chips, cp);
@@ -352,6 +366,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         }
         // from the bubble's attach button, or images pasted there (already copied into Buddy's storage)
         if (state == null && getIntent().getBooleanExtra("attach", false)) input.post(this::attachSheet);
+        if (state == null && getIntent().getBooleanExtra("background", false)) {
+            bgConnectOnOpen = true; // from the bubble's dot: connect right away when it isn't
+            input.postDelayed(this::backgroundSheet, 250);
+        }
         java.util.ArrayList<String> files = getIntent().getStringArrayListExtra("files");
         if (state == null && files != null) {
             pending.addAll(files);
@@ -690,6 +708,178 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         c.addView(other, full());
         d[0] = bottomSheet(this, c);
         d[0].show();
+    }
+
+    // ------------------------------------------------------ background mode, from the chat
+
+    private LinearLayout bgChip;
+    /** -1 not asked yet, 0 not set up, 1 paired but its helper isn't running, 2 connected. */
+    private volatile int bgState = -1;
+    private long bgCheckedAt;
+    private Runnable bgSheetUpdate;
+    private boolean bgConnectOnOpen;
+
+    /** Asks the helper (off the main thread) and repaints the chip; at most every 4 s unless now. */
+    private void checkBackground(boolean now) {
+        long t = android.os.SystemClock.elapsedRealtime();
+        if (!now && t - bgCheckedAt < 4000) return;
+        bgCheckedAt = t;
+        new Thread(() -> {
+            int st = !Background.setUp(this) ? 0 : Background.alive(this) ? 2 : 1;
+            runOnUiThread(() -> {
+                bgState = st;
+                paintBackgroundChip();
+                if (bgSheetUpdate != null) bgSheetUpdate.run();
+            });
+        }).start();
+    }
+
+    private int backgroundColor() {
+        return bgState == 2 ? OK : bgState == 1 ? ERR : MUTED;
+    }
+
+    private String backgroundStatus() {
+        return getString(bgState == 2 ? R.string.chat_bg_connected : bgState == 1 ? R.string.chat_bg_disconnected
+                : bgState == 0 ? R.string.chat_bg_not_set_up : R.string.chat_bg_checking);
+    }
+
+    private void paintBackgroundChip() {
+        if (bgChip == null) return;
+        boolean on = ses.background && bgState != 0;
+        bgChip.getChildAt(0).setBackground(oval(backgroundColor()));
+        ((ImageView) bgChip.getChildAt(1)).setImageTintList(ColorStateList.valueOf(on ? ACCENT_TEXT : MUTED));
+        bgChip.setBackground(rounded(this, on ? ACCENT_SOFT : CARD, 14));
+        bgChip.setContentDescription(getString(R.string.background_title) + ": " + backgroundStatus());
+    }
+
+    /** Background mode from the chat: its state, this chat's switch, and Connect / Set up / Pair again. */
+    private void backgroundSheet() {
+        LinearLayout c = protect(column(this));
+        c.addView(title(this, getString(R.string.background_title), 18));
+        LinearLayout st = row(this);
+        st.setGravity(Gravity.CENTER_VERTICAL);
+        st.setPaddingRelative(0, dp(this, 12), 0, 0);
+        final View d = dot(this, MUTED, 10);
+        st.addView(d);
+        final TextView status = text(this, "", 15, TEXT);
+        status.setPaddingRelative(dp(this, 10), 0, 0, 0);
+        st.addView(status, weight1());
+        c.addView(st, full());
+        final TextView info = text(this, "", 13, MUTED);
+        info.setPaddingRelative(0, dp(this, 6), 0, 0);
+        c.addView(info, full());
+        final LinearLayout sw = switchRow(this, getString(R.string.chat_background), getString(R.string.chat_background_info),
+                ses.background, on -> hub.setBackground(ses, on));
+        sw.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 4));
+        c.addView(sw, full());
+        final Button act = button(this, "", true);
+        LinearLayout.LayoutParams ap = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(this, 48));
+        ap.topMargin = dp(this, 14);
+        c.addView(act, ap);
+        final Button pair = button(this, getString(R.string.chat_bg_pair_again), false);
+        LinearLayout.LayoutParams pp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(this, 48));
+        pp.topMargin = dp(this, 8);
+        pair.setVisibility(View.GONE);
+        c.addView(pair, pp);
+        final Button more = button(this, getString(R.string.chat_bg_more), false);
+        LinearLayout.LayoutParams mp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(this, 48));
+        mp.topMargin = dp(this, 8);
+        c.addView(more, mp);
+        final Dialog sheet = bottomSheet(this, c);
+        final boolean[] busy = {false};
+        final String[] failed = {null};
+        bgSheetUpdate = () -> {
+            d.setBackground(oval(backgroundColor()));
+            Background.Step step = Background.step();
+            status.setText(!busy[0] ? backgroundStatus() : getString(step == Background.Step.INSTALLING ? R.string.background_installing
+                    : step == Background.Step.WAITING ? R.string.background_waiting
+                    : step == Background.Step.PAIRING ? R.string.background_pairing : R.string.background_starting));
+            if (failed[0] != null && bgState != 2) {
+                info.setText(getString(R.string.background_failed, failed[0]));
+                info.setTextColor(ERR);
+            } else {
+                info.setText(bgState == 2 ? getString(R.string.chat_bg_connected_info)
+                        : bgState == 1 ? getString(R.string.background_asleep)
+                        : bgState == 0 ? getString(R.string.chat_bg_setup_info) : "");
+                info.setTextColor(MUTED);
+            }
+            sw.setVisibility(bgState > 0 ? View.VISIBLE : View.GONE);
+            act.setText(bgState == 0 ? R.string.background_setup : R.string.background_start_now);
+            act.setVisibility(bgState == 0 || bgState == 1 ? View.VISIBLE : View.GONE);
+            if (busy[0]) pair.setVisibility(View.GONE);
+            act.setEnabled(!busy[0]);
+            if (bgConnectOnOpen && bgState >= 0 && !busy[0]) { // opened from the bubble's dot: one tap connects
+                bgConnectOnOpen = false;
+                if (bgState == 1) act.performClick();
+            }
+        };
+        final Runnable toChat = () -> { // Buddy walked Settings for it: back to this chat, not to a settings screen
+            BuddyService svc = BuddyService.get();
+            if (svc != null && !hasWindowFocus()) svc.runOnMain(() -> svc.startActivity(
+                    new android.content.Intent(svc, ChatActivity.class).putExtra("id", ses.id)
+                            .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                                    | android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+                                    | android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP)));
+        };
+        Runnable setUp = () -> { // set up or pair again from here: the sheet says the step, and the chat comes back at the end
+            BuddyService svc = BuddyService.get();
+            if (svc == null) {
+                Toast.makeText(this, R.string.background_needs_service, Toast.LENGTH_LONG).show();
+                return;
+            }
+            busy[0] = true;
+            failed[0] = null;
+            pair.setVisibility(View.GONE);
+            Background.listen(() -> runOnUiThread(() -> {
+                Background.Step s = Background.step();
+                if (isDestroyed()) { // the chat was closed meanwhile: the set-up goes on by itself
+                    Background.listen(null);
+                    return;
+                }
+                if (s == Background.Step.READY || s == Background.Step.FAILED || s == Background.Step.IDLE) {
+                    Background.listen(null);
+                    busy[0] = false;
+                    failed[0] = s == Background.Step.FAILED ? Background.detail() : null;
+                    if (s == Background.Step.FAILED) pair.setVisibility(View.VISIBLE);
+                    toChat.run();
+                    checkBackground(true);
+                }
+                if (bgSheetUpdate != null) bgSheetUpdate.run();
+            }));
+            Background.beginSetup(svc);
+            bgSheetUpdate.run();
+        };
+        act.setOnClickListener(v -> {
+            if (bgState == 0) {
+                setUp.run();
+                return;
+            }
+            busy[0] = true;
+            failed[0] = null;
+            pair.setVisibility(View.GONE);
+            bgSheetUpdate.run();
+            new Thread(() -> {
+                final String why = Background.start(this, true);
+                toChat.run();
+                runOnUiThread(() -> {
+                    busy[0] = false;
+                    failed[0] = why;
+                    // the pairing is gone (Wireless debugging forgot Buddy): pairing again is one tap from here
+                    pair.setVisibility(why != null && why.contains("paired") ? View.VISIBLE : View.GONE);
+                    bgSheetUpdate.run();
+                    checkBackground(true);
+                });
+            }).start();
+        });
+        pair.setOnClickListener(v -> setUp.run());
+        more.setOnClickListener(v -> {
+            sheet.dismiss();
+            startActivity(new android.content.Intent(this, BackgroundActivity.class));
+        });
+        sheet.setOnDismissListener(x -> bgSheetUpdate = null);
+        bgSheetUpdate.run();
+        sheet.show();
+        checkBackground(true);
     }
 
     /**
@@ -1342,6 +1532,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         usage.setContentDescription(Usage.shortLine(this, ses.backend));
         usage.setVisibility(used < 0 ? View.GONE : View.VISIBLE);
         if (linux != null) paintLinuxChip(this, linux, ses.dev);
+        paintBackgroundChip();
+        checkBackground(false);
         options.setImageTintList(ColorStateList.valueOf(ses.awake || ses.schedule != null || !ses.allowed.isEmpty() ? ACCENT : MUTED));
         if (hint != null) hint.setText(hintText());
         strip.setVisibility(ses.running ? View.VISIBLE : View.GONE);

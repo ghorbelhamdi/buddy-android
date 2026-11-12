@@ -1392,7 +1392,7 @@
     <string name="setup_dev_mode_info">Linux tools let the agent run commands, install packages and edit files in ~/.buddy/work, so it can build apps. New chats start with this setting; each chat can change it under its title.</string>
     <string name="setup_agents_tap">Let agents tap Buddy\'s screens</string>
     <!-- "App permissions" is the name of a screen in Buddy. -->
-    <string name="setup_agents_tap_info">For testing Buddy with an agent (for example Claude Code in Termux with the phone tools). The bubble, approval cards, App permissions and these switches stay off-limits.</string>
+    <string name="setup_agents_tap_info">For testing Buddy with an agent (for example Claude Code in Termux with the phone tools). Agents can then use the Chats list, a chat and this Settings screen. Everything that decides what they may do stays yours: the bubble, approval cards, Linux tools, Chat options and schedules, and the screens for App permissions, keys, rules, skills, background mode and backup.</string>
     <!-- Warning shown while Linux tools in new chats (setup_dev_mode) is on. -->
     <string name="setup_dev_mode_warning">Best left off: turn Linux tools on just in the chats that need them. When they\'re on, a malicious message or web page on screen could try to trick the agent into running commands. Approval cards still guard sending, posting, buying and deleting.</string>
 
@@ -1870,7 +1870,6 @@
     <!-- The small live picture of the browser under the bubble's status while an agent browses (for screen readers), and the action that hides it (a sideways swipe does too). -->
     <string name="bubble_browser_thumb">Live view of the background browser. Tap to open it full screen.</string>
     <string name="bubble_browser_thumb_hide">Hide</string>
-    <string name="bubble_pill_show_page">%1$s · tap to show the page</string>
     <!-- Hint of the text field under the page: what the user types goes into the page. -->
     <string name="browser_type_hint">Type into the page</string>
     <!-- Button: the keyboard's Enter key, for the page. -->
@@ -2001,6 +2000,14 @@
     <!-- Switch on the Background mode screen. -->
     <string name="background_default">New chats work in the background</string>
     <string name="background_default_info">Each chat still has its own switch in Chat options.</string>
+    <string name="chat_bg_connected">Connected</string>
+    <string name="chat_bg_disconnected">Not connected</string>
+    <string name="chat_bg_not_set_up">Not set up</string>
+    <string name="chat_bg_checking">Checking…</string>
+    <string name="chat_bg_pair_again">Pair again</string>
+    <string name="chat_bg_more">More settings</string>
+    <string name="chat_bg_connected_info">Agents in background chats can work on a screen of their own.</string>
+    <string name="chat_bg_setup_info">Lets an agent work in your apps on a screen of its own while you use your phone. Set-up takes about a minute and needs Wi-Fi.</string>
     <!-- "USB debugging" is Android's name of that developer option: use the name this language's Android shows. -->
     <string name="background_usb_note">Buddy also turns on USB debugging. With it, the helper keeps running when Wi-Fi drops and Android switches Wireless debugging off. Leave it on.</string>
     <string name="background_security">Wireless debugging lets paired devices control this phone. Buddy pairs only itself, on this phone, and its helper listens only here.</string>

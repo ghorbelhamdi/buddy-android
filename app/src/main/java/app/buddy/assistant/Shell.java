@@ -56,7 +56,7 @@ import java.util.Map;
  */
 public final class Shell {
     /** Raised when the protocol changes: Buddy restarts a helper that answers another number. */
-    static final int VERSION = 8;
+    static final int VERSION = 9;
     /** A chat's display goes when nothing was asked of it for this long (Buddy keeps the ones in use alive). */
     private static final long IDLE_MS = 10 * 60_000;
 
@@ -377,7 +377,20 @@ public final class Shell {
         if (power == null) return;
         if (!s.resting) s.still = shot(s); // asleep it draws nothing: the chat's small picture keeps this one
         s.resting = true;
-        sleep(s);
+        sleepIfAllRest(s);
+    }
+
+    /**
+     * The helper's displays share one power group (seen on Android 16: two displays, one group, whatever the flags),
+     * so sleep is for all of them or none. One chat resting while another works must not put the working one's
+     * display to sleep: its touches were refused and its picture went black. So the group sleeps only when every
+     * display rests; until then a resting display's app stays awake.
+     */
+    private static void sleepIfAllRest(Screen any) throws Exception {
+        synchronized (screens) {
+            for (Screen x : screens.values()) if (!x.resting) return;
+        }
+        sleep(any);
     }
 
     /**
@@ -400,7 +413,7 @@ public final class Shell {
         }
         for (Screen s : all) {
             try {
-                if (s.resting && power != null && Boolean.TRUE.equals(interactive.invoke(power, s.id))) sleep(s);
+                if (s.resting && power != null && Boolean.TRUE.equals(interactive.invoke(power, s.id))) sleepIfAllRest(s);
                 // nobody said the run ended (Buddy was restarted or updated mid-run): no app stays awake for good
                 else if (!s.resting && SystemClock.uptimeMillis() - s.active > UNATTENDED_MS) rest(s);
             } catch (Throwable ignored) {
@@ -635,8 +648,20 @@ public final class Shell {
             setDisplayId = InputEvent.class.getMethod("setDisplayId", int.class);
         }
         setDisplayId.invoke(e, displayId);
-        Object ok = inject.invoke(inputManager, e, 2 /* wait until it's handled */);
+        // Wait for the event to be handed to the window, not for the app to finish with it: a busy app (a shop's
+        // result list) took too long for that, the touch counted as failed and its finger was left down.
+        Object ok = inject.invoke(inputManager, e, 1 /* wait for the result */);
         if (Boolean.FALSE.equals(ok)) throw new IllegalStateException("the display didn't take the touch");
+    }
+
+    /** Lifts a finger that may still be down on the display (no waiting, no complaint): the next touch starts clean. */
+    private static void cancelTouch(int displayId, long down, float x, float y) {
+        try {
+            MotionEvent e = touch(down, SystemClock.uptimeMillis(), MotionEvent.ACTION_CANCEL, x, y);
+            setDisplayId.invoke(e, displayId);
+            inject.invoke(inputManager, e, 0 /* don't wait */);
+        } catch (Throwable ignored) {
+        }
     }
 
     private static void key(int displayId, int code) throws Exception {
@@ -663,20 +688,34 @@ public final class Shell {
     private static void gesture(int displayId, long ms, float[] xs, float[] ys) throws Exception {
         ms = Math.max(1, Math.min(ms, 60_000));
         long down = SystemClock.uptimeMillis();
-        inject(touch(down, down, MotionEvent.ACTION_DOWN, xs[0], ys[0]), displayId);
-        int steps = xs.length == 1 ? 0 : (int) Math.max(xs.length - 1, ms / 12);
-        for (int i = 1; i <= steps; i++) {
-            float at = i * (xs.length - 1) / (float) steps; // where along the points
-            int k = Math.min((int) at, xs.length - 2);
-            float f = at - k;
-            long when = down + ms * i / steps;
-            long wait = when - SystemClock.uptimeMillis();
-            if (wait > 0) Thread.sleep(wait);
-            inject(touch(down, SystemClock.uptimeMillis(), MotionEvent.ACTION_MOVE, xs[k] + (xs[k + 1] - xs[k]) * f,
-                    ys[k] + (ys[k + 1] - ys[k]) * f), displayId);
+        try {
+            inject(touch(down, down, MotionEvent.ACTION_DOWN, xs[0], ys[0]), displayId);
+        } catch (Exception first) { // a finger left down by an earlier touch that broke off: lift it, once more
+            cancelTouch(displayId, down, xs[0], ys[0]);
+            Thread.sleep(60);
+            down = SystemClock.uptimeMillis();
+            inject(touch(down, down, MotionEvent.ACTION_DOWN, xs[0], ys[0]), displayId);
         }
-        long wait = down + ms - SystemClock.uptimeMillis();
-        if (wait > 0) Thread.sleep(wait);
-        inject(touch(down, SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, xs[xs.length - 1], ys[ys.length - 1]), displayId);
+        boolean lifted = false;
+        try {
+            int steps = xs.length == 1 ? 0 : (int) Math.max(xs.length - 1, ms / 12);
+            for (int i = 1; i <= steps; i++) {
+                float at = i * (xs.length - 1) / (float) steps; // where along the points
+                int k = Math.min((int) at, xs.length - 2);
+                float f = at - k;
+                long when = down + ms * i / steps;
+                long wait = when - SystemClock.uptimeMillis();
+                if (wait > 0) Thread.sleep(wait);
+                inject(touch(down, SystemClock.uptimeMillis(), MotionEvent.ACTION_MOVE, xs[k] + (xs[k + 1] - xs[k]) * f,
+                        ys[k] + (ys[k + 1] - ys[k]) * f), displayId);
+            }
+            long wait = down + ms - SystemClock.uptimeMillis();
+            if (wait > 0) Thread.sleep(wait);
+            inject(touch(down, SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, xs[xs.length - 1], ys[ys.length - 1]), displayId);
+            lifted = true;
+        } finally {
+            // never leave the finger down: every later touch on this display would be refused
+            if (!lifted) cancelTouch(displayId, down, xs[xs.length - 1], ys[ys.length - 1]);
+        }
     }
 }

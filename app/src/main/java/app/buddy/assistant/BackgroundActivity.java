@@ -164,6 +164,18 @@ public class BackgroundActivity extends Screen {
         final Button start = button(this, getString(R.string.background_start_now), true);
         start.setVisibility(View.GONE);
         body.addView(start, big(14));
+        final Button pair = button(this, getString(R.string.chat_bg_pair_again), false);
+        pair.setVisibility(View.GONE);
+        body.addView(pair, big(8));
+        pair.setOnClickListener(v -> {
+            BuddyService svc = BuddyService.get();
+            if (svc == null) {
+                android.widget.Toast.makeText(this, R.string.background_needs_service, android.widget.Toast.LENGTH_LONG).show();
+                return;
+            }
+            opened = false;
+            Background.beginSetup(svc);
+        });
         Runnable check = () -> new Thread(() -> {
             boolean alive = Background.alive(this);
             String problem = alive ? Background.problem(this) : null;
@@ -187,6 +199,7 @@ public class BackgroundActivity extends Screen {
                     if (why != null) {
                         info.setText(getString(R.string.background_failed, why));
                         start.setEnabled(true);
+                        if (why.contains("paired")) pair.setVisibility(View.VISIBLE); // Wireless debugging forgot Buddy
                     } else {
                         status.setText(R.string.background_ready);
                         info.setText(R.string.background_ready_info);

@@ -1303,7 +1303,7 @@
     <string name="setup_dev_mode_info">Avec les outils Linux, l\'agent peut exécuter des commandes, installer des paquets et modifier des fichiers dans ~/.buddy/work, pour créer des applis. Les nouvelles discussions démarrent avec ce réglage ; chaque discussion peut le changer sous son titre.</string>
     <string name="setup_agents_tap">Laisser les agents appuyer dans Buddy</string>
     <!-- "App permissions" is the name of a screen in Buddy. -->
-    <string name="setup_agents_tap_info">Pour tester Buddy avec un agent (par exemple Claude Code dans Termux avec les outils du téléphone). La bulle, les cartes d\'approbation, Autorisations des applis et ces options restent hors de portée.</string>
+    <string name="setup_agents_tap_info">Pour tester Buddy avec un agent (par exemple Claude Code dans Termux avec les outils du téléphone). Les agents peuvent alors utiliser la liste des discussions, une discussion et cet écran Paramètres. Tout ce qui décide de ce qu\'ils peuvent faire reste à vous : la bulle, les cartes d\'approbation, les outils Linux, les options de discussion et les tâches planifiées, ainsi que les écrans des autorisations des applis, des clés, des règles, des compétences, du mode arrière-plan et de la sauvegarde.</string>
     <!-- Warning shown while Linux tools in new chats (setup_dev_mode) is on. -->
     <string name="setup_dev_mode_warning">Mieux vaut laisser ce réglage désactivé et n\'activer les outils Linux que dans les discussions qui en ont besoin. Quand ils sont activés, un message ou une page Web malveillants à l\'écran pourraient tenter de pousser l\'agent à exécuter des commandes. Les cartes d\'approbation protègent toujours l\'envoi, la publication, l\'achat et la suppression.</string>
 
@@ -1725,7 +1725,6 @@
     <string name="browser_backspace">Effacer un caractère</string>
     <string name="bubble_browser_thumb">Vue en direct du navigateur en arrière-plan. Touchez pour l\'ouvrir en plein écran.</string>
     <string name="bubble_browser_thumb_hide">Masquer</string>
-    <string name="bubble_pill_show_page">%1$s · touchez pour afficher la page</string>
     <string name="browser_type_hint">Écrire dans la page</string>
     <string name="browser_enter">Entrée</string>
     <string name="browser_dialog">La page demande : %1$s</string>
@@ -1826,6 +1825,14 @@
     <string name="background_remove_text">Buddy oublie l\'association et arrête son programme auxiliaire. Les discussions travaillent de nouveau sur le vrai écran.</string>
     <string name="background_default">Les nouvelles discussions travaillent en arrière-plan</string>
     <string name="background_default_info">Chaque discussion garde son propre interrupteur dans Options de la discussion.</string>
+    <string name="chat_bg_connected">Connecté</string>
+    <string name="chat_bg_disconnected">Non connecté</string>
+    <string name="chat_bg_not_set_up">Non configuré</string>
+    <string name="chat_bg_checking">Vérification…</string>
+    <string name="chat_bg_pair_again">Associer à nouveau</string>
+    <string name="chat_bg_more">Plus de réglages</string>
+    <string name="chat_bg_connected_info">Les agents des discussions en arrière-plan peuvent travailler sur leur propre écran.</string>
+    <string name="chat_bg_setup_info">Permet à un agent de travailler dans vos applis sur son propre écran pendant que vous utilisez votre téléphone. La configuration prend environ une minute et nécessite le Wi-Fi.</string>
     <string name="background_security">Le Débogage sans fil permet aux appareils associés de contrôler ce téléphone. Buddy n\'associe que lui-même, sur ce téléphone, et son programme auxiliaire n\'écoute qu\'ici.</string>
     <string name="background_brought">Passé sur votre écran : cette étape a besoin de vous. Le mode arrière-plan est maintenant désactivé pour cette discussion.</string>
     <string name="chat_background">Travailler en arrière-plan</string>
