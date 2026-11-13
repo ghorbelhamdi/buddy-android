@@ -56,7 +56,7 @@ import java.util.Map;
  */
 public final class Shell {
     /** Raised when the protocol changes: Buddy restarts a helper that answers another number. */
-    static final int VERSION = 9;
+    static final int VERSION = 10;
     /** A chat's display goes when nothing was asked of it for this long (Buddy keeps the ones in use alive). */
     private static final long IDLE_MS = 10 * 60_000;
 
@@ -464,8 +464,7 @@ public final class Shell {
                 wake(old);
                 return old;
             }
-            if (screens.size() >= 4) throw new IllegalStateException("four chats already work in the background, the most at once: wait for one to finish");
-            if (w < 200 || h < 200 || w > 4096 || h > 4096 || dpi < 80 || dpi > 800) throw new IllegalArgumentException("bad size");
+                        if (w < 200 || h < 200 || w > 4096 || h > 4096 || dpi < 80 || dpi > 800) throw new IllegalArgumentException("bad size");
             final Screen s = new Screen();
             s.w = w;
             s.h = h;

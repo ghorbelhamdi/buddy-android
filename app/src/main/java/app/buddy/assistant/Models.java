@@ -243,6 +243,13 @@ final class Models {
                 + (ctx >= 50 ? " · " + BuddyApp.str(R.string.models_chip_context, ctx) : "");
     }
 
+    /** "model · effort" for the chip in a chat's message box: the agent's name is in the title and the box's hint. */
+    static String chip(Sessions.Session s) {
+        int ctx = contextPercent(s);
+        return shownModel(s) + (s.effort.isEmpty() ? "" : " · " + BuddyApp.str(R.string.models_chip_effort, s.effort))
+                + (ctx >= 50 ? " · " + BuddyApp.str(R.string.models_chip_context, ctx) : "");
+    }
+
     /** The API key service the chat's model comes from (its name), or null for the agent's own. */
     static String via(Sessions.Session s) {
         Providers.P p = Providers.of(effective(s));

@@ -90,6 +90,10 @@ final class Sessions {
         boolean pinned;
         /** Archived: out of the chat list (it has an Archived section), the bubble and sharing; its schedules still run. */
         boolean archived;
+        /** A helper (see Helpers): the id of the chat whose agent started it; "" for every other chat. */
+        String parent = "";
+        /** A helper's place among its parent's (0, 1, 2), in the order they were started. */
+        int slot;
         /** The chat's scheduled task (see Schedules), or null. */
         Schedules.Plan schedule;
         /** Messages the agent scheduled for itself in this chat (schedule_message), soonest first. Main thread. */
@@ -156,7 +160,7 @@ final class Sessions {
         if (all.isEmpty()) create(Prefs.backend(c));
         String cur = sp.getString("current", null);
         current = find(cur);
-        if (current == null) current = all.get(0);
+        if (current == null) current = first();
         if (older) save(); // so they keep what Settings said now, whatever it says later
     }
 
@@ -180,6 +184,12 @@ final class Sessions {
         return s;
     }
 
+    /** The newest chat that isn't a helper (the bubble never lands on one by itself). */
+    private Session first() {
+        for (Session s : all) if (s.parent.isEmpty()) return s;
+        return all.get(0);
+    }
+
     Session find(String id) {
         if (id == null) return null;
         for (Session s : all) if (s.id.equals(id)) return s;
@@ -197,7 +207,7 @@ final class Sessions {
             file(id).delete();
         });
         if (all.isEmpty()) create(s.backend);
-        if (current == s) current = all.get(0);
+        if (current == s) current = first();
         saveOrder();
     }
 
@@ -339,7 +349,7 @@ final class Sessions {
         JSONObject o = new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model)
                 .put("effort", s.effort).put("actual_model", s.actualModel).put("ctx_used", s.ctxUsed).put("ctx_window", s.ctxWindow)
                 .put("interrupted", s.interrupted).put("incognito", s.incognito).put("dev", s.dev).put("awake", s.awake).put("background", s.background)
-                .put("pinned", s.pinned).put("archived", s.archived).put("updated", s.updated).put("cut", s.cut).put("messages", msgs);
+                .put("pinned", s.pinned).put("archived", s.archived).put("updated", s.updated).put("cut", s.cut).put("parent", s.parent).put("slot", s.slot).put("messages", msgs);
         if (s.schedule != null) {
             JSONArray ok;
             synchronized (s.allowed) {
@@ -373,6 +383,8 @@ final class Sessions {
         s.background = o.optBoolean("background");
         s.pinned = o.optBoolean("pinned");
         s.archived = o.optBoolean("archived");
+        s.parent = o.optString("parent");
+        s.slot = o.optInt("slot");
         s.schedule = Schedules.Plan.of(o.optJSONObject("schedule"));
         JSONArray ok = s.schedule == null ? null : o.optJSONArray("allowed"); // kept for its scheduled runs
         if (ok != null) for (int j = 0; j < ok.length(); j++) s.allowed.add(ok.getString(j));

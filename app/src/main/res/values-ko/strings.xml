@@ -1384,6 +1384,16 @@
     <string name="chat_bg_more">설정 더 보기</string>
     <string name="chat_bg_connected_info">백그라운드 채팅의 에이전트가 자체 화면에서 작업할 수 있습니다.</string>
     <string name="chat_bg_setup_info">휴대전화를 사용하는 동안 에이전트가 자체 화면에서 앱을 다룹니다. 설정은 1분 정도 걸리며 Wi-Fi가 필요합니다.</string>
+    <string name="hub_tool_delegate">하위 에이전트 시작: %1$s</string>
+    <string name="hub_tool_helpers">하위 에이전트를 기다리는 중</string>
+    <string name="helpers_title">하위 에이전트</string>
+    <string name="helper_working">작업 중</string>
+    <string name="helper_done">완료</string>
+    <string name="helper_failed">실패</string>
+    <string name="helper_stopped">중지됨</string>
+    <string name="helper_of">“%1$s”의 하위 에이전트</string>
+    <string name="helper_this_chat">이 채팅</string>
+    <string name="helper_waiting">대기 중</string>
     <string name="background_security">‘무선 디버깅’을 켜면 페어링된 기기가 이 휴대전화를 제어할 수 있어요. Buddy는 이 휴대전화에서 자기 자신만 페어링하고, 도우미도 이 휴대전화 안의 연결만 받아요.</string>
     <string name="background_brought">내 화면으로 옮겼어요: 이 단계는 직접 해야 해요. 이제 이 채팅의 백그라운드 모드는 꺼졌어요.</string>
     <string name="chat_background">백그라운드에서 작업하기</string>

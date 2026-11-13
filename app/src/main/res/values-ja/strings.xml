@@ -1385,6 +1385,16 @@
     <string name="chat_bg_more">その他の設定</string>
     <string name="chat_bg_connected_info">バックグラウンドのチャットのエージェントは専用の画面で作業できます。</string>
     <string name="chat_bg_setup_info">スマホを使っている間、エージェントが専用の画面でアプリを操作します。セットアップは約1分で、Wi-Fi が必要です。</string>
+    <string name="hub_tool_delegate">サブエージェントを開始: %1$s</string>
+    <string name="hub_tool_helpers">サブエージェントを待っています</string>
+    <string name="helpers_title">サブエージェント</string>
+    <string name="helper_working">作業中</string>
+    <string name="helper_done">完了</string>
+    <string name="helper_failed">失敗</string>
+    <string name="helper_stopped">停止</string>
+    <string name="helper_of">「%1$s」のサブエージェント</string>
+    <string name="helper_this_chat">このチャット</string>
+    <string name="helper_waiting">待機中</string>
     <string name="background_security">「ワイヤレス デバッグ」では、ペア設定したデバイスがこのスマートフォンを操作できます。Buddy がペア設定するのはこのスマートフォン上の Buddy 自身だけで、ヘルパーもこのスマートフォン内からの接続しか受け付けません。</string>
     <string name="background_brought">あなたの画面に移しました：この手順はあなたの操作が必要です。このチャットのバックグラウンド モードはオフになりました。</string>
     <string name="chat_background">バックグラウンドで作業する</string>

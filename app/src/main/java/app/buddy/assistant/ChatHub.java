@@ -213,6 +213,17 @@ final class ChatHub {
         } catch (Exception ignored) {
         }
         viewing.remove(s);
+        Helpers.forget(s.id);
+        if (!s.parent.isEmpty() && s.dev) { // a helper's own folder goes with it
+            final String dir = Helpers.folder(s.id);
+            new Thread(() -> {
+                try {
+                    Linux.exec(app, "rm -rf " + dir, 30);
+                } catch (Exception ignored) {
+                }
+            }).start();
+        }
+        if (s.parent.isEmpty()) for (Sessions.Session h : Helpers.of(this, s.id)) delete(h); // its helpers go with it
         sessions.remove(s);
         Schedules.cancelAll(app, s);
         changed();
@@ -252,6 +263,11 @@ final class ChatHub {
         return send(ses, text, null, prompt, true);
     }
 
+    /** A helper's one run (see Helpers): the chat shows its task, the agent gets it with the helper's rules. */
+    String sendHelper(Sessions.Session ses, String shown, String prompt) {
+        return send(ses, shown, null, prompt, false, false);
+    }
+
     private String send(final Sessions.Session ses, String text, List<String> files, String prompt) {
         return send(ses, text, files, prompt, false);
     }
@@ -283,7 +299,8 @@ final class ChatHub {
             return e.getMessage();
         }
         ses.interrupted = false;
-        if (!scheduled && !rule) ses.archived = false; // the user writing in an archived chat brings it back
+        // the user writing in an archived chat brings it back (not a sub-agent's: its parent's chat lists it)
+        if (!scheduled && !rule && ses.parent.isEmpty()) ses.archived = false;
         sessions.add(ses, Bubble.Kind.USER, text, hasFiles ? new ArrayList<>(files) : null);
         Sessions.Msg um = ses.messages.get(ses.messages.size() - 1);
         if (scheduled) {
@@ -342,15 +359,16 @@ final class ChatHub {
     /** Change a chat's model; the next message uses it, and the conversation continues. */
     void setModel(Sessions.Session ses, String model) {
         ses.model = model == null ? "" : model.trim();
-        add(ses, Bubble.Kind.STEP, app.getString(R.string.hub_model_set, Models.label(ses.backend, ses.model)));
+        // (no line in the chat: it showed up as "1 tool call", and the chip in the message box says the model and effort)
+        sessions.save(ses);
         changed();
     }
 
     /** Change a chat's effort ("" = the agent's default); the next message uses it. */
     void setEffort(Sessions.Session ses, String effort) {
         ses.effort = effort == null ? "" : effort;
-        add(ses, Bubble.Kind.STEP, ses.effort.isEmpty() ? app.getString(R.string.hub_effort_default)
-                : app.getString(R.string.hub_effort_set, ses.effort));
+        // (no line in the chat: it showed up as "1 tool call", and the chip in the message box says the model and effort)
+        sessions.save(ses);
         changed();
     }
 
@@ -509,6 +527,7 @@ final class ChatHub {
     }
 
     void stop(Sessions.Session ses) {
+        if (ses.parent.isEmpty()) Helpers.stop(this, ses.id); // a stopped task's helpers stop with it
         if (!ses.running) return;
         BuddyService svc = BuddyService.get();
         if (svc != null) svc.stopPaused();
@@ -689,7 +708,7 @@ final class ChatHub {
                     runEnded(ses);
                     if (!ses.lastReply.isEmpty()) {
                         Prefs.setHadReply(app);
-                        flash(ses.lastReply);
+                        if (ses.parent.isEmpty()) flash(ses.lastReply);
                     }
                     // what the user added but the agent never got (it made no phone action since): send it now
                     String left;
@@ -726,9 +745,7 @@ final class ChatHub {
      * user's latest request, the agent's latest note}, or null when no chat is running (an outside agent).
      */
     String[] reviewContext() {
-        Sessions.Session latest = null;
-        for (Sessions.Session s : sessions.all)
-            if (s.running && (latest == null || s.lastEventAt > latest.lastEventAt)) latest = s;
+        Sessions.Session latest = latestRunning();
         if (latest == null) return null;
         String request = "", note = "";
         for (int i = latest.messages.size() - 1; i >= 0; i--) {
@@ -810,10 +827,11 @@ final class ChatHub {
     }
 
     /** The newest working chat, or null. */
+    /** The working chat with the latest step: one the user talks to, not a sub-agent (those work for their parent). */
     Sessions.Session latestRunning() {
         Sessions.Session latest = null;
         for (Sessions.Session s : sessions.all)
-            if (s.running && (latest == null || s.lastEventAt > latest.lastEventAt)) latest = s;
+            if (s.running && s.parent.isEmpty() && (latest == null || s.lastEventAt > latest.lastEventAt)) latest = s;
         return latest;
     }
 
@@ -821,9 +839,12 @@ final class ChatHub {
      * Notes for the agent that's working, to attach to a phone tool's result (any thread). Taken once: null
      * when there are none.
      */
-    String takeNotes() {
+    /** chat: the calling chat, whose notes these are (null, an agent outside Buddy's chats: any working chat's). */
+    String takeNotes(String chat) {
         for (Sessions.Session s : new ArrayList<>(sessions.all)) {
             if (!s.running) continue;
+            // (a sub-agent's phone step must not take what the user told its parent, which waits in delegate)
+            if (chat != null ? !s.id.equals(chat) : !s.parent.isEmpty()) continue;
             String joined;
             synchronized (s.notes) {
                 if (s.notes.isEmpty()) continue;
@@ -890,7 +911,10 @@ final class ChatHub {
     private void runEnded(Sessions.Session ses) {
         Prefs.setBusy(app, ses.id, false);
         StepLog.runEnded(app, ses);
-        if (ses.background) {
+        if (!ses.parent.isEmpty()) { // a sub-agent has one run: its screen is free for the next at once, and one waiting starts
+            Background.close(app, ses.id);
+            Helpers.pump(this, ses.parent);
+        } else if (ses.background) {
             Background.rest(app, ses.id); // its apps aren't "on screen" between runs
             // and a minute later, unless the chat works again, its screen goes and its apps with it: an app left
             // there isn't on the user's screen either, and the chat kept showing it as if it still worked there
@@ -909,7 +933,8 @@ final class ChatHub {
         // nobody is looking: the phone is locked, or the chat worked in the background and isn't the one on screen.
         // Then its end is a notification too, as for a long task's or a scheduled one's
         boolean away = Triggers.locked(app) || (ses.background && !viewing.contains(ses));
-        if ((ses.awake || ses.scheduledRun || away) && !quiet) KeepAwake.notifyEnded(app, ses);
+        // (a helper's end is its parent's business: no notification)
+        if ((ses.awake || ses.scheduledRun || away) && !quiet && ses.parent.isEmpty()) KeepAwake.notifyEnded(app, ses);
         ses.scheduledRun = false;
         ses.quietRun = false;
         ses.quietSaid = false;
@@ -922,9 +947,10 @@ final class ChatHub {
     private void add(Sessions.Session ses, Bubble.Kind kind, String text, List<String> files) {
         if (text == null) return;
         sessions.add(ses, kind, text, files);
-        if (kind == Bubble.Kind.BUDDY && !viewing.contains(ses)) ses.unread = true;
-        // not during a live voice call: the voice tells the user itself
-        if (kind == Bubble.Kind.BUDDY && !text.isEmpty() && Prefs.speakReplies(app) && !CodexLive.on()) Voice.speak(app, text);
+        if (kind == Bubble.Kind.BUDDY && !viewing.contains(ses) && ses.parent.isEmpty()) ses.unread = true;
+        // not during a live voice call: the voice tells the user itself (nor a helper's report, which is for its parent)
+        if (kind == Bubble.Kind.BUDDY && !text.isEmpty() && Prefs.speakReplies(app) && !CodexLive.on() && ses.parent.isEmpty())
+            Voice.speak(app, text);
         Sessions.Msg m = ses.messages.get(ses.messages.size() - 1);
         for (Listener l : new ArrayList<>(listeners)) l.onMessage(ses, m);
     }
@@ -1072,6 +1098,17 @@ final class ChatHub {
             }
             case "update_buddy": return BuddyApp.str(in.optBoolean("install") ? R.string.hub_tool_update_download : R.string.hub_tool_update_check);
             case "notify": return in.optString("text");
+            case "delegate": {
+                StringBuilder names = new StringBuilder();
+                org.json.JSONArray ts = in.optJSONArray("tasks");
+                for (int i = 0; ts != null && i < ts.length(); i++) {
+                    JSONObject t = ts.optJSONObject(i);
+                    String nm = t == null ? ts.optString(i) : t.optString("name", t.optString("task"));
+                    names.append(names.length() == 0 ? "" : ", ").append(clip(nm, 28));
+                }
+                return BuddyApp.str(R.string.hub_tool_delegate, names.toString());
+            }
+            case "subagents": return BuddyApp.str(R.string.hub_tool_helpers);
             case "schedule_message": return BuddyApp.str(R.string.hub_tool_schedule_message, said(full, in.optString("message"), 40));
             case "list_scheduled": return BuddyApp.str(R.string.hub_tool_list_scheduled);
             case "cancel_scheduled": return BuddyApp.str(R.string.hub_tool_cancel_scheduled);

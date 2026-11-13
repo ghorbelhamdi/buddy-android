@@ -231,6 +231,36 @@ final class Tools {
                         + "field. Buddy shows the user an approval card with the text first, unless you called confirm "
                         + "with it just before.",
                 props().put("text", strProp("The reply, exactly as it should be sent")), "text"));
+        t.put(tool("delegate",
+                "Hand parts of a task to sub-agents that work at the same time, and get their reports back: for "
+                        + "work that splits into independent parts in different apps or sites (compare a price in three "
+                        + "shops, gather facts from several places). Each sub-agent is an agent like you with the phone "
+                        + "tools, on a hidden screen of its own, so the user keeps their screen and you keep yours. "
+                        + "Sub-agents only look things up: they can't send, post, buy, delete, change settings or ask the "
+                        + "user, so do those steps yourself afterwards. Give each a different app or site (an app can "
+                        + "only be open in one place) and a task that stands on its own: a sub-agent knows nothing of "
+                        + "this conversation. The call waits for the reports (up to 8 minutes; then subagents gives the "
+                        + "rest). When you have a part of your own to do meanwhile (in another app), pass wait false: "
+                        + "the sub-agents start, you work at the same time, and subagents collects their reports when you "
+                        + "are done. Give as many tasks as the work has parts: they all start at once. Each sub-agent uses the user's plan as you do, so don't delegate what you can do "
+                        + "quickly yourself, and never a step whose result you need before you can go on: a lone "
+                        + "sub-agent you only wait for is slower than doing it yourself.",
+                props().put("tasks", new JSONObject().put("type", "array").put("minItems", 1)
+                        .put("description", "One per sub-agent")
+                        .put("items", new JSONObject().put("type", "object")
+                                .put("properties", props()
+                                        .put("name", strProp("A few words the user sees, e.g. \"Amazon\""))
+                                        .put("task", strProp("Everything the sub-agent needs: what to find, where, and "
+                                                + "what to report back"))
+                                        .put("phone", boolProp("Default true. False for a part that needs no app "
+                                                + "(the web, files, thinking): that sub-agent takes no phone screen")))
+                                .put("required", new JSONArray().put("task"))))
+                        .put("wait", boolProp("Default true: wait here for the reports. False: return at once, so you "
+                                + "can work on your own part at the same time; call subagents afterwards.")), "tasks"));
+        t.put(tool("subagents",
+                "Your sub-agents from delegate: waits for the ones still working (up to 8 minutes) and returns every "
+                        + "report. With stop, ends the ones still working first.",
+                props().put("stop", boolProp("End the sub-agents that still work"))));
         t.put(tool("schedule_message",
                 "Schedule a message to yourself in this chat, sent once at a later time: to check something again, "
                         + "remind the user, or go on with a task later (\"check the price again tomorrow at 9\"). At its time "
@@ -352,7 +382,7 @@ final class Tools {
                     !UNSEEN.contains(name));
         }
         if ("confirm".equals(name) || "ask".equals(name)) return r;
-        String notes = ChatHub.get(svc).takeNotes();
+        String notes = ChatHub.get(svc).takeNotes(McpServer.CALLER_CHAT.get());
         if (notes != null) {
             r.getJSONArray("content").put(new JSONObject().put("type", "text").put("text",
                     "\n[BUDDY_USER_UPDATE] The user added this while you were working; it comes from the user, through "
@@ -368,6 +398,16 @@ final class Tools {
         if (revoked != null && !"notify".equals(name)) return text(revoked);
         String capped = countStep(name, a);
         if (capped != null) return text(capped);
+        if (Helpers.is(svc, McpServer.CALLER_CHAT.get())) { // a helper only looks things up, by itself (see Helpers)
+            if (HELPER_NO.contains(name)) return text(Helpers.refuse("\"" + name + "\" is for the chat the user talks to"));
+            if ("confirm".equals(name)) return text("DENIED: " + Helpers.refuse("sending, posting, buying, deleting or changing things"));
+            if ("ask".equals(name)) return text("NO ANSWER: " + Helpers.refuse("asking the user"));
+            if (SCREEN.contains(name) && !Background.on(svc, McpServer.CALLER_CHAT.get()))
+                return text(Helpers.refuse("you have no phone screen, only the browser_* tools"));
+        }
+        // starting helpers or waiting for them isn't using the phone: no "Using your phone", no wait for a pause to end
+        if ("delegate".equals(name)) return text(Helpers.delegate(svc, McpServer.CALLER_CHAT.get(), a));
+        if ("subagents".equals(name)) return text(Helpers.status(svc, McpServer.CALLER_CHAT.get(), a));
         if (name.startsWith("browser_")) { // the background browser: it doesn't need the phone's screen
             svc.onToolActivity(name, false);
             return browser.call(name, a);
@@ -746,6 +786,12 @@ final class Tools {
             "read_screen", "tap", "long_press", "type_text", "scroll", "swipe", "press", "open_app", "open_url",
             "screenshot", "point_out", "wait_for", "do_steps", "collect", "find"));
 
+    /** Not for a helper (see Helpers): what reaches the user, the phone's own settings or a later time. */
+    private static final java.util.Set<String> HELPER_NO = new java.util.HashSet<>(java.util.Arrays.asList(
+            "delegate", "subagents", "phone_shell", "install_apk", "update_buddy", "wait_for_install", "schedule_message",
+            "cancel_scheduled", "notify", "share", "reply_notification", "point_out", "add_calendar_event", "set_alarm",
+            "set_timer", "take_photo", "clipboard_write", "save_to_downloads"));
+
     /** Tools that act on the screen: the point_out marks go first, as the screen is about to change. */
     private static final java.util.Set<String> ACTIONS = new java.util.HashSet<>(java.util.Arrays.asList(
             "tap", "long_press", "type_text", "scroll", "swipe", "press", "open_app", "open_url", "do_steps", "collect", "find"));
@@ -782,7 +828,8 @@ final class Tools {
     /** The app's mode for this call: a rule's run gets no Trust (it works for someone else's message). */
     private String mode(String pkg) {
         String m = Guard.mode(svc, pkg, null);
-        return "trust".equals(m) && ruleRun() ? "hard" : m;
+        // nor a helper: it only looks things up, so nothing it does is waved through
+        return "trust".equals(m) && (ruleRun() || Helpers.is(svc, McpServer.CALLER_CHAT.get())) ? "hard" : m;
     }
 
     private static JSONObject text(String s) throws JSONException {

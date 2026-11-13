@@ -1872,6 +1872,16 @@
     <string name="chat_bg_more">Інші налаштування</string>
     <string name="chat_bg_connected_info">Агенти у фонових чатах можуть працювати на власному екрані.</string>
     <string name="chat_bg_setup_info">Дає агентові змогу працювати у ваших застосунках на власному екрані, поки ви користуєтеся телефоном. Налаштування триває близько хвилини й потребує Wi-Fi.</string>
+    <string name="hub_tool_delegate">Запуск субагентів: %1$s</string>
+    <string name="hub_tool_helpers">Очікування субагентів</string>
+    <string name="helpers_title">Субагенти</string>
+    <string name="helper_working">Працює</string>
+    <string name="helper_done">Готово</string>
+    <string name="helper_failed">Не вдалося</string>
+    <string name="helper_stopped">Зупинено</string>
+    <string name="helper_of">Субагент чату «%1$s»</string>
+    <string name="helper_this_chat">Цей чат</string>
+    <string name="helper_waiting">Очікує</string>
     <string name="background_security">«Налагодження через Wi-Fi» дозволяє підключеним пристроям керувати цим телефоном. Buddy підключає лише себе, на цьому ж телефоні, а його допоміжна програма приймає з’єднання лише тут.</string>
     <string name="background_brought">Перенесено на ваш екран: цей крок маєте зробити ви. Фоновий режим для цього чату тепер вимкнено.</string>
     <string name="chat_background">Працювати у фоні</string>

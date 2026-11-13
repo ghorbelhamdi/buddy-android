@@ -1399,6 +1399,16 @@
     <string name="chat_bg_more">Meer instellingen</string>
     <string name="chat_bg_connected_info">Agents in achtergrondchats kunnen op een eigen scherm werken.</string>
     <string name="chat_bg_setup_info">Laat een agent op een eigen scherm in je apps werken terwijl jij je telefoon gebruikt. Instellen duurt ongeveer een minuut en vereist wifi.</string>
+    <string name="hub_tool_delegate">Subagents starten: %1$s</string>
+    <string name="hub_tool_helpers">Wachten op de subagents</string>
+    <string name="helpers_title">Subagents</string>
+    <string name="helper_working">Bezig</string>
+    <string name="helper_done">Klaar</string>
+    <string name="helper_failed">Mislukt</string>
+    <string name="helper_stopped">Gestopt</string>
+    <string name="helper_of">Subagent van “%1$s”</string>
+    <string name="helper_this_chat">Deze chat</string>
+    <string name="helper_waiting">Wacht</string>
     <string name="background_security">Met Draadloze foutopsporing kunnen gekoppelde apparaten deze telefoon bedienen. Buddy koppelt alleen zichzelf, op deze telefoon, en de helper luistert alleen hier.</string>
     <string name="background_brought">Naar je scherm verplaatst: deze stap heeft jou nodig. De achtergrondmodus staat nu uit voor deze chat.</string>
     <string name="chat_background">Op de achtergrond werken</string>

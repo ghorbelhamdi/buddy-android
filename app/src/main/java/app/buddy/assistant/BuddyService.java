@@ -876,6 +876,8 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
      */
     String askConfirm(final String summary, boolean canAuto) throws InterruptedException {
         final String chat = McpServer.CALLER_CHAT.get();
+        // a helper only looks things up: no card for it, whatever the step
+        if (Helpers.is(this, chat)) return "DENIED: " + Helpers.refuse("sending, posting, buying, deleting or changing things");
         boolean rule = Triggers.ruleRun(chat);
         int cd = canAuto ? Triggers.countdown(chat) : 0;
         boolean now = canAuto && Triggers.instant(chat); // the rule's "Don't ask": no card when the second check agrees

@@ -95,16 +95,9 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         // the model chip, then Linux tools: in a row only as wide as its chips, the weight just lets the model chip
         // shrink (its text cut short) when a narrow screen has no room for both
         LinearLayout chips = row(this);
-        LinearLayout chip = chip(this, "");
-        chipText = (TextView) chip.getChildAt(0);
-        chip.setOnClickListener(v -> chooseModel());
-        chips.addView(chip, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT, 1));
         linux = protect(linuxChip(this)); // agents never switch it, even when they may tap Buddy's screens
         linux.setOnClickListener(v -> switchLinuxTools());
-        LinearLayout.LayoutParams lp = wrap();
-        lp.setMarginStart(dp(this, 6));
-        chips.addView(linux, lp);
+        chips.addView(linux, wrap()); // (the model chip sits in the message box, by the buttons)
         // background mode at a glance: a dot says whether its helper is connected; a tap connects or sets it up from here
         bgChip = protect(row(this)); // only the user connects, pairs or switches it
         bgChip.setGravity(Gravity.CENTER_VERTICAL);
@@ -171,6 +164,15 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         stp.leftMargin = stp.rightMargin = dp(this, 12);
         stp.topMargin = dp(this, 8);
         root.addView(strip, stp);
+        // the chat's helpers (see Helpers), each a row that opens its own chat; in a helper's chat, the way back
+        helpersBox = column(this);
+        helpersBox.setBackground(rounded(this, CARD, 12));
+        helpersBox.setPaddingRelative(dp(this, 12), dp(this, 6), dp(this, 12), dp(this, 6));
+        helpersBox.setVisibility(View.GONE);
+        LinearLayout.LayoutParams hbp = full();
+        hbp.leftMargin = hbp.rightMargin = dp(this, 12);
+        hbp.topMargin = dp(this, 8);
+        root.addView(helpersBox, hbp);
 
         browser = new BrowserPanel(this, ses.id, false);
         browser.setVisibility(View.GONE);
@@ -242,12 +244,26 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         trayScroll.setVisibility(View.GONE);
         root.addView(trayScroll, full());
 
-        pill = row(this);
+        // the message box: the text on top, and under it a bar with attach, the model chip, live voice, the mic and send
+        pill = column(this);
+        LinearLayout bar = row(this);
+        bar.setGravity(Gravity.CENTER_VERTICAL);
         pill.setPaddingRelative(dp(this, 4), dp(this, 4), dp(this, 4), dp(this, 4));
         ImageButton attach = iconButton(this, R.drawable.ms_attach_file, getString(R.string.chat_attach_description), MUTED);
         attach.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
         attach.setOnClickListener(v -> attachSheet());
-        pill.addView(attach);
+        bar.addView(attach);
+        // agent · model · effort: tap to change (it shortens its text when the bar has little room)
+        LinearLayout chip = chip(this, "");
+        chipText = (TextView) chip.getChildAt(0);
+        chip.setOnClickListener(v -> chooseModel());
+        FrameLayout chipBox = new FrameLayout(this);
+        chipBox.addView(chip, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER_VERTICAL | Gravity.START));
+        LinearLayout.LayoutParams cbp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+        cbp.setMarginStart(dp(this, 2));
+        cbp.setMarginEnd(dp(this, 6));
+        bar.addView(chipBox, cbp);
         pill.setBackground(outlined(this, CARD, 28, LINE, 1));
         RichEditText field = new RichEditText(this);
         field.onImages(this::addFiles); // pasted, or from the keyboard's clipboard (issue #6)
@@ -259,15 +275,15 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         input.setTypeface(sans(this, 400));
         input.setMaxLines(6);
         input.setBackground(null);
-        input.setPaddingRelative(0, dp(this, 10), 0, dp(this, 10));
+        input.setPaddingRelative(dp(this, 14), dp(this, 12), dp(this, 14), dp(this, 4));
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE
                 | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
-        pill.addView(input, weight1());
+        pill.addView(input, full());
         live = iconButton(this, R.drawable.ms_graphic_eq, getString(R.string.live_option), MUTED);
         live.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
         live.setOnClickListener(v -> startLive());
         live.setVisibility(CodexLive.available(this, ses) ? View.VISIBLE : View.GONE);
-        pill.addView(live);
+        bar.addView(live);
         mic = button(this, "", false);
         mic.setContentDescription(getString(R.string.chat_talk));
         mic.setOnClickListener(v -> toggleMic());
@@ -275,7 +291,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             languageSheet();
             return true;
         });
-        pill.addView(mic, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 40)));
+        bar.addView(mic, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 40)));
         micIdle();
         send = new ImageButton(this);
         send.setImageResource(R.drawable.ms_arrow_upward);
@@ -284,7 +300,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         send.setOnClickListener(v -> send());
         LinearLayout.LayoutParams snp = new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40));
         snp.setMarginStart(dp(this, 4));
-        pill.addView(send, snp);
+        bar.addView(send, snp);
+        pill.addView(bar, full());
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int a, int b, int c) {
@@ -512,6 +529,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
 
     @Override
     protected void onPause() {
+        if (helpersBox != null) helpersBox.removeCallbacks(helperTick);
+        for (HelperCard c : helperCards.values()) if (c.watching != null) {
+            Browser.unwatch(c.watching, c);
+            c.watching = null;
+        }
         if (Voice.listening()) Voice.stopListening();
         // a live call goes on (the agent works in other apps): it ends with End, the screen off or a pause
         CodexLive.removeUi(liveUi);
@@ -708,6 +730,305 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         c.addView(other, full());
         d[0] = bottomSheet(this, c);
         d[0].show();
+    }
+
+    // ------------------------------------------------------ helpers
+
+    private LinearLayout helpersBox;
+    private String helpersShown = "";
+    /** A helper's card in the Helpers box: the live picture of its screen (or its browser tab), its name and state. */
+    private final class HelperCard implements Browser.Frames {
+        final String chat;
+        LinearLayout view;
+        ImageView picture;
+        View dot;
+        TextView name, state;
+        View empty;
+        /** This chat's own card: the app on its screen, shown as its second line when it isn't working. */
+        final String[] app = {""};
+        String watching; // its tab in the background browser, while this card gets its frames
+        boolean loading;
+        /** Its hidden screen has no app on it: nothing to show from there. */
+        boolean emptyScreen, screenSeen;
+        int ticks;
+
+        HelperCard(String chat) {
+            this.chat = chat;
+        }
+
+        @Override
+        public void onFrame(final android.graphics.Bitmap b, float w, float h) {
+            runOnUiThread(() -> helperPicture(HelperCard.this, b));
+        }
+    }
+
+    /**
+     * A picture that fills its card from the top: a page's or a screen's start is where things are (a short page's
+     * few lines sat in the part a centred crop cut off, and its card was white).
+     */
+    private static final class TopCrop extends ImageView {
+        TopCrop(android.content.Context c) {
+            super(c);
+            setScaleType(ScaleType.MATRIX);
+        }
+
+        private void fit() {
+            android.graphics.drawable.Drawable d = getDrawable();
+            if (d == null || getWidth() == 0 || d.getIntrinsicWidth() <= 0 || d.getIntrinsicHeight() <= 0) return;
+            float scale = Math.max(getWidth() / (float) d.getIntrinsicWidth(), getHeight() / (float) d.getIntrinsicHeight());
+            android.graphics.Matrix m = new android.graphics.Matrix();
+            m.setScale(scale, scale);
+            m.postTranslate((getWidth() - d.getIntrinsicWidth() * scale) / 2f, 0);
+            setImageMatrix(m);
+        }
+
+        @Override
+        public void setImageBitmap(android.graphics.Bitmap b) {
+            super.setImageBitmap(b);
+            fit();
+        }
+
+        @Override
+        protected void onSizeChanged(int w, int h, int ow, int oh) {
+            super.onSizeChanged(w, h, ow, oh);
+            fit();
+        }
+    }
+
+    private final java.util.Map<String, HelperCard> helperCards = new java.util.LinkedHashMap<>();
+    private final Runnable helperTick = this::loadHelperPictures;
+
+    // (the chat's own background screen sits in the row as the first card, "This chat"; a tap opens a sheet with its
+    // bigger picture and Show on my screen, so the row stays as it is)
+
+    /** Sub-agents that have shown a picture (a screen or a browser page), and their latest: those are cards. */
+    private final java.util.Map<String, android.graphics.Bitmap> helperPictures = new java.util.HashMap<>();
+
+    private void renderHelpers() {
+        if (helpersBox == null) return;
+        java.util.List<Sessions.Session> l = ses.parent.isEmpty() ? Helpers.of(hub, ses.id) : new java.util.ArrayList<>();
+        final Sessions.Session parent = ses.parent.isEmpty() ? null : hub.sessions.find(ses.parent);
+        boolean ownScreen = !l.isEmpty() && ses.background && Background.displayOf(ses.id) != android.view.Display.DEFAULT_DISPLAY;
+        if (!ownScreen) ownApp = null;
+        // this chat's own card only once an app is on its screen: a screen it opened and left empty is a black picture
+        boolean own = ownScreen && ownApp != null;
+        StringBuilder ids = new StringBuilder(parent == null ? "" : "p" + parent.label()).append(own ? "own|" : "");
+        for (Sessions.Session h : l) ids.append(h.id).append('|');
+        if (!ids.toString().equals(helpersShown)) { // other sub-agents: the box from scratch
+            helpersShown = ids.toString();
+            dropHelperCards();
+            helpersBox.removeAllViews();
+            helpersBox.setVisibility(l.isEmpty() && parent == null ? View.GONE : View.VISIBLE);
+            if (parent != null) {
+                helpersBox.addView(helperRow(MUTED, getString(R.string.helper_of, parent.label()), "", parent.id), full());
+                return;
+            }
+            if (l.isEmpty()) return;
+            helperPictures.keySet().retainAll(idsOf(l, own));
+            helpersBox.addView(sectionLabel(this, getString(R.string.helpers_title)));
+            // a card each from the start, side by side, three across, more scroll sideways: a sub-agent with nothing
+            // to show yet has a placeholder, and its picture comes into the same card (nothing moves when it does)
+            LinearLayout cards = row(this);
+            int cardW = (getResources().getDisplayMetrics().widthPixels - dp(this, 48)) / 3;
+            int picH = Math.round((cardW - dp(this, 8)) * 1.75f); // about a phone screen's shape
+            if (own) cards.addView(helperCard(ses.id, getString(R.string.helper_this_chat), picH, true).view,
+                    new LinearLayout.LayoutParams(cardW, LinearLayout.LayoutParams.WRAP_CONTENT));
+            for (Sessions.Session h : l)
+                cards.addView(helperCard(h.id, h.title, picH, false).view,
+                        new LinearLayout.LayoutParams(cardW, LinearLayout.LayoutParams.WRAP_CONTENT));
+            android.widget.HorizontalScrollView across = new android.widget.HorizontalScrollView(this);
+            across.setHorizontalScrollBarEnabled(false);
+            across.setOverScrollMode(View.OVER_SCROLL_NEVER);
+            across.addView(cards);
+            helpersBox.addView(across, full());
+        }
+        for (Sessions.Session h : l) { // states change all the time: in place
+            HelperCard c = helperCards.get(h.id);
+            if (c == null) continue;
+            boolean failed = "failed".equals(h.outcome), stopped = "stopped".equals(h.outcome);
+            boolean queued = Helpers.waiting(h.id);
+            c.dot.setBackground(oval(queued ? MUTED : h.running ? ACCENT : failed ? ERR : stopped ? MUTED : OK));
+            c.state.setText(queued ? getString(R.string.helper_waiting)
+                    : h.running ? (h.status.isEmpty() ? getString(R.string.helper_working) : h.status)
+                    : getString(failed ? R.string.helper_failed : stopped ? R.string.helper_stopped : R.string.helper_done));
+        }
+        HelperCard mine = helperCards.get(ses.id);
+        if (mine != null) {
+            mine.dot.setBackground(oval(ses.running ? ACCENT : OK));
+            mine.state.setText(ses.running && !ses.status.isEmpty() ? ses.status : mine.app[0]);
+        }
+        // one row for every screen: this chat's own panel is in its card's sheet
+        if (backgroundPanel != null && mine != null) backgroundPanel.setVisibility(View.GONE);
+        helpersBox.removeCallbacks(helperTick);
+        if (resumed && !helperCards.isEmpty()) helpersBox.post(helperTick);
+    }
+
+    private java.util.Set<String> idsOf(java.util.List<Sessions.Session> l, boolean own) {
+        java.util.Set<String> s = new java.util.HashSet<>();
+        for (Sessions.Session h : l) s.add(h.id);
+        if (own) s.add(ses.id);
+        return s;
+    }
+
+    private HelperCard helperCard(final String chat, String title, int picH, final boolean own) {
+        HelperCard c = new HelperCard(chat);
+        c.view = column(this);
+        c.view.setBackgroundResource(ripple(this, false));
+        c.view.setPaddingRelative(dp(this, 4), dp(this, 6), dp(this, 4), dp(this, 6));
+        c.picture = new TopCrop(this);
+        c.picture.setBackground(rounded(this, CARD2, 10));
+        c.picture.setClipToOutline(true);
+        // until its first picture: a quiet placeholder of the same size
+        c.empty = icon(this, R.drawable.ms_auto_awesome, OUTLINE, 28);
+        FrameLayout frame = new FrameLayout(this);
+        frame.addView(c.picture, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        frame.addView(c.empty, new FrameLayout.LayoutParams(dp(this, 28), dp(this, 28), Gravity.CENTER));
+        if (helperPictures.get(chat) != null) {
+            c.picture.setImageBitmap(helperPictures.get(chat));
+            c.empty.setVisibility(View.GONE);
+        }
+        c.view.addView(frame, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, picH));
+        LinearLayout nm = row(this);
+        nm.setGravity(Gravity.CENTER_VERTICAL);
+        nm.setPaddingRelative(0, dp(this, 6), 0, 0);
+        c.dot = dot(this, MUTED, 8);
+        nm.addView(c.dot);
+        c.name = single(text(this, title, 13, TEXT));
+        c.name.setPaddingRelative(dp(this, 6), 0, 0, 0);
+        nm.addView(c.name, weight1());
+        c.view.addView(nm, full());
+        c.state = single(text(this, "", 11, MUTED));
+        c.view.addView(c.state, full());
+        c.view.setOnClickListener(v -> {
+            if (!own) {
+                startActivity(new android.content.Intent(this, ChatActivity.class).putExtra("id", chat));
+                return;
+            }
+            // this chat's own screen: a sheet with the bigger picture and Show on my screen
+            LinearLayout box = column(this);
+            box.addView(title(this, getString(R.string.helper_this_chat), 18));
+            final BackgroundPanel big = new BackgroundPanel(this, ses);
+            LinearLayout.LayoutParams bp = full();
+            bp.topMargin = dp(this, 10);
+            box.addView(big, bp);
+            Dialog d = bottomSheet(this, box);
+            d.setOnDismissListener(x -> big.setShown(false));
+            big.setShown(true);
+            d.show();
+        });
+        helperCards.put(chat, c);
+        return c;
+    }
+
+    /** A sub-agent's picture arrived: into its card, in place of the placeholder. */
+    private void helperPicture(HelperCard c, android.graphics.Bitmap b) {
+        if (b == null || helperCards.get(c.chat) != c) return;
+        helperPictures.put(c.chat, b);
+        c.picture.setImageBitmap(b);
+        c.empty.setVisibility(View.GONE);
+    }
+
+    /** The app on this chat's own hidden screen (its card shows only then), or null; ownAsked: being looked up. */
+    private String ownApp;
+    private boolean ownAsked;
+
+    /** Each sub-agent's screen as it is now: its hidden screen's picture every second, or its browser tab's frames. */
+    private void loadHelperPictures() {
+        helpersBox.removeCallbacks(helperTick);
+        if (!resumed || helperCards.isEmpty()) return;
+        boolean any = false;
+        if (ownApp == null && !ownAsked && ses.background && Background.displayOf(ses.id) != android.view.Display.DEFAULT_DISPLAY) {
+            ownAsked = true;
+            any = true;
+            new Thread(() -> {
+                BuddyService svc = BuddyService.get();
+                final String pkg = svc == null ? null : Background.appOn(svc, ses.id);
+                runOnUiThread(() -> {
+                    ownAsked = false;
+                    if (pkg != null && ownApp == null) {
+                        ownApp = pkg;
+                        renderHelpers(); // now with this chat's card
+                    }
+                });
+            }).start();
+        }
+        for (final HelperCard c : new java.util.ArrayList<>(helperCards.values())) {
+            Sessions.Session h = hub.sessions.find(c.chat);
+            // its hidden screen, when an app is on it; a screen it opened and left empty (seen so last time) is looked
+            // at again only now and then, and its page in the background browser shows meanwhile
+            boolean screen = Background.displayOf(c.chat) != android.view.Display.DEFAULT_DISPLAY
+                    && !(c.emptyScreen && c.ticks++ % 5 != 0);
+            String tab = Browser.key(c.chat);
+            // (until its screen has been looked at once, its page shows too: no second's wait for that answer)
+            boolean browsing = (!screen || c.emptyScreen || !c.screenSeen) && Browser.running() && Browser.hasTab(tab);
+            if (browsing && c.watching == null) {
+                c.watching = tab;
+                Browser.watch(this, tab, c);
+            } else if (!browsing && c.watching != null) {
+                Browser.unwatch(c.watching, c);
+                c.watching = null;
+            }
+            any |= screen || browsing || (h != null && h.running);
+            if (!screen || c.loading) continue;
+            c.loading = true;
+            final int width = dp(this, 110) * 2;
+            new Thread(() -> {
+                BuddyService svc = BuddyService.get();
+                // which app is there is asked through the accessibility service the agents read screens with: only
+                // until the card has a picture, and for this chat's own card (it names the app), not every second
+                final boolean ask = c.chat.equals(ses.id) || !helperPictures.containsKey(c.chat);
+                final String pkg = !ask ? "" : svc == null ? null : Background.appOn(svc, c.chat);
+                byte[] jpg = pkg == null ? null : Background.frame(getApplicationContext(), c.chat, width, 60);
+                final android.graphics.Bitmap b = jpg == null ? null : android.graphics.BitmapFactory.decodeByteArray(jpg, 0, jpg.length);
+                String app = null; // this chat's own card says the app on its screen
+                try {
+                    if (pkg != null && !pkg.isEmpty() && c.chat.equals(ses.id)) app = String.valueOf(getPackageManager().getApplicationLabel(
+                            getPackageManager().getApplicationInfo(pkg, 0)));
+                } catch (Exception ignored) {
+                }
+                final String label = app;
+                runOnUiThread(() -> {
+                    c.loading = false;
+                    c.emptyScreen = pkg == null;
+                    c.screenSeen = true;
+                    if (label != null) c.app[0] = label;
+                    helperPicture(c, b);
+                });
+            }).start();
+        }
+        // all done and their screens gone: the last pictures stay. While a working sub-agent's card still shows its
+        // placeholder, look more often, so its first picture comes as soon as there is one
+        boolean waiting = false;
+        for (HelperCard c : helperCards.values()) {
+            Sessions.Session h = hub.sessions.find(c.chat);
+            waiting |= h != null && h.running && !helperPictures.containsKey(c.chat);
+        }
+        if (any) helpersBox.postDelayed(helperTick, waiting ? 300 : 1000);
+    }
+
+    private void dropHelperCards() {
+        if (helpersBox != null) helpersBox.removeCallbacks(helperTick);
+        for (HelperCard c : helperCards.values()) if (c.watching != null) Browser.unwatch(c.watching, c);
+        helperCards.clear();
+    }
+
+    private LinearLayout helperRow(int color, String name, String state, final String chat) {
+        LinearLayout r = row(this);
+        r.setGravity(Gravity.CENTER_VERTICAL);
+        r.setPaddingRelative(dp(this, 2), dp(this, 9), dp(this, 2), dp(this, 9));
+        r.setBackgroundResource(ripple(this, false));
+        r.addView(dot(this, color, 9));
+        TextView n = single(text(this, name, 14, TEXT));
+        n.setPaddingRelative(dp(this, 10), 0, dp(this, 8), 0);
+        r.addView(n, weight1());
+        if (!state.isEmpty()) {
+            TextView s = single(text(this, state, 12, MUTED));
+            s.setMaxWidth(dp(this, 170));
+            r.addView(s);
+        }
+        r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 18));
+        r.setOnClickListener(v -> startActivity(new android.content.Intent(this, ChatActivity.class).putExtra("id", chat)));
+        return r;
     }
 
     // ------------------------------------------------------ background mode, from the chat
@@ -1526,7 +1847,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         speaker.setImageResource(speak ? R.drawable.ms_volume_up : R.drawable.ms_volume_off);
         speaker.setImageTintList(ColorStateList.valueOf(speak ? ACCENT : MUTED));
         title.setText(ses.label());
-        chipText.setText(Models.summary(ses));
+        chipText.setText(Models.chip(ses));
         int used = Usage.peak(this, ses.backend);
         usage.set(used);
         usage.setContentDescription(Usage.shortLine(this, ses.backend));
@@ -1534,6 +1855,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         if (linux != null) paintLinuxChip(this, linux, ses.dev);
         paintBackgroundChip();
         checkBackground(false);
+        renderHelpers();
         options.setImageTintList(ColorStateList.valueOf(ses.awake || ses.schedule != null || !ses.allowed.isEmpty() ? ACCENT : MUTED));
         if (hint != null) hint.setText(hintText());
         strip.setVisibility(ses.running ? View.VISIBLE : View.GONE);

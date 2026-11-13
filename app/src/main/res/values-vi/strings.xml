@@ -1974,6 +1974,16 @@
     <string name="chat_bg_more">Cài đặt khác</string>
     <string name="chat_bg_connected_info">Tác nhân trong các cuộc trò chuyện nền có thể làm việc trên màn hình riêng.</string>
     <string name="chat_bg_setup_info">Cho phép tác nhân làm việc trong ứng dụng của bạn trên màn hình riêng trong khi bạn dùng điện thoại. Thiết lập mất khoảng một phút và cần Wi-Fi.</string>
+    <string name="hub_tool_delegate">Đang khởi động tác nhân phụ: %1$s</string>
+    <string name="hub_tool_helpers">Đang chờ các tác nhân phụ</string>
+    <string name="helpers_title">Tác nhân phụ</string>
+    <string name="helper_working">Đang làm</string>
+    <string name="helper_done">Xong</string>
+    <string name="helper_failed">Thất bại</string>
+    <string name="helper_stopped">Đã dừng</string>
+    <string name="helper_of">Tác nhân phụ của “%1$s”</string>
+    <string name="helper_this_chat">Cuộc trò chuyện này</string>
+    <string name="helper_waiting">Đang chờ</string>
     <string name="background_security">Gỡ lỗi qua Wi-Fi cho phép các thiết bị đã ghép nối điều khiển điện thoại này. Buddy chỉ ghép nối chính nó, ngay trên điện thoại này, và trình trợ giúp của nó chỉ nhận kết nối tại đây.</string>
     <string name="background_brought">Đã chuyển sang màn hình của bạn: bước này cần bạn. Chế độ nền hiện đã tắt cho cuộc trò chuyện này.</string>
     <string name="chat_background">Làm việc ở chế độ nền</string>

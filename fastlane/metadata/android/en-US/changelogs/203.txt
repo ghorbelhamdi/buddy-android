@@ -1,0 +1,4 @@
+• New: sub-agents. For a task with independent parts (compare a price in three shops), the agent starts sub-agents that work at the same time, each on a hidden screen of its own when it needs one. They only look things up; the chat shows every screen side by side
+• The bubble's picture pages through every agent's screen
+• The model and effort chip moved into the message box
+• A model change no longer shows up as a tool call

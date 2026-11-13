@@ -1833,6 +1833,16 @@
     <string name="chat_bg_more">Altre impostazioni</string>
     <string name="chat_bg_connected_info">Gli agenti delle chat in background possono lavorare su uno schermo proprio.</string>
     <string name="chat_bg_setup_info">Permette a un agente di lavorare nelle tue app su uno schermo proprio mentre usi il telefono. La configurazione richiede circa un minuto e il Wi-Fi.</string>
+    <string name="hub_tool_delegate">Avvio dei sub-agenti: %1$s</string>
+    <string name="hub_tool_helpers">In attesa dei sub-agenti</string>
+    <string name="helpers_title">Sub-agenti</string>
+    <string name="helper_working">Al lavoro</string>
+    <string name="helper_done">Fatto</string>
+    <string name="helper_failed">Non riuscito</string>
+    <string name="helper_stopped">Fermato</string>
+    <string name="helper_of">Sub-agente di «%1$s»</string>
+    <string name="helper_this_chat">Questa chat</string>
+    <string name="helper_waiting">In attesa</string>
     <string name="background_security">Debug wireless permette ai dispositivi accoppiati di controllare questo telefono. Buddy accoppia solo se stesso, su questo telefono, e il suo programma di supporto ascolta solo qui.</string>
     <string name="background_brought">Ora è sul tuo schermo: questo passaggio ha bisogno di te. La modalità background adesso è disattivata per questa chat.</string>
     <string name="chat_background">Lavora in background</string>

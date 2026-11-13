@@ -221,6 +221,7 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         List<Sessions.Session> working = new ArrayList<>(), pinned = new ArrayList<>(), recent = new ArrayList<>(),
                 archived = new ArrayList<>();
         for (Sessions.Session ses : hub.sessions.all) {
+            if (!ses.parent.isEmpty()) continue; // a helper: its parent's chat lists it
             if (ses.running) working.add(ses);
             else if (ses.messages.isEmpty()) continue; // hide untouched new chats
             else if (ses.archived) archived.add(ses);

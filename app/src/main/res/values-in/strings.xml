@@ -1834,6 +1834,16 @@
     <string name="chat_bg_more">Setelan lainnya</string>
     <string name="chat_bg_connected_info">Agen di chat latar belakang dapat bekerja di layarnya sendiri.</string>
     <string name="chat_bg_setup_info">Memungkinkan agen bekerja di aplikasi Anda pada layarnya sendiri saat Anda memakai ponsel. Penyiapan butuh sekitar satu menit dan memerlukan Wi-Fi.</string>
+    <string name="hub_tool_delegate">Memulai sub-agen: %1$s</string>
+    <string name="hub_tool_helpers">Menunggu sub-agen</string>
+    <string name="helpers_title">Sub-agen</string>
+    <string name="helper_working">Bekerja</string>
+    <string name="helper_done">Selesai</string>
+    <string name="helper_failed">Gagal</string>
+    <string name="helper_stopped">Dihentikan</string>
+    <string name="helper_of">Sub-agen dari “%1$s”</string>
+    <string name="helper_this_chat">Chat ini</string>
+    <string name="helper_waiting">Menunggu</string>
     <string name="background_security">Proses debug nirkabel memungkinkan perangkat yang tersambung mengendalikan ponsel ini. Buddy hanya menyambungkan dirinya sendiri, di ponsel ini, dan pembantunya hanya mendengarkan di sini.</string>
     <string name="background_brought">Dipindahkan ke layar Anda: langkah ini memerlukan Anda. Mode latar belakang kini nonaktif untuk chat ini.</string>
     <string name="chat_background">Bekerja di latar belakang</string>

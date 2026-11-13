@@ -14,7 +14,7 @@
 #   buddy-run <token> transcript <claude|codex> <file>   last messages of a session (buddy_transcript)
 #   buddy-run <token> adopt <session> <claude|codex> <agent-session-id>  continue that session as a Buddy chat
 # Every event sent to the bubble carries "buddy_session" so the app can route it.
-HELPER_VERSION=29
+HELPER_VERSION=30
 set -u
 export PATH=$HOME/.local/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # The claude launcher sets BUN_OPTIONS with a path relative to its folder; never inherit a stale one.
@@ -369,8 +369,10 @@ run_claude() {
     "Read(/$HOME/.agents/skills/**)" "Read(/$HOME/.claude/skills/**)")
   [ "$DEV" = rule ] && tools=("mcp__phone")
   for n in $(jq -r '.[].name' <<<"$EXTRA"); do tools+=("mcp__$n"); done
-  local deny=()
-  [ "$DEV" = rule ] && deny=(--disallowedTools "Bash" "WebFetch" "WebSearch" "Write" "Edit" "NotebookEdit" "Skill")
+  # Claude Code's own sub-agents (Agent, once Task) are off: Buddy can't show them, give each a screen or keep them to
+  # looking things up. The phone server's delegate tool starts sub-agents the user sees and can open.
+  local deny=(--disallowedTools "Agent" "Task")
+  [ "$DEV" = rule ] && deny=(--disallowedTools "Agent" "Task" "Bash" "WebFetch" "WebSearch" "Write" "Edit" "NotebookEdit" "Skill")
   [ "$DEV" = 1 ] && tools+=("Bash" "Read" "Write" "Edit" "Glob" "Grep" "Skill")
   local args=(-p "$MSG" --output-format stream-json --verbose
     --mcp-config "$mcp" --strict-mcp-config

@@ -27,6 +27,9 @@ final class BrowserThumb extends View implements Browser.Frames {
 
         void dismiss();
 
+        /** The pager's arrows: the next (1) or the one before (-1) of the agents' screens. */
+        void page(int by);
+
         /** A tap on the tiny picture in the pill: back to its full size. */
         void restore();
 
@@ -64,6 +67,23 @@ final class BrowserThumb extends View implements Browser.Frames {
         setBackground(rounded(getContext(), CARD2, on ? 6 : 14));
         setForeground(outlined(getContext(), Color.TRANSPARENT, on ? 6 : 14, ACCENT, 1));
         invalidate();
+    }
+
+    /** Several agents' screens to show: a bar on top says whose this is, "2/7", with an arrow to each side. */
+    private int page, pages;
+    private String pageName = "";
+    private final Paint bar = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    void setPager(int page, int pages, String name) {
+        if (this.page == page && this.pages == pages && pageName.equals(name)) return;
+        this.page = page;
+        this.pages = pages;
+        pageName = name == null ? "" : name;
+        invalidate();
+    }
+
+    private float barHeight() {
+        return dp(getContext(), 30);
     }
 
     void setGripLeft(boolean left) {
@@ -121,10 +141,33 @@ final class BrowserThumb extends View implements Browser.Frames {
     @Override
     protected void onDraw(Canvas c) {
         super.onDraw(c);
-        if (bitmap == null) return; // the background until the first frame
-        dst.set(0, 0, getWidth(), getHeight()); // sized to the page (see Bubble.updateThumb)
-        c.drawBitmap(bitmap, null, dst, paint);
+        if (bitmap != null) { // (the background until the first frame; the pager and the grip are there all the same)
+            dst.set(0, 0, getWidth(), getHeight()); // sized to the page (see Bubble.updateThumb)
+            c.drawBitmap(bitmap, null, dst, paint);
+        }
         if (mini) return;
+        if (pages > 1) { // ‹  Amazon 2/7  ›
+            float h = barHeight(), w = getWidth(), u = dp(getContext(), 1);
+            bar.setStyle(Paint.Style.FILL);
+            bar.setColor(0xB3000000);
+            c.drawRect(0, 0, w, h, bar);
+            bar.setColor(0xFFFFFFFF);
+            bar.setTextSize(11 * u * getResources().getConfiguration().fontScale);
+            bar.setTextAlign(Paint.Align.CENTER);
+            String label = page + "/" + pages;
+            float room = w - 56 * u;
+            String name = pageName;
+            while (!name.isEmpty() && bar.measureText(name + " " + label) > room) name = name.substring(0, name.length() - 1);
+            c.drawText((name.isEmpty() ? "" : name.trim() + (name.equals(pageName) ? " " : "… ")) + label, w / 2, h / 2 + 4 * u, bar);
+            bar.setStyle(Paint.Style.STROKE);
+            bar.setStrokeWidth(2 * u);
+            bar.setStrokeCap(Paint.Cap.ROUND);
+            float m = h / 2;
+            c.drawLine(15 * u, m - 5 * u, 10 * u, m, bar);
+            c.drawLine(10 * u, m, 15 * u, m + 5 * u, bar);
+            c.drawLine(w - 15 * u, m - 5 * u, w - 10 * u, m, bar);
+            c.drawLine(w - 10 * u, m, w - 15 * u, m + 5 * u, bar);
+        }
         // the resize grip: two short diagonal strokes in the free bottom corner, readable on light and dark pages
         float u = dp(getContext(), 1), h = getHeight(), x0 = gripLeft ? 0 : getWidth(), sx = gripLeft ? 1 : -1;
         for (int pass = 0; pass < 2; pass++) {
@@ -173,7 +216,11 @@ final class BrowserThumb extends View implements Browser.Frames {
                 return true;
             case MotionEvent.ACTION_UP:
                 if (dragging) actions.drop(dx, dy, false);
-                else if (Math.hypot(dx, dy) < slop) performClick();
+                else if (Math.hypot(dx, dy) < slop) {
+                    // on the pager's bar: its left half is "before", its right half "next"; anywhere else opens
+                    if (pages > 1 && e.getY() < barHeight() + dp(getContext(), 8)) actions.page(e.getX() < getWidth() / 2f ? -1 : 1);
+                    else performClick();
+                }
                 dragging = false;
                 return true;
             case MotionEvent.ACTION_CANCEL:

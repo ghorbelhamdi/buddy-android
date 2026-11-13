@@ -64,7 +64,7 @@ public final class ShareActivity extends Screen {
         int n = 0;
         for (Sessions.Session s : new ArrayList<>(hub.sessions.all)) {
             if (n == RECENT) break;
-            if (s.running || s.archived || s.messages.isEmpty() || !SetupState.signedIn(this, s.backend)) continue;
+            if (s.running || s.archived || !s.parent.isEmpty() || s.messages.isEmpty() || !SetupState.signedIn(this, s.backend)) continue;
             if (n == 0) c.addView(sectionLabel(this, getString(R.string.main_section_recent)));
             c.addView(choice(s.backend, s.label(), s), full());
             n++;

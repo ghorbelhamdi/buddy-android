@@ -1833,6 +1833,16 @@
     <string name="chat_bg_more">更多设置</string>
     <string name="chat_bg_connected_info">后台聊天中的代理可以在自己的屏幕上工作。</string>
     <string name="chat_bg_setup_info">让代理在自己的屏幕上操作你的应用，同时你照常使用手机。设置大约需要一分钟，并且需要 Wi-Fi。</string>
+    <string name="hub_tool_delegate">正在启动子代理：%1$s</string>
+    <string name="hub_tool_helpers">正在等待子代理</string>
+    <string name="helpers_title">子代理</string>
+    <string name="helper_working">工作中</string>
+    <string name="helper_done">完成</string>
+    <string name="helper_failed">失败</string>
+    <string name="helper_stopped">已停止</string>
+    <string name="helper_of">“%1$s”的子代理</string>
+    <string name="helper_this_chat">此聊天</string>
+    <string name="helper_waiting">等待中</string>
     <string name="background_security">“无线调试”允许已配对的设备控制这部手机。Buddy 只配对它自己，而且就在这部手机上；它的助手程序也只在本机监听。</string>
     <string name="background_brought">已移到你的屏幕：这一步需要你来做。这个对话的后台模式现已关闭。</string>
     <string name="chat_background">在后台工作</string>

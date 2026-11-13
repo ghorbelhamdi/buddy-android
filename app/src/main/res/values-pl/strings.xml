@@ -1427,6 +1427,16 @@
     <string name="chat_bg_more">Więcej ustawień</string>
     <string name="chat_bg_connected_info">Agenci w czatach w tle mogą pracować na własnym ekranie.</string>
     <string name="chat_bg_setup_info">Pozwala agentowi pracować w Twoich aplikacjach na własnym ekranie, gdy korzystasz z telefonu. Konfiguracja trwa około minuty i wymaga Wi-Fi.</string>
+    <string name="hub_tool_delegate">Uruchamianie podagentów: %1$s</string>
+    <string name="hub_tool_helpers">Czekanie na podagentów</string>
+    <string name="helpers_title">Podagenci</string>
+    <string name="helper_working">Pracuje</string>
+    <string name="helper_done">Gotowe</string>
+    <string name="helper_failed">Nie udało się</string>
+    <string name="helper_stopped">Zatrzymano</string>
+    <string name="helper_of">Podagent czatu „%1$s”</string>
+    <string name="helper_this_chat">Ten czat</string>
+    <string name="helper_waiting">Czeka</string>
     <string name="background_security">Debugowanie bezprzewodowe pozwala sparowanym urządzeniom sterować tym telefonem. Buddy paruje tylko siebie, na tym telefonie, a jego pomocnik nasłuchuje tylko tutaj.</string>
     <string name="background_brought">Przeniesiono na twój ekran: ten krok wymaga ciebie. Tryb w tle jest teraz wyłączony w tym czacie.</string>
     <string name="chat_background">Pracuj w tle</string>

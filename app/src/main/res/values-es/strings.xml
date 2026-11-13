@@ -1832,6 +1832,16 @@
     <string name="chat_bg_more">Más ajustes</string>
     <string name="chat_bg_connected_info">Los agentes de los chats en segundo plano pueden trabajar en una pantalla propia.</string>
     <string name="chat_bg_setup_info">Permite que un agente trabaje en tus apps en una pantalla propia mientras usas el teléfono. La configuración tarda un minuto y necesita Wi-Fi.</string>
+    <string name="hub_tool_delegate">Iniciando subagentes: %1$s</string>
+    <string name="hub_tool_helpers">Esperando a los subagentes</string>
+    <string name="helpers_title">Subagentes</string>
+    <string name="helper_working">Trabajando</string>
+    <string name="helper_done">Listo</string>
+    <string name="helper_failed">Falló</string>
+    <string name="helper_stopped">Detenido</string>
+    <string name="helper_of">Subagente de «%1$s»</string>
+    <string name="helper_this_chat">Este chat</string>
+    <string name="helper_waiting">En espera</string>
     <string name="background_security">Depuración inalámbrica permite que los dispositivos emparejados controlen este teléfono. Buddy solo se empareja a sí mismo, en este teléfono, y su ayudante solo escucha aquí.</string>
     <string name="background_brought">Pasó a tu pantalla: este paso te necesita. El modo en segundo plano queda desactivado en este chat.</string>
     <string name="chat_background">Trabajar en segundo plano</string>

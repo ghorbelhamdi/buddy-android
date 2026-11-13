@@ -1401,6 +1401,16 @@
     <string name="chat_bg_more">Diğer ayarlar</string>
     <string name="chat_bg_connected_info">Arka plan sohbetlerindeki ajanlar kendi ekranlarında çalışabilir.</string>
     <string name="chat_bg_setup_info">Siz telefonunuzu kullanırken ajanın uygulamalarınızda kendi ekranında çalışmasını sağlar. Kurulum yaklaşık bir dakika sürer ve Wi-Fi gerekir.</string>
+    <string name="hub_tool_delegate">Alt ajanlar başlatılıyor: %1$s</string>
+    <string name="hub_tool_helpers">Alt ajanlar bekleniyor</string>
+    <string name="helpers_title">Alt ajanlar</string>
+    <string name="helper_working">Çalışıyor</string>
+    <string name="helper_done">Bitti</string>
+    <string name="helper_failed">Başarısız</string>
+    <string name="helper_stopped">Durduruldu</string>
+    <string name="helper_of">“%1$s” için alt ajan</string>
+    <string name="helper_this_chat">Bu sohbet</string>
+    <string name="helper_waiting">Bekliyor</string>
     <string name="background_security">Kablosuz hata ayıklama, eşlenen cihazların bu telefonu kontrol etmesine izin verir. Buddy yalnızca kendini, bu telefonun üzerinde eşler ve yardımcısı yalnızca burayı dinler.</string>
     <string name="background_brought">Ekranınıza taşındı: bu adımı sizin yapmanız gerekiyor. Arka plan modu bu sohbet için artık kapalı.</string>
     <string name="chat_background">Arka planda çalış</string>

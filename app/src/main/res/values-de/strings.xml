@@ -1400,6 +1400,16 @@
     <string name="chat_bg_more">Weitere Einstellungen</string>
     <string name="chat_bg_connected_info">Agenten in Hintergrund-Chats können auf einem eigenen Bildschirm arbeiten.</string>
     <string name="chat_bg_setup_info">Lässt einen Agenten auf einem eigenen Bildschirm in deinen Apps arbeiten, während du dein Handy benutzt. Die Einrichtung dauert etwa eine Minute und braucht WLAN.</string>
+    <string name="hub_tool_delegate">Sub-Agenten werden gestartet: %1$s</string>
+    <string name="hub_tool_helpers">Warten auf die Sub-Agenten</string>
+    <string name="helpers_title">Sub-Agenten</string>
+    <string name="helper_working">Arbeitet</string>
+    <string name="helper_done">Fertig</string>
+    <string name="helper_failed">Fehlgeschlagen</string>
+    <string name="helper_stopped">Gestoppt</string>
+    <string name="helper_of">Sub-Agent von „%1$s“</string>
+    <string name="helper_this_chat">Dieser Chat</string>
+    <string name="helper_waiting">Wartet</string>
     <string name="background_security">Über „Debugging über WLAN“ können gekoppelte Geräte dieses Handy steuern. Buddy koppelt nur sich selbst, auf diesem Handy, und sein Helfer lauscht nur hier.</string>
     <string name="background_brought">Auf deinen Bildschirm geholt: Dieser Schritt braucht dich. Der Hintergrundmodus ist für diesen Chat jetzt aus.</string>
     <string name="chat_background">Im Hintergrund arbeiten</string>

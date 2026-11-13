@@ -1445,6 +1445,16 @@
     <string name="chat_bg_more">إعدادات أخرى</string>
     <string name="chat_bg_connected_info">يمكن للوكلاء في محادثات الخلفية العمل على شاشة خاصة بهم.</string>
     <string name="chat_bg_setup_info">يتيح للوكيل العمل في تطبيقاتك على شاشة خاصة به بينما تستخدم هاتفك. يستغرق الإعداد نحو دقيقة ويحتاج إلى Wi-Fi.</string>
+    <string name="hub_tool_delegate">بدء الوكلاء الفرعيين: %1$s</string>
+    <string name="hub_tool_helpers">في انتظار الوكلاء الفرعيين</string>
+    <string name="helpers_title">الوكلاء الفرعيون</string>
+    <string name="helper_working">يعمل</string>
+    <string name="helper_done">تم</string>
+    <string name="helper_failed">فشل</string>
+    <string name="helper_stopped">أُوقف</string>
+    <string name="helper_of">وكيل فرعي لـ «%1$s»</string>
+    <string name="helper_this_chat">هذه المحادثة</string>
+    <string name="helper_waiting">في الانتظار</string>
     <string name="background_security">يتيح «تصحيح الأخطاء اللاسلكي» للأجهزة المقترنة التحكم في هذا الهاتف. يقرن Buddy نفسه فقط، على هذا الهاتف، وبرنامجه المساعد لا يستمع إلا هنا.</string>
     <string name="background_brought">تم النقل إلى شاشتك: هذه الخطوة تحتاج إليك. وضع الخلفية متوقف الآن لهذه المحادثة.</string>
     <string name="chat_background">العمل في الخلفية</string>

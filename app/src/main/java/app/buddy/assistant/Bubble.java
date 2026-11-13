@@ -343,14 +343,12 @@ final class Bubble implements ChatHub.Listener {
         LinearLayout chip = Ui.chip(svc, "");
         subtitle = (TextView) chip.getChildAt(0);
         chip.setOnClickListener(v -> showModelPicker());
-        modelChip = chip;
-        chips.addView(chip, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        modelChip = chip; // (it sits in the message box, by the buttons, as on the chat screen)
         LinearLayout tag = Ui.linuxChip(svc);
         Ui.paintLinuxChip(svc, tag, true);
         tag.setVisibility(View.GONE);
         linuxTag = tag;
         LinearLayout.LayoutParams ltp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        ltp.setMarginStart(dp(6));
         chips.addView(tag, ltp);
         // background mode at a glance, as on the chat screen: green connected, red not; a tap connects or opens its sheet
         LinearLayout bg = new LinearLayout(svc);
@@ -420,6 +418,14 @@ final class Bubble implements ChatHub.Listener {
         messages.setOrientation(LinearLayout.VERTICAL);
         messages.setPaddingRelative(0, dp(8), 0, dp(8));
         scroll.addView(messages);
+        helpersList = new LinearLayout(svc);
+        helpersList.setOrientation(LinearLayout.VERTICAL);
+        helpersList.setBackground(Ui.rounded(svc, Ui.CARD, 12));
+        helpersList.setPaddingRelative(dp(10), dp(4), dp(8), dp(4));
+        helpersList.setVisibility(View.GONE);
+        LinearLayout.LayoutParams hlp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        hlp.topMargin = dp(8);
+        panel.addView(helpersList, hlp);
         panel.addView(scroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
         listScroll = new ScrollView(svc);
         sessionList = new LinearLayout(svc);
@@ -521,14 +527,25 @@ final class Bubble implements ChatHub.Listener {
         panel.addView(confirmCard, clp);
 
         // composer: one pill with the text field, a mic and a round send button (like the chat screen)
+        // the message box, as on the chat screen: the text on top, and under it a bar with attach, the model chip, paste,
+        // live voice, the mic and send
+        LinearLayout box = new LinearLayout(svc);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setPaddingRelative(dp(4), dp(4), dp(4), dp(4));
+        box.setBackground(rounded(Ui.CARD, 26, Ui.OUTLINE, 1));
         LinearLayout inputRow = new LinearLayout(svc);
         inputRow.setGravity(Gravity.CENTER_VERTICAL);
-        inputRow.setPaddingRelative(dp(4), dp(4), dp(4), dp(4));
-        inputRow.setBackground(rounded(Ui.CARD, 26, Ui.OUTLINE, 1));
         // attachments are picked in the app (camera, gallery, files), with this chat and draft open
         android.widget.ImageButton attach = Ui.iconButton(svc, R.drawable.ms_attach_file, svc.getString(R.string.bubble_attach), Ui.MUTED);
         attach.setOnClickListener(v -> openInApp(true));
         inputRow.addView(attach, new LinearLayout.LayoutParams(dp(40), dp(40)));
+        FrameLayout chipBox = new FrameLayout(svc);
+        chipBox.addView(modelChip, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER_VERTICAL | Gravity.START));
+        LinearLayout.LayoutParams cbp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+        cbp.setMarginStart(dp(2));
+        cbp.setMarginEnd(dp(6));
+        inputRow.addView(chipBox, cbp);
         RichEditText field = new RichEditText(svc);
         field.onImages(this::pasteImages); // from the keyboard's clipboard, say (issue #6)
         input = field;
@@ -541,7 +558,7 @@ final class Bubble implements ChatHub.Listener {
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE
                 | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
         input.setImeOptions(EditorInfo.IME_ACTION_SEND);
-        input.setPaddingRelative(0, dp(10), 0, dp(10));
+        input.setPaddingRelative(dp(12), dp(10), dp(12), dp(4));
         input.setBackground(null);
         input.setOnFocusChangeListener((v, has) -> {
             refit();
@@ -551,7 +568,7 @@ final class Bubble implements ChatHub.Listener {
             refit();
             updatePaste();
         });
-        inputRow.addView(input, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        box.addView(input, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         // Android shows no Copy/Paste menu in an overlay window: a Paste button shows while something is copied
         paste = Ui.iconButton(svc, R.drawable.ms_content_paste, svc.getString(R.string.bubble_paste), Ui.MUTED);
         paste.setOnClickListener(v -> pasteClip());
@@ -601,9 +618,11 @@ final class Bubble implements ChatHub.Listener {
                 paintSend.run();
             }
         });
-        panel.addView(inputRow, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+        box.addView(inputRow, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
-        composer = inputRow;
+        panel.addView(box, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+        composer = box;
         voiceBar = new VoiceBar(svc, new VoiceBar.Actions() {
             @Override
             public void cancel() {
@@ -1550,7 +1569,7 @@ final class Bubble implements ChatHub.Listener {
         Sessions.Session last = null;
         if (Prefs.liveContinue(svc)) {
             for (Sessions.Session s : new java.util.ArrayList<>(sessions.all)) { // most recent first
-                if (s.backend.equals(agent) && !s.archived && !s.incognito && !s.running && !s.title.startsWith("⚡ ")) {
+                if (s.backend.equals(agent) && !s.archived && s.parent.isEmpty() && !s.incognito && !s.running && !s.title.startsWith("⚡ ")) {
                     last = s; // not a notification rule's chat (⚡), nor one at work
                     break;
                 }
@@ -1894,6 +1913,7 @@ final class Bubble implements ChatHub.Listener {
         java.util.List<Sessions.Session> list = new java.util.ArrayList<>();
         int recent = 0;
         for (Sessions.Session s : sessions.all) { // most recent first
+            if (!s.parent.isEmpty()) continue; // a sub-agent: its parent's chat lists it
             if (s.archived && !waitingIn(s)) continue;
             if (!s.pinned && !waitingIn(s) && !s.running && ++recent > 30) continue;
             list.add(s);
@@ -2081,8 +2101,9 @@ final class Bubble implements ChatHub.Listener {
         header.setText(pickingModel ? svc.getString(R.string.bubble_model_effort_title)
                 : picking ? svc.getString(R.string.bubble_new_chat)
                 : showingList ? svc.getString(R.string.bubble_chats_title) : ses.label());
-        subtitle.setText(Models.summary(ses));
+        subtitle.setText(Models.chip(ses));
         modelChip.setVisibility(showingList ? View.GONE : View.VISIBLE);
+        renderHelpers(showingList ? null : ses);
         linuxTag.setVisibility(!showingList && ses.dev ? View.VISIBLE : View.GONE);
         bgChip.setVisibility(!showingList && Linux.installed(svc) ? View.VISIBLE : View.GONE);
         paintBackgroundChip();
@@ -2643,6 +2664,7 @@ final class Bubble implements ChatHub.Listener {
         activityBrowser = browserTab != null;
         activityTab = browserTab;
         activityAt = android.os.SystemClock.elapsedRealtime();
+        if (browserTab != null) screenSeen.put(browserTab, activityAt);
         svc.mainHandler().removeCallbacks(activityExpired);
         svc.mainHandler().postDelayed(activityExpired, ACTIVITY_MS + 100);
         refreshStatus();
@@ -2675,7 +2697,31 @@ final class Bubble implements ChatHub.Listener {
         } else if (browsing && pendingConfirm == null) {
             text = activity;
         }
-        thumbTab = browsing && !paused && pendingConfirm == null ? activityTab : null;
+        // Whose screen the picture shows. With several agents at work their steps alternate, and following the latest
+        // one made the picture jump between them and close on every step that had no screen. So it stays on the
+        // screen it shows (or the one the user paged to) for as long as that agent works there, and only then moves
+        // on: to the latest step's screen, or the first there is.
+        String want = null;
+        if (!paused && pendingConfirm == null && !controlling) {
+            java.util.List<String> keys = thumbKeys();
+            if (thumbPick != null && !keys.contains(thumbPick)) thumbPick = null;
+            if (thumbPick != null) want = thumbPick;
+            else if (thumbTab != null && keys.contains(thumbTab) && screenFresh(thumbTab)) want = thumbTab;
+            // the latest step's screen, unless its agent is done (its screen shows nothing any more); an agent
+            // outside Buddy's chats has no chat to be done
+            else if (browsing && activityTab != null && (keys.contains(activityTab) || thumbName(activityTab).isEmpty())) want = activityTab;
+            else { // the screen that last had a step, if one did lately: an agent that only thinks shows nothing
+                long best = 0;
+                for (String k : keys) {
+                    Long t = screenSeen.get(k);
+                    if (t != null && t > best && screenFresh(k)) {
+                        best = t;
+                        want = k;
+                    }
+                }
+            }
+        }
+        thumbTab = want;
         // working, but not on the screen (the background browser, Linux tools, thinking): the phone is the user's, so
         // the pill says so above the status and the ring is calm; on the screen (ControlIndicator) the look stays loud
         boolean background = !paused && !controlling && (running || browsing) && pendingConfirm == null;
@@ -2749,6 +2795,16 @@ final class Bubble implements ChatHub.Listener {
             public void dismiss() { // not gone: tiny, in the pill
                 thumbMini = true;
                 Prefs.setThumbMini(svc, true);
+                updateThumb();
+            }
+
+            @Override
+            public void page(int by) { // the next agent's screen, round and round
+                java.util.List<String> keys = thumbKeys();
+                if (keys.size() < 2) return;
+                int at = keys.indexOf(thumbTab);
+                thumbPick = keys.get(at < 0 ? 0 : (at + by + keys.size()) % keys.size());
+                thumbTab = thumbPick;
                 updateThumb();
             }
 
@@ -2840,6 +2896,11 @@ final class Bubble implements ChatHub.Listener {
                 && pill.getVisibility() == View.VISIBLE
                 && (thumbTab.startsWith(Background.KEY) || Browser.available(svc));
         if (on) on = placeThumb();
+        if (on) { // several agents with a screen: the picture says which one it shows, and pages through them
+            java.util.List<String> keys = thumbKeys();
+            int at = keys.indexOf(thumbTab);
+            thumb.setPager(at + 1, at < 0 ? 0 : keys.size(), thumbName(thumbTab)); // (a screen not in the list: no pager)
+        }
         if (!on || !thumbMini) pillRoom(0, false);
         thumbWindow.setVisibility(on ? View.VISIBLE : View.GONE);
         String want = on ? thumbTab : null;
@@ -2899,6 +2960,91 @@ final class Bubble implements ChatHub.Listener {
         int fromEdge = lp.x + (right ? root.getWidth() - pill.getRight() : pill.getLeft());
         int width = wm.getCurrentWindowMetrics().getBounds().width();
         return new int[]{right ? width - fromEdge - w : fromEdge, lp.y + pill.getBottom() + dp(6)};
+    }
+
+    /** When each screen (a key as thumbTab's) last had a step: the picture stays on one only while it is in use. */
+    private final java.util.Map<String, Long> screenSeen = new java.util.HashMap<>();
+    private static final long SCREEN_FRESH_MS = 20_000;
+
+    private boolean screenFresh(String key) {
+        Long t = screenSeen.get(key);
+        return t != null && SystemClock.elapsedRealtime() - t < SCREEN_FRESH_MS;
+    }
+
+    /** The screen the user paged the picture to (a key as thumbTab's), or null: the latest step's. */
+    private String thumbPick;
+
+    /** Every screen there is to show now: working chats' and sub-agents' hidden screens and browser tabs. */
+    private java.util.List<String> thumbKeys() {
+        java.util.List<Sessions.Session> l = new java.util.ArrayList<>();
+        for (Sessions.Session s : sessions.all) if (s.running) l.add(s); // only these have a screen worth watching
+        // a fixed order (the chat list's own changes with every message): a chat, then its sub-agents as started
+        java.util.Collections.sort(l, (x, y) -> {
+            int c = (x.parent.isEmpty() ? x.id : x.parent).compareTo(y.parent.isEmpty() ? y.id : y.parent);
+            if (c != 0) return c;
+            if (x.parent.isEmpty() != y.parent.isEmpty()) return x.parent.isEmpty() ? -1 : 1;
+            return Integer.compare(x.slot, y.slot);
+        });
+        java.util.List<String> keys = new java.util.ArrayList<>();
+        for (Sessions.Session s : l) {
+            if (!s.running) continue; // a finished agent's screen rests until it closes: nothing to watch
+            if (Background.displayOf(s.id) != android.view.Display.DEFAULT_DISPLAY) keys.add(Background.KEY + s.id);
+            else if (Browser.running() && Browser.hasTab(Browser.key(s.id))) keys.add(Browser.key(s.id));
+        }
+        return keys;
+    }
+
+    /** Whose screen a key is: the chat's or sub-agent's name. */
+    private String thumbName(String key) {
+        if (key == null) return "";
+        for (Sessions.Session s : sessions.all)
+            if (key.equals(Background.KEY + s.id) || key.equals(Browser.key(s.id))) return s.label();
+        return "";
+    }
+
+    private LinearLayout helpersList;
+    private String helpersShown = "";
+
+    /** The open chat's sub-agents as rows above its messages (dot, name, state); a tap opens one in the app. */
+    private void renderHelpers(Sessions.Session ses) {
+        if (helpersList == null) return;
+        java.util.List<Sessions.Session> l = ses == null || !ses.parent.isEmpty() ? new java.util.ArrayList<>() : Helpers.of(hub, ses.id);
+        StringBuilder sig = new StringBuilder();
+        for (Sessions.Session h : l) sig.append(h.id).append(h.running).append(h.outcome).append(h.status).append('|');
+        if (sig.toString().equals(helpersShown)) return;
+        helpersShown = sig.toString();
+        helpersList.removeAllViews();
+        helpersList.setVisibility(l.isEmpty() ? View.GONE : View.VISIBLE);
+        if (l.isEmpty()) return;
+        LinearLayout rows = new LinearLayout(svc);
+        rows.setOrientation(LinearLayout.VERTICAL);
+        for (final Sessions.Session h : l) {
+            boolean failed = "failed".equals(h.outcome), stopped = "stopped".equals(h.outcome);
+            LinearLayout r = new LinearLayout(svc);
+            r.setGravity(Gravity.CENTER_VERTICAL);
+            r.setPaddingRelative(dp(2), dp(7), dp(2), dp(7));
+            r.addView(Ui.dot(svc, h.running ? Ui.ACCENT : failed ? Ui.ERR : stopped ? Ui.MUTED : Ui.OK, 8));
+            TextView n = Ui.single(Ui.text(svc, h.title, 13, Ui.TEXT));
+            n.setPaddingRelative(dp(8), 0, dp(8), 0);
+            r.addView(n, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+            TextView st = Ui.single(Ui.text(svc, h.running ? (h.status.isEmpty() ? svc.getString(R.string.helper_working) : h.status)
+                    : svc.getString(failed ? R.string.helper_failed : stopped ? R.string.helper_stopped : R.string.helper_done), 11, Ui.MUTED));
+            st.setMaxWidth(dp(150));
+            r.addView(st);
+            r.addView(Ui.icon(svc, R.drawable.ms_chevron_right, Ui.MUTED, 16));
+            r.setOnClickListener(v -> {
+                svc.startActivity(new android.content.Intent(svc, ChatActivity.class).putExtra("id", h.id)
+                        .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK));
+                collapse();
+            });
+            rows.addView(r, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        }
+        if (l.size() > 4) { // many: they scroll, the messages keep their room
+            ScrollView down = new ScrollView(svc);
+            down.setOverScrollMode(View.OVER_SCROLL_NEVER);
+            down.addView(rows);
+            helpersList.addView(down, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(4 * 34 + 14)));
+        } else helpersList.addView(rows);
     }
 
     private int pillRoomPx;

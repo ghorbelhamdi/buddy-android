@@ -1833,6 +1833,16 @@
     <string name="chat_bg_more">Plus de réglages</string>
     <string name="chat_bg_connected_info">Les agents des discussions en arrière-plan peuvent travailler sur leur propre écran.</string>
     <string name="chat_bg_setup_info">Permet à un agent de travailler dans vos applis sur son propre écran pendant que vous utilisez votre téléphone. La configuration prend environ une minute et nécessite le Wi-Fi.</string>
+    <string name="hub_tool_delegate">Démarrage des sous-agents : %1$s</string>
+    <string name="hub_tool_helpers">En attente des sous-agents</string>
+    <string name="helpers_title">Sous-agents</string>
+    <string name="helper_working">En cours</string>
+    <string name="helper_done">Terminé</string>
+    <string name="helper_failed">Échec</string>
+    <string name="helper_stopped">Arrêté</string>
+    <string name="helper_of">Sous-agent de « %1$s »</string>
+    <string name="helper_this_chat">Cette discussion</string>
+    <string name="helper_waiting">En attente</string>
     <string name="background_security">Le Débogage sans fil permet aux appareils associés de contrôler ce téléphone. Buddy n\'associe que lui-même, sur ce téléphone, et son programme auxiliaire n\'écoute qu\'ici.</string>
     <string name="background_brought">Passé sur votre écran : cette étape a besoin de vous. Le mode arrière-plan est maintenant désactivé pour cette discussion.</string>
     <string name="chat_background">Travailler en arrière-plan</string>
