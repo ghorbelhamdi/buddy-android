@@ -33,6 +33,14 @@
     <string name="onboarding_brain_claude">Claude aboneliğinizi kullanır (Pro veya Max).</string>
     <string name="onboarding_brain_codex">ChatGPT planınızı kullanır.</string>
     <string name="onboarding_brain_opencode">Hesap gerekmez. Kendi sağlayıcılarınızı daha sonra bağlayabilirsiniz.</string>
+    <string name="onboarding_brain_local_title">Yerel model</string>
+    <string name="onboarding_brain_local">Kendi bilgisayarınızda Ollama, LM Studio veya llama.cpp. Hiçbir şey bir yapay zekâ şirketine gitmez. OpenCode üzerinden çalışır.</string>
+    <string name="onboarding_access_privacy_local">Yerel modelde ajanın ekranınızda okudukları bir yapay zekâ şirketine değil, kendi sunucunuza gider. Gönderme, paylaşma, satın alma ve silme her zaman önce onayınızı ister.</string>
+    <string name="onboarding_local_server_title">Model sunucunuz</string>
+    <string name="onboarding_local_server_none">Henüz eklenmedi</string>
+    <string name="onboarding_local_server_added">%1$s eklendi</string>
+    <string name="onboarding_local_server_text">Bilgisayarınızda Ollama, LM Studio veya llama.cpp\'yi başlatın, sonra adresini buraya ekleyin. Anahtar gerekmez. Araç çağrılarını iyi yöneten bir model seçin: küçük modeller (4–8B) yalnızca basit istekleri yapabilir.</string>
+    <string name="onboarding_local_server_add">Sunucunuzu ekleyin</string>
     <string name="onboarding_brain_agy">Google hesabınızı kullanır, Google AI Pro veya Ultra ile de çalışır.</string>
     <string name="onboarding_brain_grok">Grok hesabınızı kullanır (Google veya X ile giriş).</string>
     <string name="onboarding_brain_both">İkisini de yükleyin, her sohbette seçin. Varsayılan Claude Code olarak kalır.</string>

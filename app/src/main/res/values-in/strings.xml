@@ -42,6 +42,14 @@
     <string name="onboarding_brain_claude">Menggunakan langganan Claude Anda (Pro atau Max).</string>
     <string name="onboarding_brain_codex">Menggunakan paket ChatGPT Anda.</string>
     <string name="onboarding_brain_opencode">Tanpa perlu akun. Hubungkan penyedia Anda sendiri nanti.</string>
+    <string name="onboarding_brain_local_title">Model lokal</string>
+    <string name="onboarding_brain_local">Ollama, LM Studio, atau llama.cpp di komputer Anda sendiri. Tidak ada yang dikirim ke perusahaan AI. Berjalan lewat OpenCode.</string>
+    <string name="onboarding_access_privacy_local">Dengan model lokal, apa yang dibaca agen di layar Anda dikirim ke server Anda sendiri, bukan ke perusahaan AI. Mengirim, memposting, membeli, dan menghapus selalu meminta persetujuan Anda dulu.</string>
+    <string name="onboarding_local_server_title">Server model Anda</string>
+    <string name="onboarding_local_server_none">Belum ditambahkan</string>
+    <string name="onboarding_local_server_added">%1$s ditambahkan</string>
+    <string name="onboarding_local_server_text">Jalankan Ollama, LM Studio, atau llama.cpp di komputer Anda, lalu tambahkan alamatnya di sini. Tidak perlu kunci. Pilih model yang andal menangani pemanggilan alat: model kecil (4–8B) hanya sanggup permintaan sederhana.</string>
+    <string name="onboarding_local_server_add">Tambahkan server Anda</string>
     <string name="onboarding_brain_agy">Menggunakan akun Google Anda, juga dengan Google AI Pro atau Ultra.</string>
     <string name="onboarding_brain_grok">Menggunakan akun Grok Anda (login dengan Google atau X).</string>
     <!-- The option that installs both Claude Code and Codex. -->

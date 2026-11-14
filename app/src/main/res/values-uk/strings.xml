@@ -42,6 +42,14 @@
     <string name="onboarding_brain_claude">Використовує вашу підписку Claude (Pro або Max).</string>
     <string name="onboarding_brain_codex">Використовує вашу підписку ChatGPT.</string>
     <string name="onboarding_brain_opencode">Обліковий запис не потрібен. Власних провайдерів можна підключити пізніше.</string>
+    <string name="onboarding_brain_local_title">Локальна модель</string>
+    <string name="onboarding_brain_local">Ollama, LM Studio або llama.cpp на вашому комп\'ютері. Нічого не надходить ШІ-компанії. Працює через OpenCode.</string>
+    <string name="onboarding_access_privacy_local">З локальною моделлю те, що агент читає на екрані, надходить на ваш власний сервер, а не ШІ-компанії. Перед надсиланням, публікацією, купівлею та видаленням завжди запитується ваша згода.</string>
+    <string name="onboarding_local_server_title">Ваш сервер моделей</string>
+    <string name="onboarding_local_server_none">Ще не додано</string>
+    <string name="onboarding_local_server_added">Додано: %1$s</string>
+    <string name="onboarding_local_server_text">Запустіть Ollama, LM Studio або llama.cpp на комп\'ютері та додайте тут його адресу. Ключ не потрібен. Виберіть модель, яка добре працює з викликами інструментів: малі (4–8B) впораються лише з простими запитами.</string>
+    <string name="onboarding_local_server_add">Додати сервер</string>
     <string name="onboarding_brain_agy">Використовує ваш обліковий запис Google, зокрема з Google AI Pro або Ultra.</string>
     <string name="onboarding_brain_grok">Використовує ваш обліковий запис Grok (вхід через Google або X).</string>
     <!-- The option that installs both Claude Code and Codex. -->

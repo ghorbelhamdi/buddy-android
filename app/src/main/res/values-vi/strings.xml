@@ -42,6 +42,14 @@
     <string name="onboarding_brain_claude">Dùng gói Claude của bạn (Pro hoặc Max).</string>
     <string name="onboarding_brain_codex">Dùng gói ChatGPT của bạn.</string>
     <string name="onboarding_brain_opencode">Không cần tài khoản. Kết nối nhà cung cấp riêng của bạn sau.</string>
+    <string name="onboarding_brain_local_title">Mô hình cục bộ</string>
+    <string name="onboarding_brain_local">Ollama, LM Studio hoặc llama.cpp trên máy tính của bạn. Không có gì được gửi đến công ty AI. Chạy qua OpenCode.</string>
+    <string name="onboarding_access_privacy_local">Với mô hình cục bộ, những gì agent đọc trên màn hình được gửi đến máy chủ của riêng bạn, không đến công ty AI. Gửi, đăng, mua và xóa luôn hỏi bạn trước.</string>
+    <string name="onboarding_local_server_title">Máy chủ mô hình của bạn</string>
+    <string name="onboarding_local_server_none">Chưa thêm</string>
+    <string name="onboarding_local_server_added">Đã thêm %1$s</string>
+    <string name="onboarding_local_server_text">Chạy Ollama, LM Studio hoặc llama.cpp trên máy tính, rồi thêm địa chỉ của nó vào đây. Không cần khóa. Hãy chọn mô hình xử lý tốt việc gọi công cụ: mô hình nhỏ (4–8B) chỉ làm được yêu cầu đơn giản.</string>
+    <string name="onboarding_local_server_add">Thêm máy chủ của bạn</string>
     <!-- Under "Antigravity" (Google's agent) in the agent choice. Google AI Pro and Ultra are Google's paid plans (names stay as they are). -->
     <string name="onboarding_brain_agy">Dùng tài khoản Google của bạn, kể cả với Google AI Pro hoặc Ultra.</string>
     <!-- Under "Grok" (xAI's agent) in the agent choice. Grok, xAI and X stay as they are; "X" is the social network. -->

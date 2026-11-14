@@ -41,6 +41,14 @@
     <string name="onboarding_brain_claude">Usa sua assinatura do Claude (Pro ou Max).</string>
     <string name="onboarding_brain_codex">Usa seu plano do ChatGPT.</string>
     <string name="onboarding_brain_opencode">Sem precisar de conta. Conecte seus próprios provedores depois.</string>
+    <string name="onboarding_brain_local_title">Modelo local</string>
+    <string name="onboarding_brain_local">Ollama, LM Studio ou llama.cpp no seu próprio computador. Nada vai para uma empresa de IA. Funciona pelo OpenCode.</string>
+    <string name="onboarding_access_privacy_local">Com um modelo local, o que o agente lê na sua tela vai para o seu próprio servidor, não para uma empresa de IA. Enviar, publicar, comprar e apagar sempre pedem o seu OK.</string>
+    <string name="onboarding_local_server_title">Seu servidor de modelos</string>
+    <string name="onboarding_local_server_none">Ainda não adicionado</string>
+    <string name="onboarding_local_server_added">%1$s adicionado</string>
+    <string name="onboarding_local_server_text">Inicie o Ollama, o LM Studio ou o llama.cpp no seu computador e adicione o endereço aqui. Não precisa de chave. Escolha um modelo que lide bem com chamadas de ferramentas: os pequenos (4–8B) só dão conta de pedidos simples.</string>
+    <string name="onboarding_local_server_add">Adicionar seu servidor</string>
     <string name="onboarding_brain_agy">Usa sua conta do Google, também com Google AI Pro ou Ultra.</string>
     <string name="onboarding_brain_grok">Usa sua conta do Grok (login com Google ou X).</string>
     <!-- The option that installs both Claude Code and Codex. -->

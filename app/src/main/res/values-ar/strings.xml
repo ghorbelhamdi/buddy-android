@@ -33,6 +33,14 @@
     <string name="onboarding_brain_claude">يستخدم اشتراكك في Claude (خطة Pro أو Max).</string>
     <string name="onboarding_brain_codex">يستخدم اشتراكك في ChatGPT.</string>
     <string name="onboarding_brain_opencode">دون الحاجة إلى حساب. يمكنك ربط مزوّديك لاحقًا.</string>
+    <string name="onboarding_brain_local_title">نموذج محلي</string>
+    <string name="onboarding_brain_local">Ollama أو LM Studio أو llama.cpp على حاسوبك. لا شيء يذهب إلى شركة ذكاء اصطناعي. يعمل عبر OpenCode.</string>
+    <string name="onboarding_access_privacy_local">مع نموذج محلي، ما يقرؤه الوكيل على شاشتك يذهب إلى خادمك أنت، لا إلى شركة ذكاء اصطناعي. الإرسال والنشر والشراء والحذف تطلب موافقتك دائمًا أولًا.</string>
+    <string name="onboarding_local_server_title">خادم النماذج الخاص بك</string>
+    <string name="onboarding_local_server_none">لم يُضف بعد</string>
+    <string name="onboarding_local_server_added">تمت إضافة %1$s</string>
+    <string name="onboarding_local_server_text">شغّل Ollama أو LM Studio أو llama.cpp على حاسوبك، ثم أضف عنوانه هنا. لا حاجة إلى مفتاح. اختر نموذجًا يجيد استدعاء الأدوات: النماذج الصغيرة (4–8B) تنجز الطلبات البسيطة فقط.</string>
+    <string name="onboarding_local_server_add">أضف خادمك</string>
     <string name="onboarding_brain_agy">يستخدم حسابك في Google، ويعمل أيضًا مع Google AI Pro أو Ultra.</string>
     <string name="onboarding_brain_grok">يستخدم حسابك في Grok (سجّل الدخول باستخدام Google أو X).</string>
     <string name="onboarding_brain_both">ثبّت الاثنين واختر أحدهما لكل محادثة. يظل Claude Code هو الافتراضي.</string>

@@ -33,6 +33,14 @@
     <string name="onboarding_brain_claude">Nutzt dein Claude-Abo (Pro oder Max).</string>
     <string name="onboarding_brain_codex">Nutzt dein ChatGPT-Abo.</string>
     <string name="onboarding_brain_opencode">Kein Konto nötig. Eigene Anbieter kannst du später verbinden.</string>
+    <string name="onboarding_brain_local_title">Lokales Modell</string>
+    <string name="onboarding_brain_local">Ollama, LM Studio oder llama.cpp auf deinem eigenen Rechner. Nichts geht an eine KI-Firma. Läuft über OpenCode.</string>
+    <string name="onboarding_access_privacy_local">Mit einem lokalen Modell geht das, was der Agent auf deinem Bildschirm liest, an deinen eigenen Server und nicht an eine KI-Firma. Vor dem Senden, Posten, Kaufen und Löschen wirst du immer gefragt.</string>
+    <string name="onboarding_local_server_title">Dein Modell-Server</string>
+    <string name="onboarding_local_server_none">Noch nicht hinzugefügt</string>
+    <string name="onboarding_local_server_added">%1$s hinzugefügt</string>
+    <string name="onboarding_local_server_text">Starte Ollama, LM Studio oder llama.cpp auf deinem Rechner und trage hier die Adresse ein. Kein Schlüssel nötig. Nimm ein Modell, das gut mit Tool-Aufrufen umgeht: kleine (4–8B) schaffen nur einfache Anfragen.</string>
+    <string name="onboarding_local_server_add">Server hinzufügen</string>
     <string name="onboarding_brain_agy">Nutzt dein Google-Konto, auch mit Google AI Pro oder Ultra.</string>
     <string name="onboarding_brain_grok">Nutzt dein Grok-Konto (Anmeldung mit Google oder X).</string>
     <string name="onboarding_brain_both">Installiere beide und wähle pro Chat. Claude Code bleibt der Standard.</string>

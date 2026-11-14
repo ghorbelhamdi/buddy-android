@@ -3300,6 +3300,27 @@ final class Bubble implements ChatHub.Listener {
                     }
                     v = col;
                 }
+                copyOnLongPress(v, text); // a long press copies the reply, as before the icon below
+                // the same small icon as under a reply in the app's chat: copies all of it, as the agent wrote it
+                LinearLayout whole = new LinearLayout(svc);
+                whole.setOrientation(LinearLayout.VERTICAL);
+                whole.addView(v, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT));
+                ImageButton copy = new ImageButton(svc);
+                copy.setImageResource(R.drawable.ms_content_copy);
+                copy.setImageTintList(android.content.res.ColorStateList.valueOf(Ui.MUTED));
+                copy.setContentDescription(svc.getString(R.string.chat_copy_whole_reply));
+                copy.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                copy.setPadding(dp(9), dp(9), dp(9), dp(9)); // a 16dp icon in a 34dp target
+                copy.setBackgroundResource(Ui.ripple(svc, true));
+                copy.setOnClickListener(x -> {
+                    svc.getSystemService(ClipboardManager.class).setPrimaryClip(ClipData.newPlainText("Buddy", text));
+                    toast(svc.getString(R.string.bubble_copied));
+                });
+                LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(dp(34), dp(34));
+                cp.setMarginStart(-dp(5)); // the icon itself in line with the text
+                whole.addView(copy, cp);
+                v = whole;
                 p.width = LinearLayout.LayoutParams.MATCH_PARENT;
                 p.topMargin = dp(14);
                 break;

@@ -33,6 +33,14 @@
     <string name="onboarding_brain_claude">Claude のサブスクリプション（Pro または Max）を使用します。</string>
     <string name="onboarding_brain_codex">ChatGPT のプランを使用します。</string>
     <string name="onboarding_brain_opencode">アカウントなしで使えます。お使いのプロバイダーは後から接続できます。</string>
+    <string name="onboarding_brain_local_title">ローカルモデル</string>
+    <string name="onboarding_brain_local">自分のパソコンで動かす Ollama、LM Studio、llama.cpp。AI 企業には何も送られません。OpenCode 経由で動きます。</string>
+    <string name="onboarding_access_privacy_local">ローカルモデルでは、エージェントが画面で読んだ内容は AI 企業ではなく自分のサーバーに送られます。送信・投稿・購入・削除の前には必ず確認します。</string>
+    <string name="onboarding_local_server_title">モデルサーバー</string>
+    <string name="onboarding_local_server_none">まだ追加されていません</string>
+    <string name="onboarding_local_server_added">%1$s を追加しました</string>
+    <string name="onboarding_local_server_text">パソコンで Ollama、LM Studio、llama.cpp のいずれかを起動し、そのアドレスをここに追加してください。キーは不要です。ツール呼び出しが得意なモデルを選んでください。小さなモデル（4〜8B）は簡単な依頼しかこなせません。</string>
+    <string name="onboarding_local_server_add">サーバーを追加</string>
     <string name="onboarding_brain_agy">Google アカウントを使用します（Google AI Pro や Ultra でも使えます）。</string>
     <string name="onboarding_brain_grok">Grok アカウント（Google または X でログイン）を使用します。</string>
     <string name="onboarding_brain_both">両方をインストールして、チャットごとに選べます。デフォルトは Claude Code です。</string>

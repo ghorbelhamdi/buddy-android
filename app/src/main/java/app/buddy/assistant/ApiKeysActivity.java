@@ -52,7 +52,12 @@ public class ApiKeysActivity extends Screen {
         frame.setFitsSystemWindows(true);
         frame.addView(root);
         setContentView(protect(frame)); // agents never see or change keys, even when they may tap Buddy's screens
+        // from the first-run guide's "Local model": straight to a new server, and back there once it's saved
+        addLocal = getIntent().getBooleanExtra("add_local", false);
+        if (addLocal && state == null) body.post(() -> editor(null, "Ollama"));
     }
+
+    private boolean addLocal;
 
     @Override
     protected void onResume() {
@@ -149,6 +154,11 @@ public class ApiKeysActivity extends Screen {
 
     /** Add a service (p null) or change one: its name, key, addresses; its models are listed with the key to check it. */
     private void editor(Providers.P p) {
+        editor(p, null);
+    }
+
+    /** Preset: the service the menu starts on when adding (its addresses filled in), or null for Custom. */
+    private void editor(Providers.P p, String preset) {
         boolean adding = p == null;
         LinearLayout c = column(this);
         c.addView(title(this, adding ? getString(R.string.api_keys_add) : p.name, 18));
@@ -185,6 +195,14 @@ public class ApiKeysActivity extends Screen {
                 });
                 pm.show();
             });
+            for (String[] pr : Providers.PRESETS) {
+                if (!pr[0].equals(preset)) continue;
+                chosen.setText(pr[0]);
+                name.setText(pr[0]);
+                anthropic.setText(pr[1]);
+                openai.setText(pr[2]);
+                localInfo.setVisibility(Providers.isLocal(pr[2]) ? View.VISIBLE : View.GONE);
+            }
             c.addView(text(this, getString(R.string.api_keys_service), 13, MUTED), gap(12));
             c.addView(menu, gap(6));
         } else {
@@ -339,8 +357,16 @@ public class ApiKeysActivity extends Screen {
                         if (q.fits(a) && Prefs.agentDefault(this, a).isEmpty() && !"opencode".equals(a)
                                 && !SetupState.ownModels(this, a)) Prefs.setAgentDefault(this, a, Providers.ref(q, q.defaultModel()));
                     }
+                    // "Local model" was the first-run choice: OpenCode's chats use this server, not its free models
+                    if (Prefs.localSetup(this) && q.local() && q.fits("opencode") && Prefs.agentDefault(this, "opencode").isEmpty()) {
+                        Prefs.setAgentDefault(this, "opencode", Providers.ref(q, q.defaultModel()));
+                    }
                     d.dismiss();
                     refreshAgents();
+                    if (addLocal && adding) { // back to the guide, which goes on by itself
+                        finish();
+                        return;
+                    }
                     render();
                 });
             }, "api-key").start();

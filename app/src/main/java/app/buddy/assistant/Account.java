@@ -274,7 +274,9 @@ final class Account {
                     }
                 } else if (grok()) {
                     // signed in = its saved login (auth.json, which also has the account's email)
-                    String out = Linux.exec(app, "[ -x " + GROK_BIN + " ] || { echo NOTINSTALLED; exit 0; }; "
+                    String out = Linux.exec(app, "[ -x " + GROK_BIN + " ] || { [ -x /root/.grok/bin/grok ] && mkdir -p /root/.local/bin"
+                            + " && ln -sf /root/.grok/bin/grok " + GROK_BIN + "; }; "
+                            + "[ -x " + GROK_BIN + " ] || { echo NOTINSTALLED; exit 0; }; "
                             + "[ -s " + GROK_AUTH + " ] && echo GROK_SIGNED=$(jq -r '[.[].email // empty] | first // empty' "
                             + GROK_AUTH + " 2>/dev/null); echo VER=$(" + GROK_BIN + " --version 2>/dev/null)", 60);
                     version = ver(out);
@@ -374,9 +376,15 @@ final class Account {
                     if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
                 } else if (grok()) {
                     set(Step.INSTALLING, app.getString(R.string.account_downloading, name()));
-                    // xAI's installer fetches one static binary (it runs on Alpine as it is) and links it in ~/.local/bin
-                    String o = Linux.exec(app, "curl -fsSL https://x.ai/cli/install.sh -o /tmp/grok-install.sh"
-                            + " && bash /tmp/grok-install.sh 2>&1 | tail -5 && " + GROK_BIN + " --version && echo AGENT_OK", 1800);
+                    // xAI's installer fetches one static binary (it runs on Alpine as it is) into ~/.grok/bin and links it
+                    // in ~/.local/bin, but only when that folder exists already; otherwise it links in /usr/local/bin.
+                    // With Grok as the first agent nothing had made ~/.local/bin yet (Claude Code's installer does), so
+                    // Buddy makes it first, and links the binary there itself should the installer not have.
+                    String o = Linux.exec(app, "mkdir -p /root/.local/bin"
+                            + " && curl -fsSL https://x.ai/cli/install.sh -o /tmp/grok-install.sh"
+                            + " && bash /tmp/grok-install.sh 2>&1 | tail -5"
+                            + " && { [ -x " + GROK_BIN + " ] || ln -sf /root/.grok/bin/grok " + GROK_BIN + "; }"
+                            + " && " + GROK_BIN + " --version && echo AGENT_OK", 1800);
                     if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
                 } else if (opencode()) {
                     set(Step.INSTALLING, app.getString(R.string.account_downloading, name()));

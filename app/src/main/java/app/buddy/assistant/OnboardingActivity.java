@@ -47,6 +47,12 @@ public class OnboardingActivity extends Screen implements Account.Listener {
             Prefs.setOnboardVersion(this, 2);
         }
         step = Math.min(Prefs.onboardStep(this), LAST);
+        // opened again from Settings after setup was done: from the choice of agent, not the last step
+        if (state == null && getIntent().getBooleanExtra("again", false)) {
+            step = BRAIN;
+            Prefs.setOnboardStep(this, BRAIN);
+            noAutoAdvance = true; // a step that's done already waits for Continue the first time
+        }
 
         LinearLayout root = column(this);
         root.setBackgroundColor(BG);
@@ -117,12 +123,18 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                 return SetupState.accessibilityEnabled(c);
             case AGENTS:
                 for (String a : wanted(c)) if (!SetupState.signedIn(c, a)) return false;
-                return true;
+                return !Prefs.localSetup(c) || localServer() != null; // "Local model": its server too
             case BACKGROUND:
                 return c.getSystemService(PowerManager.class).isIgnoringBatteryOptimizations(c.getPackageName());
             default:
                 return false;
         }
+    }
+
+    /** The user's own model server that OpenCode can use (the first one), or null. */
+    static Providers.P localServer() {
+        for (Providers.P p : Providers.forAgent("opencode")) if (p.local()) return p;
+        return null;
     }
 
     static String[] wanted(Context c) {
@@ -175,7 +187,8 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                         getString(ok ? R.string.onboarding_access_done : R.string.onboarding_access_text), ok);
                 if (!ok) {
                     String agents = Prefs.agents(this);
-                    note("opencode".equals(agents) ? getString(R.string.onboarding_access_privacy_opencode, agentNames())
+                    note(Prefs.localSetup(this) ? getString(R.string.onboarding_access_privacy_local)
+                            : "opencode".equals(agents) ? getString(R.string.onboarding_access_privacy_opencode, agentNames())
                             : "both".equals(agents) ? getString(R.string.onboarding_access_privacy_both)
                             : getString(R.string.onboarding_access_privacy, agentNames(),
                             "codex".equals(agents) ? "OpenAI" : "agy".equals(agents) ? "Google" : "grok".equals(agents) ? "xAI"
@@ -269,9 +282,13 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                 {"agy", "Antigravity", getString(R.string.onboarding_brain_agy)},
                 {"grok", "Grok", getString(R.string.onboarding_brain_grok)},
                 {"both", "Claude Code + Codex", getString(R.string.onboarding_brain_both)},
+                // a model server of your own, driven by OpenCode (it needs no account)
+                {"local", getString(R.string.onboarding_brain_local_title), getString(R.string.onboarding_brain_local)},
         };
+        final boolean localNow = Prefs.localSetup(this) && "opencode".equals(cur);
         for (String[] o : opts) {
-            boolean on = o[0].equals(cur);
+            final boolean local = "local".equals(o[0]);
+            boolean on = local ? localNow : o[0].equals(cur) && !("opencode".equals(o[0]) && localNow);
             LinearLayout r = row(this);
             r.setPaddingRelative(dp(this, 14), dp(this, 14), dp(this, 14), dp(this, 14));
             r.setBackground(outlined(this, CARD, 16, on ? ACCENT : OUTLINE, on ? 2 : 1));
@@ -285,6 +302,9 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                 bp.setMarginStart(dp(this, 2));
                 two.addView(b, bp);
                 r.addView(two);
+            } else if (local) {
+                r.addView(icon(this, R.drawable.ms_terminal, ACCENT_TEXT, 28),
+                        new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
             } else {
                 r.addView(agentTile(this, o[0]));
             }
@@ -310,8 +330,9 @@ public class OnboardingActivity extends Screen implements Account.Listener {
             r.addView(t, weight1());
             r.addView(radio(on));
             r.setOnClickListener(v -> {
-                Prefs.setAgents(this, o[0]);
-                Prefs.setBackend(this, Account.known(o[0]) ? o[0] : "claude");
+                Prefs.setLocalSetup(this, local);
+                Prefs.setAgents(this, local ? "opencode" : o[0]);
+                Prefs.setBackend(this, local ? "opencode" : Account.known(o[0]) ? o[0] : "claude");
                 render();
             });
             LinearLayout.LayoutParams p = full();
@@ -380,11 +401,47 @@ public class OnboardingActivity extends Screen implements Account.Listener {
             p.topMargin = dp(this, 12);
             body.addView(card, p);
         }
+        if (Prefs.localSetup(this)) localServerCard();
         if (!ok) {
             note(getString(R.string.onboarding_agents_wifi));
             stuck(getString(R.string.onboarding_stuck_sign_in_q), getString(R.string.onboarding_stuck_sign_in_a),
                     getString(R.string.onboarding_stuck_install_q), getString(R.string.onboarding_stuck_install_a));
         }
+    }
+
+    /** "Local model": the user's own server, added on the API keys screen (which comes back here once it's saved). */
+    private void localServerCard() {
+        Providers.P p = localServer();
+        // a server saved before "Local model" was picked: OpenCode's chats use it from now on, unless the user
+        // chose another default for OpenCode themselves
+        if (p != null && Prefs.agentDefault(this, "opencode").isEmpty()) {
+            Prefs.setAgentDefault(this, "opencode", Providers.ref(p, p.defaultModel()));
+            ChatHub.get(this).changed();
+        }
+        LinearLayout card = column(this);
+        card.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));
+        card.setBackground(rounded(this, CARD, 16));
+        LinearLayout r = row(this);
+        r.addView(icon(this, R.drawable.ms_terminal, ACCENT_TEXT, 28), new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
+        LinearLayout t = column(this);
+        t.setPaddingRelative(dp(this, 12), 0, 0, 0);
+        t.addView(title(this, getString(R.string.onboarding_local_server_title), 15));
+        t.addView(single(monoText(this, p == null ? getString(R.string.onboarding_local_server_none)
+                : getString(R.string.onboarding_local_server_added, p.name), 12, p == null ? MUTED : OK)));
+        r.addView(t, weight1());
+        if (p != null) r.addView(icon(this, R.drawable.ms_check, OK, 22));
+        card.addView(r, full());
+        if (p == null) {
+            TextView how = text(this, getString(R.string.onboarding_local_server_text), 14, MUTED);
+            how.setPaddingRelative(0, dp(this, 10), 0, dp(this, 10));
+            card.addView(how);
+            Button b = button(this, getString(R.string.onboarding_local_server_add), SetupState.signedIn(this, "opencode"));
+            b.setOnClickListener(v -> startActivity(new Intent(this, ApiKeysActivity.class).putExtra("add_local", true)));
+            card.addView(b, wrap());
+        }
+        LinearLayout.LayoutParams lp = full();
+        lp.topMargin = dp(this, 12);
+        body.addView(card, lp);
     }
 
     private void background(boolean ok) {

@@ -1,0 +1,5 @@
+• New in the setup guide: "Local model". Buddy sets up OpenCode and asks for your own server (Ollama, LM Studio or llama.cpp), and chats use it by default
+• The setup guide can be opened again from Settings
+• Fixed: Grok failed to install when it was the first agent
+• Settings says which agent can use a saved server or key, and switches to it with one tap
+• The bubble has the copy icon under each reply too

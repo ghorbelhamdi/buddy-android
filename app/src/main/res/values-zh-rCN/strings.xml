@@ -42,6 +42,14 @@
     <string name="onboarding_brain_claude">使用你的 Claude 订阅（Pro 或 Max）。</string>
     <string name="onboarding_brain_codex">使用你的 ChatGPT 套餐。</string>
     <string name="onboarding_brain_opencode">无需账号。之后可以连接你自己的模型提供商。</string>
+    <string name="onboarding_brain_local_title">本地模型</string>
+    <string name="onboarding_brain_local">在你自己的电脑上运行 Ollama、LM Studio 或 llama.cpp。不会有任何内容发送给 AI 公司。通过 OpenCode 运行。</string>
+    <string name="onboarding_access_privacy_local">使用本地模型时，智能体在屏幕上读到的内容只会发送到你自己的服务器，不会发送给 AI 公司。发送、发布、购买和删除之前始终会先征求你的同意。</string>
+    <string name="onboarding_local_server_title">你的模型服务器</string>
+    <string name="onboarding_local_server_none">尚未添加</string>
+    <string name="onboarding_local_server_added">已添加 %1$s</string>
+    <string name="onboarding_local_server_text">在电脑上启动 Ollama、LM Studio 或 llama.cpp，然后在这里添加它的地址。无需密钥。请选择擅长工具调用的模型：小模型（4–8B）只能完成简单请求。</string>
+    <string name="onboarding_local_server_add">添加你的服务器</string>
     <string name="onboarding_brain_agy">使用你的 Google 账号，也支持 Google AI Pro 或 Ultra。</string>
     <string name="onboarding_brain_grok">使用你的 Grok 账号（可用 Google 或 X 登录）。</string>
     <!-- The option that installs both Claude Code and Codex. -->

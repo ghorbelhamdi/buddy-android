@@ -33,6 +33,14 @@
     <string name="onboarding_brain_claude">आपकी Claude सदस्यता (Pro या Max) इस्तेमाल करता है.</string>
     <string name="onboarding_brain_codex">आपका ChatGPT प्लान इस्तेमाल करता है.</string>
     <string name="onboarding_brain_opencode">किसी खाते की ज़रूरत नहीं. अपने प्रोवाइडर बाद में जोड़ें.</string>
+    <string name="onboarding_brain_local_title">लोकल मॉडल</string>
+    <string name="onboarding_brain_local">आपके अपने कंप्यूटर पर Ollama, LM Studio या llama.cpp. किसी AI कंपनी को कुछ नहीं जाता. OpenCode के ज़रिए चलता है.</string>
+    <string name="onboarding_access_privacy_local">लोकल मॉडल के साथ, एजेंट आपकी स्क्रीन पर जो पढ़ता है वह आपके अपने सर्वर पर जाता है, किसी AI कंपनी को नहीं. भेजने, पोस्ट करने, खरीदने और मिटाने से पहले हमेशा आपकी मंज़ूरी ली जाती है.</string>
+    <string name="onboarding_local_server_title">आपका मॉडल सर्वर</string>
+    <string name="onboarding_local_server_none">अभी जोड़ा नहीं गया</string>
+    <string name="onboarding_local_server_added">%1$s जोड़ा गया</string>
+    <string name="onboarding_local_server_text">अपने कंप्यूटर पर Ollama, LM Studio या llama.cpp चालू करें, फिर उसका पता यहां जोड़ें. की की ज़रूरत नहीं. ऐसा मॉडल चुनें जो टूल कॉल अच्छे से संभाले: छोटे मॉडल (4–8B) सिर्फ़ आसान काम कर पाते हैं.</string>
+    <string name="onboarding_local_server_add">अपना सर्वर जोड़ें</string>
     <string name="onboarding_brain_agy">आपका Google खाता इस्तेमाल करता है, Google AI Pro या Ultra के साथ भी.</string>
     <string name="onboarding_brain_grok">आपका Grok खाता इस्तेमाल करता है (Google या X से साइन इन करें).</string>
     <string name="onboarding_brain_both">दोनों इंस्टॉल करें और हर चैट के लिए इनमें से एक चुनें. Claude Code डिफ़ॉल्ट रहेगा.</string>

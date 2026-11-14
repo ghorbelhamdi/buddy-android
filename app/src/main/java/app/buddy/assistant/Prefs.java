@@ -321,6 +321,18 @@ final class Prefs {
         sp(c).edit().putBoolean("voice_cards", on).apply();
     }
 
+    /**
+     * The first-run guide's "Local model" choice: OpenCode with a model server of the user's own. The guide then asks
+     * for the server too, and the server becomes what OpenCode's chats use by default.
+     */
+    static boolean localSetup(Context c) {
+        return sp(c).getBoolean("local_setup", false);
+    }
+
+    static void setLocalSetup(Context c, boolean on) {
+        sp(c).edit().putBoolean("local_setup", on).apply();
+    }
+
     /** Pause what's playing while a reply is read aloud, and start it again afterwards. Off unless switched on. */
     static boolean pauseMediaForSpeech(Context c) {
         return sp(c).getBoolean("speak_pause_media", false);

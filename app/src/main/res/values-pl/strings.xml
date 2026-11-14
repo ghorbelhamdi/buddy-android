@@ -33,6 +33,14 @@
     <string name="onboarding_brain_claude">Korzysta z twojej subskrypcji Claude (Pro lub Max).</string>
     <string name="onboarding_brain_codex">Korzysta z twojego planu ChatGPT.</string>
     <string name="onboarding_brain_opencode">Bez zakładania konta. Własnych dostawców podłączysz później.</string>
+    <string name="onboarding_brain_local_title">Model lokalny</string>
+    <string name="onboarding_brain_local">Ollama, LM Studio lub llama.cpp na twoim własnym komputerze. Nic nie trafia do firmy AI. Działa przez OpenCode.</string>
+    <string name="onboarding_access_privacy_local">Przy modelu lokalnym to, co agent czyta na ekranie, trafia na twój własny serwer, a nie do firmy AI. Wysyłanie, publikowanie, kupowanie i usuwanie zawsze wymagają twojej zgody.</string>
+    <string name="onboarding_local_server_title">Twój serwer modeli</string>
+    <string name="onboarding_local_server_none">Jeszcze nie dodano</string>
+    <string name="onboarding_local_server_added">Dodano: %1$s</string>
+    <string name="onboarding_local_server_text">Uruchom Ollama, LM Studio lub llama.cpp na komputerze, a potem dodaj tutaj jego adres. Klucz nie jest potrzebny. Wybierz model, który dobrze radzi sobie z wywołaniami narzędzi: małe (4–8B) poradzą sobie tylko z prostymi prośbami.</string>
+    <string name="onboarding_local_server_add">Dodaj serwer</string>
     <string name="onboarding_brain_agy">Korzysta z twojego konta Google, także z Google AI Pro lub Ultra.</string>
     <string name="onboarding_brain_grok">Korzysta z twojego konta Grok (logowanie przez Google lub X).</string>
     <string name="onboarding_brain_both">Zainstaluj oba i wybieraj w każdym czacie. Domyślnym pozostaje Claude Code.</string>

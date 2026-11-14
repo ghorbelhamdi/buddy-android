@@ -43,6 +43,14 @@
     <string name="onboarding_brain_claude">Uses your Claude subscription (Pro or Max).</string>
     <string name="onboarding_brain_codex">Uses your ChatGPT plan.</string>
     <string name="onboarding_brain_opencode">No account needed. Connect your own providers later.</string>
+    <string name="onboarding_brain_local_title">Local model</string>
+    <string name="onboarding_brain_local">Ollama, LM Studio or llama.cpp on your own computer. Nothing goes to an AI company. Runs through OpenCode.</string>
+    <string name="onboarding_access_privacy_local">With a local model, what the agent reads on your screen goes to your own server, not to an AI company. Sending, posting, buying and deleting always ask for your OK first.</string>
+    <string name="onboarding_local_server_title">Your model server</string>
+    <string name="onboarding_local_server_none">Not added yet</string>
+    <string name="onboarding_local_server_added">%1$s added</string>
+    <string name="onboarding_local_server_text">Start Ollama, LM Studio or llama.cpp on your computer, then add its address here. No key needed. Pick a model that handles tool calls well: small ones (4–8B) only manage simple requests.</string>
+    <string name="onboarding_local_server_add">Add your server</string>
     <!-- Under "Antigravity" (Google's agent) in the agent choice. Google AI Pro and Ultra are Google's paid plans (names stay as they are). -->
     <string name="onboarding_brain_agy">Uses your Google account, also with Google AI Pro or Ultra.</string>
     <!-- Under "Grok" (xAI's agent) in the agent choice. Grok, xAI and X stay as they are; "X" is the social network. -->

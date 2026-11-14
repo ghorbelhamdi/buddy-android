@@ -33,6 +33,14 @@
     <string name="onboarding_brain_claude">Gebruikt je Claude-abonnement (Pro of Max).</string>
     <string name="onboarding_brain_codex">Gebruikt je ChatGPT-abonnement.</string>
     <string name="onboarding_brain_opencode">Geen account nodig. Koppel later je eigen aanbieders.</string>
+    <string name="onboarding_brain_local_title">Lokaal model</string>
+    <string name="onboarding_brain_local">Ollama, LM Studio of llama.cpp op je eigen computer. Er gaat niets naar een AI-bedrijf. Werkt via OpenCode.</string>
+    <string name="onboarding_access_privacy_local">Met een lokaal model gaat wat de agent op je scherm leest naar je eigen server, niet naar een AI-bedrijf. Verzenden, plaatsen, kopen en verwijderen vragen altijd eerst je akkoord.</string>
+    <string name="onboarding_local_server_title">Je modelserver</string>
+    <string name="onboarding_local_server_none">Nog niet toegevoegd</string>
+    <string name="onboarding_local_server_added">%1$s toegevoegd</string>
+    <string name="onboarding_local_server_text">Start Ollama, LM Studio of llama.cpp op je computer en voeg hier het adres toe. Geen sleutel nodig. Kies een model dat goed met tool-aanroepen overweg kan: kleine (4–8B) kunnen alleen eenvoudige verzoeken aan.</string>
+    <string name="onboarding_local_server_add">Server toevoegen</string>
     <string name="onboarding_brain_agy">Gebruikt je Google-account, ook met Google AI Pro of Ultra.</string>
     <string name="onboarding_brain_grok">Gebruikt je Grok-account (inloggen met Google of X).</string>
     <string name="onboarding_brain_both">Installeer beide en kies per chat. Claude Code blijft de standaard.</string>

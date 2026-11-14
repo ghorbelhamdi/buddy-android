@@ -200,15 +200,6 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 v -> openAppInfo(getPackageName()));
 
         boolean installed = SetupState.installed(this, backend);
-        steps[1] = step(getString(R.string.setup_step_install_title, acc.name()),
-                installed ? getString(R.string.setup_step_install_done, acc.name())
-                        : acc.step == Account.Step.INSTALLING ? acc.detail
-                        : Ui.downloadNote(this, getString(acc.claude() ? R.string.setup_step_install_claude : acc.opencode()
-                        ? R.string.setup_step_install_opencode : acc.grok() ? R.string.setup_step_install_grok
-                        : R.string.setup_step_install_codex, acc.name())),
-                installed, installed || acc.step == Account.Step.INSTALLING ? null : getString(R.string.setup_install),
-                v -> openAgent(backend), null, null);
-
         boolean signed = SetupState.signedIn(this, backend);
         String signText = acc.opencode()
                 ? getString(signed ? R.string.setup_step_signin_opencode_done : R.string.setup_step_signin_opencode)
@@ -257,6 +248,31 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 v -> {
                     if (choices.size() == 1) useInstead(choices.get(0), misfit);
                     else switchDefaultSheet(choices, misfit);
+                });
+
+        // a saved key or server the default agent can't use: say so already here, with the agent that can, so nobody
+        // installs an agent they then can't use with it
+        String installText = installed ? getString(R.string.setup_step_install_done, acc.name())
+                : acc.step == Account.Step.INSTALLING ? acc.detail
+                : Ui.downloadNote(this, getString(acc.claude() ? R.string.setup_step_install_claude : acc.opencode()
+                ? R.string.setup_step_install_opencode : acc.grok() ? R.string.setup_step_install_grok
+                : R.string.setup_step_install_codex, acc.name()));
+        boolean offerOther = !installed && misfit != null && !keyAgents.isEmpty() && acc.step != Account.Step.INSTALLING;
+        if (offerOther) {
+            java.util.List<String> keys = new java.util.ArrayList<>(), fit = new java.util.ArrayList<>();
+            for (Providers.P k : Providers.all()) keys.add(k.name);
+            for (String a : keyAgents) fit.add(Account.nameOf(a));
+            installText += "\n\n" + getString(R.string.setup_step_signin_key_mismatch, acc.name(),
+                    android.text.TextUtils.join(", ", keys), android.text.TextUtils.join(", ", fit));
+        }
+        steps[1] = step(getString(R.string.setup_step_install_title, acc.name()), installText,
+                installed, installed || acc.step == Account.Step.INSTALLING ? null : getString(R.string.setup_install),
+                v -> openAgent(backend),
+                !offerOther ? null : keyAgents.size() == 1 ? getString(R.string.setup_use_agent, Account.nameOf(keyAgents.get(0)))
+                        : getString(R.string.setup_switch_default),
+                v -> {
+                    if (keyAgents.size() == 1) useInstead(keyAgents.get(0), misfit);
+                    else switchDefaultSheet(keyAgents, misfit);
                 });
 
         PowerManager pm = getSystemService(PowerManager.class);
@@ -912,11 +928,12 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         bp.topMargin = dp(this, 10);
         c.addView(bar, bp);
 
-        if (!complete) {
+        if (!complete || open) { // with setup done, the opened card still offers the guide: to pick another agent
+            // or a local model the guided way. It then starts at the choice of agent, not at its last step.
             TextView guide = text(this, getString(R.string.setup_open_guide), 14, ACCENT_TEXT);
             guide.setTypeface(sans(this, 600));
             guide.setPaddingRelative(0, dp(this, 12), 0, 0);
-            guide.setOnClickListener(v -> startActivity(new Intent(this, OnboardingActivity.class)));
+            guide.setOnClickListener(v -> startActivity(new Intent(this, OnboardingActivity.class).putExtra("again", complete)));
             c.addView(guide);
         }
         if (!open) {
