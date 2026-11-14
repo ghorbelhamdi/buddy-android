@@ -31,6 +31,8 @@ The short version is in the [README](../README.md). This page has the details.
 3. Each release has two identical APKs (`buddy.apk` and `buddy-vX.Y.Z.apk`). If Obtainium asks which one, pick `buddy.apk`. To never be asked, set **Filter APKs by regular expression** to `^buddy\.apk$` in the app's settings in Obtainium.
 4. Obtainium now notifies you when a new version is out; tap **Update** and confirm Android's installer (the first time, allow Obtainium to install apps).
 
+**From F-Droid:** Buddy is on [F-Droid](https://f-droid.org/packages/app.buddy.assistant/), and the F-Droid app updates it for you. F-Droid builds each version itself, so a new one arrives there some days after the GitHub release. Its build is the same app signed with the same key, minus the built-in updater, so you can switch between the two without reinstalling.
+
 **By hand:** open the [latest `buddy.apk`](https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk) on the phone and install it over the current one. To get an email for each new version, sign in to GitHub and choose **Watch → Custom → Releases** on the repository.
 
 **The agents** (Claude Code, Codex, OpenCode, Antigravity, Grok) update separately: Settings → the agent → **Check for updates**. An OpenCode 1.x install gets **Update to OpenCode 2** there; your connected providers are kept.
