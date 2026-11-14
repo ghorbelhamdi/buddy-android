@@ -91,7 +91,7 @@ jobs:
           notes=$(gh release view "$GITHUB_REF_NAME" --json body -q .body)
           case "$notes" in
             *"Which file?"*) ;;
-            *) printf '%s\n\n%s\n' "$notes" "**Which file?** Download \`buddy.apk\`: it updates itself. \`fdroid-check-only-$GITHUB_REF_NAME.apk\` is only there for F-Droid's reproducible-build check, and doesn't update itself." \
+            *) printf '%s\n\n%s\n' "$notes" "**Which file?** Download \`buddy.apk\`: it updates itself. Buddy is also on [F-Droid](https://f-droid.org/packages/app.buddy.assistant/), where each version arrives a few days after it is released here. \`fdroid-check-only-$GITHUB_REF_NAME.apk\` is only there for F-Droid's reproducible-build check, and doesn't update itself." \
                  | gh release edit "$GITHUB_REF_NAME" --notes-file - ;;
           esac
 
