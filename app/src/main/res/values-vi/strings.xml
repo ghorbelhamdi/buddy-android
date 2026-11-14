@@ -515,6 +515,8 @@
     <string name="schedule_info">Đến giờ đã đặt, Buddy gửi tin nhắn này vào cuộc trò chuyện như thể bạn tự gõ, với agent và tùy chọn của cuộc trò chuyện này. Thẻ duyệt vẫn chờ bạn. Nếu cần màn hình khi điện thoại đang khóa, Buddy sẽ nhờ bạn mở khóa.</string>
     <!-- Schedule sheet: section titles, the day choices and the message field. -->
     <string name="schedule_time">Giờ</string>
+    <string name="schedule_add_time">Thêm giờ</string>
+    <string name="schedule_remove_time">Xóa %1$s</string>
     <string name="schedule_days">Ngày</string>
     <string name="schedule_daily">Mỗi ngày</string>
     <string name="schedule_weekdays">Ngày thường</string>
@@ -664,6 +666,7 @@
     <!-- Chat messages -->
     <!-- Toast after a long press copies a message. -->
     <string name="chat_copied">Đã sao chép</string>
+    <string name="chat_copy_whole_reply">Sao chép toàn bộ câu trả lời</string>
     <!-- Header of a collapsible group of the agent's steps in the chat. -->
     <plurals name="chat_tool_calls">
         <item quantity="other">%1$d lần gọi công cụ</item>
@@ -1351,6 +1354,8 @@
     <string name="setup_read_aloud">Đọc to câu trả lời</string>
     <!-- "Voice" = the Settings section of that name (setup_voice). -->
     <string name="setup_read_aloud_info">Buddy đọc to câu trả lời của agent, bằng giọng bạn chọn trong mục Giọng nói.</string>
+    <string name="setup_pause_media">Tạm dừng nội dung đang phát khi đọc to</string>
+    <string name="setup_pause_media_info">Nhạc hoặc video đang phát sẽ tạm dừng khi Buddy đọc câu trả lời và phát tiếp sau đó. Buddy chỉ phát tiếp những gì nó đã tạm dừng, và không làm vậy nếu bạn đã thay đổi việc phát trong lúc đó. Cần bật “Đọc to câu trả lời” và quyền truy cập thông báo.</string>
     <string name="setup_voice_cards">Trả lời thẻ bằng giọng nói</string>
     <string name="setup_voice_cards_info">Sau khi đọc to một thẻ, Buddy sẽ lắng nghe: hãy nói “đồng ý” hoặc “từ chối”, hoặc lựa chọn bạn muốn. Cần bật “Đọc to câu trả lời”. Không hoạt động khi điện thoại bị khóa. Bất kỳ ai trong tầm nghe đều có thể trả lời.</string>
     <string name="voice_card_approval">Buddy cần bạn đồng ý. %1$s</string>
@@ -1983,7 +1988,6 @@
     <string name="helper_stopped">Đã dừng</string>
     <string name="helper_of">Tác nhân phụ của “%1$s”</string>
     <string name="helper_this_chat">Cuộc trò chuyện này</string>
-    <string name="helper_waiting">Đang chờ</string>
     <string name="background_security">Gỡ lỗi qua Wi-Fi cho phép các thiết bị đã ghép nối điều khiển điện thoại này. Buddy chỉ ghép nối chính nó, ngay trên điện thoại này, và trình trợ giúp của nó chỉ nhận kết nối tại đây.</string>
     <string name="background_brought">Đã chuyển sang màn hình của bạn: bước này cần bạn. Chế độ nền hiện đã tắt cho cuộc trò chuyện này.</string>
     <string name="chat_background">Làm việc ở chế độ nền</string>

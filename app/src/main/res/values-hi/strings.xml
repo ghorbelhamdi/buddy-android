@@ -347,6 +347,8 @@
     <string name="schedule_set_info">तय समय पर इस चैट में अपने आप एक मैसेज भेजें, जैसे हर दिन 14:00 बजे.</string>
     <string name="schedule_info">तय समय पर Buddy यह मैसेज चैट में ऐसे भेजता है जैसे आपने लिखा हो, इसी चैट के एजेंट और विकल्पों के साथ. मंज़ूरी कार्ड अब भी आपका इंतज़ार करते हैं. अगर फ़ोन लॉक होने पर इसे स्क्रीन चाहिए, तो यह आपसे अनलॉक करने को कहता है.</string>
     <string name="schedule_time">समय</string>
+    <string name="schedule_add_time">समय जोड़ें</string>
+    <string name="schedule_remove_time">%1$s हटाएं</string>
     <string name="schedule_days">दिन</string>
     <string name="schedule_daily">हर दिन</string>
     <string name="schedule_weekdays">कामकाजी दिन</string>
@@ -452,6 +454,7 @@
 
     <!-- Chat messages -->
     <string name="chat_copied">कॉपी किया गया</string>
+    <string name="chat_copy_whole_reply">पूरा जवाब कॉपी करें</string>
     <plurals name="chat_tool_calls">
         <item quantity="one">%1$d टूल कॉल</item>
         <item quantity="other">%1$d टूल कॉल</item>
@@ -950,6 +953,8 @@
     <string name="setup_tap_to_talk_info">एक टैप से माइक खुल जाता है: जो चाहिए वह बोलें, आपके रुकने पर इसे भेज दिया जाएगा. चैट और दूसरे विकल्पों के लिए बबल को दबाकर रखें.</string>
     <string name="setup_read_aloud">जवाब पढ़कर सुनाएं</string>
     <string name="setup_read_aloud_info">Buddy एजेंटों के जवाब उस आवाज़ में पढ़कर सुनाता है, जो आप “आवाज़” में चुनते हैं.</string>
+    <string name="setup_pause_media">पढ़कर सुनाते समय मीडिया रोकें</string>
+    <string name="setup_pause_media_info">Buddy जब जवाब पढ़कर सुनाता है, तब चल रहा संगीत या वीडियो रुक जाता है और बाद में फिर चलने लगता है. Buddy सिर्फ़ वही दोबारा चलाता है जो उसने रोका था, और अगर आपने इस बीच प्लेबैक बदला हो तो नहीं. इसके लिए “जवाब पढ़कर सुनाएं” और सूचनाओं का ऐक्सेस चालू होना चाहिए.</string>
     <string name="setup_voice_cards">कार्ड का जवाब आवाज़ से दें</string>
     <string name="setup_voice_cards_info">कार्ड ज़ोर से पढ़े जाने के बाद Buddy सुनता है: “मंज़ूर” या “अस्वीकार” कहें, या अपना विकल्प बोलें। इसके लिए “जवाब ज़ोर से पढ़ें” चालू होना चाहिए। फ़ोन लॉक होने पर नहीं। आसपास का कोई भी व्यक्ति जवाब दे सकता है।</string>
     <string name="voice_card_approval">Buddy को आपकी मंज़ूरी चाहिए। %1$s</string>
@@ -1402,7 +1407,6 @@
     <string name="helper_stopped">रोका गया</string>
     <string name="helper_of">“%1$s” का सब-एजेंट</string>
     <string name="helper_this_chat">यह चैट</string>
-    <string name="helper_waiting">प्रतीक्षा में</string>
     <string name="background_security">“वॉयरलेस डीबगिंग” से पेयर किए गए डिवाइस इस फ़ोन को कंट्रोल कर सकते हैं. Buddy सिर्फ़ खुद को पेयर करता है, इसी फ़ोन पर, और इसका हेल्पर सिर्फ़ यहीं सुनता है.</string>
     <string name="background_brought">आपकी स्क्रीन पर लाया गया: इस चरण के लिए आपकी ज़रूरत है. इस चैट के लिए बैकग्राउंड मोड अब बंद है.</string>
     <string name="chat_background">बैकग्राउंड में काम करें</string>

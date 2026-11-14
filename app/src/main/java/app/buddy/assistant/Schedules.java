@@ -81,8 +81,8 @@ public final class Schedules extends BroadcastReceiver {
     static final class Plan {
         /** Days of the week as bits (1 << (Calendar.DAY_OF_WEEK - 1)), Sunday first. */
         static final int EVERY_DAY = 0x7F, WEEKDAYS = 0x3E;
-        /** Minutes after midnight, the phone's time. */
-        int minute = 9 * 60;
+        /** The times of day it runs, as minutes after midnight (the phone's time), earliest first; at least one. */
+        int[] minutes = {9 * 60};
         int days = EVERY_DAY;
         /** The message, sent as the user's own. */
         String text = "";
@@ -98,7 +98,7 @@ public final class Schedules extends BroadcastReceiver {
 
         Plan copy() {
             Plan p = new Plan();
-            p.minute = minute;
+            p.minutes = minutes.clone();
             p.days = days;
             p.text = text;
             p.wake = wake;
@@ -109,8 +109,9 @@ public final class Schedules extends BroadcastReceiver {
 
         JSONObject toJson() {
             try {
-                return new JSONObject().put("minute", minute).put("days", days).put("text", text).put("wake", wake)
-                        .put("quiet", quiet).put("paused", paused);
+                // "minute" (the first time) is what versions before several times read
+                return new JSONObject().put("minute", minutes[0]).put("minutes", new org.json.JSONArray(minutes))
+                        .put("days", days).put("text", text).put("wake", wake).put("quiet", quiet).put("paused", paused);
             } catch (Exception e) {
                 return new JSONObject();
             }
@@ -119,13 +120,27 @@ public final class Schedules extends BroadcastReceiver {
         static Plan of(JSONObject o) {
             if (o == null || o.optString("text").trim().isEmpty() || (o.optInt("days") & EVERY_DAY) == 0) return null;
             Plan p = new Plan();
-            p.minute = Math.max(0, Math.min(24 * 60 - 1, o.optInt("minute")));
+            org.json.JSONArray ms = o.optJSONArray("minutes");
+            int[] in = new int[ms == null || ms.length() == 0 ? 1 : ms.length()];
+            if (ms == null || ms.length() == 0) in[0] = o.optInt("minute");
+            else for (int i = 0; i < in.length; i++) in[i] = ms.optInt(i);
+            p.minutes = tidy(in);
             p.days = o.optInt("days") & EVERY_DAY;
             p.text = o.optString("text");
             p.wake = o.optBoolean("wake");
             p.quiet = o.optBoolean("quiet");
             p.paused = o.optBoolean("paused");
             return p;
+        }
+
+        /** Times in range, earliest first, each once. */
+        static int[] tidy(int[] in) {
+            java.util.TreeSet<Integer> t = new java.util.TreeSet<>();
+            for (int m : in) t.add(Math.max(0, Math.min(24 * 60 - 1, m)));
+            int[] out = new int[t.size()];
+            int i = 0;
+            for (int m : t) out[i++] = m;
+            return out;
         }
 
         boolean on(int dayOfWeek) {
@@ -137,18 +152,28 @@ public final class Schedules extends BroadcastReceiver {
             Calendar c = Calendar.getInstance();
             c.setTimeInMillis(after);
             for (int i = 0; i < 8; i++) {
-                c.set(Calendar.HOUR_OF_DAY, minute / 60); // each day again: a clock change can move it
-                c.set(Calendar.MINUTE, minute % 60);
-                c.set(Calendar.SECOND, 0);
-                c.set(Calendar.MILLISECOND, 0);
-                if (c.getTimeInMillis() > after && on(c.get(Calendar.DAY_OF_WEEK))) return c.getTimeInMillis();
+                if (on(c.get(Calendar.DAY_OF_WEEK))) {
+                    for (int minute : minutes) { // earliest first
+                        c.set(Calendar.HOUR_OF_DAY, minute / 60); // each day again: a clock change can move it
+                        c.set(Calendar.MINUTE, minute % 60);
+                        c.set(Calendar.SECOND, 0);
+                        c.set(Calendar.MILLISECOND, 0);
+                        if (c.getTimeInMillis() > after) return c.getTimeInMillis();
+                    }
+                }
                 c.add(Calendar.DAY_OF_YEAR, 1);
             }
             return 0;
         }
 
-        /** The time of day in the user's format ("14:00", "2:00 PM"). */
+        /** The times of day in the user's format ("14:00", "9:00 AM, 2:00 PM"). */
         String time(Context c) {
+            StringBuilder b = new StringBuilder();
+            for (int minute : minutes) b.append(b.length() > 0 ? ", " : "").append(time(c, minute));
+            return b.toString();
+        }
+
+        static String time(Context c, int minute) {
             Calendar t = Calendar.getInstance();
             t.set(Calendar.HOUR_OF_DAY, minute / 60);
             t.set(Calendar.MINUTE, minute % 60);
@@ -167,7 +192,12 @@ public final class Schedules extends BroadcastReceiver {
 
         /** For the agent: "every day at 14:00", in English like the rest of its instructions. */
         String english() {
-            String at = String.format(java.util.Locale.ROOT, " at %02d:%02d", minute / 60, minute % 60);
+            StringBuilder t = new StringBuilder(" at ");
+            for (int i = 0; i < minutes.length; i++) {
+                t.append(i == 0 ? "" : i == minutes.length - 1 ? " and " : ", ")
+                        .append(String.format(java.util.Locale.ROOT, "%02d:%02d", minutes[i] / 60, minutes[i] % 60));
+            }
+            String at = t.toString();
             if (days == EVERY_DAY) return "every day" + at;
             if (days == WEEKDAYS) return "on weekdays" + at;
             String[] names = new java.text.DateFormatSymbols(java.util.Locale.ENGLISH).getShortWeekdays();
@@ -317,7 +347,8 @@ public final class Schedules extends BroadcastReceiver {
             return;
         }
         set(c, s, Math.max(System.currentTimeMillis(), at)); // never this same time again
-        if (waiting.containsKey(id)) return; // yesterday's still waits? It can't: it gives up after an hour
+        // an earlier time of this chat may still wait (several times a day): one run does for both, and it gets
+        // this time's full hour before it is given up
         waiting.put(id, SystemClock.elapsedRealtime() + WAIT_MS);
         listen(c);
         pump();

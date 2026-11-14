@@ -697,14 +697,36 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         tap.addView(text(this, getString(R.string.setup_panel_size_info), 13, MUTED), topGap(8));
         ex.addView(tap, full());
         ex.addView(divider(), lineParams());
+        // these two only do something while replies are read aloud: without it they show as off, greyed out and
+        // not tappable; what the user chose is kept and comes back with it
+        final boolean speak = Prefs.speakReplies(this);
+        LinearLayout pauseMedia = switchRow(this, getString(R.string.setup_pause_media),
+                getString(R.string.setup_pause_media_info), speak && Prefs.pauseMediaForSpeech(this),
+                on -> {
+                    Prefs.setPauseMediaForSpeech(this, on);
+                    if (on && !NotificationWatcher.enabled(this)) { // that is how Buddy sees what plays
+                        Toast.makeText(this, R.string.rules_access_off_title, Toast.LENGTH_LONG).show();
+                        startActivity(new Intent(this, CheckActivity.class));
+                    }
+                });
+        LinearLayout voiceCards = switchRow(this, getString(R.string.setup_voice_cards),
+                getString(R.string.setup_voice_cards_info), speak && Prefs.voiceCards(this),
+                on -> Prefs.setVoiceCards(this, on));
+        for (LinearLayout r : new LinearLayout[]{pauseMedia, voiceCards}) {
+            r.setAlpha(speak ? 1f : 0.4f);
+            r.setEnabled(speak);
+            r.setClickable(speak);
+        }
         ex.addView(switchRow(this, getString(R.string.setup_read_aloud), getString(R.string.setup_read_aloud_info),
-                Prefs.speakReplies(this), on -> {
+                speak, on -> {
                     Prefs.setSpeakReplies(this, on);
                     if (!on) Voice.stopSpeaking();
+                    render();
                 }), full());
         ex.addView(divider(), lineParams());
-        ex.addView(switchRow(this, getString(R.string.setup_voice_cards), getString(R.string.setup_voice_cards_info),
-                Prefs.voiceCards(this), on -> Prefs.setVoiceCards(this, on)), full());
+        ex.addView(pauseMedia, full());
+        ex.addView(divider(), lineParams());
+        ex.addView(voiceCards, full());
         ex.addView(divider(), lineParams());
         if (!Flavor.FDROID) { // F-Droid updates its build itself
             ex.addView(switchRow(this, getString(R.string.setup_update_notices), getString(R.string.setup_update_notices_info),

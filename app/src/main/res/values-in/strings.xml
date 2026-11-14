@@ -480,6 +480,8 @@
     <string name="schedule_set_info">Kirim pesan ke chat ini secara otomatis pada waktu tertentu, mis. setiap hari pukul 14:00.</string>
     <string name="schedule_info">Pada waktu yang diatur, Buddy mengirim pesan ini ke chat seolah Anda yang mengetiknya, dengan agen dan opsi chat ini. Kartu persetujuan tetap menunggu Anda. Jika perlu layar saat ponsel terkunci, Buddy meminta Anda membukanya.</string>
     <string name="schedule_time">Waktu</string>
+    <string name="schedule_add_time">Tambahkan waktu</string>
+    <string name="schedule_remove_time">Hapus %1$s</string>
     <string name="schedule_days">Hari</string>
     <string name="schedule_daily">Setiap hari</string>
     <string name="schedule_weekdays">Hari kerja</string>
@@ -613,6 +615,7 @@
     <!-- Chat messages -->
     <!-- Toast after a long press copies a message. -->
     <string name="chat_copied">Disalin</string>
+    <string name="chat_copy_whole_reply">Salin seluruh balasan</string>
     <!-- Header of a collapsible group of the agent's steps in the chat. -->
     <plurals name="chat_tool_calls">
         <item quantity="other">%1$d panggilan alat</item>
@@ -1282,6 +1285,8 @@
     <string name="setup_read_aloud">Bacakan balasan</string>
     <!-- "Voice" = the Settings section of that name (setup_voice). -->
     <string name="setup_read_aloud_info">Buddy membacakan balasan agen dengan suara yang Anda pilih di bagian Suara.</string>
+    <string name="setup_pause_media">Jeda media saat membacakan</string>
+    <string name="setup_pause_media_info">Musik atau video yang sedang diputar dijeda saat Buddy membacakan balasan, lalu dilanjutkan setelahnya. Buddy hanya melanjutkan yang dijedanya sendiri, dan tidak jika Anda mengubah pemutaran sementara itu. Memerlukan “Bacakan balasan” dan akses notifikasi.</string>
     <string name="setup_voice_cards">Jawab kartu dengan suara</string>
     <string name="setup_voice_cards_info">Setelah kartu dibacakan, Buddy mendengarkan: ucapkan “setujui” atau “tolak”, atau opsi yang Anda inginkan. Memerlukan “Bacakan balasan”. Tidak saat ponsel terkunci. Siapa pun yang berada dalam jangkauan suara bisa menjawab.</string>
     <string name="voice_card_approval">Buddy memerlukan persetujuan Anda. %1$s</string>
@@ -1843,7 +1848,6 @@
     <string name="helper_stopped">Dihentikan</string>
     <string name="helper_of">Sub-agen dari “%1$s”</string>
     <string name="helper_this_chat">Chat ini</string>
-    <string name="helper_waiting">Menunggu</string>
     <string name="background_security">Proses debug nirkabel memungkinkan perangkat yang tersambung mengendalikan ponsel ini. Buddy hanya menyambungkan dirinya sendiri, di ponsel ini, dan pembantunya hanya mendengarkan di sini.</string>
     <string name="background_brought">Dipindahkan ke layar Anda: langkah ini memerlukan Anda. Mode latar belakang kini nonaktif untuk chat ini.</string>
     <string name="chat_background">Bekerja di latar belakang</string>

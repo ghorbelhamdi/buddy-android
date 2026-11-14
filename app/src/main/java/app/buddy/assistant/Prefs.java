@@ -321,6 +321,15 @@ final class Prefs {
         sp(c).edit().putBoolean("voice_cards", on).apply();
     }
 
+    /** Pause what's playing while a reply is read aloud, and start it again afterwards. Off unless switched on. */
+    static boolean pauseMediaForSpeech(Context c) {
+        return sp(c).getBoolean("speak_pause_media", false);
+    }
+
+    static void setPauseMediaForSpeech(Context c, boolean on) {
+        sp(c).edit().putBoolean("speak_pause_media", on).apply();
+    }
+
     static boolean hadReply(Context c) {
         return sp(c).getBoolean("had_reply", false);
     }

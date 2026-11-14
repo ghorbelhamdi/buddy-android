@@ -213,7 +213,6 @@ final class ChatHub {
         } catch (Exception ignored) {
         }
         viewing.remove(s);
-        Helpers.forget(s.id);
         if (!s.parent.isEmpty() && s.dev) { // a helper's own folder goes with it
             final String dir = Helpers.folder(s.id);
             new Thread(() -> {
@@ -911,9 +910,8 @@ final class ChatHub {
     private void runEnded(Sessions.Session ses) {
         Prefs.setBusy(app, ses.id, false);
         StepLog.runEnded(app, ses);
-        if (!ses.parent.isEmpty()) { // a sub-agent has one run: its screen is free for the next at once, and one waiting starts
+        if (!ses.parent.isEmpty()) { // a sub-agent has one run: its screen closes at once
             Background.close(app, ses.id);
-            Helpers.pump(this, ses.parent);
         } else if (ses.background) {
             Background.rest(app, ses.id); // its apps aren't "on screen" between runs
             // and a minute later, unless the chat works again, its screen goes and its apps with it: an app left

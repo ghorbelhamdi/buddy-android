@@ -350,6 +350,8 @@
     <string name="schedule_set_info">Schick diesem Chat zu festen Zeiten von selbst eine Nachricht, z. B. jeden Tag um 14:00.</string>
     <string name="schedule_info">Zur festgelegten Zeit schickt Buddy diese Nachricht in den Chat, als hättest du sie getippt, mit dem Agenten und den Optionen dieses Chats. Freigabekarten warten weiterhin auf dich. Braucht es den Bildschirm, während das Handy gesperrt ist, bittet es dich zu entsperren.</string>
     <string name="schedule_time">Uhrzeit</string>
+    <string name="schedule_add_time">Uhrzeit hinzufügen</string>
+    <string name="schedule_remove_time">%1$s entfernen</string>
     <string name="schedule_days">Tage</string>
     <string name="schedule_daily">Jeden Tag</string>
     <string name="schedule_weekdays">Werktags</string>
@@ -455,6 +457,7 @@
 
     <!-- Chat messages -->
     <string name="chat_copied">Kopiert</string>
+    <string name="chat_copy_whole_reply">Ganze Antwort kopieren</string>
     <plurals name="chat_tool_calls">
         <item quantity="one">%1$d Tool-Aufruf</item>
         <item quantity="other">%1$d Tool-Aufrufe</item>
@@ -956,6 +959,8 @@
     <string name="setup_tap_to_talk_info">Einmal tippen öffnet das Mikrofon: Sag, was du möchtest, und es wird gesendet, sobald du eine Pause machst. Halte die Bubble gedrückt für den Chat und mehr.</string>
     <string name="setup_read_aloud">Antworten vorlesen</string>
     <string name="setup_read_aloud_info">Buddy liest die Antworten der Agenten vor, mit der Stimme, die du unter „Stimme“ auswählst.</string>
+    <string name="setup_pause_media">Medien beim Vorlesen pausieren</string>
+    <string name="setup_pause_media_info">Laufende Musik oder ein Video wird pausiert, während Buddy eine Antwort vorliest, und läuft danach weiter. Buddy startet nur, was es selbst pausiert hat, und nicht, wenn du die Wiedergabe inzwischen geändert hast. Benötigt „Antworten vorlesen“ und den Benachrichtigungszugriff.</string>
     <string name="setup_voice_cards">Karten per Stimme beantworten</string>
     <string name="setup_voice_cards_info">Nachdem eine Karte vorgelesen wurde, hört Buddy zu: Sag „genehmigen“ oder „ablehnen“ oder die gewünschte Option. Benötigt „Antworten vorlesen“. Nicht bei gesperrtem Handy. Jeder in Hörweite könnte antworten.</string>
     <string name="voice_card_approval">Buddy braucht dein OK. %1$s</string>
@@ -1409,7 +1414,6 @@
     <string name="helper_stopped">Gestoppt</string>
     <string name="helper_of">Sub-Agent von „%1$s“</string>
     <string name="helper_this_chat">Dieser Chat</string>
-    <string name="helper_waiting">Wartet</string>
     <string name="background_security">Über „Debugging über WLAN“ können gekoppelte Geräte dieses Handy steuern. Buddy koppelt nur sich selbst, auf diesem Handy, und sein Helfer lauscht nur hier.</string>
     <string name="background_brought">Auf deinen Bildschirm geholt: Dieser Schritt braucht dich. Der Hintergrundmodus ist für diesen Chat jetzt aus.</string>
     <string name="chat_background">Im Hintergrund arbeiten</string>

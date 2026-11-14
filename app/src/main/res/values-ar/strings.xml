@@ -363,6 +363,8 @@
     <string name="schedule_set_info">أرسل رسالة إلى هذه المحادثة تلقائيًا في أوقات محددة، مثلًا كل يوم الساعة 14:00.</string>
     <string name="schedule_info">في الوقت المحدد يرسل Buddy هذه الرسالة إلى المحادثة كأنك كتبتها، بوكيل هذه المحادثة وخياراتها. بطاقات الموافقة ما زالت تنتظرك. إذا احتاج إلى الشاشة والهاتف مقفل، يطلب منك فتح القفل.</string>
     <string name="schedule_time">الوقت</string>
+    <string name="schedule_add_time">إضافة وقت</string>
+    <string name="schedule_remove_time">إزالة %1$s</string>
     <string name="schedule_days">الأيام</string>
     <string name="schedule_daily">كل يوم</string>
     <string name="schedule_weekdays">أيام العمل</string>
@@ -472,6 +474,7 @@
 
     <!-- Chat messages -->
     <string name="chat_copied">تم النسخ</string>
+    <string name="chat_copy_whole_reply">نسخ الرد كاملًا</string>
     <plurals name="chat_tool_calls">
         <item quantity="zero">%1$d استدعاء للأدوات</item>
         <item quantity="one">استدعاء أداة واحد</item>
@@ -994,6 +997,8 @@
     <string name="setup_tap_to_talk_info">تفتح نقرة واحدة الميكروفون: قل ما تريد وسيُرسَل عندما تتوقف عن الكلام. اضغط مطولًا على الفقاعة لفتح المحادثة والمزيد.</string>
     <string name="setup_read_aloud">قراءة الردود بصوت عالٍ</string>
     <string name="setup_read_aloud_info">يقرأ Buddy ردود الوكلاء بصوت عالٍ، بالصوت الذي تختاره في قسم «الصوت».</string>
+    <string name="setup_pause_media">إيقاف الوسائط مؤقتًا أثناء القراءة بصوت عالٍ</string>
+    <string name="setup_pause_media_info">تتوقف الموسيقى أو الفيديو مؤقتًا أثناء قراءة Buddy للرد، ثم تُستأنف بعد ذلك. لا يستأنف Buddy إلا ما أوقفه هو، ولا يفعل ذلك إذا غيّرت التشغيل في هذه الأثناء. يتطلب «قراءة الردود بصوت عالٍ» والوصول إلى الإشعارات.</string>
     <string name="setup_voice_cards">الرد على البطاقات بالصوت</string>
     <string name="setup_voice_cards_info">بعد قراءة البطاقة بصوت عالٍ يستمع Buddy: قل «موافق» أو «رفض»، أو الخيار الذي تريده. يتطلب تشغيل «قراءة الردود بصوت عالٍ». لا يعمل والهاتف مقفل. يمكن لأي شخص على مسمع أن يجيب.</string>
     <string name="voice_card_approval">يحتاج Buddy إلى موافقتك. %1$s</string>
@@ -1454,7 +1459,6 @@
     <string name="helper_stopped">أُوقف</string>
     <string name="helper_of">وكيل فرعي لـ «%1$s»</string>
     <string name="helper_this_chat">هذه المحادثة</string>
-    <string name="helper_waiting">في الانتظار</string>
     <string name="background_security">يتيح «تصحيح الأخطاء اللاسلكي» للأجهزة المقترنة التحكم في هذا الهاتف. يقرن Buddy نفسه فقط، على هذا الهاتف، وبرنامجه المساعد لا يستمع إلا هنا.</string>
     <string name="background_brought">تم النقل إلى شاشتك: هذه الخطوة تحتاج إليك. وضع الخلفية متوقف الآن لهذه المحادثة.</string>
     <string name="chat_background">العمل في الخلفية</string>

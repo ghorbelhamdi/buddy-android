@@ -846,10 +846,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             HelperCard c = helperCards.get(h.id);
             if (c == null) continue;
             boolean failed = "failed".equals(h.outcome), stopped = "stopped".equals(h.outcome);
-            boolean queued = Helpers.waiting(h.id);
-            c.dot.setBackground(oval(queued ? MUTED : h.running ? ACCENT : failed ? ERR : stopped ? MUTED : OK));
-            c.state.setText(queued ? getString(R.string.helper_waiting)
-                    : h.running ? (h.status.isEmpty() ? getString(R.string.helper_working) : h.status)
+            c.dot.setBackground(oval(h.running ? ACCENT : failed ? ERR : stopped ? MUTED : OK));
+            c.state.setText(h.running ? (h.status.isEmpty() ? getString(R.string.helper_working) : h.status)
                     : getString(failed ? R.string.helper_failed : stopped ? R.string.helper_stopped : R.string.helper_done));
         }
         HelperCard mine = helperCards.get(ses.id);
@@ -1361,15 +1359,91 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         TextView tl = sectionLabel(this, getString(R.string.schedule_time));
         tl.setPaddingRelative(0, dp(this, 8), 0, dp(this, 4));
         c.addView(tl);
-        TextView time = title(this, p.time(this), 28);
-        time.setTypeface(mono(this, 500));
-        time.setPaddingRelative(dp(this, 12), dp(this, 6), dp(this, 12), dp(this, 6));
-        time.setBackground(outlined(this, BG, 12, OUTLINE, 1));
-        time.setOnClickListener(v -> new android.app.TimePickerDialog(this, (tp, h, m) -> {
-            p.minute = h * 60 + m;
-            time.setText(p.time(this));
-        }, p.minute / 60, p.minute % 60, android.text.format.DateFormat.is24HourFormat(this)).show());
-        c.addView(time, wrap());
+        // one box per time: a tap changes it, its ✕ takes it away, + adds another. One time alone shows large;
+        // several share each line's width evenly, three to a line (two with a 12-hour clock, whose times are longer)
+        LinearLayout times = column(this);
+        c.addView(times, full());
+        final boolean h24 = android.text.format.DateFormat.is24HourFormat(this);
+        final Runnable[] paintTimes = new Runnable[1];
+        paintTimes[0] = () -> {
+            times.removeAllViews();
+            final boolean one = p.minutes.length == 1;
+            final int per = one ? 2 : h24 ? 3 : 2;
+            LinearLayout line = null;
+            for (int i = 0; i <= p.minutes.length; i++) {
+                if (i % per == 0) {
+                    line = row(this);
+                    LinearLayout.LayoutParams lp = full();
+                    if (i > 0) lp.topMargin = dp(this, 8);
+                    times.addView(line, lp);
+                }
+                LinearLayout box = row(this);
+                box.setGravity(Gravity.CENTER_VERTICAL);
+                box.setBackground(outlined(this, BG, 12, OUTLINE, 1));
+                final int at = i;
+                if (i == p.minutes.length) { // the + box
+                    box.setPaddingRelative(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
+                    box.addView(icon(this, R.drawable.ms_add, ACCENT_TEXT, 20));
+                    box.setContentDescription(getString(R.string.schedule_add_time));
+                    box.setOnClickListener(v -> {
+                        int from = p.minutes[p.minutes.length - 1] + 120; // two hours after the last, to start from
+                        if (from >= 24 * 60) from = p.minutes[p.minutes.length - 1];
+                        new android.app.TimePickerDialog(this, (tp, h, m) -> {
+                            int[] more = java.util.Arrays.copyOf(p.minutes, p.minutes.length + 1);
+                            more[more.length - 1] = h * 60 + m;
+                            p.minutes = Schedules.Plan.tidy(more);
+                            paintTimes[0].run();
+                        }, from / 60, from % 60, android.text.format.DateFormat.is24HourFormat(this)).show();
+                    });
+                } else {
+                    String label = Schedules.Plan.time(this, p.minutes[i]);
+                    TextView t = title(this, label, one ? 28 : 18);
+                    t.setTypeface(mono(this, 500));
+                    t.setMaxLines(1);
+                    t.setPaddingRelative(dp(this, 12), dp(this, 6), dp(this, one ? 12 : 4), dp(this, 6));
+                    if (one) {
+                        box.addView(t);
+                    } else { // the time takes what the ✕ leaves, and shrinks before it would be cut off
+                        t.setAutoSizeTextTypeUniformWithConfiguration(11, 18, 1, android.util.TypedValue.COMPLEX_UNIT_SP);
+                        box.addView(t, new LinearLayout.LayoutParams(0, dp(this, 36), 1));
+                    }
+                    t.setOnClickListener(v -> new android.app.TimePickerDialog(this, (tp, h, m) -> {
+                        int[] changed = p.minutes.clone();
+                        changed[at] = h * 60 + m;
+                        p.minutes = Schedules.Plan.tidy(changed);
+                        paintTimes[0].run();
+                    }, p.minutes[at] / 60, p.minutes[at] % 60, android.text.format.DateFormat.is24HourFormat(this)).show());
+                    if (p.minutes.length > 1) {
+                        ImageView x = icon(this, R.drawable.ms_close, MUTED, 18);
+                        x.setContentDescription(getString(R.string.schedule_remove_time, label));
+                        FrameLayout tapArea = new FrameLayout(this);
+                        tapArea.setPaddingRelative(dp(this, 4), dp(this, 8), dp(this, 10), dp(this, 8));
+                        tapArea.addView(x);
+                        tapArea.setOnClickListener(v -> {
+                            int[] fewer = new int[p.minutes.length - 1];
+                            for (int k = 0, n = 0; k < p.minutes.length; k++) if (k != at) fewer[n++] = p.minutes[k];
+                            p.minutes = fewer;
+                            paintTimes[0].run();
+                        });
+                        box.addView(tapArea);
+                    }
+                }
+                LinearLayout.LayoutParams bp = one || i == p.minutes.length ? wrap()
+                        : new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+                bp.setMarginEnd(dp(this, 8));
+                line.addView(box, bp);
+            }
+            // a last line that isn't full: empty places, so its boxes are as wide as those above
+            int last = (p.minutes.length + 1) % per;
+            if (!one && last != 0 && p.minutes.length % per != 0) {
+                for (int k = last; k < per; k++) {
+                    LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(0, 1, 1);
+                    sp.setMarginEnd(dp(this, 8));
+                    line.addView(new View(this), sp);
+                }
+            }
+        };
+        paintTimes[0].run();
 
         TextView dl = sectionLabel(this, getString(R.string.schedule_days));
         dl.setPaddingRelative(0, dp(this, 14), 0, dp(this, 4));
@@ -2381,16 +2455,52 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 break;
             }
             case BUDDY: { // Buddy 3: replies read as plain text on the page, no bubble
-                TextView tv = text(this, text, 15, TEXT);
-                tv.setTextIsSelectable(true);
-                tv.setText(Ui.markdown(text, null)); // **bold**, lists, `code`, [text](url) as a link…
-                links(tv);
-                Ui.copyWithLinks(tv);
-                tv.setLineSpacing(0, 1.25f);
-                tv.setPaddingRelative(dp(this, 4), dp(this, 2), dp(this, 4), dp(this, 2));
+                java.util.List<String[]> parts = Ui.tableParts(text);
+                if (parts.size() == 1 && "text".equals(parts.get(0)[0])) {
+                    v = replyText(text);
+                } else { // a reply with tables: its text and its tables, one under the other
+                    LinearLayout col = column(this);
+                    for (String[] part : parts) {
+                        // a long press on a table copies it whole (as the agent wrote it); its text isn't selectable
+                        // cell by cell, which would only ever copy one cell
+                        View pv = "table".equals(part[0]) ? Ui.tableView(this, part[1], null, cell -> {
+                            CharSequence shown = cell.getText();
+                            if (shown.toString().matches("(?s).*(://|www\\.|@).*")) links(cell);
+                            if (shown instanceof android.text.Spanned && ((android.text.Spanned) shown)
+                                    .getSpans(0, shown.length(), Ui.LinkSpan.class).length > 0) {
+                                cell.setLinkTextColor(ACCENT_TEXT);
+                                cell.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
+                            }
+                            copyOnLongPress(cell, part[1]);
+                        }) : replyText(part[1]);
+                        LinearLayout.LayoutParams pp = "table".equals(part[0]) ? wrap() : full();
+                        if (col.getChildCount() > 0) pp.topMargin = dp(this, 10);
+                        if ("table".equals(part[0])) pp.setMarginStart(dp(this, 4));
+                        col.addView(pv, pp);
+                    }
+                    v = col;
+                }
+                // a small icon under the reply copies all of it, as the agent wrote it: a selection can't reach
+                // past a table, and nothing else copies a whole reply here
+                LinearLayout whole = column(this);
+                whole.addView(v, full());
+                android.widget.ImageButton copy = new android.widget.ImageButton(this);
+                copy.setImageResource(R.drawable.ms_content_copy);
+                copy.setImageTintList(android.content.res.ColorStateList.valueOf(MUTED));
+                copy.setContentDescription(getString(R.string.chat_copy_whole_reply));
+                copy.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                copy.setPadding(dp(this, 9), dp(this, 9), dp(this, 9), dp(this, 9)); // a 16dp icon in a 34dp target
+                copy.setBackgroundResource(Ui.ripple(this, true));
+                copy.setOnClickListener(x -> {
+                    getSystemService(ClipboardManager.class).setPrimaryClip(ClipData.newPlainText("Buddy", text));
+                    Toast.makeText(this, R.string.chat_copied, Toast.LENGTH_SHORT).show();
+                });
+                LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(dp(this, 34), dp(this, 34));
+                cp.setMarginStart(-dp(this, 5)); // the icon itself in line with the text
+                whole.addView(copy, cp);
+                v = whole;
                 p.width = LinearLayout.LayoutParams.MATCH_PARENT;
                 p.topMargin = dp(this, 14);
-                v = tv;
                 break;
             }
             default: { // ERROR
@@ -2406,6 +2516,18 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             }
         }
         messages.addView(v, p);
+    }
+
+    /** A reply's text (or the text between its tables): Markdown, selectable, links tappable. */
+    private TextView replyText(String text) {
+        TextView tv = text(this, text, 15, TEXT);
+        tv.setTextIsSelectable(true);
+        tv.setText(Ui.markdown(text, null)); // **bold**, lists, `code`, [text](url) as a link…
+        links(tv);
+        Ui.copyWithLinks(tv);
+        tv.setLineSpacing(0, 1.25f);
+        tv.setPaddingRelative(dp(this, 4), dp(this, 2), dp(this, 4), dp(this, 2));
+        return tv;
     }
 
     /** Web links and email addresses become tappable (selectable text stays selectable). */

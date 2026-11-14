@@ -23,17 +23,6 @@ import java.util.concurrent.TimeUnit;
  * of its own, and its end makes no notification. With Linux tools it works in a folder of its own, deleted with it. Stopping or deleting the parent stops or deletes its helpers.
  */
 final class Helpers {
-    /** Sub-agents of a round that wait for their turn: id → what the chat shows and what the agent gets. */
-    private static final java.util.Map<String, String[]> pending = new java.util.concurrent.ConcurrentHashMap<>();
-
-    /** Not started yet: waiting for one of its round to finish. */
-    static boolean waiting(String helper) {
-        return pending.containsKey(helper);
-    }
-
-    static void forget(String helper) {
-        pending.remove(helper);
-    }
     /** A tool call may take 10 minutes (buddy-run sets that for every agent): the wait ends before that. */
     private static final long WAIT_MS = 8 * 60_000;
 
@@ -60,26 +49,8 @@ final class Helpers {
     }
 
     private static boolean anyRunning(List<Sessions.Session> l) {
-        for (Sessions.Session s : l) if (s.running || waiting(s.id)) return true;
+        for (Sessions.Session s : l) if (s.running) return true;
         return false;
-    }
-
-    /** Starts every sub-agent of this chat that hasn't started yet: all at once, no limit. Main thread. */
-    static void pump(final ChatHub hub, final String parent) {
-        boolean any = false;
-        for (Sessions.Session h : of(hub, parent)) {
-            String[] p = pending.remove(h.id);
-            if (p == null) continue;
-            String err = hub.sendHelper(h, p[0], p[1]);
-            h.archived = true; // out of the chat list and the bubble: the parent's chat shows it
-            if (err != null) {
-                h.outcome = "failed";
-                hub.note(h, Bubble.Kind.ERROR, err);
-            }
-            hub.sessions.save(h);
-            any = true;
-        }
-        if (any) hub.changed();
     }
 
     /** The delegate tool: starts the helpers and waits for their reports. */
@@ -127,11 +98,16 @@ final class Helpers {
                     h.incognito = parent.incognito; // an incognito chat's sub-agents leave no trace either
                     boolean phone = screens && !w[2].isEmpty();
                     h.background = phone;
-                    h.archived = true; // out of the chat list and the bubble: the parent's chat shows it
                     hub.sessions.save(h);
-                    pending.put(h.id, new String[]{w[1], prompt(w[1], phone, !w[2].isEmpty(), parent.dev, h.id)});
+                    // all start at once: no limit on how many work at the same time
+                    String err = hub.sendHelper(h, w[1], prompt(w[1], phone, !w[2].isEmpty(), parent.dev, h.id));
+                    h.archived = true; // out of the chat list and the bubble: the parent's chat shows it
+                    if (err != null) {
+                        h.outcome = "failed";
+                        hub.note(h, Bubble.Kind.ERROR, err);
+                    }
+                    hub.sessions.save(h);
                 }
-                pump(hub, parent.id); // the first ones now, the rest as those finish
                 hub.changed();
             } catch (Exception e) {
                 error[0] = String.valueOf(e.getMessage());
@@ -171,7 +147,6 @@ final class Helpers {
 
     static void stop(ChatHub hub, String parent) {
         for (Sessions.Session h : of(hub, parent)) {
-            if (pending.remove(h.id) != null) h.outcome = "stopped"; // never started
             if (h.running) hub.stop(h);
         }
         hub.changed();
@@ -195,10 +170,7 @@ final class Helpers {
         for (Sessions.Session h : l) {
             n++;
             b.append("Sub-agent ").append(n).append(" \"").append(h.title).append("\"");
-            if (waiting(h.id)) {
-                waiting = true;
-                b.append(": hasn't started yet.\n\n");
-            } else if (h.running) {
+            if (h.running) {
                 waiting = true;
                 b.append(": still working").append(h.status.isEmpty() ? "" : " (" + h.status + ")").append(".\n\n");
             } else if (h.outcome != null) {

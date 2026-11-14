@@ -3278,16 +3278,30 @@ final class Bubble implements ChatHub.Listener {
                 break;
             }
             case BUDDY: { // Buddy 3: replies read as plain text in the panel, as in the app's chat
-                TextView tv = Ui.text(svc, text, 15, Ui.TEXT);
-                CharSequence md = Ui.markdown(text, this::collapse); // **bold**, lists, `code`, [text](url) as a link…
-                tv.setText(md);
-                tv.setLineSpacing(0, 1.25f);
-                tv.setPaddingRelative(dp(4), dp(2), dp(4), dp(2));
-                Ui.linkifyForService(tv, this::collapse);
-                copyOnLongPress(tv, Ui.linkCopy(md, 0, md.length())); // as shown, links as "text (address)"
+                java.util.List<String[]> parts = Ui.tableParts(text);
+                if (parts.size() == 1 && "text".equals(parts.get(0)[0])) {
+                    v = replyText(text);
+                } else { // a reply with tables: its text and its tables, one under the other
+                    LinearLayout col = new LinearLayout(svc);
+                    col.setOrientation(LinearLayout.VERTICAL);
+                    for (String[] part : parts) {
+                        boolean table = "table".equals(part[0]);
+                        View pv = table ? Ui.tableView(svc, part[1], this::collapse, cell -> {
+                            Ui.linkifyForService(cell, this::collapse);
+                            copyOnLongPress(cell, text);
+                        }) : replyText(part[1]);
+                        if (!table) copyOnLongPress(pv, text); // every part copies the whole reply, as one without tables does
+                        LinearLayout.LayoutParams pp = new LinearLayout.LayoutParams(table
+                                ? LinearLayout.LayoutParams.WRAP_CONTENT : LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT);
+                        if (col.getChildCount() > 0) pp.topMargin = dp(10);
+                        if (table) pp.setMarginStart(dp(4));
+                        col.addView(pv, pp);
+                    }
+                    v = col;
+                }
                 p.width = LinearLayout.LayoutParams.MATCH_PARENT;
                 p.topMargin = dp(14);
-                v = tv;
                 break;
             }
             default: { // ERROR
@@ -3305,6 +3319,18 @@ final class Bubble implements ChatHub.Listener {
         messages.addView(v, p);
         while (messages.getChildCount() > Sessions.PAGE) messages.removeViewAt(0);
         scrollToEnd();
+    }
+
+    /** A reply's text (or the text between its tables): Markdown, links tappable, a long press copies it. */
+    private TextView replyText(String text) {
+        TextView tv = Ui.text(svc, text, 15, Ui.TEXT);
+        CharSequence md = Ui.markdown(text, this::collapse); // **bold**, lists, `code`, [text](url) as a link…
+        tv.setText(md);
+        tv.setLineSpacing(0, 1.25f);
+        tv.setPaddingRelative(dp(4), dp(2), dp(4), dp(2));
+        Ui.linkifyForService(tv, this::collapse);
+        copyOnLongPress(tv, Ui.linkCopy(md, 0, md.length())); // as shown, links as "text (address)"
+        return tv;
     }
 
     private ImageButton paste;

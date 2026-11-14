@@ -226,9 +226,13 @@ final class Voice {
                 .replaceAll("https?://\\S+", link)
                 .trim();
         if (clean.isEmpty()) return;
+        SpeechPause.begin(c);
         if ("chatgpt".equals(Prefs.speechEngine(c)) && SetupState.planSignedIn(c, "codex")) {
             final Context app = c.getApplicationContext();
-            CodexSpeech.speak(app, clean, t -> phoneSpeak(app, t)); // the phone's voice if ChatGPT's fails
+            CodexSpeech.speak(app, clean, t -> { // the phone's voice if ChatGPT's fails
+                SpeechPause.begin(app); // what was paused stays so while that voice gets ready
+                phoneSpeak(app, t);
+            });
             return;
         }
         phoneSpeak(c, clean);

@@ -353,6 +353,8 @@
     <string name="schedule_set_info">Bu sohbete belirli saatlerde kendiliğinden mesaj gönderin, örn. her gün 14:00\'te.</string>
     <string name="schedule_info">Belirlenen saatte Buddy bu mesajı, siz yazmışsınız gibi bu sohbetin aracısı ve seçenekleriyle sohbete gönderir. Onay kartları yine sizi bekler. Telefon kilitliyken ekrana ihtiyaç duyarsa kilidi açmanızı ister.</string>
     <string name="schedule_time">Saat</string>
+    <string name="schedule_add_time">Saat ekle</string>
+    <string name="schedule_remove_time">%1$s saatini kaldır</string>
     <string name="schedule_days">Günler</string>
     <string name="schedule_daily">Her gün</string>
     <string name="schedule_weekdays">Hafta içi</string>
@@ -458,6 +460,7 @@
 
     <!-- Chat messages -->
     <string name="chat_copied">Kopyalandı</string>
+    <string name="chat_copy_whole_reply">Yanıtın tamamını kopyala</string>
     <plurals name="chat_tool_calls">
         <item quantity="one">%1$d araç çağrısı</item>
         <item quantity="other">%1$d araç çağrısı</item>
@@ -959,6 +962,8 @@
     <string name="setup_tap_to_talk_info">Tek dokunuş mikrofonu açar: ne istediğinizi söyleyin, duraklayınca gönderilir. Sohbet ve daha fazlası için baloncuğa uzun basın.</string>
     <string name="setup_read_aloud">Yanıtları sesli oku</string>
     <string name="setup_read_aloud_info">Buddy, ajanların yanıtlarını Ses bölümünde seçtiğiniz sesle okur.</string>
+    <string name="setup_pause_media">Sesli okuma sırasında medyayı duraklat</string>
+    <string name="setup_pause_media_info">Çalan müzik veya video, Buddy bir yanıtı okurken duraklatılır ve sonra devam eder. Buddy yalnızca kendi duraklattığını devam ettirir; bu sırada oynatmayı değiştirdiyseniz dokunmaz. “Yanıtları sesli oku” ve bildirim erişimi gerekir.</string>
     <string name="setup_voice_cards">Kartları sesle yanıtla</string>
     <string name="setup_voice_cards_info">Bir kart sesli okunduktan sonra Buddy dinler: “onayla” veya “reddet” ya da istediğiniz seçeneği söyleyin. “Yanıtları sesli oku” açık olmalıdır. Telefon kilitliyken çalışmaz. Duyabilecek mesafedeki herkes yanıt verebilir.</string>
     <string name="voice_card_approval">Buddy onayınızı bekliyor. %1$s</string>
@@ -1410,7 +1415,6 @@
     <string name="helper_stopped">Durduruldu</string>
     <string name="helper_of">“%1$s” için alt ajan</string>
     <string name="helper_this_chat">Bu sohbet</string>
-    <string name="helper_waiting">Bekliyor</string>
     <string name="background_security">Kablosuz hata ayıklama, eşlenen cihazların bu telefonu kontrol etmesine izin verir. Buddy yalnızca kendini, bu telefonun üzerinde eşler ve yardımcısı yalnızca burayı dinler.</string>
     <string name="background_brought">Ekranınıza taşındı: bu adımı sizin yapmanız gerekiyor. Arka plan modu bu sohbet için artık kapalı.</string>
     <string name="chat_background">Arka planda çalış</string>

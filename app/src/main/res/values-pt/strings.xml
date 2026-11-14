@@ -483,6 +483,8 @@
     <string name="schedule_set_info">Envie uma mensagem para este chat sozinho em horários fixos, por ex. todo dia às 14:00.</string>
     <string name="schedule_info">No horário definido, o Buddy envia esta mensagem no chat como se você tivesse digitado, com o agente e as opções deste chat. Os cartões de aprovação continuam esperando você. Se precisar da tela com o celular bloqueado, ele pede para você desbloquear.</string>
     <string name="schedule_time">Horário</string>
+    <string name="schedule_add_time">Adicionar um horário</string>
+    <string name="schedule_remove_time">Remover %1$s</string>
     <string name="schedule_days">Dias</string>
     <string name="schedule_daily">Todo dia</string>
     <string name="schedule_weekdays">Dias úteis</string>
@@ -617,6 +619,7 @@
     <!-- Chat messages -->
     <!-- Toast after a long press copies a message. -->
     <string name="chat_copied">Copiado</string>
+    <string name="chat_copy_whole_reply">Copiar a resposta inteira</string>
     <!-- Header of a collapsible group of the agent's steps in the chat. -->
     <plurals name="chat_tool_calls">
         <item quantity="one">%1$d chamada de ferramenta</item>
@@ -1292,6 +1295,8 @@
     <string name="setup_read_aloud">Ler respostas em voz alta</string>
     <!-- "Voice" = the Settings section of that name (setup_voice). -->
     <string name="setup_read_aloud_info">O Buddy lê em voz alta as respostas dos agentes, com a voz que você escolher na seção Voz.</string>
+    <string name="setup_pause_media">Pausar a mídia durante a leitura em voz alta</string>
+    <string name="setup_pause_media_info">A música ou o vídeo em reprodução é pausado enquanto o Buddy lê uma resposta e continua depois. O Buddy só retoma o que ele pausou, e não se você mudou a reprodução nesse meio-tempo. Requer “Ler respostas em voz alta” e o acesso às notificações.</string>
     <string name="setup_voice_cards">Responder aos cartões por voz</string>
     <string name="setup_voice_cards_info">Depois de ler um cartão em voz alta, o Buddy escuta: diga “aprovar” ou “negar”, ou a opção que quiser. Requer “Ler respostas em voz alta”. Não funciona com o telefone bloqueado. Qualquer pessoa por perto poderia responder.</string>
     <string name="voice_card_approval">O Buddy precisa da sua aprovação. %1$s</string>
@@ -1854,7 +1859,6 @@
     <string name="helper_stopped">Parado</string>
     <string name="helper_of">Subagente de “%1$s”</string>
     <string name="helper_this_chat">Esta conversa</string>
-    <string name="helper_waiting">Aguardando</string>
     <string name="background_security">A Depuração por Wi-Fi permite que dispositivos pareados controlem este telefone. O Buddy pareia apenas a si mesmo, neste telefone, e o ajudante só escuta aqui.</string>
     <string name="background_brought">Movido para a sua tela: este passo precisa de você. O modo em segundo plano agora está desativado neste chat.</string>
     <string name="chat_background">Trabalhar em segundo plano</string>

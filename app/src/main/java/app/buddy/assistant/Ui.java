@@ -649,7 +649,7 @@ final class Ui {
     }
 
     static String linkText(String text) {
-        return markdown(text, null).toString();
+        return markdown(text, null, true).toString();
     }
 
     private static final java.util.regex.Pattern MD_INLINE = java.util.regex.Pattern.compile(
@@ -664,7 +664,7 @@ final class Ui {
             MD_BULLET = java.util.regex.Pattern.compile("(\\s*)[-*+]\\s+(.*)"),
             MD_NUMBER = java.util.regex.Pattern.compile("(\\s*)(\\d{1,3}[.)])\\s+(.*)"),
             MD_RULE = java.util.regex.Pattern.compile("\\s*([-*_])(\\s*\\1){2,}\\s*"),
-            MD_TABLE_LINE = java.util.regex.Pattern.compile("\\s*\\|?\\s*:?-{3,}:?\\s*(\\|\\s*:?-{3,}:?\\s*)*\\|?\\s*");
+            MD_TABLE_LINE = java.util.regex.Pattern.compile("\\s*\\|?\\s*:?-+:?\\s*(\\|\\s*:?-+:?\\s*)*\\|?\\s*");
 
     /**
      * An agent's reply in Markdown, as formatted text: headings, bold, italic, struck through, `code` and code blocks,
@@ -672,6 +672,10 @@ final class Ui {
      * (bare addresses are left to Linkify). Then runs before a link opens (e.g. to fold the panel).
      */
     static CharSequence markdown(String text, Runnable then) {
+        return markdown(text, then, false);
+    }
+
+    private static CharSequence markdown(String text, Runnable then, boolean plain) {
         android.text.SpannableStringBuilder out = new android.text.SpannableStringBuilder();
         String[] lines = text.split("\n", -1);
         int code = -1; // where the open code block started
@@ -708,10 +712,11 @@ final class Ui {
             } else if (l.startsWith(">")) {
                 inline(out, l.replaceFirst(">\\s?", ""), then);
                 set(out, new android.text.style.QuoteSpan(MUTED), start);
-            } else if (l.trim().startsWith("|") && l.trim().endsWith("|") && l.trim().length() > 1) {
-                if (MD_TABLE_LINE.matcher(l).matches()) continue; // |---|---|
-                out.append(l.trim());
-                monospace(out, start, out.length());
+            } else if (tableLine(l)) {
+                int j = i;
+                while (j + 1 < lines.length && tableLine(lines[j + 1])) j++;
+                table(out, lines, i, j, then, plain);
+                i = j;
             } else {
                 inline(out, l, then);
             }
@@ -719,6 +724,156 @@ final class Ui {
         }
         if (code >= 0) monospace(out, code, out.length()); // never closed
         return out;
+    }
+
+    /**
+     * A reply split at its tables, in order: {"text", Markdown} and {"table", its lines}. A table is a heading line, a
+     * |---|---| line under it, and rows; lines inside a fenced code block are never one.
+     */
+    static java.util.List<String[]> tableParts(String text) {
+        java.util.List<String[]> parts = new java.util.ArrayList<>();
+        StringBuilder cur = new StringBuilder();
+        String[] lines = text.split("\n", -1);
+        boolean code = false;
+        for (int i = 0; i < lines.length; i++) {
+            String l = lines[i];
+            if (l.trim().startsWith("```")) code = !code;
+            if (!code && tableLine(l) && i + 1 < lines.length && tableLine(lines[i + 1])
+                    && MD_TABLE_LINE.matcher(lines[i + 1]).matches()) {
+                int j = i + 1;
+                while (j + 1 < lines.length && tableLine(lines[j + 1])) j++;
+                textPart(parts, cur);
+                StringBuilder t = new StringBuilder();
+                for (int k = i; k <= j; k++) t.append(k > i ? "\n" : "").append(lines[k].trim());
+                parts.add(new String[]{"table", t.toString()});
+                i = j;
+                continue;
+            }
+            cur.append(l).append('\n');
+        }
+        textPart(parts, cur);
+        if (parts.isEmpty()) parts.add(new String[]{"text", text});
+        return parts;
+    }
+
+    private static void textPart(java.util.List<String[]> parts, StringBuilder cur) {
+        String t = cur.toString().replaceAll("^(\\s*\n)+", "").replaceAll("\\s+$", "");
+        cur.setLength(0);
+        if (!t.isEmpty()) parts.add(new String[]{"text", t});
+    }
+
+    private static String[] tableCells(String line) {
+        String t = line.trim();
+        String[] c = t.substring(1, t.length() - 1).split("(?<!\\\\)\\|", -1);
+        for (int i = 0; i < c.length; i++) c[i] = c[i].trim().replace("\\|", "|").replaceAll("(?i)\\s*<br\\s*/?>\\s*", "\n");
+        return c;
+    }
+
+    /**
+     * A table of a reply (one "table" part of tableParts) as a real one: a heading row, lines between the cells, each
+     * column as wide as its longest cell (a long cell wraps), and a sideways scroll when it is wider than the screen.
+     * Each cell's text is given to "each" for what the caller does with a reply's text (links, copying).
+     */
+    static View tableView(Context c, String table, Runnable then, java.util.function.Consumer<TextView> each) {
+        String[] lines = table.split("\n");
+        String[] align = tableCells(lines[1]);
+        int cols = 0;
+        for (int i = 0; i < lines.length; i++) if (i != 1) cols = Math.max(cols, tableCells(lines[i]).length);
+        android.widget.TableLayout t = new android.widget.TableLayout(c);
+        t.setBackground(rounded(c, OUTLINE, 10)); // shows between the cells and around them as the lines
+        t.setClipToOutline(true);
+        int line = Math.max(1, dp(c, 1));
+        t.setPadding(line, line, 0, 0);
+        for (int i = 0; i < lines.length; i++) {
+            if (i == 1) continue; // |---|---|
+            String[] cells = tableCells(lines[i]);
+            android.widget.TableRow row = new android.widget.TableRow(c);
+            for (int k = 0; k < cols; k++) {
+                TextView tv = text(c, "", 14, TEXT);
+                tv.setText(inlineMarkdown(k < cells.length ? cells[k] : "", then));
+                if (i == 0) tv.setTypeface(sans(c, 600));
+                tv.setBackgroundColor(i == 0 ? CARD2 : BG);
+                tv.setPaddingRelative(dp(c, 10), dp(c, 7), dp(c, 10), dp(c, 7));
+                tv.setMaxWidth(dp(c, 240));
+                String a = k < align.length ? align[k] : "";
+                tv.setGravity((a.startsWith(":") && a.endsWith(":") ? Gravity.CENTER_HORIZONTAL
+                        : a.endsWith(":") ? Gravity.END : Gravity.START) | Gravity.CENTER_VERTICAL);
+                if (each != null) each.accept(tv);
+                android.widget.TableRow.LayoutParams lp = new android.widget.TableRow.LayoutParams(
+                        android.widget.TableRow.LayoutParams.WRAP_CONTENT, android.widget.TableRow.LayoutParams.MATCH_PARENT);
+                lp.setMargins(0, 0, line, line);
+                row.addView(tv, lp);
+            }
+            t.addView(row);
+        }
+        android.widget.HorizontalScrollView hs = new android.widget.HorizontalScrollView(c);
+        hs.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        hs.setHorizontalFadingEdgeEnabled(true); // more to the side shows as a fade
+        hs.setFadingEdgeLength(dp(c, 24));
+        hs.addView(t, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        return hs;
+    }
+
+    /** One line's Markdown (bold, italic, `code`, links) as formatted text. */
+    static CharSequence inlineMarkdown(String s, Runnable then) {
+        android.text.SpannableStringBuilder out = new android.text.SpannableStringBuilder();
+        inline(out, s, then);
+        return out;
+    }
+
+    private static boolean tableLine(String l) {
+        String t = l.trim();
+        return t.length() > 1 && t.startsWith("|") && t.endsWith("|");
+    }
+
+    /**
+     * A table where a real one (tableView) can't be shown, inside one text: a user's own message, or lines that only
+     * look like a table. Each row is a block, its first cell in bold and the others under it as "Heading: value";
+     * that reads at any width, which a grid of padded columns doesn't. Plain (one-line previews, notifications):
+     * each row's cells with " · " between.
+     */
+    private static void table(android.text.SpannableStringBuilder out, String[] lines, int from, int to, Runnable then,
+            boolean plain) {
+        java.util.List<String[]> rows = new java.util.ArrayList<>();
+        boolean header = false;
+        for (int i = from; i <= to; i++) {
+            if (MD_TABLE_LINE.matcher(lines[i]).matches()) { // |---|---|
+                if (rows.size() == 1) header = true;
+                continue;
+            }
+            rows.add(tableCells(lines[i]));
+        }
+        if (plain || !header || rows.size() == 1) { // nothing to put headings on: the cells as they come
+            for (int r = 0; r < rows.size(); r++) {
+                int rowStart = out.length();
+                for (int k = 0; k < rows.get(r).length; k++) {
+                    if (k > 0) out.append(" · ");
+                    inline(out, rows.get(r)[k].replace('\n', ' '), then);
+                }
+                if (header && r == 0 && !plain) set(out, new android.text.style.StyleSpan(android.graphics.Typeface.BOLD), rowStart);
+                if (r < rows.size() - 1) out.append('\n');
+            }
+            return;
+        }
+        String[] head = rows.get(0);
+        for (int r = 1; r < rows.size(); r++) {
+            String[] row = rows.get(r);
+            int rowStart = out.length();
+            if (row.length > 0) inline(out, row[0].replace('\n', ' '), then);
+            set(out, new android.text.style.StyleSpan(android.graphics.Typeface.BOLD), rowStart);
+            for (int k = 1; k < row.length; k++) {
+                if (row[k].isEmpty()) continue;
+                out.append('\n');
+                if (k < head.length && !head[k].isEmpty()) {
+                    int h = out.length();
+                    inline(out, head[k].replace('\n', ' '), then);
+                    out.append(": ");
+                    set(out, new android.text.style.ForegroundColorSpan(MUTED), h);
+                }
+                inline(out, row[k].replace('\n', ' '), then);
+            }
+            if (r < rows.size() - 1) out.append("\n\n");
+        }
     }
 
     private static void inline(android.text.SpannableStringBuilder out, String s, Runnable then) {
@@ -757,9 +912,19 @@ final class Ui {
 
     private static void monospace(android.text.SpannableStringBuilder out, int a, int b) {
         if (b <= a) return;
-        out.setSpan(new android.text.style.TypefaceSpan("monospace"), a, b, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        out.setSpan(monoSpan(400), a, b, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         out.setSpan(new android.text.style.BackgroundColorSpan(CARD2), a, b, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         out.setSpan(new android.text.style.RelativeSizeSpan(0.9f), a, b, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    }
+
+    /**
+     * Buddy's own monospaced font at a weight. Not the system's "monospace" family: a phone's font setting can map
+     * that to a proportional font, and then a table's columns don't line up.
+     */
+    private static android.text.style.TypefaceSpan monoSpan(int weight) {
+        Context c = BuddyApp.context();
+        return c == null ? new android.text.style.TypefaceSpan("monospace")
+                : new android.text.style.TypefaceSpan(mono(c, weight));
     }
 
     private static void set(android.text.SpannableStringBuilder out, Object span, int from) {

@@ -520,6 +520,8 @@
     <string name="schedule_info">At the set time Buddy sends this message into the chat as if you typed it, with this chat\'s agent and options. Approval cards still wait for you. If it needs the screen while the phone is locked, it asks you to unlock.</string>
     <!-- Schedule sheet: section titles, the day choices and the message field. -->
     <string name="schedule_time">Time</string>
+    <string name="schedule_add_time">Add a time</string>
+    <string name="schedule_remove_time">Remove %1$s</string>
     <string name="schedule_days">Days</string>
     <string name="schedule_daily">Every day</string>
     <string name="schedule_weekdays">Weekdays</string>
@@ -670,6 +672,7 @@
     <!-- Chat messages -->
     <!-- Toast after a long press copies a message. -->
     <string name="chat_copied">Copied</string>
+    <string name="chat_copy_whole_reply">Copy whole reply</string>
     <!-- Header of a collapsible group of the agent's steps in the chat. -->
     <plurals name="chat_tool_calls">
         <item quantity="one">%1$d tool call</item>
@@ -1368,6 +1371,8 @@
     <string name="setup_read_aloud">Read replies aloud</string>
     <!-- "Voice" = the Settings section of that name (setup_voice). -->
     <string name="setup_read_aloud_info">Buddy reads the agents\' replies out loud, in the voice you pick under Voice.</string>
+    <string name="setup_pause_media">Pause media while reading aloud</string>
+    <string name="setup_pause_media_info">Music or a video that\'s playing is paused while Buddy reads a reply, and starts again afterwards. Buddy only restarts what it paused, and not if you changed playback meanwhile. Needs “Read replies aloud” and notification access.</string>
     <string name="setup_voice_cards">Answer cards by voice</string>
     <string name="setup_voice_cards_info">After a card is read aloud, Buddy listens: say “approve” or “deny”, or the option you want. Needs “Read replies aloud”. Not while the phone is locked. Anyone within earshot could answer.</string>
     <string name="voice_card_approval">Buddy needs your OK. %1$s</string>
@@ -2017,7 +2022,6 @@
     <string name="helper_stopped">Stopped</string>
     <string name="helper_of">Sub-agent of “%1$s”</string>
     <string name="helper_this_chat">This chat</string>
-    <string name="helper_waiting">Waiting</string>
     <!-- "USB debugging" is Android's name of that developer option: use the name this language's Android shows. -->
     <string name="background_usb_note">Buddy also turns on USB debugging. With it, the helper keeps running when Wi-Fi drops and Android switches Wireless debugging off. Leave it on.</string>
     <string name="background_security">Wireless debugging lets paired devices control this phone. Buddy pairs only itself, on this phone, and its helper listens only here.</string>

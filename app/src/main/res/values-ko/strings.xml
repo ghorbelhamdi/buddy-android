@@ -345,6 +345,8 @@
     <string name="schedule_set_info">정해진 시간에 이 채팅에 자동으로 메시지를 보내요. 예: 매일 14:00.</string>
     <string name="schedule_info">설정한 시간에 Buddy가 직접 입력한 것처럼 이 메시지를 채팅에 보내요. 에이전트와 옵션은 이 채팅 그대로예요. 승인 카드는 여전히 기다려요. 휴대폰이 잠겨 있을 때 화면이 필요하면 잠금 해제를 부탁해요.</string>
     <string name="schedule_time">시간</string>
+    <string name="schedule_add_time">시간 추가</string>
+    <string name="schedule_remove_time">%1$s 삭제</string>
     <string name="schedule_days">요일</string>
     <string name="schedule_daily">매일</string>
     <string name="schedule_weekdays">평일</string>
@@ -449,6 +451,7 @@
 
     <!-- Chat messages -->
     <string name="chat_copied">복사했어요</string>
+    <string name="chat_copy_whole_reply">답변 전체 복사</string>
     <plurals name="chat_tool_calls">
         <item quantity="other">도구 호출 %1$d회</item>
     </plurals>
@@ -944,6 +947,8 @@
     <string name="setup_tap_to_talk_info">한 번 탭하면 마이크가 켜져요. 원하는 걸 말하고 잠시 멈추면 전송돼요. 채팅 등은 버블을 길게 누르세요.</string>
     <string name="setup_read_aloud">답변 읽어 주기</string>
     <string name="setup_read_aloud_info">Buddy가 에이전트의 답변을 ‘음성’에서 고른 목소리로 읽어 줘요.</string>
+    <string name="setup_pause_media">읽어 주는 동안 미디어 일시정지</string>
+    <string name="setup_pause_media_info">Buddy가 답변을 읽어 주는 동안 재생 중인 음악이나 동영상을 일시정지하고, 끝나면 다시 재생해요. Buddy가 멈춘 것만 다시 재생하고, 그 사이에 재생을 바꿨다면 다시 재생하지 않아요. ‘답변 읽어 주기’와 알림 접근 권한이 필요해요.</string>
     <string name="setup_voice_cards">음성으로 카드에 답하기</string>
     <string name="setup_voice_cards_info">카드를 소리 내어 읽은 뒤 Buddy가 듣습니다. “승인” 또는 “거부”, 아니면 원하는 선택지를 말하세요. “답변 소리 내어 읽기”가 켜져 있어야 합니다. 휴대전화가 잠겨 있으면 작동하지 않습니다. 들리는 거리에 있는 누구나 답할 수 있습니다.</string>
     <string name="voice_card_approval">Buddy가 승인을 기다립니다. %1$s</string>
@@ -1393,7 +1398,6 @@
     <string name="helper_stopped">중지됨</string>
     <string name="helper_of">“%1$s”의 하위 에이전트</string>
     <string name="helper_this_chat">이 채팅</string>
-    <string name="helper_waiting">대기 중</string>
     <string name="background_security">‘무선 디버깅’을 켜면 페어링된 기기가 이 휴대전화를 제어할 수 있어요. Buddy는 이 휴대전화에서 자기 자신만 페어링하고, 도우미도 이 휴대전화 안의 연결만 받아요.</string>
     <string name="background_brought">내 화면으로 옮겼어요: 이 단계는 직접 해야 해요. 이제 이 채팅의 백그라운드 모드는 꺼졌어요.</string>
     <string name="chat_background">백그라운드에서 작업하기</string>

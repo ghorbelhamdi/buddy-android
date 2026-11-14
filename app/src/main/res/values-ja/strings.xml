@@ -345,6 +345,8 @@
     <string name="schedule_set_info">決まった時刻にこのチャットへ自動でメッセージを送ります（例：毎日14:00）。</string>
     <string name="schedule_info">設定した時刻に、Buddy があなたが入力したのと同じようにこのメッセージをチャットへ送ります。エージェントとオプションはこのチャットのものです。承認カードはこれまでどおりあなたを待ちます。スマホがロック中に画面が必要になったら、ロック解除をお願いします。</string>
     <string name="schedule_time">時刻</string>
+    <string name="schedule_add_time">時刻を追加</string>
+    <string name="schedule_remove_time">%1$s を削除</string>
     <string name="schedule_days">曜日</string>
     <string name="schedule_daily">毎日</string>
     <string name="schedule_weekdays">平日</string>
@@ -449,6 +451,7 @@
 
     <!-- Chat messages -->
     <string name="chat_copied">コピーしました</string>
+    <string name="chat_copy_whole_reply">返信全体をコピー</string>
     <plurals name="chat_tool_calls">
         <item quantity="other">ツール呼び出し %1$d 件</item>
     </plurals>
@@ -944,6 +947,8 @@
     <string name="setup_tap_to_talk_info">1 回タップするとマイクがオンになります。話して少し間を置くと送信されます。バブルを長押しすると、チャットなどを開けます。</string>
     <string name="setup_read_aloud">返信を読み上げる</string>
     <string name="setup_read_aloud_info">エージェントの返信を、「音声」で選んだ声で Buddy が読み上げます。</string>
+    <string name="setup_pause_media">読み上げ中はメディアを一時停止</string>
+    <string name="setup_pause_media_info">Buddy が返信を読み上げている間、再生中の音楽や動画を一時停止し、終わったら再開します。再開するのは Buddy が停止したものだけで、その間に再生を操作した場合は再開しません。「返信を読み上げる」と通知へのアクセスが必要です。</string>
     <string name="setup_voice_cards">カードに声で答える</string>
     <string name="setup_voice_cards_info">カードを読み上げたあと、Buddy が聞き取ります。「承認」か「拒否」、または選びたい選択肢を言ってください。「返信を読み上げる」がオンのときに使えます。スマートフォンがロック中は使えません。声の届く範囲にいる人なら誰でも答えられます。</string>
     <string name="voice_card_approval">Buddy が承認を求めています。%1$s</string>
@@ -1394,7 +1399,6 @@
     <string name="helper_stopped">停止</string>
     <string name="helper_of">「%1$s」のサブエージェント</string>
     <string name="helper_this_chat">このチャット</string>
-    <string name="helper_waiting">待機中</string>
     <string name="background_security">「ワイヤレス デバッグ」では、ペア設定したデバイスがこのスマートフォンを操作できます。Buddy がペア設定するのはこのスマートフォン上の Buddy 自身だけで、ヘルパーもこのスマートフォン内からの接続しか受け付けません。</string>
     <string name="background_brought">あなたの画面に移しました：この手順はあなたの操作が必要です。このチャットのバックグラウンド モードはオフになりました。</string>
     <string name="chat_background">バックグラウンドで作業する</string>

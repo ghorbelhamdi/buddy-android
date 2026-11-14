@@ -492,6 +492,8 @@
     <string name="schedule_set_info">Сам надсилає повідомлення в цей чат у заданий час, наприклад щодня о 14:00.</string>
     <string name="schedule_info">У заданий час Buddy надсилає це повідомлення в чат, ніби ви його набрали, з агентом і налаштуваннями цього чату. Картки підтвердження й далі чекають на вас. Якщо йому потрібен екран, коли телефон заблоковано, він попросить розблокувати.</string>
     <string name="schedule_time">Час</string>
+    <string name="schedule_add_time">Додати час</string>
+    <string name="schedule_remove_time">Вилучити %1$s</string>
     <string name="schedule_days">Дні</string>
     <string name="schedule_daily">Щодня</string>
     <string name="schedule_weekdays">У будні</string>
@@ -628,6 +630,7 @@
     <!-- Chat messages -->
     <!-- Toast after a long press copies a message. -->
     <string name="chat_copied">Скопійовано</string>
+    <string name="chat_copy_whole_reply">Копіювати всю відповідь</string>
     <!-- Header of a collapsible group of the agent's steps in the chat. -->
     <plurals name="chat_tool_calls">
         <item quantity="one">%1$d виклик інструмента</item>
@@ -1315,6 +1318,8 @@
     <string name="setup_read_aloud">Читати відповіді вголос</string>
     <!-- "Voice" = the Settings section of that name (setup_voice). -->
     <string name="setup_read_aloud_info">Buddy читає відповіді агентів вголос — тим голосом, який ви вибрали в розділі «Голос».</string>
+    <string name="setup_pause_media">Ставити медіа на паузу під час читання вголос</string>
+    <string name="setup_pause_media_info">Музика або відео ставляться на паузу, поки Buddy читає відповідь, і потім продовжуються. Buddy відновлює лише те, що призупинив сам, і не робить цього, якщо ви тим часом змінили відтворення. Потрібні налаштування «Читати відповіді вголос» і доступ до сповіщень.</string>
     <string name="setup_voice_cards">Відповідати на картки голосом</string>
     <string name="setup_voice_cards_info">Після того як картку прочитано вголос, Buddy слухає: скажіть «схвалити» або «відхилити» чи потрібний варіант. Потрібно ввімкнути «Читати відповіді вголос». Не працює на заблокованому телефоні. Відповісти може будь-хто поруч.</string>
     <string name="voice_card_approval">Buddy потрібне ваше підтвердження. %1$s</string>
@@ -1881,7 +1886,6 @@
     <string name="helper_stopped">Зупинено</string>
     <string name="helper_of">Субагент чату «%1$s»</string>
     <string name="helper_this_chat">Цей чат</string>
-    <string name="helper_waiting">Очікує</string>
     <string name="background_security">«Налагодження через Wi-Fi» дозволяє підключеним пристроям керувати цим телефоном. Buddy підключає лише себе, на цьому ж телефоні, а його допоміжна програма приймає з’єднання лише тут.</string>
     <string name="background_brought">Перенесено на ваш екран: цей крок маєте зробити ви. Фоновий режим для цього чату тепер вимкнено.</string>
     <string name="chat_background">Працювати у фоні</string>

@@ -350,6 +350,8 @@
     <string name="schedule_set_info">Stuur deze chat op vaste tijden vanzelf een bericht, bijv. elke dag om 14:00.</string>
     <string name="schedule_info">Op de ingestelde tijd stuurt Buddy dit bericht in de chat alsof je het zelf typte, met de agent en opties van deze chat. Goedkeuringskaarten wachten nog steeds op je. Heeft het het scherm nodig terwijl de telefoon vergrendeld is, dan vraagt het je te ontgrendelen.</string>
     <string name="schedule_time">Tijd</string>
+    <string name="schedule_add_time">Tijd toevoegen</string>
+    <string name="schedule_remove_time">%1$s verwijderen</string>
     <string name="schedule_days">Dagen</string>
     <string name="schedule_daily">Elke dag</string>
     <string name="schedule_weekdays">Werkdagen</string>
@@ -455,6 +457,7 @@
 
     <!-- Chat messages -->
     <string name="chat_copied">Gekopieerd</string>
+    <string name="chat_copy_whole_reply">Hele antwoord kopiëren</string>
     <plurals name="chat_tool_calls">
         <item quantity="one">%1$d toolaanroep</item>
         <item quantity="other">%1$d toolaanroepen</item>
@@ -956,6 +959,8 @@
     <string name="setup_tap_to_talk_info">Eén tik opent de microfoon: zeg wat je wilt en het wordt verzonden zodra je pauzeert. Houd de bubbel ingedrukt voor de chat en meer.</string>
     <string name="setup_read_aloud">Antwoorden voorlezen</string>
     <string name="setup_read_aloud_info">Buddy leest de antwoorden van de agents voor, met de stem die je kiest onder Spraak.</string>
+    <string name="setup_pause_media">Media pauzeren tijdens het voorlezen</string>
+    <string name="setup_pause_media_info">Muziek of een video die speelt, wordt gepauzeerd terwijl Buddy een antwoord voorleest en gaat daarna verder. Buddy hervat alleen wat het zelf heeft gepauzeerd, en niet als je het afspelen intussen hebt gewijzigd. Vereist ‘Antwoorden voorlezen’ en toegang tot meldingen.</string>
     <string name="setup_voice_cards">Kaarten met je stem beantwoorden</string>
     <string name="setup_voice_cards_info">Nadat een kaart is voorgelezen, luistert Buddy: zeg ‘goedkeuren’ of ‘weigeren’, of de optie die je wilt. Vereist ‘Antwoorden voorlezen’. Niet als de telefoon vergrendeld is. Iedereen binnen gehoorsafstand kan antwoorden.</string>
     <string name="voice_card_approval">Buddy heeft je OK nodig. %1$s</string>
@@ -1408,7 +1413,6 @@
     <string name="helper_stopped">Gestopt</string>
     <string name="helper_of">Subagent van “%1$s”</string>
     <string name="helper_this_chat">Deze chat</string>
-    <string name="helper_waiting">Wacht</string>
     <string name="background_security">Met Draadloze foutopsporing kunnen gekoppelde apparaten deze telefoon bedienen. Buddy koppelt alleen zichzelf, op deze telefoon, en de helper luistert alleen hier.</string>
     <string name="background_brought">Naar je scherm verplaatst: deze stap heeft jou nodig. De achtergrondmodus staat nu uit voor deze chat.</string>
     <string name="chat_background">Op de achtergrond werken</string>

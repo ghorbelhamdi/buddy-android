@@ -480,6 +480,8 @@
     <string name="schedule_set_info">在固定时间自动向这个对话发送一条消息，例如每天 14:00。</string>
     <string name="schedule_info">到了设定时间，Buddy 会像你亲自输入一样把这条消息发到对话里，使用这个对话的智能体和选项。批准卡片仍会等你确认。如果手机锁定时需要用到屏幕，它会请你解锁。</string>
     <string name="schedule_time">时间</string>
+    <string name="schedule_add_time">添加时间</string>
+    <string name="schedule_remove_time">移除 %1$s</string>
     <string name="schedule_days">日期</string>
     <string name="schedule_daily">每天</string>
     <string name="schedule_weekdays">工作日</string>
@@ -613,6 +615,7 @@
     <!-- Chat messages -->
     <!-- Toast after a long press copies a message. -->
     <string name="chat_copied">已复制</string>
+    <string name="chat_copy_whole_reply">复制整条回复</string>
     <!-- Header of a collapsible group of the agent's steps in the chat. -->
     <plurals name="chat_tool_calls">
         <item quantity="other">%1$d 次工具调用</item>
@@ -1282,6 +1285,8 @@
     <string name="setup_read_aloud">朗读回复</string>
     <!-- "Voice" = the Settings section of that name (setup_voice). -->
     <string name="setup_read_aloud_info">Buddy 会用你在“语音”中选择的声音朗读智能体的回复。</string>
+    <string name="setup_pause_media">朗读时暂停媒体</string>
+    <string name="setup_pause_media_info">Buddy 朗读回复时，会暂停正在播放的音乐或视频，读完后继续播放。Buddy 只会恢复它自己暂停的内容；如果你在此期间更改了播放，则不会恢复。需要开启“朗读回复”和通知使用权。</string>
     <string name="setup_voice_cards">用语音回答卡片</string>
     <string name="setup_voice_cards_info">朗读卡片后，Buddy 会聆听：说“批准”或“拒绝”，或者说出你要的选项。需要开启“朗读回复”。手机锁定时不可用。听得到的人都可以回答。</string>
     <string name="voice_card_approval">Buddy 需要你的确认。%1$s</string>
@@ -1842,7 +1847,6 @@
     <string name="helper_stopped">已停止</string>
     <string name="helper_of">“%1$s”的子代理</string>
     <string name="helper_this_chat">此聊天</string>
-    <string name="helper_waiting">等待中</string>
     <string name="background_security">“无线调试”允许已配对的设备控制这部手机。Buddy 只配对它自己，而且就在这部手机上；它的助手程序也只在本机监听。</string>
     <string name="background_brought">已移到你的屏幕：这一步需要你来做。这个对话的后台模式现已关闭。</string>
     <string name="chat_background">在后台工作</string>

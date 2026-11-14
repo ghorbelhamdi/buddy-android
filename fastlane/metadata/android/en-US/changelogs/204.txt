@@ -1,0 +1,5 @@
+• A chat's scheduled task can run at several times of the day
+• New setting: pause music or a video while Buddy reads a reply aloud, and start it again afterwards (needs notification access)
+• Tables in replies are shown as real tables; a wide one scrolls sideways
+• A small copy icon under each reply copies all of it
+• Code is shown in Buddy's own monospaced font
