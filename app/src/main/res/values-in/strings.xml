@@ -476,6 +476,16 @@
     <string name="chat_keep_awake">Biarkan layar menyala selama bekerja</string>
     <string name="chat_keep_awake_info">Untuk tugas panjang: ponsel tetap terjaga selama chat ini bekerja, dan notifikasi memberi tahu hasilnya. Mengunci ponsel tetap mematikan layar.</string>
     <string name="chat_allowed">Diizinkan tanpa bertanya</string>
+    <string name="chat_approvals">Persetujuan</string>
+    <string name="chat_approvals_info">Cara chat ini bertanya kepada Anda sebelum agennya bertindak. Tetap begitu sampai Anda mengubahnya; chat baru dimulai dengan Tanya.</string>
+    <string name="chat_approvals_ask">Tanya</string>
+    <string name="chat_approvals_ask_info">Tiap aplikasi mengikuti pengaturannya di %1$s.</string>
+    <string name="chat_approvals_strict_info">Juga di aplikasi yang disetel ke %1$s, Buddy bertanya sebelum mengirim, memposting, membeli, atau menghapus.</string>
+    <string name="chat_approvals_apps_hint">Tempat agen bertindak, dengan setelan tiap aplikasi di %1$s. Ketuk salah satu untuk mengubahnya di sana.</string>
+    <string name="chat_approvals_routine">Rutin diizinkan</string>
+    <string name="chat_approvals_routine_info">Langkah rutin langsung berjalan di semua aplikasi tanpa kartu: mengirim pesan, atau langkah yang akan ditanyakan peninjau. Setiap langkah dicatat di chat. Membayar, membeli, menghapus, memasang, kata sandi, dan setelan keamanan tetap menanyakan Anda, begitu juga semua hal di aplikasi perbankan dan pembayaran, Setelan, dan toko aplikasi.</string>
+    <string name="chat_approvals_strict">Selalu tanya</string>
+    <string name="chat_approvals_apps">Aplikasi di chat ini</string>
     <string name="chat_allowed_info">Sampai tugas chat ini selesai, persetujuan rutin di aplikasi ini berjalan sendiri: mengirim pesan, atau langkah yang akan ditanyakan peninjau. Masing-masing muncul di chat. Membayar, membeli, menghapus, menginstal, kata sandi, dan setelan keamanan tetap menanyakan Anda.</string>
     <string name="chat_allowed_kept">Disimpan untuk jadwal chat ini: aplikasi ini tetap diizinkan untuk tugas terjadwalnya, sampai Anda menghapusnya atau menghapus jadwalnya.</string>
     <string name="chat_allowed_add">Tambah aplikasi</string>

@@ -346,6 +346,16 @@
     <string name="chat_keep_awake">Bildschirm anlassen, während es arbeitet</string>
     <string name="chat_keep_awake_info">Für lange Aufgaben: Das Handy bleibt wach, solange dieser Chat arbeitet, und eine Benachrichtigung sagt dir, wie es gelaufen ist. Wenn du das Handy sperrst, geht der Bildschirm trotzdem aus.</string>
     <string name="chat_allowed">Ohne Nachfrage erlaubt</string>
+    <string name="chat_approvals">Freigaben</string>
+    <string name="chat_approvals_info">Wie dieser Chat dich fragt, bevor sein Agent etwas tut. Das bleibt so, bis du es änderst; neue Chats beginnen mit Fragen.</string>
+    <string name="chat_approvals_ask">Fragen</string>
+    <string name="chat_approvals_ask_info">Jede App folgt dem, was unter %1$s für sie festgelegt ist.</string>
+    <string name="chat_approvals_strict_info">Auch in Apps, die auf %1$s stehen, fragt Buddy vor dem Senden, Posten, Kaufen oder Löschen.</string>
+    <string name="chat_approvals_apps_hint">Wo der Agent etwas getan hat, mit der Einstellung jeder App unter %1$s. Tippe auf eine App, um sie dort zu ändern.</string>
+    <string name="chat_approvals_routine">Routine erlaubt</string>
+    <string name="chat_approvals_routine_info">Routineschritte laufen in jeder App ohne Karte: eine Nachricht senden oder ein Schritt, bei dem der Prüfer nachfragen würde. Jeder wird im Chat vermerkt. Bezahlen, Kaufen, Löschen, Installieren, Passwörter und Sicherheitseinstellungen fragen dich weiterhin, ebenso alles in Banking- und Bezahl-Apps, den Einstellungen und App-Stores.</string>
+    <string name="chat_approvals_strict">Immer fragen</string>
+    <string name="chat_approvals_apps">Apps in diesem Chat</string>
     <string name="chat_allowed_info">Bis die Aufgabe dieses Chats endet, laufen Routine-Freigaben in diesen Apps von selbst: eine Nachricht senden oder ein Schritt, bei dem der Prüfer nachfragen würde. Jede steht im Chat. Bezahlen, Kaufen, Löschen, Installieren, Passwörter und Sicherheitseinstellungen fragen dich weiterhin.</string>
     <string name="chat_allowed_kept">Für den Zeitplan dieses Chats behalten: Diese Apps bleiben für seine geplanten Läufe erlaubt, bis du sie oder den Zeitplan entfernst.</string>
     <string name="chat_allowed_add">App hinzufügen</string>

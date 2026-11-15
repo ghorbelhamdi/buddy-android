@@ -479,6 +479,16 @@
     <string name="chat_keep_awake">Manter a tela ligada enquanto trabalha</string>
     <string name="chat_keep_awake_info">Para tarefas longas: o celular fica acordado enquanto este chat trabalha, e uma notificação diz como foi. Bloquear o celular ainda desliga a tela.</string>
     <string name="chat_allowed">Permitido sem perguntar</string>
+    <string name="chat_approvals">Aprovações</string>
+    <string name="chat_approvals_info">Como este chat pergunta antes de o agente agir. Fica assim até você mudar; chats novos começam em Perguntar.</string>
+    <string name="chat_approvals_ask">Perguntar</string>
+    <string name="chat_approvals_ask_info">Cada app segue o que está definido em %1$s.</string>
+    <string name="chat_approvals_strict_info">Também nos apps em %1$s, o Buddy pergunta antes de enviar, publicar, comprar ou excluir.</string>
+    <string name="chat_approvals_apps_hint">Onde o agente agiu, com o ajuste de cada app em %1$s. Toque em um para mudar lá.</string>
+    <string name="chat_approvals_routine">Rotina permitida</string>
+    <string name="chat_approvals_routine_info">Passos de rotina seguem em qualquer app sem cartão: enviar uma mensagem ou um passo sobre o qual o revisor perguntaria. Cada um fica anotado no chat. Pagar, comprar, excluir, instalar, senhas e configurações de segurança continuam perguntando, assim como tudo em apps de banco e pagamento, Configurações e lojas de apps.</string>
+    <string name="chat_approvals_strict">Sempre perguntar</string>
+    <string name="chat_approvals_apps">Apps deste chat</string>
     <string name="chat_allowed_info">Até a tarefa deste chat terminar, as aprovações de rotina nestes apps seguem sozinhas: enviar uma mensagem, ou um passo sobre o qual o revisor perguntaria. Cada uma aparece no chat. Pagar, comprar, excluir, instalar, senhas e configurações de segurança ainda perguntam a você.</string>
     <string name="chat_allowed_kept">Mantidos para o agendamento deste chat: estes apps continuam permitidos nas execuções agendadas, até você removê-los ou remover o agendamento.</string>
     <string name="chat_allowed_add">Adicionar um app</string>

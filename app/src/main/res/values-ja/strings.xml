@@ -341,6 +341,16 @@
     <string name="chat_keep_awake">作業中は画面をオンのままにする</string>
     <string name="chat_keep_awake_info">長い作業向け：このチャットが作業している間はスリープせず、終わると結果を通知でお知らせします。スマホをロックすれば画面は通常どおり消えます。</string>
     <string name="chat_allowed">確認なしで許可</string>
+    <string name="chat_approvals">承認</string>
+    <string name="chat_approvals_info">このチャットのエージェントが操作する前に、どのように確認するかを決めます。変更するまでそのままで、新しいチャットは「確認する」から始まります。</string>
+    <string name="chat_approvals_ask">確認する</string>
+    <string name="chat_approvals_ask_info">各アプリは「%1$s」の設定に従います。</string>
+    <string name="chat_approvals_strict_info">「%1$s」に設定したアプリでも、送信、投稿、購入、削除の前に Buddy が確認します。</string>
+    <string name="chat_approvals_apps_hint">エージェントが操作したアプリと、「%1$s」での各アプリの設定です。タップするとそこで変更できます。</string>
+    <string name="chat_approvals_routine">定型操作を許可</string>
+    <string name="chat_approvals_routine_info">定型的な操作は、どのアプリでもカードなしで進みます。メッセージの送信や、レビュー担当が確認を求めるような操作が対象です。それぞれチャットに記録されます。支払い、購入、削除、インストール、パスワード、セキュリティ設定は引き続き確認し、銀行・決済アプリ、設定、アプリストア内の操作もすべて確認します。</string>
+    <string name="chat_approvals_strict">常に確認する</string>
+    <string name="chat_approvals_apps">このチャットのアプリ</string>
     <string name="chat_allowed_info">このチャットの作業が終わるまで、これらのアプリでの定型的な承認は自動で進みます（メッセージの送信や、レビュー担当が確認を求める手順など）。それぞれチャットに表示されます。支払い、購入、削除、インストール、パスワード、セキュリティ設定は引き続き確認します。</string>
     <string name="chat_allowed_kept">このチャットのスケジュール用に保持：これらのアプリは、削除するかスケジュールを削除するまで、スケジュール実行でも許可されたままです。</string>
     <string name="chat_allowed_add">アプリを追加</string>

@@ -341,6 +341,16 @@
     <string name="chat_keep_awake">작업 중에는 화면 켜 두기</string>
     <string name="chat_keep_awake_info">긴 작업용: 이 채팅이 작업하는 동안 휴대폰이 잠들지 않고, 끝나면 결과를 알림으로 알려 줘요. 휴대폰을 잠그면 화면은 그대로 꺼져요.</string>
     <string name="chat_allowed">묻지 않고 허용</string>
+    <string name="chat_approvals">승인</string>
+    <string name="chat_approvals_info">에이전트가 행동하기 전에 이 채팅이 어떻게 물어볼지 정합니다. 바꿀 때까지 유지되며, 새 채팅은 \'묻기\'로 시작합니다.</string>
+    <string name="chat_approvals_ask">묻기</string>
+    <string name="chat_approvals_ask_info">각 앱은 %1$s에서 정한 대로 따릅니다.</string>
+    <string name="chat_approvals_strict_info">\'%1$s\'(으)로 설정한 앱에서도 Buddy가 보내기, 게시, 구매, 삭제 전에 물어봅니다.</string>
+    <string name="chat_approvals_apps_hint">에이전트가 작업한 앱과 %1$s의 앱별 설정입니다. 앱을 탭하면 거기서 바꿀 수 있습니다.</string>
+    <string name="chat_approvals_routine">일상 작업 허용</string>
+    <string name="chat_approvals_routine_info">일상적인 단계는 모든 앱에서 카드 없이 진행됩니다. 메시지 보내기, 또는 검토자가 물어볼 만한 단계가 해당됩니다. 각 단계는 채팅에 기록됩니다. 결제, 구매, 삭제, 설치, 비밀번호, 보안 설정은 계속 물어보며, 은행·결제 앱, 설정, 앱 스토어 안의 모든 것도 마찬가지입니다.</string>
+    <string name="chat_approvals_strict">항상 묻기</string>
+    <string name="chat_approvals_apps">이 채팅의 앱</string>
     <string name="chat_allowed_info">이 채팅의 작업이 끝날 때까지 이 앱들의 일상적인 승인은 자동으로 진행돼요: 메시지 보내기나 검토자가 물어볼 만한 단계 같은 것이요. 하나하나 채팅에 표시돼요. 결제, 구매, 삭제, 설치, 비밀번호, 보안 설정은 계속 물어봐요.</string>
     <string name="chat_allowed_kept">이 채팅의 예약용으로 유지돼요: 이 앱들은 직접 삭제하거나 예약을 삭제할 때까지 예약된 실행에서도 계속 허용돼요.</string>
     <string name="chat_allowed_add">앱 추가</string>

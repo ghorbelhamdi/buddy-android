@@ -264,11 +264,6 @@ final class Guard {
         return null;
     }
 
-    /** Trust: the agent works on its own in this app, without asking the user. */
-    static boolean autonomous(android.content.Context c, String pkg) {
-        return pkg != null && "trust".equals(mode(c, pkg, null));
-    }
-
     /** "hard": Buddy enforces approval in this app; "smart": the lists, then a reviewer AI for every tap;
      *  "trust": the agent works on its own, without asking. */
     static String mode(android.content.Context c, String pkg, CharSequence label) {
@@ -301,6 +296,55 @@ final class Guard {
     private Guard() {
     }
 
+    /** "Search" at the start of a field's hint or name, in Buddy's languages (CJK puts it at either end). */
+    private static final java.util.regex.Pattern SEARCH_WORD = java.util.regex.Pattern.compile(
+            "^(search|suche|suchen|recherche|rechercher|buscar|pesquisar|cerca|zoeken|szukaj|поиск|найти|пошук|"
+                    + "arama|telusuri|tìm kiếm|खोजें|بحث)\\b|^(検索|搜索|搜尋|검색)|(検索|搜索|搜尋|검색)$",
+            java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
+    /** "search" as a word of a view id: search_box, rs_search_src_text, searchBar; not research_note. */
+    private static final java.util.regex.Pattern SEARCH_ID = java.util.regex.Pattern.compile("(^|[^a-z])search");
+
+    /**
+     * A field that searches, so Enter in it looks something up and sends nothing to anyone: no password, and it says
+     * so itself, by its class (a search view's field), by "search" as a word of its id, or, for a one-line field, by
+     * a hint or name that begins with the word ("Search Amazon", not "Message #job-search"). Only what an app says of
+     * its own field counts: the caller leaves out web pages, whose ids and hints are the page's to write, and
+     * browsers, whose address bar says "search" and goes anywhere (see Tools.typeText). Kept narrow: a field wrongly
+     * taken for a search box loses the card before a message goes out.
+     */
+    static boolean searchField(android.view.accessibility.AccessibilityNodeInfo n) {
+        if (n == null || n.isPassword()) return false;
+        String cls = String.valueOf(n.getClassName());
+        String raw = n.getViewIdResourceName();
+        raw = raw == null ? "" : raw.substring(raw.indexOf('/') + 1);
+        String id = raw.replaceAll("([a-z0-9])([A-Z])", "$1_$2").toLowerCase(java.util.Locale.ROOT); // searchBar: search_bar
+        if (id.contains("url") || id.contains("address")) return false; // an address bar, whatever else it says
+        CharSequence hint = n.getHintText(), desc = n.getContentDescription();
+        boolean word = !n.isMultiLine() && (SEARCH_WORD.matcher(hint == null ? "" : hint.toString().trim()).find()
+                || SEARCH_WORD.matcher(desc == null ? "" : desc.toString().trim()).find());
+        boolean search = cls.contains("Search") || SEARCH_ID.matcher(id).find() || word;
+        // off unless the phone's owner turns it on (adb shell setprop log.tag.BuddyField DEBUG): how a field describes
+        // itself, to see why one was or wasn't taken for a search. Never its text, hint or name
+        if (android.util.Log.isLoggable("BuddyField", android.util.Log.DEBUG)) {
+            android.util.Log.d("BuddyField", "search=" + search + " class=" + cls + " id=" + id + " multiline="
+                    + n.isMultiLine() + " word=" + word + " pkg=" + n.getPackageName());
+        }
+        return search;
+    }
+
+    /** An app that opens any web link (a browser): what its fields say of themselves is no guide to where Enter goes. */
+    static boolean browser(android.content.Context c, CharSequence pkg) {
+        if (pkg == null) return true;
+        try {
+            android.content.Intent i = new android.content.Intent(android.content.Intent.ACTION_VIEW,
+                    android.net.Uri.parse("https://example.com/")).addCategory(android.content.Intent.CATEGORY_BROWSABLE)
+                    .setPackage(pkg.toString());
+            return !c.getPackageManager().queryIntentActivities(i, 0).isEmpty();
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
     /** The agent's confirm was approved: that covers the next risky action. */
     static synchronized void approved(String summary) {
         approved(summary, false);
@@ -319,6 +363,16 @@ final class Guard {
         planAt = approvedAt;
         plan = summary;
         planFor = approvedFor;
+    }
+
+    /**
+     * The agent pressed Enter in a search field, which went ahead without a card: an approval still pending for the
+     * chat was not given for that, so from here it covers only what a countdown's would, a send (of the approved
+     * text, see takeApproval). The message the user approved before the agent looked up the contact still goes; a
+     * Buy or Delete button after an approved search asks.
+     */
+    static synchronized void afterSearch() {
+        if (approvedAt != 0 && java.util.Objects.equals(approvedFor, McpServer.CALLER_CHAT.get())) approvedAuto = true;
     }
 
     /**
@@ -413,11 +467,23 @@ final class Guard {
      * The calling chat's run rule: the user allowed this app without asking until the run ends (ChatHub.allowedFor).
      * It covers only what a notification rule's countdown may approve (sending a message) and a smart reviewer's
      * "ask" on a tap that isn't a risky button; Tools decides which an action is. Never in a notification rule's run.
+     * A chat set to "Routine allowed" has it for every app such a rule may cover (not money apps, Settings, stores).
      */
     static boolean runRule(android.content.Context c, String pkg) {
+        return runRule(c, pkg, false);
+    }
+
+    /**
+     * As above; listedOnly: only an app the user put on the chat's own list counts, not "Routine allowed". For Enter
+     * on a web page or in a browser, where Buddy can't tell a message box from a checkout form.
+     */
+    static boolean runRule(android.content.Context c, String pkg, boolean listedOnly) {
         String chat = McpServer.CALLER_CHAT.get();
         if (chat == null || Triggers.ruleRun(chat) || !allowable(c, pkg)) return false;
-        return ChatHub.get(c).allowedFor(chat).contains(pkg);
+        ChatHub hub = ChatHub.get(c);
+        String choice = hub.approvalsFor(chat);
+        if ("strict".equals(choice)) return false; // "Always ask" is over the chat's own list of allowed apps too
+        return (!listedOnly && "routine".equals(choice)) || hub.allowedFor(chat).contains(pkg);
     }
 
     /**

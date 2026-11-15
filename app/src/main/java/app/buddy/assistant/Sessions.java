@@ -116,6 +116,18 @@ final class Sessions {
          * them between runs (and saved) for its scheduled runs, until the schedule is removed.
          */
         final java.util.Set<String> allowed = java.util.Collections.synchronizedSet(new java.util.LinkedHashSet<>());
+        /**
+         * How this chat asks before its agent's actions, until the user changes it (the line under the chat's header):
+         * "" as App permissions say; "routine": routine approvals go ahead in every app (what "Allowed without asking"
+         * does for chosen apps, see Guard.runRule); "strict": apps on Trust ask like the others (see Tools.mode).
+         */
+        volatile String approvals = "";
+        /**
+         * The apps this chat's agent has tapped or sent in, in the order it first came to them: shown on the chat's
+         * Approvals sheet with each one's setting in App permissions, so the user sees where it acted and can change
+         * what applies there.
+         */
+        final java.util.Set<String> apps = java.util.Collections.synchronizedSet(new java.util.LinkedHashSet<>());
         /** The current run is a scheduled task's: its end is a notification, as in long-task mode. */
         boolean scheduledRun;
         /** How the current run ended so far: null (fine), "stopped" or "failed". */
@@ -348,8 +360,11 @@ final class Sessions {
         }
         JSONObject o = new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model)
                 .put("effort", s.effort).put("actual_model", s.actualModel).put("ctx_used", s.ctxUsed).put("ctx_window", s.ctxWindow)
-                .put("interrupted", s.interrupted).put("incognito", s.incognito).put("dev", s.dev).put("awake", s.awake).put("background", s.background)
+                .put("interrupted", s.interrupted).put("incognito", s.incognito).put("dev", s.dev).put("awake", s.awake).put("background", s.background).put("approvals", s.approvals)
                 .put("pinned", s.pinned).put("archived", s.archived).put("updated", s.updated).put("cut", s.cut).put("parent", s.parent).put("slot", s.slot).put("messages", msgs);
+        synchronized (s.apps) {
+            if (!s.apps.isEmpty()) o.put("apps", new JSONArray(s.apps));
+        }
         if (s.schedule != null) {
             JSONArray ok;
             synchronized (s.allowed) {
@@ -381,6 +396,9 @@ final class Sessions {
         s.dev = o.optBoolean("dev", Prefs.devMode(app));
         s.awake = o.optBoolean("awake");
         s.background = o.optBoolean("background");
+        s.approvals = o.optString("approvals", "");
+        JSONArray apps = o.optJSONArray("apps");
+        for (int i = 0; apps != null && i < apps.length(); i++) s.apps.add(apps.optString(i));
         s.pinned = o.optBoolean("pinned");
         s.archived = o.optBoolean("archived");
         s.parent = o.optString("parent");

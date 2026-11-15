@@ -496,6 +496,16 @@
     <string name="chat_keep_awake_info">Cho việc dài: điện thoại luôn thức khi cuộc trò chuyện này đang chạy, và một thông báo cho biết kết quả. Khóa điện thoại vẫn tắt màn hình.</string>
     <!-- Section title in Chat options: apps where this chat's routine approvals need no card until its task ends. -->
     <string name="chat_allowed">Cho phép không cần hỏi</string>
+    <string name="chat_approvals">Phê duyệt</string>
+    <string name="chat_approvals_info">Cách cuộc trò chuyện này hỏi bạn trước khi tác nhân của nó hành động. Giữ nguyên cho đến khi bạn đổi; cuộc trò chuyện mới bắt đầu ở Hỏi.</string>
+    <string name="chat_approvals_ask">Hỏi</string>
+    <string name="chat_approvals_ask_info">Mỗi ứng dụng theo đúng thiết lập của nó trong %1$s.</string>
+    <string name="chat_approvals_strict_info">Cả trong ứng dụng đặt ở %1$s, Buddy vẫn hỏi trước khi gửi, đăng, mua hoặc xóa.</string>
+    <string name="chat_approvals_apps_hint">Nơi tác nhân đã hành động, kèm cài đặt của từng ứng dụng trong %1$s. Chạm vào một ứng dụng để đổi ở đó.</string>
+    <string name="chat_approvals_routine">Cho phép việc thường lệ</string>
+    <string name="chat_approvals_routine_info">Các bước thường lệ được thực hiện trong mọi ứng dụng mà không cần thẻ: gửi tin nhắn, hoặc bước mà trình kiểm duyệt sẽ hỏi. Mỗi bước đều được ghi trong cuộc trò chuyện. Thanh toán, mua, xóa, cài đặt, mật khẩu và cài đặt bảo mật vẫn hỏi bạn, cũng như mọi thứ trong ứng dụng ngân hàng và thanh toán, Cài đặt và cửa hàng ứng dụng.</string>
+    <string name="chat_approvals_strict">Luôn hỏi</string>
+    <string name="chat_approvals_apps">Ứng dụng trong cuộc trò chuyện này</string>
     <!-- Under that title. "The reviewer" = Buddy's smart reviewer (App permissions). -->
     <string name="chat_allowed_info">Cho đến khi việc của cuộc trò chuyện này kết thúc, các lần duyệt thông thường trong những ứng dụng này sẽ tự được thông qua: gửi tin nhắn, hoặc một bước mà trình kiểm duyệt sẽ hỏi. Mỗi lần đều hiện trong cuộc trò chuyện. Thanh toán, mua, xóa, cài ứng dụng, mật khẩu và cài đặt bảo mật vẫn hỏi bạn.</string>
     <!-- Under that, when the chat has a schedule: the list isn't cleared when a run ends. -->

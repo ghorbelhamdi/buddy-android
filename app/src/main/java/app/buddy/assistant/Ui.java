@@ -346,6 +346,41 @@ final class Ui {
         chip.setSelected(on); // for TalkBack: on reads as selected
     }
 
+    /**
+     * The line under a chat's header that says how the chat asks before its agent's actions (see Session.approvals),
+     * and opens the choice: a shield, "Approvals · Ask", a chevron. Paint it with paintApprovals.
+     */
+    static LinearLayout approvalsLine(Context c) {
+        LinearLayout l = row(c);
+        l.setGravity(Gravity.CENTER_VERTICAL);
+        l.setPaddingRelative(dp(c, 16), dp(c, 6), dp(c, 12), dp(c, 6));
+        l.addView(icon(c, R.drawable.ms_shield_person, MUTED, 15));
+        TextView t = single(text(c, "", 13, MUTED));
+        t.setPaddingRelative(dp(c, 8), 0, dp(c, 4), 0);
+        l.addView(t, weight1());
+        l.addView(icon(c, R.drawable.ms_expand_more, MUTED, 16));
+        return l;
+    }
+
+    /** The choice's short name: Ask, Routine allowed, Always ask. */
+    static String approvalsName(Context c, String choice) {
+        return c.getString("routine".equals(choice) ? R.string.chat_approvals_routine
+                : "strict".equals(choice) ? R.string.chat_approvals_strict : R.string.chat_approvals_ask);
+    }
+
+    /** Ask: quiet. Any other choice stands out in the accent, so it can't be on without being seen. */
+    static void paintApprovals(Context c, LinearLayout line, String choice) {
+        boolean own = !choice.isEmpty();
+        int color = own ? ACCENT_TEXT : MUTED;
+        ((ImageView) line.getChildAt(0)).setImageTintList(ColorStateList.valueOf(color));
+        TextView t = (TextView) line.getChildAt(1);
+        t.setText(c.getString(R.string.chat_approvals) + " · " + approvalsName(c, choice));
+        t.setTextColor(color);
+        t.setTypeface(sans(c, own ? 600 : 400));
+        ((ImageView) line.getChildAt(2)).setImageTintList(ColorStateList.valueOf(color));
+        line.setBackgroundColor(own ? ACCENT_SOFT : 0x00000000);
+    }
+
     /** A red note with a warning icon (what could go wrong with a setting). */
     static LinearLayout warning(Context c, String s) {
         LinearLayout w = row(c);

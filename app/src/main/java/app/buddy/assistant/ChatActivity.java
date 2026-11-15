@@ -142,6 +142,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         top.addView(speaker);
         root.addView(top, full());
         root.addView(divider(), new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(this, 1)));
+        // how this chat asks before the agent's actions, always in sight; only the user changes it (not for a
+        // sub-agent, which only looks things up, nor a notification rule's chat, which has its own stricter rules)
+        approvals = protect(approvalsLine(this));
+        approvals.setOnClickListener(v -> approvalsSheet());
+        root.addView(approvals, full());
 
         // running strip
         strip = row(this);
@@ -383,6 +388,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         }
         // from the bubble's attach button, or images pasted there (already copied into Buddy's storage)
         if (state == null && getIntent().getBooleanExtra("attach", false)) input.post(this::attachSheet);
+        if (state == null && getIntent().getBooleanExtra("approvals", false)) input.post(this::approvalsSheet);
         if (state == null && getIntent().getBooleanExtra("background", false)) {
             bgConnectOnOpen = true; // from the bubble's dot: connect right away when it isn't
             input.postDelayed(this::backgroundSheet, 250);
@@ -511,6 +517,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         Browser.addListener(this);
         Waiting.listener = waitingChanged;
         hub.setViewing(ses, true);
+        hub.setOnScreen(ses, hasWindowFocus());
         hub.select(ses);
         Voice.prepare(this); // so the mic is quick
         CodexLive.addUi(liveUi);
@@ -539,7 +546,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         CodexLive.removeUi(liveUi);
         if (ses != null) {
             hub.setViewing(ses, false);
+            hub.setOnScreen(ses, false);
             hub.removeListener(this);
+            // (a card waiting in this chat stays where it is when the chat is left: the user has seen it here, and the
+            // bubble's panel opening with it again on the way out was a loop. The bubble's label and the Chats list's
+            // "Waiting for you" say it still waits; a tap on either shows it)
         }
         resumed = false;
         Browser.removeListener(this);
@@ -1032,6 +1043,94 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     // ------------------------------------------------------ background mode, from the chat
 
     private LinearLayout bgChip;
+    private LinearLayout approvals;
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        // with a sheet or dialog over the chat, a card drawn in it would sit unseen: one that comes now shows in the
+        // bubble's panel. A card already waiting stays put: the user has seen it, and finds it when the sheet closes
+        if (ses == null) return;
+        hub.setOnScreen(ses, hasFocus && resumed);
+    }
+
+    /** The three ways this chat can ask before its agent's actions (see Session.approvals). */
+    private void approvalsSheet() {
+        if (!hub.approvalsEditable(ses)) return;
+        LinearLayout c = protect(column(this));
+        c.addView(title(this, getString(R.string.chat_approvals), 18));
+        TextView info = text(this, getString(R.string.chat_approvals_info), 13, MUTED);
+        info.setPaddingRelative(0, dp(this, 4), 0, dp(this, 8));
+        c.addView(info);
+        final Dialog[] d = new Dialog[1];
+        String[][] choices = {{"", getString(R.string.chat_approvals_ask_info, getString(R.string.perms_title))},
+                {"routine", getString(R.string.chat_approvals_routine_info)},
+                {"strict", getString(R.string.chat_approvals_strict_info, getString(R.string.perms_mode_trust))}};
+        for (String[] ch : choices) {
+            LinearLayout r = row(this);
+            r.setGravity(Gravity.CENTER_VERTICAL);
+            r.setPaddingRelative(dp(this, 4), dp(this, 10), dp(this, 4), dp(this, 10));
+            r.setBackgroundResource(ripple(this, false));
+            LinearLayout t = column(this);
+            t.addView(title(this, approvalsName(this, ch[0]), 15));
+            t.addView(text(this, ch[1], 13, MUTED));
+            r.addView(t, weight1());
+            if (ch[0].equals(ses.approvals)) r.addView(icon(this, R.drawable.ms_check, ACCENT, 22));
+            r.setOnClickListener(v -> {
+                d[0].dismiss();
+                hub.setApprovals(ses, ch[0]);
+                refresh();
+            });
+            c.addView(r, full());
+        }
+        // the apps this chat's agent has acted in, each with its setting in App permissions: a tap opens that screen
+        java.util.List<String> used;
+        synchronized (ses.apps) {
+            used = new java.util.ArrayList<>(ses.apps);
+        }
+        if (!used.isEmpty()) {
+            TextView al = sectionLabel(this, getString(R.string.chat_approvals_apps));
+            al.setPaddingRelative(dp(this, 4), dp(this, 14), 0, dp(this, 2));
+            c.addView(al);
+            TextView ah = text(this, getString(R.string.chat_approvals_apps_hint, getString(R.string.perms_title)), 13, MUTED);
+            ah.setPaddingRelative(dp(this, 4), 0, 0, dp(this, 4));
+            c.addView(ah);
+            android.content.pm.PackageManager pm = getPackageManager();
+            for (String pkg : used) {
+                String name, mode;
+                android.graphics.drawable.Drawable pic = null;
+                try {
+                    android.content.pm.ApplicationInfo ai = pm.getApplicationInfo(pkg, 0);
+                    name = String.valueOf(pm.getApplicationLabel(ai));
+                    pic = pm.getApplicationIcon(ai);
+                    mode = Guard.mode(this, pkg, name);
+                } catch (android.content.pm.PackageManager.NameNotFoundException gone) {
+                    continue; // uninstalled since
+                }
+                LinearLayout r = row(this);
+                r.setGravity(Gravity.CENTER_VERTICAL);
+                r.setPaddingRelative(dp(this, 4), dp(this, 8), dp(this, 4), dp(this, 8));
+                r.setBackgroundResource(ripple(this, false));
+                ImageView iv = new ImageView(this);
+                iv.setImageDrawable(pic);
+                r.addView(iv, new LinearLayout.LayoutParams(dp(this, 28), dp(this, 28)));
+                TextView n = single(title(this, name, 15));
+                n.setPaddingRelative(dp(this, 12), 0, dp(this, 8), 0);
+                r.addView(n, weight1());
+                r.addView(monoText(this, getString("trust".equals(mode) ? R.string.perms_mode_trust
+                        : "smart".equals(mode) ? R.string.perms_mode_smart : R.string.perms_mode_hard), 12,
+                        "trust".equals(mode) ? ACCENT_TEXT : MUTED));
+                r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
+                r.setOnClickListener(v -> {
+                    d[0].dismiss();
+                    startActivity(new android.content.Intent(this, AppPermissionsActivity.class));
+                });
+                c.addView(r, full());
+            }
+        }
+        d[0] = bottomSheet(this, c);
+        d[0].show();
+    }
     /** -1 not asked yet, 0 not set up, 1 paired but its helper isn't running, 2 connected. */
     private volatile int bgState = -1;
     private long bgCheckedAt;
@@ -1927,6 +2026,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         usage.setContentDescription(Usage.shortLine(this, ses.backend));
         usage.setVisibility(used < 0 ? View.GONE : View.VISIBLE);
         if (linux != null) paintLinuxChip(this, linux, ses.dev);
+        if (approvals != null) {
+            approvals.setVisibility(hub.approvalsEditable(ses) ? View.VISIBLE : View.GONE);
+            paintApprovals(this, approvals, ses.approvals);
+        }
         paintBackgroundChip();
         checkBackground(false);
         renderHelpers();

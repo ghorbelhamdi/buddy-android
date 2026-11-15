@@ -501,6 +501,16 @@
     <string name="chat_keep_awake_info">For long tasks: the phone stays awake while this chat works, and a notification says how it went. Locking the phone still turns the screen off.</string>
     <!-- Section title in Chat options: apps where this chat's routine approvals need no card until its task ends. -->
     <string name="chat_allowed">Allowed without asking</string>
+    <string name="chat_approvals">Approvals</string>
+    <string name="chat_approvals_info">How this chat asks you before its agent acts. It stays until you change it; new chats start on Ask.</string>
+    <string name="chat_approvals_ask">Ask</string>
+    <string name="chat_approvals_ask_info">Each app follows what %1$s says for it.</string>
+    <string name="chat_approvals_strict_info">Also in apps set to %1$s, Buddy asks before sending, posting, buying or deleting.</string>
+    <string name="chat_approvals_apps_hint">Where the agent has acted, with each app\'s setting in %1$s. Tap one to change it there.</string>
+    <string name="chat_approvals_routine">Routine allowed</string>
+    <string name="chat_approvals_routine_info">Routine steps go ahead in every app without a card: sending a message, or a step the reviewer would ask about. Each one is noted in the chat. Paying, buying, deleting, installing, passwords and security settings still ask you, and so does everything in banking and payment apps, Settings and app stores.</string>
+    <string name="chat_approvals_strict">Always ask</string>
+    <string name="chat_approvals_apps">Apps in this chat</string>
     <!-- Under that title. "The reviewer" = Buddy's smart reviewer (App permissions). -->
     <string name="chat_allowed_info">Until this chat\'s task ends, routine approvals in these apps go ahead on their own: sending a message, or a step the reviewer would ask about. Each one shows in the chat. Paying, buying, deleting, installing, passwords and security settings still ask you.</string>
     <!-- Under that, when the chat has a schedule: the list isn't cleared when a run ends. -->

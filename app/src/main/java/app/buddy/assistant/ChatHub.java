@@ -174,6 +174,22 @@ final class ChatHub {
         listeners.remove(l);
     }
 
+    /** The chat whose own screen (ChatActivity) is in front, or null. */
+    private Sessions.Session onScreen;
+
+    void setOnScreen(Sessions.Session ses, boolean on) {
+        if (on) onScreen = ses;
+        else if (onScreen == ses) onScreen = null;
+    }
+
+    /**
+     * This chat's own screen is in front with nothing over it (a sheet or dialog takes its window's focus, and the
+     * card under it would not be seen): a card for it shows there, so the bubble's panel need not open over it.
+     */
+    boolean onScreen(Sessions.Session ses) {
+        return ses != null && ses == onScreen;
+    }
+
     void setViewing(Sessions.Session ses, boolean on) {
         if (on) {
             viewing.add(ses);
@@ -524,16 +540,51 @@ final class ChatHub {
         changed();
     }
 
+    /**
+     * The calling chat's approvals choice (any thread, see Session.approvals): "", "routine" or "strict". Always ""
+     * for a session outside Buddy's chats and for a sub-agent, which only looks things up.
+     */
+    String approvalsFor(String chat) {
+        Sessions.Session s = byId(chat);
+        return s != null && s.parent.isEmpty() ? s.approvals : "";
+    }
+
+    /** The chat with this id, for a tool's thread (a copy of the list: it changes on the main thread); or null. */
+    private Sessions.Session byId(String chat) {
+        if (chat == null) return null;
+        for (Sessions.Session s : new ArrayList<>(sessions.all)) if (s.id.equals(chat)) return s;
+        return null;
+    }
+
+    /** The calling chat's agent acted in this app (any thread): kept with the chat (see Session.apps), saved when new. */
+    void appUsed(String chat, String pkg) {
+        final Sessions.Session s = byId(chat);
+        if (s == null || pkg == null || !s.apps.add(pkg)) return;
+        main.post(() -> {
+            if (sessions.all.contains(s)) sessions.save(s);
+        });
+    }
+
+    /** The line under a chat's header applies to it: not a sub-agent's chat, nor a notification rule's. */
+    boolean approvalsEditable(Sessions.Session ses) {
+        return ses != null && ses.parent.isEmpty() && !Triggers.ruleChat(app, ses.id);
+    }
+
+    void setApprovals(Sessions.Session ses, String choice) {
+        // what the old choice approved and the agent hasn't used yet doesn't carry over into the new one
+        if (!choice.equals(ses.approvals)) Guard.forget(ses.id);
+        ses.approvals = choice;
+        sessions.save(ses);
+        changed();
+    }
+
     /** The calling chat's "Allowed without asking" apps (any thread); empty for a session outside Buddy's chats. */
     java.util.Set<String> allowedFor(String chat) {
-        if (chat == null) return java.util.Collections.emptySet();
-        for (Sessions.Session s : new ArrayList<>(sessions.all)) {
-            if (!s.id.equals(chat)) continue;
-            synchronized (s.allowed) {
-                return new java.util.HashSet<>(s.allowed);
-            }
+        Sessions.Session s = byId(chat);
+        if (s == null) return java.util.Collections.emptySet();
+        synchronized (s.allowed) {
+            return new java.util.HashSet<>(s.allowed);
         }
-        return java.util.Collections.emptySet();
     }
 
     /**
@@ -1188,7 +1239,9 @@ final class ChatHub {
                 return BuddyApp.str(R.string.hub_tool_do_steps, st == null ? 0 : st.length());
             }
             case "collect": return BuddyApp.str(R.string.hub_tool_collect);
-            case "find": return BuddyApp.str(R.string.hub_tool_find, said(full, in.optString("text"), 40));
+            case "find": // (its text can come a moment after the call itself: no “” meanwhile)
+                return in.optString("text").trim().isEmpty() ? BuddyApp.str(R.string.hub_tool_read_screen)
+                        : BuddyApp.str(R.string.hub_tool_find, said(full, in.optString("text"), 40));
             case "WebSearch": return BuddyApp.str(R.string.hub_tool_web_search, said(full, in.optString("query"), 40));
             case "WebFetch": return BuddyApp.str(R.string.hub_tool_web_fetch, said(full, in.optString("url"), 40));
             case "Bash": return in.has("command") ? BuddyApp.str(R.string.hub_tool_command, said(full, in.optString("command"), 40))

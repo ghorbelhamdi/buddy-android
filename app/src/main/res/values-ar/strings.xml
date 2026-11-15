@@ -359,6 +359,16 @@
     <string name="chat_keep_awake">إبقاء الشاشة مضاءة أثناء العمل</string>
     <string name="chat_keep_awake_info">للمهام الطويلة: يبقى الهاتف مستيقظًا ما دامت هذه المحادثة تعمل، ويخبرك إشعار بالنتيجة. قفل الهاتف يطفئ الشاشة كالمعتاد.</string>
     <string name="chat_allowed">مسموح دون سؤال</string>
+    <string name="chat_approvals">الموافقات</string>
+    <string name="chat_approvals_info">كيف تسألك هذه المحادثة قبل أن يتصرف وكيلها. يبقى الاختيار إلى أن تغيّره؛ المحادثات الجديدة تبدأ على «اسأل».</string>
+    <string name="chat_approvals_ask">اسأل</string>
+    <string name="chat_approvals_ask_info">كل تطبيق يتبع ما هو محدَّد له في «%1$s».</string>
+    <string name="chat_approvals_strict_info">حتى في التطبيقات المضبوطة على «%1$s»، يسأل Buddy قبل الإرسال أو النشر أو الشراء أو الحذف.</string>
+    <string name="chat_approvals_apps_hint">حيث تصرّف الوكيل، مع إعداد كل تطبيق في «%1$s». اضغط على تطبيق لتغييره هناك.</string>
+    <string name="chat_approvals_routine">الروتيني مسموح</string>
+    <string name="chat_approvals_routine_info">الخطوات الروتينية تمضي في كل تطبيق دون بطاقة: إرسال رسالة، أو خطوة كان المراجع سيسأل عنها. تُدوَّن كل واحدة في المحادثة. الدفع والشراء والحذف والتثبيت وكلمات المرور وإعدادات الأمان ما زالت تسألك، وكذلك كل شيء في تطبيقات البنوك والدفع والإعدادات ومتاجر التطبيقات.</string>
+    <string name="chat_approvals_strict">اسأل دائمًا</string>
+    <string name="chat_approvals_apps">التطبيقات في هذه المحادثة</string>
     <string name="chat_allowed_info">حتى تنتهي مهمة هذه المحادثة، تمرّ الموافقات الروتينية في هذه التطبيقات تلقائيًا: إرسال رسالة، أو خطوة كان المراجع سيسأل عنها. تظهر كل واحدة في المحادثة. الدفع والشراء والحذف والتثبيت وكلمات المرور وإعدادات الأمان ما زالت تسألك.</string>
     <string name="chat_allowed_kept">محفوظة لجدولة هذه المحادثة: تبقى هذه التطبيقات مسموحًا بها في تشغيلاتها المجدولة، حتى تزيلها أو تزيل الجدولة.</string>
     <string name="chat_allowed_add">إضافة تطبيق</string>

@@ -384,6 +384,14 @@ final class Bubble implements ChatHub.Listener {
         llp.topMargin = dp(8);
         llp.leftMargin = llp.rightMargin = -dp(12);
         panel.addView(line, llp);
+        // how this chat asks before the agent's actions, as on the chat screen; changed there (the user's own choice,
+        // made on a sheet), so a tap opens the chat with that sheet
+        approvals = Ui.approvalsLine(svc);
+        approvals.setOnClickListener(v -> openChatSheet("approvals"));
+        LinearLayout.LayoutParams apl = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        apl.leftMargin = apl.rightMargin = -dp(12);
+        panel.addView(approvals, apl);
 
         // running strip, as in the chat screen: what it's doing, and Stop
         strip = new LinearLayout(svc);
@@ -1316,7 +1324,9 @@ final class Bubble implements ChatHub.Listener {
     /*
      * Android 16 (targetSdk 36) delivers Back through OnBackInvokedDispatcher instead of
      * KEYCODE_BACK, so the panel registers a callback while it is open. Back first closes
-     * the keyboard, then denies a pending approval, then collapses the panel.
+     * the keyboard, then ends a "Change" answer, then collapses the panel. It never answers a
+     * waiting card: like the panel's ✕, it only puts the panel away, and the card goes on
+     * waiting (the bubble's label says so). Only Deny denies.
      */
     private final Runnable outsideCollapse = () -> {
         if (expanded && pendingConfirm == null) collapse();
@@ -1364,7 +1374,6 @@ final class Bubble implements ChatHub.Listener {
         root.removeCallbacks(outsideCollapse);
         if (keyboardVisible()) hideKeyboard();
         else if (changing) endChange();
-        else if (pendingConfirm != null) answerConfirm(false);
         else collapse();
     }
 
@@ -2131,6 +2140,8 @@ final class Bubble implements ChatHub.Listener {
         renderHelpers(showingList ? null : ses);
         linuxTag.setVisibility(!showingList && ses.dev ? View.VISIBLE : View.GONE);
         bgChip.setVisibility(!showingList && Linux.installed(svc) ? View.VISIBLE : View.GONE);
+        approvals.setVisibility(!showingList && hub.approvalsEditable(ses) ? View.VISIBLE : View.GONE);
+        Ui.paintApprovals(svc, approvals, ses.approvals);
         paintBackgroundChip();
         checkBackground(false);
         boolean working = !showingList && (ses.running || controlling);
@@ -2398,8 +2409,9 @@ final class Bubble implements ChatHub.Listener {
         confirmCard.setVisibility(View.VISIBLE);
         refreshStatus();
         vibrate(60);
-        if (open) expand();
-        else collapse(); // the screen stays free for the step; the pill asks
+        if (!open) collapse(); // the screen stays free for the step; the pill asks
+        // in the chat's own screen the card shows there, with the same buttons: no panel popping up over it (#41)
+        else if (!hub.onScreen(cardChat)) expand();
         // on the lock screen the card waits out of sight (a notification says so): approving needs the phone unlocked
         applyEnabled();
         if (card.countdown > 0) startCountdown(card.countdown);
@@ -3556,6 +3568,7 @@ final class Bubble implements ChatHub.Listener {
     /** The Linux tools tag beside the model chip, while the chat has them (switched in the app's chat screen). */
     private View linuxTag;
     private LinearLayout bgChip;
+    private LinearLayout approvals;
     /** -1 not asked yet, 0 not set up, 1 paired but its helper isn't running, 2 connected (as in ChatActivity). */
     private volatile int bgState = -1;
     private long bgCheckedAt;
@@ -3594,12 +3607,18 @@ final class Bubble implements ChatHub.Listener {
     }
 
     private void openBackgroundSheet() {
+        openChatSheet("background");
+    }
+
+    /** The chat's own screen, with one of its sheets open (ChatActivity reads the extra): "background", "approvals". */
+    private void openChatSheet(String sheet) {
         if (sessions.current == null) return;
         svc.startActivity(new android.content.Intent(svc, ChatActivity.class).putExtra("id", sessions.current.id)
-                .putExtra("background", true).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                .putExtra(sheet, true).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK
                         | android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP));
         collapse();
     }
+
     private LinearLayout strip;
 
     /** A small header icon (20dp glyph in a 36dp target), in the app's muted style. */

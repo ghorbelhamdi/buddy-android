@@ -479,6 +479,16 @@
     <string name="chat_keep_awake">Mantener la pantalla encendida mientras trabaja</string>
     <string name="chat_keep_awake_info">Para tareas largas: el teléfono no se duerme mientras este chat trabaja, y una notificación te dice cómo fue. Bloquear el teléfono sigue apagando la pantalla.</string>
     <string name="chat_allowed">Permitido sin preguntar</string>
+    <string name="chat_approvals">Aprobaciones</string>
+    <string name="chat_approvals_info">Cómo te pregunta este chat antes de que actúe su agente. Se mantiene hasta que lo cambies; los chats nuevos empiezan en Preguntar.</string>
+    <string name="chat_approvals_ask">Preguntar</string>
+    <string name="chat_approvals_ask_info">Cada app sigue lo que indica %1$s.</string>
+    <string name="chat_approvals_strict_info">También en las apps puestas en %1$s, Buddy pregunta antes de enviar, publicar, comprar o eliminar.</string>
+    <string name="chat_approvals_apps_hint">Dónde ha actuado el agente, con el ajuste de cada app en %1$s. Toca una para cambiarlo allí.</string>
+    <string name="chat_approvals_routine">Rutina permitida</string>
+    <string name="chat_approvals_routine_info">Los pasos rutinarios siguen adelante en todas las apps sin tarjeta: enviar un mensaje o un paso por el que el revisor preguntaría. Cada uno queda anotado en el chat. Pagar, comprar, eliminar, instalar, contraseñas y ajustes de seguridad te siguen preguntando, igual que todo en apps de banca y pagos, Ajustes y tiendas de apps.</string>
+    <string name="chat_approvals_strict">Preguntar siempre</string>
+    <string name="chat_approvals_apps">Apps de este chat</string>
     <string name="chat_allowed_info">Hasta que termine la tarea de este chat, las aprobaciones de rutina en estas apps siguen solas: enviar un mensaje, o un paso por el que el revisor preguntaría. Cada una aparece en el chat. Pagar, comprar, borrar, instalar, contraseñas y ajustes de seguridad te siguen preguntando.</string>
     <string name="chat_allowed_kept">Se guardan para la programación de este chat: estas apps siguen permitidas en sus ejecuciones programadas hasta que las quites o quites la programación.</string>
     <string name="chat_allowed_add">Añadir una app</string>

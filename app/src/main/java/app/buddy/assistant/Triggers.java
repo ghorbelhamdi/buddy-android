@@ -689,6 +689,30 @@ final class Triggers implements ChatHub.Listener {
         return null;
     }
 
+    private static String ruleChatsFrom;
+    private static java.util.Set<String> ruleChatIds = java.util.Collections.emptySet();
+
+    /**
+     * A notification rule's chat (running now, or kept for a conversation): its runs follow the rule, not the chat.
+     * Asked on every redraw of a chat's header, so the saved map is read again only when it has changed.
+     */
+    static synchronized boolean ruleChat(Context c, String chat) {
+        if (chat == null) return false;
+        if (ruleRun(chat)) return true;
+        String saved = Prefs.ruleChats(c);
+        if (!saved.equals(ruleChatsFrom)) {
+            java.util.Set<String> ids = new java.util.HashSet<>();
+            try {
+                JSONObject map = new JSONObject(saved);
+                for (java.util.Iterator<String> it = map.keys(); it.hasNext(); ) ids.add(map.optString(it.next()));
+            } catch (Exception ignored) {
+            }
+            ruleChatIds = ids;
+            ruleChatsFrom = saved;
+        }
+        return ruleChatIds.contains(chat);
+    }
+
     /** Can this chat "Check again"? It's a notification rule's chat, its rule still exists and rules are on. */
     static boolean canRecheck(Context c, Sessions.Session ses) {
         return ses != null && !ses.running && Prefs.rulesOn(c) && conversation(c, ses.id) != null;

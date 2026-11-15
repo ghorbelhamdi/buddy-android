@@ -480,6 +480,16 @@
     <string name="chat_keep_awake">Garder l\'écran allumé pendant le travail</string>
     <string name="chat_keep_awake_info">Pour les longues tâches : le téléphone reste éveillé tant que cette discussion travaille, et une notification vous dit comment ça s\'est passé. Verrouiller le téléphone éteint toujours l\'écran.</string>
     <string name="chat_allowed">Autorisé sans demander</string>
+    <string name="chat_approvals">Approbations</string>
+    <string name="chat_approvals_info">Comment cette discussion vous demande avant que son agent agisse. Le choix reste jusqu\'à ce que vous le changiez ; les nouvelles discussions commencent sur Demander.</string>
+    <string name="chat_approvals_ask">Demander</string>
+    <string name="chat_approvals_ask_info">Chaque appli suit ce qui est réglé dans %1$s.</string>
+    <string name="chat_approvals_strict_info">Même dans les applis réglées sur %1$s, Buddy demande avant d\'envoyer, publier, acheter ou supprimer.</string>
+    <string name="chat_approvals_apps_hint">Là où l\'agent a agi, avec le réglage de chaque appli dans %1$s. Touchez-en une pour le changer là-bas.</string>
+    <string name="chat_approvals_routine">Routine autorisée</string>
+    <string name="chat_approvals_routine_info">Les étapes de routine se font dans toutes les applis sans carte : envoyer un message, ou une étape sur laquelle le vérificateur vous demanderait. Chacune est notée dans la discussion. Payer, acheter, supprimer, installer, les mots de passe et les réglages de sécurité vous sont toujours demandés, comme tout dans les applis bancaires et de paiement, les Paramètres et les boutiques d\'applis.</string>
+    <string name="chat_approvals_strict">Toujours demander</string>
+    <string name="chat_approvals_apps">Applis de cette discussion</string>
     <string name="chat_allowed_info">Jusqu\'à la fin de la tâche de cette discussion, les validations de routine dans ces apps se font seules : envoyer un message, ou une étape sur laquelle le vérificateur vous demanderait. Chacune apparaît dans la discussion. Payer, acheter, supprimer, installer, les mots de passe et les réglages de sécurité vous demandent toujours.</string>
     <string name="chat_allowed_kept">Conservées pour la programmation de cette discussion : ces apps restent autorisées pour ses exécutions programmées, jusqu\'à ce que vous les retiriez ou supprimiez la programmation.</string>
     <string name="chat_allowed_add">Ajouter une app</string>

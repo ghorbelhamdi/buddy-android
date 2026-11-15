@@ -1315,9 +1315,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             d[0].dismiss();
             customMirror();
         }), full());
-        ScrollView sv = new ScrollView(this);
-        sv.addView(c);
-        d[0] = bottomSheet(this, sv);
+        d[0] = bottomSheet(this, c);
         d[0].show();
     }
 

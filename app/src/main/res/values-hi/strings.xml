@@ -343,6 +343,16 @@
     <string name="chat_keep_awake">काम करते समय स्क्रीन चालू रखें</string>
     <string name="chat_keep_awake_info">लंबे कामों के लिए: जब तक यह चैट काम करती है, फ़ोन जागा रहता है, और एक सूचना बताती है कि काम कैसा रहा. फ़ोन लॉक करने पर स्क्रीन फिर भी बंद हो जाती है.</string>
     <string name="chat_allowed">बिना पूछे इजाज़त</string>
+    <string name="chat_approvals">स्वीकृतियाँ</string>
+    <string name="chat_approvals_info">यह चैट अपने एजेंट के कुछ करने से पहले आपसे कैसे पूछती है. जब तक आप न बदलें, यही रहता है; नई चैट «पूछें» से शुरू होती हैं.</string>
+    <string name="chat_approvals_ask">पूछें</string>
+    <string name="chat_approvals_ask_info">हर ऐप वही मानता है जो %1$s में उसके लिए तय है.</string>
+    <string name="chat_approvals_strict_info">«%1$s» पर रखे ऐप में भी Buddy भेजने, पोस्ट करने, ख़रीदने या हटाने से पहले पूछता है.</string>
+    <string name="chat_approvals_apps_hint">जहाँ एजेंट ने काम किया, और %1$s में हर ऐप की सेटिंग. वहाँ बदलने के लिए किसी ऐप पर टैप करें.</string>
+    <string name="chat_approvals_routine">रोज़मर्रा की अनुमति</string>
+    <string name="chat_approvals_routine_info">रोज़मर्रा के कदम हर ऐप में बिना कार्ड के आगे बढ़ते हैं: संदेश भेजना, या ऐसा कदम जिस पर समीक्षक पूछता. हर एक चैट में दर्ज होता है. भुगतान, ख़रीदारी, हटाना, इंस्टॉल करना, पासवर्ड और सुरक्षा सेटिंग अब भी आपसे पूछती हैं, और बैंकिंग व पेमेंट ऐप, सेटिंग्स और ऐप स्टोर में सब कुछ भी.</string>
+    <string name="chat_approvals_strict">हमेशा पूछें</string>
+    <string name="chat_approvals_apps">इस चैट के ऐप</string>
     <string name="chat_allowed_info">जब तक इस चैट का काम खत्म नहीं होता, इन ऐप्स में रोज़मर्रा की मंज़ूरियां अपने आप हो जाती हैं: मैसेज भेजना, या ऐसा कदम जिस पर समीक्षक पूछता. हर एक चैट में दिखती है. भुगतान, खरीदारी, हटाना, इंस्टॉल करना, पासवर्ड और सुरक्षा सेटिंग अब भी आपसे पूछेंगे.</string>
     <string name="chat_allowed_kept">इस चैट के शेड्यूल के लिए रखे गए: ये ऐप्स इसके शेड्यूल किए गए कामों के लिए अनुमत रहते हैं, जब तक आप इन्हें या शेड्यूल को हटा नहीं देते.</string>
     <string name="chat_allowed_add">ऐप जोड़ें</string>

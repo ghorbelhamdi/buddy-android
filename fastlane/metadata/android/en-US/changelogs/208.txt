@@ -1,0 +1,6 @@
+• Approvals per chat: the line under a chat's header picks Ask, Routine allowed or Always ask
+• Its sheet lists the apps the chat's agent acted in, each with its setting
+• Enter in an app's own search field no longer asks
+• A card for the chat you're looking at shows in the chat, not in a panel over it
+• Back in the bubble's panel only closes it: it no longer denies a waiting card
+• Fixed: a background chat's approvals went by the app on your screen, not its own

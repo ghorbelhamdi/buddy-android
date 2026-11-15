@@ -476,6 +476,16 @@
     <string name="chat_keep_awake">工作时保持屏幕常亮</string>
     <string name="chat_keep_awake_info">适合长任务：这个对话工作期间手机不会休眠，结束后会用通知告诉你结果。锁定手机仍会关闭屏幕。</string>
     <string name="chat_allowed">无需询问即可允许</string>
+    <string name="chat_approvals">批准</string>
+    <string name="chat_approvals_info">此对话在智能体操作前如何向你确认。在你更改之前一直有效；新对话从“询问”开始。</string>
+    <string name="chat_approvals_ask">询问</string>
+    <string name="chat_approvals_ask_info">每个应用按“%1$s”中的设置执行。</string>
+    <string name="chat_approvals_strict_info">即使在设为“%1$s”的应用中，Buddy 也会在发送、发布、购买或删除前询问。</string>
+    <string name="chat_approvals_apps_hint">智能体操作过的应用，以及各应用在“%1$s”中的设置。点按其中一个可前往更改。</string>
+    <string name="chat_approvals_routine">允许常规操作</string>
+    <string name="chat_approvals_routine_info">常规步骤在所有应用中直接进行，不弹卡片：发送消息，或审核者会询问的步骤。每一步都会记录在对话中。付款、购买、删除、安装、密码和安全设置仍会询问你，银行和支付应用、设置及应用商店中的一切操作也是如此。</string>
+    <string name="chat_approvals_strict">始终询问</string>
+    <string name="chat_approvals_apps">此对话中的应用</string>
     <string name="chat_allowed_info">在这个对话的任务结束前，这些应用里的常规批准会自动通过：发送消息，或审核者会询问的步骤。每一次都会显示在对话中。付款、购买、删除、安装、密码和安全设置仍会询问你。</string>
     <string name="chat_allowed_kept">为这个对话的定时任务保留：在你移除这些应用或移除定时之前，它们在定时运行中一直被允许。</string>
     <string name="chat_allowed_add">添加应用</string>

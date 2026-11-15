@@ -346,6 +346,16 @@
     <string name="chat_keep_awake">Scherm aan laten terwijl het werkt</string>
     <string name="chat_keep_awake_info">Voor lange taken: de telefoon blijft wakker zolang deze chat werkt, en een melding vertelt je hoe het ging. Als je de telefoon vergrendelt, gaat het scherm gewoon uit.</string>
     <string name="chat_allowed">Toegestaan zonder te vragen</string>
+    <string name="chat_approvals">Goedkeuringen</string>
+    <string name="chat_approvals_info">Hoe deze chat het je vraagt voordat de agent iets doet. Het blijft zo tot je het wijzigt; nieuwe chats beginnen op Vragen.</string>
+    <string name="chat_approvals_ask">Vragen</string>
+    <string name="chat_approvals_ask_info">Elke app volgt wat bij %1$s ervoor is ingesteld.</string>
+    <string name="chat_approvals_strict_info">Ook in apps die op %1$s staan, vraagt Buddy het voordat er iets wordt verzonden, gepost, gekocht of verwijderd.</string>
+    <string name="chat_approvals_apps_hint">Waar de agent iets heeft gedaan, met de instelling van elke app bij %1$s. Tik op een app om die daar te wijzigen.</string>
+    <string name="chat_approvals_routine">Routine toegestaan</string>
+    <string name="chat_approvals_routine_info">Routinestappen gaan in elke app door zonder kaart: een bericht sturen, of een stap waarover de controleur zou vragen. Elke stap wordt in de chat genoteerd. Betalen, kopen, verwijderen, installeren, wachtwoorden en beveiligingsinstellingen vragen het je nog steeds, net als alles in bank- en betaalapps, Instellingen en appwinkels.</string>
+    <string name="chat_approvals_strict">Altijd vragen</string>
+    <string name="chat_approvals_apps">Apps in deze chat</string>
     <string name="chat_allowed_info">Tot de taak van deze chat klaar is, gaan routinegoedkeuringen in deze apps vanzelf door: een bericht versturen, of een stap waarover de controleur zou vragen. Elke staat in de chat. Betalen, kopen, verwijderen, installeren, wachtwoorden en beveiligingsinstellingen vragen het je nog steeds.</string>
     <string name="chat_allowed_kept">Bewaard voor de planning van deze chat: deze apps blijven toegestaan voor de geplande taken, tot je ze of de planning verwijdert.</string>
     <string name="chat_allowed_add">App toevoegen</string>

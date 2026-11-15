@@ -357,6 +357,16 @@
     <string name="chat_keep_awake">Nie wyłączaj ekranu, gdy pracuje</string>
     <string name="chat_keep_awake_info">Do długich zadań: telefon nie zasypia, dopóki ten czat pracuje, a powiadomienie powie ci, jak poszło. Zablokowanie telefonu nadal wyłącza ekran.</string>
     <string name="chat_allowed">Dozwolone bez pytania</string>
+    <string name="chat_approvals">Zgody</string>
+    <string name="chat_approvals_info">Jak ten czat pyta Cię, zanim jego agent coś zrobi. Zostaje tak, dopóki tego nie zmienisz; nowe czaty zaczynają od Pytaj.</string>
+    <string name="chat_approvals_ask">Pytaj</string>
+    <string name="chat_approvals_ask_info">Każda aplikacja działa zgodnie ze swoim ustawieniem w sekcji %1$s.</string>
+    <string name="chat_approvals_strict_info">Także w aplikacjach z ustawieniem %1$s Buddy pyta przed wysłaniem, opublikowaniem, zakupem lub usunięciem.</string>
+    <string name="chat_approvals_apps_hint">Gdzie agent działał, z ustawieniem każdej aplikacji w sekcji %1$s. Dotknij aplikacji, aby zmienić je tam.</string>
+    <string name="chat_approvals_routine">Rutynowe dozwolone</string>
+    <string name="chat_approvals_routine_info">Rutynowe kroki przechodzą w każdej aplikacji bez karty: wysłanie wiadomości albo krok, o który zapytałby recenzent. Każdy jest odnotowany w czacie. Płacenie, kupowanie, usuwanie, instalowanie, hasła i ustawienia zabezpieczeń nadal wymagają Twojej zgody, tak jak wszystko w aplikacjach bankowych i płatniczych, Ustawieniach i sklepach z aplikacjami.</string>
+    <string name="chat_approvals_strict">Zawsze pytaj</string>
+    <string name="chat_approvals_apps">Aplikacje w tym czacie</string>
     <string name="chat_allowed_info">Do końca zadania tego czatu rutynowe zgody w tych aplikacjach przechodzą same: wysłanie wiadomości albo krok, o który zapytałby recenzent. Każda pojawia się w czacie. Płacenie, kupowanie, usuwanie, instalowanie, hasła i ustawienia zabezpieczeń nadal wymagają twojej zgody.</string>
     <string name="chat_allowed_kept">Zachowane dla harmonogramu tego czatu: te aplikacje pozostają dozwolone w jego zaplanowanych zadaniach, dopóki nie usuniesz ich albo harmonogramu.</string>
     <string name="chat_allowed_add">Dodaj aplikację</string>

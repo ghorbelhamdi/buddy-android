@@ -480,6 +480,16 @@
     <string name="chat_keep_awake">Tieni lo schermo acceso mentre lavora</string>
     <string name="chat_keep_awake_info">Per i compiti lunghi: il telefono resta sveglio mentre questa chat lavora, e una notifica ti dice com\'è andata. Bloccare il telefono spegne comunque lo schermo.</string>
     <string name="chat_allowed">Consentito senza chiedere</string>
+    <string name="chat_approvals">Approvazioni</string>
+    <string name="chat_approvals_info">Come questa chat ti chiede conferma prima che il suo agente agisca. Resta così finché non lo cambi; le nuove chat partono da Chiedi.</string>
+    <string name="chat_approvals_ask">Chiedi</string>
+    <string name="chat_approvals_ask_info">Ogni app segue quanto impostato in %1$s.</string>
+    <string name="chat_approvals_strict_info">Anche nelle app impostate su %1$s, Buddy chiede prima di inviare, pubblicare, acquistare o eliminare.</string>
+    <string name="chat_approvals_apps_hint">Dove l\'agente ha agito, con l\'impostazione di ogni app in %1$s. Tocca un\'app per cambiarla lì.</string>
+    <string name="chat_approvals_routine">Routine consentita</string>
+    <string name="chat_approvals_routine_info">I passaggi di routine procedono in ogni app senza scheda: inviare un messaggio o un passaggio su cui il revisore chiederebbe. Ognuno viene annotato nella chat. Pagare, acquistare, eliminare, installare, password e impostazioni di sicurezza chiedono comunque a te, come tutto nelle app bancarie e di pagamento, nelle Impostazioni e negli store.</string>
+    <string name="chat_approvals_strict">Chiedi sempre</string>
+    <string name="chat_approvals_apps">App in questa chat</string>
     <string name="chat_allowed_info">Finché il compito di questa chat non finisce, le approvazioni di routine in queste app vanno avanti da sole: inviare un messaggio, o un passaggio su cui il revisore chiederebbe. Ognuna appare nella chat. Pagare, comprare, eliminare, installare, password e impostazioni di sicurezza ti chiedono sempre.</string>
     <string name="chat_allowed_kept">Tenute per la programmazione di questa chat: queste app restano consentite nelle sue esecuzioni programmate, finché non le rimuovi o rimuovi la programmazione.</string>
     <string name="chat_allowed_add">Aggiungi un\'app</string>
