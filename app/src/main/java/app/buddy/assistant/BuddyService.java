@@ -786,8 +786,9 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
      * browser's tab it's in (Browser.key), or null.
      */
     void showActivity(final String text, final String browserTab) {
+        final String chat = McpServer.CALLER_CHAT.get(); // (asked on the tool's own thread)
         main.post(() -> {
-            if (bubble != null) bubble.setActivity(text, browserTab);
+            if (bubble != null) bubble.setActivity(text, browserTab, chat);
         });
     }
 

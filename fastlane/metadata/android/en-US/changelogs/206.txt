@@ -1,0 +1,4 @@
+• Fixed: on some phones (reported on a Samsung) background mode turned the phone's own screen off every few seconds
+• Fixed: on some phones setup kept asking for the accessibility switch although it was on
+• Fixed: a question from another session listed under "Waiting for you" did not open when tapped
+• Tapping the bubble while its status line shows a chat's step or reply opens that chat

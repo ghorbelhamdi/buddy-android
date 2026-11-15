@@ -306,8 +306,9 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         r.addView(col, weight1());
         r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
         r.setOnClickListener(v -> {
-            bubble.bringForward(card[0]);
+            bubble.bringForward(card[0], card[1]);
             if (ses != null) open(ses);
+            else bubble.expand(); // another session's card has no chat: it is answered in the bubble
         });
         return r;
     }

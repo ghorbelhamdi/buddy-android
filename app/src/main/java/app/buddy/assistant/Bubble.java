@@ -284,7 +284,10 @@ final class Bubble implements ChatHub.Listener {
         });
         pill.setOnClickListener(v -> { // paused, the pill is the Resume button
             if (svc.paused() && pendingConfirm == null) svc.resume();
-            else expand();
+            else {
+                selectStatusChat();
+                expand();
+            }
         });
 
         face.setOnTouchListener(new DragListener());
@@ -953,6 +956,28 @@ final class Bubble implements ChatHub.Listener {
             fitPanelHeight();
             scrollToEnd();
         }
+    }
+
+    /**
+     * The status line is one chat's step or reply: a tap on it or on the face opens that chat, not the one that was
+     * open last (a waiting card picks its own chat, see showCard).
+     */
+    private void selectStatusChat() {
+        if (pendingConfirm != null || noteListening || pill.getVisibility() != View.VISIBLE) return;
+        if (!input.getText().toString().trim().isEmpty()) return; // a message begun in the open chat stays with it
+        Sessions.Session s;
+        boolean fresh = activity != null && android.os.SystemClock.elapsedRealtime() - activityAt < ACTIVITY_MS;
+        if (!svc.paused() && fresh && (controlling ? !activityBrowser : activityBrowser)) { // the line is a tool's step
+            s = activityChat == null ? null : sessions.find(activityChat); // (see refreshStatus), null: not a chat's
+            Sessions.Session parent = s == null || s.parent.isEmpty() ? null : sessions.find(s.parent);
+            if (parent != null) s = parent; // a sub-agent works for its chat
+        } else {
+            s = hub.pillChat();
+        }
+        if (s == null || (s == sessions.current && !showingList)) return;
+        showingList = false;
+        if (s != sessions.current) hub.select(s);
+        else renderCurrent();
     }
 
     void expand() {
@@ -2506,14 +2531,15 @@ final class Bubble implements ChatHub.Listener {
     }
 
     /**
-     * The user opened this chat from "Waiting for you": its queued card shows now, and the shown one waits its turn
-     * again (not one with a countdown running or a change being typed: that stays).
+     * The user opened this card from "Waiting for you" (chat null: from another session, which has no chat; several
+     * of those are told apart by their text): queued, it shows now, and the shown one waits its turn again (not one
+     * with a countdown running or a change being typed: that stays).
      */
-    void bringForward(String chat) {
-        if (pendingConfirm == null || shownCard == null || chat == null || chat.equals(shownCard.chat)
-                || countdownEnd != 0 || changing) return;
+    void bringForward(String chat, String text) {
+        if (pendingConfirm == null || shownCard == null || countdownEnd != 0 || changing) return;
+        if (java.util.Objects.equals(chat, shownCard.chat) && text.equals(shownCard.text)) return;
         Card next = null;
-        for (Card c : queued) if (chat.equals(c.chat)) {
+        for (Card c : queued) if (java.util.Objects.equals(chat, c.chat) && text.equals(c.text)) {
             next = c;
             break;
         }
@@ -2651,16 +2677,19 @@ final class Bubble implements ChatHub.Listener {
     private boolean activityBrowser;
     /** The browser tab of that step (see Browser.key), for the thumbnail. */
     private String activityTab;
+    /** The chat whose agent took that step (null: an agent outside Buddy's chats). */
+    private String activityChat;
     private long activityAt;
     private static final long ACTIVITY_MS = 8_000;
     private final Runnable activityExpired = this::refreshStatus;
 
     /**
      * A tool's step ("Tapping “Send”"); browserTab: the background browser's tab it's in (it isn't using the phone), or
-     * null.
+     * null; chat: whose agent it is (null: one outside Buddy's chats).
      */
-    void setActivity(String text, String browserTab) {
+    void setActivity(String text, String browserTab, String chat) {
         activity = text;
+        activityChat = chat;
         activityBrowser = browserTab != null;
         activityTab = browserTab;
         activityAt = android.os.SystemClock.elapsedRealtime();
@@ -3806,8 +3835,11 @@ final class Bubble implements ChatHub.Listener {
                         String action = Prefs.tapAction(svc);
                         if (pendingConfirm != null) expand();
                         else if ("talk".equals(action) && hub.runningCount() == 0 && !CodexLive.on()) talk();
-                        else if ("app".equals(action)) openInApp(false);
-                        else expand();
+                        else {
+                            selectStatusChat();
+                            if ("app".equals(action)) openInApp(false);
+                            else expand();
+                        }
                     }
                     return true;
                 case MotionEvent.ACTION_CANCEL:

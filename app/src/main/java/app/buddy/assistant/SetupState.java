@@ -69,10 +69,16 @@ final class SetupState {
         return done[0] && done[2] && BuddyService.get() != null;
     }
 
+    /**
+     * Is Buddy's accessibility service on? The service being connected says so by itself; before it has connected,
+     * the setting that names the enabled services does. Some systems (seen on a custom Android 17 ROM, issue #41)
+     * don't let an app read that setting, and Buddy then kept asking for a switch that was on already.
+     */
     static boolean accessibilityEnabled(Context c) {
+        if (BuddyService.get() != null) return true;
+        ComponentName me = new ComponentName(c, BuddyService.class);
         String enabled = Settings.Secure.getString(c.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
         if (enabled == null) return false;
-        ComponentName me = new ComponentName(c, BuddyService.class);
         TextUtils.SimpleStringSplitter s = new TextUtils.SimpleStringSplitter(':');
         s.setString(enabled);
         while (s.hasNext()) {

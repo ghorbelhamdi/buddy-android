@@ -56,7 +56,7 @@ import java.util.Map;
  */
 public final class Shell {
     /** Raised when the protocol changes: Buddy restarts a helper that answers another number. */
-    static final int VERSION = 10;
+    static final int VERSION = 12;
     /** A chat's display goes when nothing was asked of it for this long (Buddy keeps the ones in use alive). */
     private static final long IDLE_MS = 10 * 60_000;
 
@@ -71,6 +71,36 @@ public final class Shell {
         volatile Bitmap still;
         /** When the chat last acted on it or said it's still at work (looking at it doesn't count). */
         volatile long active = SystemClock.uptimeMillis();
+        /**
+         * The display has a power group of its own, so it can sleep and wake without the phone's screen doing the
+         * same. Asked of the system when the display is made; unknown counts as shared.
+         */
+        boolean ownPower;
+    }
+
+    /**
+     * Sleeping or waking one of the helper's displays did the same to the phone's own screen: on this phone they
+     * share their power whatever the system said. From then on no display is put to sleep or woken (issue #40: on a
+     * Samsung foldable the real screen went dark again every few seconds and the phone couldn't be unlocked).
+     */
+    private static volatile boolean sharedPower;
+
+    /** What an action on a display answers when it sleeps with the phone's screen and can't be woken alone. */
+    private static final String ASLEEP = "the phone's screen is off, and on this phone the hidden screen sleeps and wakes"
+            + " with it: background mode works here only while the phone's screen is on";
+
+    /** The display's power group (0 is the phone's own), or 0 when it can't be read (stderr says why). */
+    @android.annotation.SuppressLint({"BlockedPrivateApi", "SoonBlockedPrivateApi", "DiscouragedPrivateApi", "PrivateApi"})
+    private static int powerGroup(android.view.Display d) {
+        try {
+            Class<?> ic = Class.forName("android.view.DisplayInfo");
+            Object info = ic.getDeclaredConstructor().newInstance();
+            android.view.Display.class.getMethod("getDisplayInfo", ic).invoke(d, info);
+            return ic.getField("displayGroupId").getInt(info);
+        } catch (Throwable t) {
+            System.err.println("BUDDY_SHELL no power group: " + t);
+            return 0;
+        }
     }
 
     private static final Map<String, Screen> screens = new HashMap<>();
@@ -358,11 +388,14 @@ public final class Shell {
         return s;
     }
 
-    /** The chat's display, for acting on it: awake (see wake). Looking at it (frame) and keeping it don't wake it. */
+    /**
+     * The chat's display, for acting on it: awake (see wake), or the action fails saying why: touches on a sleeping
+     * display are refused and its picture stands still. Looking at it (frame) and keeping it don't wake it.
+     */
     private static Screen awake(String chat) {
         Screen s = screen(chat);
         s.active = SystemClock.uptimeMillis();
-        wake(s);
+        if (!wake(s)) throw new IllegalStateException(ASLEEP);
         return s;
     }
 
@@ -387,6 +420,7 @@ public final class Shell {
      * display rests; until then a resting display's app stays awake.
      */
     private static void sleepIfAllRest(Screen any) throws Exception {
+        if (sharedPower || !any.ownPower) return; // its sleep would be the phone's screen's too
         synchronized (screens) {
             for (Screen x : screens.values()) if (!x.resting) return;
         }
@@ -398,8 +432,25 @@ public final class Shell {
      * it, and that is exactly what must end. Seen on Android 16: dozing left the activity RESUMED, this stops it.
      */
     private static void sleep(Screen s) throws Exception {
+        boolean phoneOn = on(android.view.Display.DEFAULT_DISPLAY);
+        sleepDisplay(s.id);
+        // the phone's screen was on: it must still be. The power service has done it when the call returns, so one
+        // look right away tells (no waiting: the user's own power button a moment later must not count). If it went
+        // dark with this display, they share their power after all: it is lit again at once, and nothing is put to
+        // sleep on this phone any more
+        if (!phoneOn || on(android.view.Display.DEFAULT_DISPLAY)) return;
+        sharedPower = true;
+        wakeDisplay.invoke(power, SystemClock.uptimeMillis(), 2 /* an application asked */, "buddy:background",
+                "com.android.shell", android.view.Display.DEFAULT_DISPLAY);
+    }
+
+    private static boolean on(int displayId) throws Exception {
+        return Boolean.TRUE.equals(interactive.invoke(power, displayId));
+    }
+
+    private static void sleepDisplay(int displayId) throws Exception {
         power.getClass().getMethod("goToSleepWithDisplayId", int.class, long.class, int.class, int.class)
-                .invoke(power, s.id, SystemClock.uptimeMillis(), 0 /* an application asked */, 1 /* no doze */);
+                .invoke(power, displayId, SystemClock.uptimeMillis(), 0 /* an application asked */, 1 /* no doze */);
     }
 
     /** A display nobody acted on or kept for this long rests by itself (Buddy keeps a working chat's every 2 minutes). */
@@ -430,8 +481,10 @@ public final class Shell {
      * screen stays off, as it should. Waking it is for this display alone (Android 14+; before that there's no such
      * call, and waking "the device" would light the phone's screen: not done). Whether it sleeps is asked of the
      * power service: the display's own state goes on saying "on".
+     *
+     * False: it sleeps and stays so, because waking it would light the phone's own screen (they share their power).
      */
-    private static void wake(Screen s) {
+    private static boolean wake(Screen s) {
         s.resting = false;
         s.still = null;
         try {
@@ -444,13 +497,23 @@ public final class Shell {
                 wakeDisplay = power.getClass().getMethod("wakeUpWithDisplayId", long.class, int.class, String.class,
                         String.class, int.class);
             }
-            if (Boolean.TRUE.equals(interactive.invoke(power, s.id))) return;
+            if (on(s.id)) return true;
+            if (sharedPower || !s.ownPower) return false;
+            boolean phoneOff = !on(android.view.Display.DEFAULT_DISPLAY);
             wakeDisplay.invoke(power, SystemClock.uptimeMillis(), 2 /* an application asked */, "buddy:background",
                     "com.android.shell", s.id);
-            for (int i = 0; i < 20 && !Boolean.TRUE.equals(interactive.invoke(power, s.id)); i++) Thread.sleep(50);
+            // the phone's screen was off: it must still be (one look right away, as in sleep). Lit with this display,
+            // they share their power after all: it goes dark again, and no display is woken on this phone any more
+            if (phoneOff && on(android.view.Display.DEFAULT_DISPLAY)) {
+                sharedPower = true;
+                sleepDisplay(android.view.Display.DEFAULT_DISPLAY);
+                return false;
+            }
+            for (int i = 0; i < 20 && !on(s.id); i++) Thread.sleep(50);
             Thread.sleep(800); // its apps come back to life
-        } catch (Throwable ignored) {
+        } catch (Throwable ignored) { // an Android without these calls: as it is
         }
+        return true;
     }
 
     private static Screen open(String chat, int w, int h, int dpi) throws Exception {
@@ -494,6 +557,7 @@ public final class Shell {
             s.display = dm.createVirtualDisplay("buddy-" + chat, w, h, dpi, s.reader.getSurface(), flags);
             if (s.display == null) throw new IllegalStateException("the system made no display");
             s.id = s.display.getDisplay().getDisplayId();
+            s.ownPower = powerGroup(s.display.getDisplay()) != 0;
             hideKeyboard(s.id);
             screens.put(chat, s);
             return s;

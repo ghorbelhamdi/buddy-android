@@ -33,6 +33,8 @@ final class ChatHub {
     private final List<Listener> listeners = new ArrayList<>();
     private final List<Sessions.Session> viewing = new ArrayList<>();
     private String flash;
+    /** The chat whose reply the flash shows. */
+    private Sessions.Session flashChat;
     /** Receives buddy_procs / buddy_recent / buddy_transcript replies for the monitor screens. */
     interface MonitorListener {
         void onMonitor(JSONObject ev);
@@ -707,7 +709,7 @@ final class ChatHub {
                     runEnded(ses);
                     if (!ses.lastReply.isEmpty()) {
                         Prefs.setHadReply(app);
-                        if (ses.parent.isEmpty()) flash(ses.lastReply);
+                        if (ses.parent.isEmpty()) flash(ses, ses.lastReply);
                     }
                     // what the user added but the agent never got (it made no phone action since): send it now
                     String left;
@@ -863,26 +865,45 @@ final class ChatHub {
     String pillText() {
         int n = runningCount();
         if (n > 0) {
-            Sessions.Session latest = null;
-            for (Sessions.Session s : sessions.all)
-                if (s.running && (latest == null || s.lastEventAt > latest.lastEventAt)) latest = s;
+            Sessions.Session latest = latestWorking();
             String st = latest == null || latest.status.isEmpty() ? app.getString(R.string.chat_working) : latest.status;
             return n > 1 ? app.getResources().getQuantityString(R.plurals.hub_pill_chats, n, n, st) : st;
         }
         return flash;
     }
 
+    /**
+     * The chat the pill's text is about (see pillText), or null: the working chat with the latest step (a sub-agent's
+     * step: the chat it works for), else the one whose reply shows.
+     */
+    Sessions.Session pillChat() {
+        Sessions.Session latest = latestWorking();
+        if (latest == null) return flash != null && sessions.all.contains(flashChat) ? flashChat : null;
+        Sessions.Session parent = latest.parent.isEmpty() ? null : sessions.find(latest.parent);
+        return parent != null ? parent : latest;
+    }
+
+    /** The working chat or sub-agent with the latest step: the one whose status the pill shows. */
+    private Sessions.Session latestWorking() {
+        Sessions.Session latest = null;
+        for (Sessions.Session s : sessions.all)
+            if (s.running && (latest == null || s.lastEventAt > latest.lastEventAt)) latest = s;
+        return latest;
+    }
+
     boolean anyUnread() {
         return sessions.anyUnread();
     }
 
-    private void flash(String reply) {
+    private void flash(Sessions.Session ses, String reply) {
+        flashChat = ses;
         final String text = Ui.linkText(reply).replace('\n', ' ');
         flash = text.length() > 60 ? text.substring(0, 59) + "…" : text;
         final String mine = flash;
         main.postDelayed(() -> {
             if (mine.equals(flash)) {
                 flash = null;
+                flashChat = null;
                 changed();
             }
         }, 8000);

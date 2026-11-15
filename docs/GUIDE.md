@@ -151,7 +151,7 @@ Turn on **Settings → Background browser**: the first time, Buddy downloads Chr
 
 | | |
 |---|---|
-| Tap the bubble | Open the chat panel, or (Settings → Experience → Tapping the bubble) start talking or open the chat full screen in the app. The panel goes edge to edge; **Compact** makes it smaller and keeps clear of the screen edges, for side gestures, and in portrait looks like a messenger's chat heads: Buddy above it, Close and Open in the app below |
+| Tap the bubble | Open the chat panel, or (Settings → Experience → Tapping the bubble) start talking or open the chat full screen in the app. While the status line shows a chat's step or its reply, the panel or the app opens on that chat (unless a message you began typing waits in the chat that was open; talking still goes to that chat). The panel goes edge to edge; **Compact** makes it smaller and keeps clear of the screen edges, for side gestures, and in portrait looks like a messenger's chat heads: Buddy above it, Close and Open in the app below |
 | Spinning ring | An agent is working |
 | **Hold the bubble** | Its actions fan out: **Stop task**, **Pause**/**Resume**, **Add instruction** (by voice), **Stop voice**, **Talk**, **Open chat**, **Hide**. Slide onto one and let go, or let go and tap |
 | Drag the bubble | Move it; it snaps to the nearest edge |
