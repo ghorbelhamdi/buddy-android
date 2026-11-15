@@ -110,7 +110,7 @@
     <string name="onboarding_safety_ask_text">De agent vraagt het vóór alles wat riskant is, zoals een instelling wijzigen. Veiliger, maar meer pop-ups.</string>
     <string name="onboarding_safety_auto_title">Zelfstandig werken</string>
     <string name="onboarding_safety_auto_text">Geen pop-ups: de agent doet gewoon wat je vroeg, zoals een camera of een lamp aanzetten.</string>
-    <string name="onboarding_safety_note">Je kunt dit altijd per app wijzigen: Instellingen → App-rechten. Zet een app op Vrij om de agent daar zonder pop-ups te laten werken, of op Streng zodat Buddy het je zelf vraagt.</string>
+    <string name="onboarding_safety_note">Je kunt dit altijd per app wijzigen: Instellingen → Veiligheid en goedkeuringen → App-rechten. Zet een app op Vrij om de agent daar zonder pop-ups te laten werken, of op Streng zodat Buddy het je zelf vraagt.</string>
 
     <!-- Guide, last step: try a first task. -->
     <string name="onboarding_try_title">Alles staat klaar</string>
@@ -321,6 +321,7 @@
     <string name="control_title">Buddy bedient je telefoon</string>
     <string name="control_text">Raak het scherm niet aan tot Buddy klaar is, of tik op Stoppen om het over te nemen.</string>
     <string name="control_stop">Stoppen</string>
+    <string name="work_title">Buddy werkt op de achtergrond</string>
     <string name="pause_call_ended_title">Gesprek beëindigd · Buddy is gepauzeerd</string>
     <string name="pause_call_ended_text">Tik om de taak te hervatten</string>
 
@@ -474,11 +475,12 @@
     <!-- Notes Buddy posts into a chat, and the chat's status line -->
     <string name="hub_continuing">Een eerdere sessie van %1$s wordt voortgezet. Als die nog open is in een terminal, sluit die daar dan eerst.</string>
     <string name="hub_still_working_attachments">Deze chat is nog bezig. Stuur bijlagen als hij klaar is.</string>
-    <string name="hub_service_off">%1$s staat uit (Instellingen → API-sleutels). Zet de dienst aan of kies een ander model voor deze chat.</string>
+    <string name="hub_service_off">%1$s staat uit (Instellingen → Agents en modellen → API-sleutels). Zet de dienst aan of kies een ander model voor deze chat.</string>
     <string name="hub_thinking">Denkt na…</string>
     <string name="hub_still_waiting">Wacht nog op antwoord van het model…</string>
     <string name="hub_still_reading_local">Nog aan het lezen… Een model op je eigen computer kan een paar minuten nodig hebben, vooral voor het eerste antwoord.</string>
     <string name="hub_no_answer">Het model heeft niet geantwoord. Misschien is het overbelast: probeer het opnieuw of kies bovenaan de chat een ander model.</string>
+    <string name="hub_helper_gone">Deze run is afgebroken: de helper die de agent in Buddy\'s Linux uitvoert, is gestopt. Stuur je bericht opnieuw.</string>
     <string name="hub_model_set">Model: %1$s</string>
     <string name="hub_effort_set">Inspanning: %1$s</string>
     <string name="hub_effort_default">Inspanning: standaard</string>
@@ -674,7 +676,7 @@
     <string name="signin_token">Token gebruiken</string>
     <string name="signin_token_title">Claude Code-token</string>
     <string name="signin_token_info">Plak het token dat “claude setup-token” op een computer toont; het begint met sk-ant-oat. Het is genoeg voor chats. Voor spraakinvoer en Remote Control moet je volledig inloggen.</string>
-    <string name="signin_token_wrong">Dat is geen Claude Code-token. Een API-sleutel (sk-ant-api…) hoort onder Instellingen → API-sleutels.</string>
+    <string name="signin_token_wrong">Dat is geen Claude Code-token. Een API-sleutel (sk-ant-api…) hoort onder Instellingen → Agents en modellen → API-sleutels.</string>
     <string name="signin_token_on">Ingelogd met een token: genoeg voor chats. Voor spraakinvoer en Remote Control moet je volledig inloggen.</string>
     <string name="signin_other_device">Inloggen op een ander apparaat</string>
     <string name="signin_with_code">Inloggen met een code</string>
@@ -812,6 +814,20 @@
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">Instellingen</string>
     <string name="setup_settings_subtitle">Buddy draait Claude Code, Codex, OpenCode, Antigravity of Grok in de app, met je eigen abonnement (of de gratis modellen van OpenCode en het gratis abonnement van Antigravity).</string>
+    <string name="settings_agents">Agents en modellen</string>
+    <string name="settings_agents_sub">Standaardagent, inloggen, API-sleutels, standaardmodellen, GitHub, downloadserver</string>
+    <string name="settings_bubble">Bubbel en chat</string>
+    <string name="settings_bubble_sub">Bubbel tonen, wat een tik doet, grootte van het paneel</string>
+    <string name="settings_voice_sub">Spraakinvoer en -uitvoer, talen, live stem, antwoorden voorlezen</string>
+    <string name="settings_safety">Veiligheid en goedkeuringen</string>
+    <string name="settings_safety_sub">App-rechten, meldingsregels, Linux-tools, Buddy\'s eigen schermen</string>
+    <string name="settings_background">Achtergrond en automatisering</string>
+    <string name="settings_background_sub">Achtergrondmodus, geplande taken, achtergrondbrowser</string>
+    <string name="settings_tools">Tools en verbindingen</string>
+    <string name="settings_tools_sub">MCP-servers, skills, telefoontools voor andere terminals, Remote Control, SSH</string>
+    <string name="settings_appearance_sub">Licht of donker, accentkleur, oppervlak, Buddy\'s uiterlijk</string>
+    <string name="settings_about">Back-up en over</string>
+    <string name="settings_about_sub">Back-up en verhuizen, updates, de handleiding, de installatiecontrole</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">Instellen</string>
@@ -865,12 +881,25 @@
     <string name="setup_face_change">Andere afbeelding kiezen</string>
     <string name="setup_face_unreadable">Die afbeelding kan niet worden gelezen. Probeer een PNG of WebP.</string>
     <string name="setup_custom_colour">Eigen kleur</string>
+    <string name="setup_mirror">Downloadserver</string>
+    <string name="setup_mirror_default">Standaard</string>
+    <string name="setup_mirror_info">Waar Buddy\'s Linux, de pakketten en de agents die met npm worden geïnstalleerd (Codex, OpenCode) vandaan komen. Laat dit op Standaard, tenzij installaties bij jou mislukken of erg traag zijn. Met een andere server gebruikt Buddy\'s Linux ook de DNS-servers van je eigen netwerk.</string>
+    <string name="setup_mirror_default_sub">De eigen servers van Alpine en npm</string>
+    <string name="setup_mirror_china">Chinees vasteland</string>
+    <string name="setup_mirror_russia">Rusland</string>
+    <string name="setup_mirror_iran">Iran</string>
+    <string name="setup_mirror_custom">Aangepast</string>
+    <string name="setup_mirror_custom_sub">Een willekeurige Alpine-mirror, via het adres</string>
+    <string name="setup_mirror_custom_alpine">Adres van de Alpine-mirror</string>
+    <string name="setup_mirror_custom_alpine_hint">Het adres waar de mappen v3.24 en edge direct onder staan. Alpine vermeldt zijn mirrors op mirrors.alpinelinux.org.</string>
+    <string name="setup_mirror_custom_npm">npm-register (optioneel)</string>
+    <string name="setup_mirror_custom_bad">Voer adressen in die met https:// (of http://) beginnen</string>
+    <string name="setup_wallpaper_colour">Van je achtergrond</string>
     <string name="setup_custom_accent_title">Eigen accentkleur</string>
     <string name="setup_custom_accent_hint">Elke kleur als hexcode, bijvoorbeeld #4F8BFF.</string>
     <string name="setup_apply">Toepassen</string>
 
     <!-- Settings screen: Agent. -->
-    <string name="setup_agent">Agent</string>
     <string name="setup_default_brain">Standaardagent</string>
     <string name="setup_default_brain_info">Wie nieuwe chats beantwoordt die je via de bubbel of de knop “Nieuwe chat” start. Claude Code gebruikt je Claude-abonnement, Codex je ChatGPT-abonnement, Antigravity je Google-account, Grok je Grok-account en OpenCode zijn gratis modellen of je eigen aanbieders. Je kunt alleen agents kiezen die zijn ingesteld.</string>
     <string name="setup_default_brain_set">Nieuwe chats gebruiken %1$s. Met de knop “Nieuwe chat” kun je per chat kiezen.</string>
@@ -951,7 +980,6 @@
     <string name="setup_removed">Verwijderd.</string>
 
     <!-- Settings screen: Experience. -->
-    <string name="setup_experience">Gebruik</string>
     <string name="setup_chat_bubble">Chatbubbel</string>
     <string name="setup_chat_bubble_info">Zweeft boven andere apps. Sleep hem naar het ✕ om hem te verbergen; goedkeuringskaarten verschijnen nog steeds als een agent je akkoord nodig heeft.</string>
     <string name="setup_tap_action">Tikken op de bubbel</string>
@@ -1583,7 +1611,7 @@
     <string name="hub_compacting">Gesprek wordt gecomprimeerd…</string>
     <string name="hub_compacted">Gesprek gecomprimeerd: %1$s → %2$s tokens</string>
     <string name="signin_api_models_none">De dienst gaf geen modellen.</string>
-    <string name="setup_step_signin_api_key">Of gebruik een API-sleutel: Instellingen → API-sleutels.</string>
+    <string name="setup_step_signin_api_key">Of gebruik een API-sleutel: Instellingen → Agents en modellen → API-sleutels.</string>
     <string name="setup_step_signin_others">%1$s is je standaardbrein, maar deze zijn klaar: %2$s. Maak er een de standaard en Buddy werkt meteen.</string>
     <string name="setup_switch_default">Standaard wisselen</string>
     <string name="setup_switch_default_title">Standaardbrein</string>

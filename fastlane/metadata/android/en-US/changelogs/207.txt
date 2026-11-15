@@ -1,0 +1,6 @@
+• Settings is now a menu with eight pages in place of one long screen
+• Fixed: a chat could stay "working" forever when its agent died; a run now always ends and says why
+• A quiet notification while a chat works off the screen, with Stop
+• Download server (Agents and models): mirrors in mainland China, Russia and Iran, or your own
+• Local models: the context size a llama.cpp server really runs with
+• Appearance: an accent colour from your wallpaper (Android 12+)

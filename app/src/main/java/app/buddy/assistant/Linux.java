@@ -27,8 +27,10 @@ import java.util.zip.GZIPInputStream;
  * apps targeting SDK 29+ execute files from the APK's library folder, not from their own storage.
  */
 final class Linux {
-    static final String ALPINE_URL =
-            "https://dl-cdn.alpinelinux.org/alpine/v3.24/releases/aarch64/alpine-minirootfs-3.24.2-aarch64.tar.gz";
+    /** After the server's address (see Mirrors.alpine): the same file on Alpine's own servers and on every mirror. */
+    static final String ALPINE_PATH = "/v3.24/releases/aarch64/alpine-minirootfs-3.24.2-aarch64.tar.gz";
+    /** The DNS servers Buddy's Linux asks unless a mirror is chosen (resolv.conf). */
+    static final String DNS = "nameserver 8.8.8.8\nnameserver 1.1.1.1\n";
     static final String ALPINE_SHA256 = "9bf70a7f18ea44094cbb5f70c58f9af129c8214745743db0e68e5502cc2ce773";
 
     private Linux() {
@@ -49,7 +51,7 @@ final class Linux {
         deleteTree(root);
         root.mkdirs();
         File tgz = new File(c.getCacheDir(), "alpine.tar.gz");
-        download(ALPINE_URL, tgz);
+        download(Mirrors.alpine(c) + ALPINE_PATH, tgz);
         String sum = sha256(tgz);
         if (!ALPINE_SHA256.equals(sum)) {
             tgz.delete();
@@ -61,7 +63,7 @@ final class Linux {
         try (InputStream in = new GZIPInputStream(new BufferedInputStream(new FileInputStream(tgz)))) {
             untar(in, staging);
         }
-        write(new File(staging, "etc/resolv.conf"), "nameserver 8.8.8.8\nnameserver 1.1.1.1\n");
+        write(new File(staging, "etc/resolv.conf"), DNS);
         write(new File(staging, "etc/hosts"), "127.0.0.1 localhost\n::1 localhost\n");
         new File(staging, "root").mkdirs();
         new File(staging, "tmp").mkdirs();

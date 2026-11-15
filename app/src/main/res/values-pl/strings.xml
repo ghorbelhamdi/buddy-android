@@ -113,7 +113,7 @@
     <string name="onboarding_safety_ask_text">Agent pyta przed każdym ryzykownym krokiem, np. zmianą ustawienia. Bezpieczniej, ale więcej wyskakujących okienek.</string>
     <string name="onboarding_safety_auto_title">Działaj samodzielnie</string>
     <string name="onboarding_safety_auto_text">Bez wyskakujących okienek: agent po prostu robi to, o co prosisz, np. włącza kamerę lub światło.</string>
-    <string name="onboarding_safety_note">Możesz to w każdej chwili zmienić dla każdej aplikacji: Ustawienia → Uprawnienia aplikacji. Ustaw aplikacji tryb Zaufany, by agent działał w niej bez wyskakujących okienek, lub Ścisły, by to Buddy sam cię pytał.</string>
+    <string name="onboarding_safety_note">Możesz to w każdej chwili zmienić dla każdej aplikacji: Ustawienia → Bezpieczeństwo i zgody → Uprawnienia aplikacji. Ustaw aplikacji tryb Zaufany, by agent działał w niej bez wyskakujących okienek, lub Ścisły, by to Buddy sam cię pytał.</string>
 
     <!-- Guide, last step: try a first task. -->
     <string name="onboarding_try_title">Wszystko gotowe</string>
@@ -332,6 +332,7 @@
     <string name="control_title">Buddy używa twojego telefonu</string>
     <string name="control_text">Nie dotykaj ekranu, dopóki nie skończy, albo kliknij Zatrzymaj, by przejąć kontrolę.</string>
     <string name="control_stop">Zatrzymaj</string>
+    <string name="work_title">Buddy pracuje w tle</string>
     <string name="pause_call_ended_title">Połączenie zakończone · Buddy wstrzymany</string>
     <string name="pause_call_ended_text">Dotknij, by wznowić zadanie</string>
 
@@ -489,11 +490,12 @@
     <!-- Notes Buddy posts into a chat, and the chat's status line -->
     <string name="hub_continuing">Kontynuuję wcześniejszą sesję %1$s. Jeśli jest wciąż otwarta w terminalu, najpierw ją tam zamknij.</string>
     <string name="hub_still_working_attachments">Ten czat wciąż pracuje. Wyślij załączniki, gdy skończy.</string>
-    <string name="hub_service_off">Usługa %1$s jest wyłączona (Ustawienia → Klucze API). Włącz ją lub wybierz inny model dla tego czatu.</string>
+    <string name="hub_service_off">Usługa %1$s jest wyłączona (Ustawienia → Agenci i modele → Klucze API). Włącz ją lub wybierz inny model dla tego czatu.</string>
     <string name="hub_thinking">Myślę…</string>
     <string name="hub_still_waiting">Wciąż czekam na odpowiedź modelu…</string>
     <string name="hub_still_reading_local">Wciąż czyta… Model na twoim komputerze może potrzebować kilku minut, zwłaszcza na pierwszą odpowiedź.</string>
     <string name="hub_no_answer">Model nie odpowiedział. Może być zajęty: spróbuj ponownie albo wybierz inny model u góry czatu.</string>
+    <string name="hub_helper_gone">To uruchomienie zostało przerwane: pomocnik uruchamiający agenta w Linuksie Buddy\'ego przestał działać. Wyślij wiadomość ponownie.</string>
     <string name="hub_model_set">Model: %1$s</string>
     <string name="hub_effort_set">Wysiłek: %1$s</string>
     <string name="hub_effort_default">Wysiłek: domyślny</string>
@@ -693,7 +695,7 @@
     <string name="signin_token">Użyj tokenu</string>
     <string name="signin_token_title">Token Claude Code</string>
     <string name="signin_token_info">Wklej token, który „claude setup-token” wyświetla na komputerze; zaczyna się od sk-ant-oat. Wystarcza do czatów. Wprowadzanie głosowe i Remote Control wymagają pełnego logowania.</string>
-    <string name="signin_token_wrong">To nie jest token Claude Code. Klucz API (sk-ant-api…) wpisz w sekcji Ustawienia → Klucze API.</string>
+    <string name="signin_token_wrong">To nie jest token Claude Code. Klucz API (sk-ant-api…) wpisz w sekcji Ustawienia → Agenci i modele → Klucze API.</string>
     <string name="signin_token_on">Zalogowano tokenem: wystarcza do czatów. Wprowadzanie głosowe i Remote Control wymagają pełnego logowania.</string>
     <string name="signin_other_device">Zaloguj się na innym urządzeniu</string>
     <string name="signin_with_code">Zaloguj się kodem</string>
@@ -833,6 +835,20 @@
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">Ustawienia</string>
     <string name="setup_settings_subtitle">Buddy uruchamia Claude Code, Codex, OpenCode, Antigravity lub Grok w aplikacji, w ramach twojej własnej subskrypcji (albo na darmowych modelach OpenCode i darmowym planie Antigravity).</string>
+    <string name="settings_agents">Agenci i modele</string>
+    <string name="settings_agents_sub">Domyślny agent, logowanie, klucze API, domyślne modele, GitHub, serwer pobierania</string>
+    <string name="settings_bubble">Dymek i czat</string>
+    <string name="settings_bubble_sub">Pokazywanie dymka, działanie dotknięcia, rozmiar panelu</string>
+    <string name="settings_voice_sub">Wejście i wyjście głosowe, języki, głos na żywo, czytanie odpowiedzi na głos</string>
+    <string name="settings_safety">Bezpieczeństwo i zgody</string>
+    <string name="settings_safety_sub">Uprawnienia aplikacji, reguły powiadomień, narzędzia Linuksa, ekrany Buddy\'ego</string>
+    <string name="settings_background">Tło i automatyzacja</string>
+    <string name="settings_background_sub">Tryb w tle, zaplanowane zadania, przeglądarka w tle</string>
+    <string name="settings_tools">Narzędzia i połączenia</string>
+    <string name="settings_tools_sub">Serwery MCP, umiejętności, narzędzia telefonu dla innych terminali, Remote Control, SSH</string>
+    <string name="settings_appearance_sub">Jasny lub ciemny, kolor akcentu, powierzchnia, wygląd Buddy\'ego</string>
+    <string name="settings_about">Kopia zapasowa i informacje</string>
+    <string name="settings_about_sub">Kopia i przenoszenie, aktualizacje, przewodnik, sprawdzenie konfiguracji</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">Konfiguracja</string>
@@ -886,12 +902,25 @@
     <string name="setup_face_change">Wybierz inny obrazek</string>
     <string name="setup_face_unreadable">Nie udało się odczytać tego obrazka. Spróbuj PNG lub WebP.</string>
     <string name="setup_custom_colour">Własny kolor</string>
+    <string name="setup_mirror">Serwer pobierania</string>
+    <string name="setup_mirror_default">Domyślny</string>
+    <string name="setup_mirror_info">Skąd pobierane są Linux Buddy\'ego, jego pakiety i agenci instalowani przez npm (Codex, OpenCode). Zostaw Domyślny, chyba że u Ciebie instalacje się nie udają albo trwają bardzo długo. Z innym serwerem Linux Buddy\'ego korzysta też z serwerów DNS Twojej sieci.</string>
+    <string name="setup_mirror_default_sub">Własne serwery Alpine i npm</string>
+    <string name="setup_mirror_china">Chiny kontynentalne</string>
+    <string name="setup_mirror_russia">Rosja</string>
+    <string name="setup_mirror_iran">Iran</string>
+    <string name="setup_mirror_custom">Własny</string>
+    <string name="setup_mirror_custom_sub">Dowolny serwer lustrzany Alpine, po adresie</string>
+    <string name="setup_mirror_custom_alpine">Adres serwera lustrzanego Alpine</string>
+    <string name="setup_mirror_custom_alpine_hint">Adres, bezpośrednio pod którym są foldery v3.24 i edge. Alpine podaje listę serwerów lustrzanych na mirrors.alpinelinux.org.</string>
+    <string name="setup_mirror_custom_npm">Rejestr npm (opcjonalnie)</string>
+    <string name="setup_mirror_custom_bad">Wpisz adresy zaczynające się od https:// (lub http://)</string>
+    <string name="setup_wallpaper_colour">Z Twojej tapety</string>
     <string name="setup_custom_accent_title">Własny kolor akcentu</string>
     <string name="setup_custom_accent_hint">Dowolny kolor jako kod szesnastkowy, np. #4F8BFF.</string>
     <string name="setup_apply">Zastosuj</string>
 
     <!-- Settings screen: Agent. -->
-    <string name="setup_agent">Agent</string>
     <string name="setup_default_brain">Domyślny agent</string>
     <string name="setup_default_brain_info">Odpowiada w nowych czatach otwieranych z dymka lub przyciskiem Nowy czat. Claude Code korzysta z twojego planu Claude, Codex z planu ChatGPT, Antigravity z konta Google, Grok z konta Grok, a OpenCode z darmowych modeli lub twoich dostawców. Wybrać można tylko skonfigurowanych agentów.</string>
     <string name="setup_default_brain_set">Nowe czaty będą używać %1$s. Agenta dla danego czatu możesz wybrać przyciskiem Nowy czat.</string>
@@ -976,7 +1005,6 @@
     <string name="setup_removed">Usunięto.</string>
 
     <!-- Settings screen: Experience. -->
-    <string name="setup_experience">Obsługa</string>
     <string name="setup_chat_bubble">Dymek czatu</string>
     <string name="setup_chat_bubble_info">Unosi się nad innymi aplikacjami. Przeciągnij go na ✕, by go ukryć – karty zatwierdzenia i tak się pojawią, gdy agent będzie potrzebować twojej zgody.</string>
     <string name="setup_tap_action">Kliknięcie dymka</string>
@@ -1611,7 +1639,7 @@
     <string name="hub_compacting">Kompaktowanie rozmowy…</string>
     <string name="hub_compacted">Rozmowa skompaktowana: %1$s → %2$s tokenów</string>
     <string name="signin_api_models_none">Usługa nie podała żadnych modeli.</string>
-    <string name="setup_step_signin_api_key">Albo użyj klucza API: Ustawienia → Klucze API.</string>
+    <string name="setup_step_signin_api_key">Albo użyj klucza API: Ustawienia → Agenci i modele → Klucze API.</string>
     <string name="setup_step_signin_others">%1$s to twój domyślny mózg, ale te są gotowe: %2$s. Ustaw jeden z nich jako domyślny, a Buddy zadziała od razu.</string>
     <string name="setup_switch_default">Zmień domyślny</string>
     <string name="setup_switch_default_title">Domyślny mózg</string>

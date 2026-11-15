@@ -15,10 +15,14 @@ install() {
   [ -x /usr/bin/chromium ] && return 0
   echo "BUDDY_STATUS installing" >&2
   # Chromium needs a newer webrtc-audio-processing than the release has: from edge, tagged so nothing else moves
+  # (from the server apk already uses: a mirror, if one is chosen in Buddy's Settings)
+  local base
+  base=$(sed -n 's#^\(https\{0,1\}://[^ ]*\)/v[0-9.]*/main *$#\1#p' /etc/apk/repositories | sed -n 1p)
+  base=${base:-https://dl-cdn.alpinelinux.org/alpine}
   grep -q '^@edge .*/edge/main' /etc/apk/repositories ||
-    echo '@edge https://dl-cdn.alpinelinux.org/alpine/edge/main' >>/etc/apk/repositories
+    echo "@edge $base/edge/main" >>/etc/apk/repositories
   grep -q '^@edge .*/edge/community' /etc/apk/repositories ||
-    echo '@edge https://dl-cdn.alpinelinux.org/alpine/edge/community' >>/etc/apk/repositories
+    echo "@edge $base/edge/community" >>/etc/apk/repositories
   apk update -q >&2 && apk add -q webrtc-audio-processing-2@edge chromium >&2 || return 1
   [ -x /usr/bin/chromium ]
 }

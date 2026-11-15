@@ -110,7 +110,7 @@
     <string name="onboarding_safety_ask_text">設定の変更など、リスクのある操作の前にエージェントが確認します。より安全ですが、ポップアップが増えます。</string>
     <string name="onboarding_safety_auto_title">自動で進める</string>
     <string name="onboarding_safety_auto_text">ポップアップなし：カメラや照明をオンにするなど、頼んだことをエージェントがそのまま実行します。</string>
-    <string name="onboarding_safety_note">アプリごとにいつでも変更できます（設定 → アプリの権限）。アプリを「信頼」にするとエージェントがポップアップなしで操作し、「厳格」にすると Buddy 自身があなたに確認します。</string>
+    <string name="onboarding_safety_note">アプリごとにいつでも変更できます（設定 → 安全と承認 → アプリの権限）。アプリを「信頼」にするとエージェントがポップアップなしで操作し、「厳格」にすると Buddy 自身があなたに確認します。</string>
 
     <!-- Guide, last step: try a first task. -->
     <string name="onboarding_try_title">準備ができました</string>
@@ -316,6 +316,7 @@
     <string name="control_title">Buddy がスマートフォンを操作中</string>
     <string name="control_text">完了するまで画面に触れないでください。自分で操作する場合は「停止」をタップしてください。</string>
     <string name="control_stop">停止</string>
+    <string name="work_title">Buddy がバックグラウンドで作業中です</string>
     <string name="pause_call_ended_title">通話終了 · Buddy は一時停止中</string>
     <string name="pause_call_ended_text">タップしてタスクを再開</string>
 
@@ -467,11 +468,12 @@
     <!-- Notes Buddy posts into a chat, and the chat's status line -->
     <string name="hub_continuing">以前の %1$s セッションを続けます。ターミナルでまだ開いている場合は、先にそちらで閉じてください。</string>
     <string name="hub_still_working_attachments">このチャットはまだ実行中です。完了してから添付ファイルを送信してください。</string>
-    <string name="hub_service_off">%1$s はオフになっています（設定 → API キー）。オンにするか、このチャットで別のモデルを選んでください。</string>
+    <string name="hub_service_off">%1$s はオフになっています（設定 → エージェントとモデル → API キー）。オンにするか、このチャットで別のモデルを選んでください。</string>
     <string name="hub_thinking">考え中…</string>
     <string name="hub_still_waiting">まだモデルの応答を待っています…</string>
     <string name="hub_still_reading_local">読み込み中… 自分のコンピューターで動くモデルは、特に最初の回答に数分かかることがあります。</string>
     <string name="hub_no_answer">モデルから応答がありませんでした。混み合っている可能性があります。もう一度試すか、チャット上部で別のモデルを選んでください。</string>
+    <string name="hub_helper_gone">この実行は途中で止まりました。Buddy の Linux でエージェントを動かすヘルパーが停止しました。メッセージをもう一度送ってください。</string>
     <string name="hub_model_set">モデル：%1$s</string>
     <string name="hub_effort_set">思考レベル：%1$s</string>
     <string name="hub_effort_default">思考レベル：デフォルト</string>
@@ -665,7 +667,7 @@
     <string name="signin_token">トークンを使う</string>
     <string name="signin_token_title">Claude Code トークン</string>
     <string name="signin_token_info">パソコンで「claude setup-token」を実行すると表示されるトークンを貼り付けてください。sk-ant-oat で始まります。チャットはこのトークンで使えます。音声入力とリモートコントロールには通常のログインが必要です。</string>
-    <string name="signin_token_wrong">Claude Code のトークンではありません。APIキー（sk-ant-api…）は 設定 → APIキー で入力してください。</string>
+    <string name="signin_token_wrong">Claude Code のトークンではありません。APIキー（sk-ant-api…）は 設定 → エージェントとモデル → APIキー で入力してください。</string>
     <string name="signin_token_on">トークンでログインしています。チャットはこのトークンで使えます。音声入力とリモートコントロールには通常のログインが必要です。</string>
     <string name="signin_other_device">別のデバイスでログイン</string>
     <string name="signin_with_code">コードでログイン</string>
@@ -802,6 +804,20 @@
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">設定</string>
     <string name="setup_settings_subtitle">Buddy は、お使いのサブスクリプション（または OpenCode の無料モデルや Antigravity の無料プラン）を使って、アプリ内で Claude Code、Codex、OpenCode、Antigravity、Grok を実行します。</string>
+    <string name="settings_agents">エージェントとモデル</string>
+    <string name="settings_agents_sub">既定のエージェント、サインイン、API キー、既定のモデル、GitHub、ダウンロードサーバー</string>
+    <string name="settings_bubble">バブルとチャット</string>
+    <string name="settings_bubble_sub">バブルの表示、タップ時の動作、パネルのサイズ</string>
+    <string name="settings_voice_sub">音声入力と出力、言語、ライブ音声、返信の読み上げ</string>
+    <string name="settings_safety">安全と承認</string>
+    <string name="settings_safety_sub">アプリの権限、通知ルール、Linux ツール、Buddy 自身の画面</string>
+    <string name="settings_background">バックグラウンドと自動化</string>
+    <string name="settings_background_sub">バックグラウンドモード、スケジュールしたタスク、バックグラウンドブラウザ</string>
+    <string name="settings_tools">ツールと接続</string>
+    <string name="settings_tools_sub">MCP サーバー、スキル、他のターミナル向けのスマホツール、Remote Control、SSH</string>
+    <string name="settings_appearance_sub">ライトまたはダーク、アクセントカラー、サーフェス、Buddy の見た目</string>
+    <string name="settings_about">バックアップと情報</string>
+    <string name="settings_about_sub">バックアップと移行、アップデート、ガイド、セットアップの確認</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">セットアップ</string>
@@ -855,12 +871,25 @@
     <string name="setup_face_change">別の画像を選ぶ</string>
     <string name="setup_face_unreadable">この画像を読み込めませんでした。PNG か WebP を試してください。</string>
     <string name="setup_custom_colour">カスタムカラー</string>
+    <string name="setup_mirror">ダウンロードサーバー</string>
+    <string name="setup_mirror_default">標準</string>
+    <string name="setup_mirror_info">Buddy の Linux とそのパッケージ、npm でインストールするエージェント（Codex、OpenCode）のダウンロード元です。お使いの地域でインストールが失敗する、または極端に遅い場合を除き、標準のままにしてください。別のサーバーを選ぶと、Buddy の Linux はお使いのネットワークの DNS サーバーも使います。</string>
+    <string name="setup_mirror_default_sub">Alpine と npm の公式サーバー</string>
+    <string name="setup_mirror_china">中国本土</string>
+    <string name="setup_mirror_russia">ロシア</string>
+    <string name="setup_mirror_iran">イラン</string>
+    <string name="setup_mirror_custom">カスタム</string>
+    <string name="setup_mirror_custom_sub">アドレスを指定して任意の Alpine ミラーを使う</string>
+    <string name="setup_mirror_custom_alpine">Alpine ミラーのアドレス</string>
+    <string name="setup_mirror_custom_alpine_hint">直下に v3.24 と edge のフォルダがあるアドレスです。Alpine のミラー一覧は mirrors.alpinelinux.org にあります。</string>
+    <string name="setup_mirror_custom_npm">npm レジストリ（任意）</string>
+    <string name="setup_mirror_custom_bad">https://（または http://）で始まるアドレスを入力してください</string>
+    <string name="setup_wallpaper_colour">壁紙の色を使う</string>
     <string name="setup_custom_accent_title">カスタムのアクセントカラー</string>
     <string name="setup_custom_accent_hint">#4F8BFF のような 16 進数のカラーコードで、好きな色を指定できます。</string>
     <string name="setup_apply">適用</string>
 
     <!-- Settings screen: Agent. -->
-    <string name="setup_agent">エージェント</string>
     <string name="setup_default_brain">デフォルトのエージェント</string>
     <string name="setup_default_brain_info">バブルや「新しいチャット」ボタンから始めたチャットに応答するエージェントです。Claude Code は Claude のプラン、Codex は ChatGPT のプラン、Antigravity は Google アカウント、Grok は Grok アカウント、OpenCode は無料モデルまたはお使いのプロバイダーを使用します。選べるのは設定済みのエージェントのみです。</string>
     <string name="setup_default_brain_set">新しいチャットでは %1$s を使用します。「新しいチャット」ボタンからチャットごとに選ぶこともできます。</string>
@@ -939,7 +968,6 @@
     <string name="setup_removed">削除しました。</string>
 
     <!-- Settings screen: Experience. -->
-    <string name="setup_experience">動作</string>
     <string name="setup_chat_bubble">チャットバブル</string>
     <string name="setup_chat_bubble_info">他のアプリの上に表示されます。✕ までドラッグすると非表示になりますが、エージェントが承認を必要とするときは承認カードが表示されます。</string>
     <string name="setup_tap_action">バブルをタップしたとき</string>
@@ -1569,7 +1597,7 @@
     <string name="hub_compacting">会話を圧縮しています…</string>
     <string name="hub_compacted">会話を圧縮しました: %1$s → %2$s トークン</string>
     <string name="signin_api_models_none">サービスはモデルを返しませんでした。</string>
-    <string name="setup_step_signin_api_key">またはAPIキーを使う: 設定 → APIキー。</string>
+    <string name="setup_step_signin_api_key">またはAPIキーを使う: 設定 → エージェントとモデル → APIキー。</string>
     <string name="setup_step_signin_others">既定の頭脳は %1$s ですが、次のものは準備できています：%2$s。どれかを既定にすればすぐに Buddy を使えます。</string>
     <string name="setup_switch_default">既定を切り替え</string>
     <string name="setup_switch_default_title">既定の頭脳</string>

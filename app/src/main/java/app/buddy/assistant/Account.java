@@ -355,7 +355,7 @@ final class Account {
             try {
                 synchronized (Account.class) { // both agents use apk; don't run it twice at once
                     Linux.install(app);
-                    Helper.sync(app);
+                    Helper.sync(app); // (also points apk and npm at the chosen download server, see Mirrors)
                     set(Step.INSTALLING, app.getString(R.string.account_installing_tools));
                     String o = Linux.exec(app, "apk update -q && apk add -q bash curl jq libgcc libstdc++ ripgrep git "
                             + "ca-certificates procps coreutils findutils" + (claude() || agy() || grok() ? "" : " nodejs npm")

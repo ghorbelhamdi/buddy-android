@@ -145,7 +145,7 @@
     <string name="onboarding_safety_auto_title">自主操作</string>
     <string name="onboarding_safety_auto_text">没有弹窗：智能体会直接完成你的要求，比如打开摄像头或开灯。</string>
     <!-- "Settings → App permissions" = Buddy's own screens. "Trust" and "Hard" = names of approval modes; use the same translations as those mode labels. -->
-    <string name="onboarding_safety_note">你可以随时按应用更改：设置 → 应用权限。将应用设为“信任”，智能体就能在其中直接操作、不弹窗；设为“严格”，则由 Buddy 亲自询问你。</string>
+    <string name="onboarding_safety_note">你可以随时按应用更改：设置 → 安全与批准 → 应用权限。将应用设为“信任”，智能体就能在其中直接操作、不弹窗；设为“严格”，则由 Buddy 亲自询问你。</string>
 
     <!-- Guide, last step: try a first task. -->
     <string name="onboarding_try_title">一切就绪</string>
@@ -439,6 +439,7 @@
     <string name="control_text">完成前请不要触碰屏幕，或点按“停止”来接管。</string>
     <!-- Notification button, verb: stops the agent and gives the phone back to the user. -->
     <string name="control_stop">停止</string>
+    <string name="work_title">Buddy 正在后台工作</string>
     <string name="pause_call_ended_title">通话已结束 · Buddy 已暂停</string>
     <string name="pause_call_ended_text">点按即可继续任务</string>
 
@@ -633,13 +634,14 @@
     <!-- After "Continue in Buddy" on an earlier session. %1$s = agent name. -->
     <string name="hub_continuing">正在继续之前的 %1$s 会话。如果它仍在终端中打开，请先在那里关闭。</string>
     <string name="hub_still_working_attachments">此对话仍在处理中。请等它完成后再发送附件。</string>
-    <string name="hub_service_off">%1$s 已关闭（设置 → API 密钥）。请开启它，或为此对话选择其他模型。</string>
+    <string name="hub_service_off">%1$s 已关闭（设置 → 智能体与模型 → API 密钥）。请开启它，或为此对话选择其他模型。</string>
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">正在思考…</string>
     <string name="hub_still_waiting">仍在等待模型回复…</string>
     <string name="hub_still_reading_local">仍在读取… 在你自己电脑上运行的模型可能需要几分钟，尤其是第一次回答。</string>
     <!-- "the top of the chat" = the model chip under the chat title. -->
     <string name="hub_no_answer">模型没有回复，可能正忙。请重试，或在对话顶部选择其他模型。</string>
+    <string name="hub_helper_gone">本次运行被中断：在 Buddy 的 Linux 中运行智能体的助手已停止。请重新发送消息。</string>
     <!-- After picking a model for the chat. %1$s = model name. -->
     <string name="hub_model_set">模型：%1$s</string>
     <!-- After picking an effort level. %1$s = the level as the agent names it, not translated (low, medium, high…). -->
@@ -894,7 +896,7 @@
     <string name="signin_token">使用令牌</string>
     <string name="signin_token_title">Claude Code 令牌</string>
     <string name="signin_token_info">粘贴在电脑上运行“claude setup-token”后显示的令牌，它以 sk-ant-oat 开头。令牌可用于对话。语音输入和远程控制需要完整登录。</string>
-    <string name="signin_token_wrong">这不是 Claude Code 令牌。API 密钥（sk-ant-api…）请在“设置 → API 密钥”中添加。</string>
+    <string name="signin_token_wrong">这不是 Claude Code 令牌。API 密钥（sk-ant-api…）请在“设置 → 智能体与模型 → API 密钥”中添加。</string>
     <string name="signin_token_on">已使用令牌登录：可用于对话。语音输入和远程控制需要完整登录。</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <string name="signin_other_device">在其他设备上登录</string>
@@ -1086,6 +1088,20 @@
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">设置</string>
     <string name="setup_settings_subtitle">Buddy 在应用内运行 Claude Code、Codex、OpenCode、Antigravity 或 Grok，使用你自己的订阅（或 OpenCode 的免费模型和 Antigravity 的免费套餐）。</string>
+    <string name="settings_agents">智能体与模型</string>
+    <string name="settings_agents_sub">默认智能体、登录、API 密钥、默认模型、GitHub、下载服务器</string>
+    <string name="settings_bubble">气泡与对话</string>
+    <string name="settings_bubble_sub">显示气泡、点按气泡的操作、面板大小</string>
+    <string name="settings_voice_sub">语音输入与输出、语言、实时语音、朗读回复</string>
+    <string name="settings_safety">安全与批准</string>
+    <string name="settings_safety_sub">应用权限、通知规则、Linux 工具、Buddy 自己的界面</string>
+    <string name="settings_background">后台与自动化</string>
+    <string name="settings_background_sub">后台模式、定时任务、后台浏览器</string>
+    <string name="settings_tools">工具与连接</string>
+    <string name="settings_tools_sub">MCP 服务器、技能、供其他终端使用的手机工具、Remote Control、SSH</string>
+    <string name="settings_appearance_sub">浅色或深色、强调色、表面、Buddy 的外观</string>
+    <string name="settings_about">备份与关于</string>
+    <string name="settings_about_sub">备份与迁移、更新、指南、设置检查</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <!-- Title of the setup checklist card (noun). -->
@@ -1161,13 +1177,26 @@
     <string name="setup_face_unreadable">无法读取这张图片。请试试 PNG 或 WebP。</string>
     <!-- Read by TalkBack: the swatch that opens the custom colour sheet. -->
     <string name="setup_custom_colour">自定义颜色</string>
+    <string name="setup_mirror">下载服务器</string>
+    <string name="setup_mirror_default">默认</string>
+    <string name="setup_mirror_info">Buddy 的 Linux、软件包以及通过 npm 安装的智能体（Codex、OpenCode）的下载来源。除非你所在的地方安装失败或非常慢，否则请保持默认。选用其他服务器后，Buddy 的 Linux 还会使用你当前网络的 DNS 服务器。</string>
+    <string name="setup_mirror_default_sub">Alpine 和 npm 的官方服务器</string>
+    <string name="setup_mirror_china">中国大陆</string>
+    <string name="setup_mirror_russia">俄罗斯</string>
+    <string name="setup_mirror_iran">伊朗</string>
+    <string name="setup_mirror_custom">自定义</string>
+    <string name="setup_mirror_custom_sub">按地址使用任意 Alpine 镜像</string>
+    <string name="setup_mirror_custom_alpine">Alpine 镜像地址</string>
+    <string name="setup_mirror_custom_alpine_hint">其下直接包含 v3.24 和 edge 文件夹的地址。Alpine 的镜像列表见 mirrors.alpinelinux.org。</string>
+    <string name="setup_mirror_custom_npm">npm 源（可选）</string>
+    <string name="setup_mirror_custom_bad">请输入以 https://（或 http://）开头的地址</string>
+    <string name="setup_wallpaper_colour">取自壁纸</string>
     <string name="setup_custom_accent_title">自定义强调色</string>
     <string name="setup_custom_accent_hint">以十六进制代码输入任意颜色，例如 #4F8BFF。</string>
     <!-- Button (verb). -->
     <string name="setup_apply">应用</string>
 
     <!-- Settings screen: Agent. -->
-    <string name="setup_agent">智能体</string>
     <!-- Which AI agent answers new chats. -->
     <string name="setup_default_brain">默认智能体</string>
     <!-- "New chat" is the name of a button in Buddy. -->
@@ -1265,7 +1294,6 @@
     <string name="setup_removed">已移除。</string>
 
     <!-- Settings screen: Experience. -->
-    <string name="setup_experience">使用体验</string>
     <string name="setup_chat_bubble">聊天气泡</string>
     <!-- ✕ is the close target that appears while dragging the bubble. -->
     <string name="setup_chat_bubble_info">悬浮在其他应用上方。将它拖到 ✕ 上即可隐藏；当智能体需要你确认时，确认卡片仍会弹出。</string>
@@ -2017,7 +2045,7 @@
     <string name="hub_compacting">正在压缩对话…</string>
     <string name="hub_compacted">对话已压缩:%1$s → %2$s 个 token</string>
     <string name="signin_api_models_none">该服务未列出任何模型。</string>
-    <string name="setup_step_signin_api_key">或使用 API 密钥:设置 → API 密钥。</string>
+    <string name="setup_step_signin_api_key">或使用 API 密钥:设置 → 智能体与模型 → API 密钥。</string>
     <string name="setup_step_signin_others">你的默认大脑是 %1$s，但这些已经就绪：%2$s。把其中一个设为默认，Buddy 就能立即使用。</string>
     <string name="setup_switch_default">切换默认</string>
     <string name="setup_switch_default_title">默认大脑</string>

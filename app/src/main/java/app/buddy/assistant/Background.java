@@ -574,9 +574,9 @@ final class Background {
                 }
                 String out = Linux.exec(svc, "command -v adb >/dev/null && echo ADB_OK && exit 0; "
                         + "grep -q '^@edge .*/edge/community' /etc/apk/repositories || "
-                        + "echo '@edge https://dl-cdn.alpinelinux.org/alpine/edge/community' >>/etc/apk/repositories; "
+                        + "echo '@edge " + Mirrors.alpine(svc) + "/edge/community' >>/etc/apk/repositories; "
                         + "grep -q '^@edge .*/edge/main' /etc/apk/repositories || "
-                        + "echo '@edge https://dl-cdn.alpinelinux.org/alpine/edge/main' >>/etc/apk/repositories; "
+                        + "echo '@edge " + Mirrors.alpine(svc) + "/edge/main' >>/etc/apk/repositories; "
                         + "apk update -q 2>&1 | tail -2; apk add -q android-tools-adb@edge 2>&1 | tail -3; "
                         + "command -v adb >/dev/null && echo ADB_OK", 600);
                 if (!out.contains("ADB_OK")) {

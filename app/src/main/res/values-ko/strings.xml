@@ -110,7 +110,7 @@
     <string name="onboarding_safety_ask_text">설정 변경처럼 위험할 수 있는 작업 전에 에이전트가 물어봐요. 더 안전하지만 팝업이 많아져요.</string>
     <string name="onboarding_safety_auto_title">알아서 하기</string>
     <string name="onboarding_safety_auto_text">팝업 없이, 카메라나 조명 켜기처럼 요청한 일을 에이전트가 바로 해요.</string>
-    <string name="onboarding_safety_note">앱별로 언제든지 바꿀 수 있어요(설정 → 앱 권한). 앱을 ‘신뢰’로 설정하면 에이전트가 팝업 없이 작업하고, ‘엄격’으로 설정하면 Buddy가 직접 물어봐요.</string>
+    <string name="onboarding_safety_note">앱별로 언제든지 바꿀 수 있어요(설정 → 안전과 승인 → 앱 권한). 앱을 ‘신뢰’로 설정하면 에이전트가 팝업 없이 작업하고, ‘엄격’으로 설정하면 Buddy가 직접 물어봐요.</string>
 
     <!-- Guide, last step: try a first task. -->
     <string name="onboarding_try_title">준비가 끝났어요</string>
@@ -316,6 +316,7 @@
     <string name="control_title">Buddy가 휴대전화를 사용 중</string>
     <string name="control_text">끝날 때까지 화면을 만지지 마세요. 직접 조작하려면 ‘중지’를 탭하세요.</string>
     <string name="control_stop">중지</string>
+    <string name="work_title">Buddy가 백그라운드에서 작업 중이에요</string>
     <string name="pause_call_ended_title">통화 종료 · Buddy 일시중지됨</string>
     <string name="pause_call_ended_text">탭하여 작업 재개</string>
 
@@ -467,11 +468,12 @@
     <!-- Notes Buddy posts into a chat, and the chat's status line -->
     <string name="hub_continuing">이전 %1$s 세션을 이어서 진행해요. 터미널에서 아직 열려 있다면 먼저 거기서 닫으세요.</string>
     <string name="hub_still_working_attachments">이 채팅은 아직 작업 중이에요. 끝난 뒤에 첨부 파일을 보내세요.</string>
-    <string name="hub_service_off">%1$s이(가) 꺼져 있습니다(설정 → API 키). 켜거나 이 채팅에 다른 모델을 선택하세요.</string>
+    <string name="hub_service_off">%1$s이(가) 꺼져 있습니다(설정 → 에이전트와 모델 → API 키). 켜거나 이 채팅에 다른 모델을 선택하세요.</string>
     <string name="hub_thinking">생각하는 중…</string>
     <string name="hub_still_waiting">아직 모델의 답변을 기다리는 중…</string>
     <string name="hub_still_reading_local">아직 읽는 중… 내 컴퓨터에서 도는 모델은 특히 첫 답변에 몇 분 걸릴 수 있어요.</string>
     <string name="hub_no_answer">모델이 답하지 않았어요. 바쁠 수 있으니 다시 시도하거나 채팅 상단에서 다른 모델을 고르세요.</string>
+    <string name="hub_helper_gone">이 실행이 중단되었어요. Buddy의 Linux에서 에이전트를 실행하는 헬퍼가 멈췄습니다. 메시지를 다시 보내 주세요.</string>
     <string name="hub_model_set">모델: %1$s</string>
     <string name="hub_effort_set">추론 강도: %1$s</string>
     <string name="hub_effort_default">추론 강도: 기본값</string>
@@ -665,7 +667,7 @@
     <string name="signin_token">토큰 사용</string>
     <string name="signin_token_title">Claude Code 토큰</string>
     <string name="signin_token_info">컴퓨터에서 “claude setup-token” 명령을 실행하면 나오는 토큰을 붙여넣으세요. sk-ant-oat로 시작해요. 채팅은 이 토큰으로 충분해요. 음성 입력과 원격 제어를 쓰려면 일반 로그인이 필요해요.</string>
-    <string name="signin_token_wrong">Claude Code 토큰이 아니에요. API 키(sk-ant-api…)는 설정 → API 키에 입력하세요.</string>
+    <string name="signin_token_wrong">Claude Code 토큰이 아니에요. API 키(sk-ant-api…)는 설정 → 에이전트와 모델 → API 키에 입력하세요.</string>
     <string name="signin_token_on">토큰으로 로그인했어요. 채팅은 이 토큰으로 충분해요. 음성 입력과 원격 제어를 쓰려면 일반 로그인이 필요해요.</string>
     <string name="signin_other_device">다른 기기에서 로그인</string>
     <string name="signin_with_code">코드로 로그인</string>
@@ -802,6 +804,20 @@
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">설정</string>
     <string name="setup_settings_subtitle">Buddy는 내 구독(또는 OpenCode의 무료 모델과 Antigravity의 무료 플랜)으로 앱 안에서 Claude Code, Codex, OpenCode, Antigravity, Grok을 실행해요.</string>
+    <string name="settings_agents">에이전트와 모델</string>
+    <string name="settings_agents_sub">기본 에이전트, 로그인, API 키, 기본 모델, GitHub, 다운로드 서버</string>
+    <string name="settings_bubble">버블과 채팅</string>
+    <string name="settings_bubble_sub">버블 표시, 탭했을 때 동작, 패널 크기</string>
+    <string name="settings_voice_sub">음성 입력과 출력, 언어, 라이브 음성, 답변 소리 내어 읽기</string>
+    <string name="settings_safety">안전과 승인</string>
+    <string name="settings_safety_sub">앱 권한, 알림 규칙, Linux 도구, Buddy 자체 화면</string>
+    <string name="settings_background">백그라운드와 자동화</string>
+    <string name="settings_background_sub">백그라운드 모드, 예약 작업, 백그라운드 브라우저</string>
+    <string name="settings_tools">도구와 연결</string>
+    <string name="settings_tools_sub">MCP 서버, 스킬, 다른 터미널용 휴대폰 도구, Remote Control, SSH</string>
+    <string name="settings_appearance_sub">라이트 또는 다크, 강조 색, 표면, Buddy의 모습</string>
+    <string name="settings_about">백업 및 정보</string>
+    <string name="settings_about_sub">백업과 이동, 업데이트, 가이드, 설정 점검</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">초기 설정</string>
@@ -855,12 +871,25 @@
     <string name="setup_face_change">다른 이미지 선택</string>
     <string name="setup_face_unreadable">이 이미지를 읽을 수 없어요. PNG나 WebP로 시도해 보세요.</string>
     <string name="setup_custom_colour">맞춤 색상</string>
+    <string name="setup_mirror">다운로드 서버</string>
+    <string name="setup_mirror_default">기본</string>
+    <string name="setup_mirror_info">Buddy의 Linux와 패키지, npm으로 설치하는 에이전트(Codex, OpenCode)를 내려받는 곳입니다. 계신 곳에서 설치가 실패하거나 매우 느리지 않다면 기본으로 두세요. 다른 서버를 고르면 Buddy의 Linux가 사용 중인 네트워크의 DNS 서버도 사용합니다.</string>
+    <string name="setup_mirror_default_sub">Alpine과 npm의 자체 서버</string>
+    <string name="setup_mirror_china">중국 본토</string>
+    <string name="setup_mirror_russia">러시아</string>
+    <string name="setup_mirror_iran">이란</string>
+    <string name="setup_mirror_custom">직접 입력</string>
+    <string name="setup_mirror_custom_sub">주소로 지정하는 Alpine 미러</string>
+    <string name="setup_mirror_custom_alpine">Alpine 미러 주소</string>
+    <string name="setup_mirror_custom_alpine_hint">바로 아래에 v3.24와 edge 폴더가 있는 주소입니다. Alpine 미러 목록은 mirrors.alpinelinux.org에 있습니다.</string>
+    <string name="setup_mirror_custom_npm">npm 레지스트리(선택)</string>
+    <string name="setup_mirror_custom_bad">https://(또는 http://)로 시작하는 주소를 입력하세요</string>
+    <string name="setup_wallpaper_colour">배경화면에서 가져오기</string>
     <string name="setup_custom_accent_title">맞춤 강조 색상</string>
     <string name="setup_custom_accent_hint">#4F8BFF처럼 16진수 코드로 원하는 색상을 입력하세요.</string>
     <string name="setup_apply">적용</string>
 
     <!-- Settings screen: Agent. -->
-    <string name="setup_agent">에이전트</string>
     <string name="setup_default_brain">기본 에이전트</string>
     <string name="setup_default_brain_info">버블이나 ‘새 채팅’ 버튼으로 시작한 채팅에 답할 에이전트예요. Claude Code는 Claude 플랜을, Codex는 ChatGPT 플랜을, Antigravity는 Google 계정을, Grok은 Grok 계정을, OpenCode는 무료 모델이나 원하는 제공업체를 사용해요. 설정을 마친 에이전트만 고를 수 있어요.</string>
     <string name="setup_default_brain_set">이제 새 채팅에서 %1$s를 사용해요. ‘새 채팅’ 버튼으로 채팅마다 고를 수도 있어요.</string>
@@ -939,7 +968,6 @@
     <string name="setup_removed">삭제했어요.</string>
 
     <!-- Settings screen: Experience. -->
-    <string name="setup_experience">사용 환경</string>
     <string name="setup_chat_bubble">채팅 버블</string>
     <string name="setup_chat_bubble_info">다른 앱 위에 떠 있어요. ✕로 끌어다 놓으면 숨길 수 있지만, 에이전트가 승인을 받아야 할 때는 승인 카드가 계속 나타나요.</string>
     <string name="setup_tap_action">버블을 탭하면</string>
@@ -1568,7 +1596,7 @@
     <string name="hub_compacting">대화를 압축하는 중…</string>
     <string name="hub_compacted">대화 압축됨: %1$s → %2$s 토큰</string>
     <string name="signin_api_models_none">서비스에서 모델을 나열하지 않았습니다.</string>
-    <string name="setup_step_signin_api_key">또는 API 키 사용: 설정 → API 키.</string>
+    <string name="setup_step_signin_api_key">또는 API 키 사용: 설정 → 에이전트와 모델 → API 키.</string>
     <string name="setup_step_signin_others">기본 두뇌는 %1$s지만, 이것들은 준비돼 있어요: %2$s. 그중 하나를 기본으로 하면 Buddy를 바로 쓸 수 있어요.</string>
     <string name="setup_switch_default">기본 바꾸기</string>
     <string name="setup_switch_default_title">기본 두뇌</string>

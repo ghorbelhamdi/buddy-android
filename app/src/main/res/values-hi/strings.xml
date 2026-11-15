@@ -109,7 +109,7 @@
     <string name="onboarding_safety_ask_text">एजेंट कोई भी जोखिम वाला काम करने से पहले पूछता है, जैसे कोई सेटिंग बदलना. ज़्यादा सुरक्षित, लेकिन पॉप-अप भी ज़्यादा.</string>
     <string name="onboarding_safety_auto_title">खुद काम करे</string>
     <string name="onboarding_safety_auto_text">कोई पॉप-अप नहीं: एजेंट बस वही करता है जो आपने कहा है, जैसे कैमरा या लाइट चालू करना.</string>
-    <string name="onboarding_safety_note">आप इसे किसी भी समय हर ऐप के लिए बदल सकते हैं: सेटिंग → ऐप अनुमतियां. किसी ऐप को “भरोसा” पर सेट करें, ताकि एजेंट वहां बिना पॉप-अप के काम करे. या “सख़्त” पर सेट करें, ताकि Buddy खुद आपसे पूछे.</string>
+    <string name="onboarding_safety_note">आप इसे किसी भी समय हर ऐप के लिए बदल सकते हैं: सेटिंग → सुरक्षा और स्वीकृतियाँ → ऐप अनुमतियां. किसी ऐप को “भरोसा” पर सेट करें, ताकि एजेंट वहां बिना पॉप-अप के काम करे. या “सख़्त” पर सेट करें, ताकि Buddy खुद आपसे पूछे.</string>
 
     <!-- Guide, last step: try a first task. -->
     <string name="onboarding_try_title">आप पूरी तरह तैयार हैं</string>
@@ -318,6 +318,7 @@
     <string name="control_title">Buddy आपका फ़ोन इस्तेमाल कर रहा है</string>
     <string name="control_text">काम पूरा होने तक स्क्रीन को न छुएं, या कंट्रोल वापस लेने के लिए “रोकें” पर टैप करें.</string>
     <string name="control_stop">रोकें</string>
+    <string name="work_title">Buddy बैकग्राउंड में काम कर रहा है</string>
     <string name="pause_call_ended_title">कॉल खत्म · Buddy पॉज़ है</string>
     <string name="pause_call_ended_text">काम फिर शुरू करने के लिए टैप करें</string>
 
@@ -471,11 +472,12 @@
     <!-- Notes Buddy posts into a chat, and the chat's status line -->
     <string name="hub_continuing">पिछला %1$s सेशन जारी रखा जा रहा है. अगर यह अब भी किसी टर्मिनल में खुला है, तो पहले उसे वहां बंद करें.</string>
     <string name="hub_still_working_attachments">यह चैट अभी काम कर रही है. काम पूरा होने पर अटैचमेंट भेजें.</string>
-    <string name="hub_service_off">%1$s बंद है (सेटिंग → API कुंजियाँ)। इसे चालू करें, या इस चैट के लिए कोई दूसरा मॉडल चुनें।</string>
+    <string name="hub_service_off">%1$s बंद है (सेटिंग → एजेंट और मॉडल → API कुंजियाँ)। इसे चालू करें, या इस चैट के लिए कोई दूसरा मॉडल चुनें।</string>
     <string name="hub_thinking">सोच रहा है…</string>
     <string name="hub_still_waiting">मॉडल के जवाब का अब भी इंतज़ार है…</string>
     <string name="hub_still_reading_local">अभी पढ़ रहा है… आपके अपने कंप्यूटर पर चलने वाले मॉडल को कुछ मिनट लग सकते हैं, ख़ासकर पहले जवाब में।</string>
     <string name="hub_no_answer">मॉडल ने जवाब नहीं दिया. हो सकता है वह व्यस्त हो: फिर से कोशिश करें या चैट में सबसे ऊपर से कोई दूसरा मॉडल चुनें.</string>
+    <string name="hub_helper_gone">यह रन बीच में रुक गया: Buddy के Linux में एजेंट चलाने वाला हेल्पर बंद हो गया. अपना संदेश फिर से भेजें.</string>
     <string name="hub_model_set">मॉडल: %1$s</string>
     <string name="hub_effort_set">प्रयास: %1$s</string>
     <string name="hub_effort_default">प्रयास: डिफ़ॉल्ट</string>
@@ -671,7 +673,7 @@
     <string name="signin_token">टोकन इस्तेमाल करें</string>
     <string name="signin_token_title">Claude Code टोकन</string>
     <string name="signin_token_info">वह टोकन चिपकाएं जो कंप्यूटर पर “claude setup-token” चलाने से मिलता है; यह sk-ant-oat से शुरू होता है. यह चैट के लिए काफ़ी है. वॉइस इनपुट और रिमोट कंट्रोल के लिए पूरा साइन-इन ज़रूरी है.</string>
-    <string name="signin_token_wrong">यह Claude Code टोकन नहीं है. API कुंजी (sk-ant-api…) सेटिंग → API कुंजियाँ में डालें.</string>
+    <string name="signin_token_wrong">यह Claude Code टोकन नहीं है. API कुंजी (sk-ant-api…) सेटिंग → एजेंट और मॉडल → API कुंजियाँ में डालें.</string>
     <string name="signin_token_on">टोकन से साइन इन किया गया: यह चैट के लिए काफ़ी है. वॉइस इनपुट और रिमोट कंट्रोल के लिए पूरा साइन-इन ज़रूरी है.</string>
     <string name="signin_other_device">किसी दूसरे डिवाइस पर साइन इन करें</string>
     <string name="signin_with_code">कोड से साइन इन करें</string>
@@ -808,6 +810,20 @@
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">सेटिंग</string>
     <string name="setup_settings_subtitle">Buddy आपकी अपनी सदस्यता (या OpenCode के मुफ़्त मॉडल और Antigravity के मुफ़्त प्लान) पर, ऐप के अंदर ही Claude Code, Codex, OpenCode, Antigravity या Grok चलाता है.</string>
+    <string name="settings_agents">एजेंट और मॉडल</string>
+    <string name="settings_agents_sub">डिफ़ॉल्ट एजेंट, साइन-इन, API कुंजियाँ, डिफ़ॉल्ट मॉडल, GitHub, डाउनलोड सर्वर</string>
+    <string name="settings_bubble">बबल और चैट</string>
+    <string name="settings_bubble_sub">बबल दिखाना, उस पर टैप क्या करता है, पैनल का आकार</string>
+    <string name="settings_voice_sub">वॉइस इनपुट और आउटपुट, भाषाएँ, लाइव वॉइस, जवाब पढ़कर सुनाना</string>
+    <string name="settings_safety">सुरक्षा और स्वीकृतियाँ</string>
+    <string name="settings_safety_sub">ऐप अनुमतियाँ, नोटिफ़िकेशन नियम, Linux टूल, Buddy की अपनी स्क्रीन</string>
+    <string name="settings_background">बैकग्राउंड और ऑटोमेशन</string>
+    <string name="settings_background_sub">बैकग्राउंड मोड, शेड्यूल किए गए काम, बैकग्राउंड ब्राउज़र</string>
+    <string name="settings_tools">टूल और कनेक्शन</string>
+    <string name="settings_tools_sub">MCP सर्वर, स्किल, दूसरे टर्मिनल के लिए फ़ोन टूल, Remote Control, SSH</string>
+    <string name="settings_appearance_sub">लाइट या डार्क, एक्सेंट रंग, सतह, Buddy का रूप</string>
+    <string name="settings_about">बैकअप और जानकारी</string>
+    <string name="settings_about_sub">बैकअप और स्थानांतरण, अपडेट, गाइड, सेटअप जाँच</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">सेटअप</string>
@@ -860,12 +876,25 @@
     <string name="setup_face_change">दूसरी तस्वीर चुनें</string>
     <string name="setup_face_unreadable">यह तस्वीर पढ़ी नहीं जा सकी। PNG या WebP आज़माएँ।</string>
     <string name="setup_custom_colour">कस्टम रंग</string>
+    <string name="setup_mirror">डाउनलोड सर्वर</string>
+    <string name="setup_mirror_default">डिफ़ॉल्ट</string>
+    <string name="setup_mirror_info">Buddy का Linux, उसके पैकेज और npm से इंस्टॉल होने वाले एजेंट (Codex, OpenCode) कहाँ से डाउनलोड होते हैं. इसे डिफ़ॉल्ट पर ही रहने दें, जब तक आपके यहाँ इंस्टॉल विफल न हों या बहुत धीमे न हों. दूसरा सर्वर चुनने पर Buddy का Linux आपके नेटवर्क के अपने DNS सर्वर भी इस्तेमाल करता है.</string>
+    <string name="setup_mirror_default_sub">Alpine और npm के अपने सर्वर</string>
+    <string name="setup_mirror_china">मुख्यभूमि चीन</string>
+    <string name="setup_mirror_russia">रूस</string>
+    <string name="setup_mirror_iran">ईरान</string>
+    <string name="setup_mirror_custom">कस्टम</string>
+    <string name="setup_mirror_custom_sub">कोई भी Alpine मिरर, उसके पते से</string>
+    <string name="setup_mirror_custom_alpine">Alpine मिरर का पता</string>
+    <string name="setup_mirror_custom_alpine_hint">वह पता जिसके ठीक नीचे v3.24 और edge फ़ोल्डर हैं. Alpine अपने मिरर mirrors.alpinelinux.org पर सूचीबद्ध करता है.</string>
+    <string name="setup_mirror_custom_npm">npm रजिस्ट्री (वैकल्पिक)</string>
+    <string name="setup_mirror_custom_bad">ऐसे पते डालें जो https:// (या http://) से शुरू हों</string>
+    <string name="setup_wallpaper_colour">आपके वॉलपेपर से</string>
     <string name="setup_custom_accent_title">कस्टम ऐक्सेंट रंग</string>
     <string name="setup_custom_accent_hint">हेक्स कोड के रूप में कोई भी रंग, जैसे #4F8BFF.</string>
     <string name="setup_apply">लागू करें</string>
 
     <!-- Settings screen: Agent. -->
-    <string name="setup_agent">एजेंट</string>
     <string name="setup_default_brain">डिफ़ॉल्ट एजेंट</string>
     <string name="setup_default_brain_info">बबल या “नई चैट” बटन से शुरू होने वाली नई चैट के जवाब कौन देगा. Claude Code आपका Claude प्लान इस्तेमाल करता है, Codex आपका ChatGPT प्लान, Antigravity आपका Google खाता, Grok आपका Grok खाता, और OpenCode अपने मुफ़्त मॉडल या आपके अपने प्रोवाइडर. सिर्फ़ सेट अप किए गए एजेंट ही चुने जा सकते हैं.</string>
     <string name="setup_default_brain_set">नई चैट में %1$s इस्तेमाल होगा. आप “नई चैट” बटन से हर चैट के लिए अलग एजेंट चुन सकते हैं.</string>
@@ -945,7 +974,6 @@
     <string name="setup_removed">हटा दिया गया.</string>
 
     <!-- Settings screen: Experience. -->
-    <string name="setup_experience">अनुभव</string>
     <string name="setup_chat_bubble">चैट बबल</string>
     <string name="setup_chat_bubble_info">दूसरे ऐप के ऊपर तैरता रहता है. इसे छिपाने के लिए ✕ पर खींचें; किसी एजेंट को आपकी मंज़ूरी चाहिए होने पर मंज़ूरी कार्ड तब भी दिखेंगे.</string>
     <string name="setup_tap_action">बबल पर टैप करने पर</string>
@@ -1577,7 +1605,7 @@
     <string name="hub_compacting">बातचीत संक्षिप्त हो रही है…</string>
     <string name="hub_compacted">बातचीत संक्षिप्त हुई: %1$s → %2$s टोकन</string>
     <string name="signin_api_models_none">सेवा ने कोई मॉडल नहीं दिखाया।</string>
-    <string name="setup_step_signin_api_key">या API कुंजी इस्तेमाल करें: सेटिंग्स → API कुंजियाँ।</string>
+    <string name="setup_step_signin_api_key">या API कुंजी इस्तेमाल करें: सेटिंग्स → एजेंट और मॉडल → API कुंजियाँ।</string>
     <string name="setup_step_signin_others">%1$s आपका डिफ़ॉल्ट दिमाग है, लेकिन ये तैयार हैं: %2$s। इनमें से किसी एक को डिफ़ॉल्ट बनाएँ और Buddy तुरंत काम करेगा।</string>
     <string name="setup_switch_default">डिफ़ॉल्ट बदलें</string>
     <string name="setup_switch_default_title">डिफ़ॉल्ट दिमाग</string>

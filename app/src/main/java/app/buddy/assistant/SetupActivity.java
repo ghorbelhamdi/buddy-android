@@ -26,17 +26,24 @@ import java.util.List;
 
 import static app.buddy.assistant.Ui.*;
 
-/** Settings: setup checklist, appearance, agents and experience. */
+/**
+ * Settings: a menu (the setup card, then one row per page) and, with the extra "page", one of its pages: agents and
+ * models, bubble and chat, voice, safety and approvals, background and automation, tools and connections,
+ * appearance, backup and about. One long screen of everything had become hard to find anything on.
+ */
 public class SetupActivity extends Screen implements Account.Listener, RemoteSession.Listener, SshServer.Listener,
         CodexRemote.Listener, Browser.Listener {
     private ScrollView scroll;
     private LinearLayout list;
     /** Setup card open state; null = automatic (open until all steps are done). */
     private Boolean setupOpen;
+    /** The page shown (see pages()); null: the menu. */
+    private String page;
 
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
+        page = getIntent().getStringExtra("page");
         build();
     }
 
@@ -44,12 +51,25 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         LinearLayout root = column(this);
         root.setBackgroundColor(BG);
         root.setFitsSystemWindows(true);
+        if (page != null) { // a page: Back and its name on top, no tabs below
+            LinearLayout top = row(this);
+            top.setGravity(Gravity.CENTER_VERTICAL);
+            top.setPaddingRelative(dp(this, 4), dp(this, 4), dp(this, 16), dp(this, 4));
+            android.widget.ImageButton back = iconButton(this, R.drawable.ms_arrow_back, getString(R.string.perms_back));
+            back.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 44), dp(this, 44)));
+            back.setOnClickListener(v -> finish());
+            top.addView(back);
+            TextView t = title(this, pageTitle(), 18);
+            t.setPaddingRelative(dp(this, 6), 0, 0, 0);
+            top.addView(t, weight1());
+            root.addView(top, full());
+        }
         scroll = new ScrollView(this);
         list = column(this);
         list.setPaddingRelative(0, dp(this, 12), 0, dp(this, 24));
         scroll.addView(list);
         root.addView(scroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
-        root.addView(bottomNav(this, NAV_SETTINGS, ChatHub.get(this).runningCount()), full());
+        if (page == null) root.addView(bottomNav(this, NAV_SETTINGS, ChatHub.get(this).runningCount()), full());
         setContentView(root);
     }
 
@@ -83,12 +103,12 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
 
     @Override
     public void onRemoteChanged() {
-        if (!isFinishing() && !isDestroyed()) render();
+        if ("tools".equals(page) && !isFinishing() && !isDestroyed()) render();
     }
 
     @Override
     public void onCodexRemoteChanged() {
-        if (!isFinishing() && !isDestroyed()) render();
+        if ("tools".equals(page) && !isFinishing() && !isDestroyed()) render();
     }
 
     /** The browser's state as last shown: its tabs change often, and only the state matters here. */
@@ -97,13 +117,14 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
     @Override
     public void onBrowserChanged() {
         String now = Browser.state + Browser.detail;
-        if (now.equals(browserShown) || isFinishing() || isDestroyed()) return;
+        // (only the page that shows the browser: on the others nothing of it is drawn, and browserShown stays unset)
+        if (!"background".equals(page) || now.equals(browserShown) || isFinishing() || isDestroyed()) return;
         render();
     }
 
     @Override
     public void onSshChanged() {
-        if (!isFinishing() && !isDestroyed()) render();
+        if ("tools".equals(page) && !isFinishing() && !isDestroyed()) render();
     }
 
     @Override
@@ -173,7 +194,64 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
     private void render() {
         if (isFinishing() || isDestroyed()) return;
         list.removeAllViews();
+        if (page == null) {
+            menu();
+            return;
+        }
+        switch (page) {
+            case "agents":
+                agentSection();
+                break;
+            case "bubble":
+                bubbleSection();
+                break;
+            case "voice":
+                voiceSection();
+                readAloudSection();
+                break;
+            case "safety":
+                safetySection();
+                break;
+            case "background":
+                automationSection();
+                browserSection();
+                break;
+            case "tools":
+                connectionsSection();
+                phoneToolsSection();
+                remoteSection();
+                break;
+            case "appearance":
+                appearanceSection();
+                break;
+            default: // "about"
+                aboutSection();
+                footer();
+                break;
+        }
+    }
 
+    /** {page, icon, title, what is on it}: the Settings menu, in its order. */
+    private Object[][] pages() {
+        return new Object[][]{
+                {"agents", R.drawable.ms_auto_awesome, R.string.settings_agents, R.string.settings_agents_sub},
+                {"bubble", R.drawable.ms_chat_bubble, R.string.settings_bubble, R.string.settings_bubble_sub},
+                {"voice", R.drawable.ms_mic, R.string.setup_voice, R.string.settings_voice_sub},
+                {"safety", R.drawable.ms_shield_person, R.string.settings_safety, R.string.settings_safety_sub},
+                {"background", R.drawable.ms_layers, R.string.settings_background, R.string.settings_background_sub},
+                {"tools", R.drawable.ms_terminal, R.string.settings_tools, R.string.settings_tools_sub},
+                {"appearance", R.drawable.ms_image, R.string.setup_appearance, R.string.settings_appearance_sub},
+                {"about", R.drawable.ms_backup, R.string.settings_about, R.string.settings_about_sub},
+        };
+    }
+
+    private String pageTitle() {
+        for (Object[] p : pages()) if (p[0].equals(page)) return getString((Integer) p[2]);
+        return getString(R.string.setup_settings_title);
+    }
+
+    /** The first screen: the setup card, then one row per page. */
+    private void menu() {
         LinearLayout head = column(this);
         head.setPaddingRelative(dp(this, 20), dp(this, 8), dp(this, 20), dp(this, 4));
         TextView big = largeTitle(this, getString(R.string.setup_settings_title));
@@ -183,8 +261,41 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         sub.setPaddingRelative(0, dp(this, 4), 0, 0);
         head.addView(sub);
         list.addView(head, full());
+        setupSection();
+        LinearLayout m = card();
+        boolean first = true;
+        for (Object[] p : pages()) {
+            if (!first) m.addView(divider(), lineParams());
+            first = false;
+            final String id = (String) p[0];
+            // (not navRow: what is on the page takes two lines, in the text's own font)
+            LinearLayout r = row(this);
+            r.setGravity(Gravity.CENTER_VERTICAL);
+            r.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 12), dp(this, 14));
+            r.setBackgroundResource(ripple(this, false));
+            FrameLayout ic = new FrameLayout(this);
+            ic.setBackground(rounded(this, CARD2, 12));
+            ic.addView(icon(this, (Integer) p[1], MUTED, 22), new FrameLayout.LayoutParams(dp(this, 22), dp(this, 22), Gravity.CENTER));
+            r.addView(ic, new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
+            LinearLayout t = column(this);
+            t.setPaddingRelative(dp(this, 14), 0, dp(this, 8), 0);
+            t.addView(title(this, getString((Integer) p[2]), 16));
+            TextView what = text(this, getString((Integer) p[3]), 13, MUTED);
+            what.setMaxLines(2);
+            what.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            what.setPaddingRelative(0, dp(this, 2), 0, 0);
+            t.addView(what);
+            r.addView(t, weight1());
+            r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
+            r.setOnClickListener(v -> startActivity(new Intent(this, SetupActivity.class).putExtra("page", id)));
+            m.addView(r, full());
+        }
+        addCard(m);
+        footer();
+    }
 
-        // ---------------------------------------------------------------- setup
+    /** The setup card: what is still to do before Buddy works, or that all of it is done. */
+    private void setupSection() {
         boolean a11y = SetupState.accessibilityEnabled(this);
         String backend = Prefs.backend(this);
         Account acc = Account.of(backend);
@@ -289,8 +400,10 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 replied ? Boolean.TRUE : null, null, null, null, null);
         setupCard(steps);
 
-        // ----------------------------------------------------------- appearance
-        list.addView(sectionLabel(this, getString(R.string.setup_appearance)));
+    }
+
+    /** Appearance: light or dark, the accent, the surface, Buddy's look. */
+    private void appearanceSection() {
         LinearLayout ap = card();
         ap.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
         ap.addView(fieldLabel(getString(R.string.setup_theme_mode), null));
@@ -341,8 +454,11 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         }
         addCard(ap);
 
-        // ---------------------------------------------------------------- agent
-        list.addView(sectionLabel(this, getString(R.string.setup_agent)));
+    }
+
+    /** Agents and models: the default agent, each agent, API keys, default models, GitHub, the download server. */
+    private void agentSection() {
+        String backend = Prefs.backend(this);
         LinearLayout ag = card();
         ag.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
         ag.addView(title(this, getString(R.string.setup_default_brain), 15));
@@ -362,14 +478,32 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 }), topGap(12));
         for (Account a : Account.ALL) ag.addView(agentRow(a.agent), topGap(a == Account.CLAUDE ? 12 : 4));
         ag.addView(apiKeysRow(), topGap(4));
-        ag.addView(mcpRow(), topGap(4));
-        ag.addView(skillsRow(), topGap(4));
+        // what a chat on Default uses, per agent (issue #20; API keys has the same rows for its services)
+        List<String> defaults = new ArrayList<>();
+        for (Account one : Account.ALL) {
+            String d = Models.agentDefault(one.agent);
+            if (!d.isEmpty()) defaults.add(Account.nameOf(one.agent) + ": " + Models.label(one.agent, d));
+        }
+        View dm = navRow(R.drawable.ms_tune, getString(R.string.api_keys_defaults), defaults.isEmpty()
+                ? getString(R.string.api_keys_own_default) : android.text.TextUtils.join(" · ", defaults), !defaults.isEmpty(),
+                SetupActivity.class);
+        dm.setOnClickListener(v -> defaultsSheet(this)); // a sheet, not a screen
+        ag.addView(dm, topGap(4));
         ag.addView(navRow(R.drawable.ms_terminal, "GitHub", GitHub.login == null || GitHub.login.isEmpty()
                 ? getString(R.string.github_row_none) : "@" + GitHub.login, GitHub.login != null && !GitHub.login.isEmpty(),
                 GitHubActivity.class), topGap(4));
+        // where Buddy's Linux downloads from: Alpine's and npm's own servers, a mirror in the country, or the user's own
+        Mirrors.M server = Mirrors.current(this);
+        View ds = navRow(R.drawable.ms_build_circle, getString(R.string.setup_mirror), mirrorLabel(server), !server.id.isEmpty(),
+                SetupActivity.class);
+        ds.setOnClickListener(v -> mirrorSheet());
+        ag.addView(ds, topGap(4));
         addCard(ag);
 
-        // ---------------------------------------------------------- phone tools
+    }
+
+    /** The command that gives an agent in another terminal Buddy's phone tools. */
+    private void phoneToolsSection() {
         list.addView(sectionLabel(this, getString(R.string.setup_phone_tools)));
         LinearLayout mcp = card();
         mcp.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
@@ -421,8 +555,10 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         mcp.addView(copy, cpp);
         addCard(mcp);
 
-        // ---------------------------------------------------------------- voice
-        list.addView(sectionLabel(this, getString(R.string.setup_voice)));
+    }
+
+    /** Voice: how Buddy listens and speaks, its languages, the assistant gesture, live voice. */
+    private void voiceSection() {
         LinearLayout vc = card();
         vc.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
         vc.addView(fieldLabel(getString(R.string.setup_voice_input), null));
@@ -530,10 +666,10 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 Prefs.liveContinue(this), on -> Prefs.setLiveContinue(this, on)), topGap(8));
         addCard(vc);
 
-        // --------------------------------------------------- background browser
-        browserSection();
+    }
 
-        // ------------------------------------------------------- remote control
+    /** Remote Control, the Codex session for the ChatGPT app, SSH; chats left from the Termux days. */
+    private void remoteSection() {
         list.addView(sectionLabel(this, getString(R.string.setup_remote_control)));
         LinearLayout rcc = card();
         boolean claudeIn = SetupState.planSignedIn(this, "claude");
@@ -681,8 +817,10 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             addCard(oc);
         }
 
-        // ----------------------------------------------------------- experience
-        list.addView(sectionLabel(this, getString(R.string.setup_experience)));
+    }
+
+    /** Bubble and chat: the bubble itself, what a tap on it does, the panel's size. */
+    private void bubbleSection() {
         LinearLayout ex = card();
         ex.addView(switchRow(this, getString(R.string.setup_chat_bubble), getString(R.string.setup_chat_bubble_info),
                 Prefs.bubbleEnabled(this), on -> {
@@ -712,7 +850,12 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         }), topGap(10));
         tap.addView(text(this, getString(R.string.setup_panel_size_info), 13, MUTED), topGap(8));
         ex.addView(tap, full());
-        ex.addView(divider(), lineParams());
+        addCard(ex);
+    }
+
+    /** Reading replies aloud, and what goes with it. */
+    private void readAloudSection() {
+        LinearLayout ex = card();
         // these two only do something while replies are read aloud: without it they show as off, greyed out and
         // not tappable; what the user chose is kept and comes back with it
         final boolean speak = Prefs.speakReplies(this);
@@ -743,6 +886,93 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         ex.addView(pauseMedia, full());
         ex.addView(divider(), lineParams());
         ex.addView(voiceCards, full());
+        addCard(ex);
+    }
+
+    /** Safety and approvals: what agents may do in which app, notification rules, Linux tools, Buddy's own screens. */
+    private void safetySection() {
+        LinearLayout ex = card();
+        LinearLayout rules = listRow(this);
+        rules.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout rt = column(this);
+        rt.addView(title(this, getString(R.string.setup_rules), 15));
+        rt.addView(text(this, getString(R.string.setup_rules_info), 13, MUTED), topGap(2));
+        rules.addView(rt, weight1());
+        int ruleCount = Rules.all(this).size();
+        if (ruleCount > 0) {
+            TextView rc = monoText(this, String.valueOf(ruleCount), 13, Prefs.rulesOn(this) ? ACCENT_TEXT : MUTED);
+            rc.setPaddingRelative(dp(this, 12), 0, dp(this, 4), 0);
+            rules.addView(rc);
+        }
+        rules.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
+        rules.setOnClickListener(v -> startActivity(new android.content.Intent(this, RulesActivity.class)));
+        ex.addView(rules, full());
+        ex.addView(divider(), lineParams());
+        LinearLayout perms = listRow(this);
+        perms.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout pt = column(this);
+        pt.addView(title(this, getString(R.string.setup_app_permissions), 15));
+        pt.addView(text(this, getString(R.string.setup_app_permissions_info), 13, MUTED), topGap(2));
+        perms.addView(pt, weight1());
+        perms.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
+        perms.setOnClickListener(v -> startActivity(new android.content.Intent(this, AppPermissionsActivity.class)));
+        ex.addView(perms, full());
+        ex.addView(divider(), lineParams());
+        final boolean dev = Prefs.devMode(this);
+        ex.addView(protect(switchRow(this, getString(R.string.setup_dev_mode), getString(R.string.setup_dev_mode_info),
+                dev, on -> {
+            Prefs.setDevMode(this, on);
+            render();
+        })), full());
+        ex.addView(divider(), lineParams());
+        ex.addView(protect(switchRow(this, getString(R.string.setup_agents_tap), getString(R.string.setup_agents_tap_info),
+                Prefs.agentsTapBuddy(this), on -> {
+            Prefs.setAgentsTapBuddy(this, on);
+            render();
+        })), full());
+        if (dev) {
+            LinearLayout.LayoutParams wp = full();
+            wp.setMargins(dp(this, 12), 0, dp(this, 12), dp(this, 12));
+            ex.addView(warning(this, getString(R.string.setup_dev_mode_warning)), wp);
+        }
+        addCard(ex);
+    }
+
+    /** Background and automation: background mode and scheduled tasks (the background browser follows). */
+    private void automationSection() {
+        LinearLayout ex = card();
+        View bgm = navRow(R.drawable.ms_layers, getString(R.string.background_title), getString(R.string.background_row), false,
+                BackgroundActivity.class);
+        bgm.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
+        ex.addView(bgm, full());
+        ex.addView(divider(), lineParams());
+        View sch = navRow(R.drawable.ms_schedule, getString(R.string.schedules_title), getString(R.string.schedules_row), false,
+                SchedulesActivity.class);
+        sch.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
+        ex.addView(sch, full());
+        addCard(ex);
+    }
+
+    /** MCP servers and skills: what agents get on top of the phone tools. */
+    private void connectionsSection() {
+        LinearLayout ex = card();
+        View ms = mcpRow();
+        ms.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
+        ex.addView(ms, full());
+        ex.addView(divider(), lineParams());
+        View sk = skillsRow();
+        sk.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
+        ex.addView(sk, full());
+        addCard(ex);
+    }
+
+    /** Backup and about: backup, updates, help, the setup check. */
+    private void aboutSection() {
+        LinearLayout ex = card();
+        View bk = navRow(R.drawable.ms_backup, getString(R.string.backup_title), getString(R.string.backup_row), false,
+                BackupActivity.class);
+        bk.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
+        ex.addView(bk, full());
         ex.addView(divider(), lineParams());
         if (!Flavor.FDROID) { // F-Droid updates its build itself
             ex.addView(switchRow(this, getString(R.string.setup_update_notices), getString(R.string.setup_update_notices_info),
@@ -788,76 +1018,11 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         check.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
         check.setOnClickListener(v -> startActivity(new Intent(this, CheckActivity.class)));
         ex.addView(check, full());
-        ex.addView(divider(), lineParams());
-        LinearLayout rules = listRow(this);
-        rules.setGravity(Gravity.CENTER_VERTICAL);
-        LinearLayout rt = column(this);
-        rt.addView(title(this, getString(R.string.setup_rules), 15));
-        rt.addView(text(this, getString(R.string.setup_rules_info), 13, MUTED), topGap(2));
-        rules.addView(rt, weight1());
-        int ruleCount = Rules.all(this).size();
-        if (ruleCount > 0) {
-            TextView rc = monoText(this, String.valueOf(ruleCount), 13, Prefs.rulesOn(this) ? ACCENT_TEXT : MUTED);
-            rc.setPaddingRelative(dp(this, 12), 0, dp(this, 4), 0);
-            rules.addView(rc);
-        }
-        rules.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
-        rules.setOnClickListener(v -> startActivity(new android.content.Intent(this, RulesActivity.class)));
-        ex.addView(rules, full());
-        ex.addView(divider(), lineParams());
-        LinearLayout perms = listRow(this);
-        perms.setGravity(Gravity.CENTER_VERTICAL);
-        LinearLayout pt = column(this);
-        pt.addView(title(this, getString(R.string.setup_app_permissions), 15));
-        pt.addView(text(this, getString(R.string.setup_app_permissions_info), 13, MUTED), topGap(2));
-        perms.addView(pt, weight1());
-        perms.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
-        perms.setOnClickListener(v -> startActivity(new android.content.Intent(this, AppPermissionsActivity.class)));
-        ex.addView(perms, full());
-        ex.addView(divider(), lineParams());
-        final boolean dev = Prefs.devMode(this);
-        ex.addView(protect(switchRow(this, getString(R.string.setup_dev_mode), getString(R.string.setup_dev_mode_info),
-                dev, on -> {
-            Prefs.setDevMode(this, on);
-            render();
-        })), full());
-        ex.addView(divider(), lineParams());
-        ex.addView(protect(switchRow(this, getString(R.string.setup_agents_tap), getString(R.string.setup_agents_tap_info),
-                Prefs.agentsTapBuddy(this), on -> {
-            Prefs.setAgentsTapBuddy(this, on);
-            render();
-        })), full());
-        if (dev) {
-            LinearLayout.LayoutParams wp = full();
-            wp.setMargins(dp(this, 12), 0, dp(this, 12), dp(this, 12));
-            ex.addView(warning(this, getString(R.string.setup_dev_mode_warning)), wp);
-        }
-        View sch = navRow(R.drawable.ms_schedule, getString(R.string.schedules_title), getString(R.string.schedules_row), false,
-                SchedulesActivity.class);
-        sch.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
-        ex.addView(sch, full());
-        // what a chat on Default uses, per agent (issue #20; API keys has the same rows for its services)
-        List<String> defaults = new ArrayList<>();
-        for (Account one : Account.ALL) {
-            String d = Models.agentDefault(one.agent);
-            if (!d.isEmpty()) defaults.add(Account.nameOf(one.agent) + ": " + Models.label(one.agent, d));
-        }
-        View dm = navRow(R.drawable.ms_tune, getString(R.string.api_keys_defaults), defaults.isEmpty()
-                ? getString(R.string.api_keys_own_default) : android.text.TextUtils.join(" · ", defaults), !defaults.isEmpty(),
-                SetupActivity.class);
-        dm.setOnClickListener(v -> defaultsSheet(this)); // a sheet, not a screen
-        dm.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
-        ex.addView(dm, full());
-        View bgm = navRow(R.drawable.ms_layers, getString(R.string.background_title), getString(R.string.background_row), false,
-                BackgroundActivity.class);
-        bgm.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
-        ex.addView(bgm, full());
-        View bk = navRow(R.drawable.ms_backup, getString(R.string.backup_title), getString(R.string.backup_row), false,
-                BackupActivity.class);
-        bk.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
-        ex.addView(bk, full());
         addCard(ex);
+    }
 
+    /** The version, the licences and the privacy policy. */
+    private void footer() {
         TextView ver = monoText(this, "buddy " + BuildInfo.VERSION + " · " + getPackageName(), 12, MUTED);
         ver.setGravity(Gravity.CENTER);
         ver.setPaddingRelative(0, dp(this, 24), 0, 0);
@@ -1015,15 +1180,23 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
     private View swatches() {
         LinearLayout r = row(this);
         int current = Prefs.accent(this);
-        boolean preset = false;
+        boolean wallpaper = Prefs.accentFromWallpaper(this);
+        boolean preset = wallpaper;
         for (String[] a : Theme.accents(this)) {
             int col = Theme.parse(a[0], 0xFFD97757);
-            boolean on = col == current;
+            boolean on = col == current && !wallpaper;
             preset |= on;
             r.addView(swatch(col, on, 0, a[1], v -> {
                 Prefs.setAccent(this, col);
                 themeChanged();
             }), new LinearLayout.LayoutParams(0, dp(this, 40), 1));
+        }
+        if (android.os.Build.VERSION.SDK_INT >= 31) { // the phone's own accent, from the wallpaper: it follows it
+            r.addView(swatch(getColor(android.R.color.system_accent1_500) | 0xFF000000, wallpaper, R.drawable.ms_image,
+                    getString(R.string.setup_wallpaper_colour), v -> {
+                        Prefs.setAccentFromWallpaper(this);
+                        themeChanged();
+                    }), new LinearLayout.LayoutParams(0, dp(this, 40), 1));
         }
         r.addView(swatch(preset ? CARD2 : current, !preset, preset ? R.drawable.ms_add : 0,
                 getString(R.string.setup_custom_colour), v -> customAccent()), new LinearLayout.LayoutParams(0, dp(this, 40), 1));
@@ -1039,7 +1212,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         dotV.setBackground(oval(color));
         ring.addView(dotV, new FrameLayout.LayoutParams(dp(this, 30), dp(this, 30), Gravity.CENTER));
         if (iconRes != 0) {
-            ImageView ic = icon(this, iconRes, MUTED, 18);
+            ImageView ic = icon(this, iconRes, color == CARD2 ? MUTED : 0xFFFFFFFF, 18);
             ring.addView(ic, new FrameLayout.LayoutParams(dp(this, 18), dp(this, 18), Gravity.CENTER));
         }
         f.addView(ring, new FrameLayout.LayoutParams(dp(this, 40), dp(this, 40), Gravity.CENTER));
@@ -1102,6 +1275,113 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             themeChanged();
         });
         d.show();
+    }
+
+    // ------------------------------------------------------- download server
+
+    /** "Default", "USTC · Mainland China", or the user's own address. */
+    private String mirrorLabel(Mirrors.M m) {
+        if (m.id.isEmpty()) return getString(R.string.setup_mirror_default);
+        if (Mirrors.CUSTOM.equals(m.id)) return m.alpine;
+        return m.name + " · " + getString(m.region);
+    }
+
+    private void chooseMirror(String id) {
+        Prefs.setMirror(this, id);
+        new Thread(() -> Mirrors.apply(getApplicationContext())).start();
+        render();
+    }
+
+    /** The servers to pick from: the default, the mirrors by country, the user's own. */
+    private void mirrorSheet() {
+        LinearLayout c = column(this);
+        c.addView(title(this, getString(R.string.setup_mirror), 18));
+        TextView info = text(this, getString(R.string.setup_mirror_info), 13, MUTED);
+        info.setPaddingRelative(0, dp(this, 4), 0, dp(this, 8));
+        c.addView(info);
+        final Dialog[] d = new Dialog[1];
+        final String now = Mirrors.current(this).id;
+        for (Mirrors.M m : Mirrors.ALL) {
+            String sub = m.id.isEmpty() ? getString(R.string.setup_mirror_default_sub)
+                    : getString(m.region) + (m.npm.isEmpty() ? "" : " · npm: " + Uri.parse(m.npm).getHost());
+            c.addView(mirrorChoice(m.id.isEmpty() ? getString(R.string.setup_mirror_default) : m.name, sub, m.id.equals(now), v -> {
+                d[0].dismiss();
+                chooseMirror(m.id);
+            }), full());
+        }
+        String own = Prefs.mirrorCustom(this, false);
+        c.addView(mirrorChoice(getString(R.string.setup_mirror_custom), own.isEmpty()
+                ? getString(R.string.setup_mirror_custom_sub) : own, Mirrors.CUSTOM.equals(now), v -> {
+            d[0].dismiss();
+            customMirror();
+        }), full());
+        ScrollView sv = new ScrollView(this);
+        sv.addView(c);
+        d[0] = bottomSheet(this, sv);
+        d[0].show();
+    }
+
+    private View mirrorChoice(String name, String sub, boolean on, View.OnClickListener l) {
+        LinearLayout r = row(this);
+        r.setGravity(Gravity.CENTER_VERTICAL);
+        r.setPaddingRelative(dp(this, 4), dp(this, 10), dp(this, 4), dp(this, 10));
+        r.setBackgroundResource(ripple(this, false));
+        LinearLayout t = column(this);
+        t.addView(title(this, name, 15));
+        TextView s = text(this, sub, 13, MUTED);
+        s.setMaxLines(2);
+        s.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        t.addView(s);
+        r.addView(t, weight1());
+        if (on) r.addView(icon(this, R.drawable.ms_check, ACCENT, 22));
+        r.setOnClickListener(l);
+        return r;
+    }
+
+    /** The user's own server: an Alpine mirror's address and, if they have one, an npm registry. */
+    private void customMirror() {
+        LinearLayout c = column(this);
+        c.addView(title(this, getString(R.string.setup_mirror_custom), 18));
+        c.addView(fieldLabel(getString(R.string.setup_mirror_custom_alpine), null), topGap(12));
+        final EditText alpine = mirrorField(Prefs.mirrorCustom(this, false), "https://mirror.example.org/alpine");
+        c.addView(alpine, topGap(6));
+        c.addView(text(this, getString(R.string.setup_mirror_custom_alpine_hint), 13, MUTED), topGap(6));
+        c.addView(fieldLabel(getString(R.string.setup_mirror_custom_npm), null), topGap(16));
+        final EditText npm = mirrorField(Prefs.mirrorCustom(this, true), "https://registry.npmjs.org/");
+        c.addView(npm, topGap(6));
+        Button apply = button(this, getString(R.string.setup_apply), true);
+        LinearLayout.LayoutParams ap = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 44));
+        ap.topMargin = dp(this, 16);
+        c.addView(apply, ap);
+        final Dialog d = bottomSheet(this, c);
+        apply.setOnClickListener(v -> {
+            String a = Mirrors.address(alpine.getText().toString());
+            String typedNpm = npm.getText().toString().trim();
+            String n = typedNpm.isEmpty() ? "" : Mirrors.address(typedNpm);
+            if (a == null || n == null) {
+                Toast.makeText(this, R.string.setup_mirror_custom_bad, Toast.LENGTH_LONG).show();
+                return;
+            }
+            d.dismiss();
+            Prefs.setMirrorCustom(this, a, n.isEmpty() ? "" : n + "/");
+            chooseMirror(Mirrors.CUSTOM);
+        });
+        d.show();
+    }
+
+    private EditText mirrorField(String value, String hint) {
+        EditText et = new EditText(this);
+        et.setText(value);
+        et.setHint(hint);
+        et.setHintTextColor(MUTED);
+        et.setTextColor(TEXT);
+        et.setTypeface(mono(this, 400));
+        et.setTextSize(14);
+        et.setSingleLine(true);
+        et.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_URI);
+        et.setPaddingRelative(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
+        et.setBackground(outlined(this, BG, 12, OUTLINE, 1));
+        return et;
     }
 
     // ---------------------------------------------------------------- helpers

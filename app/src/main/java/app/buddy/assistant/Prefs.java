@@ -370,11 +370,59 @@ final class Prefs {
 
     /** Accent colour (opaque ARGB). */
     static int accent(Context c) {
+        if (android.os.Build.VERSION.SDK_INT >= 31 && accentFromWallpaper(c)) { // (the check here too: for lint)
+            return c.getColor(android.R.color.system_accent1_500) | 0xFF000000;
+        }
         return sp(c).getInt("accent", 0xFFD97757);
     }
 
     static void setAccent(Context c, int color) {
-        sp(c).edit().putInt("accent", color | 0xFF000000).apply();
+        sp(c).edit().putInt("accent", color | 0xFF000000).putBoolean("accent_wallpaper", false).apply();
+    }
+
+    /** The download server for Buddy's Linux (see Mirrors): "" is Alpine's and npm's own. */
+    static String mirror(Context c) {
+        return sp(c).getString("mirror", "");
+    }
+
+    static void setMirror(Context c, String id) {
+        sp(c).edit().putString("mirror", id).apply();
+    }
+
+    /** The user's own download server (Mirrors.CUSTOM): its Alpine address, or (npm) its npm registry; "" if none. */
+    static String mirrorCustom(Context c, boolean npm) {
+        return sp(c).getString(npm ? "mirror_custom_npm" : "mirror_custom", "");
+    }
+
+    static void setMirrorCustom(Context c, String alpine, String npm) {
+        sp(c).edit().putString("mirror_custom", alpine).putString("mirror_custom_npm", npm).apply();
+    }
+
+    /** The registry line Mirrors last wrote into Buddy's Linux (~/.npmrc), to take just that one out again. */
+    static String mirrorNpm(Context c) {
+        return sp(c).getString("mirror_npm", "");
+    }
+
+    static void setMirrorNpm(Context c, String line) {
+        sp(c).edit().putString("mirror_npm", line).apply();
+    }
+
+    /** The DNS list Mirrors last wrote into Buddy's Linux, to know it as its own later. */
+    static String mirrorDns(Context c) {
+        return sp(c).getString("mirror_dns", "");
+    }
+
+    static void setMirrorDns(Context c, String list) {
+        sp(c).edit().putString("mirror_dns", list).apply();
+    }
+
+    /** The accent is the phone's own, taken from the wallpaper (Android 12+), and changes with it. */
+    static boolean accentFromWallpaper(Context c) {
+        return android.os.Build.VERSION.SDK_INT >= 31 && sp(c).getBoolean("accent_wallpaper", false);
+    }
+
+    static void setAccentFromWallpaper(Context c) {
+        sp(c).edit().putBoolean("accent_wallpaper", true).apply();
     }
 
     /** Surface style: "warm", "neutral" or "black" (black applies in dark mode only). */

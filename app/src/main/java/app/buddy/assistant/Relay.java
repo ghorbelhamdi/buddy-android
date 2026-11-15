@@ -68,13 +68,52 @@ final class Relay {
                     continue;
                 }
                 org.json.JSONArray list = parseModels(body);
-                if (list.length() > 0) return list;
+                if (list.length() > 0) {
+                    runningContext(list, origin, anthropic, key, b);
+                    return list;
+                }
             } catch (org.json.JSONException ignored) { // not a model list
             } finally {
                 con.disconnect();
             }
         }
         throw new Exception(error != null ? error : BuddyApp.str(R.string.signin_api_models_none));
+    }
+
+    /**
+     * A llama.cpp server's model list has no context size Buddy reads (it names the one the model was trained with,
+     * not the one the server runs it with, which is what counts and is often much smaller). The server says the
+     * running one at /props. Without a size the agent can't tell when a chat is about to overrun the server and has
+     * to be shortened. Asked only of the user's own server (this phone or their network), and only for models whose
+     * size the list left out; if the server has no /props or it says nothing, the list stays as it is.
+     */
+    private static void runningContext(org.json.JSONArray list, String origin, boolean anthropic, String key, String b) {
+        if (!Providers.isLocal(origin)) return;
+        boolean unknown = false;
+        for (int i = 0; i < list.length(); i++) unknown |= list.optJSONObject(i).optLong("window") <= 0;
+        if (!unknown) return;
+        HttpURLConnection con = null;
+        try {
+            con = (HttpURLConnection) new URL(origin + "/props").openConnection();
+            con.setConnectTimeout(3_000);
+            con.setReadTimeout(5_000);
+            con.setInstanceFollowRedirects(false);
+            // (the key, as for the list: a server started with one may ask for it here too)
+            if (xApiKey(anthropic, b)) con.setRequestProperty("x-api-key", key);
+            else if (!key.isEmpty()) con.setRequestProperty("Authorization", "Bearer " + key);
+            if (con.getResponseCode() != 200) return;
+            org.json.JSONObject settings = new org.json.JSONObject(read(con.getInputStream()))
+                    .optJSONObject("default_generation_settings");
+            long window = settings == null ? 0 : settings.optLong("n_ctx", 0);
+            if (window <= 0) return;
+            for (int i = 0; i < list.length(); i++) {
+                org.json.JSONObject m = list.optJSONObject(i);
+                if (m.optLong("window") <= 0) m.put("window", window);
+            }
+        } catch (Exception ignored) { // not a llama.cpp server
+        } finally {
+            if (con != null) con.disconnect();
+        }
     }
 
     /** What a test request to a service's API found: it answered, it has no such API, or no clear answer. */

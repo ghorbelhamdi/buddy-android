@@ -46,7 +46,7 @@ final class CodexLive {
     /** Marks the voice's own lines in the chat (the agent's replies have none). */
     static final String VOICE_MARK = "🔊 ";
     private static final String AGENT = "[Phone agent] ";
-    private static final int NOTIFICATION_ID = 7;
+    private static final int NOTIFICATION_ID = 8; // (7 is the control chip's: sharing it, each took the other's down)
     private static final long CONNECT_MS = 30_000, IDLE_MS = 5 * 60_000;
     /** No new words for this long after the user spoke: they're done, even if the call hasn't said so yet. */
     private static final long PAUSE_MS = 2_500;

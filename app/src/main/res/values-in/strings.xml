@@ -145,7 +145,7 @@
     <string name="onboarding_safety_auto_title">Bekerja sendiri</string>
     <string name="onboarding_safety_auto_text">Tanpa pop-up: agen langsung melakukan apa yang Anda minta, seperti menyalakan kamera atau lampu.</string>
     <!-- "Settings → App permissions" = Buddy's own screens. "Trust" and "Hard" = names of approval modes; use the same translations as those mode labels. -->
-    <string name="onboarding_safety_note">Anda dapat mengubahnya per aplikasi kapan saja: Setelan → Izin aplikasi. Setel aplikasi ke Percaya agar agen bisa bekerja di sana tanpa pop-up, atau ke Ketat agar Buddy sendiri yang bertanya kepada Anda.</string>
+    <string name="onboarding_safety_note">Anda dapat mengubahnya per aplikasi kapan saja: Setelan → Keamanan dan persetujuan → Izin aplikasi. Setel aplikasi ke Percaya agar agen bisa bekerja di sana tanpa pop-up, atau ke Ketat agar Buddy sendiri yang bertanya kepada Anda.</string>
 
     <!-- Guide, last step: try a first task. -->
     <string name="onboarding_try_title">Semua siap</string>
@@ -439,6 +439,7 @@
     <string name="control_text">Jangan sentuh layar sampai selesai, atau ketuk Hentikan untuk mengambil alih.</string>
     <!-- Notification button, verb: stops the agent and gives the phone back to the user. -->
     <string name="control_stop">Hentikan</string>
+    <string name="work_title">Buddy sedang bekerja di latar belakang</string>
     <string name="pause_call_ended_title">Panggilan berakhir · Buddy dijeda</string>
     <string name="pause_call_ended_text">Ketuk untuk melanjutkan tugas</string>
 
@@ -633,13 +634,14 @@
     <!-- After "Continue in Buddy" on an earlier session. %1$s = agent name. -->
     <string name="hub_continuing">Melanjutkan sesi %1$s sebelumnya. Jika masih terbuka di terminal, tutup dulu di sana.</string>
     <string name="hub_still_working_attachments">Chat ini masih berjalan. Kirim lampiran setelah selesai.</string>
-    <string name="hub_service_off">%1$s dinonaktifkan (Setelan → Kunci API). Aktifkan, atau pilih model lain untuk chat ini.</string>
+    <string name="hub_service_off">%1$s dinonaktifkan (Setelan → Agen dan model → Kunci API). Aktifkan, atau pilih model lain untuk chat ini.</string>
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">Berpikir…</string>
     <string name="hub_still_waiting">Masih menunggu jawaban model…</string>
     <string name="hub_still_reading_local">Masih membaca… Model di komputermu sendiri bisa butuh beberapa menit, terutama untuk jawaban pertama.</string>
     <!-- "the top of the chat" = the model chip under the chat title. -->
     <string name="hub_no_answer">Model tidak menjawab. Mungkin sedang sibuk: coba lagi, atau pilih model lain di bagian atas chat.</string>
+    <string name="hub_helper_gone">Proses ini terputus: helper yang menjalankan agen di Linux Buddy berhenti. Kirim lagi pesan Anda.</string>
     <!-- After picking a model for the chat. %1$s = model name. -->
     <string name="hub_model_set">Model: %1$s</string>
     <!-- After picking an effort level. %1$s = the level as the agent names it, not translated (low, medium, high…). -->
@@ -894,7 +896,7 @@
     <string name="signin_token">Gunakan token</string>
     <string name="signin_token_title">Token Claude Code</string>
     <string name="signin_token_info">Tempel token yang ditampilkan “claude setup-token” di komputer; awalannya sk-ant-oat. Token ini cukup untuk chat. Input suara dan Remote Control memerlukan login penuh.</string>
-    <string name="signin_token_wrong">Itu bukan token Claude Code. Kunci API (sk-ant-api…) dimasukkan di Setelan → Kunci API.</string>
+    <string name="signin_token_wrong">Itu bukan token Claude Code. Kunci API (sk-ant-api…) dimasukkan di Setelan → Agen dan model → Kunci API.</string>
     <string name="signin_token_on">Sudah login dengan token: cukup untuk chat. Input suara dan Remote Control memerlukan login penuh.</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <string name="signin_other_device">Login di perangkat lain</string>
@@ -1086,6 +1088,20 @@
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">Setelan</string>
     <string name="setup_settings_subtitle">Buddy menjalankan Claude Code, Codex, OpenCode, Antigravity, atau Grok di dalam aplikasi, dengan langganan Anda sendiri (atau model gratis OpenCode dan paket gratis Antigravity).</string>
+    <string name="settings_agents">Agen dan model</string>
+    <string name="settings_agents_sub">Agen default, masuk, kunci API, model default, GitHub, server unduhan</string>
+    <string name="settings_bubble">Gelembung dan chat</string>
+    <string name="settings_bubble_sub">Tampilkan gelembung, fungsi ketukan, ukuran panel</string>
+    <string name="settings_voice_sub">Input dan output suara, bahasa, suara langsung, membacakan balasan</string>
+    <string name="settings_safety">Keamanan dan persetujuan</string>
+    <string name="settings_safety_sub">Izin aplikasi, aturan notifikasi, alat Linux, layar Buddy sendiri</string>
+    <string name="settings_background">Latar belakang dan otomatisasi</string>
+    <string name="settings_background_sub">Mode latar belakang, tugas terjadwal, browser latar belakang</string>
+    <string name="settings_tools">Alat dan koneksi</string>
+    <string name="settings_tools_sub">Server MCP, skill, alat ponsel untuk terminal lain, Remote Control, SSH</string>
+    <string name="settings_appearance_sub">Terang atau gelap, warna aksen, permukaan, tampilan Buddy</string>
+    <string name="settings_about">Cadangan dan tentang</string>
+    <string name="settings_about_sub">Cadangan dan pemindahan, pembaruan, panduan, pemeriksaan penyiapan</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <!-- Title of the setup checklist card (noun). -->
@@ -1161,13 +1177,26 @@
     <string name="setup_face_unreadable">Gambar itu tidak bisa dibaca. Coba PNG atau WebP.</string>
     <!-- Read by TalkBack: the swatch that opens the custom colour sheet. -->
     <string name="setup_custom_colour">Warna kustom</string>
+    <string name="setup_mirror">Server unduhan</string>
+    <string name="setup_mirror_default">Default</string>
+    <string name="setup_mirror_info">Dari mana Linux Buddy, paket-paketnya, dan agen yang dipasang dengan npm (Codex, OpenCode) diunduh. Biarkan Default kecuali pemasangan gagal atau sangat lambat di tempat Anda. Dengan server lain, Linux Buddy juga memakai server DNS jaringan Anda.</string>
+    <string name="setup_mirror_default_sub">Server Alpine dan npm sendiri</string>
+    <string name="setup_mirror_china">Tiongkok daratan</string>
+    <string name="setup_mirror_russia">Rusia</string>
+    <string name="setup_mirror_iran">Iran</string>
+    <string name="setup_mirror_custom">Kustom</string>
+    <string name="setup_mirror_custom_sub">Mirror Alpine mana pun, dengan alamatnya</string>
+    <string name="setup_mirror_custom_alpine">Alamat mirror Alpine</string>
+    <string name="setup_mirror_custom_alpine_hint">Alamat yang langsung berisi folder v3.24 dan edge. Alpine mencantumkan mirror-nya di mirrors.alpinelinux.org.</string>
+    <string name="setup_mirror_custom_npm">Registry npm (opsional)</string>
+    <string name="setup_mirror_custom_bad">Masukkan alamat yang diawali https:// (atau http://)</string>
+    <string name="setup_wallpaper_colour">Dari wallpaper Anda</string>
     <string name="setup_custom_accent_title">Aksen kustom</string>
     <string name="setup_custom_accent_hint">Warna apa pun dalam kode hex, seperti #4F8BFF.</string>
     <!-- Button (verb). -->
     <string name="setup_apply">Terapkan</string>
 
     <!-- Settings screen: Agent. -->
-    <string name="setup_agent">Agen</string>
     <!-- Which AI agent answers new chats. -->
     <string name="setup_default_brain">Agen default</string>
     <!-- "New chat" is the name of a button in Buddy. -->
@@ -1265,7 +1294,6 @@
     <string name="setup_removed">Dihapus.</string>
 
     <!-- Settings screen: Experience. -->
-    <string name="setup_experience">Pengalaman</string>
     <string name="setup_chat_bubble">Balon chat</string>
     <!-- ✕ is the close target that appears while dragging the bubble. -->
     <string name="setup_chat_bubble_info">Mengambang di atas aplikasi lain. Tarik ke ✕ untuk menyembunyikannya; kartu persetujuan tetap muncul saat agen memerlukan persetujuan Anda.</string>
@@ -2018,7 +2046,7 @@
     <string name="hub_compacting">Meringkas percakapan…</string>
     <string name="hub_compacted">Percakapan diringkas: %1$s → %2$s token</string>
     <string name="signin_api_models_none">Layanan tidak menampilkan model apa pun.</string>
-    <string name="setup_step_signin_api_key">Atau gunakan kunci API: Setelan → Kunci API.</string>
+    <string name="setup_step_signin_api_key">Atau gunakan kunci API: Setelan → Agen dan model → Kunci API.</string>
     <string name="setup_step_signin_others">%1$s adalah otak default-mu, tapi yang ini sudah siap: %2$s. Jadikan salah satunya default dan Buddy langsung bisa dipakai.</string>
     <string name="setup_switch_default">Ganti default</string>
     <string name="setup_switch_default_title">Otak default</string>

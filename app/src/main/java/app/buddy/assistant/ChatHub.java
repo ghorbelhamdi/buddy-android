@@ -292,9 +292,11 @@ final class ChatHub {
         BuddyService svc = BuddyService.get();
         // only the user's own message lifts a Stop: a queued rule run must not undo it
         if (svc != null && prompt == null) svc.allowControl();
+        final int[] run = {-1}; // this run's id, once it has started
         try {
             // a rule's run works for someone else's message: no shell, files or web, even with Linux tools on
-            Helper.run(app, "ask", ses.id, ses.backend, rule ? "rule" : devArg(ses), forAgent,
+            Helper.run(app, code -> main.postDelayed(() -> helperGone(ses, run[0], code), HELPER_GONE_MS),
+                    "ask", ses.id, ses.backend, rule ? "rule" : devArg(ses), forAgent,
                     model(ses), hasFiles ? android.text.TextUtils.join(",", files) : "", ses.effort);
         } catch (Exception e) {
             return e.getMessage();
@@ -314,6 +316,7 @@ final class ChatHub {
         ses.status = app.getString(R.string.hub_thinking);
         changed();
         final int id = ses.runId;
+        run[0] = id;
         Providers.P lp = Providers.of(Models.effective(ses));
         final boolean local = lp != null && lp.local();
         final long giveUp = local ? LOCAL_GIVE_UP_MS : GIVE_UP_MS;
@@ -326,17 +329,38 @@ final class ChatHub {
         }, NO_RESPONSE_MS);
         main.postDelayed(() -> {
             if (ses.running && id == ses.runId && SystemClock.elapsedRealtime() - ses.lastEventAt >= giveUp - 100) {
-                ses.running = false;
-                String err = lastError(ses);
-                add(ses, Bubble.Kind.ERROR, app.getString(R.string.hub_no_answer) + (err.isEmpty() ? "" : "\n\n"
-                        + ses.brainName()
-                        + ": " + err));
-                ses.outcome = "failed";
-                runEnded(ses);
-                changed();
+                failRun(ses, app.getString(R.string.hub_no_answer));
             }
         }, giveUp);
         return null;
+    }
+
+    /** After the helper process of a run ended, its last events get this long to arrive. */
+    private static final long HELPER_GONE_MS = 5000;
+
+    /**
+     * The helper that ran this chat's agent is gone. It says buddy_done however it ends, except when it is killed
+     * outright (Android freeing memory, Buddy's Linux crashing): then the chat stayed "working" for good, and a chat
+     * waiting for it as its sub-agent with it. The run ends here, as failed.
+     */
+    private void helperGone(Sessions.Session ses, int runId, int code) {
+        if (!ses.running || ses.runId != runId) return;
+        // the chat's earlier run is still going (this helper only said so): that run's own end ends the chat's work,
+        // and until then Stop must still reach it
+        if (code == Helper.BUSY) return;
+        failRun(ses, app.getString(R.string.hub_helper_gone));
+    }
+
+    /** The run is over without the helper's buddy_done: ended here as failed, with why and the agent's last error. */
+    private void failRun(Sessions.Session ses, String why) {
+        ses.running = false;
+        ses.status = "";
+        if (!sessions.all.contains(ses)) return; // deleted meanwhile: a message would bring the chat back
+        String err = lastError(ses);
+        add(ses, Bubble.Kind.ERROR, why + (err.isEmpty() ? "" : "\n\n" + ses.brainName() + ": " + err));
+        if (ses.outcome == null) ses.outcome = "failed";
+        runEnded(ses);
+        changed();
     }
 
     private static long read(JSONObject modelUsage) {
@@ -679,6 +703,8 @@ final class ChatHub {
                 break;
             }
             case "buddy_error": {
+                // the helper's own word on a run whose agent said nothing: not after the run said why itself
+                if (ev.optBoolean("quiet") && ses.outcome != null) break;
                 if (ses.outcome == null) ses.outcome = "failed";
                 String text = ev.optString("text", app.getString(R.string.hub_something_wrong));
                 add(ses, Bubble.Kind.ERROR, text);
@@ -801,14 +827,17 @@ final class ChatHub {
 
     /** A note that arrived too late for the run: becomes the next message (already shown in the chat). */
     private void sendNoteAsMessage(Sessions.Session ses, String text) {
+        final int[] run = {-1}; // this run's id, once it has started (as in send)
         try {
-            Helper.run(app, "ask", ses.id, ses.backend, devArg(ses),
+            Helper.run(app, code -> main.postDelayed(() -> helperGone(ses, run[0], code), HELPER_GONE_MS),
+                    "ask", ses.id, ses.backend, devArg(ses),
                     "(Added while you were working; if it asks something, answer it:) " + text, model(ses), "", ses.effort);
         } catch (Exception e) {
             add(ses, Bubble.Kind.ERROR, e.getMessage());
             return;
         }
         startRun(ses);
+        run[0] = ses.runId;
         ses.status = app.getString(R.string.hub_thinking);
         changed();
     }

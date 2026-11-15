@@ -51,6 +51,10 @@ public final class HiddenNotice extends BroadcastReceiver {
             if (s != null) s.takeBackControl();
             return;
         }
+        if (WorkNotice.ACTION_STOP.equals(intent.getAction())) { // Stop on "working in the background"
+            ChatHub.get(c).stopAll();
+            return;
+        }
         if (CodexLive.ACTION_END.equals(intent.getAction())) { // the live voice notification's End
             CodexLive.end(null);
             return;

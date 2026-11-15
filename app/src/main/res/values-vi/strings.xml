@@ -149,7 +149,7 @@
     <string name="onboarding_safety_auto_title">Tự làm</string>
     <string name="onboarding_safety_auto_text">Không popup: agent cứ làm điều bạn nhờ, như bật camera hay bật đèn.</string>
     <!-- "Settings → App permissions" = Buddy's own screens. "Trust" and "Hard" = names of approval modes; use the same translations as those mode labels. -->
-    <string name="onboarding_safety_note">Bạn có thể đổi điều này cho từng ứng dụng bất cứ lúc nào: Cài đặt → Quyền ứng dụng. Đặt một ứng dụng là Tin cậy để agent làm việc ở đó không cần popup, hoặc Chặt để chính Buddy hỏi bạn.</string>
+    <string name="onboarding_safety_note">Bạn có thể đổi điều này cho từng ứng dụng bất cứ lúc nào: Cài đặt → An toàn và phê duyệt → Quyền ứng dụng. Đặt một ứng dụng là Tin cậy để agent làm việc ở đó không cần popup, hoặc Chặt để chính Buddy hỏi bạn.</string>
 
     <!-- Guide, last step: try a first task. -->
     <string name="onboarding_try_title">Xong rồi!</string>
@@ -454,6 +454,7 @@
     <string name="control_text">Đừng chạm vào màn hình cho đến khi xong, hoặc nhấn Dừng để tự làm.</string>
     <!-- Notification button, verb: stops the agent and gives the phone back to the user. -->
     <string name="control_stop">Dừng</string>
+    <string name="work_title">Buddy đang làm việc trong nền</string>
     <string name="pause_call_ended_title">Cuộc gọi đã kết thúc · Buddy đang tạm dừng</string>
     <string name="pause_call_ended_text">Nhấn để tiếp tục việc đang làm</string>
 
@@ -684,13 +685,14 @@
     <!-- After "Continue in Buddy" on an earlier session. %1$s = agent name. -->
     <string name="hub_continuing">Đang tiếp tục một phiên %1$s trước đó. Nếu phiên đó vẫn mở trong terminal, hãy đóng nó ở đó trước.</string>
     <string name="hub_still_working_attachments">Cuộc trò chuyện này vẫn đang làm việc. Hãy gửi tệp đính kèm khi nó xong.</string>
-    <string name="hub_service_off">%1$s đang tắt (Cài đặt → Khóa API). Hãy bật lại, hoặc chọn mô hình khác cho cuộc trò chuyện này.</string>
+    <string name="hub_service_off">%1$s đang tắt (Cài đặt → Tác nhân và mô hình → Khóa API). Hãy bật lại, hoặc chọn mô hình khác cho cuộc trò chuyện này.</string>
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">Đang suy nghĩ…</string>
     <string name="hub_still_waiting">Vẫn đang chờ mô hình trả lời…</string>
     <string name="hub_still_reading_local">Vẫn đang đọc… Mô hình chạy trên máy tính của bạn có thể mất vài phút, nhất là cho câu trả lời đầu tiên.</string>
     <!-- "the top of the chat" = the model chip under the chat title. -->
     <string name="hub_no_answer">Mô hình không trả lời. Có thể nó đang bận: hãy thử lại, hoặc chọn mô hình khác ở đầu cuộc trò chuyện.</string>
+    <string name="hub_helper_gone">Lần chạy này đã bị ngắt: trình trợ giúp chạy tác nhân trong Linux của Buddy đã dừng. Hãy gửi lại tin nhắn của bạn.</string>
     <!-- After picking a model for the chat. %1$s = model name. -->
     <string name="hub_model_set">Mô hình: %1$s</string>
     <!-- After picking an effort level. %1$s = the level as the agent names it, not translated (low, medium, high…). -->
@@ -947,7 +949,7 @@
     <string name="signin_token">Dùng token</string>
     <string name="signin_token_title">Token Claude Code</string>
     <string name="signin_token_info">Dán token mà lệnh “claude setup-token” in ra trên máy tính; token bắt đầu bằng sk-ant-oat. Token này đủ cho các cuộc trò chuyện. Nhập bằng giọng nói và Remote Control cần đăng nhập đầy đủ.</string>
-    <string name="signin_token_wrong">Đây không phải token Claude Code. Khóa API (sk-ant-api…) thì nhập trong Cài đặt → Khóa API.</string>
+    <string name="signin_token_wrong">Đây không phải token Claude Code. Khóa API (sk-ant-api…) thì nhập trong Cài đặt → Tác nhân và mô hình → Khóa API.</string>
     <string name="signin_token_on">Đã đăng nhập bằng token: đủ cho các cuộc trò chuyện. Nhập bằng giọng nói và Remote Control cần đăng nhập đầy đủ.</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <string name="signin_other_device">Đăng nhập trên thiết bị khác</string>
@@ -1147,6 +1149,20 @@
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">Cài đặt</string>
     <string name="setup_settings_subtitle">Buddy chạy Claude Code, Codex, OpenCode, Antigravity hoặc Grok ngay trong ứng dụng, bằng gói của chính bạn (hoặc các mô hình miễn phí của OpenCode và gói miễn phí của Antigravity).</string>
+    <string name="settings_agents">Tác nhân và mô hình</string>
+    <string name="settings_agents_sub">Tác nhân mặc định, đăng nhập, khóa API, mô hình mặc định, GitHub, máy chủ tải xuống</string>
+    <string name="settings_bubble">Bong bóng và trò chuyện</string>
+    <string name="settings_bubble_sub">Hiện bong bóng, chạm vào sẽ làm gì, kích thước bảng</string>
+    <string name="settings_voice_sub">Nhập và xuất giọng nói, ngôn ngữ, giọng nói trực tiếp, đọc to câu trả lời</string>
+    <string name="settings_safety">An toàn và phê duyệt</string>
+    <string name="settings_safety_sub">Quyền ứng dụng, quy tắc thông báo, công cụ Linux, màn hình của chính Buddy</string>
+    <string name="settings_background">Chạy nền và tự động hóa</string>
+    <string name="settings_background_sub">Chế độ nền, tác vụ đã lên lịch, trình duyệt nền</string>
+    <string name="settings_tools">Công cụ và kết nối</string>
+    <string name="settings_tools_sub">Máy chủ MCP, kỹ năng, công cụ điện thoại cho terminal khác, Remote Control, SSH</string>
+    <string name="settings_appearance_sub">Sáng hoặc tối, màu nhấn, bề mặt, diện mạo của Buddy</string>
+    <string name="settings_about">Sao lưu và giới thiệu</string>
+    <string name="settings_about_sub">Sao lưu và chuyển máy, cập nhật, hướng dẫn, kiểm tra thiết lập</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <!-- Title of the setup checklist card (noun). -->
@@ -1225,13 +1241,26 @@
     <string name="setup_face_unreadable">Không đọc được ảnh đó. Hãy thử ảnh PNG hoặc WebP.</string>
     <!-- Read by TalkBack: the swatch that opens the custom colour sheet. -->
     <string name="setup_custom_colour">Màu tùy chỉnh</string>
+    <string name="setup_mirror">Máy chủ tải xuống</string>
+    <string name="setup_mirror_default">Mặc định</string>
+    <string name="setup_mirror_info">Nơi tải Linux của Buddy, các gói của nó và những tác nhân cài bằng npm (Codex, OpenCode). Hãy để Mặc định, trừ khi việc cài đặt ở chỗ bạn bị lỗi hoặc rất chậm. Khi dùng máy chủ khác, Linux của Buddy cũng dùng máy chủ DNS của chính mạng bạn.</string>
+    <string name="setup_mirror_default_sub">Máy chủ của chính Alpine và npm</string>
+    <string name="setup_mirror_china">Trung Quốc đại lục</string>
+    <string name="setup_mirror_russia">Nga</string>
+    <string name="setup_mirror_iran">Iran</string>
+    <string name="setup_mirror_custom">Tùy chỉnh</string>
+    <string name="setup_mirror_custom_sub">Bất kỳ máy chủ nhân bản Alpine nào, theo địa chỉ</string>
+    <string name="setup_mirror_custom_alpine">Địa chỉ máy chủ nhân bản Alpine</string>
+    <string name="setup_mirror_custom_alpine_hint">Địa chỉ có ngay bên dưới các thư mục v3.24 và edge. Alpine liệt kê các máy chủ nhân bản tại mirrors.alpinelinux.org.</string>
+    <string name="setup_mirror_custom_npm">Registry npm (tùy chọn)</string>
+    <string name="setup_mirror_custom_bad">Hãy nhập địa chỉ bắt đầu bằng https:// (hoặc http://)</string>
+    <string name="setup_wallpaper_colour">Từ hình nền của bạn</string>
     <string name="setup_custom_accent_title">Màu nhấn tùy chỉnh</string>
     <string name="setup_custom_accent_hint">Bất kỳ màu nào dưới dạng mã hex, như #4F8BFF.</string>
     <!-- Button (verb). -->
     <string name="setup_apply">Áp dụng</string>
 
     <!-- Settings screen: Agent. -->
-    <string name="setup_agent">Agent</string>
     <!-- Which AI agent answers new chats. -->
     <string name="setup_default_brain">Agent mặc định</string>
     <!-- "New chat" is the name of a button in Buddy. -->
@@ -1334,7 +1363,6 @@
     <string name="setup_removed">Đã gỡ.</string>
 
     <!-- Settings screen: Experience. -->
-    <string name="setup_experience">Trải nghiệm</string>
     <string name="setup_chat_bubble">Bong bóng trò chuyện</string>
     <!-- ✕ is the close target that appears while dragging the bubble. -->
     <string name="setup_chat_bubble_info">Nổi trên các ứng dụng khác. Kéo nó vào dấu ✕ để ẩn; thẻ duyệt vẫn bật lên khi agent cần bạn đồng ý.</string>
@@ -2158,7 +2186,7 @@
     <string name="hub_compacting">Đang thu gọn cuộc trò chuyện…</string>
     <string name="hub_compacted">Đã thu gọn cuộc trò chuyện: %1$s → %2$s token</string>
     <string name="signin_api_models_none">Dịch vụ không liệt kê mô hình nào.</string>
-    <string name="setup_step_signin_api_key">Hoặc dùng khóa API: Cài đặt → Khóa API.</string>
+    <string name="setup_step_signin_api_key">Hoặc dùng khóa API: Cài đặt → Tác nhân và mô hình → Khóa API.</string>
     <string name="setup_step_signin_others">%1$s là agent mặc định của bạn, nhưng các agent này đã sẵn sàng: %2$s. Đặt một trong số đó làm mặc định là Buddy chạy được ngay.</string>
     <string name="setup_switch_default">Đổi mặc định</string>
     <string name="setup_switch_default_title">Agent mặc định</string>

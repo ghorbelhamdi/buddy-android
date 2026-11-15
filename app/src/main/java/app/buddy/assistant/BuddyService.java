@@ -57,6 +57,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     private McpServer server;
     private AutoPause autoPause;
     private final KeepAwake keepAwake = new KeepAwake(this);
+    private final WorkNotice workNotice = new WorkNotice(this);
     private Marks marks;
     /** Touches on the screen while a card waited for the user (see onScreenTouched). */
     private volatile int cardTouches;
@@ -98,6 +99,8 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         marks = new Marks(this);
         bubble = new Bubble(this);
         control = new ControlIndicator(this);
+        ChatHub.get(this).addListener(workNotice);
+        workNotice.update(); // (clears one left by a process that was killed mid-run)
         bubble.show();
         server = new McpServer(Prefs.token(this), this);
         server.start();
@@ -310,6 +313,8 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         if (server != null) server.stop();
         if (autoPause != null) autoPause.stop();
         keepAwake.remove();
+        ChatHub.get(this).removeListener(workNotice);
+        workNotice.remove();
         if (marks != null) marks.clear();
         if (bubble != null) bubble.remove();
         if (control != null) control.end();
@@ -592,6 +597,16 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         return paused;
     }
 
+    /** An agent is using the phone's own screen (the control chip shows). */
+    boolean controlActive() {
+        return control != null && control.active();
+    }
+
+    /** The control chip came or went (main thread): the notice for work off the screen goes or comes back. */
+    void onControlChanged() {
+        workNotice.update();
+    }
+
     /** Pause (main thread): the agent's next phone action waits until resume, so the user can use the phone. */
     void pause() {
         pause(R.string.service_paused_note, R.string.service_paused_toast);
@@ -645,6 +660,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         Sessions.Session ses = hub.latestRunning();
         if (ses != null) hub.note(ses, Bubble.Kind.STEP, getString(note));
         if (bubble != null) bubble.onPauseChanged();
+        workNotice.update();
         android.widget.Toast.makeText(this, toast, android.widget.Toast.LENGTH_SHORT).show();
     }
 
@@ -721,6 +737,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         autoPause.onPauseEnded();
         keepAwake.update();
         if (bubble != null) bubble.onPauseChanged();
+        workNotice.update();
         Triggers.get(this).wake(); // rule runs wait while paused
     }
 

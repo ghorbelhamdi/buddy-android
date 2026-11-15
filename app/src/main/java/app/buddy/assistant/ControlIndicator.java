@@ -48,6 +48,7 @@ final class ControlIndicator {
         Bubble b = svc.bubble();
         if (b != null) b.setControlling(true);
         notifyChip();
+        svc.onControlChanged();
         svc.autoPauser().start(); // the user taking the phone back pauses it
         svc.mainHandler().postDelayed(tick, TICK_MS);
     }
@@ -78,6 +79,7 @@ final class ControlIndicator {
         Bubble b = svc.bubble();
         if (b != null) b.setControlling(false);
         svc.getSystemService(NotificationManager.class).cancel(NOTIFICATION_ID);
+        svc.onControlChanged();
     }
 
     // ------------------------------------------------------- notification

@@ -4,7 +4,9 @@
 #   javac: OpenJDK 17;  d8 + apksigner: Google's build-tools jars;  android.jar: the Android 36 platform
 set -euo pipefail
 SDK=$HOME/android-sdk
-E=https://dl-cdn.alpinelinux.org/alpine/edge
+# the server apk already uses (a mirror, if one is chosen in Buddy's Settings)
+E=$(sed -n 's#^\(https\{0,1\}://[^ ]*\)/v[0-9.]*/main *$#\1#p' /etc/apk/repositories | sed -n 1p)
+E=${E:-https://dl-cdn.alpinelinux.org/alpine}/edge
 # Only android-build-tools (and what it needs) comes from edge; the rest of the system stays on stable.
 grep -q '^@edge ' /etc/apk/repositories || printf '@edge %s/main\n@edge %s/community\n@edge %s/testing\n' "$E" "$E" "$E" >> /etc/apk/repositories
 if ! command -v aapt2 >/dev/null || ! command -v javac >/dev/null; then

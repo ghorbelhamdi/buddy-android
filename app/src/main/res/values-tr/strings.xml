@@ -113,7 +113,7 @@
     <string name="onboarding_safety_ask_text">Ajan, bir ayarı değiştirmek gibi riskli her şeyden önce sorar. Daha güvenli ama daha çok açılır pencere çıkar.</string>
     <string name="onboarding_safety_auto_title">Kendi başına çalış</string>
     <string name="onboarding_safety_auto_text">Açılır pencere yok: ajan, bir kamerayı veya ışığı açmak gibi istediğiniz şeyi doğrudan yapar.</string>
-    <string name="onboarding_safety_note">Bunu istediğiniz zaman uygulama bazında değiştirebilirsiniz: Ayarlar → Uygulama izinleri. Ajanın bir uygulamada açılır pencere olmadan çalışması için Güven modunu, Buddy\'nin size kendisinin sorması için Katı modu seçin.</string>
+    <string name="onboarding_safety_note">Bunu istediğiniz zaman uygulama bazında değiştirebilirsiniz: Ayarlar → Güvenlik ve onaylar → Uygulama izinleri. Ajanın bir uygulamada açılır pencere olmadan çalışması için Güven modunu, Buddy\'nin size kendisinin sorması için Katı modu seçin.</string>
 
     <!-- Guide, last step: try a first task. -->
     <string name="onboarding_try_title">Her şey hazır</string>
@@ -324,6 +324,7 @@
     <string name="control_title">Buddy telefonunuzu kullanıyor</string>
     <string name="control_text">İşlem bitene kadar ekrana dokunmayın ya da kontrolü almak için Durdur düğmesine dokunun.</string>
     <string name="control_stop">Durdur</string>
+    <string name="work_title">Buddy arka planda çalışıyor</string>
     <string name="pause_call_ended_title">Arama bitti · Buddy duraklatıldı</string>
     <string name="pause_call_ended_text">Göreve devam etmek için dokunun</string>
 
@@ -477,11 +478,12 @@
     <!-- Notes Buddy posts into a chat, and the chat's status line -->
     <string name="hub_continuing">Daha önceki bir %1$s oturumuna devam ediliyor. Hâlâ bir terminalde açıksa önce orada kapatın.</string>
     <string name="hub_still_working_attachments">Bu sohbet hâlâ çalışıyor. Ekleri iş bitince gönderin.</string>
-    <string name="hub_service_off">%1$s kapalı (Ayarlar → API anahtarları). Açın veya bu sohbet için başka bir model seçin.</string>
+    <string name="hub_service_off">%1$s kapalı (Ayarlar → Ajanlar ve modeller → API anahtarları). Açın veya bu sohbet için başka bir model seçin.</string>
     <string name="hub_thinking">Düşünüyor…</string>
     <string name="hub_still_waiting">Modelin yanıtı hâlâ bekleniyor…</string>
     <string name="hub_still_reading_local">Hâlâ okuyor… Kendi bilgisayarındaki bir model, özellikle ilk yanıtta birkaç dakika sürebilir.</string>
     <string name="hub_no_answer">Model yanıt vermedi. Meşgul olabilir: tekrar deneyin veya sohbetin üst kısmından başka bir model seçin.</string>
+    <string name="hub_helper_gone">Bu çalıştırma yarıda kesildi: Buddy\'nin Linux\'unda ajanı çalıştıran yardımcı durdu. Mesajınızı tekrar gönderin.</string>
     <string name="hub_model_set">Model: %1$s</string>
     <string name="hub_effort_set">Çaba: %1$s</string>
     <string name="hub_effort_default">Çaba: varsayılan</string>
@@ -677,7 +679,7 @@
     <string name="signin_token">Token kullan</string>
     <string name="signin_token_title">Claude Code tokeni</string>
     <string name="signin_token_info">Bilgisayarda “claude setup-token” komutunun verdiği tokeni yapıştırın; sk-ant-oat ile başlar. Sohbetler için yeterlidir. Sesle giriş ve Remote Control için tam giriş yapmanız gerekir.</string>
-    <string name="signin_token_wrong">Bu bir Claude Code tokeni değil. API anahtarı (sk-ant-api…) Ayarlar → API anahtarları bölümüne girilir.</string>
+    <string name="signin_token_wrong">Bu bir Claude Code tokeni değil. API anahtarı (sk-ant-api…) Ayarlar → Ajanlar ve modeller → API anahtarları bölümüne girilir.</string>
     <string name="signin_token_on">Token ile giriş yapıldı: sohbetler için yeterlidir. Sesle giriş ve Remote Control için tam giriş yapmanız gerekir.</string>
     <string name="signin_other_device">Başka bir cihazda giriş yap</string>
     <string name="signin_with_code">Kodla giriş yap</string>
@@ -815,6 +817,20 @@
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">Ayarlar</string>
     <string name="setup_settings_subtitle">Buddy; Claude Code, Codex, OpenCode, Antigravity veya Grok\'u uygulamanın içinde, kendi aboneliğinizle (ya da OpenCode\'un ücretsiz modelleriyle ve Antigravity\'nin ücretsiz planıyla) çalıştırır.</string>
+    <string name="settings_agents">Ajanlar ve modeller</string>
+    <string name="settings_agents_sub">Varsayılan ajan, oturum açma, API anahtarları, varsayılan modeller, GitHub, indirme sunucusu</string>
+    <string name="settings_bubble">Balon ve sohbet</string>
+    <string name="settings_bubble_sub">Balonu göster, dokunmanın ne yaptığı, panel boyutu</string>
+    <string name="settings_voice_sub">Sesli giriş ve çıkış, diller, canlı ses, yanıtları sesli okuma</string>
+    <string name="settings_safety">Güvenlik ve onaylar</string>
+    <string name="settings_safety_sub">Uygulama izinleri, bildirim kuralları, Linux araçları, Buddy\'nin kendi ekranları</string>
+    <string name="settings_background">Arka plan ve otomasyon</string>
+    <string name="settings_background_sub">Arka plan modu, zamanlanmış görevler, arka plan tarayıcısı</string>
+    <string name="settings_tools">Araçlar ve bağlantılar</string>
+    <string name="settings_tools_sub">MCP sunucuları, beceriler, başka terminaller için telefon araçları, Remote Control, SSH</string>
+    <string name="settings_appearance_sub">Açık veya koyu, vurgu rengi, yüzey, Buddy\'nin görünümü</string>
+    <string name="settings_about">Yedekleme ve hakkında</string>
+    <string name="settings_about_sub">Yedekleme ve taşıma, güncellemeler, kılavuz, kurulum denetimi</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">Kurulum</string>
@@ -868,12 +884,25 @@
     <string name="setup_face_change">Başka bir resim seç</string>
     <string name="setup_face_unreadable">Bu resim okunamadı. Bir PNG veya WebP dene.</string>
     <string name="setup_custom_colour">Özel renk</string>
+    <string name="setup_mirror">İndirme sunucusu</string>
+    <string name="setup_mirror_default">Varsayılan</string>
+    <string name="setup_mirror_info">Buddy\'nin Linux\'unun, paketlerinin ve npm ile kurulan ajanların (Codex, OpenCode) nereden indirileceği. Bulunduğunuz yerde kurulumlar başarısız olmadıkça veya çok yavaş ilerlemedikçe Varsayılan\'da bırakın. Başka bir sunucuyla Buddy\'nin Linux\'u ağınızın kendi DNS sunucularını da kullanır.</string>
+    <string name="setup_mirror_default_sub">Alpine ve npm\'in kendi sunucuları</string>
+    <string name="setup_mirror_china">Çin ana karası</string>
+    <string name="setup_mirror_russia">Rusya</string>
+    <string name="setup_mirror_iran">İran</string>
+    <string name="setup_mirror_custom">Özel</string>
+    <string name="setup_mirror_custom_sub">Adresiyle herhangi bir Alpine yansısı</string>
+    <string name="setup_mirror_custom_alpine">Alpine yansısının adresi</string>
+    <string name="setup_mirror_custom_alpine_hint">Hemen altında v3.24 ve edge klasörlerinin bulunduğu adres. Alpine, yansılarını mirrors.alpinelinux.org adresinde listeler.</string>
+    <string name="setup_mirror_custom_npm">npm kayıt defteri (isteğe bağlı)</string>
+    <string name="setup_mirror_custom_bad">https:// (veya http://) ile başlayan adresler girin</string>
+    <string name="setup_wallpaper_colour">Duvar kağıdınızdan</string>
     <string name="setup_custom_accent_title">Özel vurgu rengi</string>
     <string name="setup_custom_accent_hint">Herhangi bir rengin hex kodu, örneğin #4F8BFF.</string>
     <string name="setup_apply">Uygula</string>
 
     <!-- Settings screen: Agent. -->
-    <string name="setup_agent">Ajan</string>
     <string name="setup_default_brain">Varsayılan ajan</string>
     <string name="setup_default_brain_info">Baloncuktan veya Yeni sohbet düğmesiyle başlatılan yeni sohbetleri yanıtlayan ajan. Claude Code Claude planınızı, Codex ChatGPT planınızı, Antigravity Google hesabınızı, Grok Grok hesabınızı, OpenCode ise kendi ücretsiz modellerini veya sizin sağlayıcılarınızı kullanır. Yalnızca kurulmuş ajanlar seçilebilir.</string>
     <string name="setup_default_brain_set">Yeni sohbetlerde %1$s kullanılacak. Yeni sohbet düğmesiyle her sohbet için ayrı seçim yapabilirsiniz.</string>
@@ -954,7 +983,6 @@
     <string name="setup_removed">Kaldırıldı.</string>
 
     <!-- Settings screen: Experience. -->
-    <string name="setup_experience">Deneyim</string>
     <string name="setup_chat_bubble">Sohbet baloncuğu</string>
     <string name="setup_chat_bubble_info">Diğer uygulamaların üzerinde durur. Gizlemek için ✕ işaretine sürükleyin; bir ajanın onayınıza ihtiyacı olduğunda onay kartları yine de açılır.</string>
     <string name="setup_tap_action">Baloncuğa dokununca</string>
@@ -1585,7 +1613,7 @@
     <string name="hub_compacting">Sohbet sıkıştırılıyor…</string>
     <string name="hub_compacted">Sohbet sıkıştırıldı: %1$s → %2$s token</string>
     <string name="signin_api_models_none">Hizmet hiç model listelemedi.</string>
-    <string name="setup_step_signin_api_key">Ya da API anahtarı kullan: Ayarlar → API anahtarları.</string>
+    <string name="setup_step_signin_api_key">Ya da API anahtarı kullan: Ayarlar → Ajanlar ve modeller → API anahtarları.</string>
     <string name="setup_step_signin_others">Varsayılan beynin %1$s, ama şunlar hazır: %2$s. Birini varsayılan yap, Buddy hemen çalışsın.</string>
     <string name="setup_switch_default">Varsayılanı değiştir</string>
     <string name="setup_switch_default_title">Varsayılan beyin</string>

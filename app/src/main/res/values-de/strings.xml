@@ -110,7 +110,7 @@
     <string name="onboarding_safety_ask_text">Der Agent fragt vor jedem riskanten Schritt, etwa bevor er eine Einstellung ändert. Sicherer, aber mehr Rückfragen.</string>
     <string name="onboarding_safety_auto_title">Selbstständig arbeiten</string>
     <string name="onboarding_safety_auto_text">Keine Rückfragen: Der Agent erledigt einfach, worum du gebeten hast, etwa eine Kamera oder ein Licht einschalten.</string>
-    <string name="onboarding_safety_note">Du kannst das jederzeit pro App ändern: Einstellungen → App-Berechtigungen. Stelle eine App auf „Frei“, damit der Agent dort ohne Rückfragen arbeitet, oder auf „Streng“, damit Buddy dich selbst fragt.</string>
+    <string name="onboarding_safety_note">Du kannst das jederzeit pro App ändern: Einstellungen → Sicherheit und Freigaben → App-Berechtigungen. Stelle eine App auf „Frei“, damit der Agent dort ohne Rückfragen arbeitet, oder auf „Streng“, damit Buddy dich selbst fragt.</string>
 
     <!-- Guide, last step: try a first task. -->
     <string name="onboarding_try_title">Alles bereit</string>
@@ -321,6 +321,7 @@
     <string name="control_title">Buddy bedient dein Smartphone</string>
     <string name="control_text">Berühre den Bildschirm nicht, bis Buddy fertig ist, oder tippe auf „Stoppen“, um selbst zu übernehmen.</string>
     <string name="control_stop">Stoppen</string>
+    <string name="work_title">Buddy arbeitet im Hintergrund</string>
     <string name="pause_call_ended_title">Anruf beendet · Buddy ist pausiert</string>
     <string name="pause_call_ended_text">Tippe, um die Aufgabe fortzusetzen</string>
 
@@ -474,11 +475,12 @@
     <!-- Notes Buddy posts into a chat, and the chat's status line -->
     <string name="hub_continuing">Eine frühere Sitzung von %1$s wird fortgesetzt. Wenn sie noch in einem Terminal offen ist, schließe sie dort zuerst.</string>
     <string name="hub_still_working_attachments">In diesem Chat läuft noch eine Aufgabe. Sende Anhänge, wenn sie fertig ist.</string>
-    <string name="hub_service_off">%1$s ist ausgeschaltet (Einstellungen → API-Schlüssel). Schalte den Dienst ein oder wähle ein anderes Modell für diesen Chat.</string>
+    <string name="hub_service_off">%1$s ist ausgeschaltet (Einstellungen → Agenten und Modelle → API-Schlüssel). Schalte den Dienst ein oder wähle ein anderes Modell für diesen Chat.</string>
     <string name="hub_thinking">Denkt nach…</string>
     <string name="hub_still_waiting">Wartet noch auf die Antwort des Modells…</string>
     <string name="hub_still_reading_local">Liest noch… Ein Modell auf deinem eigenen Computer kann ein paar Minuten brauchen, vor allem für die erste Antwort.</string>
     <string name="hub_no_answer">Das Modell hat nicht geantwortet. Vielleicht ist es ausgelastet: Versuche es noch einmal oder wähle oben im Chat ein anderes Modell.</string>
+    <string name="hub_helper_gone">Dieser Lauf wurde abgebrochen: Der Helfer, der den Agenten in Buddys Linux ausführt, wurde beendet. Sende deine Nachricht noch einmal.</string>
     <string name="hub_model_set">Modell: %1$s</string>
     <string name="hub_effort_set">Aufwand: %1$s</string>
     <string name="hub_effort_default">Aufwand: Standard</string>
@@ -674,7 +676,7 @@
     <string name="signin_token">Token verwenden</string>
     <string name="signin_token_title">Token für Claude Code</string>
     <string name="signin_token_info">Füge das Token ein, das „claude setup-token“ auf einem Computer ausgibt; es beginnt mit sk-ant-oat. Es reicht für Chats. Spracheingabe und Remote Control brauchen die vollständige Anmeldung.</string>
-    <string name="signin_token_wrong">Das ist kein Token für Claude Code. Ein API-Schlüssel (sk-ant-api…) gehört unter Einstellungen → API-Schlüssel.</string>
+    <string name="signin_token_wrong">Das ist kein Token für Claude Code. Ein API-Schlüssel (sk-ant-api…) gehört unter Einstellungen → Agenten und Modelle → API-Schlüssel.</string>
     <string name="signin_token_on">Mit einem Token angemeldet: Es reicht für Chats. Spracheingabe und Remote Control brauchen die vollständige Anmeldung.</string>
     <string name="signin_other_device">Auf einem anderen Gerät anmelden</string>
     <string name="signin_with_code">Mit einem Code anmelden</string>
@@ -812,6 +814,20 @@
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">Einstellungen</string>
     <string name="setup_settings_subtitle">Buddy führt Claude Code, Codex, OpenCode, Antigravity oder Grok direkt in der App aus, mit deinem eigenen Abo (oder den kostenlosen Modellen von OpenCode und dem kostenlosen Tarif von Antigravity).</string>
+    <string name="settings_agents">Agenten und Modelle</string>
+    <string name="settings_agents_sub">Standard-Agent, Anmeldung, API-Schlüssel, Standardmodelle, GitHub, Download-Server</string>
+    <string name="settings_bubble">Bubble und Chat</string>
+    <string name="settings_bubble_sub">Bubble anzeigen, was ein Tipp darauf tut, Größe des Panels</string>
+    <string name="settings_voice_sub">Spracheingabe und -ausgabe, Sprachen, Live-Stimme, Antworten vorlesen</string>
+    <string name="settings_safety">Sicherheit und Freigaben</string>
+    <string name="settings_safety_sub">App-Berechtigungen, Benachrichtigungsregeln, Linux-Tools, Buddys eigene Bildschirme</string>
+    <string name="settings_background">Hintergrund und Automatisierung</string>
+    <string name="settings_background_sub">Hintergrundmodus, geplante Aufgaben, Hintergrund-Browser</string>
+    <string name="settings_tools">Tools und Verbindungen</string>
+    <string name="settings_tools_sub">MCP-Server, Skills, Telefon-Tools für andere Terminals, Remote Control, SSH</string>
+    <string name="settings_appearance_sub">Hell oder dunkel, Akzentfarbe, Oberfläche, Buddys Aussehen</string>
+    <string name="settings_about">Backup und Info</string>
+    <string name="settings_about_sub">Backup und Umzug, Updates, Anleitung, Einrichtungs-Check</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">Einrichtung</string>
@@ -865,12 +881,25 @@
     <string name="setup_face_change">Anderes Bild wählen</string>
     <string name="setup_face_unreadable">Das Bild konnte nicht gelesen werden. Versuche ein PNG oder WebP.</string>
     <string name="setup_custom_colour">Eigene Farbe</string>
+    <string name="setup_mirror">Download-Server</string>
+    <string name="setup_mirror_default">Standard</string>
+    <string name="setup_mirror_info">Woher Buddys Linux, seine Pakete und die mit npm installierten Agenten (Codex, OpenCode) geladen werden. Lass es auf Standard, außer Installationen schlagen bei dir fehl oder sind sehr langsam. Mit einem anderen Server fragt Buddys Linux auch die DNS-Server deines Netzwerks.</string>
+    <string name="setup_mirror_default_sub">Die eigenen Server von Alpine und npm</string>
+    <string name="setup_mirror_china">Festlandchina</string>
+    <string name="setup_mirror_russia">Russland</string>
+    <string name="setup_mirror_iran">Iran</string>
+    <string name="setup_mirror_custom">Eigener Server</string>
+    <string name="setup_mirror_custom_sub">Ein beliebiger Alpine-Spiegelserver, per Adresse</string>
+    <string name="setup_mirror_custom_alpine">Adresse des Alpine-Spiegelservers</string>
+    <string name="setup_mirror_custom_alpine_hint">Die Adresse, unter der direkt die Ordner v3.24 und edge liegen. Alpine listet seine Spiegelserver auf mirrors.alpinelinux.org.</string>
+    <string name="setup_mirror_custom_npm">npm-Registry (optional)</string>
+    <string name="setup_mirror_custom_bad">Gib Adressen ein, die mit https:// (oder http://) beginnen</string>
+    <string name="setup_wallpaper_colour">Aus deinem Hintergrundbild</string>
     <string name="setup_custom_accent_title">Eigene Akzentfarbe</string>
     <string name="setup_custom_accent_hint">Beliebige Farbe als Hex-Code, z. B. #4F8BFF.</string>
     <string name="setup_apply">Übernehmen</string>
 
     <!-- Settings screen: Agent. -->
-    <string name="setup_agent">Agent</string>
     <string name="setup_default_brain">Standard-Agent</string>
     <string name="setup_default_brain_info">Wer neue Chats beantwortet, die du über die Bubble oder „Neuer Chat“ startest. Claude Code nutzt dein Claude-Abo, Codex dein ChatGPT-Abo, Antigravity dein Google-Konto, Grok dein Grok-Konto, OpenCode seine kostenlosen Modelle oder deine eigenen Anbieter. Nur eingerichtete Agenten können gewählt werden.</string>
     <string name="setup_default_brain_set">Neue Chats nutzen %1$s. Über „Neuer Chat“ kannst du pro Chat wählen.</string>
@@ -951,7 +980,6 @@
     <string name="setup_removed">Entfernt.</string>
 
     <!-- Settings screen: Experience. -->
-    <string name="setup_experience">Bedienung</string>
     <string name="setup_chat_bubble">Chat-Bubble</string>
     <string name="setup_chat_bubble_info">Schwebt über anderen Apps. Ziehe sie auf das ✕, um sie auszublenden; Freigabekarten erscheinen trotzdem, wenn ein Agent dein OK braucht.</string>
     <string name="setup_tap_action">Tippen auf die Bubble</string>
@@ -1584,7 +1612,7 @@
     <string name="hub_compacting">Unterhaltung wird komprimiert…</string>
     <string name="hub_compacted">Unterhaltung komprimiert: %1$s → %2$s Tokens</string>
     <string name="signin_api_models_none">Der Dienst hat keine Modelle aufgelistet.</string>
-    <string name="setup_step_signin_api_key">Oder nutze einen API-Schlüssel: Einstellungen → API-Schlüssel.</string>
+    <string name="setup_step_signin_api_key">Oder nutze einen API-Schlüssel: Einstellungen → Agenten und Modelle → API-Schlüssel.</string>
     <string name="setup_step_signin_others">%1$s ist dein Standard-Gehirn, aber diese sind bereit: %2$s. Mach eines davon zum Standard und Buddy funktioniert sofort.</string>
     <string name="setup_switch_default">Standard wechseln</string>
     <string name="setup_switch_default_title">Standard-Gehirn</string>

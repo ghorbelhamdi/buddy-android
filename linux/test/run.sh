@@ -38,4 +38,34 @@ for f in fixtures/*/*.jsonl; do
   fi
 done
 echo "$n fixtures, $failed failed"
+
+# Runs: the whole of a run, with a stand-in for Claude Code that ends badly. Whatever happens to the agent or to the
+# helper, the chat must hear buddy_done (and why, when the agent said nothing), and soon.
+for t in bash sleep wc pgrep tr readlink ln env date basename dirname cut awk ls touch chmod cp id; do
+  p=$(command -v "$t") && ln -sf "$p" "$H/bin/$t"
+done
+mkdir -p "$H/.local/bin"
+run() { # run <case> <seconds allowed> <what the stand-in does after its first line> → the events' types, in a line
+  local name=$1 allowed=$2 ev="$H/events-$1" start=$SECONDS
+  printf '#!%s\necho '"'"'{"type":"system","session_id":"abc"}'"'"'\n%s\n' "$H/bin/bash" "$3" > "$H/.local/bin/claude"
+  chmod +x "$H/.local/bin/claude"
+  : > "$ev"
+  HOME=$H BUDDY_TEST_EVENTS=$ev bash ../buddy-run test ask "run$name" claude 0 hi >/dev/null 2>&1 &
+  local pid=$!
+  if [ "$name" = term ]; then sleep 2; kill -TERM "$pid"; fi
+  wait "$pid" 2>/dev/null
+  took=$((SECONDS - start))
+  got=$(jq -r '.type + (if .quiet then ":quiet" else "" end)' "$ev" 2>/dev/null | paste -sd, -)
+  n=$((n + 1))
+  if [ "$got" = "$4" ] && [ "$took" -le "$allowed" ]; then echo "ok   run $name"
+  else echo "FAIL run $name: got '$got' in ${took}s, expected '$4' within ${allowed}s"; failed=$((failed + 1)); fi
+}
+run exit3 20 'exit 3' 'system,buddy_error:quiet,buddy_done'
+run killed 20 'kill -9 $$' 'system,buddy_error:quiet,buddy_done'
+run said 20 'echo "no credit left" >&2; exit 1' 'system,buddy_error,buddy_done'
+# what it started keeps its output open for a minute: the run ends when the agent does
+run orphan 20 '(sleep 60 &) ; exit 0' 'system,buddy_done'
+# the helper itself is stopped from outside mid-run
+run term 20 'sleep 60' 'system,buddy_done'
+echo "$n fixtures and runs, $failed failed"
 [ "$n" -gt 0 ] && [ "$failed" -eq 0 ]
