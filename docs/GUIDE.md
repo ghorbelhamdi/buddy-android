@@ -19,6 +19,8 @@ The short version is in the [README](../README.md). This page has the details.
 | Keep it running | Battery: unrestricted for Buddy |
 | Try it | A first chat with a ready-made prompt |
 
+**"Android stopped Buddy's accessibility service"?** Android ended Buddy and didn't start its service again. It still shows as on, but nothing runs. Switch *Buddy assistant* off and on in Accessibility (Buddy does it itself if Background mode is set up). Phones with an auto-start manager (ZTE/nubia RedMagic, Xiaomi, Oppo, Vivo and others) keep doing this until Buddy may start in the background: allow **Auto-start** for Buddy in the phone's app or battery settings. Android also ends an app to take back a permission given *"Only this time"*: give the microphone *"While using the app"*. While a chat works, a silent "Buddy is working" notification keeps Android from closing Buddy mid-task; you can turn that notification off.
+
 **Android blocked the install?** Play Protect may say *"App blocked to protect your device"* for apps that use Accessibility and come from a browser: tap **More details → Install anyway** (or install from a file manager). In some countries Play Protect's stricter mode (enhanced fraud protection) shows no *Install anyway*: it blocks any sideloaded app that uses accessibility or notification access, from a browser, a messaging app or a file manager. Then turn off **Play Store → Play Protect → ⚙ → Scan apps with Play Protect** just for the install and turn it back on afterwards, or install from a computer with `adb install buddy.apk`. On Android 13+, if *Buddy assistant* is greyed out in Accessibility, open App info → ⋮ → **Allow restricted settings** first.
 
 ## Updating

@@ -711,6 +711,18 @@
     <string name="hub_still_reading_local">Still reading… A model on your own computer can take a few minutes, mostly for the first answer.</string>
     <!-- "the top of the chat" = the model chip under the chat title. -->
     <string name="hub_no_answer">The model didn\'t answer. It may be busy: try again, or pick another model at the top of the chat.</string>
+    <!-- Shown instead of starting a run: Buddy's accessibility service is switched off in Android's settings. -->
+    <string name="link_off">Buddy\'s accessibility service is off, so it can\'t use your phone. Turn on Buddy assistant in Android\'s Accessibility settings.</string>
+    <!-- The service is switched on but Android isn't running it, and Buddy is switching it off and on again itself. -->
+    <string name="link_reconnecting">Android had stopped Buddy\'s accessibility service. Buddy is connecting it again: send your message once more in a moment.</string>
+    <!-- The service is switched on but Android isn't running it, and only the user can switch it off and on. -->
+    <string name="link_stuck">Android stopped Buddy\'s accessibility service and didn\'t start it again, so Buddy can\'t use your phone. In Android\'s Accessibility settings, switch Buddy off and on again.\n\nIf this keeps happening, your phone is blocking Buddy from starting in the background: allow auto-start (or \"background activity\") for Buddy in the phone\'s app settings, and give Buddy the microphone \"While using the app\" rather than \"Only this time\".</string>
+    <!-- Toast when a message can't be sent for one of the three reasons above; the reason itself is in the chat. -->
+    <string name="link_toast">Not sent: Buddy\'s accessibility service isn\'t running.</string>
+    <!-- Notification channel and notification: keeps Buddy's process alive while a chat works. -->
+    <string name="keep_channel_name">Keeps Buddy running during a task</string>
+    <string name="keep_channel_description">Shown while a chat works, so Android doesn\'t close Buddy in the middle of a task. You can turn this notification off.</string>
+    <string name="keep_title">Buddy is working</string>
     <string name="hub_helper_gone">This run was cut off: the helper that runs the agent in Buddy\'s Linux stopped. Send your message again.</string>
     <string name="hub_helper_killed">Android ended the agent\'s processes. Some phones stop an app\'s background processes when there are many of them, for example with several sub-agents. To let them run: Settings → System → Developer options → Disable child process restrictions.</string>
     <!-- After picking a model for the chat. %1$s = model name. -->

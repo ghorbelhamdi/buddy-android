@@ -309,8 +309,11 @@ final class ChatHub {
         final boolean fresh = ses.handover != null;
         if (fresh) forAgent = handover(ses) + forAgent;
         BuddyService svc = BuddyService.get();
+        // no accessibility service, no phone tools and nowhere for the agent's events to go: the run would be cut off
+        // some seconds in. Say what is wrong instead (and connect the service again where Buddy can: see ServiceLink)
+        if (svc == null) return noService(ses);
         // only the user's own message lifts a Stop: a queued rule run must not undo it
-        if (svc != null && prompt == null) svc.allowControl();
+        if (prompt == null) svc.allowControl();
         final int[] run = {-1}; // this run's id, once it has started
         try {
             // a rule's run works for someone else's message: no shell, files or web, even with Linux tools on
@@ -354,6 +357,22 @@ final class ChatHub {
         return null;
     }
 
+    /**
+     * A message can't be sent because the accessibility service isn't there. What to do about it is too long for a
+     * toast (Android shows two lines of one), so it goes in the chat, once, and the toast only points there. The
+     * message stays in the input field to send again.
+     */
+    private String noService(Sessions.Session ses) {
+        String why = ServiceLink.why(app);
+        if (why == null) return null; // connected meanwhile
+        Sessions.Msg last = ses.messages.isEmpty() ? null : ses.messages.get(ses.messages.size() - 1);
+        if (last == null || last.kind != Bubble.Kind.ERROR || !why.equals(last.text)) {
+            add(ses, Bubble.Kind.ERROR, why);
+            changed();
+        }
+        return app.getString(R.string.link_toast);
+    }
+
     /** After the helper process of a run ended, its last events get this long to arrive. */
     private static final long HELPER_GONE_MS = 5000;
 
@@ -367,6 +386,13 @@ final class ChatHub {
         // the chat's earlier run is still going (this helper only said so): that run's own end ends the chat's work,
         // and until then Stop must still reach it
         if (code == Helper.BUSY) return;
+        // the accessibility service went while the agent worked (Android ended Buddy and it came back without it):
+        // the helper stopped because nothing answered it, and Linux is fine
+        String link = ServiceLink.why(app);
+        if (link != null) {
+            failRun(ses, link);
+            return;
+        }
         // with how it ended, for a report: 137 is a kill from outside (Android ending an app's child processes)
         // 137: killed from outside, which on a phone is Android ending an app's child processes when there are too
         // many (confirmed on a Pixel 10 Pro with sub-agents, issue #50): say what lets them run
@@ -1096,6 +1122,7 @@ final class ChatHub {
         Tools.runStarted(ses.id);
         StepLog.runStarted(app, ses);
         Prefs.setBusy(app, ses.id, true);
+        RunService.update(app); // Android keeps Buddy's process while a chat works
     }
 
     /**
@@ -1104,6 +1131,7 @@ final class ChatHub {
      */
     private void runEnded(Sessions.Session ses) {
         Prefs.setBusy(app, ses.id, false);
+        RunService.update(app);
         StepLog.runEnded(app, ses);
         if (!ses.parent.isEmpty()) { // a sub-agent has one run: its screen closes at once
             Background.close(app, ses.id);

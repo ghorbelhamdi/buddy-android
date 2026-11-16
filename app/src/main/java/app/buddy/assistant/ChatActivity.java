@@ -531,6 +531,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     protected void onResume() {
         super.onResume();
         if (ses == null || isFinishing()) return;
+        ServiceLink.check(this);
         hub.addListener(this);
         resumed = true;
         Providers.refresh(this); // fresh model lists before the picker opens (a local server's every time)

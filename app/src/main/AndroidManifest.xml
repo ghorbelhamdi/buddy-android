@@ -18,6 +18,10 @@
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <!-- Notification rules: the agent keeps working (and an approval countdown keeps running) with the screen off -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- While a chat works: Android keeps Buddy's process, and a permission given "Only this time" lasts until the
+         task is over instead of ending the app in the middle of it (see RunService) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <!-- Scheduled tasks: on time (the user allows it on Android 14+; without, a few minutes late), and again after a restart -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -257,6 +261,16 @@
             <meta-data
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_config" />
+        </service>
+
+        <!-- Runs only while a chat works, so Android doesn't end Buddy in the middle of a task -->
+        <service
+            android:name=".RunService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="An AI agent the user started is operating the phone through Buddy's accessibility service; the process must stay alive until the task ends" />
         </service>
 
         <!-- Notification rules: sees notifications from the apps the user's rules watch (Settings → Notification rules) -->

@@ -87,6 +87,7 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
     protected void onResume() {
         super.onResume();
         if (isFinishing()) return;
+        ServiceLink.check(this);
         hub.addListener(this);
         Waiting.listener = waitingChanged;
         Providers.refresh(this); // fresh model lists before a picker opens (a local server's every time)
