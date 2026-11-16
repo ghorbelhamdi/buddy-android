@@ -918,6 +918,10 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         perms.setOnClickListener(v -> startActivity(new android.content.Intent(this, AppPermissionsActivity.class)));
         ex.addView(perms, full());
         ex.addView(divider(), lineParams());
+        ex.addView(protect(switchRow(this, getString(R.string.setup_ask_new_apps),
+                getString(R.string.setup_ask_new_apps_info, getString(R.string.perms_title)),
+                Prefs.askNewApps(this), on -> Prefs.setAskNewApps(this, on))), full());
+        ex.addView(divider(), lineParams());
         final boolean dev = Prefs.devMode(this);
         ex.addView(protect(switchRow(this, getString(R.string.setup_dev_mode), getString(R.string.setup_dev_mode_info),
                 dev, on -> {
@@ -1712,6 +1716,6 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
     }
 
     private void openUrl(String url) {
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+        Ui.openLink(this, url);
     }
 }

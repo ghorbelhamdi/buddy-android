@@ -313,6 +313,20 @@ final class Ui {
         return t;
     }
 
+    /**
+     * Opens a web address in the phone's browser. A phone with none (or none enabled) says so in a toast: starting
+     * the link there throws, which took the whole screen down (issue #52).
+     */
+    static void openLink(Context c, String url) {
+        try {
+            android.content.Intent i = new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url));
+            if (!(c instanceof android.app.Activity)) i.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+            c.startActivity(i);
+        } catch (Exception e) {
+            android.widget.Toast.makeText(c, R.string.ui_no_app_for_link, android.widget.Toast.LENGTH_LONG).show();
+        }
+    }
+
     /** Outlined mono chip with a trailing expand icon. */
     static LinearLayout chip(Context c, String s) {
         LinearLayout l = row(c);
@@ -1110,8 +1124,7 @@ final class Ui {
         }
         TextView policy = text(a, a.getString(R.string.ui_privacy_policy), 14, ACCENT_TEXT);
         policy.setPaddingRelative(0, dp(a, 10), 0, 0);
-        policy.setOnClickListener(v -> a.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW,
-                android.net.Uri.parse(PRIVACY_URL))));
+        policy.setOnClickListener(v -> openLink(a, PRIVACY_URL));
         c.addView(policy);
         LinearLayout btns = row(a);
         btns.setPaddingRelative(0, dp(a, 18), 0, 0);

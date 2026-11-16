@@ -413,6 +413,8 @@
     <string name="chat_effort">思考レベル</string>
     <string name="chat_effort_help">「自動」ではエージェントが判断します。高くするほど長く考え、プランの使用量も増えます。</string>
     <string name="chat_model">モデル</string>
+    <string name="chat_agent_help">次のメッセージからこのチャットを別のエージェントに切り替えます。これまでの会話はテキストとして渡されますが、前のエージェントが把握していた手順やファイルは渡されません。</string>
+    <string name="hub_agent_switched">%1$s に切り替えました。次のメッセージと一緒にこれまでの会話が渡されます。</string>
     <string name="chat_model_other_hint">その他… 例：%1$s</string>
     <string name="chat_model_use">使用</string>
 
@@ -484,6 +486,7 @@
     <string name="hub_still_reading_local">読み込み中… 自分のコンピューターで動くモデルは、特に最初の回答に数分かかることがあります。</string>
     <string name="hub_no_answer">モデルから応答がありませんでした。混み合っている可能性があります。もう一度試すか、チャット上部で別のモデルを選んでください。</string>
     <string name="hub_helper_gone">この実行は途中で止まりました。Buddy の Linux でエージェントを動かすヘルパーが停止しました。メッセージをもう一度送ってください。</string>
+    <string name="hub_helper_killed">Android がエージェントのプロセスを終了しました。一部のスマートフォンは、アプリのバックグラウンド プロセスが多くなると停止します(複数のサブエージェントを使うときなど)。動かし続けるには: 設定 → システム → 開発者向けオプション → 子プロセスの制限を無効にする。</string>
     <string name="hub_model_set">モデル：%1$s</string>
     <string name="hub_effort_set">思考レベル：%1$s</string>
     <string name="hub_effort_default">思考レベル：デフォルト</string>
@@ -1012,6 +1015,11 @@
     <string name="setup_dev_mode_info">Linux ツールを使うと、エージェントがコマンドの実行、パッケージのインストール、~/.buddy/work 内のファイル編集を行えるため、アプリのビルドもできます。新しいチャットはこの設定で始まり、各チャットのタイトルの下で変更できます。</string>
     <string name="setup_agents_tap">エージェントによる Buddy の画面操作を許可</string>
     <string name="setup_agents_tap_info">エージェントで Buddy をテストするための設定です（例：Termux の Claude Code とスマートフォン用ツール）。オンにすると、エージェントはチャット一覧、チャット、この設定画面を操作できます。エージェントに何を許すかを決める部分は、引き続きあなただけが操作できます。吹き出し、承認カード、Linux ツール、チャットのオプションとスケジュール、アプリの権限・キー・ルール・スキル・バックグラウンドモード・バックアップの各画面です。</string>
+    <string name="setup_ask_new_apps">新しいアプリごとに確認する</string>
+    <string name="setup_ask_new_apps_info">「%1$s」で設定していないアプリでエージェントが初めて作業するとき、そこで自分で作業してよいか、先に確認するかを Buddy が尋ね、そのアプリの答えを保存します。「確認する」のチャットのみで、常に確認する銀行・決済アプリ、設定、アプリストアは対象外です。</string>
+    <string name="first_app_question">エージェントが %1$s で初めて作業します。自分で作業させますか、それとも先に確認させますか？あとで「%2$s」で変更できます。</string>
+    <string name="first_app_trust">%1$s: 自分で作業する</string>
+    <string name="first_app_hard">%1$s: 先に確認する</string>
     <string name="setup_dev_mode_warning">普段はオフにして、必要なチャットでだけ Linux ツールをオンにしてください。オンのときは、画面上の悪意のあるメッセージやウェブページが、エージェントをだましてコマンドを実行させようとするおそれがあります。送信、投稿、購入、削除は引き続き承認カードで保護されます。</string>
 
     <!-- Settings screen: footer links. -->

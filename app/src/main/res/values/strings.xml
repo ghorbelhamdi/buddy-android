@@ -616,6 +616,8 @@
     <string name="chat_effort_help">Auto lets the agent decide. Higher thinks longer and uses more of your plan.</string>
     <!-- Section label, shown in capitals, above the list of models. -->
     <string name="chat_model">Model</string>
+    <string name="chat_agent_help">Switch this chat to another agent from your next message. It gets the conversation so far as text, not the steps and files the other agent had in mind.</string>
+    <string name="hub_agent_switched">Switched to %1$s. It gets the conversation so far with your next message.</string>
     <!-- Hint of the box for typing any model id. %1$s = an example model id (not translated). -->
     <string name="chat_model_other_hint">other… e.g. %1$s</string>
     <!-- Button, verb: use the model typed in the box. Keep short. -->
@@ -710,6 +712,7 @@
     <!-- "the top of the chat" = the model chip under the chat title. -->
     <string name="hub_no_answer">The model didn\'t answer. It may be busy: try again, or pick another model at the top of the chat.</string>
     <string name="hub_helper_gone">This run was cut off: the helper that runs the agent in Buddy\'s Linux stopped. Send your message again.</string>
+    <string name="hub_helper_killed">Android ended the agent\'s processes. Some phones stop an app\'s background processes when there are many of them, for example with several sub-agents. To let them run: Settings → System → Developer options → Disable child process restrictions.</string>
     <!-- After picking a model for the chat. %1$s = model name. -->
     <string name="hub_model_set">Model: %1$s</string>
     <!-- After picking an effort level. %1$s = the level as the agent names it, not translated (low, medium, high…). -->
@@ -1444,6 +1447,11 @@
     <string name="setup_agents_tap">Let agents tap Buddy\'s screens</string>
     <!-- "App permissions" is the name of a screen in Buddy. -->
     <string name="setup_agents_tap_info">For testing Buddy with an agent (for example Claude Code in Termux with the phone tools). Agents can then use the Chats list, a chat and this Settings screen. Everything that decides what they may do stays yours: the bubble, approval cards, Linux tools, Chat options and schedules, and the screens for App permissions, keys, rules, skills, background mode and backup.</string>
+    <string name="setup_ask_new_apps">Ask about each new app</string>
+    <string name="setup_ask_new_apps_info">The first time an agent works in an app you haven\'t set in %1$s, Buddy asks whether it may work there on its own or should ask you first, and keeps your answer for that app. Only in chats on Ask, and never for banking and payment apps, Settings and app stores, which always ask.</string>
+    <string name="first_app_question">First time an agent works in %1$s. May it work there on its own, or should it ask you first? You can change this later in %2$s.</string>
+    <string name="first_app_trust">%1$s: it works on its own</string>
+    <string name="first_app_hard">%1$s: it asks me first</string>
     <!-- Warning shown while Linux tools in new chats (setup_dev_mode) is on. -->
     <string name="setup_dev_mode_warning">Best left off: turn Linux tools on just in the chats that need them. When they\'re on, a malicious message or web page on screen could try to trick the agent into running commands. Approval cards still guard sending, posting, buying and deleting.</string>
 

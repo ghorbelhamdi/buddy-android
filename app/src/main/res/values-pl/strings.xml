@@ -429,6 +429,8 @@
     <string name="chat_effort">Wysiłek</string>
     <string name="chat_effort_help">Przy Auto agent decyduje sam. Wyższe poziomy myślą dłużej i zużywają więcej limitu twojego planu.</string>
     <string name="chat_model">Model</string>
+    <string name="chat_agent_help">Przekaż ten czat innemu agentowi od następnej wiadomości. Dostaje dotychczasową rozmowę jako tekst, bez kroków i plików, które miał w pamięci poprzedni agent.</string>
+    <string name="hub_agent_switched">Przełączono na %1$s. Dostanie dotychczasową rozmowę z następną wiadomością.</string>
     <string name="chat_model_other_hint">inny… np. %1$s</string>
     <string name="chat_model_use">Użyj</string>
 
@@ -506,6 +508,7 @@
     <string name="hub_still_reading_local">Wciąż czyta… Model na twoim komputerze może potrzebować kilku minut, zwłaszcza na pierwszą odpowiedź.</string>
     <string name="hub_no_answer">Model nie odpowiedział. Może być zajęty: spróbuj ponownie albo wybierz inny model u góry czatu.</string>
     <string name="hub_helper_gone">To uruchomienie zostało przerwane: pomocnik uruchamiający agenta w Linuksie Buddy\'ego przestał działać. Wyślij wiadomość ponownie.</string>
+    <string name="hub_helper_killed">Android zakończył procesy agenta. Niektóre telefony zatrzymują procesy aplikacji w tle, gdy jest ich dużo, na przykład przy kilku podagentach. Aby mogły działać: Ustawienia → System → Opcje programisty → Wyłącz ograniczenia procesów podrzędnych.</string>
     <string name="hub_model_set">Model: %1$s</string>
     <string name="hub_effort_set">Wysiłek: %1$s</string>
     <string name="hub_effort_default">Wysiłek: domyślny</string>
@@ -1049,6 +1052,11 @@
     <string name="setup_dev_mode_info">Z narzędziami Linux agent może uruchamiać polecenia, instalować pakiety i edytować pliki w ~/.buddy/work, by tworzyć aplikacje. Nowe czaty dostają to ustawienie; każdy czat może je zmienić pod swoim tytułem.</string>
     <string name="setup_agents_tap">Pozwól agentom klikać ekrany Buddy</string>
     <string name="setup_agents_tap_info">Do testowania Buddy\'ego z agentem (na przykład Claude Code w Termuksie z narzędziami telefonu). Agenci mogą wtedy używać listy czatów, czatu i tego ekranu Ustawień. Wszystko, co decyduje o tym, co im wolno, pozostaje twoje: dymek, karty zatwierdzania, narzędzia Linux, opcje czatu i harmonogramy oraz ekrany uprawnień aplikacji, kluczy, reguł, umiejętności, trybu w tle i kopii zapasowej.</string>
+    <string name="setup_ask_new_apps">Pytaj o każdą nową aplikację</string>
+    <string name="setup_ask_new_apps_info">Gdy agent pierwszy raz działa w aplikacji, której nie ustawiono w sekcji %1$s, Buddy pyta, czy może tam działać samodzielnie, czy ma najpierw zapytać, i zapamiętuje odpowiedź dla tej aplikacji. Tylko w czatach w trybie Pytaj i nigdy dla aplikacji bankowych i płatniczych, Ustawień ani sklepów z aplikacjami, które pytają zawsze.</string>
+    <string name="first_app_question">Agent pierwszy raz działa w aplikacji %1$s. Może działać tam samodzielnie, czy ma najpierw zapytać? Możesz to później zmienić w sekcji %2$s.</string>
+    <string name="first_app_trust">%1$s: działa samodzielnie</string>
+    <string name="first_app_hard">%1$s: najpierw pyta</string>
     <string name="setup_dev_mode_warning">Najlepiej zostaw to wyłączone i włączaj narzędzia Linux tylko w czatach, które ich potrzebują. Gdy są włączone, złośliwa wiadomość lub strona na ekranie może próbować nakłonić agenta do uruchomienia poleceń. Karty zatwierdzenia nadal chronią wysyłanie, publikowanie, kupowanie i usuwanie.</string>
 
     <!-- Settings screen: footer links. -->

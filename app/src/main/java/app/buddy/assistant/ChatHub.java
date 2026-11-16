@@ -305,15 +305,18 @@ final class ChatHub {
         Providers.P service = Providers.of(ses.model); // the chat's own pick: said, not quietly swapped for another model
         if (service != null && service.off) return app.getString(R.string.hub_service_off, service.name);
         String forAgent = prompt != null ? prompt : text.isEmpty() && hasFiles ? "Have a look at what I attached." : text;
+        // the chat was switched to this agent: it begins anew, with the chat so far (before this message is added)
+        final boolean fresh = ses.handover != null;
+        if (fresh) forAgent = handover(ses) + forAgent;
         BuddyService svc = BuddyService.get();
         // only the user's own message lifts a Stop: a queued rule run must not undo it
         if (svc != null && prompt == null) svc.allowControl();
         final int[] run = {-1}; // this run's id, once it has started
         try {
             // a rule's run works for someone else's message: no shell, files or web, even with Linux tools on
-            Helper.run(app, code -> main.postDelayed(() -> helperGone(ses, run[0], code), HELPER_GONE_MS),
+            Helper.runFor(app, ses.id, code -> main.postDelayed(() -> helperGone(ses, run[0], code), HELPER_GONE_MS),
                     "ask", ses.id, ses.backend, rule ? "rule" : devArg(ses), forAgent,
-                    model(ses), hasFiles ? android.text.TextUtils.join(",", files) : "", ses.effort);
+                    model(ses), hasFiles ? android.text.TextUtils.join(",", files) : "", ses.effort, fresh ? "fresh" : "");
         } catch (Exception e) {
             return e.getMessage();
         }
@@ -364,7 +367,11 @@ final class ChatHub {
         // the chat's earlier run is still going (this helper only said so): that run's own end ends the chat's work,
         // and until then Stop must still reach it
         if (code == Helper.BUSY) return;
-        failRun(ses, app.getString(R.string.hub_helper_gone));
+        // with how it ended, for a report: 137 is a kill from outside (Android ending an app's child processes)
+        // 137: killed from outside, which on a phone is Android ending an app's child processes when there are too
+        // many (confirmed on a Pixel 10 Pro with sub-agents, issue #50): say what lets them run
+        failRun(ses, app.getString(R.string.hub_helper_gone) + (code > 0 ? " (exit " + code + ")" : "")
+                + (code == 137 ? "\n\n" + app.getString(R.string.hub_helper_killed) : ""));
     }
 
     /** The run is over without the helper's buddy_done: ended here as failed, with why and the agent's last error. */
@@ -403,6 +410,93 @@ final class ChatHub {
         // (no line in the chat: it showed up as "1 tool call", and the chip in the message box says the model and effort)
         sessions.save(ses);
         changed();
+    }
+
+    /**
+     * Another agent takes this chat over from the next message on. It has no part in what the first one did, so it
+     * starts a conversation of its own and is given the chat so far as text (see handover): what was said, not the
+     * steps, files and tool results the other agent had in mind. The model and effort go back to the new agent's
+     * defaults, as their names differ per agent.
+     */
+    void switchAgent(Sessions.Session ses, String backend) {
+        if (ses.running || backend == null || backend.equals(ses.backend) || !ses.parent.isEmpty()) return;
+        if (backend.equals(ses.handover)) { // straight back, before the other agent answered: as if never switched
+            ses.backend = backend; // its own conversation is still there, with its steps and files
+            ses.model = ses.handoverModel;
+            ses.effort = ses.handoverEffort;
+            ses.actualModel = ses.handoverActual;
+            ses.ctxUsed = ses.handoverCtxUsed;
+            ses.ctxWindow = ses.handoverCtxWindow;
+            ses.cut = ses.handoverCut;
+            ses.handover = null;
+            for (int i = ses.messages.size() - 1; i >= 0 && ses.messages.get(i).kind == Bubble.Kind.NOTE; i--) {
+                ses.messages.remove(i); // the lines that said it was switched
+            }
+            sessions.save(ses);
+            changed();
+            return;
+        }
+        if (ses.handover == null) {
+            ses.handover = ses.backend;
+            ses.handoverModel = ses.model;
+            ses.handoverEffort = ses.effort;
+            ses.handoverActual = ses.actualModel;
+            ses.handoverCtxUsed = ses.ctxUsed;
+            ses.handoverCtxWindow = ses.ctxWindow;
+            ses.handoverCut = ses.cut;
+        }
+        ses.backend = backend;
+        ses.model = "";
+        ses.effort = "";
+        ses.actualModel = "";
+        ses.ctxUsed = 0;
+        ses.ctxWindow = 0;
+        ses.cut = false;
+        ses.interrupted = false;
+        add(ses, Bubble.Kind.NOTE, app.getString(R.string.hub_agent_switched, Account.nameOf(backend)));
+        sessions.save(ses);
+        changed();
+    }
+
+    /**
+     * The most of a chat's text a new agent is handed, in UTF-8 bytes: the end of it, where the work stands. The
+     * message goes to the agent as one argument, which Linux caps at 128 KB, and it shares that with the user's
+     * own message and, for some agents, Buddy's instructions.
+     */
+    private static final int HANDOVER_MAX = 60_000;
+
+    /** The end of s that fits in max UTF-8 bytes, cut between characters. */
+    private static String tail(String s, int max) {
+        int bytes = 0, i = s.length();
+        while (i > 0) {
+            int cp = s.codePointBefore(i);
+            int n = cp < 0x80 ? 1 : cp < 0x800 ? 2 : cp < 0x10000 ? 3 : 4;
+            if (bytes + n > max) break;
+            bytes += n;
+            i -= Character.charCount(cp);
+        }
+        return s.substring(i);
+    }
+
+    /** The chat so far, for the agent that takes it over: who said what, oldest first, marked as context. */
+    private static String handover(Sessions.Session ses) {
+        StringBuilder b = new StringBuilder();
+        for (Sessions.Msg m : new ArrayList<>(ses.messages)) {
+            if (m.kind != Bubble.Kind.USER && m.kind != Bubble.Kind.BUDDY) continue;
+            if (m.text == null || m.text.trim().isEmpty()) continue;
+            b.append(m.kind == Bubble.Kind.USER ? "User: " : "Assistant: ").append(m.text.trim()).append("\n\n");
+        }
+        if (b.length() == 0) return "";
+        String all = b.toString();
+        String end = tail(all, HANDOVER_MAX);
+        boolean cutOff = end.length() < all.length();
+        all = end;
+        return "[This chat was with another agent (" + Account.nameOf(ses.handover) + ") until now, and the user switched it to you. "
+                + "Below is the conversation so far" + (cutOff ? " (its earlier part is left out)" : "") + ", oldest "
+                + "first. It is context: what was asked and answered. You don't have that agent's steps, files or tool "
+                + "results, so look again at anything you need (read the screen, open the file) rather than assuming. "
+                + "Don't redo actions it reports as done.]\n\n" + all + "[End of the earlier conversation. The user's "
+                + "message to you now:]\n\n";
     }
 
     /** Change a chat's effort ("" = the agent's default); the next message uses it. */
@@ -880,7 +974,7 @@ final class ChatHub {
     private void sendNoteAsMessage(Sessions.Session ses, String text) {
         final int[] run = {-1}; // this run's id, once it has started (as in send)
         try {
-            Helper.run(app, code -> main.postDelayed(() -> helperGone(ses, run[0], code), HELPER_GONE_MS),
+            Helper.runFor(app, ses.id, code -> main.postDelayed(() -> helperGone(ses, run[0], code), HELPER_GONE_MS),
                     "ask", ses.id, ses.backend, devArg(ses),
                     "(Added while you were working; if it asks something, answer it:) " + text, model(ses), "", ses.effort);
         } catch (Exception e) {
@@ -1045,6 +1139,8 @@ final class ChatHub {
 
     private void add(Sessions.Session ses, Bubble.Kind kind, String text, List<String> files) {
         if (text == null) return;
+        // the agent a chat was switched to has answered: the conversation is its own from here on
+        if (kind == Bubble.Kind.BUDDY && ses.handover != null) ses.handover = null;
         sessions.add(ses, kind, text, files);
         if (kind == Bubble.Kind.BUDDY && !viewing.contains(ses) && ses.parent.isEmpty()) ses.unread = true;
         // not during a live voice call: the voice tells the user itself (nor a helper's report, which is for its parent)

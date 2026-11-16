@@ -56,6 +56,92 @@ final class McpServer {
 
     private final String token;
     private final Handler handler;
+    private static final long HEAD_MS = 30_000;
+    private static final int LINE_MAX = 16 * 1024, HEADERS_MAX = 100, STRANGER_BODY = 16 * 1024;
+
+    /**
+     * Each run's own token, and the chat it stands for. A chat's agent gets this one instead of Buddy's token (see
+     * Helper.runFor): a request made with it belongs to that chat whatever its address says, so an agent can't leave
+     * out or change "?chat=" to shed what applies to its chat (a sub-agent's read-only rule, "Always ask", another
+     * chat's run rule or waiting approval). It stops working when the run's helper ends.
+     */
+    private static final Map<String, String> RUNS = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /**
+     * The run tokens are kept (in Buddy's own storage, outside its Linux and its backups) so that a run which
+     * outlives Buddy's process, killed for memory or by an update, still reaches Buddy afterwards: its tool calls
+     * and its last "done". One older than a day is dropped: no run takes that long.
+     */
+    private static final long RUN_KEPT_MS = 24 * 3600_000L;
+    private static volatile android.content.SharedPreferences kept;
+
+    static void load(android.content.Context c) {
+        android.content.SharedPreferences sp = c.getApplicationContext().getSharedPreferences("runs", android.content.Context.MODE_PRIVATE);
+        kept = sp;
+        android.content.SharedPreferences.Editor e = sp.edit();
+        long now = System.currentTimeMillis();
+        for (Map.Entry<String, ?> v : sp.getAll().entrySet()) {
+            String[] chatAt = String.valueOf(v.getValue()).split("\\|", 2);
+            long at = 0;
+            try {
+                at = chatAt.length == 2 ? Long.parseLong(chatAt[1]) : 0;
+            } catch (NumberFormatException ignored) {
+            }
+            if (now - at > RUN_KEPT_MS) e.remove(v.getKey());
+            else RUNS.putIfAbsent(v.getKey(), chatAt[0]);
+        }
+        e.apply();
+    }
+
+    static String grant(String chat) {
+        byte[] b = new byte[24];
+        new java.security.SecureRandom().nextBytes(b);
+        StringBuilder t = new StringBuilder("run-");
+        for (byte x : b) t.append(String.format("%02x", x));
+        RUNS.put(t.toString(), chat);
+        if (kept != null) kept.edit().putString(t.toString(), chat + "|" + System.currentTimeMillis()).apply();
+        return t.toString();
+    }
+
+    static void revoke(String runToken) {
+        if (runToken == null) return;
+        RUNS.remove(runToken);
+        if (kept != null) kept.edit().remove(runToken).apply();
+    }
+
+    /**
+     * Connections that haven't shown a token yet, oldest first: no more than STRANGERS at once, each with HEAD_MS to
+     * show one. When another comes and the list is full, the oldest is closed, not the newcomer turned away: an app
+     * that opens many and says nothing then loses its own, and a chat's call, which shows its token within
+     * milliseconds, still gets in.
+     */
+    private static final int STRANGERS = 32;
+    private final java.util.LinkedHashSet<Socket> strangers = new java.util.LinkedHashSet<>();
+
+    private void stranger(Socket s) {
+        Socket old = null;
+        synchronized (strangers) {
+            strangers.add(s);
+            if (strangers.size() > STRANGERS) {
+                java.util.Iterator<Socket> it = strangers.iterator();
+                old = it.next();
+                it.remove();
+            }
+        }
+        if (old != null) {
+            try {
+                old.close(); // its thread's read fails, and it ends
+            } catch (IOException ignored) {
+            }
+        }
+    }
+
+    private void known(Socket s) {
+        synchronized (strangers) {
+            strangers.remove(s);
+        }
+    }
+
     private final ExecutorService pool = Executors.newCachedThreadPool();
     private volatile ServerSocket socket;
     private volatile boolean running;
@@ -105,12 +191,14 @@ final class McpServer {
     }
 
     private void handle(Socket s) {
+        stranger(s);
         try {
             s.setSoTimeout(30000);
+            final long headBy = android.os.SystemClock.elapsedRealtime() + HEAD_MS;
             InputStream in = new BufferedInputStream(s.getInputStream());
             OutputStream out = s.getOutputStream();
 
-            String requestLine = readLine(in);
+            String requestLine = readLine(in, headBy);
             if (requestLine == null || requestLine.isEmpty()) return;
             String[] parts = requestLine.split(" ");
             if (parts.length < 2) return;
@@ -119,18 +207,12 @@ final class McpServer {
             final String rawPath = path; // with its query, for the API relay
             int q = path.indexOf('?');
             String chat = null;
-            if (q >= 0) {
-                // Buddy's own chats connect to /mcp?chat=<id>; other sessions (a terminal, Remote Control) don't
-                java.util.regex.Matcher m = java.util.regex.Pattern.compile("(?:^|&)chat=([A-Za-z0-9_-]{1,64})")
-                        .matcher(path.substring(q + 1));
-                if (m.find()) chat = m.group(1);
-                path = path.substring(0, q);
-            }
-            CALLER_CHAT.set(chat);
+            if (q >= 0) path = path.substring(0, q); // (a "?chat=" in it says nothing: the token says whose call it is)
 
             Map<String, String> headers = new HashMap<>();
             String line;
-            while ((line = readLine(in)) != null && !line.isEmpty()) {
+            while ((line = readLine(in, headBy)) != null && !line.isEmpty()) {
+                if (headers.size() >= HEADERS_MAX) return;
                 int c = line.indexOf(':');
                 if (c > 0) {
                     headers.put(line.substring(0, c).trim().toLowerCase(Locale.ROOT), line.substring(c + 1).trim());
@@ -140,6 +222,16 @@ final class McpServer {
             boolean relay = path.startsWith(Relay.PATH);
             String xKey = relay ? headers.get("x-api-key") : null;
             boolean known = authorized(headers.get("authorization")) || xKey != null && authorized("Bearer " + xKey);
+            // a chat's run shows its own token: the call is that chat's. Buddy's own token is another session
+            // (a terminal, Remote Control), which has no chat
+            String auth0 = headers.get("authorization");
+            String shown = auth0 != null && auth0.startsWith("Bearer ") ? auth0.substring(7) : xKey;
+            chat = shown == null ? null : RUNS.get(shown);
+            if (chat != null) known = true;
+            CALLER_CHAT.set(chat);
+            if (known) {
+                known(s);
+            }
             // an agent's API request carries the chat's pictures every time: tens of MB in a long chat
             String length = headers.get("content-length");
             if (relay && known && length != null && !Relay.rewrites(rawPath)) {
@@ -147,9 +239,15 @@ final class McpServer {
                 Relay.handle(BuddyApp.context(), method, rawPath, headers, null, in, Long.parseLong(length.trim()), out);
                 return;
             }
+            // without a token only the SSH key's one-time code is heard out, and that is short
+            boolean sshKey = "/ssh-key".equals(path) && "POST".equals(method);
+            if (!known && !sshKey) {
+                send(out, 401, "application/json", "{\"error\":\"unauthorized\"}");
+                return;
+            }
             byte[] body;
             try {
-                body = readBody(in, headers, relay && known ? RELAY_BODY : BODY);
+                body = readBody(in, headers, !known ? STRANGER_BODY : relay ? RELAY_BODY : BODY);
             } catch (TooLarge e) { // read to its end, so the caller gets the answer instead of a dropped connection
                 if (relay && known) Relay.tooLarge(out, e.size, RELAY_BODY);
                 else send(out, 413, null, null);
@@ -157,7 +255,7 @@ final class McpServer {
             }
             CALLER_GONE.set(() -> gone(s, in));
 
-            if ("/ssh-key".equals(path) && "POST".equals(method)) {
+            if (sshKey) {
                 // Settings' Termux command: a one-time code instead of the token, so a key gets in only when the user copied it
                 String auth = headers.get("authorization");
                 String done = auth != null && auth.startsWith("Bearer ")
@@ -219,7 +317,9 @@ final class McpServer {
         } catch (Exception e) {
             Log.w(TAG, "request failed", e);
         } finally {
+            known(s);
             CALLER_GONE.remove();
+            CALLER_CHAT.remove();
             try {
                 s.close();
             } catch (IOException ignored) {
@@ -333,13 +433,21 @@ final class McpServer {
     }
 
     private static String readLine(InputStream in) throws IOException {
+        return readLine(in, Long.MAX_VALUE);
+    }
+
+    /** by: when the request's head must be in (elapsedRealtime), so a caller can't hold a thread a byte at a time. */
+    private static String readLine(InputStream in, long by) throws IOException {
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
         int b;
         while ((b = in.read()) != -1) {
             if (b == '\n') break;
             if (b != '\r') buf.write(b);
-            if (buf.size() > 65536) throw new IOException("line too long");
+            if (buf.size() > LINE_MAX) throw new IOException("line too long");
+            // looked at with every byte: a caller sending one at a time would otherwise never reach a check
+            if (by != Long.MAX_VALUE && android.os.SystemClock.elapsedRealtime() > by) throw new IOException("too slow");
         }
+        if (android.os.SystemClock.elapsedRealtime() > by) throw new IOException("too slow");
         if (b == -1 && buf.size() == 0) return null;
         return buf.toString("UTF-8");
     }

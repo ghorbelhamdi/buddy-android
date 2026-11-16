@@ -555,7 +555,7 @@ public class RulesActivity extends Screen {
         }
         TextView policy = text(this, getString(R.string.ui_privacy_policy), 14, ACCENT_TEXT);
         policy.setPaddingRelative(0, dp(this, 10), 0, 0);
-        policy.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(Ui.PRIVACY_URL))));
+        policy.setOnClickListener(v -> Ui.openLink(this, Ui.PRIVACY_URL));
         c.addView(policy);
         LinearLayout btns = row(this);
         btns.setPaddingRelative(0, dp(this, 18), 0, 0);

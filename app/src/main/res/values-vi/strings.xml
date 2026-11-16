@@ -611,6 +611,8 @@
     <string name="chat_effort_help">Tự động để agent tự quyết. Mức cao hơn suy nghĩ lâu hơn và dùng nhiều hạn mức gói của bạn hơn.</string>
     <!-- Section label, shown in capitals, above the list of models. -->
     <string name="chat_model">Mô hình</string>
+    <string name="chat_agent_help">Chuyển cuộc trò chuyện này sang tác nhân khác từ tin nhắn tiếp theo. Nó nhận cuộc trò chuyện đến giờ dưới dạng văn bản, không gồm các bước và tệp mà tác nhân trước đang nhớ.</string>
+    <string name="hub_agent_switched">Đã chuyển sang %1$s. Nó nhận cuộc trò chuyện đến giờ cùng tin nhắn tiếp theo của bạn.</string>
     <!-- Hint of the box for typing any model id. %1$s = an example model id (not translated). -->
     <string name="chat_model_other_hint">khác… ví dụ %1$s</string>
     <!-- Button, verb: use the model typed in the box. Keep short. -->
@@ -703,6 +705,7 @@
     <!-- "the top of the chat" = the model chip under the chat title. -->
     <string name="hub_no_answer">Mô hình không trả lời. Có thể nó đang bận: hãy thử lại, hoặc chọn mô hình khác ở đầu cuộc trò chuyện.</string>
     <string name="hub_helper_gone">Lần chạy này đã bị ngắt: trình trợ giúp chạy tác nhân trong Linux của Buddy đã dừng. Hãy gửi lại tin nhắn của bạn.</string>
+    <string name="hub_helper_killed">Android đã kết thúc các tiến trình của tác nhân. Một số điện thoại dừng tiến trình nền của ứng dụng khi có quá nhiều, ví dụ với nhiều tác nhân phụ. Để chúng tiếp tục chạy: Cài đặt → Hệ thống → Tùy chọn cho nhà phát triển → Tắt các hạn chế đối với tiến trình con.</string>
     <!-- After picking a model for the chat. %1$s = model name. -->
     <string name="hub_model_set">Mô hình: %1$s</string>
     <!-- After picking an effort level. %1$s = the level as the agent names it, not translated (low, medium, high…). -->
@@ -1427,6 +1430,11 @@
     <string name="setup_agents_tap">Cho agent nhấn vào màn hình của Buddy</string>
     <!-- "App permissions" is the name of a screen in Buddy. -->
     <string name="setup_agents_tap_info">Để thử Buddy với một tác nhân (ví dụ Claude Code trong Termux với các công cụ điện thoại). Khi đó các tác nhân có thể dùng danh sách trò chuyện, một cuộc trò chuyện và màn hình Cài đặt này. Mọi thứ quyết định chúng được làm gì vẫn là của bạn: bong bóng, thẻ phê duyệt, công cụ Linux, tùy chọn trò chuyện và lịch, cùng các màn hình quyền ứng dụng, khóa, quy tắc, kỹ năng, chế độ nền và sao lưu.</string>
+    <string name="setup_ask_new_apps">Hỏi về từng ứng dụng mới</string>
+    <string name="setup_ask_new_apps_info">Lần đầu một tác nhân làm việc trong ứng dụng bạn chưa đặt trong %1$s, Buddy hỏi nó được tự làm ở đó hay phải hỏi bạn trước, và giữ câu trả lời cho ứng dụng đó. Chỉ trong các cuộc trò chuyện ở chế độ Hỏi, và không bao giờ cho ứng dụng ngân hàng và thanh toán, Cài đặt và cửa hàng ứng dụng, vốn luôn hỏi.</string>
+    <string name="first_app_question">Đây là lần đầu một tác nhân làm việc trong %1$s. Nó được tự làm ở đó, hay phải hỏi bạn trước? Bạn có thể đổi sau trong %2$s.</string>
+    <string name="first_app_trust">%1$s: tự làm việc</string>
+    <string name="first_app_hard">%1$s: hỏi tôi trước</string>
     <!-- Warning shown while Linux tools in new chats (setup_dev_mode) is on. -->
     <string name="setup_dev_mode_warning">Tốt nhất nên tắt: chỉ bật công cụ Linux trong những cuộc trò chuyện cần đến. Khi bật, một tin nhắn hoặc trang web độc hại trên màn hình có thể tìm cách lừa agent chạy lệnh. Thẻ duyệt vẫn bảo vệ việc gửi, đăng, mua và xóa.</string>
 

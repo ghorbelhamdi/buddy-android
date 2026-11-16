@@ -28,6 +28,21 @@ final class Backup {
     /** In Buddy's Linux, what to keep (no sign-ins): projects without their builds, skills, the agents' conversations. */
     private static final String LINUX_PARTS = "root/.buddy/sessions root/.buddy/work root/.agents/skills root/.claude/projects "
             + "root/.codex/sessions root/.local/share/opencode/opencode.db";
+    /**
+     * Settings that never leave this phone in a backup and are never taken from one: the tokens that open Buddy's
+     * phone tools and its background helper (anyone holding the file would hold them), and what belongs to this
+     * phone's own set-up (its pairing, its API key services).
+     */
+    private static final java.util.Set<String> OWN = new java.util.HashSet<>(java.util.Arrays.asList(
+            "token", "bg_token", "bg_paired", "bg_adb_port", "providers"));
+    /**
+     * Settings a backup can't loosen: on restore this phone's own values stay. A backup is a file from outside, and
+     * one made to harm (or just made on a phone set up differently) shouldn't switch on phone commands, Linux tools
+     * or Trust for everything, add an MCP server or a "never ask" button.
+     */
+    private static final java.util.Set<String> SAFETY = new java.util.HashSet<>(java.util.Arrays.asList(
+            "bg_shell", "bg_shell_ask", "agents_tap_buddy", "dev", "autonomous_default", "guard_builtin", "guard_allow",
+            "ssh_server", "remote_session", "codex_remote", "mcp_servers", "ask_new_apps"));
 
     private Backup() {
     }
@@ -58,7 +73,9 @@ final class Backup {
                 if (!f.isFile()) continue;
                 String xml = new String(java.nio.file.Files.readAllBytes(f.toPath()), "UTF-8");
                 // services and their choices only make sense with their keys, which stay on this phone
-                if (p.equals("buddy")) xml = xml.replaceAll("\\s*<string name=\"(providers|agent_default_[a-z]+)\">[^<]*</string>", "");
+                // nor the tokens and this phone's pairing (see OWN)
+                if (p.equals("buddy")) xml = xml.replaceAll("\\s*<string name=\"(token|bg_token|providers|agent_default_[a-z]+)\">[^<]*</string>", "")
+                        .replaceAll("\\s*<(boolean|int) name=\"(bg_paired|bg_adb_port)\"[^>]*/>", "");
                 z.putNextEntry(new ZipEntry("prefs/" + p + ".xml"));
                 z.write(xml.getBytes("UTF-8"));
             }
@@ -112,8 +129,25 @@ final class Backup {
         if (linux.isFile() && Linux.installed(c)) {
             File in = new File(Linux.root(c), "tmp/buddy-restore.tar.gz");
             copyFile(linux, in);
-            Linux.exec(c, "cd / && tar xzf /tmp/buddy-restore.tar.gz; rm -f /tmp/buddy-restore.tar.gz", 1800);
-            linuxDone = true;
+            // only the parts a backup holds, and nothing that reaches outside them: the archive is a file from
+            // outside, and unpacked as it is at / it could write over Buddy's own scripts. So: every name must sit
+            // under one of the parts, it is unpacked into a folder of its own first, links that end outside the
+            // parts are dropped there, and only then it goes into place
+            String allowed = "^(\\./)?(" + LINUX_PARTS.replace(".", "\\.").replace(" ", "|") + ")(/|$)";
+            String out = Linux.exec(c, "cd / && d=/tmp/buddy-restore.d && rm -rf $d && mkdir -p $d && f=/tmp/buddy-restore.tar.gz && "
+                    + "if tar tzf $f | grep -Ev '" + allowed + "' | grep -q . || tar tzf $f | grep -Eq '(^|/)\\.\\.(/|$)'; "
+                    + "then echo UNSAFE; else tar xzf $f -C $d && "
+                    // a link stays when it ends inside one of the parts (a project's "current -> ../releases/v2")
+                    + "D=$(readlink -f $d); find $d -type l | while IFS= read -r l; do t=$(readlink \"$l\"); "
+                    + "case \"$t\" in /*) rm -f \"$l\"; continue;; esac; "
+                    + "r=$(cd \"$(dirname \"$l\")\" && readlink -f \"$t\" 2>/dev/null); "
+                    + "k=; for q in " + LINUX_PARTS + "; do case \"$r\" in \"$D/$q\"|\"$D/$q\"/*) k=1;; esac; done; "
+                    + "[ -n \"$k\" ] || rm -f \"$l\"; done; "
+                    // the parts only, so the folders above them (/, /root) keep their own modes
+                    + "(cd $d && p=$(ls -d " + LINUX_PARTS + " 2>/dev/null); [ -z \"$p\" ] || tar cf - $p) | tar xf - -C / && echo DONE; fi; "
+                    + "rm -rf $d $f", 1800);
+            if (out.contains("UNSAFE")) throw new IllegalArgumentException(c.getString(R.string.backup_not_one));
+            linuxDone = out.contains("DONE");
         }
         File att = new File(staging, "files/attachments");
         if (att.isDirectory()) {
@@ -132,23 +166,32 @@ final class Backup {
         chats.mkdirs();
         File savedChats = new File(staging, "files/chats");
         File[] cs = savedChats.listFiles();
-        if (cs != null) for (File f : cs) if (f.isFile() && f.getName().endsWith(".json")) copyFile(f, new File(chats, f.getName()));
-        // this phone's own token, keys' services and choices stay; the rest is the backup's
-        String token = Prefs.token(c), providers = Prefs.providers(c);
-        java.util.Map<String, String> defaults = new java.util.HashMap<>();
-        for (Account a : Account.ALL) defaults.put(a.agent, Prefs.agentDefault(c, a.agent));
+        if (cs != null) for (File f : cs) if (f.isFile() && f.getName().endsWith(".json")) {
+            File to = new File(chats, f.getName());
+            try { // every restored chat asks as App permissions say: "Routine allowed" is chosen on this phone, by hand
+                org.json.JSONObject o = new org.json.JSONObject(new String(java.nio.file.Files.readAllBytes(f.toPath()), "UTF-8"));
+                o.remove("approvals");
+                // nor does a chat bring Linux tools along onto a phone that starts chats without them: a chat with a
+                // scheduled task would run with a shell there unseen. The user switches them on again in the chat
+                if (!Prefs.devMode(c)) o.put("dev", false);
+                try (OutputStream w = new FileOutputStream(to)) {
+                    w.write(o.toString().getBytes("UTF-8"));
+                }
+            } catch (org.json.JSONException notAChat) {
+                copyFile(f, to);
+            }
+        }
         for (String p : PREFS) {
             File f = new File(staging, "prefs/" + p + ".xml");
             if (!f.isFile()) continue;
             String xml = new String(java.nio.file.Files.readAllBytes(f.toPath()), "UTF-8");
-            if (p.equals("buddy")) {
-                StringBuilder keep = new StringBuilder("<string name=\"token\">" + esc(token) + "</string>\n")
-                        .append("<string name=\"providers\">").append(esc(providers)).append("</string>\n");
-                for (java.util.Map.Entry<String, String> d : defaults.entrySet()) {
-                    keep.append("<string name=\"agent_default_").append(d.getKey()).append("\">").append(esc(d.getValue())).append("</string>\n");
-                }
-                xml = xml.replaceAll("\\s*<string name=\"(token|providers|agent_default_[a-z]+)\">[^<]*</string>", "")
-                        .replace("</map>", keep + "</map>");
+            if (p.equals("buddy")) { // Buddy's settings: the backup's, except what stays this phone's (see merge)
+                android.content.SharedPreferences sp = c.getSharedPreferences(p, Context.MODE_PRIVATE);
+                java.util.Map<String, Object> merged = merge(c, readPrefs(xml), sp.getAll());
+                android.content.SharedPreferences.Editor e = sp.edit().clear();
+                for (java.util.Map.Entry<String, Object> v : merged.entrySet()) put(e, v.getKey(), v.getValue());
+                e.commit();
+                continue;
             }
             c.getSharedPreferences(p, Context.MODE_PRIVATE); // loaded, so nothing pending writes over the new file later
             try (OutputStream o = new FileOutputStream(new File(prefsDir, p + ".xml"))) {
@@ -170,8 +213,102 @@ final class Backup {
         android.os.Process.killProcess(android.os.Process.myPid());
     }
 
-    private static String esc(String s) {
-        return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
+    /**
+     * A backup's settings as they go onto this phone. This phone's own stay for its tokens, pairing and API key
+     * services (OWN), for every switch that decides what an agent may do (SAFETY) and for where downloads and requests go
+     * (see stays). An app gets the stricter of the two modes, so Trust only if this phone trusts it already, and
+     * notification rules that differ from this phone's arrive paused: both act without asking, so they start with
+     * the user's own OK here.
+     */
+    private static java.util.Map<String, Object> merge(Context c, java.util.Map<String, Object> backup, java.util.Map<String, ?> mine) {
+        java.util.Map<String, Object> out = new java.util.LinkedHashMap<>();
+        for (java.util.Map.Entry<String, Object> e : backup.entrySet()) {
+            String k = e.getKey();
+            if (stays(k)) continue;
+            if (k.startsWith("app_safety_")) { // the stricter of the two; Trust only where this phone trusts already
+                // (an app with no setting here has the mode Buddy gives it by default: Hard for a bank or a
+                // messenger, which a backup's Smart must not undo)
+                Object here = mine.get(k);
+                if (here == null) here = Guard.mode(c, k.substring("app_safety_".length()), null);
+                if (strictness(here) >= strictness(e.getValue())) continue;
+            }
+            out.put(k, e.getValue());
+        }
+        for (java.util.Map.Entry<String, ?> e : mine.entrySet()) {
+            String k = e.getKey();
+            // this phone's own choice for an app stays where the backup has none, or a looser one
+            if (stays(k) || k.startsWith("app_safety_") && !out.containsKey(k)) out.put(k, e.getValue());
+        }
+        // "always ask" buttons: this phone's and the backup's, both
+        Object ask = backup.get("guard_ask"), myAsk = mine.get("guard_ask");
+        if (ask instanceof String && myAsk instanceof String) {
+            try {
+                org.json.JSONArray both = new org.json.JSONArray((String) ask), more = new org.json.JSONArray((String) myAsk);
+                java.util.Set<String> have = new java.util.HashSet<>();
+                for (int i = 0; i < both.length(); i++) have.add(String.valueOf(both.get(i)));
+                for (int i = 0; i < more.length(); i++) if (have.add(String.valueOf(more.get(i)))) both.put(more.get(i));
+                out.put("guard_ask", both.toString());
+            } catch (org.json.JSONException odd) {
+                out.put("guard_ask", myAsk);
+            }
+        } else if (myAsk != null && ask == null) out.put("guard_ask", myAsk);
+        Object rules = backup.get("rules");
+        if (rules != null && !rules.equals(mine.get("rules")) && !"[]".equals(rules)) out.put("rules_on", false);
+        return out;
+    }
+
+    /** A setting that is never taken from a backup: this phone's own value stays (or none). */
+    private static boolean stays(String k) {
+        return OWN.contains(k) || SAFETY.contains(k) || k.startsWith("agent_default_")
+                // where Buddy's Linux downloads from, where an agent's requests go, and who reviews its steps
+                || k.startsWith("mirror") || k.startsWith("api_base_") || k.startsWith("reviewer");
+    }
+
+    /** An app's mode by how much it asks: none or Trust 0, Smart 1, Hard 2. */
+    private static int strictness(Object mode) {
+        return "hard".equals(mode) ? 2 : "smart".equals(mode) ? 1 : 0;
+    }
+
+    /** A shared-preferences file's values by name (strings, booleans, numbers, sets of strings). */
+    private static java.util.Map<String, Object> readPrefs(String xml) throws Exception {
+        java.util.Map<String, Object> out = new java.util.LinkedHashMap<>();
+        org.xmlpull.v1.XmlPullParser p = android.util.Xml.newPullParser();
+        p.setInput(new java.io.StringReader(xml));
+        String name = null;
+        java.util.Set<String> set = null;
+        for (int t = p.getEventType(); t != org.xmlpull.v1.XmlPullParser.END_DOCUMENT; t = p.next()) {
+            if (t == org.xmlpull.v1.XmlPullParser.END_TAG && "set".equals(p.getName())) {
+                if (name != null && set != null) out.put(name, set);
+                set = null;
+                continue;
+            }
+            if (t != org.xmlpull.v1.XmlPullParser.START_TAG) continue;
+            String tag = p.getName(), n = p.getAttributeValue(null, "name"), v = p.getAttributeValue(null, "value");
+            if ("set".equals(tag)) {
+                name = n;
+                set = new java.util.HashSet<>();
+            } else if ("string".equals(tag)) {
+                String text = p.nextText();
+                if (set != null) set.add(text);
+                else if (n != null) out.put(n, text);
+            } else if (n == null || v == null) {
+                continue;
+            } else if ("boolean".equals(tag)) out.put(n, Boolean.parseBoolean(v));
+            else if ("int".equals(tag)) out.put(n, Integer.parseInt(v));
+            else if ("long".equals(tag)) out.put(n, Long.parseLong(v));
+            else if ("float".equals(tag)) out.put(n, Float.parseFloat(v));
+        }
+        return out;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void put(android.content.SharedPreferences.Editor e, String k, Object v) {
+        if (v instanceof String) e.putString(k, (String) v);
+        else if (v instanceof Boolean) e.putBoolean(k, (Boolean) v);
+        else if (v instanceof Integer) e.putInt(k, (Integer) v);
+        else if (v instanceof Long) e.putLong(k, (Long) v);
+        else if (v instanceof Float) e.putFloat(k, (Float) v);
+        else if (v instanceof java.util.Set) e.putStringSet(k, (java.util.Set<String>) v);
     }
 
     private static void addTree(ZipOutputStream z, File dir, String prefix) throws Exception {

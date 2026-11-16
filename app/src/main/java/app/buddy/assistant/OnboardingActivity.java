@@ -664,7 +664,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
     }
 
     private void openUrl(String url) {
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+        Ui.openLink(this, url);
     }
 
     @Override

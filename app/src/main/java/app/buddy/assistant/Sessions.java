@@ -59,7 +59,20 @@ final class Sessions {
 
     static final class Session {
         final String id;
-        final String backend;
+        /** The agent that runs this chat; the user can switch it (see ChatHub.switchAgent). */
+        volatile String backend;
+        /**
+         * Set when the chat was switched to another agent that hasn't answered yet: the agent that had the chat
+         * ("claude", "codex"…). Until the new one answers, each run starts its conversation fresh and carries the
+         * chat so far as text.
+         */
+        String handover;
+        /** With handover: the model and effort the chat had with that agent, for a switch straight back to it. */
+        String handoverModel = "", handoverEffort = "";
+        /** And what the chat showed of that agent's conversation (not kept over a restart: the next run says it anew). */
+        String handoverActual = "";
+        long handoverCtxUsed, handoverCtxWindow;
+        boolean handoverCut;
         String title = "";
         /** Model for this chat ("" = the agent's default), e.g. claude-opus-5-5. */
         String model = "";
@@ -360,7 +373,8 @@ final class Sessions {
         }
         JSONObject o = new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model)
                 .put("effort", s.effort).put("actual_model", s.actualModel).put("ctx_used", s.ctxUsed).put("ctx_window", s.ctxWindow)
-                .put("interrupted", s.interrupted).put("incognito", s.incognito).put("dev", s.dev).put("awake", s.awake).put("background", s.background).put("approvals", s.approvals)
+                .put("interrupted", s.interrupted).put("incognito", s.incognito).put("dev", s.dev).put("awake", s.awake).put("background", s.background).put("approvals", s.approvals).put("handover", s.handover == null ? "" : s.handover)
+                .put("handover_model", s.handoverModel).put("handover_effort", s.handoverEffort)
                 .put("pinned", s.pinned).put("archived", s.archived).put("updated", s.updated).put("cut", s.cut).put("parent", s.parent).put("slot", s.slot).put("messages", msgs);
         synchronized (s.apps) {
             if (!s.apps.isEmpty()) o.put("apps", new JSONArray(s.apps));
@@ -397,6 +411,9 @@ final class Sessions {
         s.awake = o.optBoolean("awake");
         s.background = o.optBoolean("background");
         s.approvals = o.optString("approvals", "");
+        s.handover = o.optString("handover", "").isEmpty() ? null : o.optString("handover");
+        s.handoverModel = o.optString("handover_model", "");
+        s.handoverEffort = o.optString("handover_effort", "");
         JSONArray apps = o.optJSONArray("apps");
         for (int i = 0; apps != null && i < apps.length(); i++) s.apps.add(apps.optString(i));
         s.pinned = o.optBoolean("pinned");

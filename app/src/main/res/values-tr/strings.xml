@@ -421,6 +421,8 @@
     <string name="chat_effort">Çaba</string>
     <string name="chat_effort_help">Oto seçeneğinde karar ajana kalır. Daha yüksek seviyeler daha uzun düşünür ve planınızdan daha fazla harcar.</string>
     <string name="chat_model">Model</string>
+    <string name="chat_agent_help">Bu sohbeti bir sonraki mesajınızdan itibaren başka bir ajana geçirin. Ajan şimdiye kadarki konuşmayı metin olarak alır; önceki ajanın aklındaki adımları ve dosyaları almaz.</string>
+    <string name="hub_agent_switched">%1$s ajanına geçildi. Şimdiye kadarki konuşmayı bir sonraki mesajınızla alır.</string>
     <string name="chat_model_other_hint">diğer… örn. %1$s</string>
     <string name="chat_model_use">Kullan</string>
 
@@ -494,6 +496,7 @@
     <string name="hub_still_reading_local">Hâlâ okuyor… Kendi bilgisayarındaki bir model, özellikle ilk yanıtta birkaç dakika sürebilir.</string>
     <string name="hub_no_answer">Model yanıt vermedi. Meşgul olabilir: tekrar deneyin veya sohbetin üst kısmından başka bir model seçin.</string>
     <string name="hub_helper_gone">Bu çalıştırma yarıda kesildi: Buddy\'nin Linux\'unda ajanı çalıştıran yardımcı durdu. Mesajınızı tekrar gönderin.</string>
+    <string name="hub_helper_killed">Android, ajanın işlemlerini sonlandırdı. Bazı telefonlar, sayıları çok olduğunda bir uygulamanın arka plan işlemlerini durdurur, örneğin birkaç alt ajanla. Çalışmalarına izin vermek için: Ayarlar → Sistem → Geliştirici seçenekleri → Alt işlem kısıtlamalarını devre dışı bırak.</string>
     <string name="hub_model_set">Model: %1$s</string>
     <string name="hub_effort_set">Çaba: %1$s</string>
     <string name="hub_effort_default">Çaba: varsayılan</string>
@@ -1027,6 +1030,11 @@
     <string name="setup_dev_mode_info">Linux araçlarıyla ajan komut çalıştırabilir, paket yükleyebilir ve ~/.buddy/work içindeki dosyaları düzenleyebilir; böylece uygulama geliştirebilir. Yeni sohbetler bu ayarla başlar; her sohbet bunu kendi başlığının altından değiştirebilir.</string>
     <string name="setup_agents_tap">Ajanların Buddy ekranlarına dokunmasına izin ver</string>
     <string name="setup_agents_tap_info">Buddy\'yi bir ajanla test etmek için (örneğin Termux\'ta telefon araçlarıyla Claude Code). Ajanlar o zaman sohbet listesini, bir sohbeti ve bu Ayarlar ekranını kullanabilir. Neye izinli olduklarını belirleyen her şey sizde kalır: balon, onay kartları, Linux araçları, sohbet seçenekleri ve zamanlamalar ile uygulama izinleri, anahtarlar, kurallar, beceriler, arka plan modu ve yedekleme ekranları.</string>
+    <string name="setup_ask_new_apps">Her yeni uygulama için sor</string>
+    <string name="setup_ask_new_apps_info">Bir ajan, %1$s bölümünde ayarlamadığınız bir uygulamada ilk kez çalıştığında Buddy, orada kendi başına mı çalışacağını yoksa önce size mi soracağını sorar ve yanıtınızı o uygulama için saklar. Yalnızca Sor modundaki sohbetlerde; bankacılık ve ödeme uygulamaları, Ayarlar ve uygulama mağazaları için asla, onlar her zaman sorar.</string>
+    <string name="first_app_question">Bir ajan %1$s uygulamasında ilk kez çalışıyor. Orada kendi başına mı çalışsın, yoksa önce size mi sorsun? Bunu daha sonra %2$s bölümünde değiştirebilirsiniz.</string>
+    <string name="first_app_trust">%1$s: kendi başına çalışır</string>
+    <string name="first_app_hard">%1$s: önce bana sorar</string>
     <string name="setup_dev_mode_warning">Kapalı tutmanız daha iyi olur: Linux araçlarını yalnızca ihtiyaç duyan sohbetlerde açın. Açıkken ekrandaki kötü amaçlı bir mesaj veya web sayfası, ajanı komut çalıştırmaya kandırmaya çalışabilir. Onay kartları gönderme, paylaşma, satın alma ve silme işlemlerini korumaya devam eder.</string>
 
     <!-- Settings screen: footer links. -->

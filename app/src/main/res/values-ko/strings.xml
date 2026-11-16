@@ -413,6 +413,8 @@
     <string name="chat_effort">추론 강도</string>
     <string name="chat_effort_help">‘자동’은 에이전트가 알아서 정해요. 높을수록 더 오래 생각하고 플랜 사용량도 늘어나요.</string>
     <string name="chat_model">모델</string>
+    <string name="chat_agent_help">다음 메시지부터 이 채팅을 다른 에이전트로 바꿉니다. 지금까지의 대화는 텍스트로 전달되며, 이전 에이전트가 기억하던 단계와 파일은 전달되지 않습니다.</string>
+    <string name="hub_agent_switched">%1$s(으)로 바꿨습니다. 다음 메시지와 함께 지금까지의 대화가 전달됩니다.</string>
     <string name="chat_model_other_hint">기타… 예: %1$s</string>
     <string name="chat_model_use">사용</string>
 
@@ -484,6 +486,7 @@
     <string name="hub_still_reading_local">아직 읽는 중… 내 컴퓨터에서 도는 모델은 특히 첫 답변에 몇 분 걸릴 수 있어요.</string>
     <string name="hub_no_answer">모델이 답하지 않았어요. 바쁠 수 있으니 다시 시도하거나 채팅 상단에서 다른 모델을 고르세요.</string>
     <string name="hub_helper_gone">이 실행이 중단되었어요. Buddy의 Linux에서 에이전트를 실행하는 헬퍼가 멈췄습니다. 메시지를 다시 보내 주세요.</string>
+    <string name="hub_helper_killed">Android가 에이전트의 프로세스를 종료했습니다. 일부 휴대전화는 앱의 백그라운드 프로세스가 많아지면 중지합니다(예: 하위 에이전트가 여럿일 때). 계속 실행하려면: 설정 → 시스템 → 개발자 옵션 → 하위 프로세스 제한 사용 중지.</string>
     <string name="hub_model_set">모델: %1$s</string>
     <string name="hub_effort_set">추론 강도: %1$s</string>
     <string name="hub_effort_default">추론 강도: 기본값</string>
@@ -1012,6 +1015,11 @@
     <string name="setup_dev_mode_info">Linux 도구를 켜면 에이전트가 명령을 실행하고 패키지를 설치하고 ~/.buddy/work의 파일을 편집할 수 있어서, 앱을 빌드할 수 있어요. 새 채팅은 이 설정으로 시작하고, 채팅마다 제목 아래에서 바꿀 수 있어요.</string>
     <string name="setup_agents_tap">에이전트가 Buddy 화면을 탭하도록 허용</string>
     <string name="setup_agents_tap_info">에이전트로 Buddy를 테스트하기 위한 설정입니다(예: Termux의 Claude Code와 휴대전화 도구). 켜면 에이전트가 채팅 목록, 채팅, 이 설정 화면을 사용할 수 있습니다. 에이전트가 무엇을 할 수 있는지 정하는 부분은 계속 사용자만 조작합니다: 버블, 승인 카드, Linux 도구, 채팅 옵션과 예약, 그리고 앱 권한·키·규칙·스킬·백그라운드 모드·백업 화면입니다.</string>
+    <string name="setup_ask_new_apps">새 앱마다 묻기</string>
+    <string name="setup_ask_new_apps_info">에이전트가 %1$s에서 설정하지 않은 앱에서 처음 작업할 때, Buddy가 그 앱에서 알아서 작업해도 되는지 먼저 물어봐야 하는지 묻고 그 앱에 대한 답을 기억합니다. 묻기 모드인 채팅에서만 해당하며, 항상 묻는 은행·결제 앱, 설정, 앱 스토어는 제외됩니다.</string>
+    <string name="first_app_question">에이전트가 %1$s에서 처음 작업합니다. 알아서 작업하게 할까요, 먼저 물어보게 할까요? 나중에 %2$s에서 바꿀 수 있습니다.</string>
+    <string name="first_app_trust">%1$s: 알아서 작업</string>
+    <string name="first_app_hard">%1$s: 먼저 물어보기</string>
     <string name="setup_dev_mode_warning">평소에는 꺼 두고, 필요한 채팅에서만 Linux 도구를 켜세요. 켜 두면 화면에 표시된 악성 메시지나 웹페이지가 에이전트를 속여 명령을 실행하게 할 수 있어요. 보내기, 게시, 구매, 삭제는 여전히 승인 카드로 보호돼요.</string>
 
     <!-- Settings screen: footer links. -->

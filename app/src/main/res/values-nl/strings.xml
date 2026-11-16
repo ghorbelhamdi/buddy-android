@@ -418,6 +418,8 @@
     <string name="chat_effort">Inspanning</string>
     <string name="chat_effort_help">Met Auto beslist de agent zelf. Hogere niveaus denken langer na en verbruiken meer van je abonnement.</string>
     <string name="chat_model">Model</string>
+    <string name="chat_agent_help">Geef deze chat vanaf je volgende bericht aan een andere agent. Die krijgt het gesprek tot nu toe als tekst, niet de stappen en bestanden die de andere agent in gedachten had.</string>
+    <string name="hub_agent_switched">Overgeschakeld naar %1$s. Die krijgt het gesprek tot nu toe met je volgende bericht.</string>
     <string name="chat_model_other_hint">ander… bijv. %1$s</string>
     <string name="chat_model_use">Gebruiken</string>
 
@@ -491,6 +493,7 @@
     <string name="hub_still_reading_local">Nog aan het lezen… Een model op je eigen computer kan een paar minuten nodig hebben, vooral voor het eerste antwoord.</string>
     <string name="hub_no_answer">Het model heeft niet geantwoord. Misschien is het overbelast: probeer het opnieuw of kies bovenaan de chat een ander model.</string>
     <string name="hub_helper_gone">Deze run is afgebroken: de helper die de agent in Buddy\'s Linux uitvoert, is gestopt. Stuur je bericht opnieuw.</string>
+    <string name="hub_helper_killed">Android heeft de processen van de agent beëindigd. Sommige telefoons stoppen achtergrondprocessen van een app als het er veel zijn, bijvoorbeeld met meerdere sub-agents. Om ze te laten werken: Instellingen → Systeem → Ontwikkelaarsopties → Beperkingen voor onderliggende processen uitzetten.</string>
     <string name="hub_model_set">Model: %1$s</string>
     <string name="hub_effort_set">Inspanning: %1$s</string>
     <string name="hub_effort_default">Inspanning: standaard</string>
@@ -1024,6 +1027,11 @@
     <string name="setup_dev_mode_info">Met Linux-tools mag de agent opdrachten uitvoeren, pakketten installeren en bestanden bewerken in ~/.buddy/work, zodat hij apps kan bouwen. Nieuwe chats beginnen met deze instelling; elke chat kan die onder zijn titel wijzigen.</string>
     <string name="setup_agents_tap">Agents laten tikken op Buddy\'s schermen</string>
     <string name="setup_agents_tap_info">Om Buddy met een agent te testen (bijvoorbeeld Claude Code in Termux met de telefoontools). Agents kunnen dan de chatlijst, een chat en dit instellingenscherm gebruiken. Alles wat bepaalt wat ze mogen, blijft van jou: de bubbel, goedkeuringskaarten, Linux-tools, chatopties en planningen, en de schermen voor app-machtigingen, sleutels, regels, skills, achtergrondmodus en back-up.</string>
+    <string name="setup_ask_new_apps">Vragen bij elke nieuwe app</string>
+    <string name="setup_ask_new_apps_info">De eerste keer dat een agent werkt in een app die je niet hebt ingesteld bij %1$s, vraagt Buddy of hij daar zelfstandig mag werken of het eerst moet vragen, en onthoudt je antwoord voor die app. Alleen in chats op Vragen, en nooit voor bank- en betaalapps, Instellingen en appwinkels, die altijd vragen.</string>
+    <string name="first_app_question">Voor het eerst werkt een agent in %1$s. Mag hij daar zelfstandig werken, of moet hij het eerst vragen? Je kunt dit later wijzigen bij %2$s.</string>
+    <string name="first_app_trust">%1$s: werkt zelfstandig</string>
+    <string name="first_app_hard">%1$s: vraagt het eerst</string>
     <string name="setup_dev_mode_warning">Laat dit liever uit en zet Linux-tools alleen aan in de chats die ze nodig hebben. Als ze aanstaan, kan een kwaadwillend bericht of een kwaadwillende webpagina op het scherm proberen de agent te misleiden zodat hij opdrachten uitvoert. Goedkeuringskaarten bewaken nog steeds verzenden, plaatsen, kopen en verwijderen.</string>
 
     <!-- Settings screen: footer links. -->

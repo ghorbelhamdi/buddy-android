@@ -151,6 +151,18 @@ final class Prefs {
         sp(c).edit().putBoolean("agents_tap_buddy", on).apply();
     }
 
+    /**
+     * The first time an agent acts in an app the user has set no mode for, Buddy asks which it gets: Trust or Hard
+     * (see Tools.firstUse). On for a new install, off for one set up before 2.3.11, until the user turns it on.
+     */
+    static boolean askNewApps(Context c) {
+        return sp(c).getBoolean("ask_new_apps", false);
+    }
+
+    static void setAskNewApps(Context c, boolean on) {
+        sp(c).edit().putBoolean("ask_new_apps", on).apply();
+    }
+
     /** Notify when a new Buddy release is out (checked about once a day). */
     static boolean updateNotices(Context c) {
         return !Flavor.FDROID && sp(c).getBoolean("update_notices", true);
@@ -499,6 +511,8 @@ final class Prefs {
     }
 
     static void setOnboarded(Context c, boolean on) {
+        // a new install asks about each new app (see askNewApps); one set up before that existed keeps working as it did
+        if (on && !onboarded(c) && !sp(c).contains("ask_new_apps")) setAskNewApps(c, true);
         sp(c).edit().putBoolean("onboarded", on).apply();
     }
 

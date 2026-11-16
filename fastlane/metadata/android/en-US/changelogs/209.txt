@@ -1,0 +1,7 @@
+• Switch a chat's agent: tap its name in the chat's header; the new one gets the conversation so far
+• Optional: Buddy asks Trust or Hard the first time an agent works in an app
+• Settings switches, permission dialogs and installers always ask
+• Agents no longer type into password fields
+• Backups hold no tokens; restoring one can't loosen safety settings
+• Sub-agent cards fold away, and by themselves while you type
+• Fixed: crash opening a link on a phone with no browser

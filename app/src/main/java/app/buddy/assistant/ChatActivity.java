@@ -34,6 +34,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     private UsageGauge usage;
     /** The Linux tools chip beside the model chip. */
     private LinearLayout linux;
+    private LinearLayout agentChip;
     /** The empty-chat hint, while the chat has no messages. */
     private TextView hint;
     private Button mic;
@@ -95,13 +96,25 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         // the model chip, then Linux tools: in a row only as wide as its chips, the weight just lets the model chip
         // shrink (its text cut short) when a narrow screen has no room for both
         LinearLayout chips = row(this);
+        // this chat's agent, by name: a tap hands the chat to another signed-in one (only the user does; issue #32)
+        agentChip = protect(chip(this, ses.brainName()));
+        agentChip.setPaddingRelative(dp(this, 7), dp(this, 3), dp(this, 3), dp(this, 3));
+        // a name, not a model id: in the title's own font, which is also narrower ("Claude Code" then fits whole)
+        ((TextView) agentChip.getChildAt(0)).setTypeface(sans(this, 500));
+        agentChip.setOnClickListener(v -> chooseAgent());
+        // short of room (a long name, large text, the usage gauge), the name is what gets cut: the weight makes this
+        // chip the one that shrinks, so the two icon chips after it stay whole
+        LinearLayout.LayoutParams acp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+        acp.setMarginEnd(dp(this, 5));
+        chips.addView(agentChip, acp);
         linux = protect(linuxChip(this)); // agents never switch it, even when they may tap Buddy's screens
         linux.setOnClickListener(v -> switchLinuxTools());
         chips.addView(linux, wrap()); // (the model chip sits in the message box, by the buttons)
         // background mode at a glance: a dot says whether its helper is connected; a tap connects or sets it up from here
         bgChip = protect(row(this)); // only the user connects, pairs or switches it
         bgChip.setGravity(Gravity.CENTER_VERTICAL);
-        bgChip.setPaddingRelative(dp(this, 7), dp(this, 3), dp(this, 7), dp(this, 3));
+        bgChip.setPaddingRelative(dp(this, 7), dp(this, 4), dp(this, 7), dp(this, 4));
         bgChip.addView(dot(this, MUTED, 7));
         ImageView bgIcon = icon(this, R.drawable.ms_layers, MUTED, 14);
         LinearLayout.LayoutParams bip = new LinearLayout.LayoutParams(dp(this, 14), dp(this, 14));
@@ -110,7 +123,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         bgChip.setOnClickListener(v -> backgroundSheet());
         bgChip.setVisibility(Linux.installed(this) ? View.VISIBLE : View.GONE);
         LinearLayout.LayoutParams bcp = wrap();
-        bcp.setMarginStart(dp(this, 6));
+        bcp.setMarginStart(dp(this, 5));
         chips.addView(bgChip, bcp);
         LinearLayout.LayoutParams cp = wrap();
         cp.topMargin = dp(this, 3);
@@ -178,6 +191,13 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         hbp.leftMargin = hbp.rightMargin = dp(this, 12);
         hbp.topMargin = dp(this, 8);
         root.addView(helpersBox, hbp);
+        root.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            android.view.WindowInsets in = root.getRootWindowInsets();
+            boolean up = in != null && in.isVisible(android.view.WindowInsets.Type.ime());
+            if (up == keyboardUp) return;
+            keyboardUp = up;
+            foldHelpers();
+        });
 
         browser = new BrowserPanel(this, ses.id, false);
         browser.setVisibility(View.GONE);
@@ -643,6 +663,44 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         }
     }
 
+    /** The agents this chat could run on: its own and every other signed-in one. */
+    private java.util.List<String[]> agents() {
+        java.util.List<String[]> agents = new java.util.ArrayList<>();
+        for (Account a : Account.ALL) {
+            if (a.agent.equals(ses.backend) || SetupState.signedIn(this, a.agent)) agents.add(new String[]{a.agent, a.name()});
+        }
+        return agents;
+    }
+
+    /** Hand this chat to another signed-in agent (see ChatHub.switchAgent): not while it works. */
+    private void chooseAgent() {
+        if (ses.running) return;
+        final Dialog[] d = new Dialog[1];
+        LinearLayout c = column(this);
+        c.addView(title(this, getString(R.string.rules_agent), 18));
+        TextView ah = text(this, getString(R.string.chat_agent_help), 13, MUTED);
+        ah.setPaddingRelative(0, dp(this, 2), 0, dp(this, 10));
+        c.addView(ah);
+        for (final String[] a : agents()) {
+            LinearLayout r = row(this);
+            r.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
+            r.setBackgroundResource(ripple(this, false));
+            r.addView(radio(a[0].equals(ses.backend)));
+            TextView t = title(this, a[1], 15);
+            t.setPaddingRelative(dp(this, 14), 0, 0, 0);
+            r.addView(t, weight1());
+            r.setOnClickListener(v -> {
+                d[0].dismiss();
+                hub.switchAgent(ses, a[0]);
+                showAll(); // a switch straight back takes its notice line away again
+                refresh();
+            });
+            c.addView(r, full());
+        }
+        d[0] = bottomSheet(this, c);
+        d[0].show();
+    }
+
     /** Pick this chat's model; the conversation continues with the new one. */
     private void chooseModel() {
         final Dialog[] d = new Dialog[1];
@@ -815,6 +873,18 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     /** Sub-agents that have shown a picture (a screen or a browser page), and their latest: those are cards. */
     private final java.util.Map<String, android.graphics.Bitmap> helperPictures = new java.util.HashMap<>();
 
+    /** The sub-agents' cards, folded away by a tap on their title (helpersFolded) or while the keyboard is up. */
+    private View helpersCards;
+    private ImageView helpersChevron;
+    private boolean helpersFolded, keyboardUp;
+
+    private void foldHelpers() {
+        if (helpersCards == null || helpersChevron == null) return;
+        boolean folded = helpersFolded || keyboardUp;
+        helpersCards.setVisibility(folded ? View.GONE : View.VISIBLE);
+        helpersChevron.setImageResource(folded ? R.drawable.ms_expand_more : R.drawable.ms_expand_less);
+    }
+
     private void renderHelpers() {
         if (helpersBox == null) return;
         java.util.List<Sessions.Session> l = ses.parent.isEmpty() ? Helpers.of(hub, ses.id) : new java.util.ArrayList<>();
@@ -829,6 +899,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             helpersShown = ids.toString();
             dropHelperCards();
             helpersBox.removeAllViews();
+            helpersCards = null;
+            helpersChevron = null;
             helpersBox.setVisibility(l.isEmpty() && parent == null ? View.GONE : View.VISIBLE);
             if (parent != null) {
                 helpersBox.addView(helperRow(MUTED, getString(R.string.helper_of, parent.label()), "", parent.id), full());
@@ -836,7 +908,18 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             }
             if (l.isEmpty()) return;
             helperPictures.keySet().retainAll(idsOf(l, own));
-            helpersBox.addView(sectionLabel(this, getString(R.string.helpers_title)));
+            // the title folds the cards away and back (issue #49); the keyboard folds them while it is up, so the
+            // message box always has its room
+            LinearLayout head = row(this);
+            head.setGravity(Gravity.CENTER_VERTICAL);
+            head.addView(sectionLabel(this, getString(R.string.helpers_title)), weight1());
+            helpersChevron = icon(this, R.drawable.ms_expand_less, MUTED, 18);
+            head.addView(helpersChevron);
+            head.setOnClickListener(v -> {
+                helpersFolded = !helpersFolded;
+                foldHelpers();
+            });
+            helpersBox.addView(head, full());
             // a card each from the start, side by side, three across, more scroll sideways: a sub-agent with nothing
             // to show yet has a placeholder, and its picture comes into the same card (nothing moves when it does)
             LinearLayout cards = row(this);
@@ -852,6 +935,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             across.setOverScrollMode(View.OVER_SCROLL_NEVER);
             across.addView(cards);
             helpersBox.addView(across, full());
+            helpersCards = across;
+            foldHelpers();
         }
         for (Sessions.Session h : l) { // states change all the time: in place
             HelperCard c = helperCards.get(h.id);
@@ -2021,6 +2106,20 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         speaker.setImageTintList(ColorStateList.valueOf(speak ? ACCENT : MUTED));
         title.setText(ses.label());
         chipText.setText(Models.chip(ses));
+        if (agentChip != null) { // only where there is a choice: another signed-in agent, and not a sub-agent's chat
+            ((TextView) agentChip.getChildAt(0)).setText(ses.brainName());
+            agentChip.setVisibility(ses.parent.isEmpty() && agents().size() > 1 ? View.VISIBLE : View.GONE);
+            agentChip.setAlpha(ses.running ? 0.5f : 1f);
+            // beside the agent's name there is no room for "Linux tools" in words (less still with the usage gauge):
+            // the chip is then its icon alone, shaped like the background chip next to it
+            boolean named = agentChip.getVisibility() != View.VISIBLE;
+            if (linux != null) {
+                linux.getChildAt(1).setVisibility(named ? View.VISIBLE : View.GONE);
+                if (named) linux.setPaddingRelative(dp(this, 6), dp(this, 3), dp(this, 8), dp(this, 3));
+                else linux.setPaddingRelative(dp(this, 7), dp(this, 4), dp(this, 7), dp(this, 4));
+                linux.setContentDescription(getString(R.string.chat_linux_tools));
+            }
+        }
         int used = Usage.peak(this, ses.backend);
         usage.set(used);
         usage.setContentDescription(Usage.shortLine(this, ses.backend));
@@ -2604,6 +2703,13 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 v = whole;
                 p.width = LinearLayout.LayoutParams.MATCH_PARENT;
                 p.topMargin = dp(this, 14);
+                break;
+            }
+            case NOTE: { // something that changed in the chat itself (its agent), not a step of a run
+                TextView tv = text(this, text, 12, MUTED);
+                tv.setGravity(Gravity.CENTER);
+                p.width = LinearLayout.LayoutParams.MATCH_PARENT;
+                v = tv;
                 break;
             }
             default: { // ERROR

@@ -564,6 +564,8 @@
     <string name="chat_effort_help">Auto deixa o agente decidir. Níveis mais altos pensam por mais tempo e usam mais do seu plano.</string>
     <!-- Section label, shown in capitals, above the list of models. -->
     <string name="chat_model">Modelo</string>
+    <string name="chat_agent_help">Passe esta conversa para outro agente a partir da próxima mensagem. Ele recebe a conversa até aqui como texto, não os passos e arquivos que o outro agente tinha em mente.</string>
+    <string name="hub_agent_switched">Mudou para %1$s. Ele recebe a conversa até aqui com sua próxima mensagem.</string>
     <!-- Hint of the box for typing any model id. %1$s = an example model id (not translated). -->
     <string name="chat_model_other_hint">outro… ex.: %1$s</string>
     <!-- Button, verb: use the model typed in the box. Keep short. -->
@@ -657,6 +659,7 @@
     <!-- "the top of the chat" = the model chip under the chat title. -->
     <string name="hub_no_answer">O modelo não respondeu. Ele pode estar ocupado: tente de novo ou escolha outro modelo no topo do chat.</string>
     <string name="hub_helper_gone">Esta execução foi interrompida: o auxiliar que roda o agente no Linux do Buddy parou. Envie sua mensagem de novo.</string>
+    <string name="hub_helper_killed">O Android encerrou os processos do agente. Alguns telefones param os processos em segundo plano de um app quando são muitos, por exemplo com vários subagentes. Para deixá-los trabalhar: Configurações → Sistema → Opções do desenvolvedor → Desativar restrições de processos filhos.</string>
     <!-- After picking a model for the chat. %1$s = model name. -->
     <string name="hub_model_set">Modelo: %1$s</string>
     <!-- After picking an effort level. %1$s = the level as the agent names it, not translated (low, medium, high…). -->
@@ -1365,6 +1368,11 @@
     <string name="setup_agents_tap">Deixar agentes tocarem nas telas do Buddy</string>
     <!-- "App permissions" is the name of a screen in Buddy. -->
     <string name="setup_agents_tap_info">Para testar o Buddy com um agente (por exemplo, o Claude Code no Termux com as ferramentas do telefone). Os agentes podem então usar a lista de conversas, uma conversa e esta tela de Configurações. Tudo o que decide o que eles podem fazer continua com você: a bolha, os cartões de aprovação, as ferramentas Linux, as opções da conversa e os agendamentos, e as telas de permissões de apps, chaves, regras, habilidades, modo em segundo plano e backup.</string>
+    <string name="setup_ask_new_apps">Perguntar sobre cada app novo</string>
+    <string name="setup_ask_new_apps_info">Na primeira vez que um agente trabalha em um app que você não configurou em %1$s, o Buddy pergunta se ele pode trabalhar ali sozinho ou se deve perguntar antes, e guarda sua resposta para esse app. Só em conversas em Perguntar, e nunca para apps de banco e pagamento, Configurações e lojas de apps, que sempre perguntam.</string>
+    <string name="first_app_question">É a primeira vez que um agente trabalha em %1$s. Ele pode trabalhar ali sozinho ou deve perguntar antes? Você pode mudar isso depois em %2$s.</string>
+    <string name="first_app_trust">%1$s: trabalha sozinho</string>
+    <string name="first_app_hard">%1$s: pergunta antes</string>
     <!-- Warning shown while Linux tools in new chats (setup_dev_mode) is on. -->
     <string name="setup_dev_mode_warning">Melhor deixar esta opção desativada e ativar as ferramentas do Linux só nos chats que precisam delas. Quando estão ativadas, uma mensagem ou página da web maliciosa na tela pode tentar enganar o agente para executar comandos. Os cartões de aprovação continuam protegendo envios, publicações, compras e exclusões.</string>
 

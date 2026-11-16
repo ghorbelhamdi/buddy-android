@@ -14,7 +14,7 @@
 #   buddy-run <token> transcript <claude|codex> <file>   last messages of a session (buddy_transcript)
 #   buddy-run <token> adopt <session> <claude|codex> <agent-session-id>  continue that session as a Buddy chat
 # Every event sent to the bubble carries "buddy_session" so the app can route it.
-HELPER_VERSION=31
+HELPER_VERSION=32
 set -u
 export PATH=$HOME/.local/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # The claude launcher sets BUN_OPTIONS with a path relative to its folder; never inherit a stale one.
@@ -235,10 +235,16 @@ case "$CMD" in
     [ -f "$S/pid" ] && kill_tree "$(cat "$S/pid")"
     # forget (an incognito chat): the agents own records of the conversation go too
     if [ "${4:-}" = forget ]; then
-      c=$(cat "$S/claude-session" 2>/dev/null); t=$(cat "$S/codex-thread" 2>/dev/null); o=$(cat "$S/opencode-session" 2>/dev/null)
-      [[ "$c" =~ ^[A-Za-z0-9-]+$ ]] && rm -f "$HOME"/.claude/projects/*/"$c".jsonl
-      [[ "$t" =~ ^[A-Za-z0-9-]+$ ]] && find "$HOME/.codex/sessions" -name "rollout-*$t.jsonl" -delete 2>/dev/null
-      [[ "$o" =~ ^[A-Za-z0-9_-]+$ ]] && have opencode && timeout 30 opencode session delete $(oc2 && echo --standalone) "$o" >/dev/null 2>&1
+      # (with the conversations an agent had here before the chat was switched away and back: the .old lists)
+      for c in $(cat "$S/claude-session" "$S/claude-session.old" 2>/dev/null); do
+        [[ "$c" =~ ^[A-Za-z0-9-]+$ ]] && rm -f "$HOME"/.claude/projects/*/"$c".jsonl
+      done
+      for t in $(cat "$S/codex-thread" "$S/codex-thread.old" 2>/dev/null); do
+        [[ "$t" =~ ^[A-Za-z0-9-]+$ ]] && find "$HOME/.codex/sessions" -name "rollout-*$t.jsonl" -delete 2>/dev/null
+      done
+      for o in $(cat "$S/opencode-session" "$S/opencode-session.old" 2>/dev/null); do
+        [[ "$o" =~ ^[A-Za-z0-9_-]+$ ]] && have opencode && timeout 30 opencode session delete $(oc2 && echo --standalone) "$o" >/dev/null 2>&1
+      done
     fi
     rm -rf "${S:?}"
     exit 0 ;;
@@ -258,7 +264,8 @@ case "$CMD" in
     done
     exit 0 ;;
   ask) SID=${3:-}; BACKEND=${4:-claude}; DEV=${5:-0}; MSG=${6:-}; MODEL=${7:-}; FILES=${8:-}; EFFORT=${9:-}
-    [[ "$EFFORT" =~ ^[a-z]{1,16}$ ]] || EFFORT="" ;; # the agent's own level names, whatever they are
+    [[ "$EFFORT" =~ ^[a-z]{1,16}$ ]] || EFFORT="" # the agent's own level names, whatever they are
+    FRESH=${10:-} ;;
   *) echo "usage: buddy-run <token> ask|stop|delete|prune|ping ..." >&2; exit 2 ;;
 esac
 
@@ -285,6 +292,19 @@ tag() { jq -c --arg s "$SID" '. + {buddy_session:$s}' 2>/dev/null; }
 if [ -f "$S/pid" ] && kill -0 "$(cat "$S/pid")" 2>/dev/null; then
   event buddy_error "This session is still working. Tap Stop first, or start another session."
   exit 75 # (Helper.BUSY: the run that is still going ends the chat's "working", this helper's end doesn't)
+fi
+
+# The chat was just switched to this agent: it starts a conversation of its own. One it had in this chat before
+# knows nothing of what came since; the app sends the conversation so far along with the message.
+if [ "${FRESH:-}" = fresh ]; then
+  case "$BACKEND" in
+    # (the id it had is kept aside: deleting an incognito chat removes that conversation's record too)
+    claude) cat "$S/claude-session" >> "$S/claude-session.old" 2>/dev/null; echo >> "$S/claude-session.old"; rm -f "$S/claude-session" ;;
+    codex) cat "$S/codex-thread" >> "$S/codex-thread.old" 2>/dev/null; echo >> "$S/codex-thread.old"; rm -f "$S/codex-thread" ;;
+    opencode) cat "$S/opencode-session" >> "$S/opencode-session.old" 2>/dev/null; echo >> "$S/opencode-session.old"; rm -f "$S/opencode-session" ;;
+    agy) rm -f "$S/agy-conversation" "$S/agy-conversation.new" ;;
+    grok) rm -f "$S/grok-session" ;;
+  esac
 fi
 
 # From here this run says buddy_done however it ends: at its end, on an early exit, or stopped from outside (then the

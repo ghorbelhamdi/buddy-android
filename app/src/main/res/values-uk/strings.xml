@@ -573,6 +573,8 @@
     <string name="chat_effort_help">«Авто» — агент вирішує сам. На вищих рівнях він думає довше й швидше витрачає ліміти підписки.</string>
     <!-- Section label, shown in capitals, above the list of models. -->
     <string name="chat_model">Модель</string>
+    <string name="chat_agent_help">Передайте цей чат іншому агенту з наступного повідомлення. Він отримає розмову до цього моменту як текст, але не кроки й файли, які пам\'ятав попередній агент.</string>
+    <string name="hub_agent_switched">Перемкнено на %1$s. Він отримає розмову з наступним повідомленням.</string>
     <!-- Hint of the box for typing any model id. %1$s = an example model id (not translated). -->
     <string name="chat_model_other_hint">інша… наприклад, %1$s</string>
     <!-- Button, verb: use the model typed in the box. Keep short. -->
@@ -670,6 +672,7 @@
     <!-- "the top of the chat" = the model chip under the chat title. -->
     <string name="hub_no_answer">Модель не відповіла. Можливо, вона зайнята: спробуйте ще раз або виберіть іншу модель угорі чату.</string>
     <string name="hub_helper_gone">Цей запуск перервався: помічник, який запускає агента в Linux Buddy, зупинився. Надішліть повідомлення ще раз.</string>
+    <string name="hub_helper_killed">Android завершив процеси агента. Деякі телефони зупиняють фонові процеси застосунку, коли їх багато, наприклад із кількома субагентами. Щоб вони працювали: Налаштування → Система → Параметри розробника → Вимкнути обмеження дочірніх процесів.</string>
     <!-- After picking a model for the chat. %1$s = model name. -->
     <string name="hub_model_set">Модель: %1$s</string>
     <!-- After picking an effort level. %1$s = the level as the agent names it, not translated (low, medium, high…). -->
@@ -1388,6 +1391,11 @@
     <string name="setup_agents_tap">Дозволити агентам натискати на екранах Buddy</string>
     <!-- "App permissions" is the name of a screen in Buddy. -->
     <string name="setup_agents_tap_info">Для тестування Buddy з агентом (наприклад, Claude Code у Termux з інструментами телефона). Тоді агенти можуть користуватися списком чатів, чатом і цим екраном налаштувань. Усе, що визначає, що їм дозволено, залишається за вами: бульбашка, картки підтвердження, інструменти Linux, параметри чату й розклади, а також екрани дозволів застосунків, ключів, правил, навичок, фонового режиму та резервної копії.</string>
+    <string name="setup_ask_new_apps">Питати про кожен новий застосунок</string>
+    <string name="setup_ask_new_apps_info">Коли агент уперше працює в застосунку, який ви не налаштували в розділі «%1$s», Buddy питає, чи може він працювати там сам, чи має спершу запитати, і запам\'ятовує відповідь для цього застосунку. Лише в чатах у режимі «Питати» і ніколи для банківських і платіжних застосунків, Налаштувань і магазинів застосунків: вони питають завжди.</string>
+    <string name="first_app_question">Агент уперше працює в застосунку %1$s. Чи може він працювати там сам, чи має спершу запитати? Це можна змінити пізніше в розділі «%2$s».</string>
+    <string name="first_app_trust">%1$s: працює сам</string>
+    <string name="first_app_hard">%1$s: спершу питає</string>
     <!-- Warning shown while Linux tools in new chats (setup_dev_mode) is on. -->
     <string name="setup_dev_mode_warning">Краще залишити це вимкненим і вмикати інструменти Linux лише в чатах, яким вони потрібні. Коли їх увімкнено, шкідливе повідомлення чи вебсторінка на екрані можуть спробувати обманом змусити агента виконати команди. Картки схвалення все одно захищають надсилання, публікацію, покупки й видалення.</string>
 

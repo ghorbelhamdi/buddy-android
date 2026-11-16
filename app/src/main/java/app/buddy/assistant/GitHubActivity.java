@@ -130,7 +130,7 @@ public class GitHubActivity extends Screen {
         ClipboardManager cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         cm.setPrimaryClip(ClipData.newPlainText("GitHub code", GitHub.code));
         Toast.makeText(this, R.string.github_code_copied, Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/login/device")));
+        openLink(this, "https://github.com/login/device"); // (no browser: the code stays on screen, for another device)
     }
 
     private LinearLayout.LayoutParams big(int top) {

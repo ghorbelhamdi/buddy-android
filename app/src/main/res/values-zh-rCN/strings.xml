@@ -561,6 +561,8 @@
     <string name="chat_effort_help">“自动”由智能体自行决定。强度越高，思考越久，消耗的套餐额度也越多。</string>
     <!-- Section label, shown in capitals, above the list of models. -->
     <string name="chat_model">模型</string>
+    <string name="chat_agent_help">从下一条消息起把此聊天交给另一个智能体。它会以文本形式获得此前的对话，但不包括前一个智能体记住的步骤和文件。</string>
+    <string name="hub_agent_switched">已切换到 %1$s。它会随你的下一条消息收到此前的对话。</string>
     <!-- Hint of the box for typing any model id. %1$s = an example model id (not translated). -->
     <string name="chat_model_other_hint">其他…例如 %1$s</string>
     <!-- Button, verb: use the model typed in the box. Keep short. -->
@@ -652,6 +654,7 @@
     <!-- "the top of the chat" = the model chip under the chat title. -->
     <string name="hub_no_answer">模型没有回复，可能正忙。请重试，或在对话顶部选择其他模型。</string>
     <string name="hub_helper_gone">本次运行被中断：在 Buddy 的 Linux 中运行智能体的助手已停止。请重新发送消息。</string>
+    <string name="hub_helper_killed">Android 结束了智能体的进程。有些手机会在应用的后台进程过多时将其停止，例如同时运行多个子智能体。要让它们继续运行：设置 → 系统 → 开发者选项 → 停用子进程限制。</string>
     <!-- After picking a model for the chat. %1$s = model name. -->
     <string name="hub_model_set">模型：%1$s</string>
     <!-- After picking an effort level. %1$s = the level as the agent names it, not translated (low, medium, high…). -->
@@ -1355,6 +1358,11 @@
     <string name="setup_agents_tap">允许智能体点按 Buddy 的界面</string>
     <!-- "App permissions" is the name of a screen in Buddy. -->
     <string name="setup_agents_tap_info">用于让智能体测试 Buddy（例如 Termux 中带手机工具的 Claude Code）。开启后，智能体可以使用对话列表、对话和这个设置界面。凡是决定它们能做什么的部分仍只归你操作：气泡、批准卡片、Linux 工具、对话选项和定时任务，以及应用权限、密钥、规则、技能、后台模式和备份等界面。</string>
+    <string name="setup_ask_new_apps">每个新应用都询问</string>
+    <string name="setup_ask_new_apps_info">智能体第一次在你未在“%1$s”中设置的应用里操作时，Buddy 会询问它可以自行操作还是先问你，并为该应用记住你的回答。仅限“询问”模式的聊天，且不适用于始终询问的银行和支付应用、设置和应用商店。</string>
+    <string name="first_app_question">智能体第一次在 %1$s 中操作。让它自行操作，还是先问你？之后可在“%2$s”中更改。</string>
+    <string name="first_app_trust">%1$s：自行操作</string>
+    <string name="first_app_hard">%1$s：先问我</string>
     <!-- Warning shown while Linux tools in new chats (setup_dev_mode) is on. -->
     <string name="setup_dev_mode_warning">日常使用时最好保持关闭，只在需要的对话中开启 Linux 工具。开启后，屏幕上的恶意消息或网页可能会诱骗智能体运行命令。发送、发布、购买和删除仍受确认卡片保护。</string>
 

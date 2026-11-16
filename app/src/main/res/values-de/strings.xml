@@ -418,6 +418,8 @@
     <string name="chat_effort">Aufwand</string>
     <string name="chat_effort_help">Bei Auto entscheidet der Agent. Höhere Stufen denken länger und verbrauchen mehr von deinem Abo.</string>
     <string name="chat_model">Modell</string>
+    <string name="chat_agent_help">Gib diesen Chat ab deiner nächsten Nachricht an einen anderen Agenten. Er bekommt das bisherige Gespräch als Text, nicht die Schritte und Dateien, die der andere Agent im Kopf hatte.</string>
+    <string name="hub_agent_switched">Zu %1$s gewechselt. Er bekommt das bisherige Gespräch mit deiner nächsten Nachricht.</string>
     <string name="chat_model_other_hint">anderes… z. B. %1$s</string>
     <string name="chat_model_use">Nutzen</string>
 
@@ -491,6 +493,7 @@
     <string name="hub_still_reading_local">Liest noch… Ein Modell auf deinem eigenen Computer kann ein paar Minuten brauchen, vor allem für die erste Antwort.</string>
     <string name="hub_no_answer">Das Modell hat nicht geantwortet. Vielleicht ist es ausgelastet: Versuche es noch einmal oder wähle oben im Chat ein anderes Modell.</string>
     <string name="hub_helper_gone">Dieser Lauf wurde abgebrochen: Der Helfer, der den Agenten in Buddys Linux ausführt, wurde beendet. Sende deine Nachricht noch einmal.</string>
+    <string name="hub_helper_killed">Android hat die Prozesse des Agenten beendet. Manche Telefone beenden Hintergrundprozesse einer App, wenn es viele sind, zum Beispiel mit mehreren Sub-Agenten. Damit sie weiterlaufen: Einstellungen → System → Entwickleroptionen → Beschränkungen für untergeordnete Prozesse deaktivieren.</string>
     <string name="hub_model_set">Modell: %1$s</string>
     <string name="hub_effort_set">Aufwand: %1$s</string>
     <string name="hub_effort_default">Aufwand: Standard</string>
@@ -1024,6 +1027,11 @@
     <string name="setup_dev_mode_info">Mit Linux-Tools darf der Agent Befehle ausführen, Pakete installieren und Dateien in ~/.buddy/work bearbeiten, also Apps bauen. Neue Chats starten mit dieser Einstellung; jeder Chat kann sie unter seinem Titel ändern.</string>
     <string name="setup_agents_tap">Agenten auf Buddys Bildschirmen tippen lassen</string>
     <string name="setup_agents_tap_info">Zum Testen von Buddy mit einem Agenten (zum Beispiel Claude Code in Termux mit den Handy-Tools). Agenten können dann die Chatliste, einen Chat und diesen Einstellungsbildschirm bedienen. Alles, was bestimmt, was sie dürfen, bleibt bei dir: die Blase, Freigabekarten, Linux-Tools, Chat-Optionen und Zeitpläne sowie die Bildschirme für App-Berechtigungen, Schlüssel, Regeln, Skills, Hintergrundmodus und Backup.</string>
+    <string name="setup_ask_new_apps">Bei jeder neuen App fragen</string>
+    <string name="setup_ask_new_apps_info">Wenn ein Agent zum ersten Mal in einer App arbeitet, die du unter %1$s nicht eingestellt hast, fragt Buddy, ob er dort selbstständig arbeiten darf oder dich erst fragen soll, und merkt sich die Antwort für diese App. Nur in Chats auf Fragen, und nie bei Banking- und Bezahl-Apps, Einstellungen und App-Stores, die immer fragen.</string>
+    <string name="first_app_question">Zum ersten Mal arbeitet ein Agent in %1$s. Darf er dort selbstständig arbeiten oder soll er dich erst fragen? Du kannst das später unter %2$s ändern.</string>
+    <string name="first_app_trust">%1$s: arbeitet selbstständig</string>
+    <string name="first_app_hard">%1$s: fragt mich zuerst</string>
     <string name="setup_dev_mode_warning">Lieber ausgeschaltet lassen und Linux-Tools nur in den Chats einschalten, die sie brauchen. Sind sie an, könnte eine bösartige Nachricht oder Webseite auf dem Bildschirm versuchen, den Agenten zum Ausführen von Befehlen zu verleiten. Freigabekarten schützen weiterhin Senden, Posten, Kaufen und Löschen.</string>
 
     <!-- Settings screen: footer links. -->

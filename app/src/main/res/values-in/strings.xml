@@ -561,6 +561,8 @@
     <string name="chat_effort_help">Auto membiarkan agen memutuskan. Makin tinggi, makin lama agen berpikir dan makin banyak kuota paket Anda terpakai.</string>
     <!-- Section label, shown in capitals, above the list of models. -->
     <string name="chat_model">Model</string>
+    <string name="chat_agent_help">Alihkan chat ini ke agen lain mulai pesan berikutnya. Agen itu menerima percakapan sejauh ini sebagai teks, bukan langkah dan file yang diingat agen sebelumnya.</string>
+    <string name="hub_agent_switched">Beralih ke %1$s. Ia menerima percakapan sejauh ini bersama pesan Anda berikutnya.</string>
     <!-- Hint of the box for typing any model id. %1$s = an example model id (not translated). -->
     <string name="chat_model_other_hint">lainnya… mis. %1$s</string>
     <!-- Button, verb: use the model typed in the box. Keep short. -->
@@ -652,6 +654,7 @@
     <!-- "the top of the chat" = the model chip under the chat title. -->
     <string name="hub_no_answer">Model tidak menjawab. Mungkin sedang sibuk: coba lagi, atau pilih model lain di bagian atas chat.</string>
     <string name="hub_helper_gone">Proses ini terputus: helper yang menjalankan agen di Linux Buddy berhenti. Kirim lagi pesan Anda.</string>
+    <string name="hub_helper_killed">Android menghentikan proses agen. Beberapa ponsel menghentikan proses latar belakang aplikasi saat jumlahnya banyak, misalnya dengan beberapa sub-agen. Agar tetap berjalan: Setelan → Sistem → Opsi developer → Nonaktifkan pembatasan proses turunan.</string>
     <!-- After picking a model for the chat. %1$s = model name. -->
     <string name="hub_model_set">Model: %1$s</string>
     <!-- After picking an effort level. %1$s = the level as the agent names it, not translated (low, medium, high…). -->
@@ -1355,6 +1358,11 @@
     <string name="setup_agents_tap">Izinkan agen mengetuk layar Buddy</string>
     <!-- "App permissions" is the name of a screen in Buddy. -->
     <string name="setup_agents_tap_info">Untuk menguji Buddy dengan agen (misalnya Claude Code di Termux dengan alat ponsel). Agen kemudian dapat memakai daftar chat, sebuah chat, dan layar Setelan ini. Semua yang menentukan apa yang boleh mereka lakukan tetap milik Anda: gelembung, kartu persetujuan, alat Linux, opsi chat dan jadwal, serta layar izin aplikasi, kunci, aturan, skill, mode latar belakang, dan cadangan.</string>
+    <string name="setup_ask_new_apps">Tanyakan untuk setiap aplikasi baru</string>
+    <string name="setup_ask_new_apps_info">Saat pertama kali agen bekerja di aplikasi yang belum Anda atur di %1$s, Buddy bertanya apakah agen boleh bekerja sendiri di sana atau harus bertanya dulu, dan menyimpan jawaban Anda untuk aplikasi itu. Hanya di chat dengan mode Tanya, dan tidak pernah untuk aplikasi perbankan dan pembayaran, Setelan, dan toko aplikasi, yang selalu bertanya.</string>
+    <string name="first_app_question">Ini pertama kalinya agen bekerja di %1$s. Bolehkah ia bekerja sendiri di sana, atau harus bertanya dulu? Anda bisa mengubahnya nanti di %2$s.</string>
+    <string name="first_app_trust">%1$s: bekerja sendiri</string>
+    <string name="first_app_hard">%1$s: bertanya dulu</string>
     <!-- Warning shown while Linux tools in new chats (setup_dev_mode) is on. -->
     <string name="setup_dev_mode_warning">Sebaiknya biarkan nonaktif dan aktifkan alat Linux hanya di chat yang membutuhkannya. Saat aktif, pesan atau halaman web berbahaya di layar bisa mencoba menipu agen agar menjalankan perintah. Kartu persetujuan tetap menjaga pengiriman, posting, pembelian, dan penghapusan.</string>
 

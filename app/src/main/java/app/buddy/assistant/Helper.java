@@ -57,6 +57,14 @@ final class Helper {
      * could not be started; may be null.
      */
     static void run(Context c, final java.util.function.IntConsumer gone, String... args) {
+        runFor(c, null, gone, args);
+    }
+
+    /**
+     * As run, for a chat's own run: the helper (and through it the agent) gets a token of its own that stands for
+     * that chat and ends with the helper, not Buddy's token (see McpServer.grant).
+     */
+    static void runFor(Context c, String chat, final java.util.function.IntConsumer gone, String... args) {
         final Context app = c.getApplicationContext();
         if (!Linux.installed(app)) {
             throw new IllegalStateException(app.getString(R.string.helper_linux_missing)); // shown to the user
@@ -64,7 +72,8 @@ final class Helper {
         final String[] cmd = new String[args.length + 3];
         cmd[0] = "/bin/bash";
         cmd[1] = "/root/bin/buddy-run";
-        cmd[2] = Prefs.token(app);
+        final String runToken = chat == null ? null : McpServer.grant(chat);
+        cmd[2] = runToken != null ? runToken : Prefs.token(app);
         System.arraycopy(args, 0, cmd, 3, args.length);
         pool.execute(() -> {
             Process p = null;
@@ -90,6 +99,7 @@ final class Helper {
                 android.util.Log.w("Buddy", "helper failed", e);
             } finally {
                 // only a helper that has really ended (or never started) is reported as gone
+                if (p == null || !p.isAlive()) McpServer.revoke(runToken);
                 if (gone != null && (p == null || !p.isAlive())) gone.accept(p == null ? -1 : p.exitValue());
             }
         });
