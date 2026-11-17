@@ -364,7 +364,10 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         // a saved key or server the default agent can't use: say so already here, with the agent that can, so nobody
         // installs an agent they then can't use with it
         String installText = installed ? getString(R.string.setup_step_install_done, acc.name())
-                : acc.step == Account.Step.INSTALLING ? acc.detail
+                : acc.step == Account.Step.INSTALLING ? acc.detail + (acc.trace.isEmpty() ? ""
+                : "\n\n" + acc.trace.trim())
+                : acc.step == Account.Step.ERROR ? acc.detail + (acc.trace.isEmpty() ? ""
+                : "\n\n" + acc.trace.trim())
                 : Ui.downloadNote(this, getString(acc.claude() ? R.string.setup_step_install_claude : acc.opencode()
                 ? R.string.setup_step_install_opencode : acc.grok() ? R.string.setup_step_install_grok
                 : R.string.setup_step_install_codex, acc.name()));
@@ -404,6 +407,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
 
     /** Appearance: light or dark, the accent, the surface, Buddy's look. */
     private void appearanceSection() {
+        languageCard();
         LinearLayout ap = card();
         ap.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
         ap.addView(fieldLabel(getString(R.string.setup_theme_mode), null));
@@ -1173,6 +1177,100 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
     }
 
     // ----------------------------------------------------------- appearance
+
+    /**
+     * The language Buddy speaks: one of the translations, or the phone's (Android 13 keeps a language for one app
+     * alone). The rest of the phone is untouched.
+     */
+    private void languageCard() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return; // before Android 13 an app can't pick one
+        LinearLayout lc = card();
+        lc.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 10));
+        View r = navRow(R.drawable.ms_translate, getString(R.string.settings_language), languageNow(), true, SetupActivity.class);
+        r.setOnClickListener(v -> languageSheet());
+        lc.addView(r);
+        lc.addView(text(this, getString(R.string.settings_language_note), 13, MUTED));
+        addCard(lc);
+    }
+
+    /** The sheet: the phone's language, then every translation this build has, each in its own name. */
+    private void languageSheet() {
+        final Dialog[] d = new Dialog[1];
+        LinearLayout c = column(this);
+        c.addView(title(this, getString(R.string.settings_language), 18));
+        TextView info = text(this, getString(R.string.settings_language_note), 13, MUTED);
+        info.setPaddingRelative(0, dp(this, 4), 0, dp(this, 4));
+        c.addView(info);
+        String current = languageTag();
+        for (final String[] o : languages()) {
+            boolean on = o[0].equals(current);
+            LinearLayout r = row(this);
+            r.setPaddingRelative(dp(this, 4), dp(this, 10), dp(this, 4), dp(this, 10));
+            r.setBackgroundResource(ripple(this, false));
+            r.addView(radio(this, on));
+            LinearLayout t = column(this);
+            t.setPaddingRelative(dp(this, 14), 0, 0, 0);
+            t.addView(title(this, o[1], 15));
+            r.addView(t, weight1());
+            r.setOnClickListener(v -> {
+                d[0].dismiss();
+                setLanguage(o[0]);
+            });
+            c.addView(r, full());
+        }
+        d[0] = bottomSheet(this, c);
+        d[0].show();
+    }
+
+    /** {"", the phone's language}, then the translations listed in res/xml/locales_config. */
+    private List<String[]> languages() {
+        List<String[]> out = new ArrayList<>();
+        out.add(new String[]{"", getString(R.string.settings_language_system)});
+        java.util.Set<String> seen = new java.util.LinkedHashSet<>();
+        android.content.res.XmlResourceParser x = getResources().getXml(R.xml.locales_config);
+        try {
+            while (x.next() != android.content.res.XmlResourceParser.END_DOCUMENT) {
+                if (x.getEventType() != android.content.res.XmlResourceParser.START_TAG || !"locale".equals(x.getName())) continue;
+                String tag = x.getAttributeValue("http://schemas.android.com/apk/res/android", "name");
+                if (tag == null || tag.isEmpty() || !seen.add(tag)) continue;
+                java.util.Locale l = java.util.Locale.forLanguageTag(tag);
+                out.add(new String[]{tag, l.getDisplayName(l)}); // "ລາວ", "Français", "日本語"
+            }
+        } catch (Exception ignored) {
+        } finally {
+            x.close();
+        }
+        return out;
+    }
+
+    /** The language picked for Buddy alone, "" for the phone's. */
+    private String languageTag() {
+        android.app.LocaleManager lm = getSystemService(android.app.LocaleManager.class);
+        if (lm == null) return "";
+        android.os.LocaleList l = lm.getApplicationLocales();
+        return l.isEmpty() ? "" : l.toLanguageTags();
+    }
+
+    /** What the row says: the language Buddy speaks now, and whether that is the phone's choice. */
+    private String languageNow() {
+        android.app.LocaleManager lm = getSystemService(android.app.LocaleManager.class);
+        android.os.LocaleList l = lm == null ? null : lm.getApplicationLocales();
+        if (l == null || l.isEmpty()) {
+            java.util.Locale lo = getResources().getConfiguration().getLocales().get(0);
+            return getString(R.string.settings_language_system) + " (" + lo.getDisplayName(lo) + ")";
+        }
+        java.util.Locale lo = l.get(0);
+        return lo.getDisplayName(lo);
+    }
+
+    /** Picks the language ("": the phone's) and shows this screen again in it. */
+    private void setLanguage(String tag) {
+        android.app.LocaleManager lm = getSystemService(android.app.LocaleManager.class);
+        if (lm == null) return;
+        lm.setApplicationLocales(tag.isEmpty() ? android.os.LocaleList.getEmptyLocaleList()
+                : android.os.LocaleList.forLanguageTags(tag));
+        recreate();
+    }
 
     private View fieldLabel(String s, String right) {
         LinearLayout r = row(this);

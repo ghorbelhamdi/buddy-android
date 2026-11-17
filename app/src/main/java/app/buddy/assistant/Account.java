@@ -86,6 +86,8 @@ final class Account {
     volatile boolean apiKey;
     /** A failed install's own output, behind Details when detail says it in plain words ("" otherwise). */
     volatile String errorDetail = "";
+    /** The install's trace so far: one line per download stage with ✓ (ok), ✗ (failed) and how long it took. */
+    volatile String trace = "";
 
     private static final Handler main = new Handler(Looper.getMainLooper());
     private static volatile Context app;
@@ -154,9 +156,52 @@ final class Account {
                 Prefs.setAgentToken(a, agent, token);
             }
         }
+        changed();
+    }
+
+    /** Posts to screens that listen, like set() does. */
+    private void changed() {
         main.post(() -> {
             for (Listener l : new ArrayList<>(listeners)) l.onAccountChanged();
         });
+    }
+
+    /**
+     * Adds one line to the install trace, shown live in the install step: when, the stage, and ✓ ok, ✗ failed or
+     * • working on it, with how long the stage took. A download that died, and where, is then right on the screen.
+     */
+    void trace(String line) {
+        String t = android.text.format.DateFormat.format("HH:mm:ss", System.currentTimeMillis()).toString();
+        String[] ls = (trace + t + "  " + line + "\n").split("\n", -1);
+        // keep the last 10 lines: the step's text is a few lines tall
+        trace = ls.length > 11
+                ? String.join("\n", java.util.Arrays.copyOfRange(ls, ls.length - 11, ls.length)) : String.join("\n", ls);
+        changed();
+    }
+
+    /** A stage's name for the trace: an existing "Stage…" string without the dots. */
+    private static String stage(int res) {
+        String s = BuddyApp.str(res);
+        return s.endsWith("…") ? s.substring(0, s.length() - 1) : s;
+    }
+
+    /** The same, for a stage string that takes arguments ("Downloading %1$s…"). */
+    private static String stage(int res, Object... args) {
+        return String.format(stage(res), args);
+    }
+
+    /** The version in an install's output: "VER=2.1.40" lines, or any 2.1.40 in it. */
+    private static String anyVer(String o) {
+        String v = ver(o);
+        if (!v.isEmpty()) return v;
+        Matcher m = Pattern.compile("\\d+\\.\\d+\\.\\d+").matcher(o);
+        return m.find() ? m.group() : "";
+    }
+
+    /** Seconds since t0, as "12 s" or "1 min 5 s". */
+    private static String secs(long t0) {
+        long s = (System.currentTimeMillis() - t0) / 1000;
+        return s < 60 ? s + " s" : (s / 60) + " min " + (s % 60) + " s";
     }
 
     boolean busy() {
@@ -351,31 +396,52 @@ final class Account {
             return;
         }
         set(Step.INSTALLING, app.getString(R.string.account_setting_up_linux));
+        trace = "";
         new Thread(() -> {
+            String stage = "";
             try {
                 synchronized (Account.class) { // both agents use apk; don't run it twice at once
+                    long t0 = System.currentTimeMillis();
+                    stage = stage(R.string.account_setting_up_linux);
+                    trace("• " + stage);
                     Linux.install(app);
+                    trace("✓ " + stage + " (" + secs(t0) + ")");
                     Helper.sync(app); // (also points apk and npm at the chosen download server, see Mirrors)
+                    stage = stage(R.string.account_installing_tools);
+                    trace("• " + stage);
                     set(Step.INSTALLING, app.getString(R.string.account_installing_tools));
+                    t0 = System.currentTimeMillis();
                     String o = Linux.exec(app, "apk update -q && apk add -q bash curl jq libgcc libstdc++ ripgrep git "
                             + "ca-certificates procps coreutils findutils" + (claude() || agy() || grok() ? "" : " nodejs npm")
                             + (agy() ? " util-linux-misc" : "") // script: Antigravity's sign-in needs a terminal
                             + " && echo TOOLS_OK", 900);
                     if (!o.contains("TOOLS_OK")) throw new IOException(tail(o));
+                    trace("✓ " + stage + " (" + secs(t0) + ")");
                 }
                 if (claude()) {
                     set(Step.INSTALLING, app.getString(R.string.account_downloading_claude));
+                    stage = stage(R.string.account_downloading_claude);
+                    trace("• " + stage);
+                    long t0 = System.currentTimeMillis();
                     String o = Linux.exec(app, "curl -fsSL https://claude.ai/install.sh -o /tmp/install.sh && bash /tmp/install.sh"
                             + " && /root/.local/bin/claude --version && echo AGENT_OK", 1800);
                     if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
+                    trace("✓ " + stage + " " + anyVer(o) + " (" + secs(t0) + ")");
                 } else if (agy()) {
                     set(Step.INSTALLING, app.getString(R.string.account_downloading, name()));
+                    stage = stage(R.string.account_downloading, name());
+                    trace("• " + stage);
+                    long t0 = System.currentTimeMillis();
                     // Google's installer picks the Alpine (musl) build and puts agy in ~/.local/bin
                     String o = Linux.exec(app, "curl -fsSL https://antigravity.google/cli/install.sh -o /tmp/agy-install.sh"
                             + " && bash /tmp/agy-install.sh 2>&1 | tail -5 && " + AGY_BIN + " --version && echo AGENT_OK", 1800);
                     if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
+                    trace("✓ " + stage + " " + anyVer(o) + " (" + secs(t0) + ")");
                 } else if (grok()) {
                     set(Step.INSTALLING, app.getString(R.string.account_downloading, name()));
+                    stage = stage(R.string.account_downloading, name());
+                    trace("• " + stage);
+                    long t0 = System.currentTimeMillis();
                     // xAI's installer fetches one static binary (it runs on Alpine as it is) into ~/.grok/bin and links it
                     // in ~/.local/bin, but only when that folder exists already; otherwise it links in /usr/local/bin.
                     // With Grok as the first agent nothing had made ~/.local/bin yet (Claude Code's installer does), so
@@ -386,23 +452,33 @@ final class Account {
                             + " && { [ -x " + GROK_BIN + " ] || ln -sf /root/.grok/bin/grok " + GROK_BIN + "; }"
                             + " && " + GROK_BIN + " --version && echo AGENT_OK", 1800);
                     if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
+                    trace("✓ " + stage + " " + anyVer(o) + " (" + secs(t0) + ")");
                 } else if (opencode()) {
                     set(Step.INSTALLING, app.getString(R.string.account_downloading, name()));
+                    stage = stage(R.string.account_downloading, name());
+                    trace("• " + stage);
+                    long t0 = System.currentTimeMillis();
                     // OpenCode 2 (npm @opencode/cli), always a fresh install (OC_REMOVE)
                     String o = Linux.exec(app, OC_REMOVE + " npm install -g @opencode/cli >/tmp/npm.log 2>&1;"
                             + " tail -5 /tmp/npm.log;" + OC_GLIBC + " opencode --version && echo AGENT_OK", 1800);
                     if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
+                    trace("✓ " + stage + " " + anyVer(o) + " (" + secs(t0) + ")");
                 } else {
                     set(Step.INSTALLING, app.getString(R.string.account_downloading, name()));
+                    stage = stage(R.string.account_downloading, name());
+                    trace("• " + stage);
+                    long t0 = System.currentTimeMillis();
                     String o = Linux.exec(app, "npm install -g @openai/codex >/tmp/npm.log 2>&1; tail -5 /tmp/npm.log;"
                             + " codex --version && echo AGENT_OK", 1800);
                     if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
+                    trace("✓ " + stage + " " + anyVer(o) + " (" + secs(t0) + ")");
                 }
                 set(Step.SIGNED_OUT, "");
                 refresh(app);
             } catch (Exception e) {
                 String raw = String.valueOf(e.getMessage()), plain = plainError(app, raw);
                 errorDetail = plain == null ? "" : raw;
+                trace("✗ " + stage + ": " + (plain == null ? tail(String.valueOf(e.getMessage())) : plain));
                 set(Step.ERROR, plain != null ? plain : app.getString(R.string.account_install_failed, raw));
             }
         }).start();
