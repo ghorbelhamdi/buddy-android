@@ -474,6 +474,28 @@ final class Ui {
         return r;
     }
 
+    /** A small one-line segmented control (fits next to an app name). */
+    static LinearLayout compact(android.content.Context c, String[][] options, String selected, Pick l) {
+        LinearLayout box = row(c);
+        box.setPaddingRelative(dp(c, 2), dp(c, 2), dp(c, 2), dp(c, 2));
+        box.setBackground(rounded(c, CARD, 10));
+        for (String[] o : options) {
+            boolean on = o[0].equals(selected);
+            TextView t = text(c, o[1], 12, on ? TEXT : MUTED);
+            t.setSingleLine(true);
+            t.setTypeface(sans(c, on ? 600 : 500));
+            t.setGravity(Gravity.CENTER);
+            t.setPaddingRelative(dp(c, 9), dp(c, 6), dp(c, 9), dp(c, 6));
+            if (on) t.setBackground(rounded(c, CARD2, 8));
+            else t.setBackgroundResource(ripple(c, false));
+            t.setOnClickListener(v -> {
+                if (!on) l.onPick(o[0]);
+            });
+            box.addView(t);
+        }
+        return box;
+    }
+
     interface Pick {
         void onPick(String value);
     }
@@ -578,6 +600,52 @@ final class Ui {
      * Pick a model for an agent: its list ("" first, described by defaultHint) or any model name typed in. The pick goes
      * to l; nothing happens if the sheet is closed.
      */
+    /** Lists longer than this get a search field (an API service like OpenRouter lists hundreds of models, issue #58). */
+    static final int SEARCH_FROM = 10;
+
+    /**
+     * A search field over a list: each entry is {row, what it's found by (lower case), its heading or null}. Rows that
+     * don't contain what's typed hide, and a heading hides with the last of its rows. Entries may be added after.
+     */
+    static android.widget.EditText listFilter(Context c, String hint, java.util.List<Object[]> rows) {
+        final android.widget.EditText et = new android.widget.EditText(c);
+        et.setHint(hint);
+        et.setHintTextColor(MUTED);
+        et.setTextColor(TEXT);
+        et.setTextSize(14);
+        et.setSingleLine(true);
+        et.setImeOptions(android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH);
+        et.setPaddingRelative(dp(c, 12), dp(c, 10), dp(c, 12), dp(c, 10));
+        et.setBackground(outlined(c, BG, 12, OUTLINE, 1));
+        et.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int a, int b, int n) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int a, int b, int n) {
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {
+                String q = s.toString().trim().toLowerCase(java.util.Locale.ROOT);
+                Map<View, Boolean> heads = new HashMap<>();
+                for (Object[] r : rows) {
+                    boolean show = q.isEmpty() || ((String) r[1]).contains(q);
+                    ((View) r[0]).setVisibility(show ? View.VISIBLE : View.GONE);
+                    if (r[2] != null) heads.merge((View) r[2], show, Boolean::logicalOr);
+                }
+                for (Map.Entry<View, Boolean> h : heads.entrySet()) h.getKey().setVisibility(h.getValue() ? View.VISIBLE : View.GONE);
+            }
+        });
+        return et;
+    }
+
+    /** What a model row is found by: its name and its id. */
+    static String modelKey(String[] o) {
+        return (o[1] + " " + o[0]).toLowerCase(java.util.Locale.ROOT);
+    }
+
     static void modelSheet(Activity a, String backend, String current, String defaultHint, Pick l) {
         modelSheet(a, backend, current, defaultHint, true, l);
     }
@@ -595,11 +663,16 @@ final class Ui {
         h.setPaddingRelative(0, 0, 0, dp(a, 8));
         c.addView(h);
         boolean known = false;
-        for (final String[] o : Models.options(backend, services)) {
+        java.util.List<String[]> options = Models.options(backend, services);
+        java.util.List<Object[]> found = new java.util.ArrayList<>();
+        if (options.size() > SEARCH_FROM) c.addView(listFilter(a, a.getString(R.string.chat_model_search), found), full());
+        View heading = null;
+        for (final String[] o : options) {
             if (o[0] == null) { // an API key service's models
                 TextView sl = sectionLabel(a, o[1]);
                 sl.setPaddingRelative(0, dp(a, 14), 0, dp(a, 2));
                 c.addView(sl);
+                heading = sl;
                 continue;
             }
             boolean on = o[0].equals(current);
@@ -618,6 +691,7 @@ final class Ui {
                 l.onPick(o[0]);
             });
             c.addView(r, full());
+            found.add(new Object[]{r, modelKey(o), heading});
         }
         LinearLayout other = row(a);
         other.setPaddingRelative(0, dp(a, 10), 0, 0);

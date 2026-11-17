@@ -481,7 +481,7 @@
     <string name="chat_approvals_ask">询问</string>
     <string name="chat_approvals_ask_info">每个应用按“%1$s”中的设置执行。</string>
     <string name="chat_approvals_strict_info">即使在设为“%1$s”的应用中，Buddy 也会在发送、发布、购买或删除前询问。</string>
-    <string name="chat_approvals_apps_hint">智能体操作过的应用，以及各应用在“%1$s”中的设置。点按其中一个可前往更改。</string>
+    <string name="chat_approvals_apps_set">智能体操作过的应用，以及各应用在“%1$s”中的设置。在这里更改会对所有对话生效。</string>
     <string name="chat_approvals_routine">允许常规操作</string>
     <string name="chat_approvals_routine_info">常规步骤在所有应用中直接进行，不弹卡片：发送消息，或审核者会询问的步骤。每一步都会记录在对话中。付款、购买、删除、安装、密码和安全设置仍会询问你，银行和支付应用、设置及应用商店中的一切操作也是如此。</string>
     <string name="chat_approvals_strict">始终询问</string>
@@ -567,6 +567,7 @@
     <string name="chat_model_other_hint">其他…例如 %1$s</string>
     <!-- Button, verb: use the model typed in the box. Keep short. -->
     <string name="chat_model_use">使用</string>
+    <string name="chat_model_search">搜索模型</string>
 
     <!-- Language sheet (long-press the mic) -->
     <!-- Title, followed by a list of languages to speak in. -->
@@ -647,6 +648,9 @@
     <string name="hub_continuing">正在继续之前的 %1$s 会话。如果它仍在终端中打开，请先在那里关闭。</string>
     <string name="hub_still_working_attachments">此对话仍在处理中。请等它完成后再发送附件。</string>
     <string name="hub_service_off">%1$s 已关闭（设置 → 智能体与模型 → API 密钥）。请开启它，或为此对话选择其他模型。</string>
+    <string name="hub_accessibility_dead">Buddy 的无障碍服务虽已开启，但没有运行：Android 停止了 Buddy，且没有重新启动该服务，所以智能体无法操作手机。请在 Android 设置 → 无障碍 中关闭再重新开启 Buddy。为避免再次发生：如果手机的应用设置里有自启动选项，请允许 Buddy 自启动；麦克风权限请选“仅在使用该应用时允许”，而不是“仅限这一次”。</string>
+    <string name="hub_accessibility_off">Buddy 的无障碍服务已关闭，所以智能体无法操作手机。请在 Android 设置 → 无障碍 中开启 Buddy。</string>
+    <string name="voice_mic_while_using">请选择“仅在使用该应用时允许”：选“仅限这一次”的话，你离开 Buddy 一分钟后 Android 就会停止它，即使任务正在进行。</string>
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">正在思考…</string>
     <string name="hub_still_waiting">仍在等待模型回复…</string>
@@ -1237,6 +1241,15 @@
     <!-- Button. -->
     <string name="setup_copy_command">复制命令</string>
     <string name="setup_command_copied">已复制。请粘贴到你的终端中。</string>
+    <string name="setup_outside_background">在后台工作</string>
+    <string name="setup_outside_background_info">你自己会话中的智能体在隐藏屏幕上工作，就像后台模式的聊天：你可以继续使用手机，锁屏时它们也会继续。卡片和问题仍会发给你。需要你亲自查看的步骤（例如登录）会把相应应用移到你的屏幕上。需要先设置后台模式。</string>
+    <string name="setup_tailnet">通过 Tailscale 使用手机工具</string>
+    <string name="setup_tailnet_info">你自己电脑上的智能体可以通过 Tailscale 使用这些手机工具（两边都要开启 Tailscale）。每台添加的电脑都有自己的密钥，“移除”即可收回。卡片和问题仍会发到你的手机上。请打开上面的“在后台工作”，以免它们占用你的屏幕。</string>
+    <string name="setup_tailnet_address">这台手机在 Tailscale 上的地址：%1$s</string>
+    <string name="setup_tailnet_no_address">这台手机上的 Tailscale 未连接，电脑现在无法访问它。</string>
+    <string name="setup_tailnet_computer">电脑 %1$d</string>
+    <string name="setup_tailnet_pair_info">在开启了 Tailscale 的电脑上，在终端里运行这条命令。这台手机会请你批准，批准后电脑上的 Claude Code 就能用自己的密钥使用手机工具。</string>
+    <string name="tools_card_pair">配对电脑“%1$s”（Tailscale %2$s）吗？它会用自己的密钥使用 Buddy 的手机工具，你可以在设置中移除。</string>
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">语音</string>
@@ -1336,6 +1349,8 @@
     <string name="setup_read_aloud_info">Buddy 会用你在“语音”中选择的声音朗读智能体的回复。</string>
     <string name="setup_pause_media">朗读时暂停媒体</string>
     <string name="setup_pause_media_info">Buddy 朗读回复时，会暂停正在播放的音乐或视频，读完后继续播放。Buddy 只会恢复它自己暂停的内容；如果你在此期间更改了播放，则不会恢复。需要开启“朗读回复”和通知使用权。</string>
+    <string name="setup_pause_listening">聆听时暂停媒体</string>
+    <string name="setup_pause_listening_info">Buddy 聆听你说话时，正在播放的音乐或视频会暂停，这样它听到的是你的声音而不是视频，之后再继续播放。如果同时开启了“朗读时暂停媒体”，会一直暂停到回复读完。Buddy 只会恢复它自己暂停的内容；如果你在此期间更改过播放，则不会恢复。需要通知访问权限。</string>
     <string name="setup_voice_cards">用语音回答卡片</string>
     <string name="setup_voice_cards_info">朗读卡片后，Buddy 会聆听：说“批准”或“拒绝”，或者说出你要的选项。需要开启“朗读回复”。手机锁定时不可用。听得到的人都可以回答。</string>
     <string name="voice_card_approval">Buddy 需要你的确认。%1$s</string>
@@ -1807,6 +1822,9 @@
     <string name="hub_tool_browser_back">浏览器：正在返回</string>
     <string name="hub_tool_browser_tabs">浏览器：标签页</string>
     <string name="hub_tool_schedule_message">正在安排：%1$s</string>
+    <string name="hub_tool_add_rule">正在添加通知规则：%1$s</string>
+    <string name="tools_card_rule">要为聊天“%4$s”添加通知规则吗？来自 %1$s，%2$s：每条通知都会带着指令“%3$s”进入这个聊天。和所有规则一样，它在行动前会先问你。</string>
+    <string name="rules_in_chat">在聊天“%1$s”中</string>
     <string name="hub_tool_list_scheduled">正在查看已安排的消息</string>
     <string name="hub_tool_cancel_scheduled">正在取消已安排的消息</string>
     <string name="later_title">代理在 %1$s 的消息</string>

@@ -37,11 +37,16 @@ final class Rules {
         /** Most runs an hour for one conversation, and three times as many for the whole rule; 0 for no limit. */
         int limit = 20;
         boolean on = true;
+        /**
+         * The chat an agent added it from (add_notification_rule), or "": its notifications all come into that chat,
+         * which keeps its own agent and model, instead of a chat per conversation.
+         */
+        String chat = "";
 
         JSONObject json() throws org.json.JSONException {
             return new JSONObject().put("id", id).put("pkg", pkg).put("app", app).put("from", from).put("words", words)
                     .put("instruction", instruction).put("backend", backend).put("model", model).put("approval", approval)
-                    .put("seconds", seconds).put("limit", limit).put("on", on);
+                    .put("seconds", seconds).put("limit", limit).put("on", on).put("chat", chat);
         }
 
         static Rule of(JSONObject o) {
@@ -58,6 +63,7 @@ final class Rules {
             r.seconds = o.optInt("seconds", 30);
             r.limit = o.optInt("limit", 20);
             r.on = o.optBoolean("on", true);
+            r.chat = o.optString("chat", "");
             return r;
         }
 

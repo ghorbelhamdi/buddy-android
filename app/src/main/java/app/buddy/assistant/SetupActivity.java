@@ -553,8 +553,80 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         LinearLayout.LayoutParams cpp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 44));
         cpp.topMargin = dp(this, 12);
         mcp.addView(copy, cpp);
+        // those sessions on a hidden screen of their own, as a chat in background mode (issue #48)
+        mcp.addView(protect(switchRow(this, getString(R.string.setup_outside_background),
+                getString(R.string.setup_outside_background_info), Prefs.outsideBackground(this),
+                on -> Prefs.setOutsideBackground(this, on))), topGap(12));
         addCard(mcp);
+        tailnetCard();
 
+    }
+
+    /**
+     * Phone tools on Tailscale (see Tailnet): a switch, the phone's Tailscale address, and the computers paired for
+     * it, each with the command that gives Claude Code there the phone tools, and Remove.
+     */
+    private void tailnetCard() {
+        LinearLayout tn = card();
+        tn.setPaddingRelative(dp(this, 16), dp(this, 6), dp(this, 16), dp(this, 16));
+        boolean on = Prefs.tailnetTools(this);
+        tn.addView(protect(switchRow(this, getString(R.string.setup_tailnet), getString(R.string.setup_tailnet_info), on,
+                v -> {
+                    Prefs.setTailnetTools(this, v);
+                    render();
+                })));
+        if (on) {
+            java.net.InetAddress at = Tailnet.address(this);
+            tn.addView(text(this, at == null ? getString(R.string.setup_tailnet_no_address)
+                    : getString(R.string.setup_tailnet_address, at.getHostAddress()), 13, at == null ? ERR : MUTED), topGap(8));
+            // pairing starts on the computer: this command asks the phone, the user approves it on a card here, and the
+            // key goes straight into Claude Code's settings there (it never shows, nor goes through the clipboard)
+            if (at != null) {
+                tn.addView(text(this, getString(R.string.setup_tailnet_pair_info), 14, MUTED), topGap(10));
+                // paired again (a new key replaces the computer's old one, see Tailnet.add), the old entry goes first
+                String url = "http://" + at.getHostAddress() + ":" + McpServer.PORT + "/pair?name=";
+                String unix = "c=\"$(curl -sf -X POST \"" + url + "$(hostname)\")\" && { claude mcp remove -s user phone "
+                        + ">/dev/null 2>&1; claude mcp add-json -s user phone \"$c\"; } || echo \"Not paired\"";
+                // Windows PowerShell has no && or $( ), its curl is another tool, and it drops the quotes inside JSON
+                // handed to a program: the answer is read as an object, and Claude Code gets the key as a header
+                String windows = "$r = $null; $r = Invoke-RestMethod -Method Post \"" + url + "$env:COMPUTERNAME\"; "
+                        + "if ($r) { claude mcp remove -s user phone 2>$null; claude mcp add -s user --transport http phone "
+                        + "$r.url --header (\"Authorization: \" + $r.headers.Authorization) }";
+                // any other MCP app: the npm bridge, which pairs the same way on its first tool call (mcp-bridge/README.md)
+                String other = "npx -y buddy-phone-bridge\nBUDDY_URL=http://" + at.getHostAddress() + ":" + McpServer.PORT;
+                for (String[] k : new String[][]{{"Claude Code · Mac · Linux · WSL", unix}, {"Claude Code · Windows PowerShell", windows},
+                        {"Other MCP apps (Node.js 18+): command and environment", other}}) {
+                    final String cmd = k[1];
+                    tn.addView(sectionLabel(this, k[0]), topGap(12));
+                    tn.addView(codeBlock(this, cmd), topGap(6));
+                    Button copy = button(this, getString(R.string.setup_copy_command), false);
+                    copy.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ms_content_copy, 0, 0, 0);
+                    copy.setCompoundDrawableTintList(android.content.res.ColorStateList.valueOf(TEXT));
+                    copy.setCompoundDrawablePadding(dp(this, 8));
+                    copy.setOnClickListener(v -> {
+                        getSystemService(ClipboardManager.class).setPrimaryClip(ClipData.newPlainText("Buddy pairing", cmd));
+                        Toast.makeText(this, R.string.setup_command_copied, Toast.LENGTH_SHORT).show();
+                    });
+                    LinearLayout.LayoutParams cpp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 44));
+                    cpp.topMargin = dp(this, 8);
+                    tn.addView(copy, cpp);
+                }
+            }
+            for (Tailnet.Device d : Tailnet.devices(this)) {
+                LinearLayout r = row(this);
+                r.setGravity(Gravity.CENTER_VERTICAL);
+                r.addView(text(this, d.name, 15, TEXT), weight1());
+                Button rm = button(this, getString(R.string.schedule_remove), false);
+                rm.setTextColor(ERR);
+                rm.setOnClickListener(v -> {
+                    Tailnet.remove(this, d.id);
+                    render();
+                });
+                r.addView(rm, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 40)));
+                tn.addView(r, topGap(10));
+            }
+        }
+        addCard(tn);
     }
 
     /** Voice: how Buddy listens and speaks, its languages, the assistant gesture, live voice. */
@@ -876,6 +948,16 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             r.setEnabled(speak);
             r.setClickable(speak);
         }
+        // while Buddy listens: on its own, whether replies are read aloud or not (#56)
+        ex.addView(switchRow(this, getString(R.string.setup_pause_listening), getString(R.string.setup_pause_listening_info),
+                Prefs.pauseMediaForListening(this), on -> {
+                    Prefs.setPauseMediaForListening(this, on);
+                    if (on && !NotificationWatcher.enabled(this)) { // that is how Buddy sees what plays
+                        Toast.makeText(this, R.string.rules_access_off_title, Toast.LENGTH_LONG).show();
+                        startActivity(new Intent(this, CheckActivity.class));
+                    }
+                }), full());
+        ex.addView(divider(), lineParams());
         ex.addView(switchRow(this, getString(R.string.setup_read_aloud), getString(R.string.setup_read_aloud_info),
                 speak, on -> {
                     Prefs.setSpeakReplies(this, on);

@@ -5,6 +5,7 @@
 #      play: the Play version, which has no Linux tools at all)
 #                                    run the agent on the message in that session, streaming events to the bubble
 #   buddy-run <token> stop <session>       stop that session's running request
+#   buddy-run <token> reap <session>       end what is left of a run whose helper died, without a word to the chat
 #   buddy-run <token> delete <session>     forget that session
 #   buddy-run <token> prune <id,id,...>    remove the folders of chats not in the list
 #   buddy-run <token> ping                 answer the app's setup check
@@ -14,7 +15,7 @@
 #   buddy-run <token> transcript <claude|codex> <file>   last messages of a session (buddy_transcript)
 #   buddy-run <token> adopt <session> <claude|codex> <agent-session-id>  continue that session as a Buddy chat
 # Every event sent to the bubble carries "buddy_session" so the app can route it.
-HELPER_VERSION=32
+HELPER_VERSION=33
 set -u
 export PATH=$HOME/.local/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # The claude launcher sets BUN_OPTIONS with a path relative to its folder; never inherit a stale one.
@@ -42,6 +43,29 @@ kill_tree() {
   local p=$1 c
   for c in $(pgrep -P "$p" 2>/dev/null); do kill_tree "$c"; done
   kill -TERM "$p" 2>/dev/null
+}
+
+# A process and everything under it, deepest first.
+tree() {
+  local c
+  for c in $(pgrep -P "$1" 2>/dev/null); do tree "$c"; done
+  echo "$1"
+}
+
+# Ends a run for good: asks its processes to stop, then, a few seconds on, kills the ones still there. A run whose
+# proot was killed under it (Android ending an app's processes) is left without the tracer its system calls go
+# through: its shell then spins at full CPU, waiting on a child it can never collect, and never says it is done
+# (issue #53). Nothing short of a kill ends that.
+end_run() {
+  local all p
+  all=$(tree "$1")
+  kill -TERM $all 2>/dev/null
+  for p in 1 2 3 4 5; do
+    kill -0 $all 2>/dev/null || return 0
+    sleep 1
+  done
+  kill -KILL $all 2>/dev/null
+  return 0
 }
 
 # An agent's run (run_<agent>), then a line saying it has ended. Something the agent started (an MCP server, a job in
@@ -224,9 +248,20 @@ case "$CMD" in
     SID=${3:-}; valid_sid "$SID" || exit 2
     P=$D/sessions/$SID/pid
     if [ -f "$P" ]; then
-      kill_tree "$(cat "$P")"
+      R=$(cat "$P")
       rm -f "$P"
       jq -cn --arg s "$SID" '{type:"buddy_stopped",buddy_session:$s}' | post
+      [[ "$R" =~ ^[0-9]+$ ]] && end_run "$R"
+    fi
+    exit 0 ;;
+  reap)
+    # the app saw this chat's helper die without a word: what is left of its run goes, quietly
+    SID=${3:-}; valid_sid "$SID" || exit 2
+    P=$D/sessions/$SID/pid
+    if [ -f "$P" ]; then
+      R=$(cat "$P")
+      rm -f "$P"
+      [[ "$R" =~ ^[0-9]+$ ]] && end_run "$R"
     fi
     exit 0 ;;
   delete)
@@ -266,7 +301,7 @@ case "$CMD" in
   ask) SID=${3:-}; BACKEND=${4:-claude}; DEV=${5:-0}; MSG=${6:-}; MODEL=${7:-}; FILES=${8:-}; EFFORT=${9:-}
     [[ "$EFFORT" =~ ^[a-z]{1,16}$ ]] || EFFORT="" # the agent's own level names, whatever they are
     FRESH=${10:-} ;;
-  *) echo "usage: buddy-run <token> ask|stop|delete|prune|ping ..." >&2; exit 2 ;;
+  *) echo "usage: buddy-run <token> ask|stop|reap|delete|prune|ping ..." >&2; exit 2 ;;
 esac
 
 valid_sid "$SID" || exit 2

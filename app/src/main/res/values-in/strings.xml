@@ -481,7 +481,7 @@
     <string name="chat_approvals_ask">Tanya</string>
     <string name="chat_approvals_ask_info">Tiap aplikasi mengikuti pengaturannya di %1$s.</string>
     <string name="chat_approvals_strict_info">Juga di aplikasi yang disetel ke %1$s, Buddy bertanya sebelum mengirim, memposting, membeli, atau menghapus.</string>
-    <string name="chat_approvals_apps_hint">Tempat agen bertindak, dengan setelan tiap aplikasi di %1$s. Ketuk salah satu untuk mengubahnya di sana.</string>
+    <string name="chat_approvals_apps_set">Tempat agen bertindak, dengan setelan tiap aplikasi di %1$s. Perubahan di sini berlaku di semua chat.</string>
     <string name="chat_approvals_routine">Rutin diizinkan</string>
     <string name="chat_approvals_routine_info">Langkah rutin langsung berjalan di semua aplikasi tanpa kartu: mengirim pesan, atau langkah yang akan ditanyakan peninjau. Setiap langkah dicatat di chat. Membayar, membeli, menghapus, memasang, kata sandi, dan setelan keamanan tetap menanyakan Anda, begitu juga semua hal di aplikasi perbankan dan pembayaran, Setelan, dan toko aplikasi.</string>
     <string name="chat_approvals_strict">Selalu tanya</string>
@@ -567,6 +567,7 @@
     <string name="chat_model_other_hint">lainnya… mis. %1$s</string>
     <!-- Button, verb: use the model typed in the box. Keep short. -->
     <string name="chat_model_use">Gunakan</string>
+    <string name="chat_model_search">Cari model</string>
 
     <!-- Language sheet (long-press the mic) -->
     <!-- Title, followed by a list of languages to speak in. -->
@@ -647,6 +648,9 @@
     <string name="hub_continuing">Melanjutkan sesi %1$s sebelumnya. Jika masih terbuka di terminal, tutup dulu di sana.</string>
     <string name="hub_still_working_attachments">Chat ini masih berjalan. Kirim lampiran setelah selesai.</string>
     <string name="hub_service_off">%1$s dinonaktifkan (Setelan → Agen dan model → Kunci API). Aktifkan, atau pilih model lain untuk chat ini.</string>
+    <string name="hub_accessibility_dead">Layanan aksesibilitas Buddy tidak berjalan, padahal aktif: Android menghentikan Buddy dan tidak memulai layanannya lagi, jadi agen tidak bisa menjangkau ponsel. Nonaktifkan lalu aktifkan lagi Buddy di Setelan Android → Aksesibilitas. Agar tidak terulang: izinkan Buddy mulai otomatis di setelan aplikasi ponsel, jika ada, dan beri mikrofon “Saat aplikasi digunakan”, bukan “Hanya kali ini”.</string>
+    <string name="hub_accessibility_off">Layanan aksesibilitas Buddy nonaktif, jadi agen tidak bisa menjangkau ponsel. Aktifkan Buddy di Setelan Android → Aksesibilitas.</string>
+    <string name="voice_mic_while_using">Pilih “Saat aplikasi digunakan”: dengan “Hanya kali ini”, Android menghentikan Buddy semenit setelah Anda meninggalkannya, bahkan di tengah tugas.</string>
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">Berpikir…</string>
     <string name="hub_still_waiting">Masih menunggu jawaban model…</string>
@@ -1237,6 +1241,15 @@
     <!-- Button. -->
     <string name="setup_copy_command">Salin perintah</string>
     <string name="setup_command_copied">Disalin. Tempel di terminal Anda.</string>
+    <string name="setup_outside_background">Bekerja di latar belakang</string>
+    <string name="setup_outside_background_info">Agen di sesi Anda sendiri bekerja di layar tersembunyi, seperti chat dalam mode latar belakang: Anda tetap memakai ponsel, dan mereka terus berjalan saat ponsel terkunci. Kartu dan pertanyaan tetap datang kepada Anda. Langkah yang perlu mata Anda, seperti masuk akun, membawa aplikasinya ke layar Anda. Perlu mode latar belakang yang sudah disiapkan.</string>
+    <string name="setup_tailnet">Alat ponsel di Tailscale</string>
+    <string name="setup_tailnet_info">Agen di komputer Anda sendiri mendapat alat ponsel ini lewat Tailscale, dengan Tailscale aktif di keduanya. Setiap komputer yang ditambahkan punya kunci sendiri, yang dicabut lewat Hapus. Kartu dan pertanyaan tetap datang kepada Anda di ponsel. Aktifkan Bekerja di latar belakang di atas, agar mereka tidak memakai layar Anda.</string>
+    <string name="setup_tailnet_address">Ponsel ini di Tailscale: %1$s</string>
+    <string name="setup_tailnet_no_address">Tailscale tidak terhubung di ponsel ini, jadi komputer tidak bisa menjangkaunya sekarang.</string>
+    <string name="setup_tailnet_computer">Komputer %1$d</string>
+    <string name="setup_tailnet_pair_info">Di komputer, dengan Tailscale aktif, jalankan ini di terminal. Ponsel ini lalu meminta persetujuan Anda, dan Claude Code di komputer mendapat alat ponsel dengan kuncinya sendiri.</string>
+    <string name="tools_card_pair">Pasangkan komputer “%1$s” (Tailscale %2$s)? Komputer ini mendapat alat ponsel Buddy dengan kuncinya sendiri, yang bisa Anda hapus di Setelan.</string>
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Suara</string>
@@ -1336,6 +1349,8 @@
     <string name="setup_read_aloud_info">Buddy membacakan balasan agen dengan suara yang Anda pilih di bagian Suara.</string>
     <string name="setup_pause_media">Jeda media saat membacakan</string>
     <string name="setup_pause_media_info">Musik atau video yang sedang diputar dijeda saat Buddy membacakan balasan, lalu dilanjutkan setelahnya. Buddy hanya melanjutkan yang dijedanya sendiri, dan tidak jika Anda mengubah pemutaran sementara itu. Memerlukan “Bacakan balasan” dan akses notifikasi.</string>
+    <string name="setup_pause_listening">Jeda media saat mendengarkan</string>
+    <string name="setup_pause_listening_info">Musik atau video yang diputar dijeda saat Buddy mendengarkan Anda, agar yang terdengar suara Anda dan bukan videonya, lalu diputar lagi setelahnya. Jika “Jeda media saat membacakan” juga aktif, media tetap dijeda sampai balasan selesai dibacakan. Buddy hanya memutar lagi yang dijedanya, dan tidak jika Anda mengubah pemutaran sementara itu. Memerlukan akses notifikasi.</string>
     <string name="setup_voice_cards">Jawab kartu dengan suara</string>
     <string name="setup_voice_cards_info">Setelah kartu dibacakan, Buddy mendengarkan: ucapkan “setujui” atau “tolak”, atau opsi yang Anda inginkan. Memerlukan “Bacakan balasan”. Tidak saat ponsel terkunci. Siapa pun yang berada dalam jangkauan suara bisa menjawab.</string>
     <string name="voice_card_approval">Buddy memerlukan persetujuan Anda. %1$s</string>
@@ -1808,6 +1823,9 @@
     <string name="hub_tool_browser_back">Browser: kembali</string>
     <string name="hub_tool_browser_tabs">Browser: tab</string>
     <string name="hub_tool_schedule_message">Menjadwalkan: %1$s</string>
+    <string name="hub_tool_add_rule">Menambahkan aturan notifikasi: %1$s</string>
+    <string name="tools_card_rule">Tambahkan aturan notifikasi ke chat “%4$s”? Dari %1$s, %2$s: setiap notifikasi masuk ke chat ini dengan instruksi “%3$s”. Aturan ini bertanya dulu sebelum bertindak, seperti semua aturan.</string>
+    <string name="rules_in_chat">Di chat “%1$s”</string>
     <string name="hub_tool_list_scheduled">Memeriksa pesan terjadwal</string>
     <string name="hub_tool_cancel_scheduled">Membatalkan pesan terjadwal</string>
     <string name="later_title">Pesan agen untuk %1$s</string>

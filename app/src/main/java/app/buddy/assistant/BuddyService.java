@@ -781,7 +781,9 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         if (revoked != null) return revoked;
         if (rereadNeeded && phone) {
             if ("read_screen".equals(tool) || "screenshot".equals(tool)) rereadNeeded = false;
-            else if (!"wait".equals(tool) && !"list_apps".equals(tool)) {
+            // only what acts on the screen by what was read there: a phone command, the notifications, the clipboard
+            // or opening an app don't depend on it, and go ahead (the flag stays for the next tap)
+            else if (ON_SCREEN.contains(tool)) {
                 return "SCREEN CHANGED: the user used the phone themselves (they paused you, or did something on the "
                         + "screen while you waited for their answer), so the screen may have changed and element ids are "
                         + "stale. Nothing was done. Call read_screen, then continue the task.";
@@ -789,6 +791,10 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         }
         return null;
     }
+
+    /** Tools that act on what the agent last read on the screen (element ids, points), so a stale read misleads them. */
+    private static final java.util.Set<String> ON_SCREEN = new java.util.HashSet<>(java.util.Arrays.asList(
+            "tap", "long_press", "type_text", "scroll", "swipe", "press", "do_steps", "collect", "find"));
 
     /** Short vibration to get the user's attention (e.g. "tap Update"). */
     void nudge() {

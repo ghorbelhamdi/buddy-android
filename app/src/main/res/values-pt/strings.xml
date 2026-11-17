@@ -484,7 +484,7 @@
     <string name="chat_approvals_ask">Perguntar</string>
     <string name="chat_approvals_ask_info">Cada app segue o que está definido em %1$s.</string>
     <string name="chat_approvals_strict_info">Também nos apps em %1$s, o Buddy pergunta antes de enviar, publicar, comprar ou excluir.</string>
-    <string name="chat_approvals_apps_hint">Onde o agente agiu, com o ajuste de cada app em %1$s. Toque em um para mudar lá.</string>
+    <string name="chat_approvals_apps_set">Onde o agente agiu, com o ajuste de cada app em %1$s. Uma mudança aqui vale para todas as conversas.</string>
     <string name="chat_approvals_routine">Rotina permitida</string>
     <string name="chat_approvals_routine_info">Passos de rotina seguem em qualquer app sem cartão: enviar uma mensagem ou um passo sobre o qual o revisor perguntaria. Cada um fica anotado no chat. Pagar, comprar, excluir, instalar, senhas e configurações de segurança continuam perguntando, assim como tudo em apps de banco e pagamento, Configurações e lojas de apps.</string>
     <string name="chat_approvals_strict">Sempre perguntar</string>
@@ -570,6 +570,7 @@
     <string name="chat_model_other_hint">outro… ex.: %1$s</string>
     <!-- Button, verb: use the model typed in the box. Keep short. -->
     <string name="chat_model_use">Usar</string>
+    <string name="chat_model_search">Pesquisar modelos</string>
 
     <!-- Language sheet (long-press the mic) -->
     <!-- Title, followed by a list of languages to speak in. -->
@@ -652,6 +653,9 @@
     <string name="hub_continuing">Continuando uma sessão anterior do %1$s. Se ela ainda estiver aberta em um terminal, feche-a lá primeiro.</string>
     <string name="hub_still_working_attachments">Este chat ainda está trabalhando. Envie os anexos quando ele terminar.</string>
     <string name="hub_service_off">%1$s está desativado (Configurações → Agentes e modelos → Chaves de API). Ative-o ou escolha outro modelo para esta conversa.</string>
+    <string name="hub_accessibility_dead">O serviço de acessibilidade do Buddy não está em execução, embora esteja ativado: o Android fechou o Buddy e não reiniciou o serviço, então os agentes não conseguem usar o telefone. Desative e ative o Buddy em Configurações do Android → Acessibilidade. Para não acontecer de novo: permita a inicialização automática do Buddy nas configurações de apps do telefone, se houver, e dê ao microfone “Durante o uso do app”, não “Apenas esta vez”.</string>
+    <string name="hub_accessibility_off">O serviço de acessibilidade do Buddy está desativado, então os agentes não conseguem usar o telefone. Ative o Buddy em Configurações do Android → Acessibilidade.</string>
+    <string name="voice_mic_while_using">Escolha “Durante o uso do app”: com “Apenas esta vez”, o Android fecha o Buddy um minuto depois que você sai dele, mesmo no meio de uma tarefa.</string>
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">Pensando…</string>
     <string name="hub_still_waiting">Ainda aguardando a resposta do modelo…</string>
@@ -1245,6 +1249,15 @@
     <!-- Button. -->
     <string name="setup_copy_command">Copiar comando</string>
     <string name="setup_command_copied">Copiado. Cole no seu terminal.</string>
+    <string name="setup_outside_background">Trabalhar em segundo plano</string>
+    <string name="setup_outside_background_info">Os agentes das suas próprias sessões trabalham numa tela oculta, como um chat no modo segundo plano: você continua usando o telefone, e eles seguem mesmo com ele bloqueado. Cartões e perguntas continuam chegando a você. Um passo que precisa dos seus olhos, como um login, traz o app para a sua tela. Precisa do modo segundo plano configurado.</string>
+    <string name="setup_tailnet">Ferramentas do telefone no Tailscale</string>
+    <string name="setup_tailnet_info">Agentes nos seus próprios computadores recebem estas ferramentas do telefone pelo Tailscale, com o Tailscale ligado nos dois. Cada computador adicionado tem a sua própria chave, que Remover revoga. Cartões e perguntas continuam chegando a você no telefone. Ative Trabalhar em segundo plano acima, para que não usem a sua tela.</string>
+    <string name="setup_tailnet_address">Este telefone no Tailscale: %1$s</string>
+    <string name="setup_tailnet_no_address">O Tailscale não está conectado neste telefone, então os computadores não o alcançam agora.</string>
+    <string name="setup_tailnet_computer">Computador %1$d</string>
+    <string name="setup_tailnet_pair_info">No computador, com o Tailscale ligado, execute isto num terminal. Este telefone pede então a sua aprovação, e o Claude Code no computador recebe as ferramentas do telefone com uma chave própria.</string>
+    <string name="tools_card_pair">Emparelhar o computador “%1$s” (Tailscale %2$s)? Ele recebe as ferramentas do telefone do Buddy com uma chave própria, que você pode remover nas Configurações.</string>
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Voz</string>
@@ -1346,6 +1359,8 @@
     <string name="setup_read_aloud_info">O Buddy lê em voz alta as respostas dos agentes, com a voz que você escolher na seção Voz.</string>
     <string name="setup_pause_media">Pausar a mídia durante a leitura em voz alta</string>
     <string name="setup_pause_media_info">A música ou o vídeo em reprodução é pausado enquanto o Buddy lê uma resposta e continua depois. O Buddy só retoma o que ele pausou, e não se você mudou a reprodução nesse meio-tempo. Requer “Ler respostas em voz alta” e o acesso às notificações.</string>
+    <string name="setup_pause_listening">Pausar mídia enquanto ouve</string>
+    <string name="setup_pause_listening_info">A música ou o vídeo em reprodução é pausado enquanto o Buddy ouve você, para ouvir sua voz e não o vídeo, e volta a tocar depois. Com “Pausar a mídia durante a leitura em voz alta” também ativado, fica pausado até a resposta ser lida. O Buddy só retoma o que pausou, e não se você mudou a reprodução nesse meio-tempo. Precisa de acesso às notificações.</string>
     <string name="setup_voice_cards">Responder aos cartões por voz</string>
     <string name="setup_voice_cards_info">Depois de ler um cartão em voz alta, o Buddy escuta: diga “aprovar” ou “negar”, ou a opção que quiser. Requer “Ler respostas em voz alta”. Não funciona com o telefone bloqueado. Qualquer pessoa por perto poderia responder.</string>
     <string name="voice_card_approval">O Buddy precisa da sua aprovação. %1$s</string>
@@ -1818,6 +1833,9 @@
     <string name="hub_tool_browser_back">Navegador: voltando</string>
     <string name="hub_tool_browser_tabs">Navegador: abas</string>
     <string name="hub_tool_schedule_message">Agendando: %1$s</string>
+    <string name="hub_tool_add_rule">Adicionando uma regra de notificação: %1$s</string>
+    <string name="tools_card_rule">Adicionar uma regra de notificação ao chat “%4$s”? De %1$s, %2$s: cada uma chega a este chat com a instrução “%3$s”. A regra pergunta antes de agir, como todas as regras.</string>
+    <string name="rules_in_chat">No chat “%1$s”</string>
     <string name="hub_tool_list_scheduled">Verificando mensagens agendadas</string>
     <string name="hub_tool_cancel_scheduled">Cancelando uma mensagem agendada</string>
     <string name="later_title">Mensagem do agente para %1$s</string>

@@ -72,6 +72,55 @@ final class Background {
         return Prefs.backgroundPaired(c);
     }
 
+    /**
+     * The hidden screen of sessions outside Buddy (an agent in Termux, or on a PC over Tailscale): they have no chat,
+     * so they share this one, when the user switched it on (Prefs.outsideBackground). It closes after OUTSIDE_IDLE_MS
+     * without a call. A step for the user's own eyes brings its app to the real screen, and the session then works
+     * there until it has been idle that long.
+     */
+    static final String OUTSIDE = "outside";
+    private static final long OUTSIDE_IDLE_MS = 10 * 60_000L;
+    /** When each outside screen's session last made a call, and which of them work on the real screen for now. */
+    private static final java.util.Map<String, Long> outsideUsed = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Set<String> outsideOnScreen = java.util.concurrent.ConcurrentHashMap.newKeySet();
+
+    /** A hidden screen of sessions outside Buddy: OUTSIDE (this phone's own terminal) or OUTSIDE-<computer>. */
+    static boolean outside(String key) {
+        return key != null && (key.equals(OUTSIDE) || key.startsWith(OUTSIDE + "-"));
+    }
+
+    private static boolean idle(String key) {
+        Long at = outsideUsed.get(key);
+        return at == null || System.currentTimeMillis() - at > OUTSIDE_IDLE_MS;
+    }
+
+    /** Does a call for this key (a chat id, or an outside key) work on a hidden screen? */
+    static boolean onFor(Context c, String key) {
+        if (!outside(key)) return on(c, key);
+        if (outsideOnScreen.contains(key) && idle(key)) outsideOnScreen.remove(key);
+        return !outsideOnScreen.contains(key) && setUp(c) && Prefs.outsideBackground(c);
+    }
+
+    /** An outside session made a call: its hidden screen (or its turn on the real one) lasts a while longer. */
+    static void outsideUsed(String key) {
+        outsideUsed.put(key, System.currentTimeMillis());
+    }
+
+    /** An outside session's app comes to the real screen; the session works there from now on (see onFor). */
+    static String bringOutsideToScreen(BuddyService svc, String key) {
+        String pkg = appOn(svc, key);
+        android.content.Intent launch = pkg == null ? null : svc.getPackageManager().getLaunchIntentForPackage(pkg);
+        if (launch != null && launch.getComponent() != null) {
+            try {
+                call(svc, "show\t" + launch.getComponent().flattenToString());
+            } catch (IOException ignored) {
+            }
+        }
+        outsideOnScreen.add(key);
+        close(svc, key);
+        return launch == null ? null : pkg;
+    }
+
     /** Does this chat work in the background (its switch is on and the phone is set up for it)? */
     static boolean on(Context c, String chat) {
         if (chat == null || !setUp(c)) return false;
@@ -205,6 +254,18 @@ final class Background {
         keeper = Executors.newSingleThreadScheduledExecutor();
         keeper.scheduleWithFixedDelay(() -> {
             for (String chat : new ArrayList<>(displays.keySet())) {
+                if (outside(chat)) { // no run to end it: it goes after a while without calls, or when switched off
+                    if (idle(chat) || !Prefs.outsideBackground(c)) {
+                        close(c, chat);
+                    } else {
+                        try {
+                            call(c, "keep\t" + chat);
+                        } catch (IOException e) {
+                            displays.remove(chat);
+                        }
+                    }
+                    continue;
+                }
                 Sessions.Session s = ChatHub.get(c).sessions.find(chat);
                 if (s == null || !s.background) {
                     close(c, chat);

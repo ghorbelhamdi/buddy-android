@@ -346,7 +346,7 @@
     <string name="chat_approvals_ask">確認する</string>
     <string name="chat_approvals_ask_info">各アプリは「%1$s」の設定に従います。</string>
     <string name="chat_approvals_strict_info">「%1$s」に設定したアプリでも、送信、投稿、購入、削除の前に Buddy が確認します。</string>
-    <string name="chat_approvals_apps_hint">エージェントが操作したアプリと、「%1$s」での各アプリの設定です。タップするとそこで変更できます。</string>
+    <string name="chat_approvals_apps_set">エージェントが操作したアプリと、「%1$s」での各アプリの設定です。ここでの変更はすべてのチャットに適用されます。</string>
     <string name="chat_approvals_routine">定型操作を許可</string>
     <string name="chat_approvals_routine_info">定型的な操作は、どのアプリでもカードなしで進みます。メッセージの送信や、レビュー担当が確認を求めるような操作が対象です。それぞれチャットに記録されます。支払い、購入、削除、インストール、パスワード、セキュリティ設定は引き続き確認し、銀行・決済アプリ、設定、アプリストア内の操作もすべて確認します。</string>
     <string name="chat_approvals_strict">常に確認する</string>
@@ -417,6 +417,7 @@
     <string name="hub_agent_switched">%1$s に切り替えました。次のメッセージと一緒にこれまでの会話が渡されます。</string>
     <string name="chat_model_other_hint">その他… 例：%1$s</string>
     <string name="chat_model_use">使用</string>
+    <string name="chat_model_search">モデルを検索</string>
 
     <!-- Language sheet (long-press the mic) -->
     <string name="chat_speak_in">話す言語</string>
@@ -481,6 +482,9 @@
     <string name="hub_continuing">以前の %1$s セッションを続けます。ターミナルでまだ開いている場合は、先にそちらで閉じてください。</string>
     <string name="hub_still_working_attachments">このチャットはまだ実行中です。完了してから添付ファイルを送信してください。</string>
     <string name="hub_service_off">%1$s はオフになっています（設定 → エージェントとモデル → API キー）。オンにするか、このチャットで別のモデルを選んでください。</string>
+    <string name="hub_accessibility_dead">Buddy のユーザー補助サービスはオンなのに動いていません。Android が Buddy を停止し、サービスを再開しなかったため、エージェントがスマホを操作できません。Android の設定 → ユーザー補助 で Buddy をオフにしてからオンにしてください。再発を防ぐには、スマホのアプリ設定に自動起動の設定があれば Buddy に許可し、マイクは「この時のみ」ではなく「アプリの使用中のみ」にしてください。</string>
+    <string name="hub_accessibility_off">Buddy のユーザー補助サービスがオフのため、エージェントがスマホを操作できません。Android の設定 → ユーザー補助 で Buddy をオンにしてください。</string>
+    <string name="voice_mic_while_using">「アプリの使用中のみ」を選んでください。「この時のみ」だと、Buddy を離れて 1 分後に Android が Buddy を停止します。タスクの途中でもです。</string>
     <string name="hub_thinking">考え中…</string>
     <string name="hub_still_waiting">まだモデルの応答を待っています…</string>
     <string name="hub_still_reading_local">読み込み中… 自分のコンピューターで動くモデルは、特に最初の回答に数分かかることがあります。</string>
@@ -923,6 +927,15 @@
     <string name="setup_phone_tools_info">Buddy のスマートフォンツールは、このスマートフォン上で動く通常の MCP サーバーです。スマートフォンのターミナル（Termux など）でこれを一度実行すると、そのエージェントはバブルがなくても、すべてのセッションでスマートフォンツールを使えるようになります。</string>
     <string name="setup_copy_command">コマンドをコピー</string>
     <string name="setup_command_copied">コピーしました。ターミナルに貼り付けてください。</string>
+    <string name="setup_outside_background">バックグラウンドで作業</string>
+    <string name="setup_outside_background_info">自分のセッションのエージェントが、バックグラウンドモードのチャットと同じく隠れた画面で作業します。スマートフォンはそのまま使え、ロック中も作業が続きます。カードや質問はこれまでどおり届きます。ログインなど自分の目で見る手順では、そのアプリがあなたの画面に移ります。バックグラウンドモードの設定が必要です。</string>
+    <string name="setup_tailnet">Tailscale 経由のスマホツール</string>
+    <string name="setup_tailnet_info">自分のパソコンのエージェントが、Tailscale 経由でこのスマホツールを使えます(両方で Tailscale が必要)。追加したパソコンごとに専用のキーがあり、削除で取り消せます。カードや質問はこれまでどおりスマートフォンに届きます。画面を使わないよう、上の「バックグラウンドで作業」をオンにしてください。</string>
+    <string name="setup_tailnet_address">Tailscale 上のこのスマートフォン: %1$s</string>
+    <string name="setup_tailnet_no_address">このスマートフォンで Tailscale が接続されていないため、今はパソコンから届きません。</string>
+    <string name="setup_tailnet_computer">パソコン %1$d</string>
+    <string name="setup_tailnet_pair_info">Tailscale をオンにしたパソコンのターミナルでこれを実行してください。このスマートフォンが承認を求め、承認するとパソコンの Claude Code が専用のキーでスマホツールを使えるようになります。</string>
+    <string name="tools_card_pair">パソコン「%1$s」(Tailscale %2$s)をペアリングしますか? 専用のキーで Buddy のスマホツールを使えるようになります。キーは設定で削除できます。</string>
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">音声</string>
@@ -998,6 +1011,8 @@
     <string name="setup_read_aloud_info">エージェントの返信を、「音声」で選んだ声で Buddy が読み上げます。</string>
     <string name="setup_pause_media">読み上げ中はメディアを一時停止</string>
     <string name="setup_pause_media_info">Buddy が返信を読み上げている間、再生中の音楽や動画を一時停止し、終わったら再開します。再開するのは Buddy が停止したものだけで、その間に再生を操作した場合は再開しません。「返信を読み上げる」と通知へのアクセスが必要です。</string>
+    <string name="setup_pause_listening">聞き取り中はメディアを一時停止</string>
+    <string name="setup_pause_listening_info">Buddy があなたの声を聞いている間、再生中の音楽や動画を一時停止し、動画ではなくあなたの声を聞き取ってから再開します。「読み上げ中はメディアを一時停止」もオンなら、返答の読み上げが終わるまで停止したままです。Buddy が再開するのは自分で止めたものだけで、その間にあなたが再生を変えた場合は再開しません。通知へのアクセスが必要です。</string>
     <string name="setup_voice_cards">カードに声で答える</string>
     <string name="setup_voice_cards_info">カードを読み上げたあと、Buddy が聞き取ります。「承認」か「拒否」、または選びたい選択肢を言ってください。「返信を読み上げる」がオンのときに使えます。スマートフォンがロック中は使えません。声の届く範囲にいる人なら誰でも答えられます。</string>
     <string name="voice_card_approval">Buddy が承認を求めています。%1$s</string>
@@ -1359,6 +1374,9 @@
     <string name="hub_tool_browser_back">ブラウザ：前のページに戻っています</string>
     <string name="hub_tool_browser_tabs">ブラウザ：タブ</string>
     <string name="hub_tool_schedule_message">予約中: %1$s</string>
+    <string name="hub_tool_add_rule">通知ルールを追加中: %1$s</string>
+    <string name="tools_card_rule">チャット「%4$s」に通知ルールを追加しますか? %1$s から、%2$s: それぞれが指示「%3$s」と一緒にこのチャットに届きます。ほかのルールと同じく、実行する前に確認します。</string>
+    <string name="rules_in_chat">チャット「%1$s」で</string>
     <string name="hub_tool_list_scheduled">予約メッセージを確認中</string>
     <string name="hub_tool_cancel_scheduled">予約メッセージを取り消し中</string>
     <string name="later_title">%1$s のエージェントのメッセージ</string>

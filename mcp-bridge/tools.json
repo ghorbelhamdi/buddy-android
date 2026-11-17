@@ -601,6 +601,60 @@
     }
   },
   {
+    "name": "delegate",
+    "description": "Hand parts of a task to sub-agents that work at the same time, and get their reports back: for work that splits into independent parts in different apps or sites (compare a price in three shops, gather facts from several places). Each sub-agent is an agent like you with the phone tools, on a hidden screen of its own, so the user keeps their screen and you keep yours. Sub-agents only look things up: they can't send, post, buy, delete, change settings or ask the user, so do those steps yourself afterwards. Give each a different app or site (an app can only be open in one place) and a task that stands on its own: a sub-agent knows nothing of this conversation. The call waits for the reports (up to 8 minutes; then subagents gives the rest). When you have a part of your own to do meanwhile (in another app), pass wait false: the sub-agents start, you work at the same time, and subagents collects their reports when you are done. Give as many tasks as the work has parts: they all start at once. Each sub-agent uses the user's plan as you do, so don't delegate what you can do quickly yourself, and never a step whose result you need before you can go on: a lone sub-agent you only wait for is slower than doing it yourself.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "tasks": {
+          "type": "array",
+          "minItems": 1,
+          "description": "One per sub-agent",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "A few words the user sees, e.g. \"Amazon\""
+              },
+              "task": {
+                "type": "string",
+                "description": "Everything the sub-agent needs: what to find, where, and what to report back"
+              },
+              "phone": {
+                "type": "boolean",
+                "description": "Default true. False for a part that needs no app (the web, files, thinking): that sub-agent takes no phone screen"
+              }
+            },
+            "required": [
+              "task"
+            ]
+          }
+        },
+        "wait": {
+          "type": "boolean",
+          "description": "Default true: wait here for the reports. False: return at once, so you can work on your own part at the same time; call subagents afterwards."
+        }
+      },
+      "required": [
+        "tasks"
+      ]
+    }
+  },
+  {
+    "name": "subagents",
+    "description": "Your sub-agents from delegate: waits for the ones still working (up to 8 minutes) and returns every report. With stop, ends the ones still working first.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "stop": {
+          "type": "boolean",
+          "description": "End the sub-agents that still work"
+        }
+      }
+    }
+  },
+  {
     "name": "schedule_message",
     "description": "Schedule a message to yourself in this chat, sent once at a later time: to check something again, remind the user, or go on with a task later (\"check the price again tomorrow at 9\"). At its time Buddy sends it into this chat as a new message to you, also with the phone locked, and you work as usual. The user sees it above the chat and can cancel it. For something every day, tell the user about Chat options > Schedule instead.",
     "inputSchema": {
@@ -633,6 +687,35 @@
     }
   },
   {
+    "name": "add_notification_rule",
+    "description": "Have Buddy bring a notification into this chat whenever one matching arrives, with an instruction: \"when Sam writes on WhatsApp, answer that I'm driving\". Buddy shows the user the rule on a card and adds it only if they approve. Each match then comes here as a new message to you, quoting the notification, and you work as a notification rule's run does: phone tools with cards before anything risky, no shell, files or web, Trust doesn't apply. The rule starts on asking before acting; the user changes or deletes it in Settings > Safety and approvals > Notification rules. For a time instead of a notification, use schedule_message.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "app": {
+          "type": "string",
+          "description": "The app the notification comes from: its name or package"
+        },
+        "instruction": {
+          "type": "string",
+          "description": "What to do when it comes, as a message to yourself"
+        },
+        "from": {
+          "type": "string",
+          "description": "Optional: only from these senders or chats, comma-separated"
+        },
+        "words": {
+          "type": "string",
+          "description": "Optional: only notifications with one of these words, comma-separated"
+        }
+      },
+      "required": [
+        "app",
+        "instruction"
+      ]
+    }
+  },
+  {
     "name": "list_scheduled",
     "description": "List the messages scheduled in this chat with schedule_message.",
     "inputSchema": {
@@ -653,6 +736,26 @@
       },
       "required": [
         "id"
+      ]
+    }
+  },
+  {
+    "name": "phone_shell",
+    "description": "(Needs Linux tools in this chat, and the user's switch Settings > Background mode > Phone commands) Run a command line on the phone itself, as Android's shell user (what `adb shell` gives): pm, am, settings, dumpsys, logcat -d, getprop, files under /sdcard. Returns its exit code and output (the last 20,000 characters). The user approves each command on a card first, unless they turned that off. This is not Buddy's Linux: your own shell is for files there. To use the screen, use the phone tools (tap, type_text, ...), not `input`. Never use it to get around an approval card, a BLOCKED answer or a step the user has to do themselves.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "string",
+          "description": "The command line (run by sh -c)"
+        },
+        "timeout_s": {
+          "type": "integer",
+          "description": "Default 60, max 300"
+        }
+      },
+      "required": [
+        "command"
       ]
     }
   },

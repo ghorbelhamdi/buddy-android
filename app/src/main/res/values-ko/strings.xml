@@ -346,7 +346,7 @@
     <string name="chat_approvals_ask">묻기</string>
     <string name="chat_approvals_ask_info">각 앱은 %1$s에서 정한 대로 따릅니다.</string>
     <string name="chat_approvals_strict_info">\'%1$s\'(으)로 설정한 앱에서도 Buddy가 보내기, 게시, 구매, 삭제 전에 물어봅니다.</string>
-    <string name="chat_approvals_apps_hint">에이전트가 작업한 앱과 %1$s의 앱별 설정입니다. 앱을 탭하면 거기서 바꿀 수 있습니다.</string>
+    <string name="chat_approvals_apps_set">에이전트가 작업한 앱과 %1$s의 앱별 설정입니다. 여기서 바꾸면 모든 채팅에 적용됩니다.</string>
     <string name="chat_approvals_routine">일상 작업 허용</string>
     <string name="chat_approvals_routine_info">일상적인 단계는 모든 앱에서 카드 없이 진행됩니다. 메시지 보내기, 또는 검토자가 물어볼 만한 단계가 해당됩니다. 각 단계는 채팅에 기록됩니다. 결제, 구매, 삭제, 설치, 비밀번호, 보안 설정은 계속 물어보며, 은행·결제 앱, 설정, 앱 스토어 안의 모든 것도 마찬가지입니다.</string>
     <string name="chat_approvals_strict">항상 묻기</string>
@@ -417,6 +417,7 @@
     <string name="hub_agent_switched">%1$s(으)로 바꿨습니다. 다음 메시지와 함께 지금까지의 대화가 전달됩니다.</string>
     <string name="chat_model_other_hint">기타… 예: %1$s</string>
     <string name="chat_model_use">사용</string>
+    <string name="chat_model_search">모델 검색</string>
 
     <!-- Language sheet (long-press the mic) -->
     <string name="chat_speak_in">말할 언어</string>
@@ -481,6 +482,9 @@
     <string name="hub_continuing">이전 %1$s 세션을 이어서 진행해요. 터미널에서 아직 열려 있다면 먼저 거기서 닫으세요.</string>
     <string name="hub_still_working_attachments">이 채팅은 아직 작업 중이에요. 끝난 뒤에 첨부 파일을 보내세요.</string>
     <string name="hub_service_off">%1$s이(가) 꺼져 있습니다(설정 → 에이전트와 모델 → API 키). 켜거나 이 채팅에 다른 모델을 선택하세요.</string>
+    <string name="hub_accessibility_dead">Buddy의 접근성 서비스가 켜져 있지만 실행되고 있지 않습니다. Android가 Buddy를 종료하고 서비스를 다시 시작하지 않아 에이전트가 휴대폰에 접근할 수 없습니다. Android 설정 → 접근성에서 Buddy를 껐다가 다시 켜세요. 다시 생기지 않게 하려면 휴대폰 앱 설정에 자동 실행 항목이 있으면 Buddy를 허용하고, 마이크는 “이번만 허용”이 아닌 “앱 사용 중에만 허용”으로 주세요.</string>
+    <string name="hub_accessibility_off">Buddy의 접근성 서비스가 꺼져 있어 에이전트가 휴대폰에 접근할 수 없습니다. Android 설정 → 접근성에서 Buddy를 켜세요.</string>
+    <string name="voice_mic_while_using">“앱 사용 중에만 허용”을 선택하세요. “이번만 허용”이면 Buddy를 떠나고 1분 뒤 Android가 Buddy를 종료합니다. 작업 중이어도 마찬가지입니다.</string>
     <string name="hub_thinking">생각하는 중…</string>
     <string name="hub_still_waiting">아직 모델의 답변을 기다리는 중…</string>
     <string name="hub_still_reading_local">아직 읽는 중… 내 컴퓨터에서 도는 모델은 특히 첫 답변에 몇 분 걸릴 수 있어요.</string>
@@ -923,6 +927,15 @@
     <string name="setup_phone_tools_info">Buddy의 휴대전화 도구는 이 휴대전화에서 동작하는 일반 MCP 서버예요. 휴대전화의 터미널(예: Termux)에서 이 명령을 한 번 실행하면, 그 에이전트는 버블 없이도 모든 세션에서 휴대전화 도구를 쓸 수 있어요.</string>
     <string name="setup_copy_command">명령어 복사</string>
     <string name="setup_command_copied">복사했어요. 터미널에 붙여넣으세요.</string>
+    <string name="setup_outside_background">백그라운드에서 작업</string>
+    <string name="setup_outside_background_info">내 세션의 에이전트가 백그라운드 모드 채팅처럼 숨겨진 화면에서 작업합니다. 휴대전화를 계속 쓸 수 있고, 잠겨 있어도 작업이 이어집니다. 카드와 질문은 그대로 내게 옵니다. 로그인처럼 직접 봐야 하는 단계는 해당 앱을 내 화면으로 가져옵니다. 백그라운드 모드 설정이 필요합니다.</string>
+    <string name="setup_tailnet">Tailscale로 휴대전화 도구 사용</string>
+    <string name="setup_tailnet_info">내 컴퓨터의 에이전트가 Tailscale을 통해 이 휴대전화 도구를 사용합니다(양쪽 모두 Tailscale 필요). 추가한 컴퓨터마다 고유한 키가 있으며 삭제하면 회수됩니다. 카드와 질문은 그대로 휴대전화로 옵니다. 내 화면을 쓰지 않도록 위의 백그라운드에서 작업을 켜세요.</string>
+    <string name="setup_tailnet_address">Tailscale의 이 휴대전화: %1$s</string>
+    <string name="setup_tailnet_no_address">이 휴대전화에서 Tailscale이 연결되어 있지 않아 지금은 컴퓨터가 접근할 수 없습니다.</string>
+    <string name="setup_tailnet_computer">컴퓨터 %1$d</string>
+    <string name="setup_tailnet_pair_info">Tailscale을 켠 컴퓨터의 터미널에서 이것을 실행하세요. 이 휴대전화가 승인을 요청하고, 승인하면 컴퓨터의 Claude Code가 고유한 키로 휴대전화 도구를 사용합니다.</string>
+    <string name="tools_card_pair">컴퓨터 “%1$s”(Tailscale %2$s)를 연결할까요? 고유한 키로 Buddy의 휴대전화 도구를 사용하게 되며, 키는 설정에서 삭제할 수 있습니다.</string>
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">음성</string>
@@ -998,6 +1011,8 @@
     <string name="setup_read_aloud_info">Buddy가 에이전트의 답변을 ‘음성’에서 고른 목소리로 읽어 줘요.</string>
     <string name="setup_pause_media">읽어 주는 동안 미디어 일시정지</string>
     <string name="setup_pause_media_info">Buddy가 답변을 읽어 주는 동안 재생 중인 음악이나 동영상을 일시정지하고, 끝나면 다시 재생해요. Buddy가 멈춘 것만 다시 재생하고, 그 사이에 재생을 바꿨다면 다시 재생하지 않아요. ‘답변 읽어 주기’와 알림 접근 권한이 필요해요.</string>
+    <string name="setup_pause_listening">듣는 동안 미디어 일시정지</string>
+    <string name="setup_pause_listening_info">Buddy가 듣는 동안 재생 중인 음악이나 동영상을 일시정지해 동영상이 아닌 내 목소리를 듣고, 끝나면 다시 재생합니다. “읽어 주는 동안 미디어 일시정지”도 켜져 있으면 답변을 다 읽을 때까지 멈춰 둡니다. Buddy는 자신이 멈춘 것만 다시 재생하며, 그 사이 재생을 바꿨다면 다시 재생하지 않습니다. 알림 접근 권한이 필요합니다.</string>
     <string name="setup_voice_cards">음성으로 카드에 답하기</string>
     <string name="setup_voice_cards_info">카드를 소리 내어 읽은 뒤 Buddy가 듣습니다. “승인” 또는 “거부”, 아니면 원하는 선택지를 말하세요. “답변 소리 내어 읽기”가 켜져 있어야 합니다. 휴대전화가 잠겨 있으면 작동하지 않습니다. 들리는 거리에 있는 누구나 답할 수 있습니다.</string>
     <string name="voice_card_approval">Buddy가 승인을 기다립니다. %1$s</string>
@@ -1358,6 +1373,9 @@
     <string name="hub_tool_browser_back">브라우저: 뒤로 가는 중</string>
     <string name="hub_tool_browser_tabs">브라우저: 탭</string>
     <string name="hub_tool_schedule_message">예약 중: %1$s</string>
+    <string name="hub_tool_add_rule">알림 규칙 추가 중: %1$s</string>
+    <string name="tools_card_rule">채팅 “%4$s”에 알림 규칙을 추가할까요? %1$s에서, %2$s: 각 알림이 지시 “%3$s”와 함께 이 채팅으로 옵니다. 모든 규칙처럼 이 규칙도 실행 전에 물어봅니다.</string>
+    <string name="rules_in_chat">채팅 “%1$s”에서</string>
     <string name="hub_tool_list_scheduled">예약된 메시지 확인 중</string>
     <string name="hub_tool_cancel_scheduled">예약된 메시지 취소 중</string>
     <string name="later_title">%1$s 에이전트 메시지</string>

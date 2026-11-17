@@ -72,6 +72,15 @@ final class Voice {
         return c.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
     }
 
+    /**
+     * Asks for the microphone, saying first which answer to give: one given "Only this time" ends when Buddy has been
+     * out of sight for a minute, which Android does by stopping Buddy, a task that is running included (issue #54).
+     */
+    static void askMic(android.app.Activity a, int code) {
+        android.widget.Toast.makeText(a, R.string.voice_mic_while_using, android.widget.Toast.LENGTH_LONG).show();
+        a.requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, code);
+    }
+
     static boolean listening() {
         return current != null || ClaudeDictation.active() || CodexDictation.active();
     }
@@ -101,6 +110,7 @@ final class Voice {
         if (CodexLive.on()) return c.getString(R.string.live_mic_busy); // the call has the microphone
         stopListening();
         stopSpeaking();
+        SpeechPause.listen(c); // before the microphone starts, so it hears the user and not the video (#56)
         String lang = Prefs.voiceLang(c);
         // Claude's dictation (on the user's Claude plan) for the languages it supports; otherwise the phone's
         if ("claude".equals(Prefs.voiceEngine(c)) && ClaudeDictation.supports(lang)) {

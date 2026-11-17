@@ -304,6 +304,12 @@ final class ChatHub {
         if (text.isEmpty() && !hasFiles) return null;
         Providers.P service = Providers.of(ses.model); // the chat's own pick: said, not quietly swapped for another model
         if (service != null && service.off) return app.getString(R.string.hub_service_off, service.name);
+        // the phone tools live in Buddy's accessibility service: without it the agent can't reach them and its run
+        // ends a few seconds in, which looked like Buddy's Linux had failed. Said as what it is (issue #54)
+        if (BuddyService.get() == null) {
+            return app.getString(SetupState.accessibilityEnabled(app) ? R.string.hub_accessibility_dead
+                    : R.string.hub_accessibility_off);
+        }
         String forAgent = prompt != null ? prompt : text.isEmpty() && hasFiles ? "Have a look at what I attached." : text;
         // the chat was switched to this agent: it begins anew, with the chat so far (before this message is added)
         final boolean fresh = ses.handover != null;
@@ -324,6 +330,7 @@ final class ChatHub {
         // the user writing in an archived chat brings it back (not a sub-agent's: its parent's chat lists it)
         if (!scheduled && !rule && ses.parent.isEmpty()) ses.archived = false;
         sessions.add(ses, Bubble.Kind.USER, text, hasFiles ? new ArrayList<>(files) : null);
+        if (!scheduled && !rule) SpeechPause.sent(app);
         Sessions.Msg um = ses.messages.get(ses.messages.size() - 1);
         if (scheduled) {
             um.scheduled = true;
@@ -356,6 +363,8 @@ final class ChatHub {
 
     /** After the helper process of a run ended, its last events get this long to arrive. */
     private static final long HELPER_GONE_MS = 5000;
+    /** After Stop, a run has this long to say it ended (the helper kills what is left of it after 5 s). */
+    private static final long STOP_GIVE_UP_MS = 20000;
 
     /**
      * The helper that ran this chat's agent is gone. It says buddy_done however it ends, except when it is killed
@@ -370,8 +379,18 @@ final class ChatHub {
         // with how it ended, for a report: 137 is a kill from outside (Android ending an app's child processes)
         // 137: killed from outside, which on a phone is Android ending an app's child processes when there are too
         // many (confirmed on a Pixel 10 Pro with sub-agents, issue #50): say what lets them run
-        failRun(ses, app.getString(R.string.hub_helper_gone) + (code > 0 ? " (exit " + code + ")" : "")
-                + (code == 137 ? "\n\n" + app.getString(R.string.hub_helper_killed) : ""));
+        String why = app.getString(R.string.hub_helper_gone) + (code > 0 ? " (exit " + code + ")" : "")
+                + (code == 137 ? "\n\n" + app.getString(R.string.hub_helper_killed) : "");
+        // what the dead helper left running (its shell and the agent, without the proot they ran under) is ended:
+        // it would spin at full CPU for good, and its pid file would have the chat's next message refused as busy.
+        // The chat stays working until that is done: a message sent meanwhile would start a run the reap then ends
+        try {
+            Helper.run(app, reaped -> main.post(() -> {
+                if (ses.running && ses.runId == runId) failRun(ses, why);
+            }), "reap", ses.id);
+        } catch (Exception e) {
+            failRun(ses, why);
+        }
     }
 
     /** The run is over without the helper's buddy_done: ended here as failed, with why and the agent's last error. */
@@ -706,6 +725,20 @@ final class ChatHub {
             // set now: the run's own buddy_done can arrive before buddy_stopped, and must not send the notes
             ses.outcome = "stopped";
             ses.status = app.getString(R.string.hub_stopping);
+            // a run that can no longer speak (see buddy-run's end_run) never says it has ended: the stop that killed
+            // it is its end, and the chat doesn't stay on "Stopping" (issue #53)
+            final int id = ses.runId;
+            main.postDelayed(() -> {
+                if (!ses.running || ses.runId != id) return;
+                ses.running = false;
+                ses.status = "";
+                if (!sessions.all.contains(ses)) return; // deleted meanwhile: a line would bring the chat back
+                String stopped = app.getString(R.string.hub_stopped);
+                Sessions.Msg last = ses.messages.isEmpty() ? null : ses.messages.get(ses.messages.size() - 1);
+                if (last == null || !stopped.equals(last.text)) add(ses, Bubble.Kind.STEP, stopped);
+                runEnded(ses);
+                changed();
+            }, STOP_GIVE_UP_MS);
         } catch (Exception e) {
             add(ses, Bubble.Kind.ERROR, e.getMessage());
         }
@@ -1104,6 +1137,7 @@ final class ChatHub {
      */
     private void runEnded(Sessions.Session ses) {
         Prefs.setBusy(app, ses.id, false);
+        SpeechPause.runEnded();
         StepLog.runEnded(app, ses);
         if (!ses.parent.isEmpty()) { // a sub-agent has one run: its screen closes at once
             Background.close(app, ses.id);
@@ -1305,6 +1339,7 @@ final class ChatHub {
             }
             case "subagents": return BuddyApp.str(R.string.hub_tool_helpers);
             case "schedule_message": return BuddyApp.str(R.string.hub_tool_schedule_message, said(full, in.optString("message"), 40));
+            case "add_notification_rule": return BuddyApp.str(R.string.hub_tool_add_rule, in.optString("app"));
             case "list_scheduled": return BuddyApp.str(R.string.hub_tool_list_scheduled);
             case "cancel_scheduled": return BuddyApp.str(R.string.hub_tool_cancel_scheduled);
             case "reply_notification": return BuddyApp.str(R.string.hub_tool_reply_notification, said(full, in.optString("text"), 40));

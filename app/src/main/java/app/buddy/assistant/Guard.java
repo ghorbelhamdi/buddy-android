@@ -392,7 +392,7 @@ final class Guard {
         // in it pays, buys, deletes or installs) isn't spent on a Pay, Buy or Delete button or a Settings switch that
         // comes after (see takeApproval). An OK for anything else ("Turn on Bluetooth") covers the tap it was for
         approvedSendOnly = routineText(summary) && saysSend(summary);
-        approvedFor = McpServer.CALLER_CHAT.get();
+        approvedFor = who();
         approvedText = summary;
         if (auto) return;
         planAt = approvedAt;
@@ -407,7 +407,7 @@ final class Guard {
      * Buy or Delete button after an approved search asks.
      */
     static synchronized void afterSearch() {
-        if (approvedAt != 0 && java.util.Objects.equals(approvedFor, McpServer.CALLER_CHAT.get())) approvedAuto = true;
+        if (approvedAt != 0 && java.util.Objects.equals(approvedFor, who())) approvedAuto = true;
     }
 
     /**
@@ -416,7 +416,16 @@ final class Guard {
      */
     static synchronized String approvedPlan() {
         return plan != null && System.currentTimeMillis() - planAt < APPROVAL_VALID_MS
-                && java.util.Objects.equals(planFor, McpServer.CALLER_CHAT.get()) ? plan : null;
+                && java.util.Objects.equals(planFor, who()) ? plan : null;
+    }
+
+    /**
+     * Whose approval it is: the calling chat's, or, for a session outside Buddy, that session's (the phone's own
+     * terminal, or one paired computer each), so one never uses an OK the user gave another.
+     */
+    private static String who() {
+        String k = McpServer.CALLER_KEY.get();
+        return k != null ? k : McpServer.CALLER_CHAT.get();
     }
 
     /** A chat's run starts or ends: what was approved for it before doesn't carry over. */
@@ -452,7 +461,7 @@ final class Guard {
      */
     static synchronized boolean takeApproval(boolean send, String content, boolean otherRisk) {
         if (otherRisk && approvedSendOnly && approvedAt != 0) return false;
-        if (approvedAt == 0 || !java.util.Objects.equals(approvedFor, McpServer.CALLER_CHAT.get())) return false;
+        if (approvedAt == 0 || !java.util.Objects.equals(approvedFor, who())) return false;
         boolean ok = System.currentTimeMillis() - approvedAt < APPROVAL_USE_MS && (send || !approvedAuto)
                 && (content == null || approvedText != null && plain(approvedText).contains(plain(content)));
         approvedAt = 0;

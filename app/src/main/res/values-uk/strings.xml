@@ -493,7 +493,7 @@
     <string name="chat_approvals_ask">Питати</string>
     <string name="chat_approvals_ask_info">Кожен застосунок діє так, як задано для нього в розділі «%1$s».</string>
     <string name="chat_approvals_strict_info">Навіть у застосунках із режимом «%1$s» Buddy питає перед надсиланням, публікацією, купівлею чи видаленням.</string>
-    <string name="chat_approvals_apps_hint">Де діяв агент і налаштування кожного застосунку в розділі «%1$s». Торкніться застосунку, щоб змінити його там.</string>
+    <string name="chat_approvals_apps_set">Де діяв агент і налаштування кожного застосунку в розділі «%1$s». Зміна тут діє в усіх чатах.</string>
     <string name="chat_approvals_routine">Рутинне дозволено</string>
     <string name="chat_approvals_routine_info">Рутинні кроки виконуються в будь-якому застосунку без картки: надсилання повідомлення або крок, про який запитав би перевіряльник. Кожен позначається в чаті. Оплата, покупки, видалення, встановлення, паролі та налаштування безпеки й далі питають вас, як і все в банківських і платіжних застосунках, Налаштуваннях і магазинах застосунків.</string>
     <string name="chat_approvals_strict">Завжди питати</string>
@@ -579,6 +579,7 @@
     <string name="chat_model_other_hint">інша… наприклад, %1$s</string>
     <!-- Button, verb: use the model typed in the box. Keep short. -->
     <string name="chat_model_use">Вибрати</string>
+    <string name="chat_model_search">Пошук моделей</string>
 
     <!-- Language sheet (long-press the mic) -->
     <!-- Title, followed by a list of languages to speak in. -->
@@ -665,6 +666,9 @@
     <string name="hub_continuing">Продовження попереднього сеансу %1$s. Якщо він ще відкритий у терміналі, спершу закрийте його там.</string>
     <string name="hub_still_working_attachments">Цей чат ще працює. Надішліть вкладення, коли завдання буде виконано.</string>
     <string name="hub_service_off">Сервіс %1$s вимкнено (Налаштування → Агенти й моделі → Ключі API). Увімкніть його або виберіть іншу модель для цього чату.</string>
+    <string name="hub_accessibility_dead">Служба спеціальних можливостей Buddy не працює, хоча ввімкнена: Android зупинив Buddy і не запустив службу знову, тож агенти не можуть керувати телефоном. Вимкніть і знову ввімкніть Buddy у Налаштуваннях Android → Спеціальні можливості. Щоб це не повторилося: дозвольте Buddy автозапуск у налаштуваннях застосунків телефона, якщо вони є, і дайте мікрофону «Лише під час використання застосунку», а не «Лише цього разу».</string>
+    <string name="hub_accessibility_off">Служба спеціальних можливостей Buddy вимкнена, тож агенти не можуть керувати телефоном. Увімкніть Buddy у Налаштуваннях Android → Спеціальні можливості.</string>
+    <string name="voice_mic_while_using">Виберіть «Лише під час використання застосунку»: з «Лише цього разу» Android зупиняє Buddy через хвилину після того, як ви з нього вийшли, навіть посеред завдання.</string>
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">Думаю…</string>
     <string name="hub_still_waiting">Досі чекаю на відповідь моделі…</string>
@@ -1264,6 +1268,15 @@
     <!-- Button. -->
     <string name="setup_copy_command">Копіювати команду</string>
     <string name="setup_command_copied">Скопійовано. Вставте її в термінал.</string>
+    <string name="setup_outside_background">Працювати у фоні</string>
+    <string name="setup_outside_background_info">Агенти у ваших власних сеансах працюють на прихованому екрані, як чат у фоновому режимі: ви й далі користуєтеся телефоном, а вони працюють і коли він заблокований. Картки й запитання так само приходять вам. Крок, де потрібні ваші очі, як-от вхід, виводить застосунок на ваш екран. Потрібен налаштований фоновий режим.</string>
+    <string name="setup_tailnet">Інструменти телефона через Tailscale</string>
+    <string name="setup_tailnet_info">Агенти на ваших комп’ютерах отримують ці інструменти телефона через Tailscale, якщо він увімкнений на обох. Кожен доданий комп’ютер має власний ключ, який «Вилучити» відкликає. Картки й запитання так само приходять вам на телефон. Увімкніть вище «Працювати у фоні», щоб вони не займали ваш екран.</string>
+    <string name="setup_tailnet_address">Цей телефон у Tailscale: %1$s</string>
+    <string name="setup_tailnet_no_address">Tailscale на цьому телефоні не підключений, тож комп’ютери зараз до нього не дістануться.</string>
+    <string name="setup_tailnet_computer">Комп’ютер %1$d</string>
+    <string name="setup_tailnet_pair_info">На комп’ютері з увімкненим Tailscale виконайте це в терміналі. Телефон попросить вас підтвердити, і Claude Code на комп’ютері отримає інструменти телефона з власним ключем.</string>
+    <string name="tools_card_pair">Під’єднати комп’ютер «%1$s» (Tailscale %2$s)? Він отримає інструменти телефона Buddy з власним ключем, який можна вилучити в налаштуваннях.</string>
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Голос</string>
@@ -1369,6 +1382,8 @@
     <string name="setup_read_aloud_info">Buddy читає відповіді агентів вголос — тим голосом, який ви вибрали в розділі «Голос».</string>
     <string name="setup_pause_media">Ставити медіа на паузу під час читання вголос</string>
     <string name="setup_pause_media_info">Музика або відео ставляться на паузу, поки Buddy читає відповідь, і потім продовжуються. Buddy відновлює лише те, що призупинив сам, і не робить цього, якщо ви тим часом змінили відтворення. Потрібні налаштування «Читати відповіді вголос» і доступ до сповіщень.</string>
+    <string name="setup_pause_listening">Пауза медіа під час прослуховування</string>
+    <string name="setup_pause_listening_info">Музика чи відео ставляться на паузу, поки Buddy слухає вас, щоб він чув ваш голос, а не відео, і потім грають далі. Якщо ввімкнено й «Ставити медіа на паузу під час читання вголос», пауза триває, доки відповідь не буде прочитано. Buddy відновлює лише те, що сам зупинив, і не робить цього, якщо ви тим часом змінили відтворення. Потрібен доступ до сповіщень.</string>
     <string name="setup_voice_cards">Відповідати на картки голосом</string>
     <string name="setup_voice_cards_info">Після того як картку прочитано вголос, Buddy слухає: скажіть «схвалити» або «відхилити» чи потрібний варіант. Потрібно ввімкнути «Читати відповіді вголос». Не працює на заблокованому телефоні. Відповісти може будь-хто поруч.</string>
     <string name="voice_card_approval">Buddy потрібне ваше підтвердження. %1$s</string>
@@ -1843,6 +1858,9 @@
     <string name="hub_tool_browser_back">Браузер: повертаюся назад</string>
     <string name="hub_tool_browser_tabs">Браузер: вкладки</string>
     <string name="hub_tool_schedule_message">Планує: %1$s</string>
+    <string name="hub_tool_add_rule">Додавання правила сповіщень: %1$s</string>
+    <string name="tools_card_rule">Додати правило сповіщень до чату «%4$s»? З %1$s, %2$s: кожне прийде в цей чат із вказівкою «%3$s». Правило питає вас, перш ніж діяти, як і кожне правило.</string>
+    <string name="rules_in_chat">У чаті «%1$s»</string>
     <string name="hub_tool_list_scheduled">Перевіряє заплановані повідомлення</string>
     <string name="hub_tool_cancel_scheduled">Скасовує заплановане повідомлення</string>
     <string name="later_title">Повідомлення агента на %1$s</string>

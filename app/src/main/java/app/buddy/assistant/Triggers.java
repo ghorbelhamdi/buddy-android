@@ -407,6 +407,9 @@ final class Triggers implements ChatHub.Listener {
         Rules.Rule r = Rules.find(app, j.rule.id); // it may have changed, or been switched off, meanwhile
         if (r == null || !r.on || !Prefs.rulesOn(app)) return;
         j.rule = r;
+        // a rule bound to a chat runs with that chat's own agent and model (the user may have switched it since)
+        Sessions.Session bound = r.chat.isEmpty() ? null : ChatHub.get(app).sessions.find(r.chat);
+        if (bound != null) r.backend = bound.backend;
         if (!SetupState.signedIn(app, r.backend)) {
             log(j, "error", app.getString(R.string.rules_log_not_signed_in, Account.nameOf(r.backend)));
             return;
@@ -418,7 +421,7 @@ final class Triggers implements ChatHub.Listener {
         j.replied = j.later = null;
         ChatHub hub = ChatHub.get(app);
         Sessions.Session ses = chat(hub, j);
-        ses.model = r.model; // the rule's choice, also when it changed since the chat's last run
+        if (ses != bound) ses.model = r.model; // the rule's choice, also when it changed since the chat's last run
         j.chat = ses.id;
         Guard.forget(ses.id); // an approval from this chat's earlier run doesn't cover this one
         active.put(ses.id, j);
@@ -537,7 +540,9 @@ final class Triggers implements ChatHub.Listener {
         } catch (Exception e) {
             map = new JSONObject();
         }
-        Sessions.Session s = hub.sessions.find(map.optString(j.key, null));
+        // a rule bound to a chat brings every conversation into it; once that chat is deleted, it works as any rule
+        Sessions.Session s = j.rule.chat.isEmpty() ? null : hub.sessions.find(j.rule.chat);
+        if (s == null) s = hub.sessions.find(map.optString(j.key, null));
         if (s == null || !s.backend.equals(j.rule.backend) || s.running) {
             // every conversation keeps its chat (and with it what was answered before): none is deleted to make room
             s = hub.create(j.rule.backend, false);
@@ -547,9 +552,11 @@ final class Triggers implements ChatHub.Listener {
         try {
             for (java.util.Iterator<String> it = map.keys(); it.hasNext(); ) {
                 String k = it.next();
-                if (hub.sessions.find(map.optString(k)) != null) kept.put(k, map.optString(k));
+                String v = map.optString(k);
+                if (hub.sessions.find(v) != null && !v.equals(j.rule.chat)) kept.put(k, v);
             }
-            kept.put(j.key, s.id);
+            // the chat a rule is bound to stays the user's chat: it isn't kept as a conversation's (see ruleChat)
+            if (!s.id.equals(j.rule.chat)) kept.put(j.key, s.id);
         } catch (Exception ignored) {
         }
         Prefs.setRuleChats(app, kept.toString());

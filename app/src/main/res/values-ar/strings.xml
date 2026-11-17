@@ -364,7 +364,7 @@
     <string name="chat_approvals_ask">اسأل</string>
     <string name="chat_approvals_ask_info">كل تطبيق يتبع ما هو محدَّد له في «%1$s».</string>
     <string name="chat_approvals_strict_info">حتى في التطبيقات المضبوطة على «%1$s»، يسأل Buddy قبل الإرسال أو النشر أو الشراء أو الحذف.</string>
-    <string name="chat_approvals_apps_hint">حيث تصرّف الوكيل، مع إعداد كل تطبيق في «%1$s». اضغط على تطبيق لتغييره هناك.</string>
+    <string name="chat_approvals_apps_set">حيث تصرّف الوكيل، مع إعداد كل تطبيق في «%1$s». التغيير هنا يسري على كل الدردشات.</string>
     <string name="chat_approvals_routine">الروتيني مسموح</string>
     <string name="chat_approvals_routine_info">الخطوات الروتينية تمضي في كل تطبيق دون بطاقة: إرسال رسالة، أو خطوة كان المراجع سيسأل عنها. تُدوَّن كل واحدة في المحادثة. الدفع والشراء والحذف والتثبيت وكلمات المرور وإعدادات الأمان ما زالت تسألك، وكذلك كل شيء في تطبيقات البنوك والدفع والإعدادات ومتاجر التطبيقات.</string>
     <string name="chat_approvals_strict">اسأل دائمًا</string>
@@ -435,6 +435,7 @@
     <string name="hub_agent_switched">تم التبديل إلى %1$s. سيحصل على المحادثة حتى الآن مع رسالتك التالية.</string>
     <string name="chat_model_other_hint">نموذج آخر… مثل %1$s</string>
     <string name="chat_model_use">استخدام</string>
+    <string name="chat_model_search">ابحث في النماذج</string>
 
     <!-- Language sheet (long-press the mic) -->
     <string name="chat_speak_in">لغة التحدث</string>
@@ -509,6 +510,9 @@
     <string name="hub_continuing">جارٍ متابعة جلسة سابقة من %1$s. إذا كانت لا تزال مفتوحة في طرفية، فأغلقها هناك أولًا.</string>
     <string name="hub_still_working_attachments">لا تزال هذه المحادثة قيد العمل. أرسل المرفقات عند انتهائها.</string>
     <string name="hub_service_off">الخدمة %1$s متوقفة (الإعدادات ← الوكلاء والنماذج ← مفاتيح API). شغّلها أو اختر نموذجًا آخر لهذه المحادثة.</string>
+    <string name="hub_accessibility_dead">خدمة إمكانية الوصول في Buddy لا تعمل رغم أنها مفعّلة: أوقف Android تطبيق Buddy ولم يُعد تشغيل الخدمة، فلا يستطيع الوكلاء الوصول إلى الهاتف. أوقف Buddy ثم شغّله في إعدادات Android ← إمكانية الوصول. ولكي لا يتكرر ذلك: اسمح لـ Buddy بالتشغيل التلقائي في إعدادات التطبيقات إن كان هاتفك يتيح ذلك، وامنح الميكروفون «أثناء استخدام التطبيق» لا «هذه المرة فقط».</string>
+    <string name="hub_accessibility_off">خدمة إمكانية الوصول في Buddy متوقفة، فلا يستطيع الوكلاء الوصول إلى الهاتف. شغّل Buddy في إعدادات Android ← إمكانية الوصول.</string>
+    <string name="voice_mic_while_using">اختر «أثناء استخدام التطبيق»: مع «هذه المرة فقط» يوقف Android تطبيق Buddy بعد دقيقة من مغادرتك له، حتى في منتصف مهمة.</string>
     <string name="hub_thinking">جارٍ التفكير…</string>
     <string name="hub_still_waiting">لم يردّ النموذج بعد…</string>
     <string name="hub_still_reading_local">ما زال يقرأ… قد يستغرق نموذج على حاسوبك بضع دقائق، خاصة للإجابة الأولى.</string>
@@ -963,6 +967,15 @@
     <string name="setup_phone_tools_info">أدوات الهاتف في Buddy هي خادم MCP عادي على هذا الهاتف. شغّل هذا الأمر مرة واحدة في طرفية على الهاتف (Termux مثلًا)، وسيحصل ذلك الوكيل على أدوات الهاتف في كل جلسة، حتى بدون الفقاعة.</string>
     <string name="setup_copy_command">نسخ الأمر</string>
     <string name="setup_command_copied">تم النسخ. الصقه في الطرفية.</string>
+    <string name="setup_outside_background">العمل في الخلفية</string>
+    <string name="setup_outside_background_info">يعمل الوكلاء في جلساتك الخاصة على شاشة مخفية، مثل محادثة في وضع الخلفية: تواصل استخدام هاتفك، ويواصلون العمل وهو مقفل. تصلك البطاقات والأسئلة كالمعتاد. الخطوة التي تحتاج إلى عينيك، مثل تسجيل الدخول، تُحضر تطبيقها إلى شاشتك. يتطلب إعداد وضع الخلفية.</string>
+    <string name="setup_tailnet">أدوات الهاتف عبر Tailscale</string>
+    <string name="setup_tailnet_info">يحصل الوكلاء على حواسيبك الخاصة على أدوات الهاتف هذه عبر Tailscale، مع تشغيل Tailscale على الجهازين. لكل حاسوب تضيفه مفتاحه الخاص، وتسحبه «إزالة». تصلك البطاقات والأسئلة على الهاتف كالمعتاد. فعّل «العمل في الخلفية» أعلاه حتى لا يستخدموا شاشتك.</string>
+    <string name="setup_tailnet_address">هذا الهاتف على Tailscale: %1$s</string>
+    <string name="setup_tailnet_no_address">Tailscale غير متصل على هذا الهاتف، فلا تستطيع الحواسيب الوصول إليه الآن.</string>
+    <string name="setup_tailnet_computer">حاسوب %1$d</string>
+    <string name="setup_tailnet_pair_info">على الحاسوب، مع تشغيل Tailscale، شغّل هذا في طرفية. يطلب منك هذا الهاتف بعدها الموافقة، ويحصل Claude Code على الحاسوب على أدوات الهاتف بمفتاح خاص به.</string>
+    <string name="tools_card_pair">إقران الحاسوب “%1$s” (Tailscale %2$s)؟ يحصل على أدوات هاتف Buddy بمفتاح خاص به، يمكنك إزالته من الإعدادات.</string>
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">الصوت</string>
@@ -1048,6 +1061,8 @@
     <string name="setup_read_aloud_info">يقرأ Buddy ردود الوكلاء بصوت عالٍ، بالصوت الذي تختاره في قسم «الصوت».</string>
     <string name="setup_pause_media">إيقاف الوسائط مؤقتًا أثناء القراءة بصوت عالٍ</string>
     <string name="setup_pause_media_info">تتوقف الموسيقى أو الفيديو مؤقتًا أثناء قراءة Buddy للرد، ثم تُستأنف بعد ذلك. لا يستأنف Buddy إلا ما أوقفه هو، ولا يفعل ذلك إذا غيّرت التشغيل في هذه الأثناء. يتطلب «قراءة الردود بصوت عالٍ» والوصول إلى الإشعارات.</string>
+    <string name="setup_pause_listening">إيقاف الوسائط مؤقتًا أثناء الاستماع</string>
+    <string name="setup_pause_listening_info">تتوقف الموسيقى أو الفيديو مؤقتًا بينما يستمع إليك Buddy، فيسمع صوتك لا صوت الفيديو، ثم تعود للتشغيل بعد ذلك. وإذا كان «إيقاف الوسائط مؤقتًا أثناء القراءة بصوت عالٍ» مفعّلًا أيضًا، تبقى متوقفة حتى تُقرأ الإجابة. لا يعيد Buddy تشغيل إلا ما أوقفه، ولا يفعل ذلك إن غيّرت التشغيل في الأثناء. يتطلب الوصول إلى الإشعارات.</string>
     <string name="setup_voice_cards">الرد على البطاقات بالصوت</string>
     <string name="setup_voice_cards_info">بعد قراءة البطاقة بصوت عالٍ يستمع Buddy: قل «موافق» أو «رفض»، أو الخيار الذي تريده. يتطلب تشغيل «قراءة الردود بصوت عالٍ». لا يعمل والهاتف مقفل. يمكن لأي شخص على مسمع أن يجيب.</string>
     <string name="voice_card_approval">يحتاج Buddy إلى موافقتك. %1$s</string>
@@ -1414,6 +1429,9 @@
     <string name="hub_tool_browser_back">المتصفح: جارٍ الرجوع</string>
     <string name="hub_tool_browser_tabs">المتصفح: علامات التبويب</string>
     <string name="hub_tool_schedule_message">جدولة: %1$s</string>
+    <string name="hub_tool_add_rule">إضافة قاعدة إشعارات: %1$s</string>
+    <string name="tools_card_rule">إضافة قاعدة إشعارات إلى المحادثة “%4$s”؟ من %1$s، %2$s: يصل كل إشعار إلى هذه المحادثة مع التعليمة “%3$s”. تسألك القاعدة قبل أن تتصرف، مثل كل القواعد.</string>
+    <string name="rules_in_chat">في المحادثة “%1$s”</string>
     <string name="hub_tool_list_scheduled">يتحقق من الرسائل المجدولة</string>
     <string name="hub_tool_cancel_scheduled">يلغي رسالة مجدولة</string>
     <string name="later_title">رسالة الوكيل في %1$s</string>

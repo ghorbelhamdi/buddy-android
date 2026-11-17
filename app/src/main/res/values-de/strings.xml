@@ -351,7 +351,7 @@
     <string name="chat_approvals_ask">Fragen</string>
     <string name="chat_approvals_ask_info">Jede App folgt dem, was unter %1$s für sie festgelegt ist.</string>
     <string name="chat_approvals_strict_info">Auch in Apps, die auf %1$s stehen, fragt Buddy vor dem Senden, Posten, Kaufen oder Löschen.</string>
-    <string name="chat_approvals_apps_hint">Wo der Agent etwas getan hat, mit der Einstellung jeder App unter %1$s. Tippe auf eine App, um sie dort zu ändern.</string>
+    <string name="chat_approvals_apps_set">Wo der Agent etwas getan hat, mit der Einstellung jeder App unter %1$s. Eine Änderung hier gilt in jedem Chat.</string>
     <string name="chat_approvals_routine">Routine erlaubt</string>
     <string name="chat_approvals_routine_info">Routineschritte laufen in jeder App ohne Karte: eine Nachricht senden oder ein Schritt, bei dem der Prüfer nachfragen würde. Jeder wird im Chat vermerkt. Bezahlen, Kaufen, Löschen, Installieren, Passwörter und Sicherheitseinstellungen fragen dich weiterhin, ebenso alles in Banking- und Bezahl-Apps, den Einstellungen und App-Stores.</string>
     <string name="chat_approvals_strict">Immer fragen</string>
@@ -422,6 +422,7 @@
     <string name="hub_agent_switched">Zu %1$s gewechselt. Er bekommt das bisherige Gespräch mit deiner nächsten Nachricht.</string>
     <string name="chat_model_other_hint">anderes… z. B. %1$s</string>
     <string name="chat_model_use">Nutzen</string>
+    <string name="chat_model_search">Modelle suchen</string>
 
     <!-- Language sheet (long-press the mic) -->
     <string name="chat_speak_in">Sprechen auf</string>
@@ -488,6 +489,9 @@
     <string name="hub_continuing">Eine frühere Sitzung von %1$s wird fortgesetzt. Wenn sie noch in einem Terminal offen ist, schließe sie dort zuerst.</string>
     <string name="hub_still_working_attachments">In diesem Chat läuft noch eine Aufgabe. Sende Anhänge, wenn sie fertig ist.</string>
     <string name="hub_service_off">%1$s ist ausgeschaltet (Einstellungen → Agenten und Modelle → API-Schlüssel). Schalte den Dienst ein oder wähle ein anderes Modell für diesen Chat.</string>
+    <string name="hub_accessibility_dead">Buddys Bedienungshilfe-Dienst läuft nicht, obwohl er eingeschaltet ist: Android hat Buddy beendet und den Dienst nicht wieder gestartet, daher erreichen Agenten das Handy nicht. Schalte Buddy unter Android-Einstellungen → Bedienungshilfen aus und wieder ein. Damit es nicht wieder passiert: Erlaube Buddy den Autostart in den App-Einstellungen des Handys, falls es das gibt, und gib dem Mikrofon „Während der App-Nutzung“, nicht „Nur dieses Mal“.</string>
+    <string name="hub_accessibility_off">Buddys Bedienungshilfe-Dienst ist aus, daher erreichen Agenten das Handy nicht. Schalte Buddy unter Android-Einstellungen → Bedienungshilfen ein.</string>
+    <string name="voice_mic_while_using">Wähle „Während der App-Nutzung“: Bei „Nur dieses Mal“ beendet Android Buddy eine Minute, nachdem du es verlassen hast, auch mitten in einer Aufgabe.</string>
     <string name="hub_thinking">Denkt nach…</string>
     <string name="hub_still_waiting">Wartet noch auf die Antwort des Modells…</string>
     <string name="hub_still_reading_local">Liest noch… Ein Modell auf deinem eigenen Computer kann ein paar Minuten brauchen, vor allem für die erste Antwort.</string>
@@ -933,6 +937,15 @@
     <string name="setup_phone_tools_info">Buddys Smartphone-Tools sind ein normaler MCP-Server auf diesem Smartphone. Führe diesen Befehl einmal in einem Terminal auf dem Smartphone aus (zum Beispiel in Termux), dann bekommt der Agent dort die Smartphone-Tools in jeder Sitzung, auch ohne die Bubble.</string>
     <string name="setup_copy_command">Befehl kopieren</string>
     <string name="setup_command_copied">Kopiert. Füge ihn in dein Terminal ein.</string>
+    <string name="setup_outside_background">Im Hintergrund arbeiten</string>
+    <string name="setup_outside_background_info">Agenten in deinen eigenen Sitzungen arbeiten auf einem verborgenen Bildschirm, wie ein Chat im Hintergrundmodus: Du nutzt dein Telefon weiter, und sie arbeiten auch bei gesperrtem Telefon weiter. Karten und Fragen kommen trotzdem zu dir. Ein Schritt für deine eigenen Augen, etwa eine Anmeldung, holt seine App auf deinen Bildschirm. Der Hintergrundmodus muss eingerichtet sein.</string>
+    <string name="setup_tailnet">Telefon-Tools über Tailscale</string>
+    <string name="setup_tailnet_info">Agenten auf deinen eigenen Computern bekommen diese Telefon-Tools über Tailscale, mit Tailscale auf beiden. Jeder hinzugefügte Computer hat einen eigenen Schlüssel, den Entfernen zurücknimmt. Karten und Fragen kommen weiter auf dem Telefon zu dir. Schalte oben Im Hintergrund arbeiten ein, damit sie deinen Bildschirm nicht nutzen.</string>
+    <string name="setup_tailnet_address">Dieses Telefon in Tailscale: %1$s</string>
+    <string name="setup_tailnet_no_address">Tailscale ist auf diesem Telefon nicht verbunden, Computer erreichen es gerade nicht.</string>
+    <string name="setup_tailnet_computer">Computer %1$d</string>
+    <string name="setup_tailnet_pair_info">Führe das auf dem Computer mit eingeschaltetem Tailscale in einem Terminal aus. Dieses Telefon bittet dich dann um Zustimmung, und Claude Code auf dem Computer bekommt die Telefon-Tools mit einem eigenen Schlüssel.</string>
+    <string name="tools_card_pair">Den Computer „%1$s“ (Tailscale %2$s) koppeln? Er bekommt Buddys Telefon-Tools mit einem eigenen Schlüssel, den du in den Einstellungen entfernen kannst.</string>
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Stimme</string>
@@ -1010,6 +1023,8 @@
     <string name="setup_read_aloud_info">Buddy liest die Antworten der Agenten vor, mit der Stimme, die du unter „Stimme“ auswählst.</string>
     <string name="setup_pause_media">Medien beim Vorlesen pausieren</string>
     <string name="setup_pause_media_info">Laufende Musik oder ein Video wird pausiert, während Buddy eine Antwort vorliest, und läuft danach weiter. Buddy startet nur, was es selbst pausiert hat, und nicht, wenn du die Wiedergabe inzwischen geändert hast. Benötigt „Antworten vorlesen“ und den Benachrichtigungszugriff.</string>
+    <string name="setup_pause_listening">Medien beim Zuhören pausieren</string>
+    <string name="setup_pause_listening_info">Musik oder ein Video wird pausiert, während Buddy dir zuhört, damit es deine Stimme hört und nicht das Video, und danach fortgesetzt. Ist auch „Medien beim Vorlesen pausieren“ an, bleibt es pausiert, bis die Antwort vorgelesen ist. Buddy setzt nur fort, was es selbst pausiert hat, und nicht, wenn du die Wiedergabe inzwischen geändert hast. Braucht Benachrichtigungszugriff.</string>
     <string name="setup_voice_cards">Karten per Stimme beantworten</string>
     <string name="setup_voice_cards_info">Nachdem eine Karte vorgelesen wurde, hört Buddy zu: Sag „genehmigen“ oder „ablehnen“ oder die gewünschte Option. Benötigt „Antworten vorlesen“. Nicht bei gesperrtem Handy. Jeder in Hörweite könnte antworten.</string>
     <string name="voice_card_approval">Buddy braucht dein OK. %1$s</string>
@@ -1373,6 +1388,9 @@
     <string name="hub_tool_browser_back">Browser: geht zurück</string>
     <string name="hub_tool_browser_tabs">Browser: Tabs</string>
     <string name="hub_tool_schedule_message">Plant: %1$s</string>
+    <string name="hub_tool_add_rule">Benachrichtigungsregel wird hinzugefügt: %1$s</string>
+    <string name="tools_card_rule">Eine Benachrichtigungsregel zum Chat „%4$s“ hinzufügen? Von %1$s, %2$s: Jede kommt mit der Anweisung „%3$s“ in diesen Chat. Die Regel fragt dich, bevor sie handelt, wie jede Regel.</string>
+    <string name="rules_in_chat">Im Chat „%1$s“</string>
     <string name="hub_tool_list_scheduled">Prüft geplante Nachrichten</string>
     <string name="hub_tool_cancel_scheduled">Entfernt eine geplante Nachricht</string>
     <string name="later_title">Nachricht des Agenten für %1$s</string>

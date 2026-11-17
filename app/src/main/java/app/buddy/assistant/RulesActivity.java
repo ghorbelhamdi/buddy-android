@@ -193,8 +193,16 @@ public class RulesActivity extends Screen {
         ins.setEllipsize(android.text.TextUtils.TruncateAt.END);
         ins.setPaddingRelative(0, dp(this, 2), 0, 0);
         col.addView(ins);
-        String tag = (r.on ? "" : getString(R.string.rules_tag_off) + " · ") + Account.nameOf(r.backend)
-                + (r.model.isEmpty() ? "" : " · " + Models.label(r.backend, r.model)) + " · "
+        Sessions.Session bound = r.chat.isEmpty() ? null : ChatHub.get(this).sessions.find(r.chat);
+        if (bound != null) { // added by an agent in that chat: its notifications go there
+            TextView where = single(text(this, getString(R.string.rules_in_chat, bound.label()), 13, ACCENT_TEXT));
+            where.setPaddingRelative(0, dp(this, 2), 0, 0);
+            col.addView(where);
+        }
+        // a rule bound to a chat runs with that chat's agent and model (Triggers.start)
+        String agentTag = bound != null ? Account.nameOf(bound.backend) : Account.nameOf(r.backend)
+                + (r.model.isEmpty() ? "" : " · " + Models.label(r.backend, r.model));
+        String tag = (r.on ? "" : getString(R.string.rules_tag_off) + " · ") + agentTag + " · "
                 + (r.countdown() ? getString(R.string.rules_tag_countdown, Rules.Rule.duration(this, r.seconds))
                 : r.now() ? getString(R.string.rules_tag_now) : getString(R.string.rules_tag_ask)) + " · "
                 + (r.limit == 0 ? getString(R.string.rules_tag_no_limit) : getString(R.string.rules_tag_limit, r.limit));
@@ -285,6 +293,12 @@ public class RulesActivity extends Screen {
         body.addView(chips.view(), gap(8));
 
         body.addView(label(getString(R.string.rules_agent)), gap(20));
+        Sessions.Session boundChat = draft.chat.isEmpty() ? null : ChatHub.get(this).sessions.find(draft.chat);
+        if (boundChat != null) { // its matches go into that chat, with the chat's own agent and model
+            draft.backend = boundChat.backend;
+            body.addView(text(this, getString(R.string.rules_in_chat, boundChat.label()) + " · "
+                    + Account.nameOf(boundChat.backend), 15, TEXT), gap(8));
+        }
         java.util.Set<String> notReady = new java.util.HashSet<>();
         java.util.List<String[]> runners = new java.util.ArrayList<>();
         for (Account a : Account.ALL) {
@@ -321,7 +335,7 @@ public class RulesActivity extends Screen {
             agentSlot.addView(box);
         };
         paintAgent[0].run();
-        body.addView(agentSlot, gap(8));
+        if (boundChat == null) body.addView(agentSlot, gap(8));
 
         body.addView(label(getString(R.string.rules_approval)), gap(20));
         approvalSlot = new FrameLayout(this);

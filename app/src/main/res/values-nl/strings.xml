@@ -351,7 +351,7 @@
     <string name="chat_approvals_ask">Vragen</string>
     <string name="chat_approvals_ask_info">Elke app volgt wat bij %1$s ervoor is ingesteld.</string>
     <string name="chat_approvals_strict_info">Ook in apps die op %1$s staan, vraagt Buddy het voordat er iets wordt verzonden, gepost, gekocht of verwijderd.</string>
-    <string name="chat_approvals_apps_hint">Waar de agent iets heeft gedaan, met de instelling van elke app bij %1$s. Tik op een app om die daar te wijzigen.</string>
+    <string name="chat_approvals_apps_set">Waar de agent iets heeft gedaan, met de instelling van elke app bij %1$s. Een wijziging hier geldt in elke chat.</string>
     <string name="chat_approvals_routine">Routine toegestaan</string>
     <string name="chat_approvals_routine_info">Routinestappen gaan in elke app door zonder kaart: een bericht sturen, of een stap waarover de controleur zou vragen. Elke stap wordt in de chat genoteerd. Betalen, kopen, verwijderen, installeren, wachtwoorden en beveiligingsinstellingen vragen het je nog steeds, net als alles in bank- en betaalapps, Instellingen en appwinkels.</string>
     <string name="chat_approvals_strict">Altijd vragen</string>
@@ -422,6 +422,7 @@
     <string name="hub_agent_switched">Overgeschakeld naar %1$s. Die krijgt het gesprek tot nu toe met je volgende bericht.</string>
     <string name="chat_model_other_hint">ander… bijv. %1$s</string>
     <string name="chat_model_use">Gebruiken</string>
+    <string name="chat_model_search">Modellen zoeken</string>
 
     <!-- Language sheet (long-press the mic) -->
     <string name="chat_speak_in">Spreken in</string>
@@ -488,6 +489,9 @@
     <string name="hub_continuing">Een eerdere sessie van %1$s wordt voortgezet. Als die nog open is in een terminal, sluit die daar dan eerst.</string>
     <string name="hub_still_working_attachments">Deze chat is nog bezig. Stuur bijlagen als hij klaar is.</string>
     <string name="hub_service_off">%1$s staat uit (Instellingen → Agents en modellen → API-sleutels). Zet de dienst aan of kies een ander model voor deze chat.</string>
+    <string name="hub_accessibility_dead">De toegankelijkheidsservice van Buddy draait niet, hoewel hij aanstaat: Android heeft Buddy gestopt en de service niet opnieuw gestart, dus agents kunnen de telefoon niet bereiken. Zet Buddy uit en weer aan in Android-instellingen → Toegankelijkheid. Zodat het niet weer gebeurt: sta automatisch starten voor Buddy toe in de app-instellingen van de telefoon, als die dat heeft, en geef de microfoon „Tijdens gebruik van de app”, niet „Alleen deze keer”.</string>
+    <string name="hub_accessibility_off">De toegankelijkheidsservice van Buddy staat uit, dus agents kunnen de telefoon niet bereiken. Zet Buddy aan in Android-instellingen → Toegankelijkheid.</string>
+    <string name="voice_mic_while_using">Kies „Tijdens gebruik van de app”: bij „Alleen deze keer” stopt Android Buddy een minuut nadat je het verlaat, ook midden in een taak.</string>
     <string name="hub_thinking">Denkt na…</string>
     <string name="hub_still_waiting">Wacht nog op antwoord van het model…</string>
     <string name="hub_still_reading_local">Nog aan het lezen… Een model op je eigen computer kan een paar minuten nodig hebben, vooral voor het eerste antwoord.</string>
@@ -933,6 +937,15 @@
     <string name="setup_phone_tools_info">De telefoontools van Buddy zijn een gewone MCP-server op deze telefoon. Voer deze opdracht één keer uit in een terminal op de telefoon (bijvoorbeeld in Termux), dan krijgt de agent daar de telefoontools in elke sessie, ook zonder de bubbel.</string>
     <string name="setup_copy_command">Opdracht kopiëren</string>
     <string name="setup_command_copied">Gekopieerd. Plak het in je terminal.</string>
+    <string name="setup_outside_background">Op de achtergrond werken</string>
+    <string name="setup_outside_background_info">Agents in je eigen sessies werken op een verborgen scherm, zoals een chat in achtergrondmodus: je blijft je telefoon gebruiken, en zij gaan door als hij vergrendeld is. Kaarten en vragen komen nog steeds bij jou. Een stap voor je eigen ogen, zoals inloggen, brengt de app naar je scherm. Achtergrondmodus moet ingesteld zijn.</string>
+    <string name="setup_tailnet">Telefoontools via Tailscale</string>
+    <string name="setup_tailnet_info">Agents op je eigen computers krijgen deze telefoontools via Tailscale, met Tailscale op allebei. Elke computer die je toevoegt heeft een eigen sleutel, die Verwijderen intrekt. Kaarten en vragen komen nog steeds op de telefoon bij jou. Zet hierboven Op de achtergrond werken aan, zodat ze je scherm niet gebruiken.</string>
+    <string name="setup_tailnet_address">Deze telefoon in Tailscale: %1$s</string>
+    <string name="setup_tailnet_no_address">Tailscale is niet verbonden op deze telefoon, dus computers bereiken hem nu niet.</string>
+    <string name="setup_tailnet_computer">Computer %1$d</string>
+    <string name="setup_tailnet_pair_info">Voer dit op de computer, met Tailscale aan, uit in een terminal. Deze telefoon vraagt je dan om goedkeuring, en Claude Code op de computer krijgt de telefoontools met een eigen sleutel.</string>
+    <string name="tools_card_pair">De computer ‘%1$s’ (Tailscale %2$s) koppelen? Hij krijgt Buddy\'s telefoontools met een eigen sleutel, die je in Instellingen kunt verwijderen.</string>
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Spraak</string>
@@ -1010,6 +1023,8 @@
     <string name="setup_read_aloud_info">Buddy leest de antwoorden van de agents voor, met de stem die je kiest onder Spraak.</string>
     <string name="setup_pause_media">Media pauzeren tijdens het voorlezen</string>
     <string name="setup_pause_media_info">Muziek of een video die speelt, wordt gepauzeerd terwijl Buddy een antwoord voorleest en gaat daarna verder. Buddy hervat alleen wat het zelf heeft gepauzeerd, en niet als je het afspelen intussen hebt gewijzigd. Vereist ‘Antwoorden voorlezen’ en toegang tot meldingen.</string>
+    <string name="setup_pause_listening">Media pauzeren tijdens luisteren</string>
+    <string name="setup_pause_listening_info">Muziek of een video die speelt, wordt gepauzeerd terwijl Buddy naar je luistert, zodat het je stem hoort en niet de video, en speelt daarna verder. Staat ook „Media pauzeren tijdens het voorlezen” aan, dan blijft het gepauzeerd tot het antwoord is voorgelezen. Buddy hervat alleen wat het zelf pauzeerde, en niet als je het afspelen intussen hebt veranderd. Vereist toegang tot meldingen.</string>
     <string name="setup_voice_cards">Kaarten met je stem beantwoorden</string>
     <string name="setup_voice_cards_info">Nadat een kaart is voorgelezen, luistert Buddy: zeg ‘goedkeuren’ of ‘weigeren’, of de optie die je wilt. Vereist ‘Antwoorden voorlezen’. Niet als de telefoon vergrendeld is. Iedereen binnen gehoorsafstand kan antwoorden.</string>
     <string name="voice_card_approval">Buddy heeft je OK nodig. %1$s</string>
@@ -1372,6 +1387,9 @@
     <string name="hub_tool_browser_back">Browser: gaat terug</string>
     <string name="hub_tool_browser_tabs">Browser: tabbladen</string>
     <string name="hub_tool_schedule_message">Plant: %1$s</string>
+    <string name="hub_tool_add_rule">Meldingsregel toevoegen: %1$s</string>
+    <string name="tools_card_rule">Een meldingsregel toevoegen aan de chat ‘%4$s’? Van %1$s, %2$s: elke melding komt in deze chat met de instructie ‘%3$s’. De regel vraagt het je voordat hij iets doet, zoals elke regel.</string>
+    <string name="rules_in_chat">In de chat ‘%1$s’</string>
     <string name="hub_tool_list_scheduled">Bekijkt geplande berichten</string>
     <string name="hub_tool_cancel_scheduled">Annuleert een gepland bericht</string>
     <string name="later_title">Bericht van de agent voor %1$s</string>

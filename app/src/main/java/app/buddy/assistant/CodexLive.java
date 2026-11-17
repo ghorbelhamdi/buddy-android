@@ -187,6 +187,7 @@ final class CodexLive {
         Voice.stopListening();
         Voice.stopSpeaking();
         app = c.getApplicationContext();
+        SpeechPause.listen(app); // a live voice call listens the whole time: media stays paused until it ends (#56)
         logStartNew();
         log("start: chat " + s.id);
         ses = s;

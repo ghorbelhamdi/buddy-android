@@ -46,7 +46,7 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         // from the "update available" notification
         if (state == null && getIntent().getBooleanExtra("update", false)) Updates.showSheet(this);
         if (getIntent().getBooleanExtra("askMic", false) && !Voice.micAllowed(this)) {
-            requestPermissions(new String[]{android.Manifest.permission.RECORD_AUDIO}, 3);
+            Voice.askMic(this, 3);
         } else if (android.os.Build.VERSION.SDK_INT >= 33
                 && checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 2);

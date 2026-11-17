@@ -348,7 +348,7 @@
     <string name="chat_approvals_ask">पूछें</string>
     <string name="chat_approvals_ask_info">हर ऐप वही मानता है जो %1$s में उसके लिए तय है.</string>
     <string name="chat_approvals_strict_info">«%1$s» पर रखे ऐप में भी Buddy भेजने, पोस्ट करने, ख़रीदने या हटाने से पहले पूछता है.</string>
-    <string name="chat_approvals_apps_hint">जहाँ एजेंट ने काम किया, और %1$s में हर ऐप की सेटिंग. वहाँ बदलने के लिए किसी ऐप पर टैप करें.</string>
+    <string name="chat_approvals_apps_set">जहाँ एजेंट ने काम किया, और %1$s में हर ऐप की सेटिंग. यहाँ किया गया बदलाव हर चैट पर लागू होता है.</string>
     <string name="chat_approvals_routine">रोज़मर्रा की अनुमति</string>
     <string name="chat_approvals_routine_info">रोज़मर्रा के कदम हर ऐप में बिना कार्ड के आगे बढ़ते हैं: संदेश भेजना, या ऐसा कदम जिस पर समीक्षक पूछता. हर एक चैट में दर्ज होता है. भुगतान, ख़रीदारी, हटाना, इंस्टॉल करना, पासवर्ड और सुरक्षा सेटिंग अब भी आपसे पूछती हैं, और बैंकिंग व पेमेंट ऐप, सेटिंग्स और ऐप स्टोर में सब कुछ भी.</string>
     <string name="chat_approvals_strict">हमेशा पूछें</string>
@@ -419,6 +419,7 @@
     <string name="hub_agent_switched">%1$s पर बदला गया. अगले संदेश के साथ उसे अब तक की बातचीत मिलेगी.</string>
     <string name="chat_model_other_hint">कोई और… जैसे %1$s</string>
     <string name="chat_model_use">इस्तेमाल करें</string>
+    <string name="chat_model_search">मॉडल खोजें</string>
 
     <!-- Language sheet (long-press the mic) -->
     <string name="chat_speak_in">बोलने की भाषा</string>
@@ -485,6 +486,9 @@
     <string name="hub_continuing">पिछला %1$s सेशन जारी रखा जा रहा है. अगर यह अब भी किसी टर्मिनल में खुला है, तो पहले उसे वहां बंद करें.</string>
     <string name="hub_still_working_attachments">यह चैट अभी काम कर रही है. काम पूरा होने पर अटैचमेंट भेजें.</string>
     <string name="hub_service_off">%1$s बंद है (सेटिंग → एजेंट और मॉडल → API कुंजियाँ)। इसे चालू करें, या इस चैट के लिए कोई दूसरा मॉडल चुनें।</string>
+    <string name="hub_accessibility_dead">Buddy की सुलभता सेवा चालू होने के बावजूद नहीं चल रही: Android ने Buddy को बंद किया और सेवा को फिर से शुरू नहीं किया, इसलिए एजेंट फ़ोन तक नहीं पहुँच सकते. Android की सेटिंग → सुलभता में Buddy को बंद करके फिर चालू करें. ताकि यह दोबारा न हो: अगर आपके फ़ोन में यह सेटिंग है तो ऐप सेटिंग में Buddy को अपने-आप शुरू होने दें, और माइक्रोफ़ोन को “ऐप इस्तेमाल करते समय” दें, “सिर्फ़ इस बार” नहीं.</string>
+    <string name="hub_accessibility_off">Buddy की सुलभता सेवा बंद है, इसलिए एजेंट फ़ोन तक नहीं पहुँच सकते. Android की सेटिंग → सुलभता में Buddy चालू करें.</string>
+    <string name="voice_mic_while_using">“ऐप इस्तेमाल करते समय” चुनें: “सिर्फ़ इस बार” के साथ, Android आपके Buddy छोड़ने के एक मिनट बाद उसे बंद कर देता है, काम के बीच में भी.</string>
     <string name="hub_thinking">सोच रहा है…</string>
     <string name="hub_still_waiting">मॉडल के जवाब का अब भी इंतज़ार है…</string>
     <string name="hub_still_reading_local">अभी पढ़ रहा है… आपके अपने कंप्यूटर पर चलने वाले मॉडल को कुछ मिनट लग सकते हैं, ख़ासकर पहले जवाब में।</string>
@@ -927,6 +931,15 @@
     <string name="setup_phone_tools_info">Buddy के फ़ोन टूल इस फ़ोन पर एक सामान्य MCP सर्वर हैं. फ़ोन के किसी टर्मिनल (जैसे Termux) में इसे एक बार चलाएं. इसके बाद उस एजेंट को हर सेशन में फ़ोन टूल मिलेंगे, बबल के बिना भी.</string>
     <string name="setup_copy_command">कमांड कॉपी करें</string>
     <string name="setup_command_copied">कॉपी किया गया. इसे अपने टर्मिनल में चिपकाएं.</string>
+    <string name="setup_outside_background">बैकग्राउंड में काम करें</string>
+    <string name="setup_outside_background_info">आपके अपने सेशन के एजेंट एक छिपी स्क्रीन पर काम करते हैं, जैसे बैकग्राउंड मोड वाली चैट: आप फ़ोन इस्तेमाल करते रहते हैं, और फ़ोन लॉक होने पर भी वे चलते रहते हैं। कार्ड और सवाल फिर भी आपके पास आते हैं। जिस कदम में आपकी ज़रूरत हो, जैसे साइन-इन, उसका ऐप आपकी स्क्रीन पर आ जाता है। बैकग्राउंड मोड सेट होना चाहिए।</string>
+    <string name="setup_tailnet">Tailscale पर फ़ोन टूल</string>
+    <string name="setup_tailnet_info">आपके अपने कंप्यूटरों पर एजेंट Tailscale के ज़रिए ये फ़ोन टूल पाते हैं, दोनों पर Tailscale चालू हो। हर जोड़े गए कंप्यूटर की अपनी कुंजी होती है, जिसे हटाएं वापस ले लेता है। कार्ड और सवाल फिर भी फ़ोन पर आपके पास आते हैं। ऊपर बैकग्राउंड में काम करें चालू करें, ताकि वे आपकी स्क्रीन इस्तेमाल न करें।</string>
+    <string name="setup_tailnet_address">Tailscale पर यह फ़ोन: %1$s</string>
+    <string name="setup_tailnet_no_address">इस फ़ोन पर Tailscale जुड़ा नहीं है, इसलिए अभी कंप्यूटर इस तक नहीं पहुंच सकते।</string>
+    <string name="setup_tailnet_computer">कंप्यूटर %1$d</string>
+    <string name="setup_tailnet_pair_info">कंप्यूटर पर, Tailscale चालू रखकर, इसे टर्मिनल में चलाएं। फिर यह फ़ोन आपसे मंज़ूरी मांगता है, और कंप्यूटर के Claude Code को अपनी कुंजी के साथ फ़ोन टूल मिल जाते हैं।</string>
+    <string name="tools_card_pair">कंप्यूटर “%1$s” (Tailscale %2$s) को जोड़ें? उसे अपनी कुंजी के साथ Buddy के फ़ोन टूल मिलेंगे, जिसे आप सेटिंग में हटा सकते हैं।</string>
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">आवाज़</string>
@@ -1004,6 +1017,8 @@
     <string name="setup_read_aloud_info">Buddy एजेंटों के जवाब उस आवाज़ में पढ़कर सुनाता है, जो आप “आवाज़” में चुनते हैं.</string>
     <string name="setup_pause_media">पढ़कर सुनाते समय मीडिया रोकें</string>
     <string name="setup_pause_media_info">Buddy जब जवाब पढ़कर सुनाता है, तब चल रहा संगीत या वीडियो रुक जाता है और बाद में फिर चलने लगता है. Buddy सिर्फ़ वही दोबारा चलाता है जो उसने रोका था, और अगर आपने इस बीच प्लेबैक बदला हो तो नहीं. इसके लिए “जवाब पढ़कर सुनाएं” और सूचनाओं का ऐक्सेस चालू होना चाहिए.</string>
+    <string name="setup_pause_listening">सुनते समय मीडिया रोकें</string>
+    <string name="setup_pause_listening_info">जब Buddy आपको सुनता है, तब चल रहा संगीत या वीडियो रुक जाता है, ताकि वह आपकी आवाज़ सुने न कि वीडियो की, और बाद में फिर चलता है. अगर “पढ़कर सुनाते समय मीडिया रोकें” भी चालू है, तो जवाब पढ़े जाने तक रुका रहता है. Buddy सिर्फ़ वही फिर चलाता है जो उसने रोका था, और तब नहीं जब आपने इस बीच प्लेबैक बदला हो. नोटिफ़िकेशन ऐक्सेस चाहिए.</string>
     <string name="setup_voice_cards">कार्ड का जवाब आवाज़ से दें</string>
     <string name="setup_voice_cards_info">कार्ड ज़ोर से पढ़े जाने के बाद Buddy सुनता है: “मंज़ूर” या “अस्वीकार” कहें, या अपना विकल्प बोलें। इसके लिए “जवाब ज़ोर से पढ़ें” चालू होना चाहिए। फ़ोन लॉक होने पर नहीं। आसपास का कोई भी व्यक्ति जवाब दे सकता है।</string>
     <string name="voice_card_approval">Buddy को आपकी मंज़ूरी चाहिए। %1$s</string>
@@ -1366,6 +1381,9 @@
     <string name="hub_tool_browser_back">ब्राउज़र: वापस जा रहा है</string>
     <string name="hub_tool_browser_tabs">ब्राउज़र: टैब</string>
     <string name="hub_tool_schedule_message">शेड्यूल कर रहा है: %1$s</string>
+    <string name="hub_tool_add_rule">सूचना नियम जोड़ा जा रहा है: %1$s</string>
+    <string name="tools_card_rule">चैट “%4$s” में एक सूचना नियम जोड़ें? %1$s से, %2$s: हर सूचना इस चैट में निर्देश “%3$s” के साथ आएगी। हर नियम की तरह, यह नियम कुछ करने से पहले आपसे पूछता है।</string>
+    <string name="rules_in_chat">चैट “%1$s” में</string>
     <string name="hub_tool_list_scheduled">शेड्यूल किए गए संदेश देख रहा है</string>
     <string name="hub_tool_cancel_scheduled">शेड्यूल किया गया संदेश रद्द कर रहा है</string>
     <string name="later_title">%1$s के लिए एजेंट का संदेश</string>

@@ -501,7 +501,7 @@
     <string name="chat_approvals_ask">Hỏi</string>
     <string name="chat_approvals_ask_info">Mỗi ứng dụng theo đúng thiết lập của nó trong %1$s.</string>
     <string name="chat_approvals_strict_info">Cả trong ứng dụng đặt ở %1$s, Buddy vẫn hỏi trước khi gửi, đăng, mua hoặc xóa.</string>
-    <string name="chat_approvals_apps_hint">Nơi tác nhân đã hành động, kèm cài đặt của từng ứng dụng trong %1$s. Chạm vào một ứng dụng để đổi ở đó.</string>
+    <string name="chat_approvals_apps_set">Nơi tác nhân đã hành động, kèm cài đặt của từng ứng dụng trong %1$s. Thay đổi ở đây áp dụng cho mọi cuộc trò chuyện.</string>
     <string name="chat_approvals_routine">Cho phép việc thường lệ</string>
     <string name="chat_approvals_routine_info">Các bước thường lệ được thực hiện trong mọi ứng dụng mà không cần thẻ: gửi tin nhắn, hoặc bước mà trình kiểm duyệt sẽ hỏi. Mỗi bước đều được ghi trong cuộc trò chuyện. Thanh toán, mua, xóa, cài đặt, mật khẩu và cài đặt bảo mật vẫn hỏi bạn, cũng như mọi thứ trong ứng dụng ngân hàng và thanh toán, Cài đặt và cửa hàng ứng dụng.</string>
     <string name="chat_approvals_strict">Luôn hỏi</string>
@@ -514,7 +514,7 @@
     <string name="chat_allowed_add">Thêm ứng dụng</string>
     <!-- Read by TalkBack for the X beside an allowed app; %1$s = the app's name. -->
     <string name="chat_allowed_remove">Gỡ %1$s</string>
-    <!-- A line in the chat for an action that went ahead because of "Allowed without asking"; %1$s = the action, e.g. Tap “Complete Task” in Testers Community. -->
+    <!-- A line in the chat for an action that went ahead because of "Allowed without asking"; %1$s = the action, e.g. Tap “Send” in WhatsApp. -->
     <string name="run_rule_approved">Được duyệt theo quy tắc lần chạy của bạn: %1$s</string>
     <!-- Notification title when a long-task chat's run ends; %1$s = the agent's name (Claude Code, Codex…). -->
     <string name="run_end_done">%1$s đã xong</string>
@@ -617,6 +617,7 @@
     <string name="chat_model_other_hint">khác… ví dụ %1$s</string>
     <!-- Button, verb: use the model typed in the box. Keep short. -->
     <string name="chat_model_use">Dùng</string>
+    <string name="chat_model_search">Tìm mô hình</string>
 
     <!-- Language sheet (long-press the mic) -->
     <!-- Title, followed by a list of languages to speak in. -->
@@ -698,6 +699,9 @@
     <string name="hub_continuing">Đang tiếp tục một phiên %1$s trước đó. Nếu phiên đó vẫn mở trong terminal, hãy đóng nó ở đó trước.</string>
     <string name="hub_still_working_attachments">Cuộc trò chuyện này vẫn đang làm việc. Hãy gửi tệp đính kèm khi nó xong.</string>
     <string name="hub_service_off">%1$s đang tắt (Cài đặt → Tác nhân và mô hình → Khóa API). Hãy bật lại, hoặc chọn mô hình khác cho cuộc trò chuyện này.</string>
+    <string name="hub_accessibility_dead">Dịch vụ hỗ trợ tiếp cận của Buddy không chạy dù đang bật: Android đã dừng Buddy và không khởi động lại dịch vụ, nên các tác nhân không dùng được điện thoại. Hãy tắt rồi bật lại Buddy trong Cài đặt Android → Hỗ trợ tiếp cận. Để không lặp lại: cho phép Buddy tự khởi động trong cài đặt ứng dụng của điện thoại nếu có, và cấp micrô “Trong khi dùng ứng dụng”, không phải “Chỉ lần này”.</string>
+    <string name="hub_accessibility_off">Dịch vụ hỗ trợ tiếp cận của Buddy đang tắt, nên các tác nhân không dùng được điện thoại. Hãy bật Buddy trong Cài đặt Android → Hỗ trợ tiếp cận.</string>
+    <string name="voice_mic_while_using">Hãy chọn “Trong khi dùng ứng dụng”: với “Chỉ lần này”, Android dừng Buddy một phút sau khi bạn rời khỏi nó, kể cả giữa chừng một tác vụ.</string>
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">Đang suy nghĩ…</string>
     <string name="hub_still_waiting">Vẫn đang chờ mô hình trả lời…</string>
@@ -1301,6 +1305,15 @@
     <!-- Button. -->
     <string name="setup_copy_command">Sao chép lệnh</string>
     <string name="setup_command_copied">Đã sao chép. Hãy dán vào terminal của bạn.</string>
+    <string name="setup_outside_background">Làm việc ở chế độ nền</string>
+    <string name="setup_outside_background_info">Tác nhân trong phiên của riêng bạn làm việc trên một màn hình ẩn, như cuộc trò chuyện ở chế độ nền: bạn vẫn dùng điện thoại, và chúng tiếp tục cả khi máy khóa. Thẻ và câu hỏi vẫn đến với bạn. Bước cần chính mắt bạn, như đăng nhập, sẽ đưa ứng dụng lên màn hình của bạn. Cần thiết lập chế độ nền.</string>
+    <string name="setup_tailnet">Công cụ điện thoại qua Tailscale</string>
+    <string name="setup_tailnet_info">Tác nhân trên máy tính của bạn nhận các công cụ điện thoại này qua Tailscale, khi cả hai đều bật Tailscale. Mỗi máy tính bạn thêm có khóa riêng, nút Xóa sẽ thu hồi khóa đó. Thẻ và câu hỏi vẫn đến với bạn trên điện thoại. Hãy bật Làm việc ở chế độ nền ở trên để chúng không dùng màn hình của bạn.</string>
+    <string name="setup_tailnet_address">Điện thoại này trên Tailscale: %1$s</string>
+    <string name="setup_tailnet_no_address">Tailscale chưa kết nối trên điện thoại này, nên máy tính hiện không truy cập được.</string>
+    <string name="setup_tailnet_computer">Máy tính %1$d</string>
+    <string name="setup_tailnet_pair_info">Trên máy tính, khi đã bật Tailscale, chạy lệnh này trong terminal. Điện thoại này sẽ hỏi bạn có đồng ý không, và Claude Code trên máy tính nhận công cụ điện thoại với khóa riêng.</string>
+    <string name="tools_card_pair">Ghép nối máy tính “%1$s” (Tailscale %2$s)? Máy tính sẽ nhận công cụ điện thoại của Buddy với khóa riêng, bạn có thể xóa khóa trong Cài đặt.</string>
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Giọng nói</string>
@@ -1405,6 +1418,8 @@
     <string name="setup_read_aloud_info">Buddy đọc to câu trả lời của agent, bằng giọng bạn chọn trong mục Giọng nói.</string>
     <string name="setup_pause_media">Tạm dừng nội dung đang phát khi đọc to</string>
     <string name="setup_pause_media_info">Nhạc hoặc video đang phát sẽ tạm dừng khi Buddy đọc câu trả lời và phát tiếp sau đó. Buddy chỉ phát tiếp những gì nó đã tạm dừng, và không làm vậy nếu bạn đã thay đổi việc phát trong lúc đó. Cần bật “Đọc to câu trả lời” và quyền truy cập thông báo.</string>
+    <string name="setup_pause_listening">Tạm dừng phương tiện khi đang nghe</string>
+    <string name="setup_pause_listening_info">Nhạc hoặc video đang phát sẽ tạm dừng khi Buddy nghe bạn, để nó nghe giọng bạn chứ không phải video, rồi phát lại sau đó. Nếu “Tạm dừng nội dung đang phát khi đọc to” cũng bật, phương tiện sẽ dừng cho đến khi câu trả lời được đọc xong. Buddy chỉ phát lại những gì nó đã dừng, và không phát lại nếu bạn đã thay đổi việc phát trong lúc đó. Cần quyền truy cập thông báo.</string>
     <string name="setup_voice_cards">Trả lời thẻ bằng giọng nói</string>
     <string name="setup_voice_cards_info">Sau khi đọc to một thẻ, Buddy sẽ lắng nghe: hãy nói “đồng ý” hoặc “từ chối”, hoặc lựa chọn bạn muốn. Cần bật “Đọc to câu trả lời”. Không hoạt động khi điện thoại bị khóa. Bất kỳ ai trong tầm nghe đều có thể trả lời.</string>
     <string name="voice_card_approval">Buddy cần bạn đồng ý. %1$s</string>
@@ -1948,6 +1963,9 @@
     <string name="hub_tool_browser_back">Trình duyệt: đang quay lại</string>
     <string name="hub_tool_browser_tabs">Trình duyệt: các thẻ</string>
     <string name="hub_tool_schedule_message">Đang lên lịch: %1$s</string>
+    <string name="hub_tool_add_rule">Đang thêm quy tắc thông báo: %1$s</string>
+    <string name="tools_card_rule">Thêm quy tắc thông báo vào cuộc trò chuyện “%4$s”? Từ %1$s, %2$s: mỗi thông báo sẽ vào cuộc trò chuyện này cùng chỉ dẫn “%3$s”. Quy tắc hỏi bạn trước khi làm, như mọi quy tắc.</string>
+    <string name="rules_in_chat">Trong cuộc trò chuyện “%1$s”</string>
     <string name="hub_tool_list_scheduled">Đang xem tin nhắn đã lên lịch</string>
     <string name="hub_tool_cancel_scheduled">Đang hủy một tin nhắn đã lên lịch</string>
     <string name="later_title">Tin nhắn của agent lúc %1$s</string>

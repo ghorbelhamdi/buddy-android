@@ -751,11 +751,16 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             c.addView(ml);
         }
         boolean known = false;
-        for (final String[] o : Models.options(ses.backend, true)) {
+        java.util.List<String[]> options = Models.options(ses.backend, true);
+        java.util.List<Object[]> found = new java.util.ArrayList<>();
+        if (options.size() > SEARCH_FROM) c.addView(listFilter(this, getString(R.string.chat_model_search), found), full());
+        View heading = null;
+        for (final String[] o : options) {
             if (o[0] == null) { // an API key service's models
                 TextView sl = sectionLabel(this, o[1]);
                 sl.setPaddingRelative(0, dp(this, 14), 0, dp(this, 2));
                 c.addView(sl);
+                heading = sl;
                 continue;
             }
             boolean on = o[0].equals(ses.model);
@@ -774,6 +779,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 if (!o[0].equals(ses.model)) hub.setModel(ses, o[0]);
             });
             c.addView(r, full());
+            found.add(new Object[]{r, modelKey(o), heading});
         }
         LinearLayout other = row(this);
         other.setPaddingRelative(0, dp(this, 10), 0, 0);
@@ -1168,7 +1174,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             });
             c.addView(r, full());
         }
-        // the apps this chat's agent has acted in, each with its setting in App permissions: a tap opens that screen
+        // the apps this chat's agent has acted in, each with its setting in App permissions, changed right here
         java.util.List<String> used;
         synchronized (ses.apps) {
             used = new java.util.ArrayList<>(ses.apps);
@@ -1177,39 +1183,42 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             TextView al = sectionLabel(this, getString(R.string.chat_approvals_apps));
             al.setPaddingRelative(dp(this, 4), dp(this, 14), 0, dp(this, 2));
             c.addView(al);
-            TextView ah = text(this, getString(R.string.chat_approvals_apps_hint, getString(R.string.perms_title)), 13, MUTED);
+            TextView ah = text(this, getString(R.string.chat_approvals_apps_set, getString(R.string.perms_title)), 13, MUTED);
             ah.setPaddingRelative(dp(this, 4), 0, 0, dp(this, 4));
             c.addView(ah);
             android.content.pm.PackageManager pm = getPackageManager();
             for (String pkg : used) {
-                String name, mode;
+                String name;
                 android.graphics.drawable.Drawable pic = null;
                 try {
                     android.content.pm.ApplicationInfo ai = pm.getApplicationInfo(pkg, 0);
                     name = String.valueOf(pm.getApplicationLabel(ai));
                     pic = pm.getApplicationIcon(ai);
-                    mode = Guard.mode(this, pkg, name);
                 } catch (android.content.pm.PackageManager.NameNotFoundException gone) {
                     continue; // uninstalled since
                 }
                 LinearLayout r = row(this);
                 r.setGravity(Gravity.CENTER_VERTICAL);
                 r.setPaddingRelative(dp(this, 4), dp(this, 8), dp(this, 4), dp(this, 8));
-                r.setBackgroundResource(ripple(this, false));
                 ImageView iv = new ImageView(this);
                 iv.setImageDrawable(pic);
                 r.addView(iv, new LinearLayout.LayoutParams(dp(this, 28), dp(this, 28)));
                 TextView n = single(title(this, name, 15));
                 n.setPaddingRelative(dp(this, 12), 0, dp(this, 8), 0);
                 r.addView(n, weight1());
-                r.addView(monoText(this, getString("trust".equals(mode) ? R.string.perms_mode_trust
-                        : "smart".equals(mode) ? R.string.perms_mode_smart : R.string.perms_mode_hard), 12,
-                        "trust".equals(mode) ? ACCENT_TEXT : MUTED));
-                r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
-                r.setOnClickListener(v -> {
-                    d[0].dismiss();
-                    startActivity(new android.content.Intent(this, AppPermissionsActivity.class));
-                });
+                // the app's mode is set right here (it's the app's setting in App permissions, for every chat)
+                final FrameLayout holder = new FrameLayout(this);
+                final Runnable[] paint = new Runnable[1];
+                final String label = name;
+                paint[0] = () -> {
+                    holder.removeAllViews();
+                    holder.addView(compact(this, AppPermissionsActivity.modes(this), Guard.mode(this, pkg, label), m -> {
+                        Prefs.setAppSafety(this, pkg, m);
+                        paint[0].run();
+                    }));
+                };
+                paint[0].run();
+                r.addView(holder);
                 c.addView(r, full());
             }
         }
@@ -1856,7 +1865,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             return;
         }
         if (!Voice.micAllowed(this)) {
-            requestPermissions(new String[]{android.Manifest.permission.RECORD_AUDIO}, 3);
+            Voice.askMic(this, 3);
             return;
         }
         final String before = input.getText().toString().trim();
@@ -1953,7 +1962,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     private void startLive() {
         liveHint.setVisibility(View.GONE);
         if (!Voice.micAllowed(this)) {
-            requestPermissions(new String[]{android.Manifest.permission.RECORD_AUDIO}, 4);
+            Voice.askMic(this, 4);
             return;
         }
         String err = CodexLive.start(this, ses);
