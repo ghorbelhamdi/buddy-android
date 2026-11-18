@@ -91,6 +91,10 @@ public class BackgroundActivity extends Screen {
         body.addView(text(this, getString(R.string.background_how), 13, MUTED), gap(8));
         boolean working = s == Background.Step.INSTALLING || s == Background.Step.WAITING || s == Background.Step.PAIRING
                 || s == Background.Step.STARTING;
+        if (s == Background.Step.COMPUTER) {
+            renderComputer();
+            return;
+        }
         if (Background.setUp(this) && !working) {
             renderSetUp();
             return;
@@ -138,9 +142,57 @@ public class BackgroundActivity extends Screen {
                 Background.beginSetup(svc);
             });
             body.addView(go, big(18));
+            // the other way: a computer with USB debugging starts the helper itself (no pairing dialog needed)
+            Button pc = button(this, getString(R.string.background_pc_setup), false);
+            pc.setOnClickListener(v -> {
+                BuddyService svc = BuddyService.get();
+                if (svc == null) {
+                    android.widget.Toast.makeText(this, R.string.background_needs_service, android.widget.Toast.LENGTH_LONG).show();
+                    return;
+                }
+                Background.beginComputerSetup(svc);
+            });
+            body.addView(pc, big(8));
         }
         body.addView(text(this, getString(R.string.background_usb_note), 12, MUTED), gap(18));
         body.addView(text(this, getString(R.string.background_security), 12, MUTED), gap(8));
+    }
+
+    /** The computer way waits: the two commands to run there, and whether the helper has answered yet. */
+    private void renderComputer() {
+        body.addView(text(this, getString(R.string.background_pc_intro), 14, TEXT), full());
+        TextView l1 = text(this, getString(R.string.background_pc_step1), 13, TEXT2);
+        body.addView(l1, gap(14));
+        TextView grant = text(this, "adb shell pm grant " + getPackageName()
+                + " android.permission.WRITE_SECURE_SETTINGS", 13, TEXT);
+        grant.setTypeface(Ui.mono(this, 400));
+        grant.setTextIsSelectable(true);
+        body.addView(grant, gap(6));
+        TextView l2 = text(this, getString(R.string.background_pc_step2), 13, TEXT2);
+        body.addView(l2, gap(14));
+        TextView cmd = text(this, Background.pcCommand(this), 13, TEXT);
+        cmd.setTypeface(Ui.mono(this, 400));
+        cmd.setTextIsSelectable(true);
+        body.addView(cmd, gap(6));
+        Button copy = button(this, getString(R.string.background_pc_copy), false);
+        copy.setOnClickListener(v -> {
+            getSystemService(android.content.ClipboardManager.class).setPrimaryClip(
+                    android.content.ClipData.newPlainText("Buddy",
+                            "adb shell pm grant " + getPackageName() + " android.permission.WRITE_SECURE_SETTINGS\n"
+                                    + Background.pcCommand(this)));
+            android.widget.Toast.makeText(this, R.string.background_pc_copied, android.widget.Toast.LENGTH_SHORT).show();
+        });
+        body.addView(copy, big(10));
+        LinearLayout r = row(this);
+        r.setGravity(Gravity.CENTER_VERTICAL);
+        r.addView(spinner(this, 20));
+        TextView w = text(this, getString(R.string.background_pc_waiting), 14, TEXT);
+        w.setPaddingRelative(dp(this, 12), 0, 0, 0);
+        r.addView(w, weight1());
+        body.addView(r, gap(18));
+        Button cancel = button(this, getString(android.R.string.cancel), false);
+        cancel.setOnClickListener(v -> Background.cancelComputerSetup());
+        body.addView(cancel, big(8));
     }
 
     private LinearLayout.LayoutParams big(int top) {

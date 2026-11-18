@@ -46,7 +46,7 @@ final class Background {
     private static final String SECURE = "android.permission.WRITE_SECURE_SETTINGS";
 
     /** Set up, step by step; the screen shows it. */
-    enum Step {IDLE, INSTALLING, WAITING, PAIRING, STARTING, READY, FAILED}
+    enum Step {IDLE, INSTALLING, WAITING, PAIRING, STARTING, COMPUTER, READY, FAILED}
 
     private static volatile Step step = Step.IDLE;
     private static volatile String detail = "";
@@ -564,7 +564,8 @@ final class Background {
      * off that dialog, pairs, and starts the helper. Only this flow reads that dialog, and only while it waits.
      */
     static void beginSetup(final BuddyService svc) {
-        if (step == Step.INSTALLING || step == Step.WAITING || step == Step.PAIRING || step == Step.STARTING) return;
+        if (step == Step.INSTALLING || step == Step.WAITING || step == Step.PAIRING || step == Step.STARTING
+                || step == Step.COMPUTER) return;
         set(Step.INSTALLING, "");
         new Thread(() -> {
             try {
@@ -637,6 +638,43 @@ final class Background {
 
     static void cancelSetup() {
         if (step == Step.WAITING) set(Step.IDLE, "");
+    }
+
+    static void cancelComputerSetup() {
+        if (step == Step.COMPUTER) set(Step.IDLE, "");
+    }
+
+    /**
+     * The other way of setting up, where Wireless debugging's pairing dialog can't be done: the user runs one command
+     * on a computer connected to this phone by USB debugging, and it starts the helper directly. The screen shows the
+     * command and waits (10 minutes) for the helper to answer; then it's set up like over Wireless debugging. The
+     * helper doesn't outlive a restart of the phone (no pairing made it): after one, the command needs running again,
+     * or the pairing flow does once.
+     */
+    static void beginComputerSetup(final BuddyService svc) {
+        if (step == Step.INSTALLING || step == Step.WAITING || step == Step.PAIRING || step == Step.STARTING
+                || step == Step.COMPUTER) return;
+        set(Step.COMPUTER, "");
+        new Thread(() -> {
+            long until = System.currentTimeMillis() + 10 * 60_000;
+            while (step == Step.COMPUTER && System.currentTimeMillis() < until) {
+                if (alive(svc)) {
+                    Prefs.setBackgroundPaired(svc, true);
+                    stay(svc);
+                    set(Step.READY, "");
+                    return;
+                }
+                sleep(1000);
+            }
+            if (step == Step.COMPUTER) set(Step.FAILED, svc.getString(R.string.background_pc_timeout));
+        }).start();
+    }
+
+    /** The helper's start command, as the user runs it on the computer (the helper's token is in it, it checks it). */
+    static String pcCommand(Context c) {
+        return "adb shell \"CLASSPATH=$(pm path " + c.getPackageName() + " | sed 's/package://') setsid app_process / "
+                + Shell.class.getName() + " " + PORT + " " + Prefs.backgroundToken(c)
+                + " >/data/local/tmp/buddy-helper.log 2>&1 </dev/null &\"";
     }
 
     /** Forget the pairing and stop the helper (its displays go with it). */

@@ -1296,7 +1296,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             Background.Step step = Background.step();
             status.setText(!busy[0] ? backgroundStatus() : getString(step == Background.Step.INSTALLING ? R.string.background_installing
                     : step == Background.Step.WAITING ? R.string.background_waiting
-                    : step == Background.Step.PAIRING ? R.string.background_pairing : R.string.background_starting));
+                    : step == Background.Step.PAIRING ? R.string.background_pairing
+                    : step == Background.Step.COMPUTER ? R.string.background_pc_waiting : R.string.background_starting));
             if (failed[0] != null && bgState != 2) {
                 info.setText(getString(R.string.background_failed, failed[0]));
                 info.setTextColor(ERR);

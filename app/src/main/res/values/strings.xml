@@ -2079,6 +2079,15 @@
     <!-- "USB debugging" is Android's name of that developer option: use the name this language's Android shows. -->
     <string name="background_usb_note">Buddy also turns on USB debugging. With it, the helper keeps running when Wi-Fi drops and Android switches Wireless debugging off. Leave it on.</string>
     <string name="background_security">Wireless debugging lets paired devices control this phone. Buddy pairs only itself, on this phone, and its helper listens only here.</string>
+    <!-- The other way of setting up: a computer with USB debugging. adb is a program's name. -->
+    <string name="background_pc_setup">Set up from a computer</string>
+    <string name="background_pc_intro">A computer can set this up too, where the pairing dialog can\'t be done: connect this phone by USB, allow USB debugging on it, and run the two commands on the computer (adb, one line each). This way works until the phone restarts: then run the second command again, or pair with Wireless debugging as usual.</string>
+    <string name="background_pc_step1">1. Once: lets Buddy switch Wireless debugging on itself.</string>
+    <string name="background_pc_step2">2. Starts the helper. Run it again after every restart of the phone.</string>
+    <string name="background_pc_copy">Copy both commands</string>
+    <string name="background_pc_copied">Copied</string>
+    <string name="background_pc_waiting">Waiting for the helper to answerΓÇª</string>
+    <string name="background_pc_timeout">The helper didn\'t answer. Is the computer connected, USB debugging allowed, and adb installed on it?</string>
     <!-- Note in the chat when a step needs the user and the app moves from the background screen to the real one. -->
     <string name="background_brought">Moved to your screen: this step needs you. Background mode is off for this chat now.</string>
     <!-- Section title on the Background mode screen: commands the agent runs on the phone itself. Keep short. -->
