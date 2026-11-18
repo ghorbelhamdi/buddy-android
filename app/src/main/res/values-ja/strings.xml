@@ -294,6 +294,14 @@
     <string name="card_label_approval">承認が必要</string>
     <string name="card_label_question">質問</string>
     <string name="card_label_other_session">%1$s · 別のセッションから</string>
+    <string name="card_label_from">%1$s · %2$s から</string>
+    <string name="outside_terminal">このスマホのターミナル</string>
+    <string name="outside_computer">コンピューター</string>
+    <string name="monitor_outside">Buddy の外</string>
+    <string name="monitor_outside_hidden">専用の隠れた画面で作業中 · 最後の操作 %1$s</string>
+    <string name="monitor_outside_screen">あなたの画面で作業中 · 最後の操作 %1$s</string>
+    <string name="monitor_outside_bring">自分の画面に移す</string>
+    <string name="monitor_outside_stopped">停止しました。1 分間はスマホのツールが拒否され、待機中のカードは拒否されました。</string>
     <string name="card_label_queue">%1$s · 1 / %2$d 件</string>
     <string name="card_deny">拒否</string>
     <string name="card_change">変更</string>
@@ -473,6 +481,26 @@
 
     <!-- Chat messages -->
     <string name="chat_copied">コピーしました</string>
+    <string name="chat_copy">コピー</string>
+    <string name="chat_quote">引用</string>
+    <string name="chat_quote_remove">引用を削除</string>
+    <string name="chat_edit">編集</string>
+    <string name="chat_fork">ここから分岐</string>
+    <string name="chat_fork_title">%1$s · 分岐</string>
+    <string name="chat_forked_from">「%1$s」から分岐</string>
+    <string name="chat_forked">分岐しました: ここからの新しいチャット</string>
+    <string name="chat_before_edit_title">%1$s (編集前)</string>
+    <string name="chat_edit_running">このチャットが終わるまで待ってから編集してください。</string>
+    <string name="chat_edit_failed">メッセージを編集できませんでした。</string>
+    <string name="chat_edit_title">メッセージを編集</string>
+    <string name="chat_edit_info">エージェントはここから答え直し、このメッセージより前のチャットで新たに始めます。これより後はこのチャットから消え、元のチャットはアーカイブに残ります。</string>
+    <string name="chat_edit_send">送信</string>
+    <string name="chat_edited">編集済み</string>
+    <string name="setup_voice_pause">この間が空いたら聞き取りを終了</string>
+    <string name="setup_voice_auto">自動</string>
+    <string name="setup_voice_pause_info">聞き取った言葉がその時間変わらなければ、音楽や騒音があっても Buddy は止めて送信します。自動: 音声エンジンが判断し、静かになるのを待ちます。</string>
+    <string name="setup_voice_max">最長の録音</string>
+    <string name="setup_voice_no_limit">制限なし</string>
     <string name="chat_copy_whole_reply">返信全体をコピー</string>
     <plurals name="chat_tool_calls">
         <item quantity="other">ツール呼び出し %1$d 件</item>
@@ -1643,6 +1671,9 @@
     <string name="api_keys_local_info">自分のサーバー（Ollama、LM Studio、llama.cpp）の場合: API キーは空のままにします。PC で動かす場合は、localhost の代わりに Wi-Fi 上の PC のアドレスを入力します（例: http://192.168.1.20:11434/v1）。</string>
     <string name="main_section_pinned">固定済み</string>
     <string name="main_section_archived">アーカイブ (%1$d)</string>
+    <string name="main_archived_title">アーカイブ</string>
+    <string name="main_archived_open">アーカイブしたチャット</string>
+    <string name="main_archived_back">チャットに戻る</string>
     <string name="chat_pinned_marker">固定済み</string>
     <string name="chat_menu_rename">名前を変更</string>
     <string name="chat_menu_pin">一番上に固定</string>

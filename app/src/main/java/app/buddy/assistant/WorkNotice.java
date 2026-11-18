@@ -15,7 +15,8 @@ import java.util.List;
  * own screen has the control chip (ControlIndicator), a paused one AutoPause's notification: then this one goes.
  */
 final class WorkNotice implements ChatHub.Listener {
-    static final String ACTION_STOP = "app.buddy.assistant.STOP_RUNS";
+    static final String ACTION_STOP = "app.buddy.assistant.STOP_RUNS", EXTRA_OUTSIDE_ONLY = "outsideOnly",
+            EXTRA_OUTSIDE = "outside";
     private static final int ID = 11;
 
     private final BuddyService svc;
@@ -25,6 +26,8 @@ final class WorkNotice implements ChatHub.Listener {
     private boolean fresh = true;
     /** The service is going (see remove): nothing is posted any more. */
     private boolean gone;
+
+    private final Runnable recheck = this::update;
 
     WorkNotice(BuddyService svc) {
         this.svc = svc;
@@ -45,12 +48,24 @@ final class WorkNotice implements ChatHub.Listener {
         ChatHub hub = ChatHub.get(svc);
         List<String> names = new ArrayList<>();
         Sessions.Session first = hub.latestRunning();
-        if (first != null && !svc.controlActive() && !svc.paused()) {
+        // a chat on the real screen has the control chip instead; only chats named here are opened or stopped from it
+        if (svc.controlActive() || svc.paused()) first = null;
+        if (first != null) {
             names.add(first.label());
             // (a sub-agent works for its chat, which is named)
             for (Sessions.Session s : hub.sessions.all) if (s.running && s.parent.isEmpty() && s != first) names.add(s.label());
         }
-        String want = names.isEmpty() ? null : first.id + "\n" + android.text.TextUtils.join(", ", names);
+        // sessions from outside Buddy (a paired computer, this phone's terminal) working on the phone: named too,
+        // and looked at again a minute on, when one that went quiet no longer counts as working
+        java.util.List<String> outside = Background.outsideActive();
+        outside.removeIf(k -> !Background.outsideHidden(k)); // one on the real screen has the control chip
+        for (String k : outside) names.add(Background.outsideName(svc, k));
+        svc.mainHandler().removeCallbacks(recheck);
+        if (!outside.isEmpty()) svc.mainHandler().postDelayed(recheck, 15_000);
+        String key = first != null ? first.id : outside.isEmpty() ? "" : outside.get(0);
+        // (which sessions too: two computers can have the same name, and Stop must stop the ones named now)
+        String want = names.isEmpty() ? null : key + "\n" + android.text.TextUtils.join(", ", names) + "\n"
+                + android.text.TextUtils.join(",", outside);
         if (!fresh && (want == null ? shown == null : want.equals(shown))) return;
         fresh = false;
         shown = want;
@@ -60,10 +75,15 @@ final class WorkNotice implements ChatHub.Listener {
             return;
         }
         ControlIndicator.channel(svc);
-        PendingIntent stop = PendingIntent.getBroadcast(svc, ID, new Intent(svc, HiddenNotice.class).setAction(ACTION_STOP),
+        PendingIntent stop = PendingIntent.getBroadcast(svc, ID, new Intent(svc, HiddenNotice.class).setAction(ACTION_STOP)
+                        .putExtra(EXTRA_OUTSIDE_ONLY, first == null)
+                        .putExtra(EXTRA_OUTSIDE, outside.toArray(new String[0])), // the ones it names, no others
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent open = PendingIntent.getActivity(svc, ID, new Intent(svc, ChatActivity.class)
-                        .putExtra("id", first.id).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP),
+        // a chat's run opens its chat; only outside sessions working: the Sessions tab, where they are listed
+        Intent where = first != null ? new Intent(svc, ChatActivity.class).putExtra("id", first.id)
+                : new Intent(svc, MonitorActivity.class);
+        PendingIntent open = PendingIntent.getActivity(svc, ID,
+                where.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP),
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
         Notification n = new Notification.Builder(svc, ControlIndicator.CHANNEL)
                 .setSmallIcon(R.drawable.ic_launcher_monochrome)

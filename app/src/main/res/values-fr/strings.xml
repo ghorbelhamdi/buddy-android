@@ -411,6 +411,14 @@
     <!-- The card's label when the request comes from an agent session outside Buddy's chats (e.g. a terminal).
          %1$s: card_label_approval or card_label_question. All caps. -->
     <string name="card_label_other_session">%1$s · AUTRE SESSION</string>
+    <string name="card_label_from">%1$s · DE %2$s</string>
+    <string name="outside_terminal">Terminal de ce téléphone</string>
+    <string name="outside_computer">Un ordinateur</string>
+    <string name="monitor_outside">Hors de Buddy</string>
+    <string name="monitor_outside_hidden">Sur son propre écran caché · dernière étape %1$s</string>
+    <string name="monitor_outside_screen">Sur votre écran · dernière étape %1$s</string>
+    <string name="monitor_outside_bring">Ramener sur mon écran</string>
+    <string name="monitor_outside_stopped">Arrêtée. Ses outils du téléphone sont refusés pendant une minute, et ses cartes en attente ont été refusées.</string>
     <string name="card_label_queue">%1$s · 1 SUR %2$d</string>
     <!-- Buttons side by side at the bottom of the card: keep them short. -->
     <string name="card_deny">Refuser</string>
@@ -642,6 +650,26 @@
     <!-- Chat messages -->
     <!-- Toast after a long press copies a message. -->
     <string name="chat_copied">Copié</string>
+    <string name="chat_copy">Copier</string>
+    <string name="chat_quote">Citer</string>
+    <string name="chat_quote_remove">Retirer la citation</string>
+    <string name="chat_edit">Modifier</string>
+    <string name="chat_fork">Bifurquer d\'ici</string>
+    <string name="chat_fork_title">%1$s · bifurcation</string>
+    <string name="chat_forked_from">Bifurqué depuis « %1$s »</string>
+    <string name="chat_forked">Bifurqué : une nouvelle discussion à partir d\'ici</string>
+    <string name="chat_before_edit_title">%1$s (avant modification)</string>
+    <string name="chat_edit_running">Attendez que cette discussion ait fini, puis modifiez.</string>
+    <string name="chat_edit_failed">Le message n\'a pas pu être modifié.</string>
+    <string name="chat_edit_title">Modifier votre message</string>
+    <string name="chat_edit_info">L\'agent répond à nouveau à partir d\'ici, en repartant de zéro avec la discussion avant ce message. Tout ce qui suit disparaît de cette discussion ; la discussion telle qu\'elle était est gardée dans Archivées.</string>
+    <string name="chat_edit_send">Envoyer</string>
+    <string name="chat_edited">modifié</string>
+    <string name="setup_voice_pause">Arrêter l\'écoute après une pause de</string>
+    <string name="setup_voice_auto">Auto</string>
+    <string name="setup_voice_pause_info">Buddy s\'arrête et envoie quand les mots entendus n\'ont pas changé pendant ce temps, même avec de la musique ou du bruit autour. Auto : le moteur vocal décide, et il attend le silence.</string>
+    <string name="setup_voice_max">Enregistrement le plus long</string>
+    <string name="setup_voice_no_limit">Sans limite</string>
     <string name="chat_copy_whole_reply">Copier toute la réponse</string>
     <!-- Header of a collapsible group of the agent's steps in the chat. -->
     <plurals name="chat_tool_calls">
@@ -2091,6 +2119,9 @@
     <string name="api_keys_local_info">Pour ton propre serveur (Ollama, LM Studio, llama.cpp) : laisse la clé API vide. Sur un PC, mets son adresse sur ton Wi-Fi à la place de localhost, par exemple http://192.168.1.20:11434/v1.</string>
     <string name="main_section_pinned">Épinglées</string>
     <string name="main_section_archived">Archivées (%1$d)</string>
+    <string name="main_archived_title">Archivées</string>
+    <string name="main_archived_open">Discussions archivées</string>
+    <string name="main_archived_back">Retour aux discussions</string>
     <string name="chat_pinned_marker">Épinglée</string>
     <string name="chat_menu_rename">Renommer</string>
     <string name="chat_menu_pin">Épingler en haut</string>

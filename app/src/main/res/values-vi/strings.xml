@@ -412,6 +412,14 @@
     <!-- The card's label when the request comes from an agent session outside Buddy's chats (e.g. a terminal).
          %1$s: card_label_approval or card_label_question. All caps. -->
     <string name="card_label_other_session">%1$s · TỪ PHIÊN KHÁC</string>
+    <string name="card_label_from">%1$s · TỪ %2$s</string>
+    <string name="outside_terminal">Terminal của điện thoại này</string>
+    <string name="outside_computer">Một máy tính</string>
+    <string name="monitor_outside">Ngoài Buddy</string>
+    <string name="monitor_outside_hidden">Trên màn hình ẩn riêng · bước cuối %1$s</string>
+    <string name="monitor_outside_screen">Trên màn hình của bạn · bước cuối %1$s</string>
+    <string name="monitor_outside_bring">Đưa lên màn hình của tôi</string>
+    <string name="monitor_outside_stopped">Đã dừng. Các công cụ điện thoại của nó bị từ chối trong một phút, và các thẻ đang chờ đã bị từ chối.</string>
     <string name="card_label_queue">%1$s · 1 TRONG %2$d</string>
     <!-- Buttons side by side at the bottom of the card: keep them short. -->
     <string name="card_deny">Từ chối</string>
@@ -688,6 +696,26 @@
     <!-- Chat messages -->
     <!-- Toast after a long press copies a message. -->
     <string name="chat_copied">Đã sao chép</string>
+    <string name="chat_copy">Sao chép</string>
+    <string name="chat_quote">Trích dẫn</string>
+    <string name="chat_quote_remove">Xóa trích dẫn</string>
+    <string name="chat_edit">Sửa</string>
+    <string name="chat_fork">Tách nhánh từ đây</string>
+    <string name="chat_fork_title">%1$s · nhánh</string>
+    <string name="chat_forked_from">Tách nhánh từ “%1$s”</string>
+    <string name="chat_forked">Đã tách nhánh: cuộc trò chuyện mới từ đây</string>
+    <string name="chat_before_edit_title">%1$s (trước khi sửa)</string>
+    <string name="chat_edit_running">Hãy chờ cuộc trò chuyện này xong rồi sửa.</string>
+    <string name="chat_edit_failed">Không sửa được tin nhắn.</string>
+    <string name="chat_edit_title">Sửa tin nhắn của bạn</string>
+    <string name="chat_edit_info">Tác nhân trả lời lại từ đây, bắt đầu mới với cuộc trò chuyện trước tin nhắn này. Mọi thứ sau đó bị bỏ khỏi cuộc trò chuyện này; cuộc trò chuyện như cũ được giữ trong Lưu trữ.</string>
+    <string name="chat_edit_send">Gửi</string>
+    <string name="chat_edited">đã sửa</string>
+    <string name="setup_voice_pause">Ngừng nghe sau khoảng lặng</string>
+    <string name="setup_voice_auto">Tự động</string>
+    <string name="setup_voice_pause_info">Buddy dừng và gửi khi những từ đã nghe không thay đổi trong khoảng đó, kể cả khi có nhạc hay tiếng xe xung quanh. Tự động: công cụ giọng nói quyết định và chờ lúc yên tĩnh.</string>
+    <string name="setup_voice_max">Ghi âm dài nhất</string>
+    <string name="setup_voice_no_limit">Không giới hạn</string>
     <string name="chat_copy_whole_reply">Sao chép toàn bộ câu trả lời</string>
     <!-- Header of a collapsible group of the agent's steps in the chat. -->
     <plurals name="chat_tool_calls">
@@ -2232,6 +2260,9 @@
     <string name="api_keys_local_info">Với máy chủ của riêng bạn (Ollama, LM Studio, llama.cpp): để trống khóa API. Nếu chạy trên PC, hãy thay localhost bằng địa chỉ của PC trong Wi-Fi, ví dụ http://192.168.1.20:11434/v1.</string>
     <string name="main_section_pinned">Đã ghim</string>
     <string name="main_section_archived">Đã lưu trữ (%1$d)</string>
+    <string name="main_archived_title">Đã lưu trữ</string>
+    <string name="main_archived_open">Cuộc trò chuyện đã lưu trữ</string>
+    <string name="main_archived_back">Quay lại cuộc trò chuyện</string>
     <string name="chat_pinned_marker">Đã ghim</string>
     <string name="chat_menu_rename">Đổi tên</string>
     <string name="chat_menu_pin">Ghim lên đầu</string>

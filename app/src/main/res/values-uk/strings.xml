@@ -419,6 +419,14 @@
     <!-- The card's label when the request comes from an agent session outside Buddy's chats (e.g. a terminal).
          %1$s: card_label_approval or card_label_question. All caps. -->
     <string name="card_label_other_session">%1$s · З ІНШОГО СЕАНСУ</string>
+    <string name="card_label_from">%1$s · ВІД %2$s</string>
+    <string name="outside_terminal">Термінал цього телефона</string>
+    <string name="outside_computer">Комп\'ютер</string>
+    <string name="monitor_outside">Поза Buddy</string>
+    <string name="monitor_outside_hidden">На власному прихованому екрані · останній крок %1$s</string>
+    <string name="monitor_outside_screen">На вашому екрані · останній крок %1$s</string>
+    <string name="monitor_outside_bring">Перенести на мій екран</string>
+    <string name="monitor_outside_stopped">Зупинено. Його інструменти телефона відхиляються протягом хвилини, а картки, що чекали, відхилено.</string>
     <string name="card_label_queue">%1$s · 1 З %2$d</string>
     <!-- Buttons side by side at the bottom of the card: keep them short. -->
     <string name="card_deny">Відхилити</string>
@@ -652,6 +660,26 @@
     <!-- Chat messages -->
     <!-- Toast after a long press copies a message. -->
     <string name="chat_copied">Скопійовано</string>
+    <string name="chat_copy">Копіювати</string>
+    <string name="chat_quote">Цитувати</string>
+    <string name="chat_quote_remove">Прибрати цитату</string>
+    <string name="chat_edit">Змінити</string>
+    <string name="chat_fork">Відгалузити звідси</string>
+    <string name="chat_fork_title">%1$s · відгалуження</string>
+    <string name="chat_forked_from">Відгалужено від «%1$s»</string>
+    <string name="chat_forked">Відгалужено: новий чат звідси</string>
+    <string name="chat_before_edit_title">%1$s (до зміни)</string>
+    <string name="chat_edit_running">Зачекайте, доки цей чат закінчить, а тоді змінюйте.</string>
+    <string name="chat_edit_failed">Не вдалося змінити повідомлення.</string>
+    <string name="chat_edit_title">Змінити повідомлення</string>
+    <string name="chat_edit_info">Агент відповість заново з цього місця, почавши з чистого аркуша з чатом до цього повідомлення. Усе після нього зникне з цього чату; чат у попередньому вигляді залишиться в архіві.</string>
+    <string name="chat_edit_send">Надіслати</string>
+    <string name="chat_edited">змінено</string>
+    <string name="setup_voice_pause">Припиняти слухати після паузи</string>
+    <string name="setup_voice_auto">Авто</string>
+    <string name="setup_voice_pause_info">Buddy зупиняється й надсилає, коли почуті слова не змінюються стільки часу, навіть якщо довкола музика чи шум. Авто: вирішує голосовий рушій, а він чекає тиші.</string>
+    <string name="setup_voice_max">Найдовший запис</string>
+    <string name="setup_voice_no_limit">Без обмеження</string>
     <string name="chat_copy_whole_reply">Копіювати всю відповідь</string>
     <!-- Header of a collapsible group of the agent's steps in the chat. -->
     <plurals name="chat_tool_calls">
@@ -2130,6 +2158,9 @@
     <string name="api_keys_local_info">Для власного сервера (Ollama, LM Studio, llama.cpp): залиште API-ключ порожнім. Якщо сервер на ПК, вкажіть його адресу у вашій мережі Wi-Fi замість localhost, наприклад http://192.168.1.20:11434/v1.</string>
     <string name="main_section_pinned">Закріплені</string>
     <string name="main_section_archived">Архів (%1$d)</string>
+    <string name="main_archived_title">Архів</string>
+    <string name="main_archived_open">Архівні чати</string>
+    <string name="main_archived_back">Назад до чатів</string>
     <string name="chat_pinned_marker">Закріплено</string>
     <string name="chat_menu_rename">Перейменувати</string>
     <string name="chat_menu_pin">Закріпити зверху</string>

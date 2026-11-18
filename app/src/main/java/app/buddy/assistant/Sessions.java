@@ -32,6 +32,8 @@ final class Sessions {
         final List<String> files;
         /** A user message Buddy sent on its own at a scheduled time (see Schedules): the chat marks it so. */
         boolean scheduled;
+        /** A user message the user edited (issue #44): the chat marks it so. */
+        boolean edited;
 
         Msg(Bubble.Kind kind, String text) {
             this(kind, text, null);
@@ -67,6 +69,11 @@ final class Sessions {
          * chat so far as text.
          */
         String handover;
+        /**
+         * A fork, or a chat whose message the user edited (issue #44): its agent starts a conversation of its own with
+         * the chat so far as text, as after a switch (see ChatHub.send), until it has answered.
+         */
+        boolean reseed;
         /** With handover: the model and effort the chat had with that agent, for a switch straight back to it. */
         String handoverModel = "", handoverEffort = "";
         /** And what the chat showed of that agent's conversation (not kept over a restart: the next run says it anew). */
@@ -115,6 +122,10 @@ final class Sessions {
         final List<Msg> messages = new ArrayList<>();
         // runtime only
         boolean running, gotText, unread;
+        /** When its agent last started a Linux or file step (elapsedRealtime; not saved). */
+        volatile long otherToolAt;
+        /** When its agent last started a phone tool in this run (elapsedRealtime; not saved). */
+        volatile long phoneToolAt;
         String status = "";
         String lastReply = "";
         long lastEventAt;
@@ -213,6 +224,35 @@ final class Sessions {
     private Session first() {
         for (Session s : all) if (s.parent.isEmpty()) return s;
         return all.get(0);
+    }
+
+    /**
+     * A new chat that is a copy of src with its first count messages (issue #44): same agent, model, effort, Linux
+     * tools, background and incognito; nothing of its schedule, approvals choice, allowed apps, pin or archive.
+     * Placed just after src in the list (a fork then moves to the top with its first note, as any chat with a new
+     * message does). Its agent starts fresh with the chat so far (reseed).
+     */
+    Session copy(Session src, int count, String title) {
+        try {
+            JSONObject o = toJson(src);
+            JSONArray msgs = o.getJSONArray("messages"), kept = new JSONArray();
+            for (int i = 0; i < Math.min(count, msgs.length()); i++) kept.put(msgs.get(i));
+            o.put("messages", kept).put("id", UUID.randomUUID().toString().replace("-", "").substring(0, 12))
+                    .put("title", title).put("approvals", "").put("handover", "").put("pinned", false)
+                    .put("archived", false).put("interrupted", false).put("parent", "").put("slot", 0)
+                    .put("ctx_used", 0).put("updated", System.currentTimeMillis());
+            o.remove("schedule");
+            o.remove("allowed");
+            o.remove("later");
+            Session s = fromJson(o, new boolean[1]);
+            s.reseed = true;
+            int at = all.indexOf(src);
+            all.add(at < 0 ? 0 : at + 1, s);
+            save(s);
+            return s;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     Session find(String id) {
@@ -369,11 +409,12 @@ final class Sessions {
             JSONObject mo = new JSONObject().put("k", m.kind.name()).put("t", m.text);
             if (!m.files.isEmpty()) mo.put("f", new JSONArray(m.files));
             if (m.scheduled) mo.put("s", true);
+            if (m.edited) mo.put("e", true);
             msgs.put(mo);
         }
         JSONObject o = new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model)
                 .put("effort", s.effort).put("actual_model", s.actualModel).put("ctx_used", s.ctxUsed).put("ctx_window", s.ctxWindow)
-                .put("interrupted", s.interrupted).put("incognito", s.incognito).put("dev", s.dev).put("awake", s.awake).put("background", s.background).put("approvals", s.approvals).put("handover", s.handover == null ? "" : s.handover)
+                .put("interrupted", s.interrupted).put("incognito", s.incognito).put("dev", s.dev).put("awake", s.awake).put("background", s.background).put("approvals", s.approvals).put("handover", s.handover == null ? "" : s.handover).put("reseed", s.reseed)
                 .put("handover_model", s.handoverModel).put("handover_effort", s.handoverEffort)
                 .put("pinned", s.pinned).put("archived", s.archived).put("updated", s.updated).put("cut", s.cut).put("parent", s.parent).put("slot", s.slot).put("messages", msgs);
         synchronized (s.apps) {
@@ -412,6 +453,7 @@ final class Sessions {
         s.background = o.optBoolean("background");
         s.approvals = o.optString("approvals", "");
         s.handover = o.optString("handover", "").isEmpty() ? null : o.optString("handover");
+        s.reseed = o.optBoolean("reseed");
         s.handoverModel = o.optString("handover_model", "");
         s.handoverEffort = o.optString("handover_effort", "");
         JSONArray apps = o.optJSONArray("apps");
@@ -439,6 +481,7 @@ final class Sessions {
             if (f != null) for (int k = 0; k < f.length(); k++) files.add(f.getString(k));
             Msg msg = new Msg(Bubble.Kind.valueOf(m.getString("k")), m.getString("t"), files);
             msg.scheduled = m.optBoolean("s");
+            msg.edited = m.optBoolean("e");
             s.messages.add(msg);
         }
         return s;

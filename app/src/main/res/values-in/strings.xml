@@ -407,6 +407,14 @@
     <!-- The card's label when the request comes from an agent session outside Buddy's chats (e.g. a terminal).
          %1$s: card_label_approval or card_label_question. All caps. -->
     <string name="card_label_other_session">%1$s · DARI SESI LAIN</string>
+    <string name="card_label_from">%1$s · DARI %2$s</string>
+    <string name="outside_terminal">Terminal ponsel ini</string>
+    <string name="outside_computer">Sebuah komputer</string>
+    <string name="monitor_outside">Di luar Buddy</string>
+    <string name="monitor_outside_hidden">Di layar tersembunyinya sendiri · langkah terakhir %1$s</string>
+    <string name="monitor_outside_screen">Di layar Anda · langkah terakhir %1$s</string>
+    <string name="monitor_outside_bring">Bawa ke layar saya</string>
+    <string name="monitor_outside_stopped">Dihentikan. Alat ponselnya ditolak selama satu menit, dan kartunya yang menunggu ditolak.</string>
     <string name="card_label_queue">%1$s · 1 DARI %2$d</string>
     <!-- Buttons side by side at the bottom of the card: keep them short. -->
     <string name="card_deny">Tolak</string>
@@ -637,6 +645,26 @@
     <!-- Chat messages -->
     <!-- Toast after a long press copies a message. -->
     <string name="chat_copied">Disalin</string>
+    <string name="chat_copy">Salin</string>
+    <string name="chat_quote">Kutip</string>
+    <string name="chat_quote_remove">Hapus kutipan</string>
+    <string name="chat_edit">Edit</string>
+    <string name="chat_fork">Cabangkan dari sini</string>
+    <string name="chat_fork_title">%1$s · cabang</string>
+    <string name="chat_forked_from">Dicabangkan dari “%1$s”</string>
+    <string name="chat_forked">Dicabangkan: chat baru dari sini</string>
+    <string name="chat_before_edit_title">%1$s (sebelum diedit)</string>
+    <string name="chat_edit_running">Tunggu sampai chat ini selesai, lalu edit.</string>
+    <string name="chat_edit_failed">Pesan tidak bisa diedit.</string>
+    <string name="chat_edit_title">Edit pesan Anda</string>
+    <string name="chat_edit_info">Agen menjawab lagi dari sini, mulai baru dengan chat sebelum pesan ini. Semua setelahnya dihapus dari chat ini; chat seperti semula disimpan di Arsip.</string>
+    <string name="chat_edit_send">Kirim</string>
+    <string name="chat_edited">diedit</string>
+    <string name="setup_voice_pause">Berhenti mendengarkan setelah jeda</string>
+    <string name="setup_voice_auto">Otomatis</string>
+    <string name="setup_voice_pause_info">Buddy berhenti dan mengirim saat kata-kata yang didengarnya tidak berubah selama itu, meski ada musik atau lalu lintas di sekitar. Otomatis: mesin suara yang memutuskan, dan ia menunggu sunyi.</string>
+    <string name="setup_voice_max">Rekaman terpanjang</string>
+    <string name="setup_voice_no_limit">Tanpa batas</string>
     <string name="chat_copy_whole_reply">Salin seluruh balasan</string>
     <!-- Header of a collapsible group of the agent's steps in the chat. -->
     <plurals name="chat_tool_calls">
@@ -2092,6 +2120,9 @@
     <string name="api_keys_local_info">Untuk server Anda sendiri (Ollama, LM Studio, llama.cpp): kosongkan kunci API. Di PC, ganti localhost dengan alamatnya di Wi-Fi Anda, misalnya http://192.168.1.20:11434/v1.</string>
     <string name="main_section_pinned">Disematkan</string>
     <string name="main_section_archived">Diarsipkan (%1$d)</string>
+    <string name="main_archived_title">Diarsipkan</string>
+    <string name="main_archived_open">Chat yang diarsipkan</string>
+    <string name="main_archived_back">Kembali ke chat</string>
     <string name="chat_pinned_marker">Disematkan</string>
     <string name="chat_menu_rename">Ganti nama</string>
     <string name="chat_menu_pin">Sematkan di atas</string>

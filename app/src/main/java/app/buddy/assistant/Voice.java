@@ -105,19 +105,20 @@ final class Voice {
     }
 
     /** Start listening. Returns an error message, or null when started. */
-    static String listen(Context c, Listener l) {
+    static String listen(Context c, Listener given) {
         if (!micAllowed(c)) return c.getString(R.string.voice_mic_needed);
         if (CodexLive.on()) return c.getString(R.string.live_mic_busy); // the call has the microphone
         stopListening();
         stopSpeaking();
+        final Listener l = endpoint(c, given);
         SpeechPause.listen(c); // before the microphone starts, so it hears the user and not the video (#56)
         String lang = Prefs.voiceLang(c);
         // Claude's dictation (on the user's Claude plan) for the languages it supports; otherwise the phone's
         if ("claude".equals(Prefs.voiceEngine(c)) && ClaudeDictation.supports(lang)) {
-            return ClaudeDictation.listen(c, lang, l);
+            return unwatchOnError(l, ClaudeDictation.listen(c, lang, l));
         }
-        if ("chatgpt".equals(Prefs.voiceEngine(c))) return CodexDictation.listen(c, l);
-        if (!SpeechRecognizer.isRecognitionAvailable(c)) return c.getString(R.string.voice_no_recognizer);
+        if ("chatgpt".equals(Prefs.voiceEngine(c))) return unwatchOnError(l, CodexDictation.listen(c, l));
+        if (!SpeechRecognizer.isRecognitionAvailable(c)) return unwatchOnError(l, c.getString(R.string.voice_no_recognizer));
         current = l;
         l.onStatus(c.getString(R.string.voice_starting));
         recognizer = SpeechRecognizer.createSpeechRecognizer(c.getApplicationContext());
@@ -181,6 +182,80 @@ final class Voice {
         }
         recognizer.startListening(i);
         return null;
+    }
+
+    /** The listening that endpoint() watches now: an earlier one's timer must not end a later one. */
+    private static Listener watched;
+    private static final android.os.Handler ends = new android.os.Handler(android.os.Looper.getMainLooper());
+
+    /**
+     * Buddy's own end of listening (issue #60), on top of the engine's: done once the words heard so far haven't
+     * changed for the chosen pause after the user started speaking, or at the longest recording. Noise around (music,
+     * a car) keeps the engine listening, as it waits for quiet; it doesn't make new words, so this pause still ends.
+     */
+    private static Listener endpoint(Context c, final Listener l) {
+        final long pause = Prefs.voicePauseMs(c), max = Prefs.voiceMaxMs(c);
+        if (pause <= 0 && max <= 0) return l; // Auto: the engine decides, as before
+        final long started = android.os.SystemClock.elapsedRealtime();
+        final Listener[] me = new Listener[1];
+        final String[] last = {""};
+        final long[] changed = {0};
+        final Runnable tick = new Runnable() {
+            @Override
+            public void run() {
+                if (watched != me[0]) return;
+                long now = android.os.SystemClock.elapsedRealtime();
+                boolean pauseDone = pause > 0 && !last[0].trim().isEmpty() && now - changed[0] >= pause;
+                if ((max > 0 && now - started >= max) || pauseDone) {
+                    watched = null;
+                    finishListening(); // what was heard goes out, as a tap would send it
+                    return;
+                }
+                ends.postDelayed(this, 200);
+            }
+        };
+        me[0] = new Listener() {
+            @Override
+            public void onPartial(String text) {
+                String t = text == null ? "" : text;
+                if (!t.equals(last[0])) {
+                    last[0] = t;
+                    changed[0] = android.os.SystemClock.elapsedRealtime();
+                }
+                l.onPartial(text);
+            }
+
+            @Override
+            public void onFinal(String text) {
+                if (watched == me[0]) watched = null;
+                l.onFinal(text);
+            }
+
+            @Override
+            public void onEnd(String message) {
+                if (watched == me[0]) watched = null;
+                l.onEnd(message);
+            }
+
+            @Override
+            public void onLevel(float level) {
+                l.onLevel(level);
+            }
+
+            @Override
+            public void onStatus(String status) {
+                l.onStatus(status);
+            }
+        };
+        watched = me[0];
+        ends.postDelayed(tick, 200);
+        return me[0];
+    }
+
+    /** Listening didn't start (error): endpoint()'s timer has nothing to end. */
+    private static String unwatchOnError(Listener l, String error) {
+        if (error != null && watched == l) watched = null;
+        return error;
     }
 
     /** Stop listening now; whatever was heard so far is delivered as the final result. */

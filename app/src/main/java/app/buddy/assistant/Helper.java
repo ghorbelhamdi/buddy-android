@@ -177,6 +177,10 @@ final class Helper {
         for (String[] f : FILES) {
             File out = new File(root, f[1].substring(1));
             out.getParentFile().mkdirs();
+            if (f[1].equals(AGENTS)) {
+                mergeAgents(c, out, f[0], Integer.parseInt(f[2], 8));
+                continue;
+            }
             try (InputStream in = c.getAssets().open(f[0]); OutputStream o = new FileOutputStream(out)) {
                 byte[] buf = new byte[8192];
                 int n;
@@ -189,5 +193,64 @@ final class Helper {
         }
         new File(root, "root/.buddy/sessions").mkdirs();
         syncedFor = BuildInfo.VERSION_CODE;
+    }
+
+    private static final String AGENTS = "/root/.buddy/work/AGENTS.md";
+    static final String AGENTS_START = "<!-- buddy:start (Buddy keeps this part up to date; your own instructions go outside it) -->",
+            AGENTS_END = "<!-- buddy:end -->";
+
+    /**
+     * The workspace's AGENTS.md is the agents' shared instructions file, and users add their own to it (#61): only
+     * Buddy's part, between the markers, is rewritten. A file from before the markers gets its copy of the template
+     * swapped for the marked part; one without it gets the part on top. Everything else is kept.
+     */
+    private static void mergeAgents(Context c, File out, String asset, int mode) throws IOException {
+        String template;
+        try (InputStream in = c.getAssets().open(asset)) {
+            template = new String(readAll(in), java.nio.charset.StandardCharsets.UTF_8).trim();
+        }
+        String ours = AGENTS_START + "\n" + template + "\n" + AGENTS_END;
+        String now = null;
+        if (out.exists()) {
+            try (InputStream in = new java.io.FileInputStream(out)) {
+                now = new String(readAll(in), java.nio.charset.StandardCharsets.UTF_8);
+            }
+        }
+        String merged = mergeAgents(now, template, ours);
+        if (merged.equals(now)) return;
+        // written next to it, then put in its place: the user's own text never sits in a half-written file
+        File tmp = new File(out.getParentFile(), ".AGENTS.md.buddy-tmp");
+        try (FileOutputStream o = new FileOutputStream(tmp)) {
+            o.write(merged.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            o.getFD().sync();
+        }
+        try {
+            Os.chmod(tmp.getPath(), mode);
+        } catch (Exception ignored) {
+        }
+        if (!tmp.renameTo(out)) {
+            //noinspection ResultOfMethodCallIgnored
+            tmp.delete();
+            throw new IOException("AGENTS.md could not be updated");
+        }
+    }
+
+    /** The file's text with Buddy's part (ours) in place of the old one; now: the file's text, or null if missing. */
+    static String mergeAgents(String now, String template, String ours) {
+        if (now == null || now.trim().isEmpty()) return ours + "\n";
+        int s = now.indexOf("<!-- buddy:start"), e = s < 0 ? -1 : now.indexOf(AGENTS_END, s);
+        if (s >= 0 && e >= 0) return now.substring(0, s) + ours + now.substring(e + AGENTS_END.length());
+        int t = now.indexOf(template);
+        if (t >= 0) return now.substring(0, t) + ours + now.substring(t + template.length());
+        // Buddy's old copy changed by hand: kept as it is (the user's lines may be in it), Buddy's part goes on top
+        return ours + "\n\n" + now;
+    }
+
+    private static byte[] readAll(InputStream in) throws IOException {
+        java.io.ByteArrayOutputStream b = new java.io.ByteArrayOutputStream();
+        byte[] buf = new byte[8192];
+        int n;
+        while ((n = in.read(buf)) > 0) b.write(buf, 0, n);
+        return b.toByteArray();
     }
 }

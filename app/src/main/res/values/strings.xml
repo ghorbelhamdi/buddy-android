@@ -417,6 +417,14 @@
     <!-- The card's label when the request comes from an agent session outside Buddy's chats (e.g. a terminal).
          %1$s: card_label_approval or card_label_question. All caps. -->
     <string name="card_label_other_session">%1$s · FROM ANOTHER SESSION</string>
+    <string name="card_label_from">%1$s · FROM %2$s</string>
+    <string name="outside_terminal">This phone\'s terminal</string>
+    <string name="outside_computer">A computer</string>
+    <string name="monitor_outside">Outside Buddy</string>
+    <string name="monitor_outside_hidden">On its own hidden screen · last step %1$s</string>
+    <string name="monitor_outside_screen">On your screen · last step %1$s</string>
+    <string name="monitor_outside_bring">Bring to my screen</string>
+    <string name="monitor_outside_stopped">Stopped. Its phone tools are refused for a minute, and its waiting cards were denied.</string>
     <string name="card_label_queue">%1$s · 1 OF %2$d</string>
     <!-- Buttons side by side at the bottom of the card: keep them short. -->
     <string name="card_deny">Deny</string>
@@ -694,6 +702,26 @@
     <!-- Chat messages -->
     <!-- Toast after a long press copies a message. -->
     <string name="chat_copied">Copied</string>
+    <string name="chat_copy">Copy</string>
+    <string name="chat_quote">Quote</string>
+    <string name="chat_quote_remove">Remove quote</string>
+    <string name="chat_edit">Edit</string>
+    <string name="chat_fork">Fork from here</string>
+    <string name="chat_fork_title">%1$s · fork</string>
+    <string name="chat_forked_from">Forked from “%1$s”</string>
+    <string name="chat_forked">Forked: a new chat from here</string>
+    <string name="chat_before_edit_title">%1$s (before edit)</string>
+    <string name="chat_edit_running">Wait until this chat has finished, then edit.</string>
+    <string name="chat_edit_failed">The message couldn\'t be edited.</string>
+    <string name="chat_edit_title">Edit your message</string>
+    <string name="chat_edit_info">The agent answers again from here, starting fresh with the chat before this message. Everything after it goes from this chat; the chat as it was is kept in Archived.</string>
+    <string name="chat_edit_send">Send</string>
+    <string name="chat_edited">edited</string>
+    <string name="setup_voice_pause">Stop listening after a pause of</string>
+    <string name="setup_voice_auto">Auto</string>
+    <string name="setup_voice_pause_info">Buddy stops and sends when the words it heard haven\'t changed for that long, even with music or traffic around. Auto: the voice engine decides, and it waits for quiet.</string>
+    <string name="setup_voice_max">Longest recording</string>
+    <string name="setup_voice_no_limit">No limit</string>
     <string name="chat_copy_whole_reply">Copy whole reply</string>
     <!-- Header of a collapsible group of the agent's steps in the chat. -->
     <plurals name="chat_tool_calls">
@@ -2284,6 +2312,9 @@
     <!-- Chat list: pinned and archived chats, and the long-press menu on a chat (rename, pin, archive, delete). -->
     <string name="main_section_pinned">Pinned</string>
     <string name="main_section_archived">Archived (%1$d)</string>
+    <string name="main_archived_title">Archived</string>
+    <string name="main_archived_open">Archived chats</string>
+    <string name="main_archived_back">Back to chats</string>
     <string name="chat_pinned_marker">Pinned</string>
     <string name="chat_menu_rename">Rename</string>
     <string name="chat_menu_pin">Pin to top</string>

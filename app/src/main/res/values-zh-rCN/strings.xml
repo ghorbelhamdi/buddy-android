@@ -407,6 +407,14 @@
     <!-- The card's label when the request comes from an agent session outside Buddy's chats (e.g. a terminal).
          %1$s: card_label_approval or card_label_question. All caps. -->
     <string name="card_label_other_session">%1$s · 来自其他会话</string>
+    <string name="card_label_from">%1$s · 来自 %2$s</string>
+    <string name="outside_terminal">本手机的终端</string>
+    <string name="outside_computer">一台电脑</string>
+    <string name="monitor_outside">Buddy 之外</string>
+    <string name="monitor_outside_hidden">在它自己的隐藏屏幕上 · 上一步 %1$s</string>
+    <string name="monitor_outside_screen">在你的屏幕上 · 上一步 %1$s</string>
+    <string name="monitor_outside_bring">移到我的屏幕</string>
+    <string name="monitor_outside_stopped">已停止。它的手机工具在一分钟内会被拒绝，等待中的卡片已被拒绝。</string>
     <string name="card_label_queue">%1$s · 第 1 个，共 %2$d 个</string>
     <!-- Buttons side by side at the bottom of the card: keep them short. -->
     <string name="card_deny">拒绝</string>
@@ -637,6 +645,26 @@
     <!-- Chat messages -->
     <!-- Toast after a long press copies a message. -->
     <string name="chat_copied">已复制</string>
+    <string name="chat_copy">复制</string>
+    <string name="chat_quote">引用</string>
+    <string name="chat_quote_remove">移除引用</string>
+    <string name="chat_edit">编辑</string>
+    <string name="chat_fork">从这里分支</string>
+    <string name="chat_fork_title">%1$s · 分支</string>
+    <string name="chat_forked_from">从“%1$s”分支</string>
+    <string name="chat_forked">已分支：从这里开始的新对话</string>
+    <string name="chat_before_edit_title">%1$s（编辑前）</string>
+    <string name="chat_edit_running">请等这个对话完成后再编辑。</string>
+    <string name="chat_edit_failed">无法编辑这条消息。</string>
+    <string name="chat_edit_title">编辑你的消息</string>
+    <string name="chat_edit_info">智能体会从这里重新回答，并以这条消息之前的对话重新开始。之后的内容会从这个对话中移除；原来的对话保存在已归档中。</string>
+    <string name="chat_edit_send">发送</string>
+    <string name="chat_edited">已编辑</string>
+    <string name="setup_voice_pause">停顿多久后停止聆听</string>
+    <string name="setup_voice_auto">自动</string>
+    <string name="setup_voice_pause_info">当听到的文字在这段时间内没有变化时，即使周围有音乐或车流声，Buddy 也会停止并发送。自动：由语音引擎决定，它会等到安静为止。</string>
+    <string name="setup_voice_max">最长录音</string>
+    <string name="setup_voice_no_limit">不限</string>
     <string name="chat_copy_whole_reply">复制整条回复</string>
     <!-- Header of a collapsible group of the agent's steps in the chat. -->
     <plurals name="chat_tool_calls">
@@ -2091,6 +2119,9 @@
     <string name="api_keys_local_info">如果是你自己的服务器（Ollama、LM Studio、llama.cpp）：API 密钥留空。若在电脑上运行，请把 localhost 换成电脑在 Wi-Fi 中的地址，例如 http://192.168.1.20:11434/v1。</string>
     <string name="main_section_pinned">已置顶</string>
     <string name="main_section_archived">已归档 (%1$d)</string>
+    <string name="main_archived_title">已归档</string>
+    <string name="main_archived_open">已归档的对话</string>
+    <string name="main_archived_back">返回对话</string>
     <string name="chat_pinned_marker">已置顶</string>
     <string name="chat_menu_rename">重命名</string>
     <string name="chat_menu_pin">置顶</string>

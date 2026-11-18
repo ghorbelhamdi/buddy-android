@@ -52,7 +52,11 @@ public final class HiddenNotice extends BroadcastReceiver {
             return;
         }
         if (WorkNotice.ACTION_STOP.equals(intent.getAction())) { // Stop on "working in the background"
-            ChatHub.get(c).stopAll();
+            // only the outside sessions when they were all it named (a chat on the real screen has its own Stop)
+            if (!intent.getBooleanExtra(WorkNotice.EXTRA_OUTSIDE_ONLY, false)) ChatHub.get(c).stopAll();
+            BuddyService s = BuddyService.get(); // and the sessions from outside Buddy working on the phone
+            String[] named = intent.getStringArrayExtra(WorkNotice.EXTRA_OUTSIDE); // the ones it named
+            if (s != null && named != null) for (String k : named) Background.stopOutside(s, k);
             return;
         }
         if (CodexLive.ACTION_END.equals(intent.getAction())) { // the live voice notification's End

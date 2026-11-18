@@ -381,6 +381,24 @@ final class Prefs {
         sp(c).edit().putBoolean("speak_pause_media", on).apply();
     }
 
+    /** Voice input ends after this pause in the words (ms); 0: the engine decides (#60). */
+    static long voicePauseMs(Context c) {
+        return sp(c).getLong("voice_pause_ms", 0);
+    }
+
+    static void setVoicePauseMs(Context c, long ms) {
+        sp(c).edit().putLong("voice_pause_ms", ms).apply();
+    }
+
+    /** Voice input ends after this long at most (ms); 0: no limit (#60). */
+    static long voiceMaxMs(Context c) {
+        return sp(c).getLong("voice_max_ms", 0);
+    }
+
+    static void setVoiceMaxMs(Context c, long ms) {
+        sp(c).edit().putLong("voice_max_ms", ms).apply();
+    }
+
     /** Pause what's playing while Buddy listens for the user's voice, and start it again afterwards (#56). Off unless switched on. */
     static boolean pauseMediaForListening(Context c) {
         return sp(c).getBoolean("listen_pause_media", false);

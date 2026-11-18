@@ -102,6 +102,8 @@ final class Bubble implements ChatHub.Listener {
     /** A card that waits its turn behind the one shown (another chat asked meanwhile). */
     private static final class Card {
         final String text, chat;
+        /** For a card from outside Buddy: the session's key (Background.outside) and, from a paired computer, its name. */
+        String key, from;
         final java.util.List<String> options;
         final ConfirmCallback cb;
         final boolean open;
@@ -2218,6 +2220,11 @@ final class Bubble implements ChatHub.Listener {
         input.setSelection(input.length());
     }
 
+    /** The chat's earlier messages changed (an edit cut them, issue #44): drawn anew on the next change, not added to. */
+    void redrawLater(Sessions.Session ses) {
+        if (renderedFor == ses) renderedFor = null;
+    }
+
     @Override
     public void onMessage(Sessions.Session ses, Sessions.Msg msg) {
         if (ses == sessions.current && renderedFor == ses) showMessage(msg);
@@ -2301,13 +2308,47 @@ final class Bubble implements ChatHub.Listener {
         showNext();
     }
 
-    void askConfirm(String summary, String chat, ConfirmCallback cb) {
-        askConfirm(summary, chat, 0, cb);
+    /**
+     * countdown: seconds after which the card approves itself unless the user stops it (0: it waits for the user);
+     * key, from: see Card.
+     */
+    void askConfirm(String summary, String chat, int countdown, ConfirmCallback cb, String key, String from) {
+        Card c = new Card(summary, null, chat, cb, true, countdown);
+        showFrom(c, key, from);
     }
 
-    /** countdown: seconds after which the card approves itself unless the user stops it (0: it waits for the user). */
-    void askConfirm(String summary, String chat, int countdown, ConfirmCallback cb) {
-        showCard(new Card(summary, null, chat, cb, true, countdown));
+    /** A card's label when it comes from outside Buddy: from the computer it names, or from another session. */
+    private String otherLabel(String label) {
+        String from = shownCard == null ? null : shownCard.from;
+        return from != null ? svc.getString(R.string.card_label_from, label, from.toUpperCase(java.util.Locale.ROOT))
+                : svc.getString(R.string.card_label_other_session, label);
+    }
+
+    /** A card from a session (key: an outside one, or null; from: the computer that asks), unless it was just stopped. */
+    private void showFrom(Card c, String key, String from) {
+        c.key = key;
+        c.from = from;
+        if (key != null && Background.outsideStopped(key) != null) { // stopped while this card was on its way
+            c.cb.onAnswer(false, null);
+            return;
+        }
+        showCard(c);
+    }
+
+    /** The user stopped this outside session: its cards, shown or queued, are answered no. */
+    void denyFrom(String key) {
+        for (Card c : new java.util.ArrayList<>(queued)) {
+            if (!key.equals(c.key)) continue;
+            queued.remove(c);
+            c.cb.onAnswer(false, null);
+        }
+        paintCardLabel();
+        if (shownCard != null && key.equals(shownCard.key) && pendingConfirm == shownCard.cb) {
+            ConfirmCallback cb = shownCard.cb;
+            cancelConfirm(cb);
+            cb.onAnswer(false, null);
+        }
+        hub.changed();
     }
 
     // ------------------------------------------------------------ countdown
@@ -2342,7 +2383,7 @@ final class Bubble implements ChatHub.Listener {
     void stopCountdown() {
         if (countdownEnd == 0) return;
         endCountdown();
-        setCardLabel(cardChat == null ? svc.getString(R.string.card_label_other_session, svc.getString(R.string.card_label_approval))
+        setCardLabel(cardChat == null ? otherLabel(svc.getString(R.string.card_label_approval))
                 : svc.getString(R.string.card_label_approval));
         if (cardChat != null) hub.note(cardChat, Kind.STEP, svc.getString(R.string.card_note_countdown_stopped));
         hub.changed();
@@ -2379,10 +2420,12 @@ final class Bubble implements ChatHub.Listener {
     /**
      * The ask tool: the same card, with a button per answer and one to type an answer instead. handsOn: the user has a
      * step to do on the screen first (marks show where), so the card waits by the bubble, the question in its pill,
-     * and opens when they tap it.
+     * and opens when they tap it. key, from: see Card.
      */
-    void askQuestion(String question, java.util.List<String> options, String chat, boolean handsOn, ConfirmCallback cb) {
-        showCard(new Card(question, options, chat, cb, !handsOn, 0));
+    void askQuestion(String question, java.util.List<String> options, String chat, boolean handsOn, ConfirmCallback cb,
+                     String key, String from) {
+        Card c = new Card(question, options, chat, cb, !handsOn, 0);
+        showFrom(c, key, from);
     }
 
     /** The waiting card has a step for the user to do on the screen first (see askQuestion). */
@@ -2454,7 +2497,7 @@ final class Bubble implements ChatHub.Listener {
         asking = options != null;
         askOptions = options;
         String label = svc.getString(asking ? R.string.card_label_question : R.string.card_label_approval);
-        setCardLabel(cardChat == null ? svc.getString(R.string.card_label_other_session, label) : label);
+        setCardLabel(cardChat == null ? otherLabel(label) : label);
         confirmOptions.removeAllViews();
         if (asking) for (String o : options) confirmOptions.addView(optionButton(o, false, v -> answerOption(o)));
         layoutOptions();
@@ -2588,12 +2631,15 @@ final class Bubble implements ChatHub.Listener {
                 : svc.getString(R.string.card_label_queue, cardLabel, queued.size() + 1));
     }
 
-    /** Every card waiting for the user, the shown one first: {chat id (null: another session), text, "ask" or ""}. */
+    /**
+     * Every card waiting for the user, the shown one first: {chat id (null: another session), text, "ask" or "", the
+     * paired computer that asks or null}.
+     */
     java.util.List<String[]> openCards() {
         java.util.List<String[]> out = new java.util.ArrayList<>();
         if (pendingConfirm == null) return out;
-        if (shownCard != null) out.add(new String[]{shownCard.chat, shownCard.text, shownCard.options != null ? "ask" : ""});
-        for (Card c : queued) out.add(new String[]{c.chat, c.text, c.options != null ? "ask" : ""});
+        if (shownCard != null) out.add(new String[]{shownCard.chat, shownCard.text, shownCard.options != null ? "ask" : "", shownCard.from});
+        for (Card c : queued) out.add(new String[]{c.chat, c.text, c.options != null ? "ask" : "", c.from});
         return out;
     }
 
@@ -2719,7 +2765,7 @@ final class Bubble implements ChatHub.Listener {
     void noticeWaitingCard() {
         if (pendingConfirm == null || shownCard == null) return;
         Triggers.approvalShown(svc, shownCard.chat, shownCard.text, 0, !asking && shownCard.open,
-                asking && shownCard.open ? askOptions : null);
+                asking && shownCard.open ? askOptions : null, shownCard.from); // (the main thread: no caller here)
     }
 
     private void answerConfirm(boolean approved) {
@@ -2900,7 +2946,12 @@ final class Bubble implements ChatHub.Listener {
                 if (thumbTab == null) return;
                 if (thumbTab.startsWith(Background.KEY)) { // a background chat's screen: its chat has the bigger picture
                     String id = thumbTab.substring(Background.KEY.length());
-                    if (sessions.find(id) == null) return; // a session outside Buddy's: it has no chat to open
+                    if (Background.outside(id)) { // a session outside Buddy's: the Sessions tab shows it, with Stop
+                        svc.startActivity(new android.content.Intent(svc, MonitorActivity.class)
+                                .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK));
+                        return;
+                    }
+                    if (sessions.find(id) == null) return;
                     svc.startActivity(new android.content.Intent(svc, ChatActivity.class).putExtra("id", id)
                             .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK));
                     return;
@@ -3109,6 +3160,10 @@ final class Bubble implements ChatHub.Listener {
             if (Background.displayOf(s.id) != android.view.Display.DEFAULT_DISPLAY) keys.add(Background.KEY + s.id);
             else if (Browser.running() && Browser.hasTab(Browser.key(s.id))) keys.add(Browser.key(s.id));
         }
+        // sessions from outside Buddy working on a hidden screen of their own (a paired computer, Termux)
+        java.util.List<String> outside = Background.outsideActive();
+        java.util.Collections.sort(outside); // a fixed order, as the chats': taking turns doesn't move the pager
+        for (String k : outside) if (Background.outsideHidden(k)) keys.add(Background.KEY + k);
         return keys;
     }
 
@@ -3117,6 +3172,8 @@ final class Bubble implements ChatHub.Listener {
         if (key == null) return "";
         for (Sessions.Session s : sessions.all)
             if (key.equals(Background.KEY + s.id) || key.equals(Browser.key(s.id))) return s.label();
+        if (key.startsWith(Background.KEY) && Background.outside(key.substring(Background.KEY.length())))
+            return Background.outsideName(svc, key.substring(Background.KEY.length()));
         return "";
     }
 

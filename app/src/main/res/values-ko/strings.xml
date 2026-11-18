@@ -294,6 +294,14 @@
     <string name="card_label_approval">승인 필요</string>
     <string name="card_label_question">질문</string>
     <string name="card_label_other_session">%1$s · 다른 세션에서</string>
+    <string name="card_label_from">%1$s · %2$s에서</string>
+    <string name="outside_terminal">이 휴대폰의 터미널</string>
+    <string name="outside_computer">컴퓨터</string>
+    <string name="monitor_outside">Buddy 밖</string>
+    <string name="monitor_outside_hidden">자체 숨은 화면에서 · 마지막 단계 %1$s</string>
+    <string name="monitor_outside_screen">내 화면에서 · 마지막 단계 %1$s</string>
+    <string name="monitor_outside_bring">내 화면으로 가져오기</string>
+    <string name="monitor_outside_stopped">중지했습니다. 1분 동안 휴대폰 도구가 거부되고, 대기 중인 카드는 거부되었습니다.</string>
     <string name="card_label_queue">%1$s · %2$d개 중 1</string>
     <string name="card_deny">거부</string>
     <string name="card_change">변경</string>
@@ -473,6 +481,26 @@
 
     <!-- Chat messages -->
     <string name="chat_copied">복사했어요</string>
+    <string name="chat_copy">복사</string>
+    <string name="chat_quote">인용</string>
+    <string name="chat_quote_remove">인용 삭제</string>
+    <string name="chat_edit">수정</string>
+    <string name="chat_fork">여기서 분기</string>
+    <string name="chat_fork_title">%1$s · 분기</string>
+    <string name="chat_forked_from">“%1$s”에서 분기</string>
+    <string name="chat_forked">분기됨: 여기서부터 새 채팅</string>
+    <string name="chat_before_edit_title">%1$s (수정 전)</string>
+    <string name="chat_edit_running">이 채팅이 끝날 때까지 기다린 뒤 수정하세요.</string>
+    <string name="chat_edit_failed">메시지를 수정할 수 없습니다.</string>
+    <string name="chat_edit_title">메시지 수정</string>
+    <string name="chat_edit_info">에이전트가 여기서부터 다시 답하며, 이 메시지 이전의 채팅으로 새로 시작합니다. 그 뒤의 내용은 이 채팅에서 사라지고, 원래 채팅은 보관함에 남습니다.</string>
+    <string name="chat_edit_send">보내기</string>
+    <string name="chat_edited">수정됨</string>
+    <string name="setup_voice_pause">이만큼 멈추면 듣기 종료</string>
+    <string name="setup_voice_auto">자동</string>
+    <string name="setup_voice_pause_info">들은 말이 그 시간 동안 바뀌지 않으면 음악이나 소음이 있어도 Buddy가 멈추고 보냅니다. 자동: 음성 엔진이 정하며, 조용해질 때까지 기다립니다.</string>
+    <string name="setup_voice_max">최장 녹음</string>
+    <string name="setup_voice_no_limit">제한 없음</string>
     <string name="chat_copy_whole_reply">답변 전체 복사</string>
     <plurals name="chat_tool_calls">
         <item quantity="other">도구 호출 %1$d회</item>
@@ -1642,6 +1670,9 @@
     <string name="api_keys_local_info">직접 운영하는 서버(Ollama, LM Studio, llama.cpp)라면 API 키는 비워 두세요. PC에서 실행한다면 localhost 대신 Wi-Fi에서의 PC 주소를 넣으세요. 예: http://192.168.1.20:11434/v1</string>
     <string name="main_section_pinned">고정됨</string>
     <string name="main_section_archived">보관됨 (%1$d)</string>
+    <string name="main_archived_title">보관됨</string>
+    <string name="main_archived_open">보관된 채팅</string>
+    <string name="main_archived_back">채팅으로 돌아가기</string>
     <string name="chat_pinned_marker">고정됨</string>
     <string name="chat_menu_rename">이름 바꾸기</string>
     <string name="chat_menu_pin">맨 위에 고정</string>

@@ -23,7 +23,7 @@ import static app.buddy.assistant.Ui.*;
 public class MainActivity extends Screen implements ChatHub.Listener, Account.Listener {
     private ChatHub hub;
     private LinearLayout list;
-    /** The Archived section is open (folded by default, each time the app starts). */
+    /** The archived chats are shown instead of the others (see setArchivedView). */
     private boolean showArchived;
     private FrameLayout navSlot;
 
@@ -123,6 +123,35 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
     public void onMessage(Sessions.Session ses, Sessions.Msg msg) {
     }
 
+    /**
+     * Back from the archived chats to all of them, on Android 13+ where onBackPressed isn't called (an
+     * OnBackInvokedCallback, made only there: the class doesn't exist before).
+     */
+    private Object archivedBack;
+
+    private void setArchivedView(boolean on) {
+        if (showArchived == on) return;
+        archivedMode(on);
+        render();
+    }
+
+    /** As setArchivedView, without drawing again (render itself may call it). */
+    private void archivedMode(boolean on) {
+        showArchived = on;
+        if (android.os.Build.VERSION.SDK_INT < 33) return;
+        if (archivedBack == null) archivedBack = (android.window.OnBackInvokedCallback) () -> setArchivedView(false);
+        android.window.OnBackInvokedCallback cb = (android.window.OnBackInvokedCallback) archivedBack;
+        if (on) getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT, cb);
+        else getOnBackInvokedDispatcher().unregisterOnBackInvokedCallback(cb);
+    }
+
+    @Override
+    public void onBackPressed() { // Android 11 and 12
+        if (showArchived) setArchivedView(false);
+        else super.onBackPressed();
+    }
+
     private void render() {
         list.removeAllViews();
         navSlot.removeAllViews();
@@ -158,11 +187,28 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         status.addView(st);
         name.addView(status);
         top.addView(name, weight1());
+        // archived chats: a view of their own, one tap from the top (it was a section at the very end of the list)
+        final List<Sessions.Session> archived = new ArrayList<>(); // (a helper's chat is listed by its parent's)
+        for (Sessions.Session ses : hub.sessions.all)
+            if (ses.parent.isEmpty() && ses.archived && !ses.running && !ses.messages.isEmpty()) archived.add(ses);
+        java.util.Collections.sort(archived, (a, b) -> Long.compare(b.updated, a.updated));
+        int archivedCount = archived.size();
+        if (archivedCount == 0 && showArchived) archivedMode(false); // the last one was taken out of the archive
+        if (archivedCount > 0 || showArchived) {
+            android.widget.ImageButton arch = iconButton(this, showArchived ? R.drawable.ms_arrow_back : R.drawable.ms_archive,
+                    getString(showArchived ? R.string.main_archived_back : R.string.main_archived_open));
+            arch.setOnClickListener(v -> setArchivedView(!showArchived));
+            top.addView(arch, new LinearLayout.LayoutParams(dp(this, 44), dp(this, 44)));
+        }
         android.widget.ImageButton search = iconButton(this, R.drawable.ms_search, getString(R.string.search_title));
         search.setOnClickListener(v -> go(SearchActivity.class));
         top.addView(search, new LinearLayout.LayoutParams(dp(this, 44), dp(this, 44)));
         list.addView(top, full());
-        list.addView(largeTitle(this, getString(R.string.ui_nav_chats)), full());
+        list.addView(largeTitle(this, getString(showArchived ? R.string.main_archived_title : R.string.ui_nav_chats)), full());
+        if (showArchived) { // only the archived chats, newest first
+            if (!archived.isEmpty()) list.addView(chatGroup(archived), inset(this));
+            return;
+        }
 
         if (!ready || setup.next() >= 0 && setup.next() < 3) {
             LinearLayout warn = row(this);
@@ -218,19 +264,17 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
             list.addView(g, inset(this));
         }
 
-        List<Sessions.Session> working = new ArrayList<>(), pinned = new ArrayList<>(), recent = new ArrayList<>(),
-                archived = new ArrayList<>();
+        List<Sessions.Session> working = new ArrayList<>(), pinned = new ArrayList<>(), recent = new ArrayList<>();
         for (Sessions.Session ses : hub.sessions.all) {
             if (!ses.parent.isEmpty()) continue; // a helper: its parent's chat lists it
             if (ses.running) working.add(ses);
             else if (ses.messages.isEmpty()) continue; // hide untouched new chats
-            else if (ses.archived) archived.add(ses);
+            else if (ses.archived) continue; // in the archived list above
             else if (ses.pinned) pinned.add(ses);
             else recent.add(ses);
         }
         java.util.Collections.sort(pinned, (a, b) -> Long.compare(b.updated, a.updated));
         java.util.Collections.sort(recent, (a, b) -> Long.compare(b.updated, a.updated));
-        java.util.Collections.sort(archived, (a, b) -> Long.compare(b.updated, a.updated));
         if (bubble != null) java.util.Collections.sort(working, (a, b) -> Boolean.compare(bubble.waitingIn(b), bubble.waitingIn(a)));
         if (!working.isEmpty()) {
             list.addView(sectionHeader(getString(R.string.main_section_working), working.size()));
@@ -244,18 +288,14 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
             list.addView(sectionLabel(this, getString(R.string.main_section_recent)));
             list.addView(chatGroup(recent), inset(this));
         }
-        if (!archived.isEmpty()) { // folded: one row that opens it
+        if (!archived.isEmpty()) { // one row at the end that opens them (as the archive button at the top does)
             LinearLayout head = listRow(this);
             head.setGravity(Gravity.CENTER_VERTICAL);
             head.setPaddingRelative(dp(this, 20), dp(this, 18), dp(this, 20), dp(this, 10));
             head.addView(text(this, getString(R.string.main_section_archived, archived.size()), 14, MUTED), weight1());
-            head.addView(icon(this, showArchived ? R.drawable.ms_expand_less : R.drawable.ms_expand_more, MUTED, 22));
-            head.setOnClickListener(v -> {
-                showArchived = !showArchived;
-                render();
-            });
+            head.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
+            head.setOnClickListener(v -> setArchivedView(true));
             list.addView(head, full());
-            if (showArchived) list.addView(chatGroup(archived), inset(this));
         }
         if (working.isEmpty() && pinned.isEmpty() && recent.isEmpty() && archived.isEmpty()) {
             LinearLayout empty = column(this);
@@ -298,7 +338,8 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         r.addView(icon(this, "ask".equals(card[2]) ? R.drawable.ms_chat_bubble : R.drawable.ms_shield_person, ACCENT, 24));
         LinearLayout col = column(this);
         col.setPaddingRelative(dp(this, 14), 0, 0, 0);
-        col.addView(single(title(this, ses != null ? ses.label() : getString(R.string.main_card_other_session), 15)));
+        col.addView(single(title(this, ses != null ? ses.label() : card.length > 3 && card[3] != null ? card[3]
+                : getString(R.string.main_card_other_session), 15)));
         TextView t = text(this, card[1].replace('\n', ' '), 14, MUTED);
         t.setMaxLines(2);
         t.setEllipsize(TextUtils.TruncateAt.END);

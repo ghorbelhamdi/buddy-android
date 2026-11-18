@@ -312,6 +312,14 @@
     <string name="card_label_approval">يتطلب موافقتك</string>
     <string name="card_label_question">سؤال</string>
     <string name="card_label_other_session">%1$s · من جلسة أخرى</string>
+    <string name="card_label_from">%1$s · من %2$s</string>
+    <string name="outside_terminal">طرفية هذا الهاتف</string>
+    <string name="outside_computer">حاسوب</string>
+    <string name="monitor_outside">خارج Buddy</string>
+    <string name="monitor_outside_hidden">على شاشته المخفية · آخر خطوة %1$s</string>
+    <string name="monitor_outside_screen">على شاشتك · آخر خطوة %1$s</string>
+    <string name="monitor_outside_bring">انقلها إلى شاشتي</string>
+    <string name="monitor_outside_stopped">تم الإيقاف. تُرفض أدوات الهاتف له لمدة دقيقة، ورُفضت بطاقاته المنتظرة.</string>
     <string name="card_label_queue">%1$s · 1 من %2$d</string>
     <string name="card_deny">رفض</string>
     <string name="card_change">تغيير</string>
@@ -496,6 +504,26 @@
 
     <!-- Chat messages -->
     <string name="chat_copied">تم النسخ</string>
+    <string name="chat_copy">نسخ</string>
+    <string name="chat_quote">اقتباس</string>
+    <string name="chat_quote_remove">إزالة الاقتباس</string>
+    <string name="chat_edit">تعديل</string>
+    <string name="chat_fork">تفرّع من هنا</string>
+    <string name="chat_fork_title">%1$s · تفرّع</string>
+    <string name="chat_forked_from">متفرّعة من «%1$s»</string>
+    <string name="chat_forked">تم التفرّع: دردشة جديدة من هنا</string>
+    <string name="chat_before_edit_title">%1$s (قبل التعديل)</string>
+    <string name="chat_edit_running">انتظر حتى تنتهي هذه الدردشة، ثم عدّل.</string>
+    <string name="chat_edit_failed">تعذّر تعديل الرسالة.</string>
+    <string name="chat_edit_title">عدّل رسالتك</string>
+    <string name="chat_edit_info">يجيب الوكيل من جديد من هنا، ويبدأ من الصفر مع الدردشة التي قبل هذه الرسالة. يُحذف كل ما بعدها من هذه الدردشة؛ وتُحفظ الدردشة كما كانت في الأرشيف.</string>
+    <string name="chat_edit_send">إرسال</string>
+    <string name="chat_edited">معدّلة</string>
+    <string name="setup_voice_pause">التوقف عن الاستماع بعد توقف لمدة</string>
+    <string name="setup_voice_auto">تلقائي</string>
+    <string name="setup_voice_pause_info">يتوقف Buddy ويرسل عندما لا تتغير الكلمات التي سمعها طوال تلك المدة، حتى مع وجود موسيقى أو ضجيج حولك. تلقائي: محرّك الصوت يقرر، وهو ينتظر الهدوء.</string>
+    <string name="setup_voice_max">أطول تسجيل</string>
+    <string name="setup_voice_no_limit">بلا حد</string>
     <string name="chat_copy_whole_reply">نسخ الرد كاملًا</string>
     <plurals name="chat_tool_calls">
         <item quantity="zero">%1$d استدعاء للأدوات</item>
@@ -1703,6 +1731,9 @@
     <string name="api_keys_local_info">لخادم خاص بك (Ollama أو LM Studio أو llama.cpp): اترك مفتاح API فارغًا. على الكمبيوتر، ضع عنوانه على شبكة Wi-Fi بدلًا من localhost، مثل http://192.168.1.20:11434/v1.</string>
     <string name="main_section_pinned">مثبّتة</string>
     <string name="main_section_archived">المؤرشفة (%1$d)</string>
+    <string name="main_archived_title">المؤرشفة</string>
+    <string name="main_archived_open">الدردشات المؤرشفة</string>
+    <string name="main_archived_back">العودة إلى الدردشات</string>
     <string name="chat_pinned_marker">مثبّتة</string>
     <string name="chat_menu_rename">إعادة التسمية</string>
     <string name="chat_menu_pin">تثبيت في الأعلى</string>

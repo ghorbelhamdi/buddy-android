@@ -961,12 +961,20 @@ final class Triggers implements ChatHub.Listener {
      * to three (a notification holds no more buttons), each behind the fingerprint or PIN as well.
      */
     static void approvalShown(Context c, String chat, String summary, int seconds, boolean approval, java.util.List<String> options) {
+        // a paired computer asks: named (read on the asking thread)
+        approvalShown(c, chat, summary, seconds, approval, options, McpServer.CALLER_REMOTE.get());
+    }
+
+    /** As above; from: the paired computer that asks, or null. */
+    static void approvalShown(Context c, String chat, String summary, int seconds, boolean approval,
+                              java.util.List<String> options, String from) {
         if (!locked(c)) return;
         new Handler(Looper.getMainLooper()).post(() -> { // chats are read on the main thread
             Job j = chat == null ? null : active.get(chat);
             Sessions.Session s = chat == null ? null : ChatHub.get(c).sessions.find(chat);
             String title = j != null ? c.getString(R.string.rules_approval_title, j.note.who(), j.note.app)
-                    : c.getString(R.string.card_locked_title, s == null ? c.getString(R.string.app_name) : s.label());
+                    : c.getString(R.string.card_locked_title, s != null ? s.label() : from != null ? from
+                    : c.getString(R.string.app_name));
             String text = seconds > 0 ? c.getString(R.string.rules_approval_auto, Rules.Rule.duration(c, seconds), summary) : summary;
             NotificationManager nm = c.getSystemService(NotificationManager.class);
             nm.createNotificationChannel(new NotificationChannel(APPROVALS, c.getString(R.string.approvals_channel),

@@ -648,6 +648,24 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         String engineNote = getString("claude".equals(engine) ? R.string.setup_voice_input_claude
                 : "chatgpt".equals(engine) ? R.string.setup_voice_input_chatgpt : R.string.setup_voice_input_phone);
         vc.addView(text(this, engineNote, 13, MUTED), topGap(8));
+        // when listening ends: the engine waits for quiet, which noise around never gives (#60)
+        vc.addView(fieldLabel(getString(R.string.setup_voice_pause), null), topGap(16));
+        vc.addView(segmented(this, new String[][]{{"0", getString(R.string.setup_voice_auto)},
+                        {"1000", getString(R.string.rules_seconds, 1)}, {"2000", getString(R.string.rules_seconds, 2)},
+                        {"3000", getString(R.string.rules_seconds, 3)}},
+                String.valueOf(Prefs.voicePauseMs(this)), false, v -> {
+                    Prefs.setVoicePauseMs(this, Long.parseLong(v));
+                    render();
+                }), topGap(8));
+        vc.addView(text(this, getString(R.string.setup_voice_pause_info), 13, MUTED), topGap(8));
+        vc.addView(fieldLabel(getString(R.string.setup_voice_max), null), topGap(16));
+        vc.addView(segmented(this, new String[][]{{"0", getString(R.string.setup_voice_no_limit)},
+                        {"60000", getString(R.string.rules_minutes, 1)}, {"120000", getString(R.string.rules_minutes, 2)},
+                        {"300000", getString(R.string.rules_minutes, 5)}},
+                String.valueOf(Prefs.voiceMaxMs(this)), false, v -> {
+                    Prefs.setVoiceMaxMs(this, Long.parseLong(v));
+                    render();
+                }), topGap(8));
         vc.addView(fieldLabel(getString(R.string.setup_voice_output), null), topGap(16));
         String speech = Prefs.speechEngine(this);
         vc.addView(segmented(this, new String[][]{{"phone", getString(R.string.setup_voice_phone)}, {"chatgpt", "ChatGPT"}},
