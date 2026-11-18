@@ -2088,6 +2088,10 @@
     <string name="background_pc_copied">Copied</string>
     <string name="background_pc_waiting">Waiting for the helper to answerΓÇª</string>
     <string name="background_pc_timeout">The helper didn\'t answer. Is the computer connected, USB debugging allowed, and adb installed on it?</string>
+    <!-- The Quick Settings tile that pauses Buddy (its accessibility service off) so guarded apps like banks open. -->
+    <string name="pause_tile_label">Pause Buddy</string>
+    <string name="pause_tile_running">On — tap to pause for banks</string>
+    <string name="pause_tile_paused">Paused — banking is safe; tap to resume</string>
     <!-- Note in the chat when a step needs the user and the app moves from the background screen to the real one. -->
     <string name="background_brought">Moved to your screen: this step needs you. Background mode is off for this chat now.</string>
     <!-- Section title on the Background mode screen: commands the agent runs on the phone itself. Keep short. -->

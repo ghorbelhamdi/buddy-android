@@ -259,6 +259,19 @@
                 android:resource="@xml/accessibility_config" />
         </service>
 
+        <!-- Pause Buddy from the Quick Settings: banks refuse to open while an accessibility service runs
+             (Settings → Notification shade → add "Pause Buddy"). -->
+        <service
+            android:name=".PauseTile"
+            android:exported="true"
+            android:icon="@drawable/ms_shield_person"
+            android:label="@string/pause_tile_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
         <!-- Notification rules: sees notifications from the apps the user's rules watch (Settings → Notification rules) -->
         <service
             android:name=".NotificationWatcher"
