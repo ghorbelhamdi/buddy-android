@@ -241,6 +241,7 @@ public final class Schedules extends BroadcastReceiver {
         @Override
         public void onReceive(Context c, Intent i) {
             sync(c.getApplicationContext());
+            BankWatch.sync(c.getApplicationContext());
         }
     }
 

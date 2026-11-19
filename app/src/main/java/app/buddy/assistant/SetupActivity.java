@@ -88,6 +88,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         Account.OPENCODE.refresh(this);
         Account.AGY.refresh(this);
         Account.GROK.refresh(this);
+        BankWatch.sync(this);
         render();
     }
 
@@ -953,6 +954,20 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 PauseTile.paused(this), on -> {
             boolean done = on ? PauseTile.pause(this) : PauseTile.resume(this);
             if (!done) startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+            render();
+        })), full());
+        ex.addView(divider(), lineParams());
+        ex.addView(protect(switchRow(this, getString(R.string.bank_auto), getString(R.string.bank_auto_info),
+                Prefs.bankAuto(this), on -> {
+            Prefs.setBankAuto(this, on);
+            if (on && !BankWatch.usageAllowed(this)) {
+                Toast.makeText(this, R.string.bank_usage_missing, Toast.LENGTH_LONG).show();
+                try {
+                    startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+                } catch (Exception ignored) {
+                }
+            }
+            BankWatch.sync(this);
             render();
         })), full());
         ex.addView(divider(), lineParams());

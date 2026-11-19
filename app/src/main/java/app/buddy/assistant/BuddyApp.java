@@ -11,6 +11,11 @@ public class BuddyApp extends Application {
     public void onCreate() {
         super.onCreate();
         ctx = this;
+        try {
+            BankWatch.sync(this); // Bank mode's watch outlives the app: it starts again with it, when it's on
+        } catch (Exception ignored) {
+            // Android may refuse a foreground service started from the background; the next app start or boot does it
+        }
     }
 
     static Context context() {

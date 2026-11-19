@@ -36,6 +36,24 @@ final class Prefs {
         sp(c).edit().putBoolean("bg_paired", paired).apply();
     }
 
+    /** Bank mode, automatic: pause while a banking app is on screen (see BankWatch). */
+    static boolean bankAuto(Context c) {
+        return sp(c).getBoolean("bank_auto", false);
+    }
+
+    static void setBankAuto(Context c, boolean on) {
+        sp(c).edit().putBoolean("bank_auto", on).apply();
+    }
+
+    /** Bank mode: the automatic watch turned the services off itself (a manual tap leaves this false). */
+    static boolean autoPaused(Context c) {
+        return sp(c).getBoolean("bank_auto_paused", false);
+    }
+
+    static void setAutoPaused(Context c, boolean on) {
+        sp(c).edit().putBoolean("bank_auto_paused", on).apply();
+    }
+
     /** Bank mode: the accessibility services it turned off, as they were (null when it isn't paused). */
     static String savedA11y(Context c) {
         return sp(c).getString("a11y_saved", null);

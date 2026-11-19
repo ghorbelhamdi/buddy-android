@@ -18,6 +18,11 @@
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <!-- Notification rules: the agent keeps working (and an approval countdown keeps running) with the screen off -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- Bank mode, automatic (BankWatch): Android's record of the app on screen, and a service that outlives the
+         accessibility service it turns off. -->
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <!-- Scheduled tasks: on time (the user allows it on Android 14+; without, a few minutes late), and again after a restart -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -260,7 +265,7 @@
         </service>
 
         <!-- Pause Buddy from the Quick Settings: banks refuse to open while an accessibility service runs
-             (Settings → Notification shade → add "Pause Buddy"). -->
+             (Settings → Notification shade → add "Bank mode"). -->
         <service
             android:name=".PauseTile"
             android:exported="true"
@@ -270,6 +275,17 @@
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
+        </service>
+
+        <!-- Bank mode, automatic: sees the app on screen (Usage access) and pauses the accessibility services while a
+             banking app is open, so it doesn't go off with them. -->
+        <service
+            android:name=".BankWatch"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Turns the accessibility services off while a banking app is on screen" />
         </service>
 
         <!-- Notification rules: sees notifications from the apps the user's rules watch (Settings → Notification rules) -->

@@ -2094,6 +2094,14 @@
     <string name="pause_tile_paused">Banking ready — tap to turn control back on</string>
     <!-- Under the Bank mode switch in Settings. Accessibility services are Android's; Link to Windows is an app's name. -->
     <string name="pause_mode_info">Turns every accessibility service off (Buddy\'s and other apps\', like Link to Windows) so banking apps open, then puts them back. Add the Bank mode tile to Quick Settings for one tap.</string>
+    <!-- The switch under Bank mode: it happens by itself when a banking app opens. "Usage access" is Android's name. -->
+    <string name="bank_auto">Automatic</string>
+    <string name="bank_auto_info">Pause while a banking app is open, and turn control back on when you leave it. Needs Usage access.</string>
+    <string name="bank_usage_missing">Allow Usage access for Buddy, so it can tell which app is open.</string>
+    <!-- The quiet notification while the automatic watch runs. -->
+    <string name="bank_channel">Bank mode</string>
+    <string name="bank_watch_title">Bank mode is on</string>
+    <string name="bank_watch_text">Screen control is off while a banking app is open</string>
     <!-- Note in the chat when a step needs the user and the app moves from the background screen to the real one. -->
     <string name="background_brought">Moved to your screen: this step needs you. Background mode is off for this chat now.</string>
     <!-- Section title on the Background mode screen: commands the agent runs on the phone itself. Keep short. -->
