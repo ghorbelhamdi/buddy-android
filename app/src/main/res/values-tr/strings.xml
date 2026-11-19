@@ -302,6 +302,14 @@
     <string name="card_label_approval">ONAYINIZ GEREKİYOR</string>
     <string name="card_label_question">SORU</string>
     <string name="card_label_other_session">%1$s · BAŞKA BİR OTURUMDAN</string>
+    <string name="card_label_from">%1$s · %2$s KAYNAKLI</string>
+    <string name="outside_terminal">Bu telefonun terminali</string>
+    <string name="outside_computer">Bir bilgisayar</string>
+    <string name="monitor_outside">Buddy dışında</string>
+    <string name="monitor_outside_hidden">Kendi gizli ekranında · son adım %1$s</string>
+    <string name="monitor_outside_screen">Sizin ekranınızda · son adım %1$s</string>
+    <string name="monitor_outside_bring">Ekranıma getir</string>
+    <string name="monitor_outside_stopped">Durduruldu. Telefon araçları bir dakika boyunca reddedilir ve bekleyen kartları reddedildi.</string>
     <string name="card_label_queue">%1$s · 1 / %2$d</string>
     <string name="card_deny">Reddet</string>
     <string name="card_change">Değiştir</string>
@@ -354,7 +362,7 @@
     <string name="chat_approvals_ask">Sor</string>
     <string name="chat_approvals_ask_info">Her uygulama, %1$s bölümünde kendisi için belirleneni izler.</string>
     <string name="chat_approvals_strict_info">%1$s olarak ayarlı uygulamalarda da Buddy göndermeden, paylaşmadan, satın almadan veya silmeden önce sorar.</string>
-    <string name="chat_approvals_apps_hint">Ajanın işlem yaptığı yerler ve her uygulamanın %1$s bölümündeki ayarı. Orada değiştirmek için birine dokunun.</string>
+    <string name="chat_approvals_apps_set">Ajanın işlem yaptığı yerler ve her uygulamanın %1$s bölümündeki ayarı. Burada yapılan değişiklik tüm sohbetlerde geçerli olur.</string>
     <string name="chat_approvals_routine">Rutin serbest</string>
     <string name="chat_approvals_routine_info">Rutin adımlar her uygulamada kart olmadan ilerler: mesaj göndermek veya denetçinin soracağı bir adım. Her biri sohbete not edilir. Ödeme, satın alma, silme, yükleme, parolalar ve güvenlik ayarları yine size sorar; bankacılık ve ödeme uygulamalarındaki, Ayarlar\'daki ve uygulama mağazalarındaki her şey de öyle.</string>
     <string name="chat_approvals_strict">Her zaman sor</string>
@@ -425,6 +433,7 @@
     <string name="hub_agent_switched">%1$s ajanına geçildi. Şimdiye kadarki konuşmayı bir sonraki mesajınızla alır.</string>
     <string name="chat_model_other_hint">diğer… örn. %1$s</string>
     <string name="chat_model_use">Kullan</string>
+    <string name="chat_model_search">Model ara</string>
 
     <!-- Language sheet (long-press the mic) -->
     <string name="chat_speak_in">Konuşma dili</string>
@@ -481,6 +490,26 @@
 
     <!-- Chat messages -->
     <string name="chat_copied">Kopyalandı</string>
+    <string name="chat_copy">Kopyala</string>
+    <string name="chat_quote">Alıntıla</string>
+    <string name="chat_quote_remove">Alıntıyı kaldır</string>
+    <string name="chat_edit">Düzenle</string>
+    <string name="chat_fork">Buradan dallandır</string>
+    <string name="chat_fork_title">%1$s · dal</string>
+    <string name="chat_forked_from">“%1$s” sohbetinden dallandı</string>
+    <string name="chat_forked">Dallandı: buradan yeni bir sohbet</string>
+    <string name="chat_before_edit_title">%1$s (düzenlemeden önce)</string>
+    <string name="chat_edit_running">Bu sohbet bitene kadar bekleyin, sonra düzenleyin.</string>
+    <string name="chat_edit_failed">Mesaj düzenlenemedi.</string>
+    <string name="chat_edit_title">Mesajını düzenle</string>
+    <string name="chat_edit_info">Ajan buradan yeniden yanıtlar ve bu mesajdan önceki sohbetle sıfırdan başlar. Sonrasındaki her şey bu sohbetten çıkar; sohbetin önceki hâli Arşiv\'de saklanır.</string>
+    <string name="chat_edit_send">Gönder</string>
+    <string name="chat_edited">düzenlendi</string>
+    <string name="setup_voice_pause">Şu kadar duraklamadan sonra dinlemeyi bitir</string>
+    <string name="setup_voice_auto">Otomatik</string>
+    <string name="setup_voice_pause_info">Duyduğu kelimeler o süre boyunca değişmezse Buddy durur ve gönderir; çevrede müzik veya trafik olsa bile. Otomatik: ses motoru karar verir ve sessizliği bekler.</string>
+    <string name="setup_voice_max">En uzun kayıt</string>
+    <string name="setup_voice_no_limit">Sınır yok</string>
     <string name="chat_copy_whole_reply">Yanıtın tamamını kopyala</string>
     <plurals name="chat_tool_calls">
         <item quantity="one">%1$d araç çağrısı</item>
@@ -491,6 +520,9 @@
     <string name="hub_continuing">Daha önceki bir %1$s oturumuna devam ediliyor. Hâlâ bir terminalde açıksa önce orada kapatın.</string>
     <string name="hub_still_working_attachments">Bu sohbet hâlâ çalışıyor. Ekleri iş bitince gönderin.</string>
     <string name="hub_service_off">%1$s kapalı (Ayarlar → Ajanlar ve modeller → API anahtarları). Açın veya bu sohbet için başka bir model seçin.</string>
+    <string name="hub_accessibility_dead">Buddy\'nin erişilebilirlik hizmeti açık olduğu hâlde çalışmıyor: Android Buddy\'yi durdurdu ve hizmeti yeniden başlatmadı, bu yüzden ajanlar telefona erişemiyor. Android Ayarlar → Erişilebilirlik\'te Buddy\'yi kapatıp yeniden açın. Tekrar olmaması için: telefonun uygulama ayarlarında varsa Buddy\'nin otomatik başlamasına izin verin ve mikrofona “Yalnızca bu sefer” değil “Uygulama kullanılırken” izni verin.</string>
+    <string name="hub_accessibility_off">Buddy\'nin erişilebilirlik hizmeti kapalı, bu yüzden ajanlar telefona erişemiyor. Android Ayarlar → Erişilebilirlik\'te Buddy\'yi açın.</string>
+    <string name="voice_mic_while_using">“Uygulama kullanılırken” seçeneğini seçin: “Yalnızca bu sefer” ile Android, Buddy\'den çıktıktan bir dakika sonra onu durdurur, bir görevin ortasında bile.</string>
     <string name="hub_thinking">Düşünüyor…</string>
     <string name="hub_still_waiting">Modelin yanıtı hâlâ bekleniyor…</string>
     <string name="hub_still_reading_local">Hâlâ okuyor… Kendi bilgisayarındaki bir model, özellikle ilk yanıtta birkaç dakika sürebilir.</string>
@@ -936,6 +968,15 @@
     <string name="setup_phone_tools_info">Buddy\'nin telefon araçları, bu telefonda çalışan sıradan bir MCP sunucusudur. Bunu telefondaki bir terminalde (örneğin Termux\'ta) bir kez çalıştırın; o ajan, baloncuk olmadan bile her oturumda telefon araçlarına sahip olur.</string>
     <string name="setup_copy_command">Komutu kopyala</string>
     <string name="setup_command_copied">Kopyalandı. Terminalinize yapıştırın.</string>
+    <string name="setup_outside_background">Arka planda çalış</string>
+    <string name="setup_outside_background_info">Kendi oturumlarındaki ajanlar, arka plan modundaki bir sohbet gibi gizli bir ekranda çalışır: telefonunu kullanmaya devam edersin, telefon kilitliyken de çalışmaya devam ederler. Kartlar ve sorular yine sana gelir. Giriş yapmak gibi senin görmen gereken bir adım, uygulamasını ekranına getirir. Arka plan modunun kurulu olması gerekir.</string>
+    <string name="setup_tailnet">Tailscale üzerinden telefon araçları</string>
+    <string name="setup_tailnet_info">Kendi bilgisayarlarındaki ajanlar bu telefon araçlarını Tailscale üzerinden alır; ikisinde de Tailscale açık olmalı. Eklediğin her bilgisayarın kendi anahtarı vardır, Kaldır onu geri alır. Kartlar ve sorular yine telefonda sana gelir. Ekranını kullanmasınlar diye yukarıdaki Arka planda çalış seçeneğini aç.</string>
+    <string name="setup_tailnet_address">Tailscale\'de bu telefon: %1$s</string>
+    <string name="setup_tailnet_no_address">Bu telefonda Tailscale bağlı değil, bilgisayarlar şu an ona ulaşamaz.</string>
+    <string name="setup_tailnet_computer">Bilgisayar %1$d</string>
+    <string name="setup_tailnet_pair_info">Bilgisayarda, Tailscale açıkken bunu bir terminalde çalıştır. Bu telefon ardından onayını ister ve bilgisayardaki Claude Code telefon araçlarını kendi anahtarıyla alır.</string>
+    <string name="tools_card_pair">“%1$s” bilgisayarı (Tailscale %2$s) eşlensin mi? Buddy\'nin telefon araçlarını kendi anahtarıyla alır; anahtarı Ayarlar\'dan kaldırabilirsin.</string>
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Ses</string>
@@ -1013,6 +1054,8 @@
     <string name="setup_read_aloud_info">Buddy, ajanların yanıtlarını Ses bölümünde seçtiğiniz sesle okur.</string>
     <string name="setup_pause_media">Sesli okuma sırasında medyayı duraklat</string>
     <string name="setup_pause_media_info">Çalan müzik veya video, Buddy bir yanıtı okurken duraklatılır ve sonra devam eder. Buddy yalnızca kendi duraklattığını devam ettirir; bu sırada oynatmayı değiştirdiyseniz dokunmaz. “Yanıtları sesli oku” ve bildirim erişimi gerekir.</string>
+    <string name="setup_pause_listening">Dinlerken medyayı duraklat</string>
+    <string name="setup_pause_listening_info">Buddy sizi dinlerken çalan müzik veya video duraklatılır; böylece videoyu değil sesinizi duyar, sonra yeniden başlatılır. “Sesli okuma sırasında medyayı duraklat” da açıksa yanıt okunana kadar duraklatılmış kalır. Buddy yalnızca kendi duraklattığını yeniden başlatır, bu arada oynatmayı değiştirdiyseniz başlatmaz. Bildirim erişimi gerekir.</string>
     <string name="setup_voice_cards">Kartları sesle yanıtla</string>
     <string name="setup_voice_cards_info">Bir kart sesli okunduktan sonra Buddy dinler: “onayla” veya “reddet” ya da istediğiniz seçeneği söyleyin. “Yanıtları sesli oku” açık olmalıdır. Telefon kilitliyken çalışmaz. Duyabilecek mesafedeki herkes yanıt verebilir.</string>
     <string name="voice_card_approval">Buddy onayınızı bekliyor. %1$s</string>
@@ -1374,6 +1417,9 @@
     <string name="hub_tool_browser_back">Tarayıcı: geri gidiliyor</string>
     <string name="hub_tool_browser_tabs">Tarayıcı: sekmeler</string>
     <string name="hub_tool_schedule_message">Planlıyor: %1$s</string>
+    <string name="hub_tool_add_rule">Bildirim kuralı ekleniyor: %1$s</string>
+    <string name="tools_card_rule">“%4$s” sohbetine bir bildirim kuralı eklensin mi? %1$s uygulamasından, %2$s: her biri bu sohbete “%3$s” talimatıyla gelir. Kural, her kural gibi, bir şey yapmadan önce sana sorar.</string>
+    <string name="rules_in_chat">“%1$s” sohbetinde</string>
     <string name="hub_tool_list_scheduled">Planlanmış mesajlara bakıyor</string>
     <string name="hub_tool_cancel_scheduled">Planlanmış bir mesajı iptal ediyor</string>
     <string name="later_title">%1$s için ajanın mesajı</string>
@@ -1641,6 +1687,9 @@
     <string name="api_keys_local_info">Kendi sunucun için (Ollama, LM Studio, llama.cpp): API anahtarını boş bırak. Bilgisayardaysa localhost yerine Wi-Fi\'deki adresini yaz, örneğin http://192.168.1.20:11434/v1.</string>
     <string name="main_section_pinned">Sabitlenenler</string>
     <string name="main_section_archived">Arşiv (%1$d)</string>
+    <string name="main_archived_title">Arşivlenenler</string>
+    <string name="main_archived_open">Arşivlenen sohbetler</string>
+    <string name="main_archived_back">Sohbetlere dön</string>
     <string name="chat_pinned_marker">Sabitlendi</string>
     <string name="chat_menu_rename">Yeniden adlandır</string>
     <string name="chat_menu_pin">En üste sabitle</string>

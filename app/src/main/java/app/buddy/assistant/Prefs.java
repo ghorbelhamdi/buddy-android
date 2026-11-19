@@ -181,6 +181,33 @@ final class Prefs {
         sp(c).edit().putBoolean("agents_tap_buddy", on).apply();
     }
 
+    /** Sessions outside Buddy (Claude Code in Termux, a PC over Tailscale) work on a hidden screen (see Background). */
+    static boolean outsideBackground(Context c) {
+        return sp(c).getBoolean("outside_background", false);
+    }
+
+    static void setOutsideBackground(Context c, boolean on) {
+        sp(c).edit().putBoolean("outside_background", on).apply();
+    }
+
+    /** "Phone tools on Tailscale" (see Tailnet): off by default. */
+    static boolean tailnetTools(Context c) {
+        return sp(c).getBoolean("tailnet_tools", false);
+    }
+
+    static void setTailnetTools(Context c, boolean on) {
+        sp(c).edit().putBoolean("tailnet_tools", on).apply();
+    }
+
+    /** The computers paired for it, as JSON (see Tailnet.devices). */
+    static String tailnetDevices(Context c) {
+        return sp(c).getString("tailnet_devices", "[]");
+    }
+
+    static void setTailnetDevices(Context c, String json) {
+        sp(c).edit().putString("tailnet_devices", json).apply();
+    }
+
     /**
      * The first time an agent acts in an app the user has set no mode for, Buddy asks which it gets: Trust or Hard
      * (see Tools.firstUse). On for a new install, off for one set up before 2.3.11, until the user turns it on.
@@ -382,6 +409,33 @@ final class Prefs {
 
     static void setPauseMediaForSpeech(Context c, boolean on) {
         sp(c).edit().putBoolean("speak_pause_media", on).apply();
+    }
+
+    /** Voice input ends after this pause in the words (ms); 0: the engine decides (#60). */
+    static long voicePauseMs(Context c) {
+        return sp(c).getLong("voice_pause_ms", 0);
+    }
+
+    static void setVoicePauseMs(Context c, long ms) {
+        sp(c).edit().putLong("voice_pause_ms", ms).apply();
+    }
+
+    /** Voice input ends after this long at most (ms); 0: no limit (#60). */
+    static long voiceMaxMs(Context c) {
+        return sp(c).getLong("voice_max_ms", 0);
+    }
+
+    static void setVoiceMaxMs(Context c, long ms) {
+        sp(c).edit().putLong("voice_max_ms", ms).apply();
+    }
+
+    /** Pause what's playing while Buddy listens for the user's voice, and start it again afterwards (#56). Off unless switched on. */
+    static boolean pauseMediaForListening(Context c) {
+        return sp(c).getBoolean("listen_pause_media", false);
+    }
+
+    static void setPauseMediaForListening(Context c, boolean on) {
+        sp(c).edit().putBoolean("listen_pause_media", on).apply();
     }
 
     static boolean hadReply(Context c) {

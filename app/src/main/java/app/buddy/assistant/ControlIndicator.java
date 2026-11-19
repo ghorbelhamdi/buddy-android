@@ -63,7 +63,9 @@ final class ControlIndicator {
             // Sessions outside Buddy (e.g. a terminal) only show their activity, so it times out.
             boolean runEnded = hub.runningCount() == 0 && hub.lastRunEndedAt() >= lastActivity;
             boolean buddyRunning = hub.runningCount() > 0;
-            if ((runEnded && idle > IDLE_BUDDY_MS) || (!buddyRunning && idle > IDLE_EXTERNAL_MS)) {
+            // the agent went on with something else (Linux commands, files): it isn't using the phone any more (#57)
+            boolean movedOn = hub.allMovedOn(lastActivity) && !Background.outsideWorkingOnRealScreen(); // a terminal's still may be
+            if (((runEnded || movedOn) && idle > IDLE_BUDDY_MS) || (!buddyRunning && idle > IDLE_EXTERNAL_MS)) {
                 end();
             } else {
                 svc.mainHandler().postDelayed(this, TICK_MS);

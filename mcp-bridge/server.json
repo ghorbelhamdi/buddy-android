@@ -9,26 +9,26 @@
     "subfolder": "mcp-bridge"
   },
   "websiteUrl": "https://ghorbelhamdi.github.io/buddy-android/",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "buddy-phone-bridge",
-      "version": "1.2.0",
+      "version": "1.3.0",
       "transport": {
         "type": "stdio"
       },
       "environmentVariables": [
         {
-          "name": "BUDDY_TOKEN",
-          "description": "Token from Buddy's Settings > Phone tools in your own sessions",
-          "isRequired": true,
-          "isSecret": true
+          "name": "BUDDY_URL",
+          "description": "On a computer: the phone's Tailscale address, e.g. http://100.x.y.z:8765 (Buddy's Settings > Phone tools in your own sessions > Phone tools on Tailscale shows it). The first tool call asks you on the phone to pair this computer. Leave empty on the phone itself (Termux).",
+          "isRequired": false
         },
         {
-          "name": "BUDDY_URL",
-          "description": "Buddy's address, if not http://127.0.0.1:8765/mcp",
-          "isRequired": false
+          "name": "BUDDY_TOKEN",
+          "description": "Optional: a token from Buddy's Settings instead of pairing (needed on the phone itself, e.g. in Termux)",
+          "isRequired": false,
+          "isSecret": true
         }
       ]
     }

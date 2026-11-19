@@ -34,7 +34,7 @@ final class Backup {
      * phone's own set-up (its pairing, its API key services).
      */
     private static final java.util.Set<String> OWN = new java.util.HashSet<>(java.util.Arrays.asList(
-            "token", "bg_token", "bg_paired", "bg_adb_port", "providers"));
+            "token", "bg_token", "bg_paired", "bg_adb_port", "providers", "tailnet_devices"));
     /**
      * Settings a backup can't loosen: on restore this phone's own values stay. A backup is a file from outside, and
      * one made to harm (or just made on a phone set up differently) shouldn't switch on phone commands, Linux tools
@@ -42,7 +42,7 @@ final class Backup {
      */
     private static final java.util.Set<String> SAFETY = new java.util.HashSet<>(java.util.Arrays.asList(
             "bg_shell", "bg_shell_ask", "agents_tap_buddy", "dev", "autonomous_default", "guard_builtin", "guard_allow",
-            "ssh_server", "remote_session", "codex_remote", "mcp_servers", "ask_new_apps"));
+            "ssh_server", "remote_session", "codex_remote", "mcp_servers", "ask_new_apps", "tailnet_tools", "outside_background"));
 
     private Backup() {
     }

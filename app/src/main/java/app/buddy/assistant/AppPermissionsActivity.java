@@ -29,9 +29,10 @@ import static app.buddy.assistant.Ui.*;
  */
 public class AppPermissionsActivity extends Screen {
     /** {mode, label} for the per-app segmented controls. */
-    private String[][] modes() {
-        return new String[][]{{"trust", getString(R.string.perms_mode_trust)}, {"hard", getString(R.string.perms_mode_hard)},
-                {"smart", getString(R.string.perms_mode_smart)}};
+    /** An app's modes, for compact (also the chat's Approvals sheet). */
+    static String[][] modes(android.content.Context c) {
+        return new String[][]{{"trust", c.getString(R.string.perms_mode_trust)}, {"hard", c.getString(R.string.perms_mode_hard)},
+                {"smart", c.getString(R.string.perms_mode_smart)}};
     }
 
     private LinearLayout body;
@@ -173,7 +174,7 @@ public class AppPermissionsActivity extends Screen {
         });
         at.addView(reset);
         all.addView(at, weight1());
-        all.addView(compact(modes(), commonMode(apps), m -> {
+        all.addView(compact(this, modes(this), commonMode(apps), m -> {
             for (App a : apps) Prefs.setAppSafety(this, a.pkg, m);
             renderApps();
         }));
@@ -214,7 +215,7 @@ public class AppPermissionsActivity extends Screen {
             holder.removeAllViews();
             String[] mw = Guard.modeWhy(this, a.pkg, a.label);
             why.setText(mw[1]);
-            holder.addView(compact(modes(), mw[0], m -> {
+            holder.addView(compact(this, modes(this), mw[0], m -> {
                 Prefs.setAppSafety(this, a.pkg, m);
                 paint[0].run();
             }));
@@ -233,32 +234,6 @@ public class AppPermissionsActivity extends Screen {
             else if (!m.equals(x)) return "";
         }
         return m == null ? "" : m;
-    }
-
-    /** A small one-line segmented control (fits next to an app name). */
-    private LinearLayout compact(String[][] options, String selected, Pick l) {
-        LinearLayout box = row(this);
-        box.setPaddingRelative(dp(this, 2), dp(this, 2), dp(this, 2), dp(this, 2));
-        box.setBackground(rounded(this, BG2(), 10));
-        for (String[] o : options) {
-            boolean on = o[0].equals(selected);
-            TextView t = text(this, o[1], 12, on ? TEXT : MUTED);
-            t.setSingleLine(true);
-            t.setTypeface(sans(this, on ? 600 : 500));
-            t.setGravity(Gravity.CENTER);
-            t.setPaddingRelative(dp(this, 9), dp(this, 6), dp(this, 9), dp(this, 6));
-            if (on) t.setBackground(rounded(this, CARD2, 8));
-            else t.setBackgroundResource(ripple(this, false));
-            t.setOnClickListener(v -> {
-                if (!on) l.onPick(o[0]);
-            });
-            box.addView(t);
-        }
-        return box;
-    }
-
-    private static int BG2() {
-        return CARD;
     }
 
     // ------------------------------------------------------------------ button rules
@@ -340,7 +315,7 @@ public class AppPermissionsActivity extends Screen {
             LinearLayout.LayoutParams np = weight1();
             np.setMarginEnd(dp(this, 10));
             row.addView(names, np);
-            row.addView(compact(new String[][]{{"allow", getString(R.string.perms_never_ask)}, {"ask", getString(R.string.perms_ask)}}, now, m -> {
+            row.addView(compact(this, new String[][]{{"allow", getString(R.string.perms_never_ask)}, {"ask", getString(R.string.perms_ask)}}, now, m -> {
                 Guard.addRule(this, m, r);
                 renderRules();
             }));

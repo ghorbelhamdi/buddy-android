@@ -72,6 +72,181 @@ final class Background {
         return Prefs.backgroundPaired(c);
     }
 
+    /**
+     * The hidden screen of sessions outside Buddy (an agent in Termux, or on a PC over Tailscale): they have no chat,
+     * so they share this one, when the user switched it on (Prefs.outsideBackground). It closes after OUTSIDE_IDLE_MS
+     * without a call. A step for the user's own eyes brings its app to the real screen, and the session then works
+     * there until it has been idle that long.
+     */
+    static final String OUTSIDE = "outside";
+    private static final long OUTSIDE_IDLE_MS = 10 * 60_000L;
+    /** When each outside screen's session last made a call, and which of them work on the real screen for now. */
+    private static final java.util.Map<String, Long> outsideUsed = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Set<String> outsideOnScreen = java.util.concurrent.ConcurrentHashMap.newKeySet();
+
+    /** The outside session making this call (read on its thread), or null for a chat's agent. */
+    static String outsideCaller() {
+        String k = McpServer.CALLER_KEY.get();
+        return outside(k) ? k : null;
+    }
+
+    /** A hidden screen of sessions outside Buddy: OUTSIDE (this phone's own terminal) or OUTSIDE-<computer>. */
+    static boolean outside(String key) {
+        return key != null && (key.equals(OUTSIDE) || key.startsWith(OUTSIDE + "-"));
+    }
+
+    /** own: the calls of its own the asker is in (its own call doesn't make it busy). */
+    private static boolean idle(String key, int own) {
+        java.util.concurrent.atomic.AtomicInteger busy = outsideBusy.get(key);
+        if (busy != null && busy.get() > own) return false; // another call still going (a card waiting): it stays
+        Long at = outsideUsed.get(key);
+        return at == null || System.currentTimeMillis() - at > OUTSIDE_IDLE_MS;
+    }
+
+    /** An outside session working on the real screen (not its hidden one) now. */
+    static boolean outsideWorkingOnRealScreen() {
+        for (String k : outsideActive()) if (!outsideHidden(k)) return true;
+        return false;
+    }
+
+    /** Does a call for this key (a chat id, or an outside key) work on a hidden screen? */
+    static boolean onFor(Context c, String key) {
+        if (!outside(key)) return on(c, key);
+        // (asked from within the session's call, which counts as one going)
+        if (outsideOnScreen.contains(key) && idle(key, 1)) outsideOnScreen.remove(key);
+        return !outsideOnScreen.contains(key) && setUp(c) && Prefs.outsideBackground(c);
+    }
+
+    /** An outside session made a call: its hidden screen (or its turn on the real one) lasts a while longer. */
+    static void outsideUsed(String key) {
+        outsideUsed.put(key, System.currentTimeMillis());
+    }
+
+    /** An outside session counts as working (the Sessions tab, the "working" notification) this long after its last call. */
+    static final long OUTSIDE_WORKING_MS = 60_000;
+    /** After the user stops an outside session, its calls are refused this long (the agent should stop and ask). */
+    private static final long OUTSIDE_STOP_MS = 60_000;
+    private static final java.util.Map<String, Long> outsideStopped = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /** Each outside session's calls still going (one can wait minutes on a card or a phone command). */
+    private static final java.util.Map<String, java.util.concurrent.atomic.AtomicInteger> outsideBusy =
+            new java.util.concurrent.ConcurrentHashMap<>();
+
+    /** An outside session's call starts (+1) or ends (-1), around the whole call (Tools.call). */
+    static void outsideCall(String key, int delta) {
+        outsideBusy.computeIfAbsent(key, k -> new java.util.concurrent.atomic.AtomicInteger()).addAndGet(delta);
+    }
+
+    /**
+     * The outside sessions at work on the phone, most recent first: a call in the last minute, a call still going
+     * (waiting on a card, say), or a hidden screen still open.
+     */
+    static java.util.List<String> outsideWorking() {
+        return outsideSessions(true);
+    }
+
+    /** As above, without the ones whose only sign is an open screen: those really at work (notification, pager). */
+    static java.util.List<String> outsideActive() {
+        return outsideSessions(false);
+    }
+
+    private static java.util.List<String> outsideSessions(boolean withScreens) {
+        long now = System.currentTimeMillis();
+        java.util.Set<String> keys = new java.util.HashSet<>();
+        for (java.util.Map.Entry<String, Long> e : outsideUsed.entrySet())
+            if (now - e.getValue() < OUTSIDE_WORKING_MS) keys.add(e.getKey());
+        // (a call still going counts once the session has used the phone: browser_* calls alone don't touch it)
+        for (java.util.Map.Entry<String, java.util.concurrent.atomic.AtomicInteger> e : outsideBusy.entrySet())
+            if (e.getValue().get() > 0 && outsideUsed.containsKey(e.getKey())) keys.add(e.getKey());
+        if (withScreens) for (String k : displays.keySet()) if (outside(k)) keys.add(k);
+        // a stopped one isn't at work, even while a call it made before the Stop (a long wait) is still returning
+        for (java.util.Map.Entry<String, Long> e : outsideStopped.entrySet()) if (e.getValue() > now) keys.remove(e.getKey());
+        java.util.List<String> l = new java.util.ArrayList<>(keys);
+        l.sort((a, b) -> Long.compare(outsideLastCall(b), outsideLastCall(a)));
+        return l;
+    }
+
+    /** Is this outside session among outsideActive() (without building that list)? */
+    static boolean outsideIsActive(String key) {
+        long now = System.currentTimeMillis();
+        Long stop = outsideStopped.get(key);
+        if (stop != null && stop > now) return false;
+        Long used = outsideUsed.get(key);
+        java.util.concurrent.atomic.AtomicInteger busy = outsideBusy.get(key);
+        return used != null && (now - used < OUTSIDE_WORKING_MS || busy != null && busy.get() > 0);
+    }
+
+    /** When this outside session last made a call (0: never). */
+    static long outsideLastCall(String key) {
+        Long t = outsideUsed.get(key);
+        return t == null ? 0 : t;
+    }
+
+    /** Does this outside session work on its hidden screen right now (rather than on the real one)? */
+    static boolean outsideHidden(String key) {
+        return displays.containsKey(key);
+    }
+
+    /** Who an outside session is: the paired computer's name, or this phone's own terminal. */
+    static String outsideName(Context c, String key) {
+        if (OUTSIDE.equals(key)) return c.getString(R.string.outside_terminal);
+        String id = key == null ? "" : key.substring(OUTSIDE.length() + 1);
+        String known = names.get(id); // asked on every repaint: the paired list is read once per computer
+        if (known != null) return known;
+        for (Tailnet.Device d : Tailnet.devices(c)) {
+            if (!d.id.equals(id)) continue;
+            names.put(id, d.name);
+            return d.name;
+        }
+        String unknown = c.getString(R.string.outside_computer); // no longer paired: not looked up again
+        names.put(id, unknown);
+        return unknown;
+    }
+
+    private static final java.util.Map<String, String> names = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /**
+     * The user stopped an outside session (the Sessions tab, or Stop on the "working" notification): its hidden screen
+     * closes, its waiting cards are denied, and its calls are refused for a minute, which tells the agent to stop.
+     */
+    static void stopOutside(BuddyService svc, String key) {
+        outsideStopped.put(key, System.currentTimeMillis() + OUTSIDE_STOP_MS);
+        outsideUsed.remove(key);
+        outsideOnScreen.remove(key);
+        close(svc, key);
+        svc.runOnMain(() -> {
+            if (svc.bubble() != null) svc.bubble().denyFrom(key);
+            svc.outsideChanged();
+        });
+    }
+
+    /** What a stopped outside session's call is told, or null when it isn't stopped. */
+    static String outsideStopped(String key) {
+        Long until = outsideStopped.get(key);
+        if (until == null) return null;
+        if (System.currentTimeMillis() > until) {
+            outsideStopped.remove(key);
+            return null;
+        }
+        return "STOPPED: the user stopped your work on the phone from Buddy. Don't use the phone tools now; stop and ask "
+                + "the user what they want.";
+    }
+
+    /** An outside session's app comes to the real screen; the session works there from now on (see onFor). */
+    static String bringOutsideToScreen(BuddyService svc, String key) {
+        String pkg = appOn(svc, key);
+        android.content.Intent launch = pkg == null ? null : svc.getPackageManager().getLaunchIntentForPackage(pkg);
+        if (launch != null && launch.getComponent() != null) {
+            try {
+                call(svc, "show\t" + launch.getComponent().flattenToString());
+            } catch (IOException ignored) {
+            }
+        }
+        outsideOnScreen.add(key);
+        close(svc, key);
+        return launch == null ? null : pkg;
+    }
+
     /** Does this chat work in the background (its switch is on and the phone is set up for it)? */
     static boolean on(Context c, String chat) {
         if (chat == null || !setUp(c)) return false;
@@ -205,6 +380,18 @@ final class Background {
         keeper = Executors.newSingleThreadScheduledExecutor();
         keeper.scheduleWithFixedDelay(() -> {
             for (String chat : new ArrayList<>(displays.keySet())) {
+                if (outside(chat)) { // no run to end it: it goes after a while without calls, or when switched off
+                    if (idle(chat, 0) || !Prefs.outsideBackground(c)) {
+                        close(c, chat);
+                    } else {
+                        try {
+                            call(c, "keep\t" + chat);
+                        } catch (IOException e) {
+                            displays.remove(chat);
+                        }
+                    }
+                    continue;
+                }
                 Sessions.Session s = ChatHub.get(c).sessions.find(chat);
                 if (s == null || !s.background) {
                     close(c, chat);
@@ -336,17 +523,35 @@ final class Background {
                 return "Wireless debugging is off, and background mode needs it once after a restart of the phone: the "
                         + "user opens Buddy → Settings → Background mode and taps Start now (Wi-Fi must be connected)";
             }
-            String out = launch(c, ports);
-            for (int i = 0; i < 20; i++) {
-                if (alive(c)) {
-                    stay(c);
-                    return null;
+            String out = "";
+            for (int attempt = 0; attempt < 2; attempt++) { // once more with a fresh adb server: a stale one can fail
+                out = launch(c, ports);
+                for (int i = 0; i < 20; i++) {
+                    if (alive(c)) {
+                        stay(c);
+                        return null;
+                    }
+                    sleep(300);
                 }
-                sleep(300);
+                if (out.contains("PORT=")) break; // adb worked: the helper itself didn't start
             }
-            return out.contains("PORT=") ? "its helper didn't start" + said(out)
-                    : "Buddy isn't paired with this phone's Wireless debugging any more (Settings → Background mode → Set up)";
+            if (out.contains("PORT=")) return "its helper didn't start" + said(out);
+            String tried = tried(out);
+            // only what adb itself says means the pairing is gone; anything else is shown as adb said it
+            if (out.contains("unauthorized") || out.contains("failed to authenticate")) {
+                return "Buddy isn't paired with this phone's Wireless debugging any more (Settings → Background mode → "
+                        + "Set up). adb said: " + tried;
+            }
+            return "adb couldn't connect to this phone's Wireless debugging. adb said: " + tried;
         }
+    }
+
+    /** adb's answers per port from launch's output (its TRIED lines), or the whole output when it had none. */
+    private static String tried(String out) {
+        StringBuilder b = new StringBuilder();
+        for (String l : out.split("\n")) if (l.startsWith("TRIED ")) b.append(b.length() == 0 ? "" : "; ").append(l.substring(6).trim());
+        String s = b.length() > 0 ? b.toString() : out.trim().isEmpty() ? "nothing" : out.trim();
+        return s.length() > 800 ? s.substring(0, 800) + "…" : s;
     }
 
     /** What the helper itself printed before it gave up (launch's output after LOG=), as ": …", or "". */
@@ -385,9 +590,15 @@ final class Background {
         String helper = "pkill -f '^app_process.*assistant.Shell'; CLASSPATH=" + c.getPackageCodePath()
                 + " setsid app_process / " + Shell.class.getName() + " " + PORT + " " + Prefs.backgroundToken(c)
                 + " >" + LOG + " 2>&1 </dev/null &";
-        String script = ADB + "adb start-server >/dev/null 2>&1; for p in" + list + "; do "
-                + "timeout 8 adb connect 127.0.0.1:$p >/dev/null 2>&1; "
-                + "if [ \"$(timeout 5 adb -s 127.0.0.1:$p get-state 2>/dev/null)\" = device ]; then echo PORT=$p; "
+        // the port Wireless debugging announces on the Wi-Fi first (adb's own discovery): it moves now and then, and a
+        // scan can miss it while finding other apps' ports, which adb only calls "offline"
+        String script = ADB + "adb start-server >/dev/null 2>&1; mp=''; for i in 1 2 3 4; do "
+                + "mp=$(adb mdns services 2>/dev/null | awk '/_adb-tls-connect._tcp/ {n=split($NF,a,\":\"); print a[n]; exit}'); "
+                + "[ -n \"$mp\" ] && break; sleep 1; done; for p in $mp" + list + "; do "
+                // what adb said for each port, for the reason when none works (it was guessed as "not paired")
+                + "r=$(timeout 8 adb connect 127.0.0.1:$p 2>&1); s=$(timeout 5 adb -s 127.0.0.1:$p get-state 2>&1); "
+                + "echo \"TRIED $p: $r / $s\" | tr '\\n' ' '; echo; "
+                + "if [ \"$s\" = device ]; then echo PORT=$p; "
                 + "adb -s 127.0.0.1:$p shell \"pm grant " + c.getPackageName() + " " + SECURE + "\" >/dev/null 2>&1; "
                 + "adb -s 127.0.0.1:$p shell \"" + helper + "\"; sleep 2; echo LOG=; "
                 + "adb -s 127.0.0.1:$p shell \"tail -c 1500 " + LOG + "\" 2>&1; break; fi; "

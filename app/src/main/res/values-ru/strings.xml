@@ -419,6 +419,14 @@
     <!-- The card's label when the request comes from an agent session outside Buddy's chats (e.g. a terminal).
          %1$s: card_label_approval or card_label_question. All caps. -->
     <string name="card_label_other_session">%1$s · ИЗ ДРУГОГО СЕАНСА</string>
+    <string name="card_label_from">%1$s · ОТ %2$s</string>
+    <string name="outside_terminal">Терминал этого телефона</string>
+    <string name="outside_computer">Компьютер</string>
+    <string name="monitor_outside">Вне Buddy</string>
+    <string name="monitor_outside_hidden">На своём скрытом экране · последний шаг %1$s</string>
+    <string name="monitor_outside_screen">На вашем экране · последний шаг %1$s</string>
+    <string name="monitor_outside_bring">Перенести на мой экран</string>
+    <string name="monitor_outside_stopped">Остановлено. Его инструменты телефона отклоняются в течение минуты, а ожидающие карточки отклонены.</string>
     <string name="card_label_queue">%1$s · 1 ИЗ %2$d</string>
     <!-- Buttons side by side at the bottom of the card: keep them short. -->
     <string name="card_deny">Отклонить</string>
@@ -493,7 +501,7 @@
     <string name="chat_approvals_ask">Спрашивать</string>
     <string name="chat_approvals_ask_info">Каждое приложение следует тому, что задано для него в разделе «%1$s».</string>
     <string name="chat_approvals_strict_info">Даже в приложениях с режимом «%1$s» Buddy спрашивает перед отправкой, публикацией, покупкой или удалением.</string>
-    <string name="chat_approvals_apps_hint">Где действовал агент и настройка каждого приложения в разделе «%1$s». Нажмите на приложение, чтобы изменить её там.</string>
+    <string name="chat_approvals_apps_set">Где действовал агент и настройка каждого приложения в разделе «%1$s». Изменение здесь действует во всех чатах.</string>
     <string name="chat_approvals_routine">Рутинное разрешено</string>
     <string name="chat_approvals_routine_info">Рутинные шаги выполняются в любом приложении без карточки: отправка сообщения или шаг, о котором спросил бы проверяющий. Каждый отмечается в чате. Оплата, покупки, удаление, установка, пароли и настройки безопасности по-прежнему спрашивают вас, как и всё в банковских и платёжных приложениях, Настройках и магазинах приложений.</string>
     <string name="chat_approvals_strict">Всегда спрашивать</string>
@@ -579,6 +587,7 @@
     <string name="chat_model_other_hint">другая… например, %1$s</string>
     <!-- Button, verb: use the model typed in the box. Keep short. -->
     <string name="chat_model_use">Выбрать</string>
+    <string name="chat_model_search">Поиск моделей</string>
 
     <!-- Language sheet (long-press the mic) -->
     <!-- Title, followed by a list of languages to speak in. -->
@@ -651,6 +660,26 @@
     <!-- Chat messages -->
     <!-- Toast after a long press copies a message. -->
     <string name="chat_copied">Скопировано</string>
+    <string name="chat_copy">Копировать</string>
+    <string name="chat_quote">Цитировать</string>
+    <string name="chat_quote_remove">Убрать цитату</string>
+    <string name="chat_edit">Изменить</string>
+    <string name="chat_fork">Ответвить отсюда</string>
+    <string name="chat_fork_title">%1$s · ответвление</string>
+    <string name="chat_forked_from">Ответвлено от «%1$s»</string>
+    <string name="chat_forked">Ответвлено: новый чат отсюда</string>
+    <string name="chat_before_edit_title">%1$s (до изменения)</string>
+    <string name="chat_edit_running">Дождитесь, пока этот чат закончит, и тогда измените.</string>
+    <string name="chat_edit_failed">Не удалось изменить сообщение.</string>
+    <string name="chat_edit_title">Изменить сообщение</string>
+    <string name="chat_edit_info">Агент ответит заново с этого места, начав с чистого листа с чатом до этого сообщения. Всё после него уйдёт из этого чата; чат в прежнем виде останется в архиве.</string>
+    <string name="chat_edit_send">Отправить</string>
+    <string name="chat_edited">изменено</string>
+    <string name="setup_voice_pause">Прекращать слушать после паузы</string>
+    <string name="setup_voice_auto">Авто</string>
+    <string name="setup_voice_pause_info">Buddy останавливается и отправляет, когда услышанные слова не меняются столько времени, даже если рядом музыка или шум. Авто: решает голосовой движок, а он ждёт тишины.</string>
+    <string name="setup_voice_max">Самая длинная запись</string>
+    <string name="setup_voice_no_limit">Без ограничения</string>
     <string name="chat_copy_whole_reply">Копировать весь ответ</string>
     <!-- Header of a collapsible group of the agent's steps in the chat. -->
     <plurals name="chat_tool_calls">
@@ -665,6 +694,9 @@
     <string name="hub_continuing">Продолжаем прежний сеанс %1$s. Если он ещё открыт в терминале, сначала закройте его там.</string>
     <string name="hub_still_working_attachments">В этом чате ещё идёт работа. Отправьте вложения, когда она закончится.</string>
     <string name="hub_service_off">Сервис %1$s выключен (Настройки → Агенты и модели → Ключи API). Включите его или выберите другую модель для этого чата.</string>
+    <string name="hub_accessibility_dead">Служба специальных возможностей Buddy не работает, хотя включена: Android остановил Buddy и не запустил службу снова, поэтому агенты не могут управлять телефоном. Выключите и снова включите Buddy в Настройках Android → Специальные возможности. Чтобы это не повторилось: разрешите Buddy автозапуск в настройках приложений телефона, если они есть, и дайте микрофону «Только во время использования приложения», а не «Только в этот раз».</string>
+    <string name="hub_accessibility_off">Служба специальных возможностей Buddy выключена, поэтому агенты не могут управлять телефоном. Включите Buddy в Настройках Android → Специальные возможности.</string>
+    <string name="voice_mic_while_using">Выберите «Только во время использования приложения»: при «Только в этот раз» Android останавливает Buddy через минуту после того, как вы из него вышли, даже посреди задачи.</string>
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">Думает…</string>
     <string name="hub_still_waiting">Всё ещё ждём ответа модели…</string>
@@ -1264,6 +1296,15 @@
     <!-- Button. -->
     <string name="setup_copy_command">Копировать команду</string>
     <string name="setup_command_copied">Скопировано. Вставьте команду в терминал.</string>
+    <string name="setup_outside_background">Работать в фоне</string>
+    <string name="setup_outside_background_info">Агенты в ваших собственных сеансах работают на скрытом экране, как чат в фоновом режиме: вы продолжаете пользоваться телефоном, а они работают и при заблокированном. Карточки и вопросы по-прежнему приходят вам. Шаг, где нужны ваши глаза, например вход в аккаунт, выводит приложение на ваш экран. Нужен настроенный фоновый режим.</string>
+    <string name="setup_tailnet">Инструменты телефона через Tailscale</string>
+    <string name="setup_tailnet_info">Агенты на ваших компьютерах получают эти инструменты телефона через Tailscale, если он включён на обоих. У каждого добавленного компьютера свой ключ, «Удалить» его отзывает. Карточки и вопросы по-прежнему приходят вам на телефон. Включите выше «Работать в фоне», чтобы они не занимали ваш экран.</string>
+    <string name="setup_tailnet_address">Этот телефон в Tailscale: %1$s</string>
+    <string name="setup_tailnet_no_address">Tailscale на этом телефоне не подключён, поэтому компьютеры сейчас до него не достанут.</string>
+    <string name="setup_tailnet_computer">Компьютер %1$d</string>
+    <string name="setup_tailnet_pair_info">На компьютере с включённым Tailscale выполните это в терминале. Телефон попросит вас подтвердить, и Claude Code на компьютере получит инструменты телефона со своим ключом.</string>
+    <string name="tools_card_pair">Связать компьютер «%1$s» (Tailscale %2$s)? Он получит инструменты телефона Buddy со своим ключом, который можно удалить в настройках.</string>
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Голос</string>
@@ -1369,6 +1410,8 @@
     <string name="setup_read_aloud_info">Buddy читает ответы агентов вслух — тем голосом, который вы выбрали в разделе «Голос».</string>
     <string name="setup_pause_media">Ставить медиа на паузу при чтении вслух</string>
     <string name="setup_pause_media_info">Музыка или видео ставятся на паузу, пока Buddy читает ответ, и затем продолжаются. Buddy возобновляет только то, что приостановил сам, и не делает этого, если вы за это время изменили воспроизведение. Нужны настройка «Читать ответы вслух» и доступ к уведомлениям.</string>
+    <string name="setup_pause_listening">Пауза медиа во время прослушивания</string>
+    <string name="setup_pause_listening_info">Музыка или видео ставятся на паузу, пока Buddy слушает вас, чтобы он слышал ваш голос, а не видео, и потом продолжают играть. Если включено и «Ставить медиа на паузу при чтении вслух», пауза длится, пока ответ не будет прочитан. Buddy возобновляет только то, что сам остановил, и не делает этого, если вы за это время меняли воспроизведение. Нужен доступ к уведомлениям.</string>
     <string name="setup_voice_cards">Отвечать на карточки голосом</string>
     <string name="setup_voice_cards_info">После того как карточка прочитана вслух, Buddy слушает: скажите «одобрить» или «отклонить» либо нужный вариант. Требуется «Читать ответы вслух». Не работает на заблокированном телефоне. Ответить может любой, кто находится рядом.</string>
     <string name="voice_card_approval">Buddy нужно ваше подтверждение. %1$s</string>
@@ -1843,6 +1886,9 @@
     <string name="hub_tool_browser_back">Браузер: возврат назад</string>
     <string name="hub_tool_browser_tabs">Браузер: вкладки</string>
     <string name="hub_tool_schedule_message">Планирует: %1$s</string>
+    <string name="hub_tool_add_rule">Добавление правила уведомлений: %1$s</string>
+    <string name="tools_card_rule">Добавить правило уведомлений в чат «%4$s»? Из %1$s, %2$s: каждое придёт в этот чат с указанием «%3$s». Правило спрашивает вас, прежде чем действовать, как и любое правило.</string>
+    <string name="rules_in_chat">В чате «%1$s»</string>
     <string name="hub_tool_list_scheduled">Проверяет запланированные сообщения</string>
     <string name="hub_tool_cancel_scheduled">Отменяет запланированное сообщение</string>
     <string name="later_title">Сообщение агента на %1$s</string>
@@ -2112,6 +2158,9 @@
     <string name="api_keys_local_info">Для своего сервера (Ollama, LM Studio, llama.cpp): оставьте API-ключ пустым. Если сервер на ПК, укажите его адрес в вашей сети Wi-Fi вместо localhost, например http://192.168.1.20:11434/v1.</string>
     <string name="main_section_pinned">Закреплённые</string>
     <string name="main_section_archived">Архив (%1$d)</string>
+    <string name="main_archived_title">Архив</string>
+    <string name="main_archived_open">Архивные чаты</string>
+    <string name="main_archived_back">Назад к чатам</string>
     <string name="chat_pinned_marker">Закреплён</string>
     <string name="chat_menu_rename">Переименовать</string>
     <string name="chat_menu_pin">Закрепить сверху</string>

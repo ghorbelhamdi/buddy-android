@@ -89,6 +89,18 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
         tp.setMargins(dp(this, 16), dp(this, 12), dp(this, 16), 0);
         list.addView(tc, tp);
 
+        // sessions from outside Buddy (a paired computer, this phone's terminal) at work on the phone: what they see,
+        // and Stop. Shown only while there is one
+        outsideBox = column(this);
+        TextView ol = sectionLabel(this, getString(R.string.monitor_outside));
+        ol.setPaddingRelative(dp(this, 20), dp(this, 16), dp(this, 20), dp(this, 4));
+        outsideBox.addView(ol);
+        outsideList = column(this);
+        outsideList.setPaddingRelative(dp(this, 16), 0, dp(this, 16), 0);
+        outsideBox.addView(outsideList, full());
+        outsideBox.setVisibility(View.GONE);
+        list.addView(outsideBox, full());
+
         LinearLayout rh = row(this);
         TextView rl = sectionLabel(this, getString(R.string.monitor_running_now));
         rl.setPaddingRelative(dp(this, 20), dp(this, 16), dp(this, 8), dp(this, 4));
@@ -122,6 +134,119 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
         recent.addView(recentEmpty);
     }
 
+    private LinearLayout outsideBox, outsideList;
+    private String outsideShown = "";
+    /** Each outside session's row parts: {state line, picture, Bring to my screen}. */
+    private final java.util.Map<String, View[]> outsideRows = new java.util.HashMap<>();
+    /** Sessions whose picture is being fetched. */
+    private final java.util.Set<String> framing = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    /** Per session: its last call when its picture was fetched, and when (elapsedRealtime). */
+    private final java.util.Map<String, long[]> framed = new java.util.HashMap<>();
+    private final Runnable outsidePoll = new Runnable() {
+        @Override
+        public void run() {
+            if (!visible) return;
+            refreshOutside();
+            outsideList.postDelayed(this, 1500);
+        }
+    };
+
+    /** The outside sessions working now (or still on a hidden screen): rebuilt when that set changes, else refreshed. */
+    private void refreshOutside() {
+        BuddyService svc = BuddyService.get();
+        java.util.List<String> keys = svc == null ? new java.util.ArrayList<>() : Background.outsideWorking();
+        java.util.List<String> sorted = new java.util.ArrayList<>(keys);
+        java.util.Collections.sort(sorted); // which sessions, not their order: taking turns doesn't rebuild the rows
+        String sig = TextUtils.join(",", sorted);
+        if (!sig.equals(outsideShown)) {
+            outsideShown = sig;
+            outsideList.removeAllViews();
+            outsideRows.clear();
+            framed.clear(); // new rows start blank
+            for (String k : keys) outsideList.addView(outsideRow(k));
+        }
+        outsideBox.setVisibility(keys.isEmpty() ? View.GONE : View.VISIBLE);
+        for (String k : keys) {
+            View[] v = outsideRows.get(k);
+            if (v == null) continue;
+            boolean hidden = Background.outsideHidden(k);
+            CharSequence when = DateUtils.getRelativeTimeSpanString(Background.outsideLastCall(k),
+                    System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);
+            ((TextView) v[0]).setText(getString(hidden ? R.string.monitor_outside_hidden : R.string.monitor_outside_screen, when));
+            v[1].setVisibility(hidden ? View.VISIBLE : View.GONE);
+            v[2].setVisibility(hidden ? View.VISIBLE : View.GONE);
+            if (!hidden) continue;
+            final android.widget.ImageView pic = (android.widget.ImageView) v[1];
+            final android.content.Context app = getApplicationContext();
+            // a new picture every 3 s at most while the session works, every 6 s while it doesn't
+            long call = Background.outsideLastCall(k), t = android.os.SystemClock.elapsedRealtime();
+            long[] f = framed.get(k);
+            if (f != null && (t - f[1] < 3000 || f[0] == call && t - f[1] < 6000)) continue;
+            if (!framing.add(k)) continue; // the last picture is still on its way
+            framed.put(k, new long[]{call, t});
+            new Thread(() -> { // what its hidden screen shows now
+                try {
+                    byte[] jpg = Background.frame(app, k, 480, 60);
+                    android.graphics.Bitmap b = jpg == null ? null : android.graphics.BitmapFactory.decodeByteArray(jpg, 0, jpg.length);
+                    if (b != null) runOnUiThread(() -> pic.setImageBitmap(b));
+                } finally {
+                    framing.remove(k);
+                }
+            }).start();
+        }
+    }
+
+    private View outsideRow(final String key) {
+        LinearLayout card = column(this);
+        card.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));
+        card.setBackground(rounded(this, CARD, 20));
+        LinearLayout head = row(this);
+        head.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        head.addView(dot(this, OK, 8));
+        TextView name = title(this, Background.outsideName(this, key), 15);
+        name.setPaddingRelative(dp(this, 10), 0, 0, 0);
+        head.addView(name, weight1());
+        card.addView(head, full());
+        TextView state = text(this, "", 13, MUTED);
+        state.setPaddingRelative(0, dp(this, 4), 0, 0);
+        card.addView(state, full());
+        android.widget.ImageView pic = new android.widget.ImageView(this);
+        pic.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
+        pic.setAdjustViewBounds(true);
+        pic.setBackground(rounded(this, CODE, 12));
+        LinearLayout.LayoutParams pp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(this, 260));
+        pp.topMargin = dp(this, 10);
+        card.addView(pic, pp);
+        LinearLayout btns = row(this);
+        btns.setPaddingRelative(0, dp(this, 10), 0, 0);
+        Button bring = button(this, getString(R.string.monitor_outside_bring), false);
+        bring.setOnClickListener(v -> {
+            BuddyService svc = BuddyService.get();
+            if (svc == null) return;
+            new Thread(() -> Background.bringOutsideToScreen(svc, key)).start();
+        });
+        LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(0, dp(this, 44), 1);
+        btns.addView(bring, bp);
+        Button stop = button(this, getString(R.string.control_stop), false);
+        stop.setTextColor(ERR);
+        stop.setOnClickListener(v -> {
+            BuddyService svc = BuddyService.get();
+            if (svc == null) return;
+            Background.stopOutside(svc, key);
+            Toast.makeText(this, R.string.monitor_outside_stopped, Toast.LENGTH_LONG).show();
+            refreshOutside();
+        });
+        LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(0, dp(this, 44), 1);
+        sp.setMarginStart(dp(this, 10));
+        btns.addView(stop, sp);
+        card.addView(btns, full());
+        outsideRows.put(key, new View[]{state, pic, bring});
+        LinearLayout.LayoutParams cp = full();
+        cp.topMargin = dp(this, 8);
+        card.setLayoutParams(cp);
+        return card;
+    }
+
     private TextView empty(String s) {
         TextView t = text(this, s, 14, MUTED);
         t.setPaddingRelative(dp(this, 20), dp(this, 8), dp(this, 20), dp(this, 8));
@@ -141,6 +266,7 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
         }
         request("recent");
         running.post(poll);
+        outsideList.post(outsidePoll);
     }
 
     @Override
@@ -149,6 +275,7 @@ public class MonitorActivity extends Screen implements ChatHub.MonitorListener {
         pulse.cancel();
         if (hub.monitor == this) hub.monitor = null;
         running.removeCallbacks(poll);
+        outsideList.removeCallbacks(outsidePoll);
         super.onPause();
     }
 

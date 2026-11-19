@@ -303,6 +303,17 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         input.setPaddingRelative(dp(this, 14), dp(this, 12), dp(this, 14), dp(this, 4));
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE
                 | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
+        // a quoted message waits above the text, in a box of its own, until sent or taken away
+        quoteBox = row(this);
+        quoteBox.setGravity(Gravity.CENTER_VERTICAL);
+        quoteBox.setVisibility(View.GONE);
+        quoteText = quoteLine(quoteBox, "", CARD2);
+        ImageButton unquote = iconButton(this, R.drawable.ms_close, getString(R.string.chat_quote_remove), MUTED);
+        unquote.setOnClickListener(x -> setQuote(null));
+        quoteBox.addView(unquote, new LinearLayout.LayoutParams(dp(this, 36), dp(this, 36)));
+        LinearLayout.LayoutParams qbp = full();
+        qbp.setMargins(dp(this, 8), dp(this, 6), dp(this, 6), 0);
+        pill.addView(quoteBox, qbp);
         pill.addView(input, full());
         live = iconButton(this, R.drawable.ms_graphic_eq, getString(R.string.live_option), MUTED);
         live.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
@@ -631,12 +642,18 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     private void send() {
         String text = input.getText().toString().trim();
         if (text.isEmpty() && pending.isEmpty()) return;
+        if (quoted != null) { // as Markdown, so the agent can tell what's quoted from what's asked
+            StringBuilder b = new StringBuilder();
+            for (String line : quoted.split("\n")) b.append("> ").append(line).append('\n');
+            text = b.append('\n').append(text).toString();
+        }
         String err = hub.send(ses, text, pending);
         if (err != null) {
             Toast.makeText(this, err, Toast.LENGTH_LONG).show();
             return;
         }
         input.setText("");
+        setQuote(null);
         pending.clear();
         renderTray();
     }
@@ -751,11 +768,16 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             c.addView(ml);
         }
         boolean known = false;
-        for (final String[] o : Models.options(ses.backend, true)) {
+        java.util.List<String[]> options = Models.options(ses.backend, true);
+        java.util.List<Object[]> found = new java.util.ArrayList<>();
+        if (options.size() > SEARCH_FROM) c.addView(listFilter(this, getString(R.string.chat_model_search), found), full());
+        View heading = null;
+        for (final String[] o : options) {
             if (o[0] == null) { // an API key service's models
                 TextView sl = sectionLabel(this, o[1]);
                 sl.setPaddingRelative(0, dp(this, 14), 0, dp(this, 2));
                 c.addView(sl);
+                heading = sl;
                 continue;
             }
             boolean on = o[0].equals(ses.model);
@@ -774,6 +796,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 if (!o[0].equals(ses.model)) hub.setModel(ses, o[0]);
             });
             c.addView(r, full());
+            found.add(new Object[]{r, modelKey(o), heading});
         }
         LinearLayout other = row(this);
         other.setPaddingRelative(0, dp(this, 10), 0, 0);
@@ -1168,7 +1191,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             });
             c.addView(r, full());
         }
-        // the apps this chat's agent has acted in, each with its setting in App permissions: a tap opens that screen
+        // the apps this chat's agent has acted in, each with its setting in App permissions, changed right here
         java.util.List<String> used;
         synchronized (ses.apps) {
             used = new java.util.ArrayList<>(ses.apps);
@@ -1177,39 +1200,42 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             TextView al = sectionLabel(this, getString(R.string.chat_approvals_apps));
             al.setPaddingRelative(dp(this, 4), dp(this, 14), 0, dp(this, 2));
             c.addView(al);
-            TextView ah = text(this, getString(R.string.chat_approvals_apps_hint, getString(R.string.perms_title)), 13, MUTED);
+            TextView ah = text(this, getString(R.string.chat_approvals_apps_set, getString(R.string.perms_title)), 13, MUTED);
             ah.setPaddingRelative(dp(this, 4), 0, 0, dp(this, 4));
             c.addView(ah);
             android.content.pm.PackageManager pm = getPackageManager();
             for (String pkg : used) {
-                String name, mode;
+                String name;
                 android.graphics.drawable.Drawable pic = null;
                 try {
                     android.content.pm.ApplicationInfo ai = pm.getApplicationInfo(pkg, 0);
                     name = String.valueOf(pm.getApplicationLabel(ai));
                     pic = pm.getApplicationIcon(ai);
-                    mode = Guard.mode(this, pkg, name);
                 } catch (android.content.pm.PackageManager.NameNotFoundException gone) {
                     continue; // uninstalled since
                 }
                 LinearLayout r = row(this);
                 r.setGravity(Gravity.CENTER_VERTICAL);
                 r.setPaddingRelative(dp(this, 4), dp(this, 8), dp(this, 4), dp(this, 8));
-                r.setBackgroundResource(ripple(this, false));
                 ImageView iv = new ImageView(this);
                 iv.setImageDrawable(pic);
                 r.addView(iv, new LinearLayout.LayoutParams(dp(this, 28), dp(this, 28)));
                 TextView n = single(title(this, name, 15));
                 n.setPaddingRelative(dp(this, 12), 0, dp(this, 8), 0);
                 r.addView(n, weight1());
-                r.addView(monoText(this, getString("trust".equals(mode) ? R.string.perms_mode_trust
-                        : "smart".equals(mode) ? R.string.perms_mode_smart : R.string.perms_mode_hard), 12,
-                        "trust".equals(mode) ? ACCENT_TEXT : MUTED));
-                r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
-                r.setOnClickListener(v -> {
-                    d[0].dismiss();
-                    startActivity(new android.content.Intent(this, AppPermissionsActivity.class));
-                });
+                // the app's mode is set right here (it's the app's setting in App permissions, for every chat)
+                final FrameLayout holder = new FrameLayout(this);
+                final Runnable[] paint = new Runnable[1];
+                final String label = name;
+                paint[0] = () -> {
+                    holder.removeAllViews();
+                    holder.addView(compact(this, AppPermissionsActivity.modes(this), Guard.mode(this, pkg, label), m -> {
+                        Prefs.setAppSafety(this, pkg, m);
+                        paint[0].run();
+                    }));
+                };
+                paint[0].run();
+                r.addView(holder);
                 c.addView(r, full());
             }
         }
@@ -1351,7 +1377,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 if (bgSheetUpdate != null) bgSheetUpdate.run();
             }));
             Background.beginSetup(svc);
-            bgSheetUpdate.run();
+            if (bgSheetUpdate != null) bgSheetUpdate.run();
         };
         act.setOnClickListener(v -> {
             if (bgState == 0) {
@@ -1361,7 +1387,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             busy[0] = true;
             failed[0] = null;
             pair.setVisibility(View.GONE);
-            bgSheetUpdate.run();
+            if (bgSheetUpdate != null) bgSheetUpdate.run();
             new Thread(() -> {
                 final String why = Background.start(this, true);
                 toChat.run();
@@ -1370,7 +1396,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                     failed[0] = why;
                     // the pairing is gone (Wireless debugging forgot Buddy): pairing again is one tap from here
                     pair.setVisibility(why != null && why.contains("paired") ? View.VISIBLE : View.GONE);
-                    bgSheetUpdate.run();
+                    if (bgSheetUpdate != null) bgSheetUpdate.run(); // the sheet may be gone (swiped down, chat reopened)
                     checkBackground(true);
                 });
             }).start();
@@ -1381,7 +1407,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             startActivity(new android.content.Intent(this, BackgroundActivity.class));
         });
         sheet.setOnDismissListener(x -> bgSheetUpdate = null);
-        bgSheetUpdate.run();
+        if (bgSheetUpdate != null) bgSheetUpdate.run();
         sheet.show();
         checkBackground(true);
     }
@@ -1434,9 +1460,33 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 ses.awake, on -> hub.setAwake(ses, on));
         sw.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
         c.addView(sw, full());
-        if (Background.setUp(this)) {
+        final Dialog[] sheet = new Dialog[1];
+        // Linux tools and background mode here too, by name (beside the agent's name their chips are icons only)
+        if (ses.parent.isEmpty()) {
+            LinearLayout lx = switchRow(this, getString(R.string.chat_linux_tools), getString(R.string.chat_linux_tools_info),
+                    ses.dev, on -> {
+                        if (on == ses.dev) return;
+                        if (!on) {
+                            hub.setDev(ses, false);
+                            return;
+                        }
+                        if (sheet[0] != null) sheet[0].dismiss(); // turning them on first says what that allows
+                        switchLinuxTools();
+                    });
+            lx.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
+            c.addView(lx, full());
+        }
+        {
+            boolean ready = Background.setUp(this);
             LinearLayout bg = switchRow(this, getString(R.string.chat_background), getString(R.string.chat_background_info),
-                    ses.background, on -> hub.setBackground(ses, on));
+                    ready && ses.background, on -> {
+                        if (ready) {
+                            hub.setBackground(ses, on);
+                            return;
+                        }
+                        if (sheet[0] != null) sheet[0].dismiss(); // not set up yet: its sheet, with Set up
+                        backgroundSheet();
+                    });
             bg.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
             c.addView(bg, full());
         }
@@ -1444,7 +1494,6 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 ses.incognito, on -> hub.setIncognito(ses, on));
         inc.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
         c.addView(inc, full());
-        final Dialog[] sheet = new Dialog[1];
         TextView sl = sectionLabel(this, getString(R.string.schedule_title));
         sl.setPaddingRelative(0, dp(this, 12), 0, dp(this, 4));
         c.addView(sl);
@@ -1857,7 +1906,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             return;
         }
         if (!Voice.micAllowed(this)) {
-            requestPermissions(new String[]{android.Manifest.permission.RECORD_AUDIO}, 3);
+            Voice.askMic(this, 3);
             return;
         }
         final String before = input.getText().toString().trim();
@@ -1954,7 +2003,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     private void startLive() {
         liveHint.setVisibility(View.GONE);
         if (!Voice.micAllowed(this)) {
-            requestPermissions(new String[]{android.Manifest.permission.RECORD_AUDIO}, 4);
+            Voice.askMic(this, 4);
             return;
         }
         String err = CodexLive.start(this, ses);
@@ -2407,25 +2456,29 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 LinearLayout.LayoutParams fp = wrap();
                 fp.gravity = Gravity.END;
                 fp.bottomMargin = dp(this, 4);
-                col.addView(attachmentView(id, true), fp);
+                View av = attachmentView(id, true);
+                if (m.text.isEmpty()) messageMenuOnLongPress(av, m); // only files: copy, quote, edit, fork from them
+                col.addView(av, fp);
             }
             if (!m.text.isEmpty()) {
-                TextView tv = text(this, m.text, 15, TEXT);
-                links(tv);
-                tv.setMaxWidth(maxBubble);
-                tv.setBackground(corners(this, USER, 20, 20, 6, 20));
-                tv.setPaddingRelative(dp(this, 14), dp(this, 10), dp(this, 14), dp(this, 10));
-                copyOnLongPress(tv, m.text);
+                View tv = userBubble(m.text);
+                swipeToQuote(tv, m.text);
+                messageMenuOnLongPress(tv, m);
                 LinearLayout.LayoutParams tp = wrap();
                 tp.gravity = Gravity.END;
                 col.addView(tv, tp);
+            }
+            if (m.edited) { // marked under it, as one without files
+                LinearLayout.LayoutParams ep = wrap();
+                ep.gravity = Gravity.END;
+                col.addView(editedMark(), ep);
             }
             LinearLayout.LayoutParams p = full();
             p.topMargin = dp(this, 12);
             messages.addView(col, p);
             return;
         }
-        if (!m.text.isEmpty() || m.files.isEmpty()) show(m.kind, m.text);
+        if (!m.text.isEmpty() || m.files.isEmpty()) show(m.kind, m.text, m);
         if (m.kind == Bubble.Kind.BUDDY) { // pictures the reply names (see ChatHub.pictures), under it
             for (String id : m.files) {
                 LinearLayout.LayoutParams fp = wrap();
@@ -2624,7 +2677,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         }
     }
 
-    private void show(Bubble.Kind kind, final String text) {
+    /** m: the message drawn, for its long press and marks (null: none, e.g. a line added live). */
+    private void show(Bubble.Kind kind, final String text, final Sessions.Msg m) {
         if (kind == Bubble.Kind.STEP) {
             if (log == null) {
                 log = new ToolLog();
@@ -2646,14 +2700,22 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         View v;
         switch (kind) {
             case USER: {
-                TextView tv = text(this, text, 15, TEXT);
-                tv.setText(Ui.markdown(text, null)); // what the user wrote in Markdown shows as such too (issue #21)
-                links(tv);
-                tv.setMaxWidth(maxBubble);
-                tv.setBackground(corners(this, USER, 20, 20, 6, 20));
-                tv.setPaddingRelative(dp(this, 14), dp(this, 10), dp(this, 14), dp(this, 10));
-                copyOnLongPress(tv, text);
+                View tv = userBubble(text);
+                swipeToQuote(tv, text);
+                if (m != null) {
+                    messageMenuOnLongPress(tv, m); // copy, quote, edit, fork (issue #44)
+                } else {
+                    copyOnLongPress(tv, text);
+                }
                 p.gravity = Gravity.END;
+                if (m != null && m.edited) { // marked under it
+                    LinearLayout col = column(this);
+                    col.setGravity(Gravity.END);
+                    col.addView(tv, wrap());
+                    col.addView(editedMark(), wrap());
+                    v = col;
+                    break;
+                }
                 v = tv;
                 break;
             }
@@ -2700,7 +2762,19 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 });
                 LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(dp(this, 34), dp(this, 34));
                 cp.setMarginStart(-dp(this, 5)); // the icon itself in line with the text
-                whole.addView(copy, cp);
+                LinearLayout acts = row(this);
+                acts.addView(copy, cp);
+                // and quote it into the message box, or fork the chat from here (issue #44); the reply's own text
+                // is selectable, so these are buttons rather than a long press
+                final Sessions.Msg reply = m;
+                swipeToQuote(v, text);
+                acts.addView(replyAction(R.drawable.ms_format_quote, R.string.chat_quote, x -> quote(text)),
+                        new LinearLayout.LayoutParams(dp(this, 34), dp(this, 34)));
+                if (reply != null && ses.parent.isEmpty()) {
+                    acts.addView(replyAction(R.drawable.ms_call_split, R.string.chat_fork, x -> fork(reply)),
+                            new LinearLayout.LayoutParams(dp(this, 34), dp(this, 34)));
+                }
+                whole.addView(acts, wrap());
                 v = whole;
                 p.width = LinearLayout.LayoutParams.MATCH_PARENT;
                 p.topMargin = dp(this, 14);
@@ -2729,6 +2803,30 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     }
 
     /** A reply's text (or the text between its tables): Markdown, selectable, links tappable. */
+    /** The user's message in its bubble; one that starts with a quote shows it in a box at the top. */
+    private View userBubble(String text) {
+        String[] q = splitQuote(text);
+        TextView tv = text(this, q != null ? q[1] : text, 15, TEXT);
+        tv.setText(Ui.markdown(q != null ? q[1] : text, null)); // Markdown shows as such too (issue #21)
+        links(tv);
+        if (q == null) {
+            tv.setMaxWidth(maxBubble);
+            tv.setBackground(corners(this, USER, 20, 20, 6, 20));
+            tv.setPaddingRelative(dp(this, 14), dp(this, 10), dp(this, 14), dp(this, 10));
+            return tv;
+        }
+        LinearLayout b = column(this);
+        b.setBackground(corners(this, USER, 20, 20, 6, 20));
+        b.setPaddingRelative(dp(this, 8), dp(this, 8), dp(this, 8), dp(this, 10));
+        TextView qt = quoteLine(b, q[0], 0x33000000);
+        qt.setMaxWidth(maxBubble - dp(this, 40));
+        tv.setMaxWidth(maxBubble - dp(this, 16));
+        tv.setPaddingRelative(dp(this, 6), dp(this, 8), dp(this, 6), 0);
+        if (!q[1].isEmpty()) b.addView(tv, wrap());
+        b.setLongClickable(true); // (so it gets the touches its long press and swipe need)
+        return b;
+    }
+
     private TextView replyText(String text) {
         TextView tv = text(this, text, 15, TEXT);
         tv.setTextIsSelectable(true);
@@ -2745,6 +2843,223 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         tv.setAutoLinkMask(android.text.util.Linkify.WEB_URLS | android.text.util.Linkify.EMAIL_ADDRESSES);
         tv.setLinkTextColor(ACCENT_TEXT);
         tv.setText(tv.getText()); // the mask applies on setText
+    }
+
+    private android.widget.ImageButton replyAction(int icon, int label, View.OnClickListener onClick) {
+        android.widget.ImageButton b = new android.widget.ImageButton(this);
+        b.setImageResource(icon);
+        b.setImageTintList(android.content.res.ColorStateList.valueOf(MUTED));
+        b.setContentDescription(getString(label));
+        b.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        b.setPadding(dp(this, 9), dp(this, 9), dp(this, 9), dp(this, 9));
+        b.setBackgroundResource(Ui.ripple(this, true));
+        b.setOnClickListener(onClick);
+        return b;
+    }
+
+    /** A long press on the user's own message: Copy, Quote, Edit, Fork from here (issue #44). */
+    private void messageMenuOnLongPress(View v, final Sessions.Msg m) {
+        v.setOnLongClickListener(x -> {
+            LinearLayout c = column(this);
+            final Dialog[] d = new Dialog[1];
+            java.util.List<Object[]> items = new java.util.ArrayList<>();
+            if (!m.text.isEmpty()) { // (files only: nothing to copy or quote)
+                items.add(new Object[]{R.drawable.ms_content_copy, R.string.chat_copy, (Runnable) () -> {
+                    getSystemService(ClipboardManager.class).setPrimaryClip(ClipData.newPlainText("Buddy", m.text));
+                    Toast.makeText(this, R.string.chat_copied, Toast.LENGTH_SHORT).show();
+                }});
+                items.add(new Object[]{R.drawable.ms_format_quote, R.string.chat_quote, (Runnable) () -> quote(m.text)});
+            }
+            boolean own = ses.parent.isEmpty() && ses.messages.contains(m);
+            if (own && !ses.running) items.add(new Object[]{R.drawable.ms_edit, R.string.chat_edit, (Runnable) () -> editMessage(m)});
+            if (own) items.add(new Object[]{R.drawable.ms_call_split, R.string.chat_fork, (Runnable) () -> fork(m)});
+            for (Object[] it : items) {
+                LinearLayout r = row(this);
+                r.setGravity(Gravity.CENTER_VERTICAL);
+                r.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
+                r.setBackgroundResource(ripple(this, false));
+                r.addView(icon(this, (Integer) it[0], TEXT, 22));
+                TextView t = text(this, getString((Integer) it[1]), 16, TEXT);
+                t.setPaddingRelative(dp(this, 16), 0, 0, 0);
+                r.addView(t, weight1());
+                r.setOnClickListener(y -> {
+                    d[0].dismiss();
+                    ((Runnable) it[2]).run();
+                });
+                c.addView(r, full());
+            }
+            d[0] = bottomSheet(this, c);
+            d[0].show();
+            return true;
+        });
+    }
+
+    /** Quote: the text goes into the message box as a Markdown quote, before what's typed there. */
+    private void quote(String text) {
+        String[] own = splitQuote(text); // a message that quoted another: what it said itself
+        String q = (own != null ? own[1] : text).trim();
+        if (q.isEmpty()) return;
+        if (q.length() > 800) q = q.substring(0, 800).trim() + "…";
+        setQuote(q);
+        input.requestFocus();
+        input.setSelection(input.getText().length());
+        getSystemService(android.view.inputmethod.InputMethodManager.class).showSoftInput(input, 0);
+    }
+
+    private String quoted;
+    private LinearLayout quoteBox;
+    private TextView quoteText;
+
+    /** The message quoted into the box (null: none). */
+    private void setQuote(String q) {
+        quoted = q;
+        if (quoteBox == null) return;
+        quoteText.setText(q == null ? "" : q);
+        quoteBox.setVisibility(q == null ? View.GONE : View.VISIBLE);
+    }
+
+    /** A quote's look: an accent bar and the quoted text, muted, in a rounded box of color bg; added to parent. */
+    private TextView quoteLine(LinearLayout parent, String q, int bg) {
+        LinearLayout box = row(this);
+        box.setBackground(rounded(this, bg, 10));
+        View bar = new View(this);
+        bar.setBackground(rounded(this, ACCENT, 2));
+        LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(dp(this, 3), LinearLayout.LayoutParams.MATCH_PARENT);
+        bp.setMargins(dp(this, 6), dp(this, 6), 0, dp(this, 6));
+        box.addView(bar, bp);
+        TextView t = text(this, q, 13, MUTED);
+        t.setMaxLines(4);
+        t.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        t.setPaddingRelative(dp(this, 8), dp(this, 6), dp(this, 10), dp(this, 6));
+        // in the composer's row it takes the room beside the X; in a bubble, which is as wide as what it holds, its
+        // text's own width (a share of "the rest" would be nothing there)
+        boolean inRow = parent.getOrientation() == LinearLayout.HORIZONTAL;
+        box.addView(t, inRow ? weight1() : wrap());
+        parent.addView(box, inRow ? new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1) : wrap());
+        return t;
+    }
+
+    /** A message that starts with a quote ("> " lines, then a blank line): {the quote, the rest}; else null. */
+    static String[] splitQuote(String text) {
+        if (text == null || !text.startsWith(">")) return null;
+        String[] lines = text.split("\n", -1);
+        StringBuilder q = new StringBuilder();
+        int i = 0;
+        for (; i < lines.length && lines[i].startsWith(">"); i++) {
+            String l = lines[i].substring(1);
+            q.append(l.startsWith(" ") ? l.substring(1) : l).append('\n');
+        }
+        StringBuilder rest = new StringBuilder();
+        for (int j = i; j < lines.length; j++) rest.append(lines[j]).append(j < lines.length - 1 ? "\n" : "");
+        return new String[]{q.toString().trim(), rest.toString().trim()};
+    }
+
+    /** A sideways swipe on a message quotes it, as in messengers: it follows the finger a little, then springs back. */
+    private void swipeToQuote(final View v, final String text) {
+        final int slop = android.view.ViewConfiguration.get(this).getScaledTouchSlop();
+        final float[] start = new float[2];
+        final boolean[] swiping = {false};
+        v.setOnTouchListener((x, e) -> {
+            switch (e.getActionMasked()) {
+                case android.view.MotionEvent.ACTION_DOWN:
+                    start[0] = e.getRawX();
+                    start[1] = e.getRawY();
+                    swiping[0] = false;
+                    return false;
+                case android.view.MotionEvent.ACTION_MOVE: {
+                    float dx = e.getRawX() - start[0], dy = e.getRawY() - start[1];
+                    if (!swiping[0] && Math.abs(dx) > slop * 2 && Math.abs(dx) > Math.abs(dy) * 2) {
+                        swiping[0] = true;
+                        v.cancelLongPress();
+                        if (v.getParent() != null) v.getParent().requestDisallowInterceptTouchEvent(true);
+                        android.view.MotionEvent c = android.view.MotionEvent.obtain(e);
+                        c.setAction(android.view.MotionEvent.ACTION_CANCEL); // no press, selection or link from it
+                        v.onTouchEvent(c);
+                        c.recycle();
+                    }
+                    if (!swiping[0]) return false;
+                    float max = dp(this, 72);
+                    v.setTranslationX(Math.max(-max, Math.min(max, dx * 0.5f)));
+                    return true;
+                }
+                case android.view.MotionEvent.ACTION_UP:
+                case android.view.MotionEvent.ACTION_CANCEL: {
+                    if (!swiping[0]) return false;
+                    swiping[0] = false;
+                    boolean go = e.getActionMasked() == android.view.MotionEvent.ACTION_UP
+                            && Math.abs(v.getTranslationX()) >= dp(this, 44);
+                    v.animate().translationX(0).setDuration(160).start();
+                    if (go) {
+                        v.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK);
+                        quote(text);
+                    }
+                    return true;
+                }
+                default:
+                    return false;
+            }
+        });
+    }
+
+    /** Fork from here: a new chat with this one up to m, opened. */
+    private void fork(Sessions.Msg m) {
+        Sessions.Session f = hub.fork(ses, ses.messages.indexOf(m));
+        if (f == null) return;
+        Toast.makeText(this, R.string.chat_forked, Toast.LENGTH_SHORT).show();
+        startActivity(new android.content.Intent(this, ChatActivity.class).putExtra("id", f.id));
+        finish();
+    }
+
+    /** "edited", small under a message the user edited (issue #44). */
+    private TextView editedMark() {
+        TextView ed = monoText(this, getString(R.string.chat_edited), 11, MUTED);
+        ed.setPaddingRelative(0, dp(this, 3), dp(this, 6), 0);
+        return ed;
+    }
+
+    /** Edit: the user changes their message, and the agent answers again from there. */
+    private void editMessage(final Sessions.Msg m) {
+        LinearLayout c = protect(column(this));
+        c.addView(title(this, getString(R.string.chat_edit_title), 18));
+        TextView info = text(this, getString(R.string.chat_edit_info), 13, MUTED);
+        info.setPaddingRelative(0, dp(this, 6), 0, dp(this, 10));
+        c.addView(info);
+        final EditText et = new EditText(this);
+        et.setText(m.text);
+        et.setTextColor(TEXT);
+        et.setTextSize(15);
+        et.setMaxLines(8);
+        et.setPaddingRelative(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
+        et.setBackground(outlined(this, BG, 12, OUTLINE, 1));
+        c.addView(et, full());
+        LinearLayout btns = row(this);
+        btns.setPaddingRelative(0, dp(this, 14), 0, 0);
+        Button no = button(this, getString(android.R.string.cancel), false);
+        Button yes = button(this, getString(R.string.chat_edit_send), true);
+        btns.addView(no, new LinearLayout.LayoutParams(0, dp(this, 48), 1));
+        LinearLayout.LayoutParams yp = new LinearLayout.LayoutParams(0, dp(this, 48), 1);
+        yp.setMarginStart(dp(this, 10));
+        btns.addView(yes, yp);
+        c.addView(btns, full());
+        Dialog d = bottomSheet(this, c);
+        no.setOnClickListener(v -> d.dismiss());
+        yes.setOnClickListener(v -> {
+            String t = et.getText().toString().trim();
+            if (t.isEmpty()) return;
+            String err = hub.edit(ses, ses.messages.indexOf(m), t);
+            if (err != null) Toast.makeText(this, err, Toast.LENGTH_LONG).show();
+            if (err != null && !ses.running) { // it didn't go and the chat is as it was: the edited text stays here
+                refresh();
+                return;
+            }
+            d.dismiss();
+            showAll(); // the messages after it are gone
+            refresh();
+            scrollToEnd();
+        });
+        d.show();
+        et.requestFocus();
+        et.setSelection(et.getText().length());
     }
 
     private void copyOnLongPress(View v, String text) {

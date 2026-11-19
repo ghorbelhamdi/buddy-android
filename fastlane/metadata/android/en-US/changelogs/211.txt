@@ -1,0 +1,9 @@
+• Edit your message, quote any message, fork a chat from any message
+• Voice input stops after a pause you choose
+• Archived chats one tap from the top of Chats
+• Cards name the computer that asks; its session can be watched and stopped
+• Background chats can read your real screen
+• Linux tools and background mode in Chat options
+• Fixed: a crash that switched accessibility off
+• Fixed: your own AGENTS.md text is kept
+• Fixed: background mode finds Wireless debugging again

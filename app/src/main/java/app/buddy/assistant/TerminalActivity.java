@@ -266,7 +266,7 @@ public class TerminalActivity extends Screen implements TermView.Callbacks {
         MicServer.start(this, new MicServer.Host() {
             @Override
             public void needMicPermission() {
-                runOnUiThread(() -> requestPermissions(new String[]{android.Manifest.permission.RECORD_AUDIO}, 7));
+                runOnUiThread(() -> Voice.askMic(TerminalActivity.this, 7));
             }
 
             @Override

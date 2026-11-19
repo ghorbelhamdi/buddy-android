@@ -411,6 +411,14 @@
     <!-- The card's label when the request comes from an agent session outside Buddy's chats (e.g. a terminal).
          %1$s: card_label_approval or card_label_question. All caps. -->
     <string name="card_label_other_session">%1$s · DA UN\'ALTRA SESSIONE</string>
+    <string name="card_label_from">%1$s · DA %2$s</string>
+    <string name="outside_terminal">Terminale di questo telefono</string>
+    <string name="outside_computer">Un computer</string>
+    <string name="monitor_outside">Fuori da Buddy</string>
+    <string name="monitor_outside_hidden">Sul suo schermo nascosto · ultimo passo %1$s</string>
+    <string name="monitor_outside_screen">Sul tuo schermo · ultimo passo %1$s</string>
+    <string name="monitor_outside_bring">Porta sul mio schermo</string>
+    <string name="monitor_outside_stopped">Fermata. I suoi strumenti del telefono sono rifiutati per un minuto, e le sue schede in attesa sono state rifiutate.</string>
     <string name="card_label_queue">%1$s · 1 DI %2$d</string>
     <!-- Buttons side by side at the bottom of the card: keep them short. -->
     <string name="card_deny">Rifiuta</string>
@@ -485,7 +493,7 @@
     <string name="chat_approvals_ask">Chiedi</string>
     <string name="chat_approvals_ask_info">Ogni app segue quanto impostato in %1$s.</string>
     <string name="chat_approvals_strict_info">Anche nelle app impostate su %1$s, Buddy chiede prima di inviare, pubblicare, acquistare o eliminare.</string>
-    <string name="chat_approvals_apps_hint">Dove l\'agente ha agito, con l\'impostazione di ogni app in %1$s. Tocca un\'app per cambiarla lì.</string>
+    <string name="chat_approvals_apps_set">Dove l\'agente ha agito, con l\'impostazione di ogni app in %1$s. Una modifica qui vale in ogni chat.</string>
     <string name="chat_approvals_routine">Routine consentita</string>
     <string name="chat_approvals_routine_info">I passaggi di routine procedono in ogni app senza scheda: inviare un messaggio o un passaggio su cui il revisore chiederebbe. Ognuno viene annotato nella chat. Pagare, acquistare, eliminare, installare, password e impostazioni di sicurezza chiedono comunque a te, come tutto nelle app bancarie e di pagamento, nelle Impostazioni e negli store.</string>
     <string name="chat_approvals_strict">Chiedi sempre</string>
@@ -571,6 +579,7 @@
     <string name="chat_model_other_hint">altro… es. %1$s</string>
     <!-- Button, verb: use the model typed in the box. Keep short. -->
     <string name="chat_model_use">Usa</string>
+    <string name="chat_model_search">Cerca modelli</string>
 
     <!-- Language sheet (long-press the mic) -->
     <!-- Title, followed by a list of languages to speak in. -->
@@ -641,6 +650,26 @@
     <!-- Chat messages -->
     <!-- Toast after a long press copies a message. -->
     <string name="chat_copied">Copiato</string>
+    <string name="chat_copy">Copia</string>
+    <string name="chat_quote">Cita</string>
+    <string name="chat_quote_remove">Rimuovi citazione</string>
+    <string name="chat_edit">Modifica</string>
+    <string name="chat_fork">Dirama da qui</string>
+    <string name="chat_fork_title">%1$s · ramo</string>
+    <string name="chat_forked_from">Diramato da «%1$s»</string>
+    <string name="chat_forked">Diramato: una nuova chat da qui</string>
+    <string name="chat_before_edit_title">%1$s (prima della modifica)</string>
+    <string name="chat_edit_running">Aspetta che questa chat finisca, poi modifica.</string>
+    <string name="chat_edit_failed">Non è stato possibile modificare il messaggio.</string>
+    <string name="chat_edit_title">Modifica il tuo messaggio</string>
+    <string name="chat_edit_info">L\'agente risponde di nuovo da qui, ripartendo da zero con la chat prima di questo messaggio. Tutto ciò che segue esce da questa chat; la chat com\'era resta in Archiviate.</string>
+    <string name="chat_edit_send">Invia</string>
+    <string name="chat_edited">modificato</string>
+    <string name="setup_voice_pause">Smetti di ascoltare dopo una pausa di</string>
+    <string name="setup_voice_auto">Auto</string>
+    <string name="setup_voice_pause_info">Buddy si ferma e invia quando le parole sentite non cambiano per quel tempo, anche con musica o traffico intorno. Auto: decide il motore vocale, che aspetta il silenzio.</string>
+    <string name="setup_voice_max">Registrazione più lunga</string>
+    <string name="setup_voice_no_limit">Nessun limite</string>
     <string name="chat_copy_whole_reply">Copia tutta la risposta</string>
     <!-- Header of a collapsible group of the agent's steps in the chat. -->
     <plurals name="chat_tool_calls">
@@ -653,6 +682,9 @@
     <string name="hub_continuing">Ripresa di una sessione %1$s precedente. Se è ancora aperta in un terminale, chiudila prima lì.</string>
     <string name="hub_still_working_attachments">Questa chat è ancora in corso. Invia gli allegati quando avrà finito.</string>
     <string name="hub_service_off">%1$s è disattivato (Impostazioni → Agenti e modelli → Chiavi API). Attivalo o scegli un altro modello per questa chat.</string>
+    <string name="hub_accessibility_dead">Il servizio di accessibilità di Buddy non è in esecuzione, anche se è attivo: Android ha chiuso Buddy e non ha riavviato il servizio, quindi gli agenti non possono usare il telefono. Disattiva e riattiva Buddy in Impostazioni Android → Accessibilità. Perché non succeda di nuovo: consenti l\'avvio automatico di Buddy nelle impostazioni delle app del telefono, se ci sono, e dai al microfono «Mentre usi l\'app», non «Solo questa volta».</string>
+    <string name="hub_accessibility_off">Il servizio di accessibilità di Buddy è disattivato, quindi gli agenti non possono usare il telefono. Attiva Buddy in Impostazioni Android → Accessibilità.</string>
+    <string name="voice_mic_while_using">Scegli «Mentre usi l\'app»: con «Solo questa volta», Android chiude Buddy un minuto dopo che lo lasci, anche a metà di un\'attività.</string>
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">Sta pensando…</string>
     <string name="hub_still_waiting">Ancora in attesa della risposta del modello…</string>
@@ -1246,6 +1278,15 @@
     <!-- Button. -->
     <string name="setup_copy_command">Copia comando</string>
     <string name="setup_command_copied">Copiato. Incollalo nel terminale.</string>
+    <string name="setup_outside_background">Lavora in background</string>
+    <string name="setup_outside_background_info">Gli agenti delle tue sessioni lavorano su uno schermo nascosto, come una chat in modalità background: continui a usare il telefono, e loro vanno avanti anche quando è bloccato. Schede e domande arrivano comunque a te. Un passaggio che richiede i tuoi occhi, come un accesso, porta la sua app sul tuo schermo. Serve la modalità background configurata.</string>
+    <string name="setup_tailnet">Strumenti del telefono su Tailscale</string>
+    <string name="setup_tailnet_info">Gli agenti sui tuoi computer ricevono questi strumenti del telefono tramite Tailscale, con Tailscale su entrambi. Ogni computer aggiunto ha una sua chiave, che Rimuovi revoca. Schede e domande arrivano comunque a te sul telefono. Attiva Lavora in background qui sopra, così non usano il tuo schermo.</string>
+    <string name="setup_tailnet_address">Questo telefono su Tailscale: %1$s</string>
+    <string name="setup_tailnet_no_address">Tailscale non è connesso su questo telefono: i computer ora non lo raggiungono.</string>
+    <string name="setup_tailnet_computer">Computer %1$d</string>
+    <string name="setup_tailnet_pair_info">Sul computer, con Tailscale attivo, esegui questo in un terminale. Questo telefono ti chiede poi di approvarlo, e Claude Code sul computer riceve gli strumenti del telefono con una sua chiave.</string>
+    <string name="tools_card_pair">Associare il computer «%1$s» (Tailscale %2$s)? Riceve gli strumenti del telefono di Buddy con una sua chiave, che puoi rimuovere nelle Impostazioni.</string>
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">Voce</string>
@@ -1336,6 +1377,8 @@
     <string name="setup_read_aloud_info">Buddy legge ad alta voce le risposte degli agenti, con la voce che scegli nella sezione Voce.</string>
     <string name="setup_pause_media">Metti in pausa i contenuti multimediali durante la lettura</string>
     <string name="setup_pause_media_info">La musica o il video in riproduzione vanno in pausa mentre Buddy legge una risposta e riprendono subito dopo. Buddy riavvia solo ciò che ha messo in pausa, e non se nel frattempo hai cambiato la riproduzione. Richiede “Leggi le risposte ad alta voce” e l\'accesso alle notifiche.</string>
+    <string name="setup_pause_listening">Metti in pausa i media durante l\'ascolto</string>
+    <string name="setup_pause_listening_info">La musica o il video in riproduzione va in pausa mentre Buddy ti ascolta, così sente la tua voce e non il video, e riprende dopo. Se è attivo anche «Metti in pausa i contenuti multimediali durante la lettura», resta in pausa finché la risposta non è stata letta. Buddy riprende solo ciò che ha messo in pausa, e non se nel frattempo hai cambiato la riproduzione. Serve l\'accesso alle notifiche.</string>
     <string name="setup_voice_cards">Rispondi alle schede con la voce</string>
     <string name="setup_voice_cards_info">Dopo aver letto una scheda ad alta voce, Buddy ascolta: di\' “approva” o “rifiuta”, oppure l\'opzione che vuoi. Richiede “Leggi le risposte ad alta voce”. Non a telefono bloccato. Chiunque sia a portata d\'orecchio potrebbe rispondere.</string>
     <string name="voice_card_approval">Buddy ha bisogno del tuo OK. %1$s</string>
@@ -1806,6 +1849,9 @@
     <string name="hub_tool_browser_back">Browser: ritorno indietro</string>
     <string name="hub_tool_browser_tabs">Browser: schede</string>
     <string name="hub_tool_schedule_message">Programmazione: %1$s</string>
+    <string name="hub_tool_add_rule">Aggiunta di una regola di notifica: %1$s</string>
+    <string name="tools_card_rule">Aggiungere una regola di notifica alla chat «%4$s»? Da %1$s, %2$s: ognuna arriva in questa chat con l\'istruzione «%3$s». La regola ti chiede prima di agire, come ogni regola.</string>
+    <string name="rules_in_chat">Nella chat «%1$s»</string>
     <string name="hub_tool_list_scheduled">Controllo dei messaggi programmati</string>
     <string name="hub_tool_cancel_scheduled">Annullamento di un messaggio programmato</string>
     <string name="later_title">Messaggio dell’agente per %1$s</string>
@@ -2073,6 +2119,9 @@
     <string name="api_keys_local_info">Per un tuo server (Ollama, LM Studio, llama.cpp): lascia vuota la chiave API. Su un PC, metti il suo indirizzo sul tuo Wi-Fi al posto di localhost, ad esempio http://192.168.1.20:11434/v1.</string>
     <string name="main_section_pinned">Fissate</string>
     <string name="main_section_archived">Archiviate (%1$d)</string>
+    <string name="main_archived_title">Archiviate</string>
+    <string name="main_archived_open">Chat archiviate</string>
+    <string name="main_archived_back">Torna alle chat</string>
     <string name="chat_pinned_marker">Fissata</string>
     <string name="chat_menu_rename">Rinomina</string>
     <string name="chat_menu_pin">Fissa in alto</string>

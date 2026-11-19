@@ -156,12 +156,16 @@ final class McpServer {
         Thread t = new Thread(this::acceptLoop, "buddy-mcp");
         t.setDaemon(true);
         t.start();
+        Thread tn = new Thread(this::tailnetLoop, "buddy-mcp-tailnet");
+        tn.setDaemon(true);
+        tn.start();
     }
 
     void stop() {
         running = false;
         try {
             if (socket != null) socket.close();
+            if (tailnetSocket != null) tailnetSocket.close();
         } catch (IOException ignored) {
         }
         pool.shutdownNow();
@@ -191,6 +195,53 @@ final class McpServer {
     }
 
     private void handle(Socket s) {
+        handle(s, false);
+    }
+
+    /**
+     * The same port on the phone's Tailscale address, while the user has "Phone tools on Tailscale" on and a paired
+     * computer: it follows the address (Tailscale off, another address) and closes when the switch goes off.
+     */
+    private void tailnetLoop() {
+        while (running) {
+            java.net.InetAddress at = Tailnet.address(BuddyApp.context());
+            if (at == null) {
+                pause(5000);
+                continue;
+            }
+            try (ServerSocket ss = new ServerSocket()) {
+                ss.setReuseAddress(true);
+                ss.bind(new InetSocketAddress(at, PORT));
+                ss.setSoTimeout(5000);
+                tailnetSocket = ss;
+                while (running && at.equals(Tailnet.address(BuddyApp.context()))) {
+                    try {
+                        final Socket s = ss.accept();
+                        pool.execute(() -> handle(s, true));
+                    } catch (java.net.SocketTimeoutException again) {
+                        // look at the address and the switch again
+                    }
+                }
+            } catch (IOException e) {
+                Log.w(TAG, "tailnet listener", e);
+                pause(5000);
+            } finally {
+                tailnetSocket = null;
+            }
+        }
+    }
+
+    private volatile ServerSocket tailnetSocket;
+
+    private static void pause(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException ignored) {
+        }
+    }
+
+    /** remote: a connection to the Tailscale address (see tailnetLoop): only /mcp, and only a paired computer's token. */
+    private void handle(Socket s, boolean remote) {
         stranger(s);
         try {
             s.setSoTimeout(30000);
@@ -218,6 +269,39 @@ final class McpServer {
                     headers.put(line.substring(0, c).trim().toLowerCase(Locale.ROOT), line.substring(c + 1).trim());
                 }
             }
+            if (remote && "/pair".equals(path) && "POST".equals(method)) { // a computer asks to be paired (Tailnet.pair)
+                String name = null;
+                int nq = rawPath.indexOf("name=");
+                if (nq >= 0) name = java.net.URLDecoder.decode(rawPath.substring(nq + 5).split("&")[0], "UTF-8");
+                CALLER_GONE.set(() -> gone(s, in)); // the card closes if the computer stops waiting
+                String config = Tailnet.pair(BuddyApp.context(), name, s.getInetAddress(), s.getLocalAddress());
+                if (config == null) send(out, 403, "text/plain", "not paired\n");
+                else send(out, 200, "application/json", config);
+                return;
+            }
+            if (remote) { // from another device: the phone tools, for a computer the user paired, and nothing else
+                String a = headers.get("authorization");
+                Tailnet.Device dev = "/mcp".equals(path) && a != null && a.startsWith("Bearer ")
+                        ? Tailnet.device(BuddyApp.context(), a.substring(7)) : null;
+                if (dev == null) {
+                    send(out, !"/mcp".equals(path) ? 404 : 401, "application/json", "{\"error\":\"unauthorized\"}");
+                    return;
+                }
+                known(s);
+                CALLER_CHAT.set(null);
+                CALLER_KEY.set(Background.OUTSIDE + "-" + dev.id); // each computer has a hidden screen of its own
+                CALLER_REMOTE.set(dev.name);
+                byte[] body;
+                try {
+                    body = readBody(in, headers, BODY);
+                } catch (TooLarge e) {
+                    send(out, 413, null, null);
+                    return;
+                }
+                CALLER_GONE.set(() -> gone(s, in));
+                serveMcp(method, body, out);
+                return;
+            }
             // Anthropic-style clients (OpenCode's) send the token they were given as x-api-key: the relay takes that too
             boolean relay = path.startsWith(Relay.PATH);
             String xKey = relay ? headers.get("x-api-key") : null;
@@ -229,6 +313,8 @@ final class McpServer {
             chat = shown == null ? null : RUNS.get(shown);
             if (chat != null) known = true;
             CALLER_CHAT.set(chat);
+            // the hidden screen a call works on: its chat's, or, for a session outside Buddy, the outside sessions'
+            CALLER_KEY.set(chat != null ? chat : Background.OUTSIDE);
             if (known) {
                 known(s);
             }
@@ -277,27 +363,8 @@ final class McpServer {
                     Log.w(TAG, "bad event", e);
                 }
                 send(out, 204, null, null);
-            } else if ("/mcp".equals(path) && "POST".equals(method)) {
-                String text = new String(body, StandardCharsets.UTF_8).trim();
-                if (text.startsWith("[")) {
-                    JSONArray batch = new JSONArray(text);
-                    JSONArray replies = new JSONArray();
-                    for (int i = 0; i < batch.length(); i++) {
-                        JSONObject r = rpc(batch.getJSONObject(i));
-                        if (r != null) replies.put(r);
-                    }
-                    if (replies.length() == 0) send(out, 202, null, null);
-                    else send(out, 200, "application/json", replies.toString());
-                } else {
-                    JSONObject r = rpc(new JSONObject(text));
-                    if (r == null) send(out, 202, null, null);
-                    else send(out, 200, "application/json", r.toString());
-                }
-            } else if ("/mcp".equals(path) && "DELETE".equals(method)) {
-                send(out, 200, null, null);
             } else if ("/mcp".equals(path)) {
-                // No server-initiated SSE stream.
-                send(out, 405, null, null);
+                serveMcp(method, body, out);
             } else if (path.startsWith("/file/") && "GET".equals(method)) {
                 // an attachment, fetched by the helper before the agent runs
                 java.io.File f = handler.attachment(path.substring(6));
@@ -320,6 +387,8 @@ final class McpServer {
             known(s);
             CALLER_GONE.remove();
             CALLER_CHAT.remove();
+            CALLER_KEY.remove();
+            CALLER_REMOTE.remove();
             try {
                 s.close();
             } catch (IOException ignored) {
@@ -330,6 +399,10 @@ final class McpServer {
     /** Returns null for notifications. */
     /** The Buddy chat whose agent made the current request (on this thread), or null for another session. */
     static final ThreadLocal<String> CALLER_CHAT = new ThreadLocal<>();
+    /** The hidden screen this call would work on: its chat's id, or Background.OUTSIDE for a session outside Buddy. */
+    static final ThreadLocal<String> CALLER_KEY = new ThreadLocal<>();
+    /** The paired computer's name for a call over Tailscale (see Tailnet), else null. */
+    static final ThreadLocal<String> CALLER_REMOTE = new ThreadLocal<>();
     /** True once the client of the current request (on this thread) has hung up, e.g. its tool call timed out. */
     static final ThreadLocal<java.util.function.BooleanSupplier> CALLER_GONE = new ThreadLocal<>();
 
@@ -529,6 +602,31 @@ final class McpServer {
             int r = in.read(buf, 0, (int) Math.min(buf.length, n));
             if (r == -1) throw new IOException("unexpected end of body");
             n -= r;
+        }
+    }
+
+    /** An MCP request: JSON-RPC over POST (one or a batch); no server-initiated stream. */
+    private void serveMcp(String method, byte[] body, OutputStream out) throws Exception {
+        if ("POST".equals(method)) {
+            String text = new String(body, StandardCharsets.UTF_8).trim();
+            if (text.startsWith("[")) {
+                JSONArray batch = new JSONArray(text);
+                JSONArray replies = new JSONArray();
+                for (int i = 0; i < batch.length(); i++) {
+                    JSONObject r = rpc(batch.getJSONObject(i));
+                    if (r != null) replies.put(r);
+                }
+                if (replies.length() == 0) send(out, 202, null, null);
+                else send(out, 200, "application/json", replies.toString());
+            } else {
+                JSONObject r = rpc(new JSONObject(text));
+                if (r == null) send(out, 202, null, null);
+                else send(out, 200, "application/json", r.toString());
+            }
+        } else if ("DELETE".equals(method)) {
+            send(out, 200, null, null);
+        } else {
+            send(out, 405, null, null);
         }
     }
 

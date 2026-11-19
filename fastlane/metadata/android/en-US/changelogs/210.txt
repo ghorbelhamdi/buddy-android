@@ -1,0 +1,8 @@
+• Phone tools on Tailscale: Claude Code on your computer uses the phone, paired with one command and a card on the phone
+• Sessions outside Buddy can work on a hidden screen of their own
+• Agents can add a notification rule for their chat, after your OK
+• Change an app's mode from a chat's Approvals sheet
+• Search in model lists
+• Optional: pause media while Buddy listens
+• Fixed: a chat stuck on "Stopping"
+• Clear message when the accessibility service isn't running

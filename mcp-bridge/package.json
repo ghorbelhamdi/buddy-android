@@ -1,6 +1,6 @@
 {
   "name": "buddy-phone-bridge",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Buddy's Android phone tools as a stdio MCP server (a bridge to the free Buddy app on your phone)",
   "mcpName": "io.github.ghorbelhamdi/buddy-phone-bridge",
   "type": "module",

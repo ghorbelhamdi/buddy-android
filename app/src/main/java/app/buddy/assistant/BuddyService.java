@@ -58,6 +58,11 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     private AutoPause autoPause;
     private final KeepAwake keepAwake = new KeepAwake(this);
     private final WorkNotice workNotice = new WorkNotice(this);
+
+    /** An outside session started or stopped working on the phone (main thread): the notification follows. */
+    void outsideChanged() {
+        workNotice.update();
+    }
     private Marks marks;
     /** Touches on the screen while a card waited for the user (see onScreenTouched). */
     private volatile int cardTouches;
@@ -781,7 +786,9 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         if (revoked != null) return revoked;
         if (rereadNeeded && phone) {
             if ("read_screen".equals(tool) || "screenshot".equals(tool)) rereadNeeded = false;
-            else if (!"wait".equals(tool) && !"list_apps".equals(tool)) {
+            // only what acts on the screen by what was read there: a phone command, the notifications, the clipboard
+            // or opening an app don't depend on it, and go ahead (the flag stays for the next tap)
+            else if (ON_SCREEN.contains(tool)) {
                 return "SCREEN CHANGED: the user used the phone themselves (they paused you, or did something on the "
                         + "screen while you waited for their answer), so the screen may have changed and element ids are "
                         + "stale. Nothing was done. Call read_screen, then continue the task.";
@@ -789,6 +796,10 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         }
         return null;
     }
+
+    /** Tools that act on what the agent last read on the screen (element ids, points), so a stale read misleads them. */
+    private static final java.util.Set<String> ON_SCREEN = new java.util.HashSet<>(java.util.Arrays.asList(
+            "tap", "long_press", "type_text", "scroll", "swipe", "press", "do_steps", "collect", "find"));
 
     /** Short vibration to get the user's attention (e.g. "tap Update"). */
     void nudge() {
@@ -978,7 +989,10 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
                 onAnswer(true, null);
             }
         };
-        main.post(() -> bubble.askConfirm(text, chat, countdown, cb));
+        // from outside Buddy: the card says which computer asks, and Stop on that session denies it
+        final String key = Background.outsideCaller();
+        final String from = McpServer.CALLER_REMOTE.get();
+        main.post(() -> bubble.askConfirm(text, chat, countdown, cb, key, from));
         Triggers.approvalShown(this, chat, text, countdown, true, null);
         String ended = null;
         try {
@@ -1002,6 +1016,8 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
                     + "make these changes (for example, rewrite the text), then call confirm again with the "
                     + "updated version and wait for the answer.";
         }
+        String stopped = key == null || Boolean.TRUE.equals(answer.get()) ? null : Background.outsideStopped(key);
+        if (stopped != null) return stopped; // denied by the user's Stop on the whole session, not just this card
         return Boolean.TRUE.equals(answer.get())
                 ? "APPROVED by the user. Go ahead."
                 : "DENIED by the user. Do not do it; ask what they want instead.";
@@ -1030,7 +1046,9 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             answer.set(text);
             done.countDown();
         };
-        main.post(() -> bubble.askQuestion(question, options, chat, handsOn, cb));
+        final String key = Background.outsideCaller();
+        final String from = McpServer.CALLER_REMOTE.get();
+        main.post(() -> bubble.askQuestion(question, options, chat, handsOn, cb, key, from));
         Triggers.approvalShown(this, chat, question, 0, false, handsOn ? null : options);
         boolean answered;
         try {
@@ -1050,6 +1068,8 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
                     + ". Don't guess; stop and ask in your reply.";
         }
         if (answer.get() == null) {
+            String stopped = key == null ? null : Background.outsideStopped(key);
+            if (stopped != null) return stopped; // the user's Stop on the whole session closed it
             return "NO ANSWER: the user closed the question. Don't guess; stop and ask what they want.";
         }
         String then = usedScreen ? " The user may have changed the screen meanwhile: call read_screen before going on." : "";
