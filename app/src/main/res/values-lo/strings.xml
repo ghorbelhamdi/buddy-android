@@ -416,6 +416,14 @@
     <!-- The card's label when the request comes from an agent session outside Buddy's chats (e.g. a terminal).
          %1$s: card_label_approval or card_label_question. All caps. -->
     <string name="card_label_other_session">%1$s · ຈາກເຊສຊັນອື່ນ</string>
+    <string name="card_label_from">%1$s · ຈາກ %2$s</string>
+    <string name="outside_terminal">ເທີມິນຂອງໂທລະສັບນີ້</string>
+    <string name="outside_computer">ຄອມພິວເຕີ</string>
+    <string name="monitor_outside">ນອກ Buddy</string>
+    <string name="monitor_outside_hidden">ຢູ່ໜ້າຈໍຊ່ອນຂອງມັນ · ຂັ້ນຕອນສຸດທ້າຍ %1$s</string>
+    <string name="monitor_outside_screen">ຢູ່ໜ້າຈໍຂອງທ່ານ · ຂັ້ນຕອນສຸດທ້າຍ %1$s</string>
+    <string name="monitor_outside_bring">ສະແດງເທິງໜ້າຈໍຂ້ອຍ</string>
+    <string name="monitor_outside_stopped">ຢຸດແລ້ວ. ເຄື່ອງມືໂທລະສັບຂອງມັນຈະຖືກປະຕິເສດເປັນເວລາໜຶ່ງນາທີ, ແລະ ບັດທີ່ລໍຖ້າຢູ່ກໍຖືກປະຕິເສດແລ້ວ.</string>
     <string name="card_label_queue">%1$s · 1 ຈາກ %2$d</string>
     <!-- Buttons side by side at the bottom of the card: keep them short. -->
     <string name="card_deny">ປະຕິເສດ</string>
@@ -505,7 +513,7 @@
     <string name="chat_approvals_ask">ຖາມ</string>
     <string name="chat_approvals_ask_info">ແຕ່ລະແອັບຈະຕາມສິ່ງທີ່ %1$s ກຳນົດໄວ້.</string>
     <string name="chat_approvals_strict_info">ແມ່ນແຕ່ໃນແອັບທີ່ຕັ້ງເປັນ %1$s, Buddy ຈະຖາມກ່ອນສົ່ງ, ໂພສ, ຊື້ ຫຼື ລຶບ.</string>
-    <string name="chat_approvals_apps_hint">ບ່ອນທີ່ຕົວແທນເຄີຍເຮັດ, ພ້ອມການຕັ້ງຄ່າຂອງແຕ່ລະແອັບໃນ %1$s. ແຕະເພື່ອປ່ຽນຢູ່ຫັ້ນ.</string>
+    <string name="chat_approvals_apps_set">ບ່ອນທີ່ຕົວແທນເຄີຍເຮັດ, ພ້ອມການຕັ້ງຄ່າຂອງແຕ່ລະແອັບໃນ %1$s. ການປ່ຽນຢູ່ນີ້ມີຜົນໃນທຸກການສົນທະນາ.</string>
     <string name="chat_approvals_routine">ອະນຸຍາດວຽກປະຈຳ</string>
     <string name="chat_approvals_routine_info">ຂັ້ນຕອນປະຈຳຈະດຳເນີນຕໍ່ໃນທຸກແອັບໂດຍບໍ່ມີບັດອະນຸຍາດ: ການສົ່ງຂໍ້ຄວາມ, ຫຼື ຂັ້ນຕອນທີ່ຜູ້ກວດສອບຈະຖາມ. ແຕ່ລະອັນຈະຖືກບັນທຶກໃນການສົນທະນາ. ການຈ່າຍເງິນ, ຊື້, ລຶບ, ຕິດຕັ້ງ, ລະຫັດຜ່ານ ແລະ ການຕັ້ງຄ່າຄວາມປອດໄພ ຍັງຈະຖາມທ່ານ, ເຊັ່ນດຽວກັບທຸກຢ່າງໃນແອັບທະນາຄານ ແລະ ຈ່າຍເງິນ, ການຕັ້ງຄ່າ ແລະ ຮ້ານແອັບ.</string>
     <string name="chat_approvals_strict">ຖາມສະເໝີ</string>
@@ -621,6 +629,7 @@
     <string name="chat_model_other_hint">ອື່ນໆ… ເຊັ່ນ %1$s</string>
     <!-- Button, verb: use the model typed in the box. Keep short. -->
     <string name="chat_model_use">ໃຊ້</string>
+    <string name="chat_model_search">ຄົ້ນຫາໂມເດລ</string>
 
     <!-- Language sheet (long-press the mic) -->
     <!-- Title, followed by a list of languages to speak in. -->
@@ -692,6 +701,26 @@
     <!-- Chat messages -->
     <!-- Toast after a long press copies a message. -->
     <string name="chat_copied">ສຳເນົາແລ້ວ</string>
+    <string name="chat_copy">ສຳເນົາ</string>
+    <string name="chat_quote">ອ້າງອີງ</string>
+    <string name="chat_quote_remove">ລຶບການອ້າງອີງ</string>
+    <string name="chat_edit">ແກ້ໄຂ</string>
+    <string name="chat_fork">ແຍກສາຂາຈາກນີ້</string>
+    <string name="chat_fork_title">%1$s · ສາຂາ</string>
+    <string name="chat_forked_from">ແຍກສາຂາຈາກ “%1$s”</string>
+    <string name="chat_forked">ແຍກສາຂາແລ້ວ: ການສົນທະນາໃໝ່ຈາກນີ້</string>
+    <string name="chat_before_edit_title">%1$s (ກ່ອນແກ້ໄຂ)</string>
+    <string name="chat_edit_running">ລໍຖ້າໃຫ້ການສົນທະນານີ້ແລ້ວກ່ອນ, ແລ້ວຈຶ່ງແກ້ໄຂ.</string>
+    <string name="chat_edit_failed">ແກ້ໄຂຂໍ້ຄວາມບໍ່ໄດ້.</string>
+    <string name="chat_edit_title">ແກ້ໄຂຂໍ້ຄວາມຂອງທ່ານ</string>
+    <string name="chat_edit_info">ຕົວແທນຈະຕອບໃໝ່ຈາກນີ້, ເລີ່ມສົດດ້ວຍການສົນທະນາກ່ອນຂໍ້ຄວາມນີ້. ທຸກຢ່າງຫຼັງຈາກນີ້ຈະໄປຈາກການສົນທະນານີ້; ການສົນທະນາເດີມຖືກເກັບໄວ້ໃນ ເກັບໄວ້.</string>
+    <string name="chat_edit_send">ສົ່ງ</string>
+    <string name="chat_edited">ແກ້ໄຂແລ້ວ</string>
+    <string name="setup_voice_pause">ຢຸດຟັງຫຼັງຈາກຢຸດເວົ້າ</string>
+    <string name="setup_voice_auto">ອັດຕະໂນມັດ</string>
+    <string name="setup_voice_pause_info">Buddy ຈະຢຸດ ແລະ ສົ່ງ ເມື່ອຄຳທີ່ມັນໄດ້ຍິນບໍ່ປ່ຽນໄປຕາມໄລຍະນັ້ນ, ເຖິງແມ່ນມີເພງ ຫຼື ສຽງຈາລະຈອນອ້ອມຂ້າງ. ອັດຕະໂນມັດ: ເຄື່ອງຈັກສຽງຕັດສິນເອງ, ແລະ ມັນຈະລໍຖ້າຄວາມງຽບ.</string>
+    <string name="setup_voice_max">ການບັນທຶກຍາວທີ່ສຸດ</string>
+    <string name="setup_voice_no_limit">ບໍ່ຈຳກັດ</string>
     <string name="chat_copy_whole_reply">ສຳເນົາຄຳຕອບທັງໝົດ</string>
     <!-- Header of a collapsible group of the agent's steps in the chat. -->
     <plurals name="chat_tool_calls">
@@ -704,6 +733,9 @@
     <string name="hub_continuing">ກຳລັງສືບຕໍ່ເຊສຊັນ %1$s ກ່ອນໜ້າ. ຖ້າມັນຍັງເປີດຢູ່ໃນເທີມິນອລ, ປິດມັນຢູ່ຫັ້ນກ່ອນ.</string>
     <string name="hub_still_working_attachments">ການສົນທະນານີ້ຍັງເຮັດວຽກຢູ່. ສົ່ງໄຟລ໌ແນບເມື່ອແລ້ວ.</string>
     <string name="hub_service_off">%1$s ຖືກປິດ (ການຕັ້ງຄ່າ → ຕົວແທນ ແລະ ໂມເດລ → API key). ເປີດມັນ, ຫຼື ເລືອກໂມເດລອື່ນສຳລັບການສົນທະນານີ້.</string>
+    <string name="hub_accessibility_dead">ບໍລິການການເຂົ້າເຖິງຂອງ Buddy ບໍ່ໄດ້ແລ່ນຢູ່, ເຖິງແມ່ນມັນເປີດຢູ່: Android ຢຸດ Buddy ແລະ ບໍ່ໄດ້ເລີ່ມບໍລິການຄືນ, ສະນັ້ນຕົວແທນຈຶ່ງເຂົ້າເຖິງໂທລະສັບບໍ່ໄດ້. ປິດ ແລ້ວເປີດ Buddy ຄືນໃນ ການຕັ້ງຄ່າ → ການເຂົ້າເຖິງ ຂອງ Android. ເພື່ອບໍ່ໃຫ້ເກີດອີກ: ອະນຸຍາດໃຫ້ Buddy ເລີ່ມຕົວອັດຕະໂນມັດໃນການຕັ້ງຄ່າແອັບຂອງໂທລະສັບ, ຖ້າໂທລະສັບຂອງທ່ານມີ, ແລະ ໃຫ້ໄມໂຄຣໂຟນ “ຂະນະໃຊ້ແອັບ”, ບໍ່ແມ່ນ “ພຽງຄັ້ງນີ້”.</string>
+    <string name="hub_accessibility_off">ບໍລິການການເຂົ້າເຖິງຂອງ Buddy ປິດຢູ່, ສະນັ້ນຕົວແທນຈຶ່ງເຂົ້າເຖິງໂທລະສັບບໍ່ໄດ້. ເປີດ Buddy ໃນ ການຕັ້ງຄ່າ → ການເຂົ້າເຖິງ ຂອງ Android.</string>
+    <string name="voice_mic_while_using">ເລືອກ “ຂະນະໃຊ້ແອັບ”: ກັບ “ພຽງຄັ້ງນີ້”, Android ຈະຢຸດ Buddy ໜຶ່ງນາທີຫຼັງທ່ານອອກໄປ, ເຖິງແມ່ນກາງວຽກ.</string>
     <!-- Status right after a message is sent, until the agent's first step. -->
     <string name="hub_thinking">ກຳລັງຄິດ…</string>
     <string name="hub_still_waiting">ຍັງລໍຖ້າໂມເດລຕອບ…</string>
@@ -1319,6 +1351,15 @@
     <!-- Button. -->
     <string name="setup_copy_command">ສຳເນົາຄຳສັ່ງ</string>
     <string name="setup_command_copied">ສຳເນົາແລ້ວ. ວາງໃນເທີມິນອລຂອງທ່ານ.</string>
+    <string name="setup_outside_background">ເຮັດວຽກຢູ່ເບື້ອງຫຼັງ</string>
+    <string name="setup_outside_background_info">ຕົວແທນໃນເຊສຊັນຂອງທ່ານເອງເຮັດວຽກຢູ່ໜ້າຈໍຊ່ອນ, ຄືກັບການສົນທະນາໃນໂໝດເບື້ອງຫຼັງ: ທ່ານຍັງໃຊ້ໂທລະສັບຕໍ່ໄດ້, ແລະ ພວກມັນເຮັດຕໍ່ເຖິງແມ່ນລັອກໜ້າຈໍ. ບັດ ແລະ ຄຳຖາມຍັງມາຫາທ່ານ. ຂັ້ນຕອນທີ່ຕ້ອງໃຫ້ທ່ານເຫັນເອງ, ເຊັ່ນການເຂົ້າສູ່ລະບົບ, ຈະເອົາແອັບຂອງມັນມາເທິງໜ້າຈໍຂອງທ່ານ. ຕ້ອງຕັ້ງຄ່າໂໝດເບື້ອງຫຼັງໄວ້ກ່ອນ.</string>
+    <string name="setup_tailnet">ເຄື່ອງມືໂທລະສັບເທິງ Tailscale</string>
+    <string name="setup_tailnet_info">ຕົວແທນເທິງຄອມພິວເຕີຂອງທ່ານເອງໄດ້ຮັບເຄື່ອງມືໂທລະສັບເຫຼົ່ານີ້ຜ່ານ Tailscale, ໂດຍເປີດ Tailscale ທັງສອງຂ້າງ. ແຕ່ລະຄອມພິວເຕີທີ່ທ່ານເພີ່ມມີກະແຈຂອງຕົນເອງ, ເຊິ່ງ ລຶບອອກ ຈະເອົາຄືນ. ບັດ ແລະ ຄຳຖາມຍັງມາຫາທ່ານເທິງໂທລະສັບ. ເປີດ ເຮັດວຽກຢູ່ເບື້ອງຫຼັງ ຂ້າງເທິງ, ເພື່ອບໍ່ໃຫ້ພວກມັນໃຊ້ໜ້າຈໍຂອງທ່ານ.</string>
+    <string name="setup_tailnet_address">ໂທລະສັບນີ້ເທິງ Tailscale: %1$s</string>
+    <string name="setup_tailnet_no_address">Tailscale ບໍ່ໄດ້ເຊື່ອມຕໍ່ເທິງໂທລະສັບນີ້, ສະນັ້ນຄອມພິວເຕີຈຶ່ງເຂົ້າເຖິງມັນບໍ່ໄດ້ຕອນນີ້.</string>
+    <string name="setup_tailnet_computer">ຄອມພິວເຕີ %1$d</string>
+    <string name="setup_tailnet_pair_info">ເທິງຄອມພິວເຕີ, ໂດຍເປີດ Tailscale, ແລ່ນສິ່ງນີ້ໃນເທີມິນອລ. ແລ້ວໂທລະສັບນີ້ຈະຖາມທ່ານເພື່ອອະນຸຍາດ, ແລະ Claude Code ຂອງຄອມພິວເຕີຈະໄດ້ເຄື່ອງມືໂທລະສັບດ້ວຍກະແຈຂອງຕົນເອງ.</string>
+    <string name="tools_card_pair">ຈັບຄູ່ຄອມພິວເຕີ “%1$s” (Tailscale %2$s)? ມັນຈະໄດ້ເຄື່ອງມືໂທລະສັບຂອງ Buddy ດ້ວຍກະແຈຂອງຕົນເອງ, ເຊິ່ງທ່ານສາມາດລຶບໄດ້ໃນ ການຕັ້ງຄ່າ.</string>
 
     <!-- Settings screen: Voice. -->
     <string name="setup_voice">ສຽງ</string>
@@ -1425,6 +1466,8 @@
     <string name="setup_read_aloud_info">Buddy ອ່ານຄຳຕອບຂອງຕົວແທນອອກສຽງ, ດ້ວຍສຽງທີ່ທ່ານເລືອກໃນ ສຽງ.</string>
     <string name="setup_pause_media">ຢຸດມີເດຍລະຫວ່າງການອ່ານອອກສຽງ</string>
     <string name="setup_pause_media_info">ເພງ ຫຼື ວິດີໂອທີ່ກຳລັງຫຼິ້ນຈະຖືກຢຸດຊົ່ວຄາວລະຫວ່າງທີ່ Buddy ອ່ານຄຳຕອບ, ແລ້ວຫຼິ້ນຕໍ່. Buddy ຈະເລີ່ມຄືນພຽງສິ່ງທີ່ມັນຢຸດໄວ້, ແລະ ຈະບໍ່ເຮັດຖ້າທ່ານປ່ຽນການຫຼິ້ນລະຫວ່າງນັ້ນ. ຕ້ອງການ “ອ່ານຄຳຕອບອອກສຽງ” ແລະ ການເຂົ້າເຖິງການແຈ້ງເຕືອນ.</string>
+    <string name="setup_pause_listening">ຢຸດມີເດຍລະຫວ່າງການຟັງ</string>
+    <string name="setup_pause_listening_info">ເພງ ຫຼື ວິດີໂອທີ່ກຳລັງຫຼິ້ນຈະຖືກຢຸດຊົ່ວຄາວລະຫວ່າງທີ່ Buddy ຟັງທ່ານ, ເພື່ອໃຫ້ມັນໄດ້ຍິນສຽງຂອງທ່ານບໍ່ແມ່ນວິດີໂອ, ແລ້ວຫຼິ້ນຕໍ່. ຖ້າເປີດ “ຢຸດມີເດຍລະຫວ່າງການອ່ານອອກສຽງ” ນຳ, ມັນຈະຢຸດຕໍ່ຈົນກວ່າຄຳຕອບຈະຖືກອ່ານຈົບ. Buddy ຈະເລີ່ມຄືນພຽງສິ່ງທີ່ມັນຢຸດໄວ້, ແລະ ຈະບໍ່ເຮັດຖ້າທ່ານປ່ຽນການຫຼິ້ນລະຫວ່າງນັ້ນ. ຕ້ອງການການເຂົ້າເຖິງການແຈ້ງເຕືອນ.</string>
     <string name="setup_voice_cards">ຕອບບັດດ້ວຍສຽງ</string>
     <string name="setup_voice_cards_info">ຫຼັງບັດຖືກອ່ານອອກສຽງ, Buddy ຈະຟັງ: ເວົ້າ “ອະນຸຍາດ” ຫຼື “ປະຕິເສດ”, ຫຼື ຕົວເລືອກທີ່ທ່ານຕ້ອງການ. ຕ້ອງການ “ອ່ານຄຳຕອບອອກສຽງ”. ບໍ່ໃຊ້ເມື່ອໂທລະສັບລັອກ. ໃຜທີ່ຢູ່ໃນລະດັບທີ່ໄດ້ຍິນກໍ່ອາດຕອບໄດ້.</string>
     <string name="voice_card_approval">Buddy ຕ້ອງການການອະນຸຍາດຂອງທ່ານ. %1$s</string>
@@ -1969,6 +2012,9 @@
     <string name="hub_tool_browser_back">ບຣາວເຊີ: ກຳລັງກັບ</string>
     <string name="hub_tool_browser_tabs">ບຣາວເຊີ: ແທັບ</string>
     <string name="hub_tool_schedule_message">ກຳລັງຕັ້ງເວລາ: %1$s</string>
+    <string name="hub_tool_add_rule">ກຳລັງເພີ່ມກົດການແຈ້ງເຕືອນ: %1$s</string>
+    <string name="tools_card_rule">ເພີ່ມກົດການແຈ້ງເຕືອນໃນການສົນທະນາ “%4$s”? ຈາກ %1$s, %2$s: ແຕ່ລະອັນຈະເຂົ້າມາໃນການສົນທະນານີ້ພ້ອມຄຳສັ່ງ “%3$s”. ກົດການຈະຖາມທ່ານກ່ອນເຮັດ, ຄືກັບທຸກກົດການ.</string>
+    <string name="rules_in_chat">ໃນການສົນທະນາ “%1$s”</string>
     <string name="hub_tool_list_scheduled">ກຳລັງກວດຂໍ້ຄວາມທີ່ຕັ້ງເວລາໄວ້</string>
     <string name="hub_tool_cancel_scheduled">ກຳລັງຍົກເລີກຂໍ້ຄວາມທີ່ຕັ້ງເວລາໄວ້</string>
     <string name="later_title">ຂໍ້ຄວາມຂອງຕົວແທນສຳລັບ %1$s</string>
@@ -2294,6 +2340,9 @@
     <!-- Chat list: pinned and archived chats, and the long-press menu on a chat (rename, pin, archive, delete). -->
     <string name="main_section_pinned">ປັກໝຸດໄວ້</string>
     <string name="main_section_archived">ເກັບໄວ້ (%1$d)</string>
+    <string name="main_archived_title">ເກັບໄວ້</string>
+    <string name="main_archived_open">ການສົນທະນາທີ່ເກັບໄວ້</string>
+    <string name="main_archived_back">ກັບໄປການສົນທະນາ</string>
     <string name="chat_pinned_marker">ປັກໝຸດໄວ້</string>
     <string name="chat_menu_rename">ປ່ຽນຊື່</string>
     <string name="chat_menu_pin">ປັກໝຸດໄວ້ເທິງສຸດ</string>
