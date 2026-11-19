@@ -36,6 +36,18 @@ final class Prefs {
         sp(c).edit().putBoolean("bg_paired", paired).apply();
     }
 
+    /** Bank mode: the accessibility services it turned off, as they were (null when it isn't paused). */
+    static String savedA11y(Context c) {
+        return sp(c).getString("a11y_saved", null);
+    }
+
+    static void setSavedA11y(Context c, String list) {
+        SharedPreferences.Editor e = sp(c).edit();
+        if (list == null) e.remove("a11y_saved");
+        else e.putString("a11y_saved", list);
+        e.apply();
+    }
+
     /** The secret the background helper is started with and asks for; generated once per install. */
     static synchronized String backgroundToken(Context c) {
         String t = sp(c).getString("bg_token", null);

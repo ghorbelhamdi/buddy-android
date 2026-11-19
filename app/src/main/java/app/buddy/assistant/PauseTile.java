@@ -1,31 +1,72 @@
 package app.buddy.assistant;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.provider.Settings;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
 
 /**
- * A Quick Settings tile that pauses Buddy with one tap: banks and other guarded apps refuse to open while an
- * accessibility service runs (they take it for "this app has control"), so the user pauses before banking and
- * resumes after. It switches only Buddy's own accessibility service off and back on (other services stay on), which
- * needs the WRITE_SECURE_SETTINGS right Buddy was given over adb (or its own pairing); without it the tile opens
- * Android's accessibility settings. The phone tools server keeps running while paused, and the background mode's
- * helper isn't touched.
+ * Bank mode: a Quick Settings tile that turns every accessibility service off with one tap, and puts them back after.
+ * Banks and other guarded apps refuse to open while any accessibility service runs (they take it for "an app has
+ * control"), and Buddy's isn't the only one: Link to Windows and the like count too. The screen shows nothing about
+ * this, so the whole list is saved and restored, never just Buddy's entry. Writing those settings needs the
+ * WRITE_SECURE_SETTINGS right Buddy was given over adb (or its own pairing); without it the tile opens Android's
+ * accessibility settings instead.
+ *
+ * While paused, Buddy's own service is off too: its bubble, screen control and phone tools server stop (the background
+ * mode's helper and chatting go on). That's what makes the bank open, and resuming brings them back.
  */
 public class PauseTile extends TileService {
-    /** Buddy's entry in the enabled services list, as Android writes it and in the short form. */
-    private static String[] entries(String pkg) {
-        return new String[]{pkg + "/" + BuddyService.class.getName(), pkg + "/.BuddyService"};
+    private static final String WRITE = "android.permission.WRITE_SECURE_SETTINGS";
+
+    /** The enabled services list, as Android keeps it ("" when empty). */
+    static String enabled(Context c) {
+        String s = Settings.Secure.getString(c.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+        return s == null ? "" : s;
     }
 
-    /** The enabled services list without Buddy's entries (others kept), as it should be while paused. */
-    private static String withoutBuddy(String list, String pkg) {
+    /** True while Bank mode holds the services it turned off (they come back on resume). */
+    static boolean paused(Context c) {
+        return Prefs.savedA11y(c) != null;
+    }
+
+    /** Buddy may write secure settings (given over adb, or by its own pairing). */
+    static boolean allowed(Context c) {
+        return c.checkSelfPermission(WRITE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    /** Turns every accessibility service off, remembering the list; false when Buddy may not write settings. */
+    static boolean pause(Context c) {
+        if (!allowed(c)) return false;
+        Prefs.setSavedA11y(c, enabled(c));
+        Settings.Secure.putString(c.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, "");
+        Settings.Secure.putInt(c.getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, 0);
+        return true;
+    }
+
+    /** Puts the paused services back, plus any that were switched on in between; false when it may not write. */
+    static boolean resume(Context c) {
+        if (!allowed(c)) return false;
+        String saved = Prefs.savedA11y(c);
+        if (saved == null) return true;
+        Prefs.setSavedA11y(c, null);
+        Settings.Secure.putString(c.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+                merge(enabled(c), saved));
+        Settings.Secure.putInt(c.getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, 1);
+        return true;
+    }
+
+    /** Two ":"-separated lists joined, no entry twice (the current ones first, in their order). */
+    private static String merge(String now, String saved) {
         StringBuilder out = new StringBuilder();
-        for (String s : list.split(":")) {
-            boolean mine = false;
-            for (String e : entries(pkg)) mine |= s.contentEquals(e);
-            if (!mine && !s.isEmpty()) {
+        for (String list : new String[]{now, saved}) {
+            for (String s : list.split(":")) {
+                if (s.isEmpty()) continue;
+                boolean seen = false;
+                for (String had : out.toString().split(":")) seen |= had.contentEquals(s);
+                if (seen) continue;
                 if (out.length() > 0) out.append(':');
                 out.append(s);
             }
@@ -33,20 +74,12 @@ public class PauseTile extends TileService {
         return out.toString();
     }
 
-    private static boolean running(String list, String pkg) {
-        for (String e : entries(pkg)) {
-            for (String s : list.split(":")) if (s.contentEquals(e)) return true;
-        }
-        return false;
-    }
-
     private void update() {
         Tile t = getQsTile();
         if (t == null) return;
-        String list = Settings.Secure.getString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
-        boolean on = list != null && running(list, getPackageName());
-        t.setState(on ? Tile.STATE_ACTIVE : Tile.STATE_INACTIVE);
-        t.setSubtitle(getString(on ? R.string.pause_tile_running : R.string.pause_tile_paused));
+        boolean off = paused(this);
+        t.setState(off ? Tile.STATE_ACTIVE : Tile.STATE_INACTIVE);
+        t.setSubtitle(getString(off ? R.string.pause_tile_paused : R.string.pause_tile_running));
         t.updateTile();
     }
 
@@ -57,18 +90,8 @@ public class PauseTile extends TileService {
 
     @Override
     public void onClick() {
-        String pkg = getPackageName();
-        String list = Settings.Secure.getString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
-        if (list == null) list = "";
-        if (running(list, pkg)) {
-            Settings.Secure.putString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
-                    withoutBuddy(list, pkg));
-        } else if (checkSelfPermission("android.permission.WRITE_SECURE_SETTINGS")
-                == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-            // back on: Buddy's entry goes at the end, after any others, as Android itself would keep them
-            String back = list.isEmpty() ? entries(pkg)[0] : list + ":" + entries(pkg)[0];
-            Settings.Secure.putString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, back);
-        } else {
+        boolean done = paused(this) ? resume(this) : pause(this);
+        if (!done) {
             try {
                 startActivityAndCollapse(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));

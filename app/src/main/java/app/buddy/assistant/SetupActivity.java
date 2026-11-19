@@ -949,6 +949,13 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
     /** Background and automation: background mode and scheduled tasks (the background browser follows). */
     private void automationSection() {
         LinearLayout ex = card();
+        ex.addView(protect(switchRow(this, getString(R.string.pause_tile_label), getString(R.string.pause_mode_info),
+                PauseTile.paused(this), on -> {
+            boolean done = on ? PauseTile.pause(this) : PauseTile.resume(this);
+            if (!done) startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+            render();
+        })), full());
+        ex.addView(divider(), lineParams());
         View bgm = navRow(R.drawable.ms_layers, getString(R.string.background_title), getString(R.string.background_row), false,
                 BackgroundActivity.class);
         bgm.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
