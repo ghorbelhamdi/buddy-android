@@ -117,12 +117,32 @@ final class Models {
         return m == null ? 0 : m.optLong("window");
     }
 
-    /** The line under a model in the pickers: its id (or what Default means), with its context size when known. */
+    /**
+     * The line under a model in the pickers: its id (or what Default means), with its context size and what the
+     * service says it takes (images, tools, thinking) when known (see Relay.capabilities).
+     */
     static String detail(String backend, String id, String defaultHint) {
         if (id.isEmpty()) return defaultHint;
         long w = window(id);
         String shown = Providers.of(id) != null ? Providers.model(id) : id;
-        return w > 0 ? shown + " · " + BuddyApp.str(R.string.models_context, tokens(w)) : shown;
+        if (w > 0) shown += " · " + BuddyApp.str(R.string.models_context, tokens(w));
+        String caps = caps(id);
+        return caps.isEmpty() ? shown : shown + " · " + caps;
+    }
+
+    /** What the service said a model takes ("Images, Tools, Thinking"), "" when it didn't say. */
+    static String caps(String ref) {
+        Providers.P p = Providers.of(ref);
+        org.json.JSONObject m = p == null ? null : p.modelInfo(Providers.model(ref));
+        org.json.JSONArray c = m == null ? null : m.optJSONArray("caps");
+        java.util.List<String> out = new java.util.ArrayList<>();
+        for (int i = 0; c != null && i < c.length(); i++) {
+            String k = c.optString(i);
+            if (k.equals("vision")) out.add(BuddyApp.str(R.string.models_caps_vision));
+            else if (k.equals("tools")) out.add(BuddyApp.str(R.string.models_caps_tools));
+            else if (k.equals("thinking")) out.add(BuddyApp.str(R.string.models_caps_thinking));
+        }
+        return String.join(", ", out);
     }
 
     /** 1048576 → "1M", 200000 → "200K", 8104 → "8.1K". */

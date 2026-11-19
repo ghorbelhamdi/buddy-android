@@ -122,6 +122,8 @@ More in [Security in detail](docs/GUIDE.md#security-in-detail). Found a problem?
 
 ## Contributing
 
+**Languages:** Arabic, Chinese (Simplified), Dutch, English, French, German, Hindi, Indonesian, Italian, Japanese, Korean, Lao (ລາວ), Polish, Portuguese, Russian, Spanish, Turkish, Ukrainian and Vietnamese.
+
 Bug reports, ideas and translation fixes are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md). If Buddy is useful to you, a ⭐ helps other people find it.
 
 ## For developers

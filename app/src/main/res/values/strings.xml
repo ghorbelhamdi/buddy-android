@@ -1250,6 +1250,10 @@
 
     <!-- Settings screen: Appearance. Section labels are shown in ALL CAPS. -->
     <string name="setup_appearance">Appearance</string>
+    <!-- Buddy's own language (Android 13+ keeps it for this app alone). -->
+    <string name="settings_language">Language</string>
+    <string name="settings_language_system">Phone\'s language</string>
+    <string name="settings_language_note">Buddy only: the rest of the phone keeps its own language.</string>
     <!-- Label of the light / dark mode picker. -->
     <string name="setup_theme_mode">Mode</string>
     <!-- Label of the accent colour picker. -->
@@ -2086,7 +2090,7 @@
     <string name="background_pc_step2">2. Starts the helper. Run it again after every restart of the phone.</string>
     <string name="background_pc_copy">Copy both commands</string>
     <string name="background_pc_copied">Copied</string>
-    <string name="background_pc_waiting">Waiting for the helper to answerΓÇª</string>
+    <string name="background_pc_waiting">Waiting for the helper to answer…</string>
     <string name="background_pc_timeout">The helper didn\'t answer. Is the computer connected, USB debugging allowed, and adb installed on it?</string>
     <!-- The Quick Settings tile that pauses Buddy (its accessibility service off) so guarded apps like banks open. -->
     <string name="pause_tile_label">Bank mode</string>
@@ -2269,6 +2273,9 @@
     <string name="chat_incognito_info">This chat is deleted, with what its agent kept of it, when Buddy restarts.</string>
     <string name="models_context">%1$s context</string>
     <string name="models_chip_context">%1$d%% context</string>
+    <string name="models_caps_vision">Images</string>
+    <string name="models_caps_tools">Tools</string>
+    <string name="models_caps_thinking">Thinking</string>
     <string name="chat_context">Context</string>
     <string name="chat_context_used">%1$s of %2$s tokens used (%3$d%%)</string>
     <string name="chat_context_help">When it fills up, %1$s summarizes the older messages on its own to make room.</string>

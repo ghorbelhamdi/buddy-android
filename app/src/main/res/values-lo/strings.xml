@@ -1,0 +1,2308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Every text Buddy shows, in Lao (ທ່ານ). English source: res/values/strings.xml. -->
+<resources>
+    <string name="service_label">ຜູ້ຊ່ວຍ Buddy</string>
+    <string name="service_description">ສະແດງບັອບເບິ້ລແຊັດຂອງ Buddy ແລະ ໃຫ້ຕົວແທນທີ່ທ່ານເລືອກ (Claude Code, Codex, OpenCode, Antigravity ຫຼື Grok) ທີ່ແລ່ນຢູ່ໃນ Buddy ເທິງໂທລະສັບນີ້ ອ່ານໜ້າຈໍ ແລະ ແຕະ, ພິມ ແລະ ເລື່ອນໜ້າແທນທ່ານ. ບໍ່ມີຫຍັງອອກຈາກໂທລະສັບ ນອກຈາກສິ່ງທີ່ຕົວແທນສົ່ງໄປຫາບໍລິການ AI ຂອງມັນເອງ (Anthropic, OpenAI, Google, xAI ຫຼື ຜູ້ໃຫ້ບໍລິການໂມເດລຂອງ OpenCode ຂອງທ່ານ).</string>
+
+    <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
+
+    <!-- First-run setup guide: top bar and buttons shared by several steps. -->
+    <!-- Button at the top right of every step. Keep short. -->
+    <string name="onboarding_skip_setup">ຂ້າມການຕັ້ງຄ່າ</string>
+    <string name="onboarding_skip_title">ຂ້າມຄຳແນະນຳການຕັ້ງຄ່າບໍ?</string>
+    <!-- "Settings" = Buddy's own Settings tab. -->
+    <string name="onboarding_skip_text">ທ່ານສາມາດຕັ້ງຄ່າໃຫ້ສຳເລັດໄດ້ທຸກເວລາໃນ ການຕັ້ງຄ່າ. ການສົນທະນາຈະບໍ່ແລ່ນຈົນກວ່າຈະສຳເລັດ.</string>
+    <!-- Verb. Confirm button of the "Skip the setup guide?" sheet. -->
+    <string name="onboarding_skip_action">ຂ້າມ</string>
+    <!-- Progress at the top of the guide, small lowercase mono text. %1$d = this step, %2$d = number of steps. -->
+    <string name="onboarding_progress">ຂັ້ນຕອນ %1$d ຈາກ %2$d</string>
+    <!-- Button: go to the next step. -->
+    <string name="onboarding_continue">ສືບຕໍ່</string>
+    <!-- Title of the expandable help section at the bottom of a step. -->
+    <string name="onboarding_stuck">ຕິດຄ້າງ?</string>
+
+    <!-- Guide, welcome screen. -->
+    <string name="onboarding_welcome_title">ພົບກັບ Buddy</string>
+    <string name="onboarding_welcome_text">ບັອບເບິ້ລແຊັດທີ່ໃຊ້ໂທລະສັບຂອງທ່ານແທນໄດ້.</string>
+    <string name="onboarding_welcome_ask_title">ຖາມດ້ວຍຄຳທຳມະດາ</string>
+    <!-- Two example requests a user could type. Translate them naturally and use your language's quotation marks. -->
+    <string name="onboarding_welcome_ask_text">“ຕອບ Sam ວ່າຂ້ອຍຈະຊ້າ”, “ເພີ່ມນົມໃສ່ກະຕ່າ”.</string>
+    <string name="onboarding_welcome_plan_title">ແຜນຂອງທ່ານເອງ, ບໍ່ຕ້ອງມີ API key</string>
+    <string name="onboarding_welcome_plan_text">ແລ່ນ Claude Code ດ້ວຍການສະໝັກສະມາຊິກ Claude ຂອງທ່ານ. Codex ກັບແຜນ ChatGPT, Antigravity ກັບບັນຊີ Google, Grok ກັບບັນຊີ Google ຫຼື X ແລະ ໂມເດລຟຣີຂອງ OpenCode ກໍ່ໃຊ້ໄດ້.</string>
+    <string name="onboarding_welcome_control_title">ທ່ານຍັງຄຸມຢູ່</string>
+    <string name="onboarding_welcome_control_text">ການສົ່ງ, ໂພສ, ຊື້ ແລະ ລຶບ ຈະຖາມກ່ອນສະເໝີ.</string>
+    <!-- Small lowercase mono line under the list. -->
+    <string name="onboarding_welcome_time">ການຕັ້ງຄ່າໃຊ້ເວລາປະມານ 5 ນາທີ</string>
+    <string name="onboarding_get_started">ເລີ່ມຕົ້ນ</string>
+
+    <!-- Guide, step: choose the agent. Agent names next to each option stay in English. -->
+    <string name="onboarding_brain_title">ເລືອກຕົວແທນຂອງທ່ານ</string>
+    <!-- "Settings" = Buddy's own Settings tab. -->
+    <string name="onboarding_brain_text">ໃຜຈະຕອບການສົນທະນາຂອງທ່ານ. ທ່ານສາມາດເພີ່ມຕົວອື່ນໄດ້ພາຍຫຼັງໃນ ການຕັ້ງຄ່າ.</string>
+    <string name="onboarding_brain_claude">ໃຊ້ການສະໝັກສະມາຊິກ Claude ຂອງທ່ານ (Pro ຫຼື Max).</string>
+    <string name="onboarding_brain_codex">ໃຊ້ແຜນ ChatGPT ຂອງທ່ານ.</string>
+    <string name="onboarding_brain_opencode">ບໍ່ຕ້ອງມີບັນຊີ. ເຊື່ອມຕໍ່ຜູ້ໃຫ້ບໍລິການຂອງທ່ານເອງພາຍຫຼັງ.</string>
+    <string name="onboarding_brain_local_title">ໂມເດລພາຍໃນ</string>
+    <string name="onboarding_brain_local">Ollama, LM Studio ຫຼື llama.cpp ເທິງຄອມພິວເຕີຂອງທ່ານເອງ. ບໍ່ມີຫຍັງສົ່ງໄປຫາບໍລິສັດ AI. ແລ່ນຜ່ານ OpenCode.</string>
+    <string name="onboarding_access_privacy_local">ກັບໂມເດລພາຍໃນ, ສິ່ງທີ່ຕົວແທນອ່ານເທິງໜ້າຈໍຈະໄປຫາເຊີບເວີຂອງທ່ານເອງ, ບໍ່ແມ່ນບໍລິສັດ AI. ການສົ່ງ, ໂພສ, ຊື້ ແລະ ລຶບ ຈະຂໍອະນຸຍາດຈາກທ່ານກ່ອນສະເໝີ.</string>
+    <string name="onboarding_local_server_title">ເຊີບເວີໂມເດລຂອງທ່ານ</string>
+    <string name="onboarding_local_server_none">ຍັງບໍ່ໄດ້ເພີ່ມ</string>
+    <string name="onboarding_local_server_added">ເພີ່ມ %1$s ແລ້ວ</string>
+    <string name="onboarding_local_server_text">ເປີດ Ollama, LM Studio ຫຼື llama.cpp ເທິງຄອມພິວເຕີຂອງທ່ານ, ແລ້ວເພີ່ມທີ່ຢູ່ຂອງມັນຢູ່ນີ້. ບໍ່ຕ້ອງມີ key. ເລືອກໂມເດລທີ່ຈັດການການເອີ້ນເຄື່ອງມືໄດ້ດີ: ໂມເດລນ້ອຍ (4–8B) ຈັດການໄດ້ພຽງຄຳຂໍງ່າຍໆ.</string>
+    <string name="onboarding_local_server_add">ເພີ່ມເຊີບເວີຂອງທ່ານ</string>
+    <!-- Under "Antigravity" (Google's agent) in the agent choice. Google AI Pro and Ultra are Google's paid plans (names stay as they are). -->
+    <string name="onboarding_brain_agy">ໃຊ້ບັນຊີ Google ຂອງທ່ານ, ລວມທັງ Google AI Pro ຫຼື Ultra.</string>
+    <!-- Under "Grok" (xAI's agent) in the agent choice. Grok, xAI and X stay as they are; "X" is the social network. -->
+    <string name="onboarding_brain_grok">ໃຊ້ບັນຊີ Grok ຂອງທ່ານ (ເຂົ້າສູ່ລະບົບດ້ວຍ Google ຫຼື X).</string>
+    <!-- The option that installs both Claude Code and Codex. -->
+    <string name="onboarding_brain_both">ຕິດຕັ້ງທັງສອງ; ເລືອກຕໍ່ການສົນທະນາ. Claude Code ຍັງເປັນຄ່າເລີ່ມຕົ້ນ.</string>
+    <!-- Small lowercase tag next to "Claude Code". Keep very short. -->
+    <string name="onboarding_recommended">ແນະນຳ</string>
+
+    <!-- Guide, step: turn on Buddy's accessibility service. -->
+    <string name="onboarding_access_title">ໃຫ້ Buddy ເຫັນ ແລະ ແຕະ</string>
+    <string name="onboarding_access_done">ເປີດການເຂົ້າເຖິງແລ້ວ.</string>
+    <string name="onboarding_access_text">ບໍລິການເຂົ້າເຖິງຂອງ Buddy ສະແດງບັອບເບິ້ລ ແລະ ໃຫ້ຕົວແທນອ່ານໜ້າຈໍ, ແຕະ ແລະ ພິມ, ພຽງເມື່ອທ່ານຂໍໃຫ້ມັນເຮັດບາງຢ່າງ.</string>
+    <!-- %1$s = the agent's name (Claude Code or Codex); %2$s = the company it sends to (Anthropic or OpenAI). -->
+    <string name="onboarding_access_privacy">ບໍ່ມີຫຍັງອອກຈາກໂທລະສັບ ນອກຈາກສິ່ງທີ່ %1$s ສົ່ງໄປຫາ %2$s ເພື່ອຕອບທ່ານ. ການສົ່ງ, ໂພສ, ຊື້ ແລະ ລຶບ ຈະຂໍອະນຸຍາດຈາກທ່ານກ່ອນສະເໝີ.</string>
+    <!-- Same as onboarding_access_privacy, when both Claude Code and Codex are set up. -->
+    <string name="onboarding_access_privacy_both">ບໍ່ມີຫຍັງອອກຈາກໂທລະສັບ ນອກຈາກສິ່ງທີ່ Claude Code ແລະ Codex ສົ່ງໄປຫາ Anthropic ແລະ OpenAI ເພື່ອຕອບທ່ານ. ການສົ່ງ, ໂພສ, ຊື້ ແລະ ລຶບ ຈະຂໍອະນຸຍາດຈາກທ່ານກ່ອນສະເໝີ.</string>
+    <!-- Same as onboarding_access_privacy, for OpenCode. %1$s = OpenCode. The model's provider = whichever AI company runs the chosen model. -->
+    <string name="onboarding_access_privacy_opencode">ບໍ່ມີຫຍັງອອກຈາກໂທລະສັບ ນອກຈາກສິ່ງທີ່ %1$s ສົ່ງໄປຫາຜູ້ໃຫ້ບໍລິການຂອງໂມເດລເພື່ອຕອບທ່ານ. ການສົ່ງ, ໂພສ, ຊື້ ແລະ ລຶບ ຈະຂໍອະນຸຍາດຈາກທ່ານກ່ອນສະເໝີ.</string>
+    <!-- Path in Android's Accessibility settings. "Downloaded apps" = that section's name on Android (use Android's wording in your language); "Buddy assistant" = Buddy's service name (service_label). -->
+    <string name="onboarding_access_list_hint">ໃນລາຍການ: ແອັບທີ່ດາວໂຫຼດ → ຜູ້ຊ່ວຍ Buddy → ເປີດມັນ.</string>
+    <string name="onboarding_access_open">ເປີດການຕັ້ງຄ່າການເຂົ້າເຖິງ</string>
+    <!-- Android 13+ greys out the switch for apps installed from a file. Title of a help box and a help question. -->
+    <string name="onboarding_access_greyed_title">ສະວິດເປັນສີເທົາ?</string>
+    <!-- "App info" = the button below (onboarding_app_info). "Allow restricted settings" = Android's own menu item; ⋮ = the three-dot menu. -->
+    <string name="onboarding_access_greyed_text">Android ບລັອກສິ່ງນີ້ສຳລັບແອັບທີ່ຕິດຕັ້ງຈາກໄຟລ໌. ແຕະ ຂໍ້ມູນແອັບ (ຂ້າງລຸ່ມ), ແລ້ວ ⋮ ຢູ່ມຸມຂວາເທິງ → ອະນຸຍາດການຕັ້ງຄ່າທີ່ຖືກຈຳກັດ, ແລ້ວລອງອີກຄັ້ງ.</string>
+    <!-- Numbered steps, one per line. Same names as in onboarding_access_greyed_text. -->
+    <string name="onboarding_access_restricted_steps">1. ແຕະ ຂໍ້ມູນແອັບ ຂ້າງລຸ່ມ.\n2. ແຕະ ⋮ ຢູ່ມຸມຂວາເທິງ → ອະນຸຍາດການຕັ້ງຄ່າທີ່ຖືກຈຳກັດ.\n3. ກັບມາແລ້ວເປີດການຕັ້ງຄ່າການເຂົ້າເຖິງອີກຄັ້ງ.</string>
+    <!-- Button: opens Android's App info page for Buddy. Use Android's name for that page. -->
+    <string name="onboarding_app_info">ຂໍ້ມູນແອັບ</string>
+
+    <!-- Guide, step: install the agent inside Buddy and sign in. -->
+    <string name="onboarding_agents_title">ຕິດຕັ້ງ ແລະ ເຂົ້າສູ່ລະບົບ</string>
+    <!-- Title once every chosen agent is installed and signed in. -->
+    <string name="onboarding_agents_done_title">ພ້ອມແລ້ວ</string>
+    <!-- %1$s = the agent's name (Claude Code, Codex, OpenCode, Antigravity or Grok). -->
+    <string name="onboarding_agents_done">ຕິດຕັ້ງ %1$s ແລະ ເຂົ້າສູ່ລະບົບແລ້ວ.</string>
+    <!-- Same as onboarding_agents_done, when both Claude Code and Codex are set up. -->
+    <string name="onboarding_agents_done_both">ຕິດຕັ້ງ Claude Code ແລະ Codex ແລະ ເຂົ້າສູ່ລະບົບແລ້ວ.</string>
+    <!-- %1$s = the agent's name (Claude Code, Codex, OpenCode, Antigravity, Grok) or onboarding_agent_names_both. -->
+    <string name="onboarding_agents_text">Buddy ຕິດຕັ້ງ %1$s ພາຍໃນແອັບ, ແລ້ວທ່ານເຂົ້າສູ່ລະບົບພຽງຄັ້ງດຽວ. ບໍ່ຕ້ອງໃຊ້ Termux.</string>
+    <!-- Both agents together, inserted as %1$s into onboarding_agents_text. -->
+    <string name="onboarding_agent_names_both">Claude Code ແລະ Codex</string>
+    <!-- Agent card status lines: small lowercase mono text, one line. -->
+    <!-- OpenCode is ready. %1$s = its model providers, or onboarding_agent_free_models. -->
+    <string name="onboarding_agent_ready">ພ້ອມ · %1$s</string>
+    <string name="onboarding_agent_free_models">ໂມເດລຟຣີ</string>
+    <string name="onboarding_agent_signed_in">ເຂົ້າສູ່ລະບົບແລ້ວ</string>
+    <!-- %1$s = the account's email address. -->
+    <string name="onboarding_agent_signed_in_as">ເຂົ້າສູ່ລະບົບ · %1$s</string>
+    <string name="onboarding_agent_installing">ກຳລັງຕິດຕັ້ງ…</string>
+    <string name="onboarding_agent_installed">ຕິດຕັ້ງແລ້ວ · ຍັງບໍ່ໄດ້ເຂົ້າສູ່ລະບົບ</string>
+    <string name="onboarding_agent_not_installed">ຍັງບໍ່ໄດ້ຕິດຕັ້ງ</string>
+    <!-- Agent card help text. "Authorize" = the button on Claude's sign-in web page (the page may be in English). -->
+    <string name="onboarding_agent_sign_in_claude">ເຂົ້າສູ່ລະບົບດ້ວຍບັນຊີ Claude ຂອງທ່ານ. ບຣາວເຊີຈະເປີດ; ແຕະ Authorize ແລ້ວ Buddy ຈະກັບມາເອງ.</string>
+    <string name="onboarding_agent_checking_opencode">ກຳລັງກວດສອບ OpenCode…</string>
+    <string name="onboarding_agent_sign_in_codex">ເຂົ້າສູ່ລະບົບດ້ວຍບັນຊີ ChatGPT ຂອງທ່ານໃນບຣາວເຊີ, ແລ້ວກັບມາ.</string>
+    <!-- Antigravity: the sign-in page shows a code that Buddy reads by itself. -->
+    <string name="onboarding_agent_sign_in_agy">ເຂົ້າສູ່ລະບົບດ້ວຍບັນຊີ Google ຂອງທ່ານ. ບຣາວເຊີຈະເປີດ; ເຂົ້າສູ່ລະບົບຢູ່ຫັ້ນ ແລ້ວ Buddy ຈະຮັບລະຫັດເອງ.</string>
+    <!-- Grok: the browser opens with a one-time code that the user confirms on the page. -->
+    <string name="onboarding_agent_sign_in_grok">ເຂົ້າສູ່ລະບົບດ້ວຍບັນຊີ Grok ຂອງທ່ານ. ບຣາວເຊີຈະເປີດ; ຢືນຢັນລະຫັດຢູ່ຫັ້ນ ແລ້ວ Buddy ຈະກັບມາເອງ.</string>
+    <!-- "Buddy's Linux" = the small Linux system built into Buddy. -->
+    <string name="onboarding_agent_download_claude">ດາວໂຫຼດປະມານ 235 MB ຄັ້ງດຽວ (Linux ຂອງ Buddy ແລະ Claude Code ຈາກ Anthropic).</string>
+    <string name="onboarding_agent_download_opencode">ດາວໂຫຼດປະມານ 230 MB ຄັ້ງດຽວ (Linux ຂອງ Buddy, Node.js ແລະ OpenCode). ບໍ່ຕ້ອງມີບັນຊີ.</string>
+    <string name="onboarding_agent_download_codex">ດາວໂຫຼດປະມານ 150 MB ຄັ້ງດຽວ (Linux ຂອງ Buddy, Node.js ແລະ Codex ຈາກ OpenAI).</string>
+    <string name="onboarding_agent_download_agy">ດາວໂຫຼດປະມານ 200 MB ຄັ້ງດຽວ (Linux ຂອງ Buddy ແລະ Antigravity CLI ຈາກ Google).</string>
+    <string name="onboarding_agent_download_grok">ດາວໂຫຼດປະມານ 170 MB ຄັ້ງດຽວ (Linux ຂອງ Buddy ແລະ Grok Build ຈາກ xAI).</string>
+    <!-- Buttons on the agent card. -->
+    <string name="onboarding_sign_in_claude">ເຂົ້າສູ່ລະບົບດ້ວຍ Claude</string>
+    <string name="onboarding_sign_in_chatgpt">ເຂົ້າສູ່ລະບົບດ້ວຍ ChatGPT</string>
+    <string name="onboarding_sign_in_google">ເຂົ້າສູ່ລະບົບດ້ວຍ Google</string>
+    <string name="onboarding_sign_in_grok">ເຂົ້າສູ່ລະບົບດ້ວຍ Grok</string>
+    <!-- %1$s = the agent's name (Claude Code, Codex, OpenCode, Antigravity or Grok). -->
+    <string name="onboarding_install_agent">ຕິດຕັ້ງ %1$s</string>
+    <string name="onboarding_agents_wifi">ໃຊ້ Wi-Fi ຖ້າເຮັດໄດ້. ທ່ານສາມາດອອກຈາກໜ້າຈໍນີ້ໄດ້ໃນຂະນະທີ່ມັນຕິດຕັ້ງ.</string>
+    <!-- Help questions and answers under "Stuck?". "Copy Code" = a button on Claude's web page. -->
+    <string name="onboarding_stuck_sign_in_q">ການເຂົ້າສູ່ລະບົບບໍ່ກັບມາ?</string>
+    <string name="onboarding_stuck_sign_in_a">Claude: ຢູ່ໜ້າ Claude ແຕະ Copy Code, ແລ້ວກັບມາຫາ Buddy; ມັນຈະຮັບລະຫັດຈາກຄລິບບອດ.</string>
+    <string name="onboarding_stuck_install_q">ການຕິດຕັ້ງລົ້ມເຫຼວ?</string>
+    <!-- "Install" = the Install button on the agent card (onboarding_install_agent). -->
+    <string name="onboarding_stuck_install_a">ກວດການເຊື່ອມຕໍ່ ແລ້ວແຕະ ຕິດຕັ້ງ ອີກຄັ້ງ; ມັນຈະສືບຕໍ່ຈາກບ່ອນທີ່ຢຸດ.</string>
+
+    <!-- Guide, step: let Buddy run in the background (Android's battery optimization). -->
+    <string name="onboarding_background_title">ໃຫ້ມັນແລ່ນຕໍ່</string>
+    <string name="onboarding_background_done">Buddy ສາມາດແລ່ນຢູ່ເບື້ອງຫຼັງໄດ້.</string>
+    <string name="onboarding_background_text">ເພື່ອໃຫ້ໂທລະສັບບໍ່ຢຸດ Buddy ເພື່ອປະຫຍັດແບັດໃນຂະນະທີ່ຕົວແທນເຮັດວຽກ.</string>
+    <!-- Button: opens Android's dialog to let Buddy run in the background. -->
+    <string name="onboarding_allow">ອະນຸຍາດ</string>
+    <string name="onboarding_skip_for_now">ຂ້າມກ່ອນ</string>
+
+    <!-- Guide, step: how much the agent asks before acting. -->
+    <string name="onboarding_safety_title">ມັນຄວນຖາມຫຼາຍປານໃດ?</string>
+    <!-- Ends with a colon: the two options follow. -->
+    <string name="onboarding_safety_text">ແອັບສົ່ງຂໍ້ຄວາມ, ໂຊເຊຍ, ຊື້ເຄື່ອງ, ຈ່າຍເງິນ ແລະ ທະນາຄານ ຕ້ອງການການອະນຸຍາດຈາກທ່ານກ່ອນ Buddy ຈະສົ່ງ, ໂພສ, ຊື້ ຫຼື ລຶບ. ສຳລັບແອັບອື່ນຂອງທ່ານ:</string>
+    <string name="onboarding_safety_ask_title">ຖາມຂ້ອຍກ່ອນ</string>
+    <string name="onboarding_safety_ask_text">ຕົວແທນຈະຖາມກ່ອນເຮັດສິ່ງທີ່ສ່ຽງ, ເຊັ່ນ ການປ່ຽນການຕັ້ງຄ່າ. ປອດໄພກວ່າ, ແຕ່ມີປັອບອັບຫຼາຍກວ່າ.</string>
+    <string name="onboarding_safety_auto_title">ເຮັດວຽກເອງ</string>
+    <string name="onboarding_safety_auto_text">ບໍ່ມີປັອບອັບ: ຕົວແທນເຮັດຕາມທີ່ທ່ານຂໍ, ເຊັ່ນ ເປີດກ້ອງ ຫຼື ໄຟ.</string>
+    <!-- "Settings → App permissions" = Buddy's own screens. "Trust" and "Hard" = names of approval modes; use the same translations as those mode labels. -->
+    <string name="onboarding_safety_note">ທ່ານສາມາດປ່ຽນສິ່ງນີ້ຕໍ່ແອັບໄດ້ທຸກເວລາ: ການຕັ້ງຄ່າ → ຄວາມປອດໄພ ແລະ ການອະນຸຍາດ → ສິດຂອງແອັບ. ຕັ້ງແອັບເປັນ ໄວ້ໃຈ ເພື່ອໃຫ້ຕົວແທນເຮັດວຽກຢູ່ຫັ້ນໂດຍບໍ່ມີປັອບອັບ, ຫຼື ເຂັ້ມງວດ ເພື່ອໃຫ້ Buddy ຖາມທ່ານເອງ.</string>
+
+    <!-- Guide, last step: try a first task. -->
+    <string name="onboarding_try_title">ທຸກຢ່າງພ້ອມແລ້ວ</string>
+    <!-- "Settings" = Android's Settings app. -->
+    <string name="onboarding_try_text">ລອງເຮັດວຽກທຳອິດ. Buddy ຈະເປີດ ການຕັ້ງຄ່າ ແລະ ອ່ານໃຫ້ທ່ານ.</string>
+    <!-- Example request: shown on this screen and put in the chat's input box, ready to send to the agent. "Settings" = Android's Settings app. -->
+    <string name="onboarding_try_prompt">ເປີດ ການຕັ້ງຄ່າ ແລະ ບອກຂ້ອຍວ່າ Android ເວີຊັນຫຍັງ</string>
+    <!-- onboarding_try_prompt in quotation marks (%1$s). Use your language's quotation marks. -->
+    <string name="onboarding_try_prompt_quoted">“%1$s”</string>
+    <!-- ✕ = the close target that appears while dragging the bubble. -->
+    <string name="onboarding_try_tip">ເຄັດລັບ: ບັອບເບິ້ລລອຍຢູ່ເທິງແອັບອື່ນ. ລາກມັນໃສ່ ✕ ເພື່ອເຊື່ອງ.</string>
+    <string name="onboarding_try_now">ລອງດຽວນີ້</string>
+    <string name="onboarding_go_to_chats">ໄປຫາການສົນທະນາຂອງຂ້ອຍ</string>
+
+    <!-- Home screen: the chat list. -->
+    <!-- Floating button that starts a chat, and the title of the sheet that picks its agent. Keep short. -->
+    <string name="main_new_chat">ສົນທະນາໃໝ່</string>
+    <!-- Small lowercase mono status under the app name when Buddy is ready. %1$s = Buddy's local server address (127.0.0.1:8765). -->
+    <string name="main_status_ready">ພ້ອມ · %1$s</string>
+    <!-- Small lowercase mono status while setup isn't finished: %1$d steps done out of %2$d. -->
+    <string name="main_status_setup">ຕັ້ງຄ່າ %1$d/%2$d</string>
+    <string name="main_setup_title">ຕັ້ງຄ່າໃຫ້ສຳເລັດເພື່ອແລ່ນການສົນທະນາ</string>
+    <!-- %1$s = the name of the next setup step, e.g. Turn on the accessibility service. -->
+    <string name="main_setup_next">ຕໍ່ໄປ: %1$s</string>
+    <string name="main_setup_next_accessibility">ຕໍ່ໄປ: ເປີດບໍລິການເຂົ້າເຖິງຂອງ Buddy</string>
+    <!-- Section header, shown in capitals: chats whose task is running now. The count follows it. -->
+    <string name="main_section_working">ກຳລັງເຮັດວຽກ</string>
+    <!-- Section header, shown in capitals. -->
+    <string name="main_section_recent">ຫຼ້າສຸດ</string>
+    <string name="main_empty_title">ຍັງບໍ່ມີການສົນທະນາ</string>
+    <!-- "New chat" = the button (main_new_chat). -->
+    <string name="main_empty_text">ແຕະ ສົນທະນາໃໝ່ ເພື່ອເລີ່ມກັບ Claude Code, Codex, OpenCode, Antigravity ຫຼື Grok. ກົດຄ້າງການສົນທະນາເພື່ອລຶບ.</string>
+    <!-- Status of a chat with a running task, until the agent reports what it's doing. Small lowercase mono text. -->
+    <string name="main_chat_working">ກຳລັງເຮັດວຽກ…</string>
+    <string name="main_chat_waiting">ກຳລັງລໍຖ້າທ່ານ…</string>
+    <string name="main_card_other_session">ເຊສຊັນອື່ນ</string>
+    <!-- Preview of a chat's last message when the user wrote it. %1$s = the message. -->
+    <string name="main_chat_last_you">ທ່ານ: %1$s</string>
+    <string name="main_delete_title">ລຶບການສົນທະນານີ້ບໍ?</string>
+    <!-- Verb. Confirm button. -->
+    <string name="main_delete_action">ລຶບ</string>
+    <!-- New chat sheet: small lowercase tag next to the default agent's name. Keep very short. -->
+    <string name="main_new_chat_default">ຄ່າເລີ່ມຕົ້ນ</string>
+    <!-- New chat sheet: shown under an agent that isn't ready yet. -->
+    <string name="main_new_chat_not_signed_in">ຍັງບໍ່ໄດ້ເຂົ້າສູ່ລະບົບ · ແຕະເພື່ອຕັ້ງຄ່າ</string>
+    <string name="main_new_chat_not_installed">ຍັງບໍ່ໄດ້ຕິດຕັ້ງ · ແຕະເພື່ອຕັ້ງຄ່າ</string>
+    <!-- How long ago a chat changed, next to it in the chat lists. Very little room: keep as short as the English (m = minutes, h = hours, d = days). -->
+    <string name="main_ago_now">ຕອນນີ້</string>
+    <plurals name="main_ago_minutes">
+        <item quantity="one">%1$d ນ</item>
+        <item quantity="other">%1$d ນ</item>
+    </plurals>
+    <plurals name="main_ago_hours">
+        <item quantity="one">%1$d ຊ</item>
+        <item quantity="other">%1$d ຊ</item>
+    </plurals>
+    <plurals name="main_ago_days">
+        <item quantity="one">%1$d ວ</item>
+        <item quantity="other">%1$d ວ</item>
+    </plurals>
+
+    <!-- Notification shown after the bubble is dragged away to hide it. -->
+    <!-- Notification category name in Android's notification settings for Buddy. -->
+    <string name="notice_channel_name">ບັອບເບິ້ລທີ່ເຊື່ອງໄວ້</string>
+    <string name="notice_hidden_title">Buddy ຖືກເຊື່ອງແລ້ວ</string>
+    <string name="notice_hidden_text">ແຕະເພື່ອສະແດງບັອບເບິ້ລອີກຄັ້ງ.</string>
+    <!-- Notification button: opens Buddy's chat list. Keep short. -->
+    <string name="notice_open_chats">ເປີດການສົນທະນາ</string>
+
+    <!-- Buddy's own updates (GitHub version): notification, update sheet and messages. -->
+    <!-- Notification category name in Android's notification settings for Buddy. -->
+    <string name="update_channel_name">ການອັບເດດຂອງ Buddy</string>
+    <!-- Notification and sheet title. %1$s = the new version number, e.g. 2.1.14. -->
+    <string name="update_available_title">Buddy %1$s ພ້ອມໃຫ້ໃຊ້ແລ້ວ</string>
+    <!-- %1$s = the installed version number. -->
+    <string name="update_notification_text">ທ່ານມີ %1$s. ແຕະເພື່ອເບິ່ງສິ່ງໃໝ່ ແລະ ອັບເດດ; ການສົນທະນາຂອງທ່ານຍັງຢູ່.</string>
+    <!-- Verb: download and install the new version. Notification button and sheet button (half width). Keep short. -->
+    <string name="update_action">ອັບເດດ</string>
+    <!-- Notification button: stop update notifications. Keep short. -->
+    <string name="update_mute">ຢ່າແຈ້ງເຕືອນຂ້ອຍ</string>
+    <!-- "Settings" = Buddy's own Settings tab (its Update notices switch). -->
+    <string name="update_muted">ບໍ່ມີການແຈ້ງເຕືອນອັບເດດອີກ. ເປີດຄືນໄດ້ໃນ ການຕັ້ງຄ່າ.</string>
+    <string name="update_checking">ກຳລັງກວດຫາການອັບເດດ…</string>
+    <string name="update_check_failed">ເຊື່ອມຕໍ່ GitHub ບໍ່ໄດ້. ລອງໃໝ່ພາຍຫຼັງ.</string>
+    <!-- %1$s = the installed version number. -->
+    <string name="update_up_to_date">Buddy %1$s ເປັນເວີຊັນລ່າສຸດແລ້ວ.</string>
+    <!-- Under the sheet title. %1$s = the installed version number. -->
+    <string name="update_sheet_text">ທ່ານມີ %1$s. ການອັບເດດຈະຮັກສາການສົນທະນາ, ການຕັ້ງຄ່າ ແລະ ການເຂົ້າສູ່ລະບົບ.</string>
+    <!-- Sheet button (half width): close without updating. -->
+    <string name="update_later">ພາຍຫຼັງ</string>
+    <!-- On the Update button while the new version downloads. -->
+    <string name="update_downloading">ກຳລັງດາວໂຫຼດ…</string>
+    <!-- "Update" = the button (update_action). -->
+    <string name="update_needs_permission">ອະນຸຍາດໃຫ້ Buddy ຕິດຕັ້ງແອັບ, ແລ້ວແຕະ ອັບເດດ ອີກຄັ້ງ.</string>
+    <!-- Why an update failed (%1$s of update_failed_manual). buddy.apk is a file name. -->
+    <string name="update_error_no_apk">ລຸ້ນນີ້ຍັງບໍ່ມີ buddy.apk.</string>
+    <!-- %1$s = the system's technical error message (usually English). -->
+    <string name="update_error_download">ການດາວໂຫຼດລົ້ມເຫຼວ (%1$s).</string>
+    <string name="update_error_not_newer">ໄຟລ໌ທີ່ດາວໂຫຼດບໍ່ແມ່ນ Buddy ເວີຊັນໃໝ່ກວ່າ, ຈຶ່ງບໍ່ໄດ້ເປີດ.</string>
+    <!-- Message after a failed update. %1$s = what went wrong (an update_error_ sentence); %2$s = the web address of the latest release; %3$s = the web address of the update instructions. Obtainium is an app name. -->
+    <string name="update_failed_manual">%1$s ທ່ານຍັງສາມາດຮັບໄດ້ທີ່ %2$s (buddy.apk), ຫຼື ໃຊ້ Obtainium ເພື່ອອັບເດດອັດຕະໂນມັດ (ເບິ່ງ %3$s).</string>
+
+    <!-- Settings, Appearance: option names. -->
+    <!-- Light/dark mode, segmented control: keep short. System = follow the phone's setting. -->
+    <string name="prefs_theme_system">ລະບົບ</string>
+    <string name="prefs_theme_light">ແຈ້ງ</string>
+    <string name="prefs_theme_dark">ມືດ</string>
+    <!-- Surface (background) tone, segmented control: keep short. Warm = Buddy's original warm greys; Black = true black, in dark mode only. -->
+    <string name="prefs_surface_warm">ອຸ່ນ</string>
+    <string name="prefs_surface_neutral">ກາງໆ</string>
+    <string name="prefs_surface_black">ດຳ</string>
+    <!-- Accent colour names, read aloud by TalkBack for the colour swatches. -->
+    <string name="prefs_accent_coral">ປະກາລັງ</string>
+    <string name="prefs_accent_ocean">ມະຫາສະໝຸດ</string>
+    <string name="prefs_accent_mint">ມິນ</string>
+    <string name="prefs_accent_violet">ມ່ວງອ່ອນ</string>
+    <string name="prefs_accent_rose">ກຸຫຼາບ</string>
+    <string name="prefs_accent_amber">ອຳພັນ</string>
+
+    <!-- ===== The bubble, its hold menu, chat panel and approval cards (Bubble, RadialMenu, ControlIndicator) ===== -->
+
+    <!-- Floating bubble, read by TalkBack. -->
+    <string name="bubble_face_description">Buddy. ແຕະເພື່ອເປີດ, ກົດຄ້າງເພື່ອເບິ່ງການກະທຳ</string>
+    <!-- TalkBack action on the bubble, read as "Double-tap and hold to show actions". Lowercase. -->
+    <string name="bubble_show_actions">ສະແດງການກະທຳ</string>
+
+    <!-- Status pill beside the bubble: at most two lines, about 250dp wide; longer text is cut off with "…".
+         "hold" = long-press the bubble, which opens the hold menu. -->
+    <string name="bubble_pill_waiting_answer">ກຳລັງລໍຖ້າຄຳຕອບຂອງທ່ານ</string>
+    <string name="bubble_pill_waiting_approval">ກຳລັງລໍຖ້າການອະນຸຍາດຂອງທ່ານ</string>
+    <string name="bubble_pill_paused">ຢຸດຊົ່ວຄາວ · ແຕະນີ້ເພື່ອເຮັດຕໍ່</string>
+    <string name="bubble_pill_hands_on">%1$s · ແຕະນີ້ເພື່ອຕອບ</string>
+    <!-- The agent is operating the phone. Also the chat panel's running strip. -->
+    <string name="bubble_using_phone">ກຳລັງໃຊ້ໂທລະສັບຂອງທ່ານ</string>
+    <!-- %1$s: what the agent is doing right now (its own status text). -->
+    <string name="bubble_using_phone_status">ກຳລັງໃຊ້ໂທລະສັບ · %1$s</string>
+    <!-- First line of the pill while the agent works without using the screen (background browser, Linux tools, thinking): the phone is free. -->
+    <string name="bubble_pill_background">ຢູ່ເບື້ອງຫຼັງ · ທ່ານໃຊ້ໂທລະສັບໄດ້</string>
+    <string name="activity_reading">ກຳລັງອ່ານໜ້າຈໍ</string>
+    <string name="activity_typing">ກຳລັງພິມ</string>
+    <string name="activity_scrolling">ກຳລັງເລື່ອນ</string>
+    <string name="activity_swiping">ກຳລັງປັດ</string>
+    <string name="activity_opening">ກຳລັງເປີດ %1$s</string>
+    <string name="activity_tapping">ກຳລັງແຕະ “%1$s”</string>
+    <string name="activity_tapping_plain">ກຳລັງແຕະ</string>
+    <string name="activity_browsing">ກຳລັງເບິ່ງ %1$s · %2$s</string>
+    <string name="activity_browser_opening">ກຳລັງເປີດໜ້າ</string>
+    <string name="activity_browser_reading">ກຳລັງອ່ານໜ້າ</string>
+    <!-- Shown until the user has opened the hold menu once; this one when there is no status text, otherwise the
+         next string. "Stop" is the hold menu's Stop task action. -->
+    <string name="bubble_pill_hold_hint">ກົດຄ້າງບັອບເບິ້ລເພື່ອ ຢຸດ ແລະ ອື່ນໆ</string>
+    <!-- %1$s: the current status text. -->
+    <string name="bubble_pill_status_hold_hint">%1$s · ກົດຄ້າງບັອບເບິ້ລເພື່ອ ຢຸດ ແລະ ອື່ນໆ</string>
+
+    <!-- Hold menu: actions fanned out around the bubble while it is held. Very little room: one line, 72dp wide
+         (about 12 characters); longer labels are cut off. -->
+    <string name="menu_stop_task">ຢຸດວຽກ</string>
+    <string name="menu_resume">ເຮັດຕໍ່</string>
+    <string name="menu_pause">ຢຸດຊົ່ວຄາວ</string>
+    <!-- Dictate an extra instruction for the agent while it works. -->
+    <string name="menu_add_instruction">ເພີ່ມຄຳສັ່ງ</string>
+    <string name="menu_end_live">ຢຸດສຽງສົດ</string>
+    <!-- Stops Buddy reading a reply aloud. -->
+    <string name="menu_stop_voice">ຢຸດສຽງ</string>
+    <!-- Verb: starts voice input to the agent. A hold-menu label (keep under ~12 characters) and the chat panel's
+         mic button (read by TalkBack). -->
+    <string name="bubble_talk">ເວົ້າ</string>
+    <string name="menu_open_chat">ເປີດການສົນທະນາ</string>
+    <!-- Hides the bubble; a notification brings it back. -->
+    <string name="menu_hide">ເຊື່ອງ</string>
+
+    <!-- Hold-menu preview: the first few times a task starts, three actions peek out of the bubble for a moment.
+         Short forms of Stop task, Add instruction and Stop voice; keep them very short. -->
+    <string name="menu_peek_stop">ຢຸດ</string>
+    <!-- Verb. -->
+    <string name="menu_peek_add">ເພີ່ມ</string>
+    <!-- Noun: Buddy's spoken voice (the action silences it). -->
+    <string name="menu_peek_voice">ສຽງ</string>
+    <!-- Badge under the preview: long-press the bubble; "me" is the bubble. -->
+    <string name="menu_peek_hint">ກົດຂ້ອຍ</string>
+
+    <!-- Toasts from the bubble. "hold" = long-press. -->
+    <string name="bubble_tip_stop_voice">ເຄັດລັບ: ກົດຄ້າງບັອບເບິ້ລເພື່ອຢຸດສຽງ</string>
+    <string name="bubble_tip_hold_menu">ເຄັດລັບ: ກົດຄ້າງບັອບເບິ້ລເພື່ອຢຸດຊົ່ວຄາວ, ຢຸດ ຫຼື ເພີ່ມຄຳສັ່ງ</string>
+    <string name="bubble_stopping">ກຳລັງຢຸດ…</string>
+    <string name="bubble_nothing_running">ບໍ່ມີຫຍັງແລ່ນຢູ່ໃນການສົນທະນາຂອງ Buddy.</string>
+    <string name="bubble_nothing_running_chat">ບໍ່ມີຫຍັງແລ່ນຢູ່ໃນການສົນທະນານີ້.</string>
+    <string name="bubble_allow_mic_tap_mic">ອະນຸຍາດໄມໂຄຣໂຟນໃນ Buddy, ແລ້ວແຕະໄມຄືນ.</string>
+    <string name="bubble_allow_mic_tap_bubble">ອະນຸຍາດໄມໂຄຣໂຟນໃນ Buddy, ແລ້ວແຕະບັອບເບິ້ລຄືນ.</string>
+    <!-- After dictating an instruction while the agent works. %1$s: the agent's name (Claude Code, Codex, OpenCode, Antigravity or Grok). -->
+    <string name="bubble_note_added">ເຂົ້າໃຈແລ້ວ: %1$s ຈະພິຈາລະນາໃຫ້</string>
+    <!-- A message was copied to the clipboard. -->
+    <string name="bubble_copied">ສຳເນົາແລ້ວ</string>
+
+    <!-- Voice input, shown in the status pill beside the bubble. -->
+    <string name="bubble_listening">ກຳລັງຟັງ…</string>
+    <string name="bubble_listening_tap_done">ກຳລັງຟັງ… ແຕະບັອບເບິ້ລເມື່ອແລ້ວ</string>
+    <!-- The words heard so far. %1$s: the words. Use your language's quotation marks. -->
+    <string name="bubble_heard">“%1$s”</string>
+
+    <!-- Chat panel opened from the bubble: header buttons (read by TalkBack) and titles. -->
+    <!-- Starts a new chat: the + button, and the title of the agent picker it opens. -->
+    <string name="bubble_new_chat">ສົນທະນາໃໝ່</string>
+    <string name="bubble_open_in_app">ເປີດໃນແອັບ</string>
+    <!-- Closes the chat panel. -->
+    <string name="bubble_close">ປິດ</string>
+    <!-- Panel title while the list of chats shows. -->
+    <string name="bubble_chats_title">ການສົນທະນາ</string>
+    <!-- Panel title while picking this chat's model and effort (how hard the agent thinks). -->
+    <string name="bubble_model_effort_title">ໂມເດລ &amp; ຄວາມພະຍາຍາມ</string>
+
+    <!-- Strip at the top of the chat panel while the agent works. -->
+    <string name="bubble_working">ກຳລັງເຮັດວຽກ…</string>
+    <!-- Verb: stops this chat's task. -->
+    <string name="bubble_stop">ຢຸດ</string>
+
+    <!-- Composer at the bottom of the chat panel. -->
+    <string name="bubble_attach">ແນບຮູບ ຫຼື ໄຟລ໌</string>
+    <!-- Hint in the empty text field. %1$s: the agent's name (Claude Code, Codex, OpenCode, Antigravity or Grok). -->
+    <string name="bubble_input_hint">ຖາມ %1$s…</string>
+    <!-- Verb: pastes copied text into the field. -->
+    <string name="bubble_paste">ວາງ</string>
+    <!-- Verb: sends the message (read by TalkBack). -->
+    <string name="bubble_send">ສົ່ງ</string>
+    <!-- A chat with no messages yet. %1$s: the agent's name (Claude Code, Codex, OpenCode, Antigravity or Grok); "me" is Buddy. -->
+    <string name="bubble_empty_chat">ການສົນທະນາ %1$s ໃໝ່. ບອກຂ້ອຍໃຫ້ເຮັດບາງຢ່າງເທິງໂທລະສັບຂອງທ່ານ.</string>
+    <!-- Header of a collapsible group of the agent's steps in the chat. -->
+    <plurals name="bubble_tool_calls">
+        <item quantity="one">%1$d ການເອີ້ນເຄື່ອງມື</item>
+        <item quantity="other">%1$d ການເອີ້ນເຄື່ອງມື</item>
+    </plurals>
+
+    <!-- List of chats in the panel. -->
+    <!-- Status of a running chat, under its title. Lowercase. -->
+    <string name="bubble_chat_row_working">ກຳລັງເຮັດວຽກ…</string>
+    <!-- Preview of the last message when the user wrote it. %1$s: the message. -->
+    <string name="bubble_chat_row_you">ທ່ານ: %1$s</string>
+    <!-- Asked in the chat's row after a long press, next to Cancel and Delete buttons. -->
+    <string name="bubble_delete_chat">ລຶບການສົນທະນານີ້ບໍ?</string>
+    <!-- Button: deletes the chat. -->
+    <string name="bubble_delete">ລຶບ</string>
+
+    <!-- Agent picker for a new chat (its title is bubble_new_chat). -->
+    <!-- Small tag next to the agent that new chats use by default. Lowercase. -->
+    <string name="bubble_agent_default">ຄ່າເລີ່ມຕົ້ນ</string>
+    <string name="bubble_agent_not_signed_in">ຍັງບໍ່ໄດ້ເຂົ້າສູ່ລະບົບ · ແຕະເພື່ອຕັ້ງຄ່າ</string>
+    <string name="bubble_agent_not_installed">ຍັງບໍ່ໄດ້ຕິດຕັ້ງ · ແຕະເພື່ອຕັ້ງຄ່າ</string>
+
+    <!-- Model and effort picker for the current chat. -->
+    <string name="bubble_model_note">ສຳລັບການສົນທະນານີ້. ການສົນທະນາຈະສືບຕໍ່; ຂໍ້ຄວາມຕໍ່ໄປຈະໃຊ້ຕົວເລືອກໃໝ່.</string>
+    <!-- Section heading, shown in capitals: how hard the agent thinks. -->
+    <string name="bubble_effort">ຄວາມພະຍາຍາມ</string>
+    <!-- "Auto" is the name of the first effort choice below it; "Higher" = the higher effort levels; "plan" = the
+         user's subscription plan. -->
+    <string name="bubble_effort_note">Auto ໃຫ້ຕົວແທນຕັດສິນເອງ. ສູງກວ່າ ຄິດດົນກວ່າ ແລະ ໃຊ້ແຜນຂອງທ່ານຫຼາຍກວ່າ.</string>
+    <!-- Section heading, shown in capitals: the AI model. -->
+    <string name="bubble_model">ໂມເດລ</string>
+
+    <!-- Card in the chat panel when the agent asks for approval or asks a question. -->
+    <!-- Small all-caps label at the top of an approval card. -->
+    <string name="card_label_approval">ຕ້ອງການການອະນຸຍາດ</string>
+    <!-- Small all-caps label at the top of a question card. -->
+    <string name="card_label_question">ຄຳຖາມ</string>
+    <!-- The card's label when the request comes from an agent session outside Buddy's chats (e.g. a terminal).
+         %1$s: card_label_approval or card_label_question. All caps. -->
+    <string name="card_label_other_session">%1$s · ຈາກເຊສຊັນອື່ນ</string>
+    <string name="card_label_queue">%1$s · 1 ຈາກ %2$d</string>
+    <!-- Buttons side by side at the bottom of the card: keep them short. -->
+    <string name="card_deny">ປະຕິເສດ</string>
+    <!-- Verb: the user says what the agent should change instead of approving. -->
+    <string name="card_change">ປ່ຽນ</string>
+    <string name="card_approve">ອະນຸຍາດ</string>
+    <!-- Verb: skips the question without answering. -->
+    <string name="card_skip">ຂ້າມ</string>
+    <!-- Last button under a question's answers: type an answer instead of picking one. -->
+    <string name="card_type_own_answer">ພິມຄຳຕອບຂອງຂ້ອຍເອງ…</string>
+    <!-- Hint in the text field after tapping Change. -->
+    <string name="card_change_hint">ຄວນປ່ຽນຫຍັງ?</string>
+    <!-- Hint in the text field when typing an answer to a question. -->
+    <string name="card_answer_hint">ຄຳຕອບຂອງທ່ານ…</string>
+
+    <!-- Notes posted into the chat after the user answers a card. Keep the mark at the start (✓ ✎ ✗) and the space
+         after it. %1$s: the answer, the requested change or what was approved (shortened). -->
+    <string name="card_note_answered">✓ ຕອບແລ້ວ: %1$s</string>
+    <string name="card_note_change_requested">✎ ຂໍປ່ຽນ: %1$s</string>
+    <string name="card_note_approved">✓ ອະນຸຍາດແລ້ວ: %1$s</string>
+    <string name="card_note_denied">✗ ປະຕິເສດ</string>
+    <string name="card_note_skipped">ຂ້າມຄຳຖາມ</string>
+    <!-- A notification rule can let approval cards approve themselves after a countdown (Settings → Notification
+         rules). Small all-caps label at the top of such a card, instead of card_label_approval. -->
+    <string name="card_label_countdown">ຈະອະນຸຍາດເອງໃນໄວໆນີ້</string>
+    <!-- Under the countdown bar on the card; tapping it stops the countdown. %1$d = seconds left. -->
+    <string name="card_countdown">ຈະອະນຸຍາດເອງໃນ %1$d ວິ · ແຕະເພື່ອຢຸດ</string>
+    <!-- Note in the chat when the countdown ran out. Keep the mark ✓ and the space after it. %1$s = what was approved (shortened). -->
+    <string name="card_note_auto_approved">✓ ອະນຸຍາດຫຼັງນັບຖອຍ: %1$s</string>
+    <string name="card_note_rule_approved">✓ ອະນຸຍາດຕາມກົດຂອງທ່ານ, ໂດຍບໍ່ຖາມ: %1$s</string>
+    <!-- Note in the chat after the user tapped the countdown to stop it: the card now waits for them. -->
+    <string name="card_note_countdown_stopped">ຢຸດການນັບຖອຍແລ້ວ: ກຳລັງລໍຖ້າການອະນຸຍາດຂອງທ່ານ</string>
+
+    <!-- Notification while an agent operates the phone; on Android 16 also a chip in the status bar. -->
+    <!-- Name of this notification category in Android's notification settings. -->
+    <string name="control_channel_name">Buddy ກຳລັງໃຊ້ໂທລະສັບຂອງທ່ານ</string>
+    <string name="control_channel_description">ສະແດງໃນແຖບສະຖານະໃນຂະນະທີ່ຕົວແທນໃຊ້ໂທລະສັບ.</string>
+    <string name="control_title">Buddy ກຳລັງໃຊ້ໂທລະສັບຂອງທ່ານ</string>
+    <!-- "Stop" is the notification's button (control_stop): use the same word. -->
+    <string name="control_text">ຢ່າແຕະໜ້າຈໍຈົນກວ່າມັນຈະແລ້ວ, ຫຼື ແຕະ ຢຸດ ເພື່ອຄືນການຄຸມ.</string>
+    <!-- Notification button, verb: stops the agent and gives the phone back to the user. -->
+    <string name="control_stop">ຢຸດ</string>
+    <string name="work_title">Buddy ກຳລັງເຮັດວຽກຢູ່ເບື້ອງຫຼັງ</string>
+    <string name="pause_call_ended_title">ສາຍຈົບແລ້ວ · Buddy ຖືກຢຸດຊົ່ວຄາວ</string>
+    <string name="pause_call_ended_text">ແຕະເພື່ອເຮັດວຽກຕໍ່</string>
+
+    <!-- ===== Full-screen chat, agent progress lines, transcripts, shared UI, voice (ChatActivity, ChatHub, Ui, BuddyService, Voice) ===== -->
+
+    <!-- Chat screen: app bar -->
+    <!-- Verb, go back. Read by TalkBack for the back arrow at the top of the chat and transcript screens; also a
+         button on the approval card that leaves the text box. Keep short. -->
+    <string name="chat_back">ກັບ</string>
+    <!-- Read by TalkBack for the speaker button at the top of the chat (turns reading replies aloud on or off). -->
+    <string name="chat_read_aloud">ອ່ານຄຳຕອບອອກສຽງ</string>
+    <string name="chat_read_aloud_on">ຄຳຕອບຈະຖືກອ່ານອອກສຽງ</string>
+    <string name="chat_read_aloud_off">ຄຳຕອບຈະບໍ່ຖືກອ່ານອອກສຽງ</string>
+
+    <!-- Chat screen: Linux tools, the chip beside the model chip (also in the bubble's panel and the New chat sheets) -->
+    <!-- A chat's own switch that lets its agent work in Buddy's Linux: run commands, install packages, edit files,
+         build and install apps. The name on the small chip under the chat's title, and of the switch in the New chat
+         sheets. Keep short. -->
+    <string name="chat_linux_tools">ເຄື່ອງມື Linux</string>
+    <!-- Under the Linux tools switch in the New chat sheets. "Buddy's Linux" = the Linux system inside the app. -->
+    <string name="chat_linux_tools_info">ຄຳສັ່ງ, ໄຟລ໌ ແລະ ການສ້າງແອັບ ໃນ Linux ຂອງ Buddy</string>
+    <!-- Title of the sheet that opens when the user turns Linux tools on in a chat. -->
+    <string name="chat_linux_tools_title">ເປີດເຄື່ອງມື Linux ບໍ?</string>
+    <!-- ~/.buddy/work is a folder: keep it as is. -->
+    <string name="chat_linux_tools_what">ຕົວແທນຈະສາມາດແລ່ນຄຳສັ່ງ, ຕິດຕັ້ງແພັກເກດ ແລະ ແກ້ໄຂໄຟລ໌ໃນ ~/.buddy/work ໄດ້, ຈຶ່ງສ້າງແອັບໄດ້.</string>
+    <!-- When the change applies: a task already running goes on as it was. -->
+    <string name="chat_linux_tools_when">ພຽງໃນການສົນທະນານີ້, ເລີ່ມຈາກຂໍ້ຄວາມຕໍ່ໄປຂອງທ່ານ.</string>
+    <!-- "it" = the agent. -->
+    <string name="chat_linux_tools_risk">ຂໍ້ຄວາມ ຫຼື ໜ້າເວັບທີ່ເປັນອັນຕະລາຍເທິງໜ້າຈໍ ອາດຫຼອກມັນໃຫ້ແລ່ນຄຳສັ່ງ. ບັດອະນຸຍາດຍັງປ້ອງກັນການສົ່ງ, ໂພສ, ຊື້ ແລະ ລຶບ.</string>
+    <!-- Button, verb: turns Linux tools on for this chat. Keep short. -->
+    <string name="chat_linux_tools_turn_on">ເປີດ</string>
+
+    <!-- Chat screen: Chat options (long-task mode, apps allowed without asking until the task ends) -->
+    <!-- Chat screen: the options button at the top (tune icon) and the title of its sheet. Keep short. -->
+    <string name="chat_options">ຕົວເລືອກການສົນທະນາ</string>
+    <!-- Switch in Chat options: long-task mode. "it" = the chat's agent. -->
+    <string name="chat_keep_awake">ເປີດໜ້າຈໍໄວ້ຕອນມັນເຮັດວຽກ</string>
+    <!-- Under that switch. -->
+    <string name="chat_keep_awake_info">ສຳລັບວຽກຍາວ: ໂທລະສັບຈະຕື່ນຢູ່ຕອນການສົນທະນານີ້ເຮັດວຽກ, ແລະ ມີການແຈ້ງເຕືອນບອກຜົນ. ການລັອກໂທລະສັບຍັງປິດໜ້າຈໍຢູ່.</string>
+    <!-- Section title in Chat options: apps where this chat's routine approvals need no card until its task ends. -->
+    <string name="chat_allowed">ອະນຸຍາດໂດຍບໍ່ຖາມ</string>
+    <string name="chat_approvals">ການອະນຸຍາດ</string>
+    <string name="chat_approvals_info">ວິທີການສົນທະນານີ້ຖາມທ່ານກ່ອນຕົວແທນຈະເຮັດ. ຄ່ານີ້ຈະຢູ່ຈົນທ່ານປ່ຽນ; ການສົນທະນາໃໝ່ເລີ່ມດ້ວຍ ຖາມ.</string>
+    <string name="chat_approvals_ask">ຖາມ</string>
+    <string name="chat_approvals_ask_info">ແຕ່ລະແອັບຈະຕາມສິ່ງທີ່ %1$s ກຳນົດໄວ້.</string>
+    <string name="chat_approvals_strict_info">ແມ່ນແຕ່ໃນແອັບທີ່ຕັ້ງເປັນ %1$s, Buddy ຈະຖາມກ່ອນສົ່ງ, ໂພສ, ຊື້ ຫຼື ລຶບ.</string>
+    <string name="chat_approvals_apps_hint">ບ່ອນທີ່ຕົວແທນເຄີຍເຮັດ, ພ້ອມການຕັ້ງຄ່າຂອງແຕ່ລະແອັບໃນ %1$s. ແຕະເພື່ອປ່ຽນຢູ່ຫັ້ນ.</string>
+    <string name="chat_approvals_routine">ອະນຸຍາດວຽກປະຈຳ</string>
+    <string name="chat_approvals_routine_info">ຂັ້ນຕອນປະຈຳຈະດຳເນີນຕໍ່ໃນທຸກແອັບໂດຍບໍ່ມີບັດອະນຸຍາດ: ການສົ່ງຂໍ້ຄວາມ, ຫຼື ຂັ້ນຕອນທີ່ຜູ້ກວດສອບຈະຖາມ. ແຕ່ລະອັນຈະຖືກບັນທຶກໃນການສົນທະນາ. ການຈ່າຍເງິນ, ຊື້, ລຶບ, ຕິດຕັ້ງ, ລະຫັດຜ່ານ ແລະ ການຕັ້ງຄ່າຄວາມປອດໄພ ຍັງຈະຖາມທ່ານ, ເຊັ່ນດຽວກັບທຸກຢ່າງໃນແອັບທະນາຄານ ແລະ ຈ່າຍເງິນ, ການຕັ້ງຄ່າ ແລະ ຮ້ານແອັບ.</string>
+    <string name="chat_approvals_strict">ຖາມສະເໝີ</string>
+    <string name="chat_approvals_apps">ແອັບໃນການສົນທະນານີ້</string>
+    <!-- Under that title. "The reviewer" = Buddy's smart reviewer (App permissions). -->
+    <string name="chat_allowed_info">ຈົນກວ່າວຽກຂອງການສົນທະນານີ້ຈະແລ້ວ, ການອະນຸຍາດປະຈຳໃນແອັບເຫຼົ່ານີ້ຈະດຳເນີນເອງ: ການສົ່ງຂໍ້ຄວາມ, ຫຼື ຂັ້ນຕອນທີ່ຜູ້ກວດສອບຈະຖາມ. ແຕ່ລະອັນຈະສະແດງໃນການສົນທະນາ. ການຈ່າຍເງິນ, ຊື້, ລຶບ, ຕິດຕັ້ງ, ລະຫັດຜ່ານ ແລະ ການຕັ້ງຄ່າຄວາມປອດໄພ ຍັງຈະຖາມທ່ານ.</string>
+    <!-- Under that, when the chat has a schedule: the list isn't cleared when a run ends. -->
+    <string name="chat_allowed_kept">ເກັບໄວ້ສຳລັບຕາຕະລາງຂອງການສົນທະນານີ້: ແອັບເຫຼົ່ານີ້ຈະຍັງຖືກອະນຸຍາດສຳລັບການແລ່ນຕາມຕາຕະລາງ, ຈົນທ່ານຈະລຶບອອກ ຫຼື ລຶບຕາຕະລາງ.</string>
+    <!-- Row that opens the app picker. -->
+    <string name="chat_allowed_add">ເພີ່ມແອັບ</string>
+    <!-- Read by TalkBack for the X beside an allowed app; %1$s = the app's name. -->
+    <string name="chat_allowed_remove">ລຶບ %1$s</string>
+    <!-- A line in the chat for an action that went ahead because of "Allowed without asking"; %1$s = the action, e.g. Tap “Complete Task” in Testers Community. -->
+    <string name="run_rule_approved">ອະນຸຍາດຕາມກົດການແລ່ນຂອງທ່ານ: %1$s</string>
+    <!-- Notification title when a long-task chat's run ends; %1$s = the agent's name (Claude Code, Codex…). -->
+    <string name="run_end_done">%1$s ເຮັດສຳເລັດແລ້ວ</string>
+    <!-- As above, when the user stopped it. -->
+    <string name="run_end_stopped">%1$s ຖືກຢຸດ</string>
+    <!-- As above, when it ended with an error. -->
+    <string name="run_end_failed">%1$s ພົບບັນຫາ</string>
+
+    <!-- Chat options: Schedule (the chat's scheduled task: Buddy sends its message at set times) -->
+    <!-- Chat options: section title and the title of its sheet: the chat's scheduled task. Keep short. -->
+    <string name="schedule_title">ຕາຕະລາງເວລາ</string>
+    <!-- Row in Chat options when the chat has no schedule; opens the Schedule sheet. -->
+    <string name="schedule_set">ຕັ້ງຕາຕະລາງເວລາ</string>
+    <!-- Under that row. -->
+    <string name="schedule_set_info">ສົ່ງຂໍ້ຄວາມຫາການສົນທະນານີ້ເອງໃນເວລາທີ່ກຳນົດ, ເຊັ່ນ ທຸກວັນເວລາ 14:00.</string>
+    <!-- At the top of the Schedule sheet. -->
+    <string name="schedule_info">ໃນເວລາທີ່ກຳນົດ Buddy ຈະສົ່ງຂໍ້ຄວາມນີ້ເຂົ້າໃນການສົນທະນາຄືກັບວ່າທ່ານພິມເອງ, ດ້ວຍຕົວແທນ ແລະ ຕົວເລືອກຂອງການສົນທະນານີ້. ບັດອະນຸຍາດຍັງລໍຖ້າທ່ານຢູ່. ຖ້າມັນຕ້ອງການໜ້າຈໍໃນຂະນະທີ່ໂທລະສັບລັອກ, ມັນຈະຂໍໃຫ້ທ່ານປົດລັອກ.</string>
+    <!-- Schedule sheet: section titles, the day choices and the message field. -->
+    <string name="schedule_time">ເວລາ</string>
+    <string name="schedule_add_time">ເພີ່ມເວລາ</string>
+    <string name="schedule_remove_time">ລຶບ %1$s</string>
+    <string name="schedule_days">ມື້</string>
+    <string name="schedule_daily">ທຸກວັນ</string>
+    <string name="schedule_weekdays">ວັນທຳການ</string>
+    <string name="schedule_pick_days">ເລືອກມື້</string>
+    <string name="schedule_message">ຂໍ້ຄວາມ</string>
+    <!-- Hint in the message field: a generic example. -->
+    <string name="schedule_message_hint">ຈະສົ່ງຫຍັງ, ເຊັ່ນ ເປີດແອັບ ແລະ ເຮັດການເຊັກອິນຂອງມື້ນີ້</string>
+    <!-- Switch in the Schedule sheet, off by default. -->
+    <string name="schedule_wake">ປຸກໂທລະສັບສຳລັບວຽກນີ້</string>
+    <!-- Under that switch. -->
+    <string name="schedule_wake_info">ເມື່ອຕ້ອງການໜ້າຈໍ, ໜ້າຈໍຈະຕື່ນ (ແລະ ໜ້າຈໍລັອກທີ່ບໍ່ມີ PIN, ຮູບແບບ ຫຼື ລາຍນິ້ວມື ຈະເປີດ). ໃນຂະນະທີ່ມັນແລ່ນ, ຄົນທີ່ຢູ່ໃກ້ອາດເຫັນໜ້າຈໍ.</string>
+    <!-- Schedule sheet, when Android doesn't let Buddy set exact alarms; then a button that opens that setting. -->
+    <string name="schedule_inexact">ການປຸກເຕືອນແບບແນ່ນອນຖືກປິດສຳລັບ Buddy, ສະນັ້ນມັນອາດເລີ່ມຊ້າໄປສອງສາມນາທີ.</string>
+    <string name="schedule_allow_exact">ອະນຸຍາດການປຸກເຕືອນແບບແນ່ນອນ</string>
+    <!-- Schedule sheet buttons. -->
+    <string name="schedule_save">ບັນທຶກ</string>
+    <string name="schedule_remove">ລຶບອອກ</string>
+    <!-- What's set; %1$s = a time of day (14:00). -->
+    <string name="schedule_summary_daily">ທຸກວັນເວລາ %1$s</string>
+    <string name="schedule_summary_weekdays">ວັນທຳການເວລາ %1$s</string>
+    <!-- %1$s = short day names (Mon, Thu), %2$s = a time of day. -->
+    <string name="schedule_summary_days">%1$s ເວລາ %2$s</string>
+    <!-- When it next runs; %1$s = weekday and time (Tue 14:00). -->
+    <string name="schedule_next">ຕໍ່ໄປ: %1$s</string>
+    <!-- Toasts when Save can't save yet. -->
+    <string name="schedule_no_days">ເລືອກຢ່າງໜ້ອຍໜຶ່ງມື້</string>
+    <string name="schedule_no_message">ຂຽນຂໍ້ຄວາມທີ່ຈະສົ່ງ</string>
+    <!-- Notification channel name. -->
+    <string name="schedule_channel">ວຽກຕາມຕາຕະລາງເວລາ</string>
+    <!-- Notification (and the screen Buddy turns on) when a scheduled task needs the screen while the phone is locked. -->
+    <string name="schedule_screen_title">ວຽກຕາມຕາຕະລາງຕ້ອງການໜ້າຈໍ: ປົດລັອກເພື່ອເຮັດຕໍ່</string>
+    <!-- Its text; %1$s = the chat's title, %2$s = the time it gives up waiting. -->
+    <string name="schedule_screen_text">%1$s: ມັນຈະເຮັດຕໍ່ເມື່ອທ່ານປົດລັອກໂທລະສັບ, ຈົນຮອດ %2$s.</string>
+    <!-- Notification titles; %1$s = the chat's title. The text says why (the lines below). -->
+    <string name="schedule_skipped_title">ຂ້າມວຽກຕາມຕາຕະລາງ: %1$s</string>
+    <string name="schedule_stopped_title">ຢຸດວຽກຕາມຕາຕະລາງ: %1$s</string>
+    <!-- Why a scheduled task was skipped or stopped. -->
+    <string name="schedule_skip_running">ການສົນທະນານີ້ຍັງເຮັດວຽກກ່ອນໜ້ານີ້ຢູ່.</string>
+    <string name="schedule_skip_busy">Buddy ບໍ່ຫວ່າງເປັນເວລາໜຶ່ງຊົ່ວໂມງ (ວຽກອື່ນ, ການຢຸດຊົ່ວຄາວ ຫຼື ບໍ່ມີອິນເຕີເນັດ).</string>
+    <string name="schedule_skip_screen">ໂທລະສັບຍັງລັອກຢູ່ເປັນເວລາໜຶ່ງຊົ່ວໂມງ.</string>
+    <!-- Small label over a message Buddy sent at its scheduled time; also read by TalkBack for the clock icon in the chat list. -->
+    <string name="schedule_marker">ຕາມຕາຕະລາງ</string>
+
+    <!-- Chat screen: the strip shown while the agent works -->
+    <!-- Button, verb: stops the agent's task. Keep short. -->
+    <string name="chat_stop">ຢຸດ</string>
+    <!-- Status while an agent works and has no step to show yet (chat strip, the bubble's status pill). -->
+    <string name="chat_working">ກຳລັງເຮັດວຽກ…</string>
+
+    <!-- Chat screen: composer and empty chat -->
+    <!-- Read by TalkBack for the paperclip button. -->
+    <string name="chat_attach_description">ແນບຮູບ ຫຼື ໄຟລ໌</string>
+    <!-- Hint in the message box. %1$s = agent name (Claude Code, Codex, OpenCode, Antigravity, Grok). -->
+    <string name="chat_input_hint">ຖາມ %1$s…</string>
+    <!-- Hint in the message box while the agent works: what you type now reaches it at its next step. -->
+    <string name="chat_input_hint_running">ເພີ່ມຄຳສັ່ງໃນຂະນະທີ່ມັນເຮັດວຽກ…</string>
+    <!-- Read by TalkBack for the mic button. Verb: starts voice input. -->
+    <string name="chat_talk">ເວົ້າ</string>
+    <!-- Read by TalkBack for the send button. Verb. -->
+    <string name="chat_send">ສົ່ງ</string>
+    <!-- Shown in a chat with no messages yet. %1$s = agent name (Claude Code, Codex, OpenCode, Antigravity, Grok). -->
+    <string name="chat_empty_hint">ການສົນທະນາ %1$s ໃໝ່. ບອກມັນໃຫ້ເຮັດບາງຢ່າງເທິງໂທລະສັບຂອງທ່ານ.</string>
+    <!-- Same, when the chat has Linux tools on. %1$s = agent name. -->
+    <string name="chat_empty_hint_dev">ການສົນທະນາ %1$s ໃໝ່ ທີ່ມີເຄື່ອງມື Linux. ບອກມັນໃຫ້ເຮັດບາງຢ່າງເທິງໂທລະສັບຂອງທ່ານ, ຫຼື ສ້າງແອັບ.</string>
+
+    <!-- Model sheet (tap the model chip under the chat title) -->
+    <!-- %1$s = agent name, e.g. "Claude Code model". -->
+    <string name="chat_model_title">ໂມເດລຂອງ %1$s</string>
+    <string name="chat_model_subtitle">ສຳລັບການສົນທະນານີ້. ການສົນທະນາຈະສືບຕໍ່ດ້ວຍໂມເດລໃໝ່.</string>
+    <!-- Section label, shown in capitals: how hard the model thinks (reasoning effort). -->
+    <string name="chat_effort">ຄວາມພະຍາຍາມ</string>
+    <!-- "Auto" is the first effort option below it; "Higher" means the higher options. -->
+    <string name="chat_effort_help">Auto ໃຫ້ຕົວແທນຕັດສິນເອງ. ສູງກວ່າ ຄິດດົນກວ່າ ແລະ ໃຊ້ແຜນຂອງທ່ານຫຼາຍກວ່າ.</string>
+    <!-- Section label, shown in capitals, above the list of models. -->
+    <string name="chat_model">ໂມເດລ</string>
+    <string name="chat_agent_help">ປ່ຽນການສົນທະນານີ້ໄປຫາຕົວແທນອື່ນ ເລີ່ມຈາກຂໍ້ຄວາມຕໍ່ໄປ. ມັນຈະໄດ້ຮັບການສົນທະນາທີ່ຜ່ານມາເປັນຂໍ້ຄວາມ, ບໍ່ແມ່ນຂັ້ນຕອນ ແລະ ໄຟລ໌ທີ່ຕົວແທນອື່ນມີຢູ່ໃນໃຈ.</string>
+    <string name="hub_agent_switched">ປ່ຽນໄປຫາ %1$s ແລ້ວ. ມັນຈະໄດ້ຮັບການສົນທະນາທີ່ຜ່ານມາພ້ອມຂໍ້ຄວາມຕໍ່ໄປຂອງທ່ານ.</string>
+    <!-- Hint of the box for typing any model id. %1$s = an example model id (not translated). -->
+    <string name="chat_model_other_hint">ອື່ນໆ… ເຊັ່ນ %1$s</string>
+    <!-- Button, verb: use the model typed in the box. Keep short. -->
+    <string name="chat_model_use">ໃຊ້</string>
+
+    <!-- Language sheet (long-press the mic) -->
+    <!-- Title, followed by a list of languages to speak in. -->
+    <string name="chat_speak_in">ເວົ້າເປັນ</string>
+    <!-- "Settings → Voice" = the Voice section of Buddy's Settings tab; use the same names as there. -->
+    <string name="chat_speak_in_help">ເລືອກພາສາຂອງທ່ານໃນ ການຕັ້ງຄ່າ → ສຽງ.</string>
+    <!-- Live voice (CodexLive): a two-way ChatGPT voice call (through Codex) in any agent's chat; %1$s is the chat's agent (Claude, Codex…). live_label is the bar's short tag. -->
+    <string name="live_option">ສຽງສົດ</string>
+    <string name="live_option_sub">ເວົ້າກັບ %1$s ອອກສຽງ. ມັນຕອບດ້ວຍສຽງຂອງ ChatGPT ແລະ ເຮັດວຽກເທິງໂທລະສັບໃນການສົນທະນານີ້.</string>
+    <string name="live_label">ສົດ</string>
+    <string name="live_end">ຈົບ</string>
+    <string name="live_connecting">ກຳລັງເຊື່ອມຕໍ່…</string>
+    <string name="live_started">ເປີດສຽງສົດແລ້ວ. ເວົ້າໄດ້ເລີຍ: %1$s ຟັງທ່ານ, ຕອບອອກສຽງ ແລະ ເຮັດຕາມທີ່ທ່ານຂໍໃນການສົນທະນານີ້.</string>
+    <string name="live_ended">ສຽງສົດຈົບແລ້ວ.</string>
+    <string name="live_ended_why">ສຽງສົດຈົບ: %1$s</string>
+    <string name="live_ended_screen_off">ໜ້າຈໍດັບ</string>
+    <string name="live_ended_paused">Buddy ຖືກຢຸດຊົ່ວຄາວ</string>
+    <string name="live_ended_idle">ບໍ່ມີການເວົ້າເປັນເວລາ 5 ນາທີ</string>
+    <string name="live_notification_title">ສຽງສົດກັບ %1$s</string>
+    <string name="live_mic_busy">ສຽງສົດກຳລັງໃຊ້ໄມໂຄຣໂຟນ. ຢຸດມັນກ່ອນ.</string>
+    <string name="live_hint">ໃໝ່: ເວົ້າສົດກັບ %1$s</string>
+    <string name="live_status_listening">ກຳລັງຟັງ…</string>
+    <string name="live_status_thinking">ກຳລັງຄິດ…</string>
+    <string name="live_status_working">ກຳລັງເຮັດ…</string>
+    <string name="live_status_speaking">ກຳລັງເວົ້າ…</string>
+    <!-- Small tag next to a language Claude's dictation doesn't support: the phone's own speech recognition is used. -->
+    <string name="chat_phone_voice">ສຽງຂອງໂທລະສັບ</string>
+
+    <!-- Approval card above the composer, when the agent asks for an OK or asks a question -->
+    <!-- Small label in capitals at the top of the card. -->
+    <string name="chat_card_question">ຄຳຖາມ</string>
+    <!-- Small label in capitals at the top of the card. -->
+    <string name="chat_card_needs_ok">ຕ້ອງການການອະນຸຍາດ</string>
+    <!-- Buttons, verbs. Deny, Change and Approve sit three in a row: keep short. -->
+    <string name="chat_deny">ປະຕິເສດ</string>
+    <!-- Verb: ask the agent to change what it wants to do. -->
+    <string name="chat_change">ປ່ຽນ</string>
+    <string name="chat_approve">ອະນຸຍາດ</string>
+    <!-- Verb: skip the agent's question without answering. -->
+    <string name="chat_skip">ຂ້າມ</string>
+    <string name="chat_type_own_answer">ພິມຄຳຕອບຂອງຂ້ອຍເອງ</string>
+    <string name="chat_answer_hint">ຄຳຕອບຂອງທ່ານ</string>
+    <string name="chat_change_hint">ຄວນປ່ຽນຫຍັງ?</string>
+    <string name="chat_send_answer">ສົ່ງຄຳຕອບ</string>
+    <string name="chat_send_change">ສົ່ງການປ່ຽນ</string>
+
+    <!-- Attachments -->
+    <!-- Title of the sheet behind the paperclip button. Verb. -->
+    <string name="chat_attach">ແນບ</string>
+    <string name="chat_attach_camera">ຖ່າຍຮູບ</string>
+    <string name="chat_attach_camera_sub">ໃຊ້ກ້ອງ</string>
+    <string name="chat_attach_photos">ຮູບພາບ</string>
+    <string name="chat_attach_photos_sub">ເລືອກຈາກຄັງຮູບ</string>
+    <string name="chat_attach_files">ໄຟລ໌</string>
+    <string name="chat_attach_files_sub">PDF, ເອກະສານ, ຫຍັງກໍໄດ້ບໍ່ເກີນ 25 MB</string>
+    <string name="chat_no_app_for_action">ບໍ່ມີແອັບໃນໂທລະສັບນີ້ທີ່ເຮັດສິ່ງນີ້ໄດ້.</string>
+    <!-- Toast while one picked photo or file is added. -->
+    <string name="chat_adding">ກຳລັງເພີ່ມ…</string>
+    <!-- Toast while several picked photos or files are added (always 2 or more). -->
+    <plurals name="chat_adding_files">
+        <item quantity="one">ກຳລັງເພີ່ມ %1$d ໄຟລ໌…</item>
+        <item quantity="other">ກຳລັງເພີ່ມ %1$d ໄຟລ໌…</item>
+    </plurals>
+    <!-- Read by TalkBack for the × on an attachment waiting to be sent. Verb. -->
+    <string name="chat_attachment_remove">ລຶບອອກ</string>
+    <!-- %1$s = file name. -->
+    <string name="chat_no_app_for_file">ບໍ່ມີແອັບທີ່ເປີດ %1$s ໄດ້.</string>
+
+    <!-- Chat messages -->
+    <!-- Toast after a long press copies a message. -->
+    <string name="chat_copied">ສຳເນົາແລ້ວ</string>
+    <string name="chat_copy_whole_reply">ສຳເນົາຄຳຕອບທັງໝົດ</string>
+    <!-- Header of a collapsible group of the agent's steps in the chat. -->
+    <plurals name="chat_tool_calls">
+        <item quantity="one">%1$d ການເອີ້ນເຄື່ອງມື</item>
+        <item quantity="other">%1$d ການເອີ້ນເຄື່ອງມື</item>
+    </plurals>
+
+    <!-- Notes Buddy posts into a chat, and the chat's status line -->
+    <!-- After "Continue in Buddy" on an earlier session. %1$s = agent name. -->
+    <string name="hub_continuing">ກຳລັງສືບຕໍ່ເຊສຊັນ %1$s ກ່ອນໜ້າ. ຖ້າມັນຍັງເປີດຢູ່ໃນເທີມິນອລ, ປິດມັນຢູ່ຫັ້ນກ່ອນ.</string>
+    <string name="hub_still_working_attachments">ການສົນທະນານີ້ຍັງເຮັດວຽກຢູ່. ສົ່ງໄຟລ໌ແນບເມື່ອແລ້ວ.</string>
+    <string name="hub_service_off">%1$s ຖືກປິດ (ການຕັ້ງຄ່າ → ຕົວແທນ ແລະ ໂມເດລ → API key). ເປີດມັນ, ຫຼື ເລືອກໂມເດລອື່ນສຳລັບການສົນທະນານີ້.</string>
+    <!-- Status right after a message is sent, until the agent's first step. -->
+    <string name="hub_thinking">ກຳລັງຄິດ…</string>
+    <string name="hub_still_waiting">ຍັງລໍຖ້າໂມເດລຕອບ…</string>
+    <string name="hub_still_reading_local">ຍັງອ່ານຢູ່… ໂມເດລເທິງຄອມພິວເຕີຂອງທ່ານເອງອາດໃຊ້ເວລາສອງສາມນາທີ, ສ່ວນຫຼາຍແມ່ນຄັ້ງທຳອິດ.</string>
+    <!-- "the top of the chat" = the model chip under the chat title. -->
+    <string name="hub_no_answer">ໂມເດລບໍ່ໄດ້ຕອບ. ມັນອາດບໍ່ຫວ່າງ: ລອງອີກຄັ້ງ, ຫຼື ເລືອກໂມເດລອື່ນຢູ່ເທິງການສົນທະນາ.</string>
+    <string name="hub_helper_gone">ການແລ່ນນີ້ຖືກຕັດ: ຕົວຊ່ວຍທີ່ແລ່ນຕົວແທນໃນ Linux ຂອງ Buddy ຢຸດໄປ. ສົ່ງຂໍ້ຄວາມຂອງທ່ານອີກຄັ້ງ.</string>
+    <string name="hub_helper_killed">Android ຢຸດ process ຂອງຕົວແທນ. ໂທລະສັບບາງລຸ້ນຢຸດ process ເບື້ອງຫຼັງຂອງແອັບເມື່ອມີຫຼາຍໂຕ, ເຊັ່ນ ເມື່ອມີຕົວແທນຍ່ອຍຫຼາຍໂຕ. ເພື່ອໃຫ້ມັນແລ່ນໄດ້: ການຕັ້ງຄ່າ → ລະບົບ → ຕົວເລືອກນັກພັດທະນາ → ປິດການຈຳກັດ process ລູກ.</string>
+    <!-- After picking a model for the chat. %1$s = model name. -->
+    <string name="hub_model_set">ໂມເດລ: %1$s</string>
+    <!-- After picking an effort level. %1$s = the level as the agent names it, not translated (low, medium, high…). -->
+    <string name="hub_effort_set">ຄວາມພະຍາຍາມ: %1$s</string>
+    <!-- After picking Auto effort: the agent's default effort. -->
+    <string name="hub_effort_default">ຄວາມພະຍາຍາມ: ຄ່າເລີ່ມຕົ້ນ</string>
+    <!-- Status after the user taps Stop. -->
+    <string name="hub_stopping">ກຳລັງຢຸດ…</string>
+    <!-- Note after the task was stopped. -->
+    <string name="hub_stopped">ຢຸດແລ້ວ.</string>
+    <string name="hub_interrupted">Android ປິດ Buddy ໃນຂະນະທີ່ຕົວແທນເຮັດວຽກ, ຈຶ່ງຢຸດໄປ.</string>
+    <string name="hub_resume_message">ເຮັດຕໍ່ຈາກບ່ອນທີ່ຢຸດ</string>
+    <string name="chat_interrupted">Android ປິດ Buddy ໃນຂະນະທີ່ %1$s ກຳລັງເຮັດວຽກນີ້. ການເຮັດຕໍ່ຈະກວດສິ່ງທີ່ແລ້ວ ແລະ ດຳເນີນຕໍ່ຈາກຫັ້ນ.</string>
+    <string name="chat_interrupted_continue">ເຮັດຕໍ່</string>
+    <string name="chat_interrupted_dismiss">ປິດ</string>
+    <!-- The agent ended with an error and gave no message. %1$s = agent name. -->
+    <string name="hub_agent_stopped">%1$s ຢຸດແລ້ວ.</string>
+    <string name="hub_something_wrong">ມີບາງຢ່າງຜິດພາດ.</string>
+    <!-- After the user adds something while the agent works. %1$s = agent name. -->
+    <string name="hub_note_added">ເພີ່ມລະຫວ່າງເຮັດວຽກ: %1$s ຈະໄດ້ຮັບມັນໃນຂັ້ນຕອນຕໍ່ໄປ</string>
+    <string name="hub_note_not_sent">ທ່ານຢຸດມັນ, ຈຶ່ງບໍ່ໄດ້ສົ່ງໝາຍເຫດຂອງທ່ານ: ມັນກັບຢູ່ໃນຊ່ອງຂໍ້ຄວາມແລ້ວ</string>
+    <!-- The agent received what the user added while it worked. -->
+    <string name="hub_note_passed">ສົ່ງຕໍ່ສິ່ງທີ່ທ່ານເພີ່ມແລ້ວ</string>
+    <!-- The bubble's status pill when several chats work at once. %1$d = number of chats (always 2 or more),
+         %2$s = the newest chat's status. -->
+    <plurals name="hub_pill_chats">
+        <item quantity="one">%1$d ການສົນທະນາ · %2$s</item>
+        <item quantity="other">%1$d ການສົນທະນາ · %2$s</item>
+    </plurals>
+
+    <!-- The agent's steps, one line each, shown in the chat and the bubble while it works. Arguments come from
+         the agent and are not translated. -->
+    <string name="hub_tool_read_screen">ກຳລັງອ່ານໜ້າຈໍ</string>
+    <string name="hub_tool_screenshot">ກຳລັງຖ່າຍພາບໜ້າຈໍ</string>
+    <!-- %1$d = number of an element on the screen. -->
+    <string name="hub_tool_tap_element">ກຳລັງແຕະອົງປະກອບ %1$d</string>
+    <!-- %1$d,%2$d = x,y position on the screen. -->
+    <string name="hub_tool_tap_point">ກຳລັງແຕະ %1$d,%2$d</string>
+    <string name="hub_tool_long_press">ກຳລັງກົດຄ້າງ</string>
+    <!-- %1$s = the text being typed. -->
+    <string name="hub_tool_type">ກຳລັງພິມ “%1$s”</string>
+    <string name="hub_tool_scroll_up">ກຳລັງເລື່ອນຂຶ້ນ</string>
+    <string name="hub_tool_scroll_down">ກຳລັງເລື່ອນລົງ</string>
+    <string name="hub_tool_scroll_left">ກຳລັງເລື່ອນຊ້າຍ</string>
+    <string name="hub_tool_scroll_right">ກຳລັງເລື່ອນຂວາ</string>
+    <!-- Any other direction. %1$s = the direction as the agent wrote it, not translated. -->
+    <string name="hub_tool_scroll">ກຳລັງເລື່ອນ %1$s</string>
+    <string name="hub_tool_swipe">ກຳລັງປັດ</string>
+    <!-- Pressing the phone's Back button. -->
+    <string name="hub_tool_press_back">ກຳລັງກົດກັບ</string>
+    <!-- Pressing the phone's Home button. -->
+    <string name="hub_tool_press_home">ກຳລັງກົດໜ້າຫຼັກ</string>
+    <!-- Pressing the phone's Recents button (recent apps). -->
+    <string name="hub_tool_press_recents">ກຳລັງກົດແອັບຫຼ້າສຸດ</string>
+    <!-- Opening the notification shade. -->
+    <string name="hub_tool_press_notifications">ກຳລັງເປີດການແຈ້ງເຕືອນ</string>
+    <!-- Opening Quick Settings ("quick_settings" is how the agent names it). -->
+    <string name="hub_tool_press_quick_settings">ກຳລັງເປີດການຕັ້ງຄ່າດ່ວນ</string>
+    <!-- Any other button. %1$s = the button as the agent named it, not translated. -->
+    <string name="hub_tool_press">ກຳລັງກົດ %1$s</string>
+    <!-- %1$s = app name. -->
+    <string name="hub_tool_open_app">ກຳລັງເປີດ %1$s</string>
+    <!-- %1$s = web address. -->
+    <string name="hub_tool_open_url">ກຳລັງເປີດ %1$s</string>
+    <string name="hub_tool_clipboard_read">ກຳລັງອ່ານຄລິບບອດ</string>
+    <string name="hub_tool_clipboard_write">ກຳລັງສຳເນົາໃສ່ຄລິບບອດ</string>
+    <string name="hub_tool_set_alarm">ກຳລັງຕັ້ງໂມງປຸກສຳລັບ %1$s</string>
+    <string name="hub_tool_set_timer">ກຳລັງເລີ່ມໂມງຈັບເວລາ</string>
+    <string name="hub_tool_share">ກຳລັງເປີດແຜ່ນແບ່ງປັນ</string>
+    <string name="hub_tool_save_downloads">ກຳລັງບັນທຶກ %1$s ໃສ່ Downloads</string>
+    <string name="hub_tool_device_status">ກຳລັງກວດໂທລະສັບ</string>
+    <string name="hub_tool_take_photo">ກຳລັງເປີດກ້ອງ</string>
+    <string name="hub_tool_location">ກຳລັງຫາຕຳແໜ່ງ</string>
+    <string name="hub_tool_notifications">ກຳລັງອ່ານການແຈ້ງເຕືອນ</string>
+    <string name="hub_tool_media">ການຄວບຄຸມມີເດຍ</string>
+    <string name="hub_tool_calendar_events">ກຳລັງອ່ານປະຕິທິນ</string>
+    <string name="hub_tool_add_event">ກຳລັງເພີ່ມໃສ່ປະຕິທິນ: %1$s</string>
+    <string name="hub_tool_wait_for">ກຳລັງລໍຖ້າໜ້າຈໍ</string>
+    <string name="hub_tool_do_steps">ກຳລັງເຮັດ %1$d ຂັ້ນຕອນ</string>
+    <string name="hub_tool_collect">ກຳລັງອ່ານລາຍການທັງໝົດ</string>
+    <string name="hub_tool_find">ກຳລັງຊອກຫາ “%1$s”</string>
+    <string name="schedules_title">ຕາມຕາຕະລາງ</string>
+    <string name="schedules_row">ວຽກ ແລະ ການເຕືອນຂອງທຸກການສົນທະນາ</string>
+    <string name="schedules_intro">ວຽກຕາມຕາຕະລາງຂອງທຸກການສົນທະນາ ແລະ ຂໍ້ຄວາມ ແລະ ການເຕືອນທີ່ຕົວແທນຕັ້ງໄວ້. ແຕະຊື່ການສົນທະນາເພື່ອເປີດ.</string>
+    <string name="schedules_none">ບໍ່ມີຫຍັງຕາມຕາຕະລາງ. ຕັ້ງວຽກໃນຕົວເລືອກຂອງການສົນທະນາ → ຕາຕະລາງເວລາ, ຫຼື ຂໍໃຫ້ຕົວແທນເຕືອນທ່ານກ່ຽວກັບບາງຢ່າງ.</string>
+    <string name="schedules_paused">ຢຸດຊົ່ວຄາວ</string>
+    <string name="schedules_quiet_tag">ສະເພາະຂ່າວ</string>
+    <string name="schedules_run_now">ແລ່ນດຽວນີ້</string>
+    <string name="schedules_started">ເລີ່ມແລ້ວ (ຫຼື ກຳລັງລໍຖ້າໃຫ້ການສົນທະນາຫວ່າງ).</string>
+    <string name="schedules_pause">ຢຸດຊົ່ວຄາວ</string>
+    <string name="schedules_resume">ເຮັດຕໍ່</string>
+    <string name="schedules_reminder">ການເຕືອນ</string>
+    <string name="schedule_quiet">ບອກຂ້ອຍພຽງເມື່ອມີຂ່າວ</string>
+    <string name="schedule_quiet_info">ເມື່ອການແລ່ນບໍ່ພົບຫຍັງໃໝ່, ມັນຈະຈົບໂດຍບໍ່ມີການແຈ້ງເຕືອນ. ຄຳຕອບຍັງຢູ່ໃນການສົນທະນາ, ແລະ ບັນຫາຈະແຈ້ງເຕືອນທ່ານສະເໝີ.</string>
+    <string name="schedule_reminder_title">ການເຕືອນ</string>
+    <string name="schedule_reminder_line">ການເຕືອນ: %1$s</string>
+    <string name="steps_view">ເບິ່ງຂັ້ນຕອນ</string>
+    <string name="steps_title">ຂັ້ນຕອນ</string>
+    <string name="steps_intro">ສິ່ງທີ່ຕົວແທນເຮັດເທິງໂທລະສັບໃນ 3 ການແລ່ນຫຼ້າສຸດຂອງການສົນທະນານີ້, ພ້ອມຮູບໜ້າຈໍຫຼັງແຕ່ລະຂັ້ນຕອນ. ເກັບພຽງໃນໂທລະສັບນີ້, ລຶບພ້ອມການສົນທະນາ. ແຕະຮູບເພື່ອເບິ່ງໃຫຍ່.</string>
+    <string name="steps_none">ຍັງບໍ່ມີຂັ້ນຕອນສຳລັບການສົນທະນານີ້.</string>
+    <string name="steps_run">%1$s · %2$s · %3$d ຂັ້ນຕອນ · %4$s</string>
+    <string name="steps_run_live">%1$s · %2$d ຂັ້ນຕອນມາຮອດຕອນນີ້</string>
+    <string name="steps_context">ບໍລິບົດ %1$s</string>
+    <string name="steps_no_actions">ບໍ່ມີການກະທຳເທິງໂທລະສັບໃນການແລ່ນນີ້.</string>
+    <string name="steps_earlier">%1$d ຂັ້ນຕອນກ່ອນໜ້າບໍ່ໄດ້ສະແດງ.</string>
+    <string name="steps_done">ສຳເລັດ</string>
+    <string name="steps_failed">ລົ້ມເຫຼວ</string>
+    <string name="steps_stopped">ຢຸດ</string>
+    <string name="hub_tool_list_apps">ກຳລັງລາຍຊື່ແອັບ</string>
+    <!-- The user's answer to an approval request. Keep the mark (✓ ✎ ✗) and the space after it at the start.
+         %1$s = what was approved. -->
+    <string name="hub_tool_approved">✓ ອະນຸຍາດແລ້ວ: %1$s</string>
+    <string name="hub_tool_change_requested">✎ ຂໍປ່ຽນ</string>
+    <!-- %1$s = the change the user asked for. -->
+    <string name="hub_tool_change_requested_text">✎ ຂໍປ່ຽນ: %1$s</string>
+    <string name="hub_tool_denied">✗ ປະຕິເສດ</string>
+    <string name="hub_tool_asking_approval">ກຳລັງຂໍການອະນຸຍາດຈາກທ່ານ</string>
+    <!-- The user answered the agent's question. Keep the ✓ and the space after it at the start. -->
+    <string name="hub_tool_answered">✓ ຕອບແລ້ວ</string>
+    <!-- %1$s = the user's answer. -->
+    <string name="hub_tool_answered_text">✓ ຕອບແລ້ວ: %1$s</string>
+    <string name="hub_tool_question_skipped">ຂ້າມຄຳຖາມ</string>
+    <!-- %1$s = the agent's question. -->
+    <string name="hub_tool_asking">ກຳລັງຖາມ: %1$s</string>
+    <string name="hub_tool_point_out">ກຳລັງຊີ້ໃຫ້ເຫັນ: %1$s</string>
+    <string name="hub_tool_point_out_any">ກຳລັງຊີ້ບາງຢ່າງເທິງໜ້າຈໍ</string>
+    <!-- Step in the chat: the agent answers a notification through its reply field. %1$s = the reply (shortened). -->
+    <string name="hub_tool_reply_notification">ກຳລັງຕອບ: %1$s</string>
+    <string name="hub_tool_update_download">ກຳລັງດາວໂຫຼດການອັບເດດ Buddy</string>
+    <string name="hub_tool_update_check">ກຳລັງກວດຫາການອັບເດດ Buddy</string>
+    <!-- %1$s = what is searched for. -->
+    <string name="hub_tool_web_search">ກຳລັງຄົ້ນຫາໃນເວັບ: %1$s</string>
+    <!-- Reading a web page. %1$s = web address. -->
+    <string name="hub_tool_web_fetch">ກຳລັງອ່ານ %1$s</string>
+    <!-- %1$s = a shell command. -->
+    <string name="hub_tool_command">ກຳລັງແລ່ນ: %1$s</string>
+    <string name="hub_tool_command_any">ກຳລັງແລ່ນຄຳສັ່ງ</string>
+    <!-- %1$s = file name. -->
+    <string name="hub_tool_edit">ກຳລັງແກ້ໄຂ %1$s</string>
+    <string name="hub_tool_edit_any">ກຳລັງແກ້ໄຂໄຟລ໌</string>
+    <!-- Reading a file. %1$s = file name. -->
+    <string name="hub_tool_read_file">ກຳລັງອ່ານ %1$s</string>
+    <!-- Any other tool. %1$s = the tool's name, not translated. -->
+    <string name="hub_tool_other">ກຳລັງໃຊ້ %1$s</string>
+
+    <!-- Transcript of an earlier agent session that isn't a Buddy chat (read-only) -->
+    <string name="transcript_loading">ກຳລັງໂຫຼດ…</string>
+    <!-- Button: continue this earlier session as a Buddy chat. -->
+    <string name="transcript_continue">ສືບຕໍ່ໃນ Buddy</string>
+    <string name="transcript_empty">ບໍ່ມີຂໍ້ຄວາມທີ່ອ່ານໄດ້ໃນເຊສຊັນນີ້.</string>
+    <!-- Above the messages. %1$d = how many of the session's last messages are shown. -->
+    <plurals name="transcript_last_messages">
+        <item quantity="one">%1$d ຂໍ້ຄວາມສຸດທ້າຍ · ອ່ານຢ່າງດຽວ</item>
+        <item quantity="other">%1$d ຂໍ້ຄວາມສຸດທ້າຍ · ອ່ານຢ່າງດຽວ</item>
+    </plurals>
+
+    <!-- Shared screens: links -->
+    <!-- Toast when a tapped link can't be opened. -->
+    <string name="ui_no_app_for_link">ບໍ່ມີແອັບທີ່ເປີດລິ້ງນີ້ໄດ້</string>
+
+    <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
+    <string name="ui_a11y_title">Buddy ໃຊ້ການເຂົ້າເຖິງແນວໃດ</string>
+    <string name="ui_a11y_what">Buddy ໃຊ້ບໍລິການເຂົ້າເຖິງຂອງ Android ເພື່ອເຮັດຕາມທີ່ທ່ານຂໍໃນແອັບອື່ນ: ມັນອ່ານສິ່ງທີ່ຢູ່ເທິງໜ້າຈໍ ແລະ ແຕະ, ພິມ ແລະ ເລື່ອນແທນທ່ານ. ມັນຍັງສະແດງບັອບເບິ້ລລອຍ.</string>
+    <string name="ui_a11y_data">ໃນຂະນະທີ່ວຽກແລ່ນ, ເນື້ອຫາໜ້າຈໍ ເຊິ່ງອາດມີຂໍ້ມູນສ່ວນຕົວ ເຊັ່ນ ຂໍ້ຄວາມ, ຊື່ ຫຼື ທີ່ຢູ່ ຈະຖືກສົ່ງໄປຫາບໍລິການ AI ຂອງຕົວແທນທີ່ທ່ານເລືອກ (Anthropic ສຳລັບ Claude Code, OpenAI ສຳລັບ Codex, Google ສຳລັບ Antigravity, xAI ສຳລັບ Grok, ຫຼື ຜູ້ໃຫ້ບໍລິການໂມເດລ OpenCode ຂອງທ່ານ), ເພື່ອເຮັດຕາມຄຳຂໍຂອງທ່ານເທົ່ານັ້ນ.</string>
+    <string name="ui_a11y_no_servers">Buddy ບໍ່ມີເຊີບເວີຂອງຕົນເອງ. ມັນບໍ່ເກັບ, ຂາຍ ຫຼື ແບ່ງປັນຂໍ້ມູນນີ້, ແລະ ບໍ່ໃຊ້ມັນສຳລັບໂຄສະນາ.</string>
+    <string name="ui_a11y_asks">ກ່ອນທຸກຢ່າງທີ່ສົ່ງ, ໂພສ, ຊື້ ຫຼື ລຶບ, Buddy ຈະຂໍການອະນຸຍາດຈາກທ່ານ. ທ່ານສາມາດປິດບໍລິການໄດ້ທຸກເວລາໃນການຕັ້ງຄ່າການເຂົ້າເຖິງຂອງ Android.</string>
+    <string name="ui_privacy_policy">ນະໂຍບາຍຄວາມເປັນສ່ວນຕົວ</string>
+    <!-- Button: close the disclosure without opening the settings. -->
+    <string name="ui_no_thanks">ບໍ່, ຂອບໃຈ</string>
+    <!-- Button: agree to the disclosure and open Android's accessibility settings. -->
+    <string name="ui_agree_continue">ຍອມຮັບ ແລະ ສືບຕໍ່</string>
+
+    <!-- Bottom navigation of the main screens. Keep very short (about 10 characters). -->
+    <!-- Tab: the list of Buddy chats. -->
+    <string name="ui_nav_chats">ການສົນທະນາ</string>
+    <!-- Tab: every agent session on the phone (running and recent). -->
+    <string name="ui_nav_sessions">ເຊສຊັນ</string>
+    <!-- Tab: Buddy's settings. -->
+    <string name="ui_nav_settings">ການຕັ້ງຄ່າ</string>
+
+    <!-- Accessibility service: pause from the bubble's hold menu, Stop on the control indicator -->
+    <!-- Toast when a pause runs out after 5 minutes. -->
+    <string name="service_pause_expired">ຢຸດຊົ່ວຄາວ 5 ນາທີ, ຈຶ່ງ Buddy ຢຸດວຽກ.</string>
+    <!-- Toast after the user stops the task to use the phone. -->
+    <string name="service_stopped_toast">ຢຸດແລ້ວ. ໂທລະສັບຂອງທ່ານກັບມາເປັນຂອງທ່ານ.</string>
+    <!-- Note in the chat when the user pauses the agent. -->
+    <string name="service_paused_note">ຢຸດຊົ່ວຄາວ: ໂທລະສັບເປັນຂອງທ່ານຈົນກວ່າຈະເຮັດຕໍ່</string>
+    <string name="service_paused_toast">ຢຸດຊົ່ວຄາວ. ໃຊ້ໂທລະສັບຂອງທ່ານ, ແລ້ວແຕະ ຢຸດຊົ່ວຄາວ ຢູ່ຂ້າງບັອບເບິ້ລເພື່ອເຮັດຕໍ່.</string>
+    <!-- Note in the chat when the user resumes the agent. -->
+    <string name="service_resumed_note">ເຮັດຕໍ່ແລ້ວ</string>
+    <string name="service_autopaused_touch">ຢຸດຊົ່ວຄາວເພາະທ່ານແຕະໜ້າຈໍ. ແຕະ ຢຸດຊົ່ວຄາວ ຢູ່ຂ້າງບັອບເບິ້ລເພື່ອເຮັດຕໍ່.</string>
+    <string name="service_autopaused_call">ຢຸດຊົ່ວຄາວເພາະມີສາຍໂທ. ແຕະ ຢຸດຊົ່ວຄາວ ຢູ່ຂ້າງບັອບເບິ້ລເພື່ອເຮັດຕໍ່.</string>
+
+    <!-- Voice input and output -->
+    <!-- 🎙 = the mic button. -->
+    <string name="voice_mic_needed">Buddy ຕ້ອງການໄມໂຄຣໂຟນ. ເປີດແອັບ Buddy ແລະ ແຕະ 🎙 ຄັ້ງໜຶ່ງເພື່ອອະນຸຍາດ.</string>
+    <string name="voice_no_recognizer">ບໍ່ມີບໍລິການຮັບຮູ້ສຽງເວົ້າໃນໂທລະສັບນີ້.</string>
+    <!-- Status in the recording bar while speech recognition starts. Keep short. -->
+    <string name="voice_starting">ກຳລັງເລີ່ມ…</string>
+    <!-- Status in the recording bar after the user stopped talking. Keep short. -->
+    <string name="voice_finishing">ກຳລັງຈົບ…</string>
+    <!-- Nothing was understood. -->
+    <string name="voice_didnt_catch">ບໍ່ໄດ້ຍິນຊັດ.</string>
+    <!-- %1$d = Android's error number. -->
+    <string name="voice_error">ຂໍ້ຜິດພາດການຮັບຮູ້ສຽງ %1$d.</string>
+    <!-- Spoken aloud by text-to-speech in place of a block of code in a reply. -->
+    <string name="voice_code_omitted">ຕັດລະຫັດອອກ.</string>
+    <!-- Spoken aloud by text-to-speech in place of a web address in a reply. Noun. -->
+    <string name="voice_link">ລິ້ງ</string>
+    <!-- Read by TalkBack for the send button of the recording bar: stops recording and sends. -->
+    <string name="voice_stop_and_send">ຢຸດ ແລະ ສົ່ງ</string>
+
+    <!-- ===== Sign-in, agents and models (SignInActivity, Account, Models, Sessions, RemoteSession, Attachments) ===== -->
+
+    <!-- Sign-in screen (one per agent: Claude Code, Codex, OpenCode, Antigravity or Grok). Product and plan names
+         (Claude, ChatGPT, Codex, OpenCode, Grok, Anthropic, OpenAI, xAI, X, Pro, Max, Plus, Business) stay as they are. -->
+    <!-- Content description of the back arrow in the top bar (read by TalkBack). -->
+    <string name="signin_back">ກັບ</string>
+    <!-- Subtitle while Buddy checks whether the agent is installed and signed in. -->
+    <string name="signin_checking">ກຳລັງກວດສອບ…</string>
+
+    <!-- Sign-in screen: the agent isn't installed yet. -->
+    <!-- Screen title and the button that starts the install. %1$s = agent name (Claude Code, Codex, OpenCode, Antigravity or Grok). -->
+    <string name="signin_install">ຕິດຕັ້ງ %1$s</string>
+    <string name="signin_install_sub_claude">ແລ່ນ Claude Code ພາຍໃນ Buddy ດ້ວຍການສະໝັກສະມາຊິກ Claude ຂອງທ່ານ.</string>
+    <string name="signin_install_sub_opencode">ແລ່ນ OpenCode ພາຍໃນ Buddy. ໂມເດລຟຣີຂອງມັນໃຊ້ໄດ້ທັນທີ, ບໍ່ຕ້ອງມີບັນຊີ; ເຊື່ອມຕໍ່ຜູ້ໃຫ້ບໍລິການຂອງທ່ານເອງ (Anthropic, OpenAI, GitHub Copilot…) ໄດ້ທຸກເວລາ.</string>
+    <string name="signin_install_sub_codex">ແລ່ນ Codex ພາຍໃນ Buddy ດ້ວຍແຜນ ChatGPT ຂອງທ່ານ.</string>
+    <string name="signin_install_sub_agy">ແລ່ນ Antigravity CLI ຂອງ Google ພາຍໃນ Buddy ດ້ວຍບັນຊີ Google ຂອງທ່ານ: ແຜນຟຣີ, ຫຼື Google AI Pro ຫຼື Ultra.</string>
+    <string name="signin_install_sub_grok">ແລ່ນ Grok Build ຂອງ xAI ພາຍໃນ Buddy ດ້ວຍບັນຊີ Grok ຂອງທ່ານ (ເຂົ້າສູ່ລະບົບດ້ວຍ Google ຫຼື X ໄດ້).</string>
+    <!-- "Buddy's Linux" = the small Linux system Buddy installs inside the app. -->
+    <string name="signin_install_size_claude">ດາວໂຫຼດປະມານ 235 MB ຄັ້ງດຽວ: Linux ຂອງ Buddy ແລະ Claude Code ຈາກ Anthropic. ໃຊ້ Wi-Fi ຖ້າເຮັດໄດ້.</string>
+    <string name="signin_install_size_opencode">ດາວໂຫຼດປະມານ 230 MB ຄັ້ງດຽວ: Linux ຂອງ Buddy, Node.js ແລະ OpenCode. ໃຊ້ Wi-Fi ຖ້າເຮັດໄດ້.</string>
+    <string name="signin_install_size_codex">ດາວໂຫຼດປະມານ 150 MB ຄັ້ງດຽວ: Linux ຂອງ Buddy, Node.js ແລະ Codex ຈາກ OpenAI. ໃຊ້ Wi-Fi ຖ້າເຮັດໄດ້.</string>
+    <string name="signin_install_size_agy">ດາວໂຫຼດປະມານ 200 MB ຄັ້ງດຽວ: Linux ຂອງ Buddy ແລະ Antigravity CLI ຈາກ Google. ໃຊ້ Wi-Fi ຖ້າເຮັດໄດ້.</string>
+    <string name="signin_install_size_grok">ດາວໂຫຼດປະມານ 170 MB ຄັ້ງດຽວ: Linux ຂອງ Buddy ແລະ Grok Build ຈາກ xAI. ໃຊ້ Wi-Fi ຖ້າເຮັດໄດ້.</string>
+
+    <!-- Sign-in screen: install or update in progress (screen titles). -->
+    <string name="signin_installing">ກຳລັງຕິດຕັ້ງ</string>
+    <string name="signin_updating">ກຳລັງອັບເດດ</string>
+    <string name="signin_install_wait">ຂະບວນການນີ້ໃຊ້ເວລາສອງສາມນາທີ. ທ່ານອອກຈາກໜ້າຈໍນີ້ໄດ້; ມັນຈະເຮັດຕໍ່.</string>
+
+    <!-- Sign-in screen: installed, not signed in. -->
+    <string name="signin_title_claude">ເຂົ້າສູ່ລະບົບ Claude</string>
+    <string name="signin_title_chatgpt">ເຂົ້າສູ່ລະບົບ ChatGPT</string>
+    <string name="signin_title_google">ເຂົ້າສູ່ລະບົບ Google</string>
+    <string name="signin_title_grok">ເຂົ້າສູ່ລະບົບ Grok</string>
+    <string name="signin_sub_claude">ໃຊ້ບັນຊີ Claude ຂອງທ່ານ (Pro ຫຼື Max). ບຣາວເຊີຈະເປີດ; ອະນຸຍາດຢູ່ຫັ້ນ ແລ້ວ Buddy ຈະກັບມາເອງ.</string>
+    <string name="signin_sub_chatgpt">ໃຊ້ບັນຊີ ChatGPT ຂອງທ່ານ (Plus, Pro ຫຼື Business). ບຣາວເຊີຈະເປີດ; ອະນຸຍາດຢູ່ຫັ້ນ ແລ້ວ Buddy ຈະກັບມາເອງ.</string>
+    <string name="signin_sub_agy">ໃຊ້ບັນຊີ Google ຂອງທ່ານ. ບຣາວເຊີຈະເປີດ; ເຂົ້າສູ່ລະບົບຢູ່ຫັ້ນ ແລ້ວ Buddy ຈະຮັບລະຫັດເອງ. Antigravity ລໍຖ້າປະມານໜຶ່ງນາທີ.</string>
+    <string name="signin_sub_grok">ໃຊ້ບັນຊີ Grok ຂອງທ່ານ; ເຂົ້າສູ່ລະບົບດ້ວຍ Google ຫຼື X ກໍ່ໄດ້. ບຣາວເຊີຈະເປີດພ້ອມລະຫັດ; ຢືນຢັນຢູ່ຫັ້ນ ແລ້ວ Buddy ຈະກັບມາເອງ.</string>
+    <!-- Main button. -->
+    <string name="signin_with_claude">ເຂົ້າສູ່ລະບົບດ້ວຍ Claude</string>
+    <string name="signin_with_chatgpt">ເຂົ້າສູ່ລະບົບດ້ວຍ ChatGPT</string>
+    <string name="signin_with_google">ເຂົ້າສູ່ລະບົບດ້ວຍ Google</string>
+    <string name="signin_with_grok">ເຂົ້າສູ່ລະບົບດ້ວຍ Grok</string>
+    <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
+    <!-- Button on Claude Code's sign-in screen: sign in by pasting a token instead. Keep short. -->
+    <string name="signin_token">ໃຊ້ໂທເຄັນ</string>
+    <!-- Title of its sheet. -->
+    <string name="signin_token_title">ໂທເຄັນ Claude Code</string>
+    <!-- "claude setup-token" is a command and "sk-ant-oat" the start of the token: keep both as they are. -->
+    <string name="signin_token_info">ວາງໂທເຄັນທີ່ “claude setup-token” ສະແດງໃນຄອມພິວເຕີ; ມັນເລີ່ມດ້ວຍ sk-ant-oat. ມັນໃຊ້ໄດ້ກັບການສົນທະນາ. ການປ້ອນສຽງ ແລະ ການຄວບຄຸມທາງໄກ ຕ້ອງການການເຂົ້າສູ່ລະບົບແບບເຕັມ.</string>
+    <!-- Under the field when what was pasted isn't such a token. "API keys" is the name of Buddy's settings screen (api_keys_title). -->
+    <string name="signin_token_wrong">ນັ້ນບໍ່ແມ່ນໂທເຄັນ Claude Code. API key (sk-ant-api…) ໃຫ້ໃສ່ໃນ ການຕັ້ງຄ່າ → ຕົວແທນ ແລະ ໂມເດລ → API key.</string>
+    <!-- On the signed-in screen when it's a token. -->
+    <string name="signin_token_on">ເຂົ້າສູ່ລະບົບດ້ວຍໂທເຄັນ: ມັນໃຊ້ໄດ້ກັບການສົນທະນາ. ການປ້ອນສຽງ ແລະ ການຄວບຄຸມທາງໄກ ຕ້ອງການການເຂົ້າສູ່ລະບົບແບບເຕັມ.</string>
+    <string name="signin_other_device">ເຂົ້າສູ່ລະບົບໃນອຸປະກອນອື່ນ</string>
+    <!-- Button (ChatGPT): sign in by entering a one-time code on another device. -->
+    <string name="signin_with_code">ເຂົ້າສູ່ລະບົບດ້ວຍລະຫັດ</string>
+
+    <!-- Sign-in screen: sign-in in progress. -->
+    <!-- Screen title while the sign-in starts. -->
+    <string name="signin_sign_in">ເຂົ້າສູ່ລະບົບ</string>
+    <!-- Also shown as status text elsewhere while the sign-in starts. -->
+    <string name="signin_starting">ກຳລັງເລີ່ມການເຂົ້າສູ່ລະບົບ…</string>
+    <string name="signin_approve_title">ອະນຸຍາດໃນບຣາວເຊີຂອງທ່ານ</string>
+    <!-- "Authorize" is the button on Claude's sign-in web page; use the label that page shows in your language. -->
+    <string name="signin_approve_claude">ແຕະ Authorize ຢູ່ໜ້າ Claude. Buddy ຈະຮັບລະຫັດ ແລະ ກັບມາເອງ.</string>
+    <string name="signin_approve_codex">ເຂົ້າສູ່ລະບົບ ແລະ ອະນຸຍາດ Codex. ແລ້ວກັບມາຫາ Buddy; ມັນຈະຈົບເອງ.</string>
+    <string name="signin_approve_agy">ເຂົ້າສູ່ລະບົບ ແລະ ອະນຸຍາດ Antigravity. Buddy ຈະຮັບລະຫັດທີ່ໜ້ານັ້ນສະແດງ ແລະ ກັບມາເອງ. ຖ້າເກີນໜຶ່ງນາທີ, ເລີ່ມໃໝ່.</string>
+    <!-- %1$s = the one-time code shown on Grok's sign-in page, e.g. "ABCD-1234". -->
+    <string name="signin_approve_grok">ກວດວ່າໜ້ານັ້ນສະແດງ %1$s, ແລ້ວຢືນຢັນ ແລະ ເຂົ້າສູ່ລະບົບ. Buddy ຈະກັບມາເອງ.</string>
+    <!-- Button. -->
+    <string name="signin_open_again">ເປີດໜ້າເຂົ້າສູ່ລະບົບອີກຄັ້ງ</string>
+    <!-- Screen title after the code was handed over. -->
+    <string name="signin_signing_in">ກຳລັງເຂົ້າສູ່ລະບົບ</string>
+    <!-- Also shown as status text elsewhere after the code was handed over. -->
+    <string name="signin_finishing">ກຳລັງຈົບການເຂົ້າສູ່ລະບົບ…</string>
+    <!-- Error status. %1$s = the agent's last output (English, technical); may be empty. -->
+    <string name="signin_not_finished">ການເຂົ້າສູ່ລະບົບບໍ່ສຳເລັດ. %1$s</string>
+
+    <!-- Sign-in screen: signing in from another device. -->
+    <string name="signin_remote_claude">ເປີດລິ້ງນີ້ໃນອຸປະກອນໃດກໍ່ໄດ້ ແລ້ວອະນຸຍາດ. ແລ້ວສຳເນົາລະຫັດທີ່ໜ້ານັ້ນສະແດງ ແລະ ວາງຂ້າງລຸ່ມ.</string>
+    <!-- Screen title (ChatGPT): a one-time code is shown below it. -->
+    <string name="signin_enter_code">ໃສ່ລະຫັດນີ້</string>
+    <string name="signin_remote_codex">ໃນອຸປະກອນໃດກໍ່ໄດ້, ເປີດລິ້ງຂ້າງລຸ່ມ, ເຂົ້າສູ່ລະບົບ ChatGPT ແລະ ໃສ່ລະຫັດ. Buddy ຈະຈົບເອງ.</string>
+    <string name="signin_remote_agy">ເປີດລິ້ງນີ້ໃນອຸປະກອນໃດກໍ່ໄດ້ ແລ້ວເຂົ້າສູ່ລະບົບ. ແລ້ວສຳເນົາລະຫັດທີ່ໜ້ານັ້ນສະແດງ ແລະ ວາງຂ້າງລຸ່ມ, ພາຍໃນປະມານໜຶ່ງນາທີ.</string>
+    <string name="signin_remote_grok">ໃນອຸປະກອນໃດກໍ່ໄດ້, ເປີດລິ້ງຂ້າງລຸ່ມ, ເຂົ້າສູ່ລະບົບ Grok ແລະ ຢືນຢັນລະຫັດ. Buddy ຈະຈົບເອງ.</string>
+    <!-- Buttons and the toasts after them. -->
+    <string name="signin_copy_code">ສຳເນົາລະຫັດ</string>
+    <string name="signin_code_copied">ສຳເນົາລະຫັດແລ້ວ</string>
+    <string name="signin_code_expiry">ລະຫັດໃຊ້ໄດ້ 15 ນາທີ.</string>
+    <string name="signin_copy_link">ສຳເນົາລິ້ງ</string>
+    <string name="signin_link_copied">ສຳເນົາລິ້ງແລ້ວ</string>
+    <!-- Button: share the sign-in link with another app. Verb. -->
+    <string name="signin_share">ແບ່ງປັນ</string>
+    <!-- Button: open the sign-in link on this phone. -->
+    <string name="signin_open_here">ເປີດຢູ່ນີ້</string>
+    <!-- Toasts. -->
+    <string name="signin_no_browser">ບໍ່ພົບບຣາວເຊີ.</string>
+    <string name="signin_no_browser_page">ບໍ່ພົບບຣາວເຊີເພື່ອເປີດໜ້າເຂົ້າສູ່ລະບົບ.</string>
+    <!-- Label of the copied code or link on the clipboard (rarely shown). -->
+    <string name="signin_clip_label">ການເຂົ້າສູ່ລະບົບ</string>
+
+    <!-- Sign-in screen: fold-out box for pasting Claude's sign-in code by hand. -->
+    <string name="signin_paste_instead">ວາງລະຫັດແທນ</string>
+    <!-- "Copy Code" is the button on Claude's sign-in web page; use the label that page shows in your language. -->
+    <string name="signin_paste_help">ຖ້າ Buddy ບໍ່ກັບມາເອງ: ແຕະ Copy Code ຢູ່ໜ້າ Claude, ແລ້ວວາງຢູ່ນີ້.</string>
+    <string name="signin_paste_help_agy">ຖ້າ Buddy ບໍ່ກັບມາເອງ: ແຕະ Copy to Clipboard ຢູ່ໜ້າ Antigravity, ແລ້ວວາງຢູ່ນີ້.</string>
+    <!-- Hint inside the empty text box for the code. Lowercase in English. -->
+    <string name="signin_code_hint">ລະຫັດ</string>
+    <!-- Short button next to the text box: use the pasted code. Verb. -->
+    <string name="signin_use_code">ໃຊ້</string>
+    <!-- Toast when there is no sign-in waiting for a code. -->
+    <string name="signin_start_again">ເລີ່ມການເຂົ້າສູ່ລະບົບໃໝ່ກ່ອນ.</string>
+
+    <!-- Sign-in screen: signed in, or OpenCode installed (it needs no sign-in). -->
+    <string name="signin_signed_in">ເຂົ້າສູ່ລະບົບແລ້ວ</string>
+    <!-- %1$s = agent name (Claude Code or Codex). -->
+    <string name="signin_agent_ready">%1$s ພ້ອມແລ້ວ.</string>
+    <!-- Button that closes the screen. -->
+    <string name="signin_done">ສຳເລັດ</string>
+    <!-- Button, and the button of the confirmation sheet. -->
+    <string name="signin_sign_out">ອອກຈາກລະບົບ</string>
+    <!-- Confirmation sheet. %1$s = agent name. -->
+    <string name="signin_sign_out_title">ອອກຈາກລະບົບ %1$s ບໍ?</string>
+    <string name="signin_sign_out_text">%1$s ໃນ Buddy ຈະຢຸດເຮັດວຽກຈົນກວ່າທ່ານຈະເຂົ້າສູ່ລະບົບອີກຄັ້ງ.</string>
+    <string name="signin_opencode_ready">OpenCode ພ້ອມແລ້ວ</string>
+    <!-- "model chip" = the button at the top of a chat that shows the agent and model. -->
+    <string name="signin_opencode_free">ກຳລັງໃຊ້ໂມເດລຟຣີຂອງ OpenCode. ເລືອກໜຶ່ງຕໍ່ການສົນທະນາດ້ວຍຊິບໂມເດລ, ຫຼື ເຊື່ອມຕໍ່ຜູ້ໃຫ້ບໍລິການຂອງທ່ານເອງ.</string>
+    <!-- %1$s = connected providers, comma-separated (e.g. "anthropic, openai"). -->
+    <string name="signin_opencode_connected">ເຊື່ອມຕໍ່ແລ້ວ: %1$s. ໂມເດລຟຣີຂອງ OpenCode ຍັງໃຊ້ໄດ້ຄືເກົ່າ.</string>
+    <!-- %1$s = the command "opencode auth login", %2$s = the command "opencode auth logout" (both stay as they are). -->
+    <string name="signin_opencode_connect_note">ການເຊື່ອມຕໍ່ຜູ້ໃຫ້ບໍລິການຈະເປີດເທີມິນອລຂອງ Buddy ດ້ວຍ %1$s: ເລືອກຜູ້ໃຫ້ບໍລິການ ແລະ ເຮັດຕາມຂັ້ນຕອນ. ເພື່ອລຶບພາຍຫຼັງ, ແລ່ນ %2$s ຢູ່ຫັ້ນ.</string>
+    <!-- Button. -->
+    <string name="signin_connect_provider">ເຊື່ອມຕໍ່ຜູ້ໃຫ້ບໍລິການ</string>
+    <!-- Installed version. %1$s = agent name, %2$s = version number (e.g. "Claude Code 2.1.40."). -->
+    <string name="signin_version">%1$s %2$s.</string>
+    <!-- %1$s = the installed OpenCode 1.x version number. -->
+    <string name="signin_version_old_opencode">OpenCode %1$s. OpenCode 2 ອອກແລ້ວ: ອັບເດດເພື່ອຮັບເວີຊັນໃໝ່. ຜູ້ໃຫ້ບໍລິການທີ່ເຊື່ອມຕໍ່ໄວ້ຈະຖືກຮັກສາ.</string>
+    <!-- Buttons. -->
+    <string name="signin_update_opencode2">ອັບເດດເປັນ OpenCode 2</string>
+    <string name="signin_check_updates">ກວດຫາການອັບເດດ</string>
+
+    <!-- Sign-in screen: error. -->
+    <string name="signin_error_title">ມີບາງຢ່າງຜິດພາດ</string>
+    <!-- Button. -->
+    <string name="signin_try_again">ລອງອີກຄັ້ງ</string>
+
+    <!-- Agent status shown on the sign-in, setup and onboarding screens. -->
+    <!-- One line under the agent's name in the agent pickers. -->
+    <string name="account_tagline_claude">ໃຊ້ແຜນ Claude ຂອງທ່ານ</string>
+    <string name="account_tagline_opencode">ບໍ່ມີບັນຊີ, ຫຼື ຜູ້ໃຫ້ບໍລິການຂອງທ່ານເອງ</string>
+    <string name="account_tagline_codex">ໃຊ້ແຜນ ChatGPT ຂອງທ່ານ</string>
+    <string name="account_tagline_agy">ໃຊ້ບັນຊີ Google ຂອງທ່ານ</string>
+    <string name="account_tagline_grok">ໃຊ້ບັນຊີ Grok ຂອງທ່ານ</string>
+    <!-- Small tag beside an agent's name in the agent pickers (OpenCode, Antigravity, Grok): usable for free, within limits. -->
+    <string name="agent_tag_free">ຟຣີ · ຈຳກັດ</string>
+    <!-- Install progress. -->
+    <string name="account_setting_up_linux">ກຳລັງຕັ້ງຄ່າ Linux ຂອງ Buddy…</string>
+    <string name="account_installing_tools">ກຳລັງຕິດຕັ້ງເຄື່ອງມື…</string>
+    <string name="account_downloading_claude">ກຳລັງດາວໂຫຼດ Claude Code (ປະມານ 230 MB)…</string>
+    <!-- %1$s = what is downloaded: an agent name (Codex, OpenCode) or "OpenCode 2". -->
+    <string name="account_downloading">ກຳລັງດາວໂຫຼດ %1$s…</string>
+    <!-- Error. %1$s = agent name, %2$s = technical detail in English. -->
+    <string name="account_check_failed">ກວດສອບ %1$s ບໍ່ໄດ້: %2$s</string>
+    <!-- Error. %1$s = technical detail in English. -->
+    <string name="account_install_failed">ການຕິດຕັ້ງລົ້ມເຫຼວ: %1$s</string>
+    <string name="account_install_no_space">ບໍ່ມີພື້ນທີ່ຫວ່າງພຽງພໍໃນໂທລະສັບ. ປົດປ່ອຍປະມານ 1 GB ແລ້ວລອງອີກຄັ້ງ.</string>
+    <string name="account_install_network">Buddy ເຊື່ອມຕໍ່ເຊີບເວີດາວໂຫຼດບໍ່ໄດ້. ກວດ Wi-Fi ຫຼື ຂໍ້ມູນມືຖື (ຫຼື VPN ຫຼື DNS ສ່ວນຕົວທີ່ບລັອກມັນ) ແລ້ວລອງອີກຄັ້ງ.</string>
+    <string name="account_install_refused">ເຊີບເວີດາວໂຫຼດປະຕິເສດຄຳຂໍ ຫຼື ຂໍໃຫ້ຊ້າລົງ. ລອງອີກຄັ້ງໃນສອງສາມນາທີ.</string>
+    <string name="account_install_space_needed">ມີພື້ນທີ່ຫວ່າງພຽງ %1$s. ການຕິດຕັ້ງຕົວແທນຕ້ອງການປະມານ 1 GB: ປົດປ່ອຍພື້ນທີ່ ແລ້ວລອງອີກຄັ້ງ.</string>
+    <string name="signin_details">ລາຍລະອຽດ</string>
+    <!-- Update progress and result. %1$s = agent name: checking for a newer version of it. -->
+    <string name="account_update_checking">ກຳລັງກວດຫາ %1$s ເວີຊັນໃໝ່…</string>
+    <!-- %1$s = version number. -->
+    <string name="account_update_latest">ທ່ານມີເວີຊັນລ່າສຸດແລ້ວ (%1$s).</string>
+    <!-- %1$s = new version number. -->
+    <string name="account_updated">ອັບເດດເປັນ %1$s ແລ້ວ.</string>
+    <!-- %1$s = new version number, %2$s = previous version number. -->
+    <string name="account_updated_from">ອັບເດດເປັນ %1$s ແລ້ວ (ເດີມ %2$s).</string>
+    <!-- %1$s = the OpenCode version that is still installed. -->
+    <string name="account_update_opencode2_failed">ອັບເດດເປັນ OpenCode 2 ບໍ່ໄດ້; ທ່ານຍັງມີ %1$s. ລອງອີກຄັ້ງຜ່ານ Wi-Fi.</string>
+    <string name="account_update_failed">ການອັບເດດລົ້ມເຫຼວ: %1$s</string>
+
+    <!-- Model and effort pickers of a chat, and the chat's chip ("agent · model · effort").
+         Model names (Opus 5.5, GPT-6.1-Sol…) stay as they are. -->
+    <!-- Model picker row: the agent's own default model. Also shown in a chat note "Model: Default". -->
+    <string name="models_default">ຄ່າເລີ່ມຕົ້ນ</string>
+    <!-- Chip: the agent's default model, now known. %1$s = model name (e.g. "Opus 5.5"). -->
+    <string name="models_name_default">%1$s (ຄ່າເລີ່ມຕົ້ນ)</string>
+    <!-- Chip: the default model, not known yet. Lowercase in English. -->
+    <string name="models_default_model">ໂມເດລເລີ່ມຕົ້ນ</string>
+    <!-- Small grey line under "Default" in the model picker. Lowercase in English.
+         %1$s = the model the agent uses by default (e.g. "Opus 5.5"). -->
+    <string name="models_default_now">ຕອນນີ້ %1$s</string>
+    <string name="models_default_claude">Claude Code ເລືອກຈາກແຜນຂອງທ່ານ; ຈະສະແດງຢູ່ນີ້ຫຼັງຂໍ້ຄວາມທຳອິດ</string>
+    <string name="models_default_codex">Codex ເປັນຜູ້ເລືອກ; ຈະສະແດງຢູ່ນີ້ຫຼັງຄຳຕອບຕໍ່ໄປ</string>
+    <string name="models_default_opencode">ໂມເດລເລີ່ມຕົ້ນຂອງ OpenCode</string>
+    <string name="models_default_agy">ໂມເດລເລີ່ມຕົ້ນຂອງ Antigravity</string>
+    <string name="models_default_grok">ໂມເດລເລີ່ມຕົ້ນຂອງ Grok</string>
+    <!-- Effort levels in a row of up to 6 segments: keep each very short (about 5 characters).
+         "Auto" = the agent decides how much to think. -->
+    <string name="models_effort_auto">Auto</string>
+    <string name="models_effort_low">ຕ່ຳ</string>
+    <!-- Short for "Medium". -->
+    <string name="models_effort_medium">ກາງ</string>
+    <string name="models_effort_high">ສູງ</string>
+    <!-- Extra high. -->
+    <string name="models_effort_xhigh">ສູງຫຼາຍ</string>
+    <!-- Maximum. -->
+    <string name="models_effort_max">ສູງສຸດ</string>
+    <!-- Chip, after the model. %1$s = effort level as the agent names it (low, medium, high, xhigh or max); not translated. -->
+    <string name="models_chip_effort">ຄວາມພະຍາຍາມ %1$s</string>
+
+    <!-- Chats. -->
+    <!-- Title of a chat before its first message. %1$s = agent name (e.g. "New Claude Code chat"). -->
+    <string name="session_new_chat">ການສົນທະນາ %1$s ໃໝ່</string>
+    <!-- Preview of a message with several photos or files (a single one shows its file name instead). -->
+    <plurals name="attach_count">
+        <item quantity="one">📎 %1$d ໄຟລ໌ແນບ</item>
+        <item quantity="other">📎 %1$d ໄຟລ໌ແນບ</item>
+    </plurals>
+
+    <!-- Attaching a photo or file to a chat message (toasts). %1$s = file name. -->
+    <string name="attach_cant_open">ເປີດ %1$s ບໍ່ໄດ້</string>
+    <string name="attach_too_large">%1$s ໃຫຍ່ກວ່າ 25 MB.</string>
+
+    <!-- Remote Control session in Settings: a Claude Code session that can be continued from the Claude app. -->
+    <string name="remote_sign_in_first">ເຂົ້າສູ່ລະບົບ Claude Code ກ່ອນ.</string>
+    <string name="remote_starting">ກຳລັງເລີ່ມ…</string>
+    <string name="remote_restarting">ກຳລັງເລີ່ມໃໝ່…</string>
+    <!-- %1$s = technical detail in English. -->
+    <string name="remote_start_failed">ເລີ່ມບໍ່ໄດ້: %1$s</string>
+    <string name="remote_keeps_stopping">ເຊສຊັນຢຸດເລື້ອຍໆ. ປິດແລ້ວເປີດໃໝ່, ຫຼື ກວດການເຂົ້າສູ່ລະບົບ Claude Code.</string>
+    <string name="codex_pair_getting">ກຳລັງຂໍລະຫັດ…</string>
+    <!-- %1$s = a time. Settings > Connections > Control other devices is the path in the ChatGPT desktop app. Keep "localhost" as is. -->
+    <string name="codex_pair_text">ໃສ່ລະຫັດນີ້ໃນ ChatGPT: ໃນ Codex ເທິງໂທລະສັບ, ຫຼື ໃນ ການຕັ້ງຄ່າ → ການເຊື່ອມຕໍ່ → ຄວບຄຸມອຸປະກອນອື່ນ ເທິງຄອມພິວເຕີ. ມັນໃຊ້ໄດ້ຄັ້ງດຽວ, ຈົນຮອດ %1$s. Buddy ຈະສະແດງຢູ່ຫັ້ນເປັນ “localhost”.</string>
+    <!-- %1$s = technical detail, in English. -->
+    <string name="codex_pair_failed">ຂໍລະຫັດຈັບຄູ່ບໍ່ໄດ້: %1$s</string>
+    <!-- %1$s = the last lines Codex printed, in English. -->
+    <string name="codex_keeps_stopping">ເຊສຊັນ Codex ຢຸດເລື້ອຍໆ: %1$s</string>
+    <!-- %1$s = the server's last message, in English. -->
+    <string name="ssh_keeps_stopping">ເຊີບເວີ SSH ຢຸດເລື້ອຍໆ: %1$s</string>
+    <!-- Shown in Termux after the copied command ran, and as a toast. "ssh buddy" is a command: keep it as is. -->
+    <string name="ssh_key_added">ສຳເລັດ. ເພື່ອເປີດ Linux ຂອງ Buddy ຈາກ Termux, ພິມ ssh buddy.</string>
+    <!-- Shown in Termux when the copied command was already used or is too old. -->
+    <string name="ssh_code_expired">ຄຳສັ່ງນີ້ຖືກໃຊ້ແລ້ວ ຫຼື ເກົ່າກວ່າ 10 ນາທີ. ສຳເນົາອີກຄັ້ງໃນ ການຕັ້ງຄ່າ ຂອງ Buddy.</string>
+
+    <!-- ===== Settings, the built-in Linux, terminal and sessions (SetupActivity, Linux, Terminal*, MonitorActivity) ===== -->
+
+    <!-- Settings screen: header. -->
+    <string name="setup_settings_title">ການຕັ້ງຄ່າ</string>
+    <string name="setup_settings_subtitle">Buddy ແລ່ນ Claude Code, Codex, OpenCode, Antigravity ຫຼື Grok ພາຍໃນແອັບ, ດ້ວຍການສະໝັກສະມາຊິກຂອງທ່ານເອງ (ຫຼື ໂມເດລຟຣີຂອງ OpenCode ແລະ ແຜນຟຣີຂອງ Antigravity).</string>
+    <string name="settings_agents">ຕົວແທນ ແລະ ໂມເດລ</string>
+    <string name="settings_agents_sub">ຕົວແທນເລີ່ມຕົ້ນ, ການເຂົ້າສູ່ລະບົບ, API key, ໂມເດລເລີ່ມຕົ້ນ, GitHub, ເຊີບເວີດາວໂຫຼດ</string>
+    <string name="settings_bubble">ບັອບເບິ້ລ ແລະ ການສົນທະນາ</string>
+    <string name="settings_bubble_sub">ສະແດງບັອບເບິ້ລ, ການແຕະມັນເຮັດຫຍັງ, ຂະໜາດຂອງແຜງ</string>
+    <string name="settings_voice_sub">ການປ້ອນ ແລະ ສົ່ງອອກສຽງ, ພາສາ, ສຽງສົດ, ການອ່ານຄຳຕອບອອກສຽງ</string>
+    <string name="settings_safety">ຄວາມປອດໄພ ແລະ ການອະນຸຍາດ</string>
+    <string name="settings_safety_sub">ສິດຂອງແອັບ, ກົດການແຈ້ງເຕືອນ, ເຄື່ອງມື Linux, ໜ້າຈໍຂອງ Buddy ເອງ</string>
+    <string name="settings_background">ເບື້ອງຫຼັງ ແລະ ອັດຕະໂນມັດ</string>
+    <string name="settings_background_sub">ຮູບແບບເບື້ອງຫຼັງ, ວຽກຕາມຕາຕະລາງ, ບຣາວເຊີເບື້ອງຫຼັງ</string>
+    <string name="settings_tools">ເຄື່ອງມື ແລະ ການເຊື່ອມຕໍ່</string>
+    <string name="settings_tools_sub">ເຊີບເວີ MCP, ສະກິລ, ເຄື່ອງມືໂທລະສັບສຳລັບເທີມິນອລອື່ນ, ການຄວບຄຸມທາງໄກ, SSH</string>
+    <string name="settings_appearance_sub">ແຈ້ງ ຫຼື ມືດ, ສີເນັ້ນ, ພື້ນຜິວ, ຮູບລັກຂອງ Buddy</string>
+    <string name="settings_about">ສຳຮອງ ແລະ ກ່ຽວກັບ</string>
+    <string name="settings_about_sub">ສຳຮອງ ແລະ ຍ້າຍ, ການອັບເດດ, ຄູ່ມື, ການກວດການຕັ້ງຄ່າ</string>
+
+    <!-- Settings screen: the setup checklist card (5 steps). -->
+    <!-- Title of the setup checklist card (noun). -->
+    <string name="setup_card_title">ການຕັ້ງຄ່າ</string>
+    <string name="setup_open_guide">ເປີດຄູ່ມືທີລະຂັ້ນຕອນ</string>
+    <string name="setup_all_set">ທຸກຢ່າງພ້ອມແລ້ວ. Buddy ພ້ອມໃຊ້.</string>
+    <!-- %1$s = name of the next unfinished setup step, e.g. "Install Claude Code". -->
+    <string name="setup_next_step">ຕໍ່ໄປ: %1$s</string>
+    <string name="setup_step_a11y_title">ເປີດບໍລິການເຂົ້າເຖິງຂອງ Buddy</string>
+    <string name="setup_step_a11y_body">ສິ່ງນີ້ສະແດງບັອບເບິ້ລ ແລະ ໃຫ້ Buddy ອ່ານໜ້າຈໍ, ແຕະ ແລະ ພິມແທນທ່ານ.</string>
+    <!-- Second paragraph of the accessibility step on Android 13+. "Restricted setting", "App info" and "Allow restricted settings" are Android's own labels: use the wording Android uses in your language. ⋮ is the three-dot menu icon. -->
+    <string name="setup_step_a11y_restricted">ສະວິດເປັນສີເທົາ (“ການຕັ້ງຄ່າທີ່ຖືກຈຳກັດ”)? Android ບລັອກສິ່ງນີ້ສຳລັບແອັບທີ່ຕິດຕັ້ງຈາກໄຟລ໌. ແຕະ ຂໍ້ມູນແອັບ, ແລ້ວ ⋮ ຢູ່ມຸມຂວາເທິງ → ອະນຸຍາດການຕັ້ງຄ່າທີ່ຖືກຈຳກັດ, ແລ້ວລອງອີກຄັ້ງ.</string>
+    <!-- Button: opens Android's accessibility settings. -->
+    <string name="setup_open_settings">ເປີດການຕັ້ງຄ່າ</string>
+    <!-- Button: opens Android's App info page for Buddy (Android's own label). -->
+    <string name="setup_app_info">ຂໍ້ມູນແອັບ</string>
+    <!-- %1$s = agent name (Claude Code, Codex, OpenCode, Antigravity or Grok). -->
+    <string name="setup_step_install_title">ຕິດຕັ້ງ %1$s</string>
+    <!-- %1$s = agent name. -->
+    <string name="setup_step_install_done">ຕິດຕັ້ງ %1$s ໃນ Buddy ແລ້ວ.</string>
+    <!-- %1$s = Claude Code. -->
+    <string name="setup_step_install_claude">Buddy ດາວໂຫຼດ Linux ນ້ອຍຂອງຕົນ ແລະ %1$s ຈາກ Anthropic (ປະມານ 235 MB).</string>
+    <!-- %1$s = OpenCode. -->
+    <string name="setup_step_install_opencode">Buddy ດາວໂຫຼດ Linux ນ້ອຍຂອງຕົນ ແລະ %1$s (ປະມານ 230 MB ພ້ອມ Node.js).</string>
+    <!-- %1$s = Codex. -->
+    <string name="setup_step_install_codex">Buddy ດາວໂຫຼດ Linux ນ້ອຍຂອງຕົນ ແລະ %1$s ຈາກ OpenAI (ປະມານ 150 MB).</string>
+    <string name="setup_step_install_grok">Buddy ດາວໂຫຼດ Linux ນ້ອຍຂອງຕົນ ແລະ %1$s ຈາກ xAI (ປະມານ 170 MB).</string>
+    <!-- Button (verb). -->
+    <string name="setup_install">ຕິດຕັ້ງ</string>
+    <!-- Name of the sign-in setup step. -->
+    <string name="setup_step_signin_title">ເຂົ້າສູ່ລະບົບ</string>
+    <string name="setup_step_signin_opencode_done">ບໍ່ຕ້ອງເຂົ້າສູ່ລະບົບ: ໂມເດລຟຣີຂອງ OpenCode ໃຊ້ໄດ້ທັນທີ. ເຊື່ອມຕໍ່ຜູ້ໃຫ້ບໍລິການຂອງທ່ານເອງໄດ້ທຸກເວລາ.</string>
+    <string name="setup_step_signin_opencode">ບໍ່ຕ້ອງເຂົ້າສູ່ລະບົບສຳລັບໂມເດລຟຣີຂອງ OpenCode.</string>
+    <string name="setup_step_signin_done">ເຂົ້າສູ່ລະບົບແລ້ວ.</string>
+    <!-- %1$s = the account's email address. -->
+    <string name="setup_step_signin_done_email">ເຂົ້າສູ່ລະບົບເປັນ %1$s.</string>
+    <string name="setup_step_signin_claude">ດ້ວຍບັນຊີ Claude ຂອງທ່ານ (Pro ຫຼື Max). ບຣາວເຊີຈະເປີດ; ອະນຸຍາດຢູ່ຫັ້ນ ແລ້ວ Buddy ຈະກັບມາເອງ.</string>
+    <string name="setup_step_signin_codex">ດ້ວຍບັນຊີ ChatGPT ຂອງທ່ານ. ບຣາວເຊີຈະເປີດ; ອະນຸຍາດຢູ່ຫັ້ນ ແລ້ວ Buddy ຈະກັບມາເອງ.</string>
+    <string name="setup_step_signin_grok">ດ້ວຍບັນຊີ Grok ຂອງທ່ານ. ບຣາວເຊີຈະເປີດ; ຢືນຢັນລະຫັດຢູ່ຫັ້ນ ແລ້ວ Buddy ຈະກັບມາເອງ.</string>
+    <!-- Button (verb). -->
+    <string name="setup_sign_in">ເຂົ້າສູ່ລະບົບ</string>
+    <string name="setup_step_background_title">ໃຫ້ Buddy ແລ່ນຢູ່ເບື້ອງຫຼັງ</string>
+    <string name="setup_step_background_done">ອະນຸຍາດແລ້ວ.</string>
+    <string name="setup_step_background_body">ເພື່ອໃຫ້ໂທລະສັບບໍ່ຢຸດ Buddy ເພື່ອປະຫຍັດແບັດໃນຂະນະທີ່ຕົວແທນເຮັດວຽກ.</string>
+    <!-- Button (verb): lets Buddy ignore battery optimization. -->
+    <string name="setup_allow">ອະນຸຍາດ</string>
+    <!-- Name of the last setup step: try Buddy out. -->
+    <string name="setup_step_try_title">ລອງໃຊ້</string>
+    <string name="setup_step_try_done">Buddy ໄດ້ຕອບທ່ານແລ້ວ. ແຕະບັອບເບິ້ລໄດ້ທຸກເວລາເພື່ອຂໍເພີ່ມ.</string>
+    <!-- "open Messenger" is an example of what to say to Buddy: translate it. -->
+    <string name="setup_step_try_body">ແຕະບັອບເບິ້ລຢູ່ຂອບໜ້າຈໍ ແລ້ວຖາມບາງຢ່າງເຊັ່ນ “ເປີດ Messenger”, ຫຼື ເລີ່ມການສົນທະນາຢູ່ນີ້.</string>
+    <string name="setup_step_try_wait">ເຮັດຂັ້ນຕອນຂ້າງເທິງໃຫ້ສຳເລັດກ່ອນ.</string>
+    <!-- Short names of the setup steps, shown after "Next:" in the Chats header. -->
+    <string name="setup_step_name_a11y">ເປີດບໍລິການເຂົ້າເຖິງ</string>
+    <string name="setup_step_name_install">ຕິດຕັ້ງຕົວແທນຂອງທ່ານ</string>
+    <string name="setup_step_name_background">ອະນຸຍາດໃຫ້ແລ່ນເບື້ອງຫຼັງ</string>
+
+    <!-- Settings screen: Appearance. Section labels are shown in ALL CAPS. -->
+    <string name="setup_appearance">ຮູບລັກ</string>
+    <!-- Buddy's own language (Android 13+ keeps it for this app alone). -->
+    <string name="settings_language">ພາສາ</string>
+    <string name="settings_language_system">ພາສາໂທລະສະພ</string>
+    <string name="settings_language_note">ສະເພາະ Buddy: ສ່ວນທີ່ເຫຼືອຂອງໂທລະສະພຍັງໃຊ້ພາສາເດີມ.</string>
+    <!-- Label of the light / dark mode picker. -->
+    <string name="setup_theme_mode">ໂໝດ</string>
+    <!-- Label of the accent colour picker. -->
+    <string name="setup_accent">ສີເນັ້ນ</string>
+    <!-- Label of the background tone picker. -->
+    <string name="setup_surface">ພື້ນຜິວ</string>
+    <!-- "Warm" and "Black" are options of the Surface picker: use the same words as those options. -->
+    <string name="setup_surface_note">ອຸ່ນ ແມ່ນໂທນເດີມຂອງ Buddy. ດຳ (ດຳແທ້) ໃຊ້ໃນໂໝດມືດເທົ່ານັ້ນ.</string>
+    <!-- Setting: Buddy's face on the floating bubble and next to its replies. Title above two short choices. -->
+    <string name="setup_face">ຮູບລັກຂອງ Buddy</string>
+    <!-- Choice: Buddy's own drawn face. Keep it short. -->
+    <string name="setup_face_buddy">ແບບເດີມ</string>
+    <!-- Choice: a picture the user picks from the phone. Keep it short. -->
+    <string name="setup_face_picture">ຮູບຂອງທ່ານ</string>
+    <string name="setup_face_note">PNG ຫຼື WebP ທີ່ພື້ນຫຼັງໂປ່ງໃສໃຊ້ໄດ້ດີທີ່ສຸດ. ມັນຈະສະແດງເທິງບັອບເບິ້ລ ແລະ ຂ້າງຄຳຕອບຂອງ Buddy.</string>
+    <string name="setup_face_change">ເລືອກຮູບອື່ນ</string>
+    <string name="setup_face_unreadable">ອ່ານຮູບນັ້ນບໍ່ໄດ້. ລອງ PNG ຫຼື WebP.</string>
+    <!-- Read by TalkBack: the swatch that opens the custom colour sheet. -->
+    <string name="setup_custom_colour">ສີກຳນົດເອງ</string>
+    <string name="setup_mirror">ເຊີບເວີດາວໂຫຼດ</string>
+    <string name="setup_mirror_default">ຄ່າເລີ່ມຕົ້ນ</string>
+    <string name="setup_mirror_info">ບ່ອນທີ່ Linux ຂອງ Buddy, ແພັກເກດ ແລະ ຕົວແທນທີ່ຕິດຕັ້ງດ້ວຍ npm (Codex, OpenCode) ຖືກດາວໂຫຼດ. ໃຫ້ຢູ່ ຄ່າເລີ່ມຕົ້ນ ເວັ້ນແຕ່ການຕິດຕັ້ງລົ້ມເຫຼວ ຫຼື ຊ້າຫຼາຍຢູ່ບ່ອນຂອງທ່ານ. ຖ້າໃຊ້ເຊີບເວີອື່ນ, Linux ຂອງ Buddy ຈະຖາມເຊີບເວີ DNS ຂອງເຄືອຂ່າຍທ່ານເອງ.</string>
+    <string name="setup_mirror_default_sub">ເຊີບເວີຂອງ Alpine ແລະ npm ເອງ</string>
+    <string name="setup_mirror_china">ຈີນແຜ່ນດິນໃຫຍ່</string>
+    <string name="setup_mirror_russia">ລັດເຊຍ</string>
+    <string name="setup_mirror_iran">ອີຣ່ານ</string>
+    <string name="setup_mirror_custom">ກຳນົດເອງ</string>
+    <string name="setup_mirror_custom_sub">Alpine mirror ໃດກໍ່ໄດ້, ຕາມທີ່ຢູ່ຂອງມັນ</string>
+    <string name="setup_mirror_custom_alpine">ທີ່ຢູ່ Alpine mirror</string>
+    <string name="setup_mirror_custom_alpine_hint">ທີ່ຢູ່ທີ່ມີໂຟນເດີ v3.24 ແລະ edge ຢູ່ກົງລຸ່ມ. Alpine ລາຍຊື່ mirror ຂອງມັນຢູ່ mirrors.alpinelinux.org.</string>
+    <string name="setup_mirror_custom_npm">npm registry (ບໍ່ບັງຄັບ)</string>
+    <string name="setup_mirror_custom_bad">ໃສ່ທີ່ຢູ່ທີ່ເລີ່ມດ້ວຍ https:// (ຫຼື http://)</string>
+    <string name="setup_wallpaper_colour">ຈາກວໍເປເປີຂອງທ່ານ</string>
+    <string name="setup_custom_accent_title">ສີເນັ້ນກຳນົດເອງ</string>
+    <string name="setup_custom_accent_hint">ສີໃດກໍ່ໄດ້ເປັນລະຫັດ hex, ເຊັ່ນ #4F8BFF.</string>
+    <!-- Button (verb). -->
+    <string name="setup_apply">ນຳໃຊ້</string>
+
+    <!-- Settings screen: Agent. -->
+    <!-- Which AI agent answers new chats. -->
+    <string name="setup_default_brain">ສະໝອງເລີ່ມຕົ້ນ</string>
+    <!-- "New chat" is the name of a button in Buddy. -->
+    <string name="setup_default_brain_info">ໃຜຈະຕອບການສົນທະນາໃໝ່ຈາກບັອບເບິ້ລ ຫຼື ປຸ່ມ ສົນທະນາໃໝ່. Claude Code ໃຊ້ແຜນ Claude, Codex ໃຊ້ແຜນ ChatGPT, Antigravity ໃຊ້ບັນຊີ Google, Grok ໃຊ້ບັນຊີ Grok, OpenCode ໃຊ້ໂມເດລຟຣີ ຫຼື ຜູ້ໃຫ້ບໍລິການຂອງທ່ານເອງ. ເລືອກໄດ້ພຽງຕົວແທນທີ່ຕັ້ງຄ່າແລ້ວ.</string>
+    <!-- Toast. %1$s = agent name. "New chat" is the name of a button in Buddy. -->
+    <string name="setup_default_brain_set">ການສົນທະນາໃໝ່ຈະໃຊ້ %1$s. ທ່ານເລືອກໄດ້ຕໍ່ການສົນທະນາດ້ວຍປຸ່ມ ສົນທະນາໃໝ່.</string>
+    <!-- Toast. %1$s = agent name. -->
+    <string name="setup_set_up_first">ຕັ້ງຄ່າ %1$s ກ່ອນ.</string>
+    <!-- Agent status under each agent's name: lowercase, monospace, keep short. -->
+    <string name="setup_agent_installing">ກຳລັງຕິດຕັ້ງ…</string>
+    <string name="setup_agent_not_installed">ຍັງບໍ່ໄດ້ຕິດຕັ້ງ</string>
+    <string name="setup_agent_ready">ພ້ອມ</string>
+    <!-- %1$s = the agent's plan or models. -->
+    <string name="setup_agent_ready_plan">ພ້ອມ · %1$s</string>
+    <string name="setup_agent_signed_in">ເຂົ້າສູ່ລະບົບແລ້ວ</string>
+    <!-- %1$s = the account's email address. -->
+    <string name="setup_agent_signed_in_email">ເຂົ້າສູ່ລະບົບ · %1$s</string>
+    <string name="setup_agent_not_signed_in">ຍັງບໍ່ໄດ້ເຂົ້າສູ່ລະບົບ</string>
+    <string name="setup_agent_api_key">ຍັງບໍ່ໄດ້ເຂົ້າສູ່ລະບົບ · API key</string>
+    <string name="signin_key_only">ກຳລັງໃຊ້ API key</string>
+
+    <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
+    <string name="setup_phone_tools">ເຄື່ອງມືໂທລະສັບໃນເຊສຊັນຂອງທ່ານເອງ</string>
+    <string name="setup_phone_tools_info">ເຄື່ອງມືໂທລະສັບຂອງ Buddy ເປັນເຊີບເວີ MCP ປົກກະຕິເທິງໂທລະສັບນີ້. ແລ່ນມັນຄັ້ງດຽວໃນເທີມິນອລເທິງໂທລະສັບ (ເຊັ່ນ Termux) ແລ້ວຕົວແທນນັ້ນຈະໄດ້ເຄື່ອງມືໂທລະສັບໃນທຸກເຊສຊັນ, ເຖິງແມ່ນບໍ່ມີບັອບເບິ້ລ.</string>
+    <!-- Button. -->
+    <string name="setup_copy_command">ສຳເນົາຄຳສັ່ງ</string>
+    <string name="setup_command_copied">ສຳເນົາແລ້ວ. ວາງໃນເທີມິນອລຂອງທ່ານ.</string>
+
+    <!-- Settings screen: Voice. -->
+    <string name="setup_voice">ສຽງ</string>
+    <string name="setup_assist">ເມື່ອ Buddy ເປັນຜູ້ຊ່ວຍຂອງໂທລະສັບ</string>
+    <string name="setup_assist_info">ເລືອກ Buddy ໃນ ການຕັ້ງຄ່າ → ແອັບ → ແອັບເລີ່ມຕົ້ນ → ແອັບຜູ້ຊ່ວຍດິຈິຕອນ. ການກົດຄ້າງປຸ່ມເປີດ-ປິດ ຈະເລີ່ມ Buddy: ເວົ້າ ສົ່ງໜຶ່ງຄຳຂໍ, ສຽງສົດ ເລີ່ມການສົນທະນາດ້ວຍສຽງ (ຕ້ອງເຂົ້າສູ່ລະບົບ Codex; ຖ້າບໍ່, ຈະເປັນ ເວົ້າ).</string>
+    <string name="setup_live_agent">ສຽງສົດໃຊ້</string>
+    <string name="setup_live_agent_default">ຄ່າເລີ່ມຕົ້ນ</string>
+    <string name="setup_live_agent_info">ສຽງສົດຈາກການກົດຄ້າງບັອບເບິ້ລ ຫຼື ປຸ່ມເປີດ-ປິດ ຈະເລີ່ມການສົນທະນາໃໝ່ກັບຕົວແທນນີ້. ຄ່າເລີ່ມຕົ້ນ ຄືຕົວແທນເລີ່ມຕົ້ນຂອງທ່ານ (ຕອນນີ້ %1$s).</string>
+    <string name="setup_live_continue">ສືບຕໍ່ການສົນທະນາຫຼ້າສຸດ</string>
+    <string name="setup_live_continue_info">ເປີດ: ສຽງສົດຈະສືບຕໍ່ການສົນທະນາຫຼ້າສຸດຂອງທ່ານກັບຕົວແທນນັ້ນ. ປິດ: ການສົນທະນາໃໝ່ທຸກຄັ້ງ.</string>
+    <string name="setup_voice_input">ການປ້ອນສຽງ</string>
+    <!-- Option next to Claude and ChatGPT: the phone's own speech engine. Keep short. -->
+    <string name="setup_voice_phone">ໂທລະສັບ</string>
+    <string name="setup_voice_input_claude">ການຂຽນຕາມສຽງຂອງ Claude Code ດ້ວຍແຜນ Claude ຂອງທ່ານ: ຖືກຕ້ອງຫຼາຍ. ຮອງຮັບ ອັງກິດ, ຝຣັ່ງ, ເຢຍລະມັນ, ສະເປນ, ອິຕາລີ, ປອກຕຸຍກິສ, ໂຮນລັງ, ຕຸລະກີ, ລັດເຊຍ, ຍີ່ປຸ່ນ ແລະ ອື່ນໆ, ແຕ່ບໍ່ຮອງຮັບອາຣັບ: ສຳລັບອາຣັບ, Buddy ໃຊ້ຕົວຮັບຮູ້ສຽງຂອງໂທລະສັບ. ຄຳຈະປາກົດເມື່ອທ່ານຢຸດເວົ້າ.</string>
+    <string name="setup_voice_input_chatgpt">ສຽງຂອງ ChatGPT ຜ່ານ Codex, ດ້ວຍແຜນ ChatGPT ຂອງທ່ານ. ເຂົ້າໃຈທຸກພາສາ, ເຖິງແມ່ນປົນກັນໃນປະໂຫຍກດຽວ. ໃຊ້ພຽງຄຳຂອງທ່ານ: ຄຳຕອບອອກສຽງຂອງ ChatGPT ຈະຖືກປິດສຽງ ແລະ ມັນແລ່ນຫຍັງບໍ່ໄດ້.</string>
+    <string name="setup_voice_input_phone">ການຮັບຮູ້ສຽງເວົ້າຂອງໂທລະສັບ (Google ໃນໂທລະສັບສ່ວນຫຼາຍ). ຂໍ້ຄວາມສົດລະຫວ່າງທີ່ທ່ານເວົ້າ; ຮູ້ພາສາທີ່ທ່ານເວົ້າໃນພາສາຂອງທ່ານ.</string>
+    <string name="setup_voice_output">ການສົ່ງອອກສຽງ</string>
+    <string name="setup_voice_output_chatgpt">ຄຳຕອບຖືກອ່ານດ້ວຍສຽງທຳມະຊາດຂອງ ChatGPT (ແຜນ ChatGPT ຂອງທ່ານ, ຜ່ານ Codex). ມັນນັບເຂົ້າໃນການໃຊ້ສຽງ ChatGPT ຂອງທ່ານ; ຖ້າໃຊ້ບໍ່ໄດ້, ສຽງຂອງໂທລະສັບຈະອ່ານແທນ.</string>
+    <string name="setup_voice_output_phone">ສຽງຂໍ້ຄວາມເປັນສຽງເວົ້າຂອງໂທລະສັບ, ໃນພາສາຂອງຄຳຕອບ.</string>
+    <!-- Spoken aloud to preview the chosen ChatGPT voice. Mixing two languages is on purpose (it shows the voice switches languages): keep a greeting in another language. -->
+    <string name="setup_voice_sample">ສະບາຍດີ! Hi, I\'m Buddy. This is how I sound.</string>
+    <string name="setup_languages">ພາສາ</string>
+    <string name="setup_languages_hint">ແຕະເພື່ອເລືອກພາສາທີ່ທ່ານເວົ້າ. ກົດຄ້າງໜຶ່ງພາສາເພື່ອເຮັດໃຫ້ເປັນຄ່າເລີ່ມຕົ້ນ. ໃນການສົນທະນາ, ກົດຄ້າງໄມເພື່ອປ່ຽນພາສາ.</string>
+    <!-- Sheet title. %1$s = agent name (Claude Code or Codex). -->
+    <string name="setup_sign_in_first">ເຂົ້າສູ່ລະບົບ %1$s ກ່ອນ</string>
+    <!-- %1$s = Claude Code. -->
+    <string name="setup_needs_claude">ການຂຽນຕາມສຽງຂອງ Claude ແລ່ນດ້ວຍແຜນ Claude ຂອງທ່ານຜ່ານ %1$s.</string>
+    <!-- %1$s = Codex. -->
+    <string name="setup_needs_chatgpt">ສຽງຂອງ ChatGPT ແລ່ນດ້ວຍແຜນ ChatGPT ຂອງທ່ານຜ່ານ %1$s.</string>
+    <!-- Button. %1$s = agent name. -->
+    <string name="setup_set_up_agent">ຕັ້ງຄ່າ %1$s</string>
+
+    <!-- Settings screen: Remote Control (a Claude Code session you continue from the Claude app). -->
+    <!-- Section label: Remote Control is the name of a Claude Code feature. -->
+    <string name="setup_remote_control">ການຄວບຄຸມທາງໄກ</string>
+    <string name="setup_remote_session">ເຊສຊັນ Claude Code</string>
+    <!-- "Code" is the name of a section of the Claude app. -->
+    <string name="setup_remote_session_info">ເຊສຊັນ Claude Code ທີ່ແລ່ນພາຍໃນ Buddy, ພ້ອມເຄື່ອງມືໂທລະສັບ. ສືບຕໍ່ມັນຈາກແອັບ Claude (Code) ເທິງໂທລະສັບນີ້ ຫຼື ຈາກບ່ອນໃດກໍ່ໄດ້.</string>
+    <string name="setup_remote_sign_in_first">ເຂົ້າສູ່ລະບົບ Claude Code ກ່ອນ.</string>
+    <!-- Status, lowercase. %1$s = the session's name as shown in the Claude app. -->
+    <string name="setup_remote_active">ເຮັດວຽກຢູ່ · “%1$s” ໃນແອັບ Claude</string>
+    <!-- Status, lowercase. -->
+    <string name="setup_remote_starting">ກຳລັງເລີ່ມ…</string>
+    <!-- Status, lowercase. -->
+    <string name="setup_remote_stopped">ຢຸດແລ້ວ</string>
+    <string name="setup_remote_open">ເປີດໃນແອັບ Claude</string>
+    <string name="setup_remote_open_failed">ເປີດບໍ່ໄດ້.</string>
+    <string name="setup_codex_session">ເຊສຊັນ Codex</string>
+    <!-- "Codex" is a section of the ChatGPT app; "Default permissions" is a permission choice in ChatGPT. -->
+    <string name="setup_codex_session_info">Codex ພ້ອມເຄື່ອງມືໂທລະສັບ, ແລ່ນພາຍໃນ Buddy. ໃຊ້ມັນຈາກແອັບ ChatGPT (Codex) ເທິງໂທລະສັບນີ້ ຫຼື ເທິງຄອມພິວເຕີ. sandbox ຂອງ Codex ແລ່ນຢູ່ນີ້ບໍ່ໄດ້, ສະນັ້ນກັບ ສິດອະນຸຍາດເລີ່ມຕົ້ນ ມັນຈະຖາມກ່ອນທຸກຄຳສັ່ງ.</string>
+    <!-- Status, lowercase. "localhost" is the name ChatGPT shows for Buddy: keep it as is. -->
+    <string name="setup_codex_active">ກຳລັງແລ່ນ · “localhost” ໃນ ChatGPT</string>
+    <string name="setup_codex_pair">ຈັບຄູ່ອຸປະກອນ</string>
+    <!-- SSH: the standard way to sign in to a computer's terminal from another program. Termux is an Android terminal app. -->
+    <string name="setup_ssh">SSH ຈາກ Termux</string>
+    <string name="setup_ssh_info">ໃຊ້ Linux ຂອງ Buddy ຈາກ Termux, ຜ່ານ SSH. ພຽງແອັບເທິງໂທລະສັບນີ້ເທົ່ານັ້ນທີ່ເຊື່ອມຕໍ່ໄດ້, ແລະ ພຽງດ້ວຍ key.</string>
+    <!-- Status, lowercase. %1$d = a port number. -->
+    <string name="setup_ssh_active">ກຳລັງແລ່ນ · ພອດ %1$d</string>
+    <!-- "ssh buddy" is a command: keep it as is. -->
+    <string name="setup_ssh_how">ສຳເນົາຄຳສັ່ງນີ້ ແລ້ວແລ່ນຄັ້ງດຽວໃນ Termux, ພາຍໃນ 10 ນາທີ. ຫຼັງຈາກນັ້ນ, ພິມ ssh buddy ໃນ Termux ເພື່ອເປີດ Linux ຂອງ Buddy.</string>
+
+    <!-- Settings screen: chats left over from when Buddy ran its agents in Termux. -->
+    <string name="setup_old_chats_title">ລຶບການສົນທະນາ Termux ເກົ່າ</string>
+    <plurals name="setup_old_chats_body">
+        <item quantity="one">%1$d ການສົນທະນາຕັ້ງແຕ່ກ່ອນ Buddy ມີ Linux ຂອງຕົນ. ຕົວແທນສືບຕໍ່ບໍ່ໄດ້.</item>
+        <item quantity="other">%1$d ການສົນທະນາຕັ້ງແຕ່ກ່ອນ Buddy ມີ Linux ຂອງຕົນ. ຕົວແທນສືບຕໍ່ບໍ່ໄດ້.</item>
+    </plurals>
+    <plurals name="setup_old_chats_remove">
+        <item quantity="one">ລຶບ %1$d ການສົນທະນາເກົ່າບໍ?</item>
+        <item quantity="other">ລຶບ %1$d ການສົນທະນາເກົ່າບໍ?</item>
+    </plurals>
+    <string name="setup_old_chats_remove_body">ລຶບພວກມັນອອກຈາກລາຍການການສົນທະນາຂອງ Buddy. ຍັງຄືນບໍ່ໄດ້.</string>
+    <!-- Button (verb). -->
+    <string name="setup_remove">ລຶບອອກ</string>
+    <string name="setup_removed">ລຶບແລ້ວ.</string>
+
+    <!-- Settings screen: Experience. -->
+    <string name="setup_chat_bubble">ບັອບເບິ້ລແຊັດ</string>
+    <!-- ✕ is the close target that appears while dragging the bubble. -->
+    <string name="setup_chat_bubble_info">ລອຍຢູ່ເທິງແອັບອື່ນ. ລາກມັນໃສ່ ✕ ເພື່ອເຊື່ອງ; ບັດອະນຸຍາດຍັງຈະປາກົດເມື່ອຕົວແທນຕ້ອງການການອະນຸຍາດຂອງທ່ານ.</string>
+    <!-- Setting: what a tap on the floating bubble does. Title above three short choices. -->
+    <string name="setup_tap_action">ການແຕະບັອບເບິ້ລ</string>
+    <!-- Choice: a tap opens the floating chat panel. Keep it short (it shares a row with two more). -->
+    <string name="setup_tap_panel">ແຜງສົນທະນາ</string>
+    <!-- Choice: a tap starts the microphone. Keep it short. -->
+    <string name="setup_tap_talk">ເວົ້າ</string>
+    <!-- Choice: a tap opens the chat full screen in the app. Keep it short. -->
+    <string name="setup_tap_app">ແອັບເຕັມ</string>
+    <!-- Explains the "Chat panel" choice. -->
+    <string name="setup_tap_panel_info">ເປີດການສົນທະນາແບບລອຍເທິງແອັບທີ່ທ່ານຢູ່. ກົດຄ້າງບັອບເບິ້ລເພື່ອເພີ່ມເຕີມ.</string>
+    <!-- Explains the "Full app" choice. -->
+    <string name="setup_tap_app_info">ເປີດການສົນທະນາເຕັມໜ້າຈໍໃນ Buddy. ກົດຄ້າງບັອບເບິ້ລເພື່ອເພີ່ມເຕີມ.</string>
+    <!-- Setting: the size of the floating chat panel. Title above two short choices. -->
+    <string name="setup_panel_size">ຂະໜາດແຜງສົນທະນາ</string>
+    <!-- Choice: the panel fills the screen. Keep it short. -->
+    <string name="setup_panel_full">ເຕັມ</string>
+    <!-- Choice: a smaller panel. Keep it short. -->
+    <string name="setup_panel_compact">ກະທັດຮັດ</string>
+    <string name="setup_panel_size_info">ເຕັມ ຈະກວມທັງໜ້າຈໍ. ກະທັດຮັດ ນ້ອຍກວ່າ ແລະ ບໍ່ຊົນຂອບໜ້າຈໍ, ສະນັ້ນການປັດຈາກຂ້າງຍັງໃຊ້ໄດ້.</string>
+    <!-- Explains the "Talk" choice of setup_tap_action. -->
+    <string name="setup_tap_to_talk_info">ແຕະຄັ້ງດຽວເປີດໄມ: ເວົ້າສິ່ງທີ່ທ່ານຕ້ອງການ ແລ້ວມັນຈະສົ່ງເມື່ອທ່ານຢຸດເວົ້າ. ກົດຄ້າງບັອບເບິ້ລສຳລັບການສົນທະນາ ແລະ ອື່ນໆ.</string>
+    <string name="setup_read_aloud">ອ່ານຄຳຕອບອອກສຽງ</string>
+    <!-- "Voice" = the Settings section of that name (setup_voice). -->
+    <string name="setup_read_aloud_info">Buddy ອ່ານຄຳຕອບຂອງຕົວແທນອອກສຽງ, ດ້ວຍສຽງທີ່ທ່ານເລືອກໃນ ສຽງ.</string>
+    <string name="setup_pause_media">ຢຸດມີເດຍລະຫວ່າງການອ່ານອອກສຽງ</string>
+    <string name="setup_pause_media_info">ເພງ ຫຼື ວິດີໂອທີ່ກຳລັງຫຼິ້ນຈະຖືກຢຸດຊົ່ວຄາວລະຫວ່າງທີ່ Buddy ອ່ານຄຳຕອບ, ແລ້ວຫຼິ້ນຕໍ່. Buddy ຈະເລີ່ມຄືນພຽງສິ່ງທີ່ມັນຢຸດໄວ້, ແລະ ຈະບໍ່ເຮັດຖ້າທ່ານປ່ຽນການຫຼິ້ນລະຫວ່າງນັ້ນ. ຕ້ອງການ “ອ່ານຄຳຕອບອອກສຽງ” ແລະ ການເຂົ້າເຖິງການແຈ້ງເຕືອນ.</string>
+    <string name="setup_voice_cards">ຕອບບັດດ້ວຍສຽງ</string>
+    <string name="setup_voice_cards_info">ຫຼັງບັດຖືກອ່ານອອກສຽງ, Buddy ຈະຟັງ: ເວົ້າ “ອະນຸຍາດ” ຫຼື “ປະຕິເສດ”, ຫຼື ຕົວເລືອກທີ່ທ່ານຕ້ອງການ. ຕ້ອງການ “ອ່ານຄຳຕອບອອກສຽງ”. ບໍ່ໃຊ້ເມື່ອໂທລະສັບລັອກ. ໃຜທີ່ຢູ່ໃນລະດັບທີ່ໄດ້ຍິນກໍ່ອາດຕອບໄດ້.</string>
+    <string name="voice_card_approval">Buddy ຕ້ອງການການອະນຸຍາດຂອງທ່ານ. %1$s</string>
+    <string name="voice_card_question">Buddy ຖາມ: %1$s ຕົວເລືອກ: %2$s</string>
+    <string name="voice_card_hint">ເວົ້າ ອະນຸຍາດ ຫຼື ປະຕິເສດ.</string>
+    <string name="voice_card_yes">approve,approved,yes,okay,ok,go ahead,do it,ອະນຸຍາດ,ໂອເຄ,ໄດ້,ເຮັດໄດ້</string>
+    <string name="voice_card_no">deny,denied,no,stop,cancel,don\'t,ປະຕິເສດ,ບໍ່,ຢຸດ,ຍົກເລີກ</string>
+    <string name="setup_update_notices">ການແຈ້ງເຕືອນອັບເດດ</string>
+    <string name="setup_update_notices_info">Buddy ກວດ GitHub ມື້ລະຄັ້ງ ແລະ ແຈ້ງເຕືອນເມື່ອມີເວີຊັນໃໝ່.</string>
+    <string name="setup_check_updates">ກວດຫາການອັບເດດ</string>
+    <!-- %1$s = Buddy's version number. "update yourself" is what you can say to an agent: translate it. -->
+    <string name="setup_check_updates_info">ທ່ານມີ Buddy %1$s. ຫຼື ຂໍຕົວແທນໃດກໍ່ໄດ້: “ອັບເດດໂຕເຈົ້າເອງ”.</string>
+    <!-- Name of the App permissions screen. -->
+    <string name="setup_app_permissions">ສິດຂອງແອັບ</string>
+    <!-- "Trust" and "Hard" are names of approval modes on the App permissions screen: use the same words. Send, Pay, Delete are example buttons in other apps. -->
+    <string name="setup_app_permissions_info">ເລືອກຕໍ່ແອັບ: ໄວ້ໃຈ ໃຫ້ຕົວແທນເຮັດວຽກຢູ່ຫັ້ນໂດຍບໍ່ມີປັອບອັບ; ເຂັ້ມງວດ ໝາຍຄວາມວ່າ Buddy ເອງຈະຖາມທ່ານກ່ອນ ສົ່ງ, ຈ່າຍ, ລຶບ…</string>
+    <!-- Settings row that opens the notification rules: when a notification from an app arrives, an agent acts on it. -->
+    <string name="setup_rules">ກົດການແຈ້ງເຕືອນ</string>
+    <string name="setup_rules_info">ໃຫ້ຕົວແທນເຮັດວຽກເມື່ອມີການແຈ້ງເຕືອນມາ: ຕອບຂໍ້ຄວາມ, ໃສ່ການສົ່ງຂອງໃນປະຕິທິນ…</string>
+    <!-- Settings switch: whether new chats start with Linux tools (chat_linux_tools); each chat can change it. -->
+    <string name="setup_dev_mode">ເຄື່ອງມື Linux ໃນການສົນທະນາໃໝ່</string>
+    <string name="setup_dev_mode_info">ເຄື່ອງມື Linux ໃຫ້ຕົວແທນແລ່ນຄຳສັ່ງ, ຕິດຕັ້ງແພັກເກດ ແລະ ແກ້ໄຂໄຟລ໌ໃນ ~/.buddy/work, ຈຶ່ງສ້າງແອັບໄດ້. ການສົນທະນາໃໝ່ເລີ່ມດ້ວຍການຕັ້ງຄ່ານີ້; ແຕ່ລະການສົນທະນາປ່ຽນໄດ້ຢູ່ໃຕ້ຫົວຂໍ້ຂອງມັນ.</string>
+    <string name="setup_agents_tap">ໃຫ້ຕົວແທນແຕະໜ້າຈໍຂອງ Buddy</string>
+    <!-- "App permissions" is the name of a screen in Buddy. -->
+    <string name="setup_agents_tap_info">ສຳລັບການທົດສອບ Buddy ກັບຕົວແທນ (ເຊັ່ນ Claude Code ໃນ Termux ພ້ອມເຄື່ອງມືໂທລະສັບ). ຕົວແທນຈະໃຊ້ລາຍການ ການສົນທະນາ, ການສົນທະນາ ແລະ ໜ້າຈໍ ການຕັ້ງຄ່າ ນີ້ໄດ້. ທຸກຢ່າງທີ່ກຳນົດສິ່ງທີ່ພວກມັນເຮັດໄດ້ ຍັງເປັນຂອງທ່ານ: ບັອບເບິ້ລ, ບັດອະນຸຍາດ, ເຄື່ອງມື Linux, ຕົວເລືອກການສົນທະນາ ແລະ ຕາຕະລາງ, ແລະ ໜ້າຈໍສຳລັບສິດຂອງແອັບ, key, ກົດການ, ສະກິລ, ໂໝດເບື້ອງຫຼັງ ແລະ ການສຳຮອງ.</string>
+    <string name="setup_ask_new_apps">ຖາມກ່ຽວກັບແອັບໃໝ່ແຕ່ລະແອັບ</string>
+    <string name="setup_ask_new_apps_info">ຄັ້ງທຳອິດທີ່ຕົວແທນເຮັດວຽກໃນແອັບທີ່ທ່ານຍັງບໍ່ໄດ້ຕັ້ງໃນ %1$s, Buddy ຈະຖາມວ່າມັນເຮັດວຽກຢູ່ຫັ້ນເອງໄດ້ ຫຼື ຄວນຖາມທ່ານກ່ອນ, ແລະ ຈື່ຄຳຕອບຂອງທ່ານສຳລັບແອັບນັ້ນ. ພຽງໃນການສົນທະນາທີ່ຢູ່ໃນ ຖາມ, ແລະ ບໍ່ເຄີຍສຳລັບແອັບທະນາຄານ ແລະ ຈ່າຍເງິນ, ການຕັ້ງຄ່າ ແລະ ຮ້ານແອັບ, ຊຶ່ງຖາມສະເໝີ.</string>
+    <string name="first_app_question">ຄັ້ງທຳອິດທີ່ຕົວແທນເຮັດວຽກໃນ %1$s. ມັນເຮັດວຽກຢູ່ຫັ້ນເອງໄດ້ ຫຼື ຄວນຖາມທ່ານກ່ອນ? ທ່ານປ່ຽນໄດ້ພາຍຫຼັງໃນ %2$s.</string>
+    <string name="first_app_trust">%1$s: ມັນເຮັດວຽກເອງ</string>
+    <string name="first_app_hard">%1$s: ມັນຖາມຂ້ອຍກ່ອນ</string>
+    <!-- Warning shown while Linux tools in new chats (setup_dev_mode) is on. -->
+    <string name="setup_dev_mode_warning">ທີ່ດີທີ່ສຸດແມ່ນປິດໄວ້: ເປີດເຄື່ອງມື Linux ພຽງໃນການສົນທະນາທີ່ຕ້ອງການ. ເມື່ອເປີດ, ຂໍ້ຄວາມ ຫຼື ໜ້າເວັບທີ່ເປັນອັນຕະລາຍເທິງໜ້າຈໍ ອາດຫຼອກຕົວແທນໃຫ້ແລ່ນຄຳສັ່ງ. ບັດອະນຸຍາດຍັງປ້ອງກັນການສົ່ງ, ໂພສ, ຊື້ ແລະ ລຶບ.</string>
+
+    <!-- Settings screen: footer links. -->
+    <!-- Link and sheet title. -->
+    <string name="setup_licences">ໃບອະນຸຍາດໂອເພນຊອດ</string>
+    <string name="setup_privacy_policy">ນະໂຍບາຍຄວາມເປັນສ່ວນຕົວ</string>
+
+    <!-- Errors while installing Buddy's built-in Linux (Alpine). Shown after "Install failed:". -->
+    <!-- %1$s = SHA-256 checksum of the download. -->
+    <string name="linux_download_corrupt">ການດາວໂຫຼດ Alpine ເສຍຫາຍ (sha256 %1$s)</string>
+    <string name="linux_move_failed">ຍ້າຍ Alpine ເຂົ້າບ່ອນບໍ່ໄດ້</string>
+    <!-- %1$d = HTTP status code, e.g. 404. -->
+    <string name="linux_download_failed_http">ການດາວໂຫຼດລົ້ມເຫຼວ: HTTP %1$d</string>
+    <!-- %1$s = a file path inside the downloaded archive. -->
+    <string name="linux_unsafe_path">ເສັ້ນທາງບໍ່ປອດໄພໃນໄຟລ໌ບີບ: %1$s</string>
+    <!-- Creating a symbolic link failed. %1$s = file path, %2$s = the system's error message. -->
+    <string name="linux_symlink_failed">symlink %1$s: %2$s</string>
+    <string name="linux_truncated_archive">ໄຟລ໌ບີບຖືກຕັດ</string>
+
+    <!-- Terminal screen (a shell in Buddy's Linux, in tabs). -->
+    <!-- Name of Buddy's built-in terminal: title of the Terminal screen and its menu, and of the Terminal card on the Sessions screen. -->
+    <string name="terminal_title">ເທີມິນອລ</string>
+    <!-- Read by TalkBack: back button. -->
+    <string name="terminal_back">ກັບ</string>
+    <!-- Read by TalkBack: button that hides the on-screen keyboard. -->
+    <string name="terminal_hide_keyboard">ເຊື່ອງແປ້ນພິມ</string>
+    <!-- Read by TalkBack: button that opens the terminal menu. -->
+    <string name="terminal_menu">ເມນູ</string>
+    <!-- Status line under the title, lowercase. "buddy linux" is the name of Buddy's Linux: keep it. Only shown for 2 or more. -->
+    <plurals name="terminal_sessions_count">
+        <item quantity="one">%1$d ເຊສຊັນ · buddy linux</item>
+        <item quantity="other">%1$d ເຊສຊັນ · buddy linux</item>
+    </plurals>
+    <!-- Status line under the title while the microphone is in use, lowercase. -->
+    <string name="terminal_listening">ກຳລັງຟັງ · ໄມເປີດ</string>
+    <string name="terminal_session_ended">ເຊສຊັນຈົບແລ້ວ</string>
+    <!-- %1$d = the shell's exit code. -->
+    <string name="terminal_session_ended_code">ເຊສຊັນຈົບແລ້ວ · ອອກ %1$d</string>
+    <!-- Button (verb): closes the terminal tab. -->
+    <string name="terminal_close">ປິດ</string>
+    <!-- Button (verb): starts a new shell. -->
+    <string name="terminal_restart">ເລີ່ມໃໝ່</string>
+    <string name="terminal_needs_linux">ຕິດຕັ້ງ Claude Code, Codex, OpenCode, Antigravity ຫຼື Grok ໃນ ການຕັ້ງຄ່າ ກ່ອນ: ຂະບວນການນັ້ນຈະຕັ້ງ Linux ຂອງ Buddy.</string>
+    <!-- %1$s = error message. -->
+    <string name="terminal_start_failed">ເລີ່ມເທີມິນອລບໍ່ໄດ້: %1$s</string>
+    <!-- Sheet title. %1$s = the tab's name, e.g. "shell 1". -->
+    <string name="terminal_close_title">ປິດ %1$s ບໍ?</string>
+    <string name="terminal_close_running">ມັນຍັງແລ່ນຢູ່. ການປິດຈະຢຸດມັນ ແລະ ທຸກຢ່າງທີ່ມັນເລີ່ມ.</string>
+    <!-- Default name of a terminal tab until the program in it sets a title. Lowercase. %1$d = tab number. -->
+    <string name="terminal_shell_name">shell %1$d</string>
+    <!-- Menu item and "+" tab button: opens a new shell tab. -->
+    <string name="terminal_new_session">ເຊສຊັນໃໝ່</string>
+    <!-- Menu item, selection toolbar item and paste key: pastes the clipboard into the terminal. -->
+    <string name="terminal_paste">ວາງ</string>
+    <!-- Menu item and selection toolbar item. -->
+    <string name="terminal_select_all">ເລືອກທັງໝົດ</string>
+    <string name="terminal_larger_text">ຂໍ້ຄວາມໃຫຍ່ຂຶ້ນ</string>
+    <string name="terminal_smaller_text">ຂໍ້ຄວາມນ້ອຍລົງ</string>
+    <string name="terminal_screen_sleep">ໃຫ້ໜ້າຈໍດັບ</string>
+    <string name="terminal_keep_screen_on">ເປີດໜ້າຈໍໄວ້</string>
+    <string name="terminal_close_session">ປິດເຊສຊັນນີ້</string>
+    <string name="terminal_tips">ກົດຄ້າງເພື່ອເລືອກຂໍ້ຄວາມ ຫຼື ລິ້ງ. ຈັບຊໍ້ເພື່ອຂະຫຍາຍ, ລາກເພື່ອເລື່ອນກັບ. ກົດຄ້າງແທັບເພື່ອປິດ.</string>
+
+    <!-- Terminal: floating toolbar over selected text. Keep short. -->
+    <string name="terminal_copy">ສຳເນົາ</string>
+    <string name="terminal_open_link">ເປີດລິ້ງ</string>
+    <string name="terminal_share">ແບ່ງປັນ</string>
+
+    <!-- Sessions screen: every agent session running on the phone, and recent history. -->
+    <string name="monitor_title">ເຊສຊັນ</string>
+    <string name="monitor_subtitle">ທຸກເຊສຊັນ Claude Code, Codex, OpenCode, Antigravity ແລະ Grok ເທິງໂທລະສັບນີ້.</string>
+    <string name="monitor_terminal_running">shell ກຳລັງແລ່ນ · ແຕະເພື່ອກັບ</string>
+    <string name="monitor_terminal_idle">shell ໃນ Linux ຂອງ Buddy</string>
+    <string name="monitor_running_now">ກຳລັງແລ່ນຕອນນີ້</string>
+    <!-- Next to "Running now": the list refreshes every 3 seconds. Lowercase, monospace, keep short. -->
+    <string name="monitor_refresh">ຣີເຟຣຊ 3ວິ</string>
+    <string name="monitor_checking">ກຳລັງກວດສອບ…</string>
+    <string name="monitor_recent">ຫຼ້າສຸດ</string>
+    <string name="monitor_loading">ກຳລັງໂຫຼດ…</string>
+    <string name="monitor_service_off">ບໍລິການເຂົ້າເຖິງຂອງ Buddy ປິດຢູ່, ຈຶ່ງກວດເຊສຊັນບໍ່ໄດ້. ເປີດມັນໃນ ການຕັ້ງຄ່າ.</string>
+    <string name="monitor_nothing_running">ບໍ່ມີຫຍັງແລ່ນຢູ່.</string>
+    <!-- Title of a running session whose Buddy chat was deleted. -->
+    <string name="monitor_deleted_chat">ການສົນທະນາ Buddy ທີ່ຖືກລຶບ</string>
+    <string name="monitor_background_session">ເຊສຊັນເບື້ອງຫຼັງ</string>
+    <string name="monitor_terminal_session">ເຊສຊັນເທີມິນອລ</string>
+    <!-- Small lowercase tag on a running session: where it runs. Keep very short. -->
+    <string name="monitor_tag_background">ເບື້ອງຫຼັງ</string>
+    <!-- Small lowercase tag on a running session: where it runs. Keep very short. -->
+    <string name="monitor_tag_terminal">ເທີມິນອລ</string>
+    <!-- Monospace details line. %1$s = command name (claude-code, codex, opencode), %2$d = process id, %3$s = working folder. -->
+    <string name="monitor_proc_meta">%1$s · pid %2$d · %3$s</string>
+    <string name="monitor_background_hint">ແລ່ນໃນບໍລິການເບື້ອງຫຼັງຂອງ Claude Code, ເຊັ່ນ ການສົນທະນາທີ່ທ່ານສືບຕໍ່ຈາກແອັບ Claude.</string>
+    <!-- Button. -->
+    <string name="monitor_open_chat">ເປີດການສົນທະນາ</string>
+    <!-- Button (verb): stops the session. -->
+    <string name="monitor_stop">ຢຸດ</string>
+    <!-- Sheet title. %1$s = agent name (Claude Code, Codex, OpenCode, Antigravity or Grok). -->
+    <string name="monitor_stop_title">ຢຸດເຊສຊັນ %1$s ນີ້ບໍ?</string>
+    <string name="monitor_stop_background_body">ມັນແລ່ນຢູ່ເບື້ອງຫຼັງ, ເຊັ່ນ ການສົນທະນາທີ່ທ່ານກຳລັງສືບຕໍ່ຈາກແອັບ Claude. ມັນອາດເປັນໂຕທີ່ຄວບຄຸມ Buddy ຢູ່. ການຢຸດຈະຢຸດວຽກປັດຈຸບັນຂອງການສົນທະນານັ້ນ.</string>
+    <string name="monitor_stop_terminal_body">ມັນອາດເປັນເຊສຊັນທີ່ທ່ານກຳລັງໃຊ້ໃນເທີມິນອລຕອນນີ້. ມັນອາດເປັນໂຕທີ່ຄວບຄຸມ Buddy ຢູ່. ການຢຸດຈະຢຸດວຽກປັດຈຸບັນຂອງການສົນທະນານັ້ນ.</string>
+    <string name="monitor_stopping">ກຳລັງຢຸດ…</string>
+    <string name="monitor_service_title">ບໍລິການເບື້ອງຫຼັງຂອງ Claude Code</string>
+    <!-- Monospace details line. %1$d = process id, %2$s = how long it has been running (e.g. 1:02:03). -->
+    <string name="monitor_service_meta">pid %1$d · ເປີດມາ %2$s · ໂຮສເຊສຊັນເບື້ອງຫຼັງ</string>
+    <string name="monitor_no_history">ບໍ່ພົບປະຫວັດ.</string>
+    <!-- Title of a past session that has no messages. -->
+    <string name="monitor_no_messages">(ບໍ່ມີຂໍ້ຄວາມ)</string>
+
+    <!-- ===== Approvals and app permissions, tool cards, dictation (AppPermissionsActivity, Guard, Tools, Reviewer, dictation) ===== -->
+
+    <!-- App permissions screen (Settings → App permissions): how much the agent may do on its own in each app.
+         The three approval modes are named Trust, Hard and Smart (perms_mode_*): use the same names wherever they appear. -->
+    <string name="perms_title">ສິດຂອງແອັບ</string>
+    <!-- Content description of the back arrow at the top of the screen (read by TalkBack). -->
+    <string name="perms_back">ກັບ</string>
+    <!-- Approval mode name, in a small one-line segmented control next to each app's name: keep it short (about 6 characters).
+         Trust = the agent works on its own in this app, without asking. -->
+    <string name="perms_mode_trust">ໄວ້ໃຈ</string>
+    <!-- Approval mode name (see perms_mode_trust), keep it short. Hard = the button rules decide: risky buttons need the user's OK. -->
+    <string name="perms_mode_hard">ເຂັ້ມງວດ</string>
+    <!-- Approval mode name (see perms_mode_trust), keep it short. Smart = the button rules, then a reviewer AI checks every other tap. -->
+    <string name="perms_mode_smart">ສະຫຼາດ</string>
+    <!-- Explains the three modes, one per line. Trust, Hard and Smart are the mode names above; Send, Pay, Delete are example button labels. -->
+    <string name="perms_modes_intro">ໄວ້ໃຈ: ຕົວແທນເຮັດວຽກຢູ່ນີ້ເອງ, ບໍ່ມີປັອບອັບອະນຸຍາດ.\nເຂັ້ມງວດ: ກົດຂອງປຸ່ມເປັນຜູ້ຕັດສິນ. ສົ່ງ, ຈ່າຍ, ລຶບ… ຕ້ອງການການອະນຸຍາດຂອງທ່ານໃນບັດ.\nສະຫຼາດ: ກົດກ່ອນ, ແລ້ວ AI ຜູ້ກວດສອບແຍກຕ່າງຫາກກວດທຸກການແຕະອື່ນ ທຽບກັບຄຳຂໍຂອງທ່ານ.\nຕົວແທນແຕະບັອບເບິ້ລ, ບັດ ຫຼື ການຕັ້ງຄ່າຂອງ Buddy ເອງບໍ່ໄດ້ເລີຍ.</string>
+    <!-- Section title: which AI reviews the taps in apps set to Smart. -->
+    <string name="perms_smart_reviewer">ຜູ້ກວດສອບສະຫຼາດ</string>
+    <!-- Reviewer choice in a segmented control, next to “Claude Code” and “Codex”: the same agent as the chat. Keep it short. -->
+    <string name="perms_reviewer_same">ຄືກັບການສົນທະນາ</string>
+    <!-- Toast when the user picks a reviewer that isn't signed in. %1$s = Claude Code or Codex. -->
+    <string name="perms_reviewer_sign_in">ເຂົ້າສູ່ລະບົບ %1$s ກ່ອນ (ການຕັ້ງຄ່າ).</string>
+    <!-- Under the reviewer choice. “allow”, “ask you” and “advise against” are the reviewer's three possible answers. -->
+    <string name="perms_reviewer_about">ເຊສຊັນຊົ່ວຄາວຕໍ່ການແຕະ, ບໍ່ມີເຄື່ອງມື: ມັນເຫັນຄຳຂໍຂອງທ່ານ, ໝາຍເຫດຂອງຕົວແທນ ແລະ ໜ້າຈໍ, ແລ້ວຕອບວ່າ ອະນຸຍາດ, ຖາມທ່ານ ຫຼື ແນະນຳວ່າຢ່າເຮັດ. ປະມານ 3 ວິນາທີຕໍ່ການແຕະ. ການສົນທະນາ OpenCode, Antigravity ແລະ Grok ຈະຖືກກວດໂດຍ Claude Code (ຫຼື Codex).</string>
+    <!-- Under the reviewer's description: it also does the check before a notification rule's countdown. -->
+    <string name="perms_reviewer_rules">ມັນຍັງກວດຄຳຕອບກ່ອນການນັບຖອຍຂອງກົດການແຈ້ງເຕືອນຈະສົ່ງ.</string>
+    <!-- In the reviewer's model picker, the first choice ("Default") described: for Claude Code it is Haiku. -->
+    <string name="reviewer_default_claude">Haiku: ໄວ ແລະ ເບົາ. ແນະນຳ.</string>
+    <!-- In the reviewer's model picker, the first choice ("Default") described, for Codex. -->
+    <string name="reviewer_default_codex">ໂມເດລນ້ອຍໆ ແລະ ໄວ. ແນະນຳ.</string>
+    <!-- Title of the button rules screen, and of the row that opens it. -->
+    <string name="perms_button_rules">ກົດຂອງປຸ່ມ</string>
+    <!-- Next to “Button rules”: how many buttons are on each list. %1$d = on the “Always ask” list, %2$d = on the “Never ask” list. -->
+    <string name="perms_rules_summary">%1$d ຖາມ · %2$d ບໍ່ຖາມ</string>
+    <!-- Section title above the list of installed apps. -->
+    <string name="perms_apps">ແອັບ</string>
+    <!-- Row that sets the mode of every app at once. -->
+    <string name="perms_all_apps">ທຸກແອັບ</string>
+    <!-- Link under “All apps”: puts every app back on the mode Buddy suggests for it. -->
+    <string name="perms_reset_suggested">ຕັ້ງຄືນເປັນຄ່າທີ່ແນະນຳ</string>
+
+    <!-- Button rules screen: buttons that always or never need the user's OK. Hard and Smart are approval mode names (perms_mode_*). -->
+    <string name="perms_rules_intro">ສຳລັບແອັບທີ່ຢູ່ໃນ ເຂັ້ມງວດ ຫຼື ສະຫຼາດ. ກົດທີ່ເລືອກຈາກຄຳແນະນຳຈະໃຊ້ກັບແອັບນັ້ນ; ຂໍ້ຄວາມທີ່ພິມເອງໃຊ້ກັບທຸກແອັບ. ແຕະກົດເພື່ອລຶບ.</string>
+    <!-- Switch title: Buddy's own list of risky button words. -->
+    <string name="perms_builtin_title">ຄຳສ່ຽງທີ່ມີມາໃນແອັບ</string>
+    <!-- Switch description. The words are examples from the built-in list: use your language's usual button labels. -->
+    <string name="perms_builtin_sub">ສົ່ງ, ໂພສ, ຈ່າຍ, ຊື້, ສັ່ງ, ລຶບ, ໂທ, ອອກຈາກລະບົບ… ຖາມສະເໝີ, ໃນທຸກພາສາທີ່ Buddy ຖືກແປ.</string>
+    <!-- List title: buttons that always need the user's OK. -->
+    <string name="perms_always_ask">ຖາມສະເໝີ</string>
+    <!-- List title, and an option in a small segmented control (keep it short): buttons the agent may tap without asking. -->
+    <string name="perms_never_ask">ບໍ່ຖາມເລີຍ</string>
+    <!-- Option in a small segmented control next to “Never ask” (keep it short): put this button on the “Always ask” list. Verb. -->
+    <string name="perms_ask">ຖາມ</string>
+    <!-- Hint in the field where the user types a button's label, as their apps show it. -->
+    <string name="perms_add_hint">ເພີ່ມປຸ່ມ, ເຊັ່ນ ສົ່ງ</string>
+    <!-- Button: adds the typed button to the list. Verb. -->
+    <string name="perms_add">ເພີ່ມ</string>
+    <!-- Section title: buttons the agent tapped lately, to put them on a list with one tap. -->
+    <string name="perms_seen_title">ປຸ່ມທີ່ເຫັນຫຼ້າສຸດ</string>
+    <!-- Shown while no buttons were seen yet. Hard and Smart are approval mode names. -->
+    <string name="perms_seen_empty">ປຸ່ມທີ່ຕົວແທນແຕະໃນແອັບທີ່ຢູ່ໃນ ເຂັ້ມງວດ ແລະ ສະຫຼາດ ຈະສະແດງຢູ່ນີ້.</string>
+
+    <!-- Button rules and modes, as App permissions shows them. -->
+    <!-- A button rule that applies in every app, on a chip and in the suggestions. %1$s = the button's label, e.g. Send. -->
+    <string name="guard_rule_all_apps">%1$s · ທຸກແອັບ</string>
+    <!-- Why an app has its mode, in small text under the app's name. Here: the user picked it. -->
+    <string name="guard_why_choice">ການເລືອກຂອງທ່ານ</string>
+    <!-- Buddy suggests Hard for this app because of the kind of app it is. -->
+    <string name="guard_why_category">ແນະນຳ: ຂໍ້ຄວາມ, ໂຊເຊຍ, ການໂທ ຫຼື ເງິນ</string>
+    <!-- Buddy suggests Hard because the app's name contains a word like bank or pay. %1$s = that word, as found (usually English). -->
+    <string name="guard_why_name">ແນະນຳ: ຊື່ມີ “%1$s”</string>
+    <!-- Buddy suggests Hard because Android lists the app as a social app. -->
+    <string name="guard_why_social">ແນະນຳ: ແອັບໂຊເຊຍ</string>
+    <!-- The mode is Buddy's suggestion. -->
+    <string name="guard_why_suggested">ແນະນຳ</string>
+    <!-- The mode comes from the first setup, where the user chose that the agent asks first. -->
+    <string name="guard_why_setup">ການເລືອກຕອນຕັ້ງຄ່າ: ຖາມກ່ອນ</string>
+
+    <!-- Approval card, shown before the agent taps a risky button: the user approves or denies it. -->
+    <!-- %1$s = the button's label, e.g. Send. -->
+    <string name="tools_card_tap">ແຕະ “%1$s”</string>
+    <!-- %1$s = the button's label, e.g. Send; %2$s = the app's name, e.g. WhatsApp. -->
+    <string name="tools_card_tap_in">ແຕະ “%1$s” ໃນ %2$s</string>
+    <!-- For a button without a label: “this” stands for the button. -->
+    <string name="tools_card_tap_this">ແຕະ “ອັນນີ້”</string>
+    <!-- For a button without a label: “this” stands for the button. %1$s = the app's name. -->
+    <string name="tools_card_tap_this_in">ແຕະ “ອັນນີ້” ໃນ %1$s</string>
+    <!-- The agent typed text and wants to press the keyboard's Enter key to send it. -->
+    <string name="tools_card_enter">ກົດ Enter ເພື່ອສົ່ງ</string>
+    <!-- Same, %1$s = the app's name. -->
+    <string name="tools_card_enter_in">ກົດ Enter ເພື່ອສົ່ງໃນ %1$s</string>
+    <!-- The agent answers a notification through its reply field (a notification rule). %1$s = the person or
+         conversation, e.g. Sarah; %2$s = the app, e.g. WhatsApp; %3$s = the reply. Use your language's quotation marks. -->
+    <string name="tools_card_reply">ຕອບ %1$s ໃນ %2$s:\n“%3$s”</string>
+    <!-- A notification rule's run wants to open a link (it always asks first). %1$s = the link. -->
+    <string name="tools_card_open_url">ເປີດ %1$s</string>
+    <string name="tools_card_clipboard">ໃຫ້ຕົວແທນອ່ານສິ່ງທີ່ທ່ານສຳເນົາຫຼ້າສຸດບໍ?</string>
+    <string name="tools_card_location">ແບ່ງປັນຕຳແໜ່ງຂອງໂທລະສັບນີ້ກັບຕົວແທນບໍ?</string>
+    <string name="tools_photo_why">ຖ່າຍຮູບ: %1$s</string>
+    <!-- %1$s = the action (e.g. Tap “Send” in WhatsApp); on the next line, %2$s = what it would send, or why Buddy asks. -->
+    <string name="tools_card_detail">%1$s:\n%2$s</string>
+    <!-- Quotation marks around text on the card (a draft message, a reason). Use your language's quotation marks. -->
+    <string name="tools_card_quote">“%1$s”</string>
+    <!-- In an app set to Smart, when neither Claude Code nor Codex is signed in to review the tap. -->
+    <string name="tools_card_no_reviewer">ບໍ່ມີຜູ້ກວດສອບທີ່ເຂົ້າສູ່ລະບົບ, ຈຶ່ງ Buddy ຖາມທ່ານ.</string>
+    <!-- The smart reviewer's answer. %1$s = Claude or Codex; %2$s = its short reason, in the reviewer's own words. -->
+    <string name="tools_card_reviewer_block">%1$s ແນະນຳວ່າຢ່າເຮັດ: %2$s</string>
+    <!-- The smart reviewer's answer. %1$s = Claude or Codex; %2$s = its short reason, in the reviewer's own words. -->
+    <string name="tools_card_reviewer_ask">%1$s ບອກໃຫ້ຖາມທ່ານ: %2$s</string>
+
+    <!-- Status line in the bubble while the agent works. -->
+    <!-- The smart reviewer is checking a tap. -->
+    <string name="tools_status_checking_tap">ກຳລັງກວດການແຕະນີ້…</string>
+    <!-- Android's installer is open. Install is the installer's button: use the label Android shows in your language. -->
+    <string name="tools_status_tap_install">ແຕະ ຕິດຕັ້ງ, ແລ້ວຢືນຢັນ</string>
+    <!-- Android's installer is open. Update is the installer's button: use the label Android shows in your language. -->
+    <string name="tools_status_tap_update">ແຕະ ອັບເດດ, ແລ້ວຢືນຢັນ</string>
+    <!-- An app the agent opened the installer for is now installed (adjective). -->
+    <string name="tools_status_installed">ຕິດຕັ້ງແລ້ວ</string>
+    <!-- Downloading Buddy's update. %1$s = version number, e.g. 2.1.13 -->
+    <string name="tools_status_downloading">ກຳລັງດາວໂຫຼດ Buddy %1$s…</string>
+
+    <!-- Smart reviewer: its reason when it fails, shown on the approval card after “Claude says ask you:”, so it starts lowercase.
+         %1$s = the technical reason (reviewer_no_answer, reviewer_timed_out, or an error in English). -->
+    <string name="reviewer_failed">ຜູ້ກວດສອບຕອບບໍ່ໄດ້ (%1$s)</string>
+    <!-- In the parentheses of reviewer_failed: the reviewer's reply had no decision in it. -->
+    <string name="reviewer_no_answer">ບໍ່ມີຄຳຕອບ</string>
+    <!-- In the parentheses of reviewer_failed: the reviewer took too long. -->
+    <string name="reviewer_timed_out">ໝົດເວລາ</string>
+
+    <!-- Error when a chat can't start because Buddy's built-in Linux isn't set up yet. -->
+    <string name="helper_linux_missing">Linux ຂອງ Buddy ຍັງບໍ່ໄດ້ຕິດຕັ້ງ. ເປີດ ການຕັ້ງຄ່າ ເພື່ອຕັ້ງມັນ.</string>
+
+    <!-- Voice input (dictation). “Claude voice” and “ChatGPT voice” are the names of two voice input options: Claude Code's
+         speech-to-text and ChatGPT's voice (through Codex). Status lines show in the voice bar, errors as toasts. -->
+    <string name="dictation_claude_sign_in">ເຂົ້າສູ່ລະບົບ Claude Code ໃນ ການຕັ້ງຄ່າ ເພື່ອໃຊ້ສຽງ Claude.</string>
+    <string name="dictation_codex_sign_in">ເຂົ້າສູ່ລະບົບ Codex ໃນ ການຕັ້ງຄ່າ ເພື່ອໃຊ້ສຽງ ChatGPT.</string>
+    <!-- Status: voice input is starting. -->
+    <string name="dictation_starting">ກຳລັງເລີ່ມ…</string>
+    <!-- Status: Claude Code, which does the voice input, is starting. -->
+    <string name="dictation_starting_claude">ກຳລັງເລີ່ມ Claude…</string>
+    <!-- Status: the recorded speech is being turned into text. -->
+    <string name="dictation_transcribing">ກຳລັງຖອດຂໍ້ຄວາມ…</string>
+    <!-- Voice input ended without any words recognized. -->
+    <string name="dictation_no_speech">ບໍ່ໄດ້ຍິນຊັດ.</string>
+    <string name="dictation_mic_failed">ເປີດໄມໂຄຣໂຟນບໍ່ໄດ້.</string>
+    <!-- %1$s = the reason, often a technical error in English. -->
+    <string name="dictation_claude_start_failed">ສຽງ Claude ເລີ່ມບໍ່ໄດ້: %1$s</string>
+    <string name="dictation_claude_no_start">ສຽງ Claude ບໍ່ໄດ້ເລີ່ມ.</string>
+    <!-- A reason after “Claude voice couldn't start:”. -->
+    <string name="dictation_claude_code_no_start">Claude Code ບໍ່ໄດ້ເລີ່ມ</string>
+    <!-- %1$s = the reason, often a technical error in English. -->
+    <string name="dictation_chatgpt_start_failed">ສຽງ ChatGPT ເລີ່ມບໍ່ໄດ້: %1$s</string>
+    <!-- %1$s = how far it got, one of dictation_stage_* below. -->
+    <string name="dictation_chatgpt_no_connect">ສຽງ ChatGPT ເຊື່ອມຕໍ່ບໍ່ໄດ້ (%1$s).</string>
+    <!-- %1$s = what went wrong: dictation_connection_failed, or an error from ChatGPT (often in English). -->
+    <string name="dictation_chatgpt_error">ສຽງ ChatGPT: %1$s</string>
+    <!-- After “ChatGPT voice:”, so it starts lowercase. -->
+    <string name="dictation_connection_failed">ການເຊື່ອມຕໍ່ລົ້ມເຫຼວ</string>
+    <!-- How far ChatGPT voice got, in the parentheses of dictation_chatgpt_no_connect, so lowercase. -->
+    <string name="dictation_stage_page">ເລີ່ມໜ້າ</string>
+    <!-- How far ChatGPT voice got (see dictation_stage_page). -->
+    <string name="dictation_stage_codex">ລໍຖ້າ Codex</string>
+    <!-- How far ChatGPT voice got (see dictation_stage_page). -->
+    <string name="dictation_stage_call">ກຳລັງໂທອອກ</string>
+    <!-- How far ChatGPT voice got (see dictation_stage_page). -->
+    <string name="dictation_stage_answer">ລໍຖ້າ ChatGPT ຕອບ</string>
+    <!-- How far ChatGPT voice got (see dictation_stage_page). -->
+    <string name="dictation_stage_connecting">ກຳລັງເຊື່ອມຕໍ່</string>
+    <!-- A reason after “ChatGPT voice couldn't start:”. -->
+    <string name="dictation_codex_no_start">Codex ບໍ່ໄດ້ເລີ່ມ</string>
+    <!-- A reason after “ChatGPT voice couldn't start:” or in the smart reviewer's reason. %1$s = a technical request name, e.g. thread/start. -->
+    <string name="dictation_request_timed_out">%1$s ໝົດເວລາ</string>
+    <!-- A reason after “ChatGPT voice couldn't start:” or in the smart reviewer's reason. %1$s = the end of Codex's error log (technical, English), or dictation_no_details. -->
+    <string name="dictation_codex_stopped">Codex ຢຸດ: %1$s</string>
+    <!-- After “Codex stopped:” when its log says nothing. -->
+    <string name="dictation_no_details">ບໍ່ມີລາຍລະອຽດ</string>
+
+    <!-- Notification rules (Settings → Notification rules): when a notification from an app the user picks arrives
+         (optionally from someone, or containing some words), Buddy gives the user's instruction to an agent. -->
+    <!-- Name of Buddy's entry in Android's notification access settings. -->
+    <string name="rules_service_label">ກົດການແຈ້ງເຕືອນຂອງ Buddy</string>
+    <string name="rules_title">ກົດການແຈ້ງເຕືອນ</string>
+    <string name="rules_intro">ເມື່ອການແຈ້ງເຕືອນທີ່ທ່ານເລືອກມາຮອດ, Buddy ຈະສົ່ງຄຳສັ່ງຂອງທ່ານໃຫ້ຕົວແທນ, ຄືກັບຂໍ້ຄວາມທີ່ທ່ານພິມ. ການແຈ້ງເຕືອນທີ່ບໍ່ກົງກັບກົດໃດຈະຖືກລະເລີຍ.</string>
+    <string name="rules_access_off_title">ການເຂົ້າເຖິງການແຈ້ງເຕືອນປິດຢູ່</string>
+    <string name="rules_access_off_text">Buddy ຕ້ອງການມັນເພື່ອເຫັນການແຈ້ງເຕືອນທີ່ກົດຂອງທ່ານຕິດຕາມ.</string>
+    <!-- Button: opens Android's notification access setting for Buddy. -->
+    <string name="rules_access_turn_on">ເປີດ</string>
+    <!-- Switch: off pauses every rule. -->
+    <string name="rules_run">ແລ່ນກົດ</string>
+    <string name="rules_run_info">ປິດເພື່ອຢຸດທຸກກົດຊົ່ວຄາວ.</string>
+    <!-- Heading above the list of rules. -->
+    <string name="rules_section">ກົດ</string>
+    <string name="rules_empty">ຍັງບໍ່ມີກົດ. ຕົວຢ່າງ: ເມື່ອລູກຄ້າຂຽນຫາທ່ານໃນ WhatsApp, ຕອບດ້ວຍເວລາເປີດ-ປິດຂອງທ່ານ.</string>
+    <string name="rules_add">ເພີ່ມກົດ</string>
+    <!-- After the app's name in the list, for a rule without sender or word filters. -->
+    <string name="rules_any">ທຸກການແຈ້ງເຕືອນ</string>
+    <!-- After the app's name in the list. %1$s = names, as the user typed them (comma-separated). -->
+    <string name="rules_from_summary">ຈາກ %1$s</string>
+    <!-- After the app's name in the list. %1$s = words, as the user typed them (comma-separated). -->
+    <string name="rules_words_summary">ມີ “%1$s”</string>
+    <!-- Small tag on a rule in the list: its approval cards wait for the user. -->
+    <string name="rules_tag_ask">ຖາມທ່ານກ່ອນ</string>
+    <string name="rules_tag_now">ສົ່ງໂດຍບໍ່ຖາມ</string>
+    <!-- Small tag on a rule in the list: its approval cards approve themselves. %1$s = the countdown, e.g. 30 s. -->
+    <string name="rules_tag_countdown">ນັບຖອຍ %1$s</string>
+    <!-- Small tag on a rule that is switched off. -->
+    <string name="rules_tag_off">ປິດ</string>
+    <!-- A countdown length. %1$d = seconds. Keep it short (it's on a small button). -->
+    <string name="rules_seconds">%1$d ວິ</string>
+    <!-- A countdown length. %1$d = minutes. Keep it short (it's on a small button). -->
+    <string name="rules_minutes">%1$d ນ</string>
+    <!-- Heading above what the rules did lately. -->
+    <string name="rules_activity">ກິດຈະກຳຫຼ້າສຸດ</string>
+    <string name="rules_activity_empty">ຍັງບໍ່ມີຫຍັງ.</string>
+    <!-- Link: empties the recent activity. -->
+    <string name="rules_activity_clear">ລ້າງ</string>
+    <!-- What a rule did. %1$s = the reply it sent. Use your language's quotation marks. -->
+    <string name="rules_log_replied">ຕອບແລ້ວ: “%1$s”</string>
+    <!-- What a rule did: the agent finished without saying anything. -->
+    <string name="rules_log_done_empty">ສຳເລັດ, ໂດຍບໍ່ມີຄຳຕອບ.</string>
+    <string name="rules_log_limit">ຂ້າມ: ໃນຊົ່ວໂມງທີ່ຜ່ານມາມີຫຼາຍເກີນໄປ.</string>
+    <string name="rules_log_held">ລໍຖ້າ: ໃນຊົ່ວໂມງທີ່ຜ່ານມາມີຫຼາຍເກີນໄປ. ຂໍ້ຄວາມໃໝ່ຈະຖືກແລ່ນລວມກັນໜຶ່ງຄັ້ງເວລາ %1$s.</string>
+    <string name="rules_limit">ຂີດຈຳກັດຕໍ່ຊົ່ວໂມງ</string>
+    <string name="rules_limit_off">ປິດ</string>
+    <string name="rules_limit_info">ຈຳນວນການແລ່ນສູງສຸດຕໍ່ຊົ່ວໂມງສຳລັບໜຶ່ງການສົນທະນາ, ແລະ ສາມເທົ່າສຳລັບທັງກົດ. ເກີນກວ່ານັ້ນ, ຂໍ້ຄວາມໃໝ່ຈະລໍຖ້າ ແລ້ວຖືກແລ່ນລວມກັນໜຶ່ງຄັ້ງ. ປິດ: ບໍ່ຈຳກັດ.</string>
+    <string name="rules_tag_limit">%1$d/ຊມ</string>
+    <string name="rules_tag_no_limit">ບໍ່ຈຳກັດ</string>
+    <string name="rules_log_busy">ຂ້າມ: ໂທລະສັບບໍ່ຫວ່າງດົນເກີນໄປ.</string>
+    <string name="card_note_later">ບໍ່ມີຄຳຕອບທັນເວລາ: ຄຳຕອບລໍຖ້າຢູ່ໃນລາຍການ ລໍຖ້າທ່ານ</string>
+    <string name="rules_log_waiting">ລໍຖ້າການອະນຸຍາດຂອງທ່ານ: “%1$s”</string>
+    <string name="rules_log_full">ຂ້າມ: ມີການສົນທະນາຫຼາຍເກີນໄປຂຽນພ້ອມກັນ.</string>
+    <string name="rules_log_hidden">ອ່ານຂໍ້ຄວາມໃໝ່ບໍ່ໄດ້: Android ເຊື່ອງພວກມັນ (ອາດມີລະຫັດຢູ່). ເປີດການສົນທະນາ, ແລ້ວຂໍ້ຕໍ່ໄປຈະຜ່ານມາ.</string>
+    <string name="waiting_title">ລໍຖ້າທ່ານ</string>
+    <string name="waiting_channel">ຄຳຕອບທີ່ລໍຖ້າທ່ານ</string>
+    <string name="waiting_banner_text">ຄຳຕອບທີ່ລໍຖ້າການອະນຸຍາດຂອງທ່ານ: %1$s</string>
+    <string name="waiting_empty">ບໍ່ມີຫຍັງລໍຖ້າ. ເມື່ອຄຳຕອບຂອງກົດຕ້ອງການການອະນຸຍາດຈາກທ່ານ ແລະ ທ່ານບໍ່ໄດ້ຕອບທັນເວລາ, ມັນຈະລໍຖ້າຢູ່ນີ້.</string>
+    <string name="waiting_their_messages">ຂໍ້ຄວາມຂອງພວກເຂົາ</string>
+    <string name="waiting_reply">ຕອບ</string>
+    <string name="waiting_send">ສົ່ງ</string>
+    <string name="waiting_copy_open">ສຳເນົາ ແລະ ເປີດ %1$s</string>
+    <string name="waiting_edit">ແກ້ໄຂ</string>
+    <string name="waiting_skip">ຂ້າມ</string>
+    <string name="waiting_open_chat">ເປີດການສົນທະນາ</string>
+    <string name="waiting_state_wrote_again">%1$s ຂຽນອີກຫຼັງຈາກນັ້ນ: ຄຳຕອບນີ້ອາດລ້າສະໄໝ.</string>
+    <string name="waiting_state_answered">ທ່ານໄດ້ຕອບໃນ %1$s ແລ້ວ.</string>
+    <string name="waiting_state_gone">ການແຈ້ງເຕືອນຫາຍໄປແລ້ວ: Buddy ຈະສຳເນົາຄຳຕອບ ແລະ ເປີດ %1$s ໃຫ້ທ່ານວາງ.</string>
+    <string name="waiting_sent">ສົ່ງໄປ %1$s ແລ້ວ</string>
+    <string name="waiting_copied">ສຳເນົາແລ້ວ. ວາງມັນໃນ %1$s.</string>
+    <string name="waiting_note_sent">✓ ສົ່ງຈາກລາຍການ ລໍຖ້າທ່ານ: %1$s</string>
+    <!-- %1$s = why: rules_log_no_service, rules_log_not_signed_in, or a technical error (often English). -->
+    <string name="rules_log_error">ບໍ່ໄດ້ແລ່ນ: %1$s</string>
+    <!-- A reason after “Didn't run:”, so it starts lowercase. -->
+    <string name="rules_log_no_service">ບໍລິການເຂົ້າເຖິງຂອງ Buddy ປິດຢູ່</string>
+    <!-- A reason after “Didn't run:”. %1$s = the agent, e.g. Claude Code. -->
+    <string name="rules_log_not_signed_in">%1$s ຍັງບໍ່ໄດ້ເຂົ້າສູ່ລະບົບ</string>
+
+    <!-- The rule editor. -->
+    <string name="rules_new">ກົດໃໝ່</string>
+    <string name="rules_edit">ແກ້ໄຂກົດ</string>
+    <!-- Field label above the app picker. -->
+    <string name="rules_app">ເມື່ອມີການແຈ້ງເຕືອນຈາກ</string>
+    <string name="rules_pick_app">ເລືອກແອັບ</string>
+    <!-- Hint in the search box of the app picker. -->
+    <string name="rules_search_apps">ຄົ້ນຫາແອັບ</string>
+    <string name="rules_from">ຈາກ (ບໍ່ບັງຄັບ)</string>
+    <string name="rules_from_hint">ໃຜກໍ່ໄດ້, ຫຼື ຊື່ຄັ່ນດ້ວຍຈຸດ</string>
+    <!-- Field label: words the notification must contain. -->
+    <string name="rules_words">ມີຄຳວ່າ (ບໍ່ບັງຄັບ)</string>
+    <string name="rules_words_hint">ຫຍັງກໍ່ໄດ້, ຫຼື ຄຳຄັ່ນດ້ວຍຈຸດ</string>
+    <string name="rules_instruction">Buddy ຄວນເຮັດຫຍັງ?</string>
+    <string name="rules_instruction_hint">ຕົວຢ່າງ: ຕອບໃນແບບຂອງຂ້ອຍ. ພວກເຮົາເປີດ 8 ໂມງເຊົ້າ ຫາ 6 ໂມງແລງ, ວັນອາທິດປິດ.</string>
+    <!-- Example chips under the instruction box: a tap puts the matching *_text in it. Keep the chips short. -->
+    <string name="rules_example_reply">ຕອບແທນຂ້ອຍ</string>
+    <string name="rules_example_reply_text">ຕອບໃນແບບຂອງຂ້ອຍ, ສັ້ນ ແລະ ເປັນມິດ.</string>
+    <string name="rules_example_summary">ສະຫຼຸບ</string>
+    <string name="rules_example_summary_text">ບອກຂ້ອຍໜຶ່ງແຖວວ່າມັນເວົ້າຫຍັງ ແລະ ຂ້ອຍຕ້ອງເຮັດຫຍັງຫຼືບໍ່.</string>
+    <string name="rules_example_calendar">ເພີ່ມໃສ່ປະຕິທິນ</string>
+    <string name="rules_example_calendar_text">ຖ້າມັນກ່ຽວກັບການນັດໝາຍ ຫຼື ການສົ່ງຂອງ, ເພີ່ມມັນໃສ່ປະຕິທິນຂອງຂ້ອຍ.</string>
+    <!-- Field label above the choice of Claude Code, Codex or OpenCode. -->
+    <string name="rules_agent">ຕົວແທນ</string>
+    <!-- Field label above "Ask me" / "Countdown". -->
+    <string name="rules_approval">ກ່ອນລົງມື</string>
+    <!-- Choice: the rule's approval cards wait for the user. Keep it short. -->
+    <string name="rules_approval_ask">ຖາມຂ້ອຍ</string>
+    <!-- Choice: the rule's approval cards approve themselves after a countdown. Keep it short. -->
+    <string name="rules_approval_countdown">ນັບຖອຍ</string>
+    <string name="rules_approval_now">ຢ່າຖາມ</string>
+    <string name="rules_approval_ask_info">ບັດອະນຸຍາດຈະລໍຖ້າທ່ານ, ຄືກັບໃນການສົນທະນາອື່ນໆ.</string>
+    <string name="rules_approval_countdown_info">ເມື່ອການນັບຖອຍຈົບ, ບັດຈະອະນຸຍາດເອງ ເວັ້ນແຕ່ທ່ານແຕະເພື່ອຢຸດ. ສິ່ງນັ້ນໃຊ້ໄດ້ພຽງກັບການສົ່ງຂໍ້ຄວາມ, ຫຼັງ AI ທີສອງກວດມັນທຽບກັບກົດຂອງທ່ານ. ການຈ່າຍ, ຊື້, ລຶບ ແລະ ການເປີດລິ້ງ ຍັງລໍຖ້າທ່ານສະເໝີ.</string>
+    <string name="rules_approval_now_info">ຂໍ້ຄວາມຈະຖືກສົ່ງທັນທີ, ໂດຍບໍ່ມີບັດ, ເມື່ອ AI ທີສອງກວດມັນທຽບກັບກົດຂອງທ່ານແລ້ວ. ຖ້າມັນຄັດຄ້ານ, ບັດຈະລໍຖ້າທ່ານ. ການຈ່າຍ, ຊື້, ລຶບ ແລະ ການເປີດລິ້ງ ຍັງລໍຖ້າທ່ານສະເໝີ.</string>
+    <!-- Under the countdown explanation, tappable (opens App permissions). %1$s = the reviewer, e.g. Claude Code · Haiku. -->
+    <string name="rules_checker">AI ທີສອງ: %1$s. ແຕະເພື່ອປ່ຽນໃນ ສິດຂອງແອັບ.</string>
+    <!-- In the model picker of a rule, the first choice ("Default"), described. -->
+    <string name="rules_model_default">ຄ່າເລີ່ມຕົ້ນຂອງຕົວແທນເອງ</string>
+    <!-- Switch: the rule runs, or not. -->
+    <string name="rules_on">ເປີດກົດ</string>
+    <string name="rules_save">ບັນທຶກ</string>
+    <string name="rules_delete">ລຶບ</string>
+    <string name="rules_delete_title">ລຶບກົດນີ້ບໍ?</string>
+    <string name="rules_need_app">ເລືອກແອັບກ່ອນ.</string>
+    <string name="rules_need_instruction">ຂຽນສິ່ງທີ່ Buddy ຄວນເຮັດ.</string>
+
+    <!-- Shown before Android's notification access setting (an explicit choice, as Google Play requires). -->
+    <string name="rules_access_title">ອະນຸຍາດການເຂົ້າເຖິງການແຈ້ງເຕືອນບໍ?</string>
+    <string name="rules_access_what">Buddy ກວດແຕ່ລະການແຈ້ງເຕືອນທຽບກັບກົດຂອງທ່ານ. ການແຈ້ງເຕືອນທີ່ບໍ່ກົງກັບກົດໃດຈະຖືກລະເລີຍທັນທີ: ບໍ່ເກັບ, ບໍ່ສົ່ງໄປໃສ.</string>
+    <string name="rules_access_data">ເມື່ອກົງກັບກົດໜຶ່ງ, ແອັບ, ຜູ້ສົ່ງ ແລະ ຂໍ້ຄວາມຈະຖືກສົ່ງໄປຫາຕົວແທນຂອງກົດນັ້ນ (Claude Code, Codex ຫຼື OpenCode) ພ້ອມຄຳສັ່ງຂອງທ່ານ.</string>
+    <string name="rules_access_reply">Buddy ສາມາດຕອບຜ່ານປຸ່ມ ຕອບ ຂອງການແຈ້ງເຕືອນ. ມັນຈະຖາມທ່ານກ່ອນ, ເວັ້ນແຕ່ທ່ານໃຫ້ກົດນັ້ນມີການນັບຖອຍ.</string>
+
+    <!-- The chat a rule's run happens in shows this as the first line of each run. %1$s = the person or conversation,
+         e.g. Sarah; %2$s = the app; %3$s = the notification's text; %4$s = the rule's instruction. Keep 🔔 and ⚡. -->
+    <string name="rules_chat_shown">🔔 %1$s · %2$s: %3$s\n⚡ %4$s</string>
+    <!-- Status in the bubble while a second AI checks an action against the rule, before its countdown starts. -->
+    <string name="rules_status_checking">ກຳລັງກວດມັນທຽບກັບກົດຂອງທ່ານ…</string>
+    <!-- Names of Buddy's notification categories in Android's settings (approvals_channel: cards waiting for the user). -->
+    <string name="rules_channel_results">ກົດການແຈ້ງເຕືອນ: ຜົນ</string>
+    <string name="approvals_channel">ການອະນຸຍາດ</string>
+    <!-- Title of the notification saying what a rule's run did. %1$s = the person or conversation; %2$s = the app. -->
+    <string name="rules_result_title">%1$s · %2$s</string>
+    <!-- Title of the notification when a rule's run waits for the user's OK while the phone is locked.
+         %1$s = the person or conversation; %2$s = the app. -->
+    <string name="rules_approval_title">ຕ້ອງການການອະນຸຍາດ: %1$s · %2$s</string>
+    <!-- Title of the notification when any chat waits for the user's OK while the phone is locked (the card stays hidden until unlock). %1$s = the chat's name. -->
+    <string name="card_locked_title">ຕ້ອງການການອະນຸຍາດ: %1$s</string>
+    <!-- Its text, with a countdown. %1$s = the countdown length, e.g. 30 s; %2$s = what it would do. -->
+    <string name="rules_approval_auto">ຈະອະນຸຍາດເອງໃນ %1$s ເວັ້ນແຕ່ທ່ານຢຸດມັນ.\n%2$s</string>
+
+    <!-- ===== The background browser: its live view in a chat, its cards and Settings (Browser, BrowserTools, BrowserPanel, BrowserActivity) ===== -->
+
+    <!-- Settings screen: the background browser, a separate browser inside Buddy that agents use for web pages. Section label and switch. -->
+    <string name="browser_section">ບຣາວເຊີເບື້ອງຫຼັງ</string>
+    <string name="browser_switch">ບຣາວເຊີເບື້ອງຫຼັງ</string>
+    <!-- Chromium is the open-source browser Chrome is built on: keep the name. -->
+    <string name="browser_switch_info">ບຣາວເຊີໃນ Buddy ທີ່ຕົວແທນໃຊ້ສຳລັບໜ້າເວັບ, ໂດຍບໍ່ຍຶດໂທລະສັບຂອງທ່ານ. ທ່ານເບິ່ງ ແລະ ໃຊ້ມັນໃນການສົນທະນາໄດ້. ຄັ້ງທຳອິດ, Buddy ຈະດາວໂຫຼດ Chromium (ປະມານ 300 MB).</string>
+    <!-- Status lines under the switch, lowercase. -->
+    <string name="browser_state_installing">ກຳລັງຕິດຕັ້ງ Chromium…</string>
+    <string name="browser_state_starting">ກຳລັງເລີ່ມ…</string>
+    <string name="browser_state_running">ກຳລັງແລ່ນ</string>
+    <string name="browser_state_idle">ພ້ອມ · ເລີ່ມເມື່ອຕົວແທນຕ້ອງການ</string>
+    <string name="browser_state_not_installed">ຍັງບໍ່ໄດ້ຕິດຕັ້ງ</string>
+    <string name="browser_install_failed">ຕິດຕັ້ງ Chromium ບໍ່ໄດ້. ກວດການເຊື່ອມຕໍ່ ແລ້ວລອງອີກຄັ້ງ.</string>
+    <!-- “Continue with Google” is the button many sites show to sign in with a Google account: use the wording sites use in your language. -->
+    <string name="browser_sign_in_help">ຕົວແທນບໍ່ເຄີຍພິມລະຫັດຜ່ານ. ເພື່ອໃຫ້ພວກມັນໃຊ້ເວັບກັບບັນຊີຂອງທ່ານ, ເປີດບຣາວເຊີ ແລະ ເຂົ້າສູ່ລະບົບເອງ. “Continue with Google” ມັກຈະລົ້ມເຫຼວໃນບຣາວເຊີອັດຕະໂນມັດ: ໃຊ້ອີເມວ ແລະ ລະຫັດຜ່ານແທນ.</string>
+    <!-- Button: opens the background browser full screen. -->
+    <string name="browser_open">ເປີດບຣາວເຊີ</string>
+    <string name="browser_wipe">ລ້າງຂໍ້ມູນບຣາວເຊີ</string>
+    <string name="browser_wipe_title">ລ້າງຂໍ້ມູນບຣາວເຊີບໍ?</string>
+    <string name="browser_wipe_body">ລຶບທຸກການເຂົ້າສູ່ລະບົບ, cookie ແລະ ປະຫວັດຂອງບຣາວເຊີເບື້ອງຫຼັງ. Chromium ຍັງຕິດຕັ້ງຢູ່.</string>
+    <!-- Verb. Confirm button of the sheet above. -->
+    <string name="browser_wipe_action">ລ້າງ</string>
+    <string name="browser_wiped">ລ້າງຂໍ້ມູນບຣາວເຊີແລ້ວ</string>
+
+    <!-- The live view: the browser's page in the chat (or full screen), which the user can tap, scroll and type into. -->
+    <!-- Small label in capitals at the top of the view. -->
+    <string name="browser_live_title">ບຣາວເຊີເບື້ອງຫຼັງ</string>
+    <!-- In place of the page's address when no page is open. -->
+    <string name="browser_no_page">ບໍ່ມີໜ້າເປີດຢູ່</string>
+    <!-- Button shown while the agent is paused because the user uses the browser: the agent goes on. -->
+    <string name="browser_continue">ສືບຕໍ່</string>
+    <!-- Descriptions of icon buttons (for screen readers). -->
+    <string name="browser_back">ໜ້າກ່ອນ</string>
+    <string name="browser_keyboard">ພິມເທິງໜ້າ</string>
+    <string name="browser_full_screen">ເຕັມໜ້າຈໍ</string>
+    <string name="browser_fold">ສະແດງ ຫຼື ເຊື່ອງໜ້າ</string>
+    <string name="browser_backspace">ລຶບໜຶ່ງຕົວອັກສອນ</string>
+    <!-- The small live picture of the browser under the bubble's status while an agent browses (for screen readers), and the action that hides it (a sideways swipe does too). -->
+    <string name="bubble_browser_thumb">ພາບສົດຂອງບຣາວເຊີເບື້ອງຫຼັງ. ແຕະເພື່ອເປີດເຕັມໜ້າຈໍ.</string>
+    <string name="bubble_browser_thumb_hide">ເຊື່ອງ</string>
+    <!-- Hint of the text field under the page: what the user types goes into the page. -->
+    <string name="browser_type_hint">ພິມເຂົ້າໃນໜ້າ</string>
+    <!-- Button: the keyboard's Enter key, for the page. -->
+    <string name="browser_enter">Enter</string>
+    <!-- The page shows a dialog (e.g. "Leave this page?"). %1$s = its message. -->
+    <string name="browser_dialog">ໜ້ານັ້ນຖາມ: %1$s</string>
+    <!-- Sheet to open another address in the browser. -->
+    <string name="browser_go_title">ໄປຫາ</string>
+    <string name="browser_go">ໄປ</string>
+    <string name="browser_address_hint">ຄົ້ນຫາ ຫຼື ພິມທີ່ຢູ່ເວັບ</string>
+    <!-- Shown in the view until the first picture of the page comes. -->
+    <string name="browser_installing">ກຳລັງຕິດຕັ້ງບຣາວເຊີ…</string>
+    <string name="browser_starting">ກຳລັງເລີ່ມບຣາວເຊີ…</string>
+    <!-- A line in the chat and a short message when the agent pauses because the user touched the live view. -->
+    <string name="browser_paused_note">ຢຸດຊົ່ວຄາວລະຫວ່າງທີ່ທ່ານໃຊ້ບຣາວເຊີ. ແຕະ ສືບຕໍ່ ເມື່ອແລ້ວ.</string>
+    <string name="browser_paused_toast">ຢຸດຊົ່ວຄາວລະຫວ່າງທີ່ທ່ານໃຊ້ບຣາວເຊີ</string>
+
+    <!-- Approval cards for the background browser. %1$s = the button's label, e.g. Post; %2$s = the site, e.g. reddit.com. -->
+    <string name="browser_card_tap">ແຕະ “%1$s” ເທິງ %2$s (ບຣາວເຊີເບື້ອງຫຼັງ)</string>
+    <!-- %1$s = the site. -->
+    <string name="browser_card_enter">ກົດ Enter ເພື່ອສົ່ງເທິງ %1$s (ບຣາວເຊີເບື້ອງຫຼັງ)</string>
+    <!-- The page itself asks a question (e.g. "Delete this item?"); approving answers OK. %1$s = the site; %2$s = its question. -->
+    <string name="browser_card_dialog">ຕອບ OK ເທິງ %1$s:\n“%2$s”</string>
+
+    <!-- Progress lines in the chat for the background browser's tools. "Browser" names the background browser. -->
+    <!-- %1$s = web address. -->
+    <string name="hub_tool_browser_open">ບຣາວເຊີ: ກຳລັງເປີດ %1$s</string>
+    <string name="hub_tool_browser_read">ບຣາວເຊີ: ກຳລັງອ່ານໜ້າ</string>
+    <!-- %1$d = the number of an item on the page. -->
+    <string name="hub_tool_browser_click">ບຣາວເຊີ: ກຳລັງແຕະລາຍການ %1$d</string>
+    <!-- %1$s = the text being typed. -->
+    <string name="hub_tool_browser_type">ບຣາວເຊີ: ກຳລັງພິມ “%1$s”</string>
+    <string name="hub_tool_browser_scroll">ບຣາວເຊີ: ກຳລັງເລື່ອນ</string>
+    <string name="hub_tool_browser_screenshot">ບຣາວເຊີ: ກຳລັງເບິ່ງໜ້າ</string>
+    <string name="hub_tool_browser_back">ບຣາວເຊີ: ກຳລັງກັບ</string>
+    <string name="hub_tool_browser_tabs">ບຣາວເຊີ: ແທັບ</string>
+    <string name="hub_tool_schedule_message">ກຳລັງຕັ້ງເວລາ: %1$s</string>
+    <string name="hub_tool_list_scheduled">ກຳລັງກວດຂໍ້ຄວາມທີ່ຕັ້ງເວລາໄວ້</string>
+    <string name="hub_tool_cancel_scheduled">ກຳລັງຍົກເລີກຂໍ້ຄວາມທີ່ຕັ້ງເວລາໄວ້</string>
+    <string name="later_title">ຂໍ້ຄວາມຂອງຕົວແທນສຳລັບ %1$s</string>
+    <string name="later_cancel">ຍົກເລີກຂໍ້ຄວາມ</string>
+    <string name="share_label">ຖາມ Buddy</string>
+    <string name="share_title">ແບ່ງປັນກັບ Buddy</string>
+    <string name="share_new_chat">ສົນທະນາໃໝ່ກັບ %1$s</string>
+    <string name="usage_five">5 ຊົ່ວໂມງ %1$d%% · ຣີເຊັດ %2$s</string>
+    <string name="usage_week">ອາທິດລະ %1$d%% · ຣີເຊັດ %2$s</string>
+    <string name="usage_five_short">5ຊມ %1$d%%</string>
+    <string name="usage_week_short">ອາທິດ %1$d%%</string>
+    <string name="usage_warn_five">ທ່ານໃຊ້ %1$d%% ຂອງຂີດຈຳກັດ 5 ຊົ່ວໂມງຂອງແຜນ. ມັນຈະຣີເຊັດເວລາ %2$s.</string>
+    <string name="usage_warn_week">ທ່ານໃຊ້ %1$d%% ຂອງຂີດຈຳກັດອາທິດຂອງແຜນ. ມັນຈະຣີເຊັດ %2$s.</string>
+    <string name="check_title">ກວດສອບ Buddy</string>
+    <string name="check_info">ທົດສອບແຕ່ລະພາກສ່ວນຂອງ Buddy ຕອນນີ້ ແລະ ບອກວິທີແກ້ບັນຫາ</string>
+    <string name="check_running">ກຳລັງກວດສອບ…</string>
+    <string name="check_all_ok">ທຸກຢ່າງເຮັດວຽກ</string>
+    <string name="check_a11y">ບໍລິການເຂົ້າເຖິງ</string>
+    <string name="check_a11y_bad">ບໍ່ໄດ້ແລ່ນ, ຈຶ່ງ Buddy ເຫັນ ຫຼື ໃຊ້ໜ້າຈໍບໍ່ໄດ້. ເປີດ Buddy ໃນການຕັ້ງຄ່າການເຂົ້າເຖິງ.</string>
+    <string name="check_notifications">ການເຂົ້າເຖິງການແຈ້ງເຕືອນ</string>
+    <string name="check_notifications_bad">ກົດການແຈ້ງເຕືອນຂອງທ່ານຕ້ອງການມັນ, ແລະ ມັນປິດຢູ່.</string>
+    <string name="check_battery">ການປັບແບັດໃຫ້ດີທີ່ສຸດ</string>
+    <string name="check_battery_bad">ເປີດສຳລັບ Buddy: Android ອາດຢຸດມັນເມື່ອຢູ່ເບື້ອງຫຼັງ, ແລະ ວຽກຕາມຕາຕະລາງອາດບໍ່ແລ່ນ.</string>
+    <string name="check_linux">Linux ຂອງ Buddy</string>
+    <string name="check_linux_ok">ເລີ່ມໃນ %1$.1f ວິ</string>
+    <string name="check_linux_bad">ບໍ່ເລີ່ມ: %1$s</string>
+    <string name="check_linux_missing">ຍັງບໍ່ໄດ້ຕິດຕັ້ງ. ຕັ້ງມັນໃນ ການຕັ້ງຄ່າ.</string>
+    <string name="check_helper">ຕົວຊ່ວຍຂອງ Buddy</string>
+    <string name="check_helper_bad">Linux ມີສຳເນົາເກົ່າກວ່າ Buddy ເວີຊັນນີ້.</string>
+    <string name="check_server">ເຊີບເວີເຄື່ອງມືໂທລະສັບ</string>
+    <string name="check_server_bad">ບໍ່ຕອບຢູ່ 127.0.0.1:%1$d. ປິດແລ້ວເປີດ Buddy ໃໝ່ໃນການຕັ້ງຄ່າການເຂົ້າເຖິງ.</string>
+    <string name="check_agent_version">ເວີຊັນ %1$s</string>
+    <string name="check_network">ອິນເຕີເນັດ</string>
+    <string name="check_network_bad">ບໍ່ພົບ %1$s. ກວດ Wi-Fi ຫຼື ຂໍ້ມູນມືຖື, ຫຼື VPN ຫຼື DNS ສ່ວນຕົວທີ່ບລັອກມັນ.</string>
+    <string name="check_space">ພື້ນທີ່ຫວ່າງ</string>
+    <string name="check_space_ok">ຫວ່າງ %1$s</string>
+    <string name="check_space_bad">ຫວ່າງພຽງ %1$s. ການຕິດຕັ້ງ ຫຼື ອັບເດດຕົວແທນຕ້ອງການປະມານ 1 GB.</string>
+    <string name="check_fix">ແກ້ໄຂ</string>
+    <string name="check_open_settings">ເປີດການຕັ້ງຄ່າ</string>
+    <string name="check_copy">ສຳເນົາລາຍງານ</string>
+    <string name="check_copied">ສຳເນົາລາຍງານແລ້ວ</string>
+    <string name="check_report">ລາຍງານບັກເທິງ GitHub</string>
+    <string name="check_report_title">ສິ່ງທີ່ຈະສົ່ງໄປ GitHub</string>
+    <string name="check_report_text">ສິ່ງນີ້ຈະເປີດ issue ໃໝ່ໃນ GitHub ພ້ອມລາຍລະອຽດເຫຼົ່ານີ້. ບໍ່ມີຫຍັງຖືກສົ່ງຈົນກວ່າທ່ານຈະສົ່ງມັນຢູ່ຫັ້ນ, ແລະ ທ່ານແກ້ໄຂກ່ອນໄດ້. ການສົນທະນາ, ຂໍ້ຄວາມເທິງໜ້າຈໍ ແລະ ການແຈ້ງເຕືອນຈະບໍ່ຖືກລວມ.</string>
+    <string name="check_report_open">ເປີດ GitHub</string>
+    <plurals name="check_failed">
+        <item quantity="one">%1$d ການກວດລົ້ມເຫຼວ</item>
+        <item quantity="other">%1$d ການກວດລົ້ມເຫຼວ</item>
+    </plurals>
+    <string name="tools_step_loop">ຢຸດ: ມັນເຮັດສິ່ງດຽວກັນ %1$d ຄັ້ງຕິດກັນ, ເຊິ່ງເບິ່ງຄືວົງຈອນ.</string>
+    <!-- ===== Background mode (BackgroundActivity, Background): an agent works on a screen of its own that the user doesn't see ===== -->
+    <!-- Title of the screen and of its row in Settings. Keep short. -->
+    <string name="background_title">ໂໝດເບື້ອງຫຼັງ</string>
+    <!-- Under that row in Settings. -->
+    <string name="background_row">ຕົວແທນເຮັດວຽກເທິງໜ້າຈໍຂອງຕົນເອງ ໃນຂະນະທີ່ທ່ານໃຊ້ໂທລະສັບ</string>
+    <string name="background_intro">ໃນໂໝດເບື້ອງຫຼັງ ຕົວແທນເຮັດວຽກເທິງໜ້າຈໍຂອງຕົນເອງທີ່ທ່ານບໍ່ເຫັນ. ທ່ານຍັງມີໜ້າຈໍ, ແປ້ນພິມ ແລະ ປຸ່ມກັບຂອງທ່ານ, ແລະ ມັນຈະເຮັດຕໍ່ເຖິງແມ່ນໂທລະສັບລັອກ.</string>
+    <!-- "Wireless debugging" is Android's name of that developer option: use the name this language's Android shows. -->
+    <string name="background_how">Android ໃຫ້ພຽງ Wireless debugging ສ້າງໜ້າຈໍແບບນັ້ນ, ສະນັ້ນ Buddy ຈະຈັບຄູ່ກັບມັນຄັ້ງດຽວ, ຢູ່ໃນໂທລະສັບນີ້. ບໍ່ຕ້ອງໃຊ້ຄອມພິວເຕີ.</string>
+    <!-- The three steps of the set-up. "Developer options", "Wireless debugging", "Build number" and "Pair device with pairing code" are Android's own names: use the ones this language's Android shows. -->
+    <string name="background_step1">1. ແຕະ ຕັ້ງຄ່າ. Buddy ຈະເປີດ ຕົວເລືອກນັກພັດທະນາ ແລະ ຊອກຫາ Wireless debugging ໃຫ້ທ່ານ.</string>
+    <string name="background_step2">2. ມັນເປີດ Wireless debugging (ຕ້ອງເຊື່ອມຕໍ່ Wi-Fi) ແລະ ເປີດ “Pair device with pairing code”.</string>
+    <string name="background_step3">3. ມັນອ່ານລະຫັດ, ຈັບຄູ່, ແລ້ວພາທ່ານກັບມານີ້. ຖ້າມັນຢຸດຢູ່ບ່ອນໃດ, ເຮັດຂັ້ນຕອນນັ້ນເອງ ແລ້ວ Buddy ຈະເຮັດຕໍ່.</string>
+    <!-- Button: starts the set-up. -->
+    <string name="background_setup">ຕັ້ງຄ່າ</string>
+    <!-- Button while the set-up waits: opens Android's Developer options again. -->
+    <string name="background_open_options">ເປີດ ຕົວເລືອກນັກພັດທະນາ</string>
+    <!-- Progress lines of the set-up. adb is a program's name. -->
+    <string name="background_installing">ກຳລັງເອົາ adb ສຳລັບ Linux ຂອງ Buddy…</string>
+    <string name="background_waiting">ລໍຖ້າ “Pair device with pairing code” ໃນ Wireless debugging…</string>
+    <string name="background_pairing">ກຳລັງຈັບຄູ່…</string>
+    <string name="background_starting">ກຳລັງເລີ່ມຕົວຊ່ວຍ…</string>
+    <!-- State: set up and its helper is running. -->
+    <string name="background_ready">ພ້ອມ</string>
+    <string name="background_ready_info">ເປີດມັນຕໍ່ການສົນທະນາ: ຕົວເລືອກການສົນທະນາ → ເຮັດວຽກຢູ່ເບື້ອງຫຼັງ.</string>
+    <!-- State: set up, but the helper isn't running (after a restart of the phone). -->
+    <string name="background_paired">ຈັບຄູ່ແລ້ວ</string>
+    <string name="background_asleep">ຕົວຊ່ວຍຂອງມັນບໍ່ໄດ້ແລ່ນ. ມັນຈະເລີ່ມກັບວຽກເບື້ອງຫຼັງທຳອິດ, ຫຼື ດຽວນີ້. ຫຼັງຈາກຣີສະຕາດໂທລະສັບ, ແຕະ ເລີ່ມດຽວນີ້: Buddy ຈະເປີດ Wireless debugging ໃຫ້ມັນ (ຕ້ອງເຊື່ອມຕໍ່ Wi-Fi).</string>
+    <!-- Button: starts the helper. -->
+    <string name="background_start_now">ເລີ່ມດຽວນີ້</string>
+    <!-- %1$s = what went wrong (may be in English). -->
+    <string name="background_failed">ມັນບໍ່ໄດ້ຜົນ: %1$s</string>
+    <string name="background_needs_linux">ໂໝດເບື້ອງຫຼັງຕ້ອງການ Linux ຂອງ Buddy. ຕິດຕັ້ງຕົວແທນກ່ອນ.</string>
+    <!-- "Developer options", "About device" and "Build number" are Android's own names: use the ones this language's Android shows. -->
+    <string name="background_needs_dev">ເປີດ ຕົວເລືອກນັກພັດທະນາ ກ່ອນ: ການຕັ້ງຄ່າ → ກ່ຽວກັບອຸປະກອນ → ແຕະ ໝາຍເລກລຸ້ນ 7 ຄັ້ງ.</string>
+    <string name="background_needs_service">ເປີດບໍລິການເຂົ້າເຖິງຂອງ Buddy ກ່ອນ.</string>
+    <string name="background_no_dialog">Buddy ບໍ່ເຫັນກ່ອງຈັບຄູ່ທັນເວລາ. ລອງອີກຄັ້ງ.</string>
+    <!-- Button, and the title of its confirmation: undoes the set-up. -->
+    <string name="background_remove">ລຶບອອກ</string>
+    <string name="background_remove_text">Buddy ຈະລືມການຈັບຄູ່ ແລະ ຢຸດຕົວຊ່ວຍ. ການສົນທະນາຈະກັບມາໃຊ້ໜ້າຈໍຈິງ.</string>
+    <!-- Switch on the Background mode screen. -->
+    <string name="background_default">ການສົນທະນາໃໝ່ເຮັດວຽກຢູ່ເບື້ອງຫຼັງ</string>
+    <string name="background_default_info">ແຕ່ລະການສົນທະນາຍັງມີສະວິດຂອງຕົນໃນ ຕົວເລືອກການສົນທະນາ.</string>
+    <string name="chat_bg_connected">ເຊື່ອມຕໍ່ແລ້ວ</string>
+    <string name="chat_bg_disconnected">ຍັງບໍ່ໄດ້ເຊື່ອມຕໍ່</string>
+    <string name="chat_bg_not_set_up">ຍັງບໍ່ໄດ້ຕັ້ງຄ່າ</string>
+    <string name="chat_bg_checking">ກຳລັງກວດສອບ…</string>
+    <string name="chat_bg_pair_again">ຈັບຄູ່ອີກຄັ້ງ</string>
+    <string name="chat_bg_more">ການຕັ້ງຄ່າເພີ່ມເຕີມ</string>
+    <string name="chat_bg_connected_info">ຕົວແທນໃນການສົນທະນາເບື້ອງຫຼັງສາມາດເຮັດວຽກເທິງໜ້າຈໍຂອງຕົນເອງໄດ້.</string>
+    <string name="chat_bg_setup_info">ໃຫ້ຕົວແທນເຮັດວຽກໃນແອັບຂອງທ່ານເທິງໜ້າຈໍຂອງຕົນເອງ ໃນຂະນະທີ່ທ່ານໃຊ້ໂທລະສັບ. ການຕັ້ງຄ່າໃຊ້ເວລາປະມານໜຶ່ງນາທີ ແລະ ຕ້ອງການ Wi-Fi.</string>
+    <string name="hub_tool_delegate">ກຳລັງເລີ່ມຕົວແທນຍ່ອຍ: %1$s</string>
+    <string name="hub_tool_helpers">ກຳລັງລໍຖ້າຕົວແທນຍ່ອຍ</string>
+    <string name="helpers_title">ຕົວແທນຍ່ອຍ</string>
+    <string name="helper_working">ກຳລັງເຮັດວຽກ</string>
+    <string name="helper_done">ສຳເລັດ</string>
+    <string name="helper_failed">ລົ້ມເຫຼວ</string>
+    <string name="helper_stopped">ຢຸດ</string>
+    <string name="helper_of">ຕົວແທນຍ່ອຍຂອງ “%1$s”</string>
+    <string name="helper_this_chat">ການສົນທະນານີ້</string>
+    <!-- "USB debugging" is Android's name of that developer option: use the name this language's Android shows. -->
+    <string name="background_usb_note">Buddy ຍັງເປີດ USB debugging. ດ້ວຍມັນ, ຕົວຊ່ວຍຈະສືບຕໍ່ແລ່ນເມື່ອ Wi-Fi ຂາດ ແລະ Android ປິດ Wireless debugging. ໃຫ້ເປີດໄວ້.</string>
+    <string name="background_security">Wireless debugging ໃຫ້ອຸປະກອນທີ່ຈັບຄູ່ຄວບຄຸມໂທລະສັບນີ້ໄດ້. Buddy ຈັບຄູ່ພຽງຕົວມັນເອງ, ເທິງໂທລະສັບນີ້, ແລະ ຕົວຊ່ວຍຂອງມັນຟັງພຽງຢູ່ນີ້.</string>
+    <!-- The other way of setting up: a computer with USB debugging. adb is a program's name. -->
+    <string name="background_pc_setup">ຕັ້ງຄ່າຈາກຄອມພິວເຕີ</string>
+    <string name="background_pc_intro">ຄອມພິວເຕີກໍຕັ້ງຄ່າໄດ້ ໃນກໍລະນີທີ່ dialog ຈັບຄູ່ເຮັດບໍ່ໄດ້: ຕໍ່ໂທລະສັບນີ້ດ້ວຍ USB, ອະນຸຍາດ USB debugging, ແລ້ວແລ່ນສອງຄຳສັ່ງເທິງຄອມພິວເຕີ (adb, ບັນທັດລະອັບ). ວິທີນີ້ໃຊ້ໄດ້ຈົນກວ່າໂທລະສັບ restart: ຫຼັງຈາກນັ້ນແລ່ນຄຳສັ່ງທີສອງຄືນ ຫຼື ຈັບຄູ່ກັບ Wireless debugging ຕາມປົກກະຕິ.</string>
+    <string name="background_pc_step1">1. ຄັ້ງດຽວ: ໃຫ້ Buddy ເປີດ Wireless debugging ເອງໄດ້.</string>
+    <string name="background_pc_step2">2. ເລີ່ມຕົວຊ່ວຍ. ແລ່ນຄືນຫຼັງທຸກຄັ້ງໂທລະສັບ restart.</string>
+    <string name="background_pc_copy">ກອບທັງສອງຄຳສັ່ງ</string>
+    <string name="background_pc_copied">ກອບແລ້ວ</string>
+    <string name="background_pc_waiting">ລໍຖ້າຕົວຊ່ວຍຕອບ…</string>
+    <string name="background_pc_timeout">ຕົວຊ່ວຍບໍ່ຕອບ. ຄອມພິວເຕີຕໍ່ຢູ່ບໍ່, USB debugging ອະນຸຍາດແລ້ວບໍ່, ແລະ ຄອມພິວເຕີມີ adb ແລ້ວບໍ່?</string>
+    <!-- The Quick Settings tile that pauses Buddy (its accessibility service off) so guarded apps like banks open. -->
+    <string name="pause_tile_label">ໂໝດທະນາຄານ</string>
+    <string name="pause_tile_running">ການຄວບຄຸມເປີດ — ແຕະກ່ອນໃຊ້ທະນາຄານ</string>
+    <string name="pause_tile_paused">ພ້ອມໃຊ້ທະນາຄານ — ແຕະເພື່ອເປີດການຄວບຄຸມຄືນ</string>
+    <!-- Under the Bank mode switch in Settings. Accessibility services are Android's; Link to Windows is an app's name. -->
+    <string name="pause_mode_info">ປິດ accessibility service ທັງໝົດ (ຂອງ Buddy ແລະ ຂອງແອັບອື່ນ ເຊັ່ນ Link to Windows) ເພື່ອໃຫ້ແອັບທະນາຄານເປີດໄດ້, ແລ້ວເປີດຄືນໃຫ້ພາຍຫຼັງ. ເພີ່ມ tile ໂໝດທະນາຄານ ໃນ Quick Settings ເພື່ອແຕະດຽວ.</string>
+    <!-- The switch under Bank mode: it happens by itself when a banking app opens. "Usage access" is Android's name. -->
+    <string name="bank_auto">ອັດຕະໂນມັດ</string>
+    <string name="bank_auto_info">ພັກເອງຕອນເປີດແອັບທະນາຄານ ແລະ ເປີດການຄວບຄຸມຄືນເມື່ອອອກ. ຕ້ອງມີສິດ Usage access.</string>
+    <string name="bank_usage_missing">ໃຫ້ສິດ Usage access ແກ່ Buddy ເພື່ອໃຫ້ຮູ້ວ່າແອັບໃດເປີດຢູ່.</string>
+    <!-- The quiet notification while the automatic watch runs. -->
+    <string name="bank_channel">ໂໝດທະນາຄານ</string>
+    <string name="bank_watch_title">ໂໝດທະນາຄານເປີດຢູ່</string>
+    <string name="bank_watch_text">ການຄວບຄຸມໜ້າຈໍປິດ ຕອນເປີດແອັບທະນາຄານ</string>
+    <!-- Note in the chat when a step needs the user and the app moves from the background screen to the real one. -->
+    <string name="background_brought">ຍ້າຍມາໜ້າຈໍຂອງທ່ານແລ້ວ: ຂັ້ນຕອນນີ້ຕ້ອງການທ່ານ. ໂໝດເບື້ອງຫຼັງຖືກປິດສຳລັບການສົນທະນານີ້ແລ້ວ.</string>
+    <!-- Section title on the Background mode screen: commands the agent runs on the phone itself. Keep short. -->
+    <string name="background_shell">ຄຳສັ່ງໂທລະສັບ</string>
+    <!-- Switch under it. "Linux tools" is the name of Buddy's chat option (chat_linux_tools). -->
+    <string name="background_shell_switch">ຕົວແທນອາດແລ່ນຄຳສັ່ງເທິງໂທລະສັບ</string>
+    <!-- "adb shell" is a program's name. -->
+    <string name="background_shell_info">ໃນການສົນທະນາທີ່ມີເຄື່ອງມື Linux, ຕົວແທນສາມາດແລ່ນຄຳສັ່ງເທິງໂທລະສັບເອງ, ຄືກັບ “adb shell”: ຕິດຕັ້ງ ແລະ ເປີດແອັບ, ປ່ຽນການຕັ້ງຄ່າ, ອ່ານ log ແລະ ໄຟລ໌. ຂໍ້ຄວາມ ຫຼື ໜ້າເວັບທີ່ມັນອ່ານ ອາດຫຼອກມັນໃຫ້ແລ່ນຄຳສັ່ງໜຶ່ງ.</string>
+    <!-- Second switch, shown while the first is on. -->
+    <string name="background_shell_ask">ຖາມກ່ອນທຸກຄຳສັ່ງ</string>
+    <string name="background_shell_ask_info">ບັດອະນຸຍາດຈະສະແດງຄຳສັ່ງກ່ອນ. ຖ້າບໍ່ມີມັນ, ບໍ່ມີຫຍັງກັ້ນລະຫວ່າງຕົວແທນທີ່ຖືກຫຼອກ ກັບໂທລະສັບຂອງທ່ານ: ຄຳສັ່ງສາມາດແຕະບັດອະນຸຍາດໄດ້ອີກ.</string>
+    <!-- Approval card for a phone command; %1$s = the command line. -->
+    <string name="tools_card_shell">ແລ່ນເທິງໂທລະສັບ:\n%1$s</string>
+    <!-- In the bubble while a phone command runs. Keep short. -->
+    <string name="activity_shell">ກຳລັງແລ່ນຄຳສັ່ງໂທລະສັບ</string>
+    <!-- A step in the chat; %1$s = the command line, shortened. -->
+    <string name="hub_tool_phone_shell">ຄຳສັ່ງໂທລະສັບ: %1$s</string>
+    <!-- Switch in Chat options. "it" = the chat's agent. -->
+    <string name="chat_background">ເຮັດວຽກຢູ່ເບື້ອງຫຼັງ</string>
+    <string name="chat_background_info">ຕົວແທນໃຊ້ໜ້າຈໍຂອງຕົນເອງ ແລະ ທ່ານຍັງໃຊ້ໂທລະສັບຂອງທ່ານ. ຂັ້ນຕອນທີ່ຕ້ອງການທ່ານ, ເຊັ່ນ ການເຂົ້າສູ່ລະບົບ, ຈະມາຍັງໜ້າຈໍຂອງທ່ານ.</string>
+    <!-- Read by TalkBack: the small live picture of the background screen in a chat. -->
+    <string name="background_preview">ໜ້າຈໍເບື້ອງຫຼັງ</string>
+    <!-- Button under that picture: the app moves to the real screen and the chat goes on there. -->
+    <string name="background_show">ສະແດງເທິງໜ້າຈໍຂອງຂ້ອຍ</string>
+    <!-- At the top of a long chat: a tap shows the messages before the ones on screen. -->
+    <string name="chat_earlier">ສະແດງຂໍ້ຄວາມກ່ອນໜ້າ</string>
+    <!-- At the top of a chat whose start an older Buddy dropped: a tap fetches it from the agent's own record of the conversation. Then, when there was nothing to fetch. -->
+    <string name="chat_earlier_load">ໂຫຼດຂໍ້ຄວາມກ່ອນໜ້າ</string>
+    <string name="chat_earlier_none">ບໍ່ພົບຂໍ້ຄວາມກ່ອນໜ້າ.</string>
+    <string name="chat_earlier_gone">ຂໍ້ຄວາມກ່ອນໜ້າບໍ່ຖືກເກັບອີກ: ການສົນທະນາເກັບພຽງ %1$d ຂໍ້ຫຼ້າສຸດ.</string>
+    <!-- Button in a notification rule's chat: the agent looks at that conversation again now, for messages that came without a notification. Keep short. -->
+    <string name="rules_recheck">ກວດອີກຄັ້ງ</string>
+    <string name="setup_help">ຊ່ວຍ</string>
+    <string name="setup_help_info">ຄູ່ມືຜູ້ໃຊ້ຂອງ Buddy, ເທິງ GitHub. ທ່ານຍັງຖາມຕົວແທນໃດກໍ່ໄດ້ວ່າ Buddy ເຮັດວຽກແນວໃດ.</string>
+    <string name="signin_api_key">ໃຊ້ API key ແທນ</string>
+    <string name="signin_api_base_bad">ໃສ່ທີ່ຢູ່ທີ່ເລີ່ມດ້ວຍ https:// (ຫຼື http:// ເທິງໂທລະສັບນີ້ ຫຼື ເຄືອຂ່າຍຂອງທ່ານເອງ)</string>
+    <string name="account_plan_api_key_at">API key · %1$s</string>
+    <string name="models_via">%1$s ຜ່ານ %2$s</string>
+    <string name="signin_api_keys">API key</string>
+    <string name="api_keys_title">API key</string>
+    <string name="api_keys_row_none">ໂມເດລຂອງບໍລິການອື່ນ, ດ້ວຍ key ຂອງທ່ານ</string>
+    <string name="api_keys_intro">ໃຊ້ໂມເດລຂອງບໍລິການອື່ນກັບ Claude Code, Codex ແລະ OpenCode, ຄຽງຂ້າງແຜນຂອງທ່ານ ຫຼື ແທນມັນ. ແຕ່ລະການສົນທະນາເລືອກໂມເດລໃນແຜ່ນໂມເດລຂອງມັນ. ການໃຊ້ດ້ວຍ key ຈະຖືກຄິດເງິນໃສ່ບັນຊີຂອງ key ນັ້ນ. Key ຖືກເກັບແບບເຂົ້າລະຫັດໃນໂທລະສັບນີ້ ແລະ ບໍ່ເຄີຍໄປຮອດຕົວແທນ: Buddy ເພີ່ມພວກມັນໃສ່ແຕ່ລະຄຳຂໍ.</string>
+    <string name="api_keys_none">ຍັງບໍ່ມີ API key.</string>
+    <string name="api_keys_add">ເພີ່ມ API key</string>
+    <string name="api_keys_models">%1$s · %2$d ໂມເດລ</string>
+    <string name="api_keys_for">ສຳລັບ %1$s</string>
+    <string name="api_keys_use">ໃຊ້ບໍລິການນີ້</string>
+    <string name="api_keys_use_info">ປິດ: key ຍັງຖືກເກັບໄວ້, ແຕ່ບໍ່ມີການສົນທະນາ ຫຼື ຕົວແທນໃຊ້ມັນ.</string>
+    <string name="api_keys_off">ປິດ</string>
+    <string name="search_title">ຄົ້ນຫາການສົນທະນາ</string>
+    <string name="search_hint">ຄົ້ນຫາການສົນທະນາ</string>
+    <string name="search_clear">ລ້າງ</string>
+    <string name="search_info">ຊອກຫາການສົນທະນາຕາມຫົວຂໍ້ ແລະ ຕາມສິ່ງທີ່ເວົ້າໃນນັ້ນ, ລວມທັງການສົນທະນາທີ່ເກັບໄວ້. ທຸກຢ່າງຖືກຄົ້ນຫາຢູ່ໃນໂທລະສັບຂອງທ່ານ.</string>
+    <string name="search_none">ບໍ່ມີການສົນທະນາໃດມີ “%1$s”.</string>
+    <string name="search_archived">ເກັບໄວ້</string>
+    <string name="search_found">ພົບການສົນທະນາ: %1$d</string>
+    <string name="search_messages">ຂໍ້ຄວາມ: %1$d</string>
+    <string name="mcp_title">ເຊີບເວີ MCP</string>
+    <string name="mcp_row_none">ເຄື່ອງມືຈາກເຊີບເວີຂອງທ່ານເອງ</string>
+    <string name="mcp_intro">ເຊື່ອມຕໍ່ເຊີບເວີ MCP ຂອງທ່ານເອງ, ແລ້ວທຸກຕົວແທນຈະໄດ້ເຄື່ອງມືຂອງພວກມັນຄຽງກັບເຄື່ອງມືໂທລະສັບ. ເຊີບເວີຖືກເຂົ້າເຖິງດ້ວຍທີ່ຢູ່ຂອງມັນ, ຜ່ານອິນເຕີເນັດ ຫຼື ເຄືອຂ່າຍຂອງທ່ານເອງ. Key ຖືກເກັບແບບເຂົ້າລະຫັດໃນໂທລະສັບນີ້ ແລະ ບໍ່ເຄີຍໄປຮອດຕົວແທນ: Buddy ເພີ່ມພວກມັນໃສ່ແຕ່ລະການເອີ້ນ.</string>
+    <string name="mcp_none">ຍັງບໍ່ມີເຊີບເວີ.</string>
+    <string name="mcp_add">ເພີ່ມເຊີບເວີ</string>
+    <string name="mcp_import">ນຳເຂົ້າລາຍການ</string>
+    <string name="mcp_export">ສຳເນົາລາຍການ</string>
+    <string name="mcp_exported">ສຳເນົາແລ້ວ, ໂດຍບໍ່ມີ key.</string>
+    <string name="mcp_note">ເຄື່ອງມືເຫຼົ່ານີ້ແລ່ນຢູ່ນອກໂທລະສັບຂອງທ່ານ, ສະນັ້ນບັດອະນຸຍາດຂອງ Buddy ບໍ່ກວມພວກມັນ: ເພີ່ມພຽງເຊີບເວີທີ່ທ່ານໄວ້ໃຈ. ພວກມັນບໍ່ຖືກໃຊ້ເມື່ອກົດການແຈ້ງເຕືອນແລ່ນ.</string>
+    <string name="mcp_name_hint">ຊື່ (ຕົວອັກສອນ ແລະ ຕົວເລກ)</string>
+    <string name="mcp_url_hint">ທີ່ຢູ່ (https://…/mcp)</string>
+    <string name="mcp_key_hint">Key ຫຼື token (ບໍ່ບັງຄັບ)</string>
+    <string name="mcp_key_info">Key ຖືກສົ່ງເປັນ “Authorization: Bearer …”. ຖ້າເຊີບເວີຕ້ອງການ header ອື່ນ, ຂຽນອອກມາ: X-Api-Key: your-key</string>
+    <string name="mcp_use">ໃຊ້ເຊີບເວີນີ້</string>
+    <string name="mcp_use_info">ປິດ: ມັນຍັງຖືກເກັບໄວ້, ແຕ່ບໍ່ມີຕົວແທນໃດໄດ້ເຄື່ອງມືຂອງມັນ.</string>
+    <string name="mcp_save">ກວດ ແລະ ບັນທຶກ</string>
+    <string name="mcp_checking">ກຳລັງຖາມເຊີບເວີກ່ຽວກັບເຄື່ອງມືຂອງມັນ…</string>
+    <string name="mcp_saved">ບັນທຶກ %1$s ແລ້ວ · ເຄື່ອງມື: %2$d</string>
+    <string name="mcp_tools_count">ເຄື່ອງມື: %1$d</string>
+    <string name="mcp_remove_text">Key ຂອງມັນຖືກລຶບອອກຈາກໂທລະສັບນີ້.</string>
+    <string name="mcp_need_name">ໃຫ້ຊື່ມັນ.</string>
+    <string name="mcp_name_taken">ຊື່ນັ້ນຖືກໃຊ້ແລ້ວ.</string>
+    <string name="mcp_import_info">ວາງລາຍການຕາມທີ່ແອັບອື່ນເກັບໄວ້ (“mcpServers”). ເຊີບເວີທີ່ມີທີ່ຢູ່ຈະຖືກເພີ່ມ; ພວກທີ່ແລ່ນເປັນຄຳສັ່ງເທິງຄອມພິວເຕີຈະຖືກຂ້າມ.</string>
+    <string name="mcp_imported">ເພີ່ມແລ້ວ: %1$d · ຂ້າມ: %2$d</string>
+    <string name="api_keys_defaults">ໂມເດລເລີ່ມຕົ້ນ</string>
+    <string name="api_keys_defaults_info">ສິ່ງທີ່ການສົນທະນາໃຊ້ເມື່ອໂມເດລຂອງມັນເປັນ ຄ່າເລີ່ມຕົ້ນ. ຄ່າເລີ່ມຕົ້ນຂອງມັນເອງແລ່ນດ້ວຍແຜນຂອງຕົວແທນ.</string>
+    <string name="api_keys_own_default">ຄ່າເລີ່ມຕົ້ນຂອງມັນເອງ</string>
+    <string name="api_keys_name_hint">ຊື່</string>
+    <string name="api_keys_key_hint">API key</string>
+    <string name="api_keys_key_keep_hint">API key (ປະໄວ້ຫວ່າງເພື່ອຮັກສາໄວ້)</string>
+    <string name="api_keys_anthropic_hint">ທີ່ຢູ່ແບບ Anthropic</string>
+    <string name="api_keys_openai_hint">ທີ່ຢູ່ແບບ OpenAI</string>
+    <string name="api_keys_addresses_info">Claude Code ໃຊ້ທີ່ຢູ່ແບບ Anthropic. Codex ໃຊ້ແບບ OpenAI, ເມື່ອບໍລິການນັ້ນມີ Responses API ຂອງ OpenAI. OpenCode ໃຊ້ໄດ້ທັງສອງ. ປະທີ່ຢູ່ໄວ້ຫວ່າງຖ້າບໍລິການບໍ່ມີມັນ.</string>
+    <string name="api_keys_check">ກວດດຽວນີ້</string>
+    <string name="api_keys_check_info">ບໍ່ບັງຄັບ: ສົ່ງຄຳຂໍທົດສອບນ້ອຍໆ, ເຊິ່ງອາດໃຊ້ເຄຣດິດ API ພຽງເລັກນ້ອຍ.</string>
+    <string name="api_keys_check_ok">%1$s: ໃຊ້ໄດ້.</string>
+    <string name="api_keys_check_chat">%1$s: ໃຊ້ໄດ້ກັບ OpenCode, ແຕ່ບໍ່ມີ Responses API, ຈຶ່ງບໍ່ໄດ້ກັບ Codex.</string>
+    <string name="api_keys_check_none">%1$s: ບໍ່ມີຫຍັງຕອບຢູ່ທີ່ຢູ່ນີ້. %2$s</string>
+    <string name="api_keys_check_unsure">%1$s: ບໍ່ມີຄຳຕອບທີ່ຊັດເຈນ. %2$s</string>
+    <string name="api_keys_service">ບໍລິການ</string>
+    <string name="api_keys_custom">ກຳນົດເອງ</string>
+    <string name="setup_step_signin_key_mismatch">API key ຂອງທ່ານ (%2$s) ໃຊ້ກັບ %1$s ບໍ່ໄດ້. ພວກມັນໃຊ້ກັບ %3$s.</string>
+    <string name="setup_step_signin_free">ບໍ່ມີບັນຊີ? OpenCode ມີໂມເດລຟຣີ ແລະ ບໍ່ຕ້ອງເຂົ້າສູ່ລະບົບ.</string>
+    <string name="setup_use_agent">ໃຊ້ %1$s</string>
+    <string name="api_keys_save">ບັນທຶກ</string>
+    <string name="api_keys_saving">ກຳລັງກວດ key…</string>
+    <string name="api_keys_need_key">ໃສ່ API key.</string>
+    <string name="api_keys_need_address">ເພີ່ມຢ່າງໜ້ອຍໜຶ່ງທີ່ຢູ່.</string>
+    <string name="api_keys_failed">ບໍ່ສາມາດລາຍຊື່ໂມເດລຂອງບໍລິການນີ້ດ້ວຍ key ນີ້: %1$s</string>
+    <string name="api_keys_remove">ລຶບອອກ</string>
+    <string name="api_keys_remove_title">ລຶບ %1$s ບໍ?</string>
+    <string name="api_keys_remove_text">Key ຂອງມັນຖືກລຶບອອກຈາກໂທລະສັບນີ້. ການສົນທະນາທີ່ໃຊ້ໂມເດລຂອງມັນຈະກັບໄປເປັນ ຄ່າເລີ່ມຕົ້ນ.</string>
+    <string name="api_keys_choose">ໂມເດລໃນຕົວເລືອກ: %1$d ຈາກ %2$d</string>
+    <string name="api_keys_choose_title">ໂມເດລ %1$s</string>
+    <string name="api_keys_choose_info">ເລືອກອັນທີ່ການສົນທະນາຈະສະເໜີ. ຖ້າບໍ່ເລືອກອັນໃດ, ຈະສະເໜີທັງໝົດ.</string>
+    <string name="api_keys_choose_search">ຄົ້ນຫາ</string>
+    <string name="skills_title">ສະກິລ</string>
+    <string name="skills_row_none">ຄຳແນະນຳທີ່ຕົວແທນໃຊ້ຮ່ວມກັນ</string>
+    <string name="skills_intro">ສະກິລແມ່ນຄຳແນະນຳທີ່ຕົວແທນເຮັດຕາມສຳລັບວຽກປະເພດໜຶ່ງ: ສະໄຕການຂຽນ, ລາຍການກວດ, ຂັ້ນຕອນໃນແອັບ. Claude Code, Codex ແລະ OpenCode ໃຊ້ມັນເມື່ອວຽກນັ້ນເໝາະ, ຫຼື ເມື່ອທ່ານພິມ / ໃນຊ່ອງຂໍ້ຄວາມແລ້ວເລືອກມັນ. ພວກມັນໃຊ້ຮູບແບບ SKILL.md, ສະນັ້ນສະກິລຈາກ Claude ຫຼື ChatGPT ກໍ່ໃຊ້ໄດ້ຢູ່ນີ້.</string>
+    <string name="skills_need_linux">ສະກິລຢູ່ໃນ Linux ຂອງ Buddy: ຕັ້ງຄ່າຕົວແທນກ່ອນ.</string>
+    <string name="skills_none">ຍັງບໍ່ມີສະກິລ.</string>
+    <string name="skills_import">ນຳເຂົ້າ</string>
+    <string name="skills_write">ຂຽນໜຶ່ງອັນ</string>
+    <string name="skills_how">ການນຳເຂົ້າຮັບໄຟລ໌ .zip ຫຼື .skill (ຕາມທີ່ Claude ສົ່ງອອກສະກິລ) ຫຼື SKILL.md. ໃນການສົນທະນາທີ່ມີເຄື່ອງມື Linux, ທ່ານຍັງຂໍໃຫ້ຕົວແທນຂຽນສະກິລໄດ້.</string>
+    <string name="skills_delete">ລຶບ</string>
+    <string name="skills_delete_title">ລຶບ /%1$s ບໍ?</string>
+    <string name="skills_delete_text">ຕົວແທນຈະບໍ່ມີມັນອີກ.</string>
+    <string name="skills_write_info">ຄຳອະທິບາຍບອກວ່າຈະໃຊ້ເມື່ອໃດ: ຕົວແທນອ່ານມັນເພື່ອຕັດສິນ.</string>
+    <string name="skills_name_hint">ຊື່, ເຊັ່ນ weekly-report</string>
+    <string name="skills_desc_hint">ມັນເຮັດຫຍັງ ແລະ ໃຊ້ເມື່ອໃດ</string>
+    <string name="skills_instructions_hint">ຄຳແນະນຳ</string>
+    <string name="skills_need_all">ເພີ່ມຄຳອະທິບາຍ ແລະ ຄຳແນະນຳ.</string>
+    <string name="skills_added">ເພີ່ມ /%1$s ແລ້ວ.</string>
+    <string name="skills_need_name">ໃຫ້ຊື່ມັນ.</string>
+    <string name="skills_exists">ມີສະກິລຊື່ %1$s ຢູ່ແລ້ວ.</string>
+    <string name="skills_bad_file">ນັ້ນບໍ່ແມ່ນສະກິລ: ມັນຕ້ອງມີ SKILL.md ພ້ອມຊື່.</string>
+    <string name="skills_slash_none">ບໍ່ມີສະກິລຊື່ນັ້ນ. ແຕະເພື່ອເພີ່ມສະກິລ.</string>
+    <string name="github_row_none">ໃຫ້ຕົວແທນ push ໄປ repository ຂອງທ່ານ</string>
+    <string name="github_intro">ເຂົ້າສູ່ລະບົບ GitHub ສຳລັບເຄື່ອງມື Linux: Buddy ຕິດຕັ້ງ git ແລະ GitHub CLI ໃນ Linux ຂອງມັນ, ເຂົ້າສູ່ລະບົບພວກມັນດ້ວຍບັນຊີຂອງທ່ານ, ແລະ ຕັ້ງ git ດ້ວຍຊື່ ແລະ ອີເມວ noreply ສ່ວນຕົວຂອງທ່ານ.</string>
+    <string name="github_risk">ຕົວແທນໃນການສົນທະນາທີ່ມີເຄື່ອງມື Linux ຈະ clone, commit ແລະ push ດ້ວຍບັນຊີຂອງທ່ານໄດ້, ແລະ ເປີດ issue ແລະ pull request. ພວກມັນຖືກບອກໃຫ້ຖາມທ່ານກ່ອນທຸກຢ່າງທີ່ຈະ push ຫຼື ໂພສ.</string>
+    <string name="github_sign_in">ເຂົ້າສູ່ລະບົບດ້ວຍ GitHub</string>
+    <string name="github_installing">ກຳລັງຕິດຕັ້ງ git ແລະ GitHub CLI…</string>
+    <string name="github_finishing">ກຳລັງຕັ້ງຄ່າ git…</string>
+    <string name="github_enter_code">ໃສ່ລະຫັດນີ້ເທິງ GitHub ແລະ ອະນຸຍາດ. ມັນຖືກສຳເນົາແລ້ວ, ສະນັ້ນທ່ານວາງໄດ້.</string>
+    <string name="github_open">ເປີດ GitHub</string>
+    <string name="github_code_copied">ສຳເນົາລະຫັດແລ້ວ</string>
+    <string name="github_failed">ເຂົ້າສູ່ລະບົບບໍ່ໄດ້: %1$s</string>
+    <string name="github_signed_in">ເຂົ້າສູ່ລະບົບເປັນ @%1$s</string>
+    <string name="github_signed_in_info">ຕົວແທນໃນການສົນທະນາທີ່ມີເຄື່ອງມື Linux ສາມາດໃຊ້ git ແລະ gh ດ້ວຍບັນຊີນີ້.</string>
+    <string name="github_sign_out_title">ອອກຈາກລະບົບ GitHub ບໍ?</string>
+    <string name="github_sign_out_text">git ແລະ GitHub CLI ໃນ Linux ຂອງ Buddy ຈະສູນເສຍການເຂົ້າເຖິງບັນຊີຂອງທ່ານ.</string>
+    <string name="backup_title">ສຳຮອງ ແລະ ຍ້າຍ</string>
+    <string name="backup_row">ການສົນທະນາ ແລະ ການຕັ້ງຄ່າຂອງທ່ານໃນໄຟລ໌ດຽວ</string>
+    <string name="backup_intro">ບັນທຶກການສົນທະນາ, ການຕັ້ງຄ່າ, ກົດ, ຮູບ, ສະກິລ, ໂຄງການຂອງຕົວແທນ ແລະ ສິ່ງທີ່ພວກມັນເກັບຂອງແຕ່ລະການສົນທະນາ ໃສ່ໄຟລ໌ດຽວໃນ Downloads/Buddy. ກູ້ຄືນຢູ່ນີ້ ຫຼື ໃນໂທລະສັບອື່ນ.</string>
+    <string name="backup_left_out">ການເຂົ້າສູ່ລະບົບ ແລະ API key ບໍ່ໄດ້ຢູ່ໃນນັ້ນ: ເຂົ້າສູ່ລະບົບອີກຄັ້ງ ແລະ ເພີ່ມ key ຂອງທ່ານຫຼັງກູ້ຄືນ. ໂຄງການບໍ່ລວມໂຟນເດີສ້າງຂອງພວກມັນ.</string>
+    <string name="backup_now">ສຳຮອງດຽວນີ້</string>
+    <string name="backup_restore">ກູ້ຄືນຈາກການສຳຮອງ</string>
+    <string name="backup_restore_title">ກູ້ຄືນການສຳຮອງນີ້ບໍ?</string>
+    <string name="backup_restore_text">ການສົນທະນາ ແລະ ການຕັ້ງຄ່າຂອງທ່ານໃນໂທລະສັບນີ້ຈະຖືກແທນດ້ວຍຂອງການສຳຮອງ. Buddy ຈະເລີ່ມໃໝ່ເມື່ອແລ້ວ.</string>
+    <string name="backup_making">ກຳລັງສຳຮອງ… (ໂຄງການອາດໃຊ້ເວລາ)</string>
+    <string name="backup_restoring">ກຳລັງກູ້ຄືນ…</string>
+    <string name="backup_made">ບັນທຶກໄປ Downloads/Buddy/%1$s ແລ້ວ.</string>
+    <string name="backup_restored">ກູ້ຄືນແລ້ວ. Buddy ກຳລັງເລີ່ມໃໝ່.</string>
+    <string name="backup_restored_no_linux">ກູ້ຄືນການສົນທະນາ ແລະ ການຕັ້ງຄ່າແລ້ວ. ພາກ Linux ຂອງມັນ (ສະກິລ, ໂຄງການ, ບັນທຶກຂອງຕົວແທນ) ຕ້ອງການ Linux ຂອງ Buddy: ຕັ້ງຄ່າຕົວແທນ, ແລ້ວກູ້ຄືນອີກຄັ້ງ. Buddy ກຳລັງເລີ່ມໃໝ່.</string>
+    <string name="backup_failed">ບໍ່ສຳເລັດ: %1$s</string>
+    <string name="backup_not_one">ໄຟລ໌ນັ້ນບໍ່ແມ່ນການສຳຮອງຂອງ Buddy.</string>
+    <string name="chat_incognito">ບໍ່ບັນທຶກ</string>
+    <string name="chat_incognito_info">ການສົນທະນານີ້ຈະຖືກລຶບ, ພ້ອມສິ່ງທີ່ຕົວແທນຂອງມັນເກັບໄວ້, ເມື່ອ Buddy ເລີ່ມໃໝ່.</string>
+    <string name="models_context">ບໍລິບົດ %1$s</string>
+    <string name="models_chip_context">ບໍລິບົດ %1$d%%</string>
+    <string name="models_caps_vision">ຮູບພາບ</string>
+    <string name="models_caps_tools">ເຄື່ອງມື</string>
+    <string name="models_caps_thinking">ການຄິດ</string>
+    <string name="chat_context">ບໍລິບົດ</string>
+    <string name="chat_context_used">ໃຊ້ແລ້ວ %1$s ຈາກ %2$s token (%3$d%%)</string>
+    <string name="chat_context_help">ເມື່ອເຕັມ, %1$s ຈະສະຫຼຸບຂໍ້ຄວາມເກົ່າເອງເພື່ອເຮັດບ່ອນຫວ່າງ.</string>
+    <string name="chat_context_compact">ຫຍໍ້ດຽວນີ້</string>
+    <string name="hub_compacting">ກຳລັງຫຍໍ້ການສົນທະນາ…</string>
+    <string name="hub_compacted">ຫຍໍ້ການສົນທະນາແລ້ວ: %1$s → %2$s token</string>
+    <string name="signin_api_models_none">ບໍລິການບໍ່ໄດ້ລາຍຊື່ໂມເດລໃດ.</string>
+    <string name="setup_step_signin_api_key">ຫຼື ໃຊ້ API key: ການຕັ້ງຄ່າ → ຕົວແທນ ແລະ ໂມເດລ → API key.</string>
+    <string name="setup_step_signin_others">%1$s ເປັນສະໝອງເລີ່ມຕົ້ນຂອງທ່ານ, ແຕ່ພວກນີ້ພ້ອມແລ້ວ: %2$s. ຕັ້ງໜຶ່ງໃນນັ້ນເປັນຄ່າເລີ່ມຕົ້ນ ແລ້ວ Buddy ຈະເຮັດວຽກໄດ້ທັນທີ.</string>
+    <string name="setup_switch_default">ປ່ຽນຄ່າເລີ່ມຕົ້ນ</string>
+    <string name="setup_switch_default_title">ສະໝອງເລີ່ມຕົ້ນ</string>
+    <string name="signin_api_key_on">%1$s ແລ່ນດ້ວຍ API key ຂອງທ່ານ: ເລືອກໂມເດລໃນແຜ່ນໂມເດລຂອງການສົນທະນາ, ຫຼື ຄ່າເລີ່ມຕົ້ນຂອງມັນໃນ API key.</string>
+    <string name="signin_api_key_on_plan">ການສົນທະນາຍັງໃຊ້ໂມເດລຈາກ API key ຂອງທ່ານໄດ້ (ເລືອກໃນແຜ່ນໂມເດລຂອງການສົນທະນາ). ສຽງ ແລະ ຄຸນສົມບັດອື່ນຂອງແຜນໃຊ້ແຜນຂອງທ່ານ.</string>
+    <!-- F-Droid build only, after what Buddy downloads (its Linux, an agent, the browser): F-Droid requires saying these downloads skip its checks. -->
+    <string name="fdroid_download_note">ສິ່ງເຫຼົ່ານີ້ມາຈາກຜູ້ຜະລິດຂອງມັນ, ບໍ່ແມ່ນຈາກ F-Droid, ສະນັ້ນ F-Droid ບໍ່ໄດ້ກວດພວກມັນ.</string>
+    <!-- API keys form, when a local server preset (Ollama, LM Studio, llama.cpp) is picked. Keep the address example as is. -->
+    <string name="api_keys_local_info">ສຳລັບເຊີບເວີຂອງທ່ານເອງ (Ollama, LM Studio, llama.cpp): ປະ API key ໄວ້ຫວ່າງ. ເທິງຄອມພິວເຕີ, ໃສ່ທີ່ຢູ່ຂອງມັນໃນ Wi-Fi ແທນ localhost, ເຊັ່ນ http://192.168.1.20:11434/v1.</string>
+    <!-- Chat list: pinned and archived chats, and the long-press menu on a chat (rename, pin, archive, delete). -->
+    <string name="main_section_pinned">ປັກໝຸດໄວ້</string>
+    <string name="main_section_archived">ເກັບໄວ້ (%1$d)</string>
+    <string name="chat_pinned_marker">ປັກໝຸດໄວ້</string>
+    <string name="chat_menu_rename">ປ່ຽນຊື່</string>
+    <string name="chat_menu_pin">ປັກໝຸດໄວ້ເທິງສຸດ</string>
+    <string name="chat_menu_unpin">ຍົກເລີກປັກໝຸດ</string>
+    <string name="chat_menu_archive">ເກັບໄວ້</string>
+    <string name="chat_menu_unarchive">ເອົາອອກຈາກການເກັບ</string>
+    <string name="chat_archived">ເກັບໄວ້ແລ້ວ. ມັນຢູ່ລຸ່ມສຸດຂອງລາຍການ.</string>
+    <string name="chat_archived_scheduled">ເກັບໄວ້ແລ້ວ. ວຽກຕາມຕາຕະລາງຂອງມັນຍັງແລ່ນຢູ່.</string>
+    <string name="chat_rename_title">ປ່ຽນຊື່ການສົນທະນາ</string>
+    <string name="chat_rename_hint">ຫວ່າງ: ຂໍ້ຄວາມທຳອິດຂອງມັນ</string>
+    <string name="chat_rename_save">ບັນທຶກ</string>
+</resources>

@@ -39,10 +39,11 @@ final class Relay {
     }
 
     /**
-     * The service's models, straight from the app (the key is here): [{id, name, window, efforts}], window the context
-     * size in tokens (0 if not said), efforts the reasoning levels it lists. Services keep the list in different places
-     * (DeepSeek's Anthropic-style address has none, its main one has), so the usual ones are tried in turn. Throws with
-     * the service's own error when none answers.
+     * The service's models, straight from the app (the key is here): [{id, name, window, efforts, caps}], window the
+     * context size in tokens (0 if not said), efforts the reasoning levels it lists, caps what the service says the
+     * model takes ("vision", "tools", "thinking"; none listed when it doesn't say). Services keep the list in
+     * different places (DeepSeek's Anthropic-style address has none, its main one has), so the usual ones are tried in
+     * turn. Throws with the service's own error when none answers.
      */
     static org.json.JSONArray models(boolean anthropic, String key, String given) throws Exception {
         String b = trim(given);
@@ -70,6 +71,7 @@ final class Relay {
                 org.json.JSONArray list = parseModels(body);
                 if (list.length() > 0) {
                     runningContext(list, origin, anthropic, key, b);
+                    capabilities(list, origin, key, b);
                     return list;
                 }
             } catch (org.json.JSONException ignored) { // not a model list
@@ -111,6 +113,71 @@ final class Relay {
                 if (m.optLong("window") <= 0) m.put("window", window);
             }
         } catch (Exception ignored) { // not a llama.cpp server
+        } finally {
+            if (con != null) con.disconnect();
+        }
+    }
+
+    /**
+     * What each model takes, as a server on the user's own computer or network says (/api/show, which Ollama has):
+     * "capabilities": completion, tools, vision, thinking, embedding. Without it a text-only model is offered for
+     * screenshots and pictures like any other, and the agent only finds out from the server's error. Asked once per
+     * model per run (a local list comes back every few seconds), and the answer stays in the list as "caps"; a server
+     * that doesn't know /api/show (LM Studio, llama.cpp) leaves the list as it is. Only the local ones are asked, and
+     * only the first 40 models of a large library at a time.
+     */
+    private static void capabilities(org.json.JSONArray list, String origin, String key, String b) {
+        if (!Providers.isLocal(origin)) return;
+        int asked = 0;
+        boolean checked = false, says = false;
+        for (int i = 0; i < list.length(); i++) {
+            org.json.JSONObject m = list.optJSONObject(i);
+            if (m == null) continue;
+            String id = m.optString("id");
+            String k = origin + "|" + id;
+            org.json.JSONArray c = caps.get(k);
+            if (c == null) {
+                if (asked >= 40) continue;
+                c = show(origin, key, b, id);
+                if (!checked) { // the first answer says whether this server is one that tells (Ollama)
+                    checked = true;
+                    says = c != null;
+                    if (!says) return;
+                }
+                asked++;
+                if (c == null) continue; // it doesn't know this one model: the rest are still worth asking
+                caps.put(k, c);
+            }
+            try {
+                m.put("caps", c);
+            } catch (org.json.JSONException ignored) {
+            }
+        }
+    }
+
+    /** origin|model → what it takes, as /api/show said (this run; the lists carry it on). */
+    private static final java.util.Map<String, org.json.JSONArray> caps = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /** /api/show's "capabilities" for one model, or null when this server has no such endpoint or doesn't say. */
+    private static org.json.JSONArray show(String origin, String key, String b, String model) {
+        HttpURLConnection con = null;
+        try {
+            byte[] body = new org.json.JSONObject().put("model", model).toString().getBytes(StandardCharsets.UTF_8);
+            con = (HttpURLConnection) new URL(origin + "/api/show").openConnection();
+            con.setConnectTimeout(2_000);
+            con.setReadTimeout(5_000);
+            con.setRequestMethod("POST");
+            con.setInstanceFollowRedirects(false);
+            con.setDoOutput(true);
+            if (!key.isEmpty()) con.setRequestProperty("Authorization", "Bearer " + key);
+            con.setFixedLengthStreamingMode(body.length);
+            try (OutputStream o = con.getOutputStream()) {
+                o.write(body);
+            }
+            if (con.getResponseCode() != 200) return null;
+            return new org.json.JSONObject(read(con.getInputStream())).optJSONArray("capabilities");
+        } catch (Exception ignored) { // not an Ollama server, or it went away
+            return null;
         } finally {
             if (con != null) con.disconnect();
         }
