@@ -1,0 +1,5 @@
+• Models on this phone: Gemma 4 or Qwen3.5 run offline on the NPU, GPU or CPU
+• Lite mode for small models: a dozen phone tools, more when needed
+• Fixed: OpenCode got Buddy's instructions twice
+• Fixed: app installer opened on a hidden screen
+• Fixed: background chats paused when you touched the screen

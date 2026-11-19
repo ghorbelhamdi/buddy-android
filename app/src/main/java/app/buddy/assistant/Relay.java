@@ -254,6 +254,8 @@ final class Relay {
         String[] parts = rawPath.substring(PATH.length()).split("/", 3);
         Providers.P p = parts.length >= 2 ? Providers.find(parts[0]) : null;
         if (p == null || !"o".equals(parts[1])) return false;
+        // a model on this phone: which one the engine runs comes from the chat (or, for no chat, the request itself)
+        if (OnPhone.ID.equals(p.id)) return McpServer.CALLER_CHAT.get() == null;
         return parts.length == 3 && ("/" + parts[2]).startsWith("/responses") && !isOpenAi(p.openai);
     }
 
@@ -266,6 +268,20 @@ final class Relay {
     /** As above; with body null, the request's body (length bytes) is still to be read, and goes on as it comes. */
     static void handle(Context c, String method, String rawPath, Map<String, String> headers, byte[] body,
                        InputStream from, long length, OutputStream out) throws Exception {
+        String[] ps = rawPath.substring(PATH.length()).split("/", 3);
+        if (!OnPhone.ID.equals(ps[0])) {
+            handle0(c, method, rawPath, headers, body, from, length, out);
+            return;
+        }
+        try { // a model on this phone counts as answering from OnPhone.ensure until here: not stopped as idle meanwhile
+            handle0(c, method, rawPath, headers, body, from, length, out);
+        } finally {
+            OnPhone.endIfBegun();
+        }
+    }
+
+    private static void handle0(Context c, String method, String rawPath, Map<String, String> headers, byte[] body,
+                                InputStream from, long length, OutputStream out) throws Exception {
         String[] parts = rawPath.substring(PATH.length()).split("/", 3);
         Providers.P p = parts.length >= 2 ? Providers.find(parts[0]) : null;
         boolean anthropic = parts.length >= 2 && "a".equals(parts[1]);
@@ -283,6 +299,27 @@ final class Relay {
             return;
         }
         String rest = parts.length == 3 ? "/" + parts[2] : "";
+        if (OnPhone.ID.equals(p.id)) { // a model on this phone: Buddy runs it, started now if need be
+            String model = "";
+            String chat = McpServer.CALLER_CHAT.get();
+            Sessions.Session ses = chat == null ? null : ChatHub.get(c).sessions.find(chat);
+            String ref = ses == null ? "" : Models.effective(ses);
+            if (OnPhone.ID.equals(Providers.idOf(ref))) model = Providers.model(ref);
+            try {
+                if (model.isEmpty() && body != null && body.length > 0) {
+                    model = new org.json.JSONObject(new String(body, StandardCharsets.UTF_8)).optString("model");
+                }
+            } catch (Exception ignored) {
+            }
+            String err = model.isEmpty() // (the chat moved to another model meanwhile: the engine may be stopped)
+                    ? "This chat's model isn't one on this phone anymore. Send your message again."
+                    : OnPhone.ensure(c, model);
+            if (err != null) {
+                if (body == null) drain(from, length); // the caller reads the answer only once its request is through
+                error(out, 503, "api_error", err);
+                return;
+            }
+        }
         // Codex sends MCP tools grouped as "namespace" tools, which only OpenAI's own API knows; other services
         // drop them and the model never sees the phone tools. Those get them as plain tools, and calls back as Codex
         // wants them (flat name → namespace + name).

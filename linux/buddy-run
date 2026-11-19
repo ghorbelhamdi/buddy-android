@@ -300,7 +300,7 @@ case "$CMD" in
     exit 0 ;;
   ask) SID=${3:-}; BACKEND=${4:-claude}; DEV=${5:-0}; MSG=${6:-}; MODEL=${7:-}; FILES=${8:-}; EFFORT=${9:-}
     [[ "$EFFORT" =~ ^[a-z]{1,16}$ ]] || EFFORT="" # the agent's own level names, whatever they are
-    FRESH=${10:-} ;;
+    FRESH=${10:-}; LITE=0; [ "${11:-}" = lite ] && LITE=1 ;;
   *) echo "usage: buddy-run <token> ask|stop|reap|delete|prune|ping ..." >&2; exit 2 ;;
 esac
 
@@ -596,6 +596,12 @@ stream_codex() {
 # auto-update or sharing. Normal mode sets shell and edits to "ask", which a non-interactive run
 # auto-rejects ("deny" would drop those tools, and OpenCode's free models refuse a changed tool set).
 run_opencode() {
+  # Lite mode (Buddy's Lite, for small models): a short prompt, and the phone tools come a dozen at first (Buddy's
+  # server gives this chat those, more_tools loads others); OpenCode's own tools, its skills and the user's other
+  # MCP servers are left out. A small model reads its whole prompt again at every step.
+  if [ "${LITE:-0}" = 1 ]; then
+    { cat "$D/lite-prompt.md"; [ -n "$PERMS" ] && printf '\n%s\n' "$PERMS"; } > "$S/system.md"
+  else
   # OpenCode names MCP tools <server>_<tool>; small models otherwise call "read_screen" and give up
   printf '%s\n\n%s\n' "$SYSTEM" "In this app the phone tools are named with a phone_ prefix: phone_read_screen, phone_tap, \
 phone_long_press, phone_type_text, phone_scroll, phone_swipe, phone_press, phone_open_app, phone_list_apps, phone_open_url, \
@@ -604,27 +610,42 @@ $([ "$BROWSER" = 1 ] && printf '%s' ", and for the background browser phone_brow
 phone_browser_type, phone_browser_scroll, phone_browser_screenshot, phone_browser_back and phone_browser_tabs"). Always call them by \
 these exact names. Right at the start of a chat they can still be connecting: if one answers that there is no such \
 tool, it's not missing, call it again in your next step." > "$S/system.md"
+  fi
   local cfg v2=0
   oc2 && v2=1
-  # OpenCode 2 ignores instructions given through OPENCODE_CONFIG_CONTENT (the model never saw this prompt),
-  # but reads its global AGENTS.md, next to the work folder's own. Buddy owns that file (marked on line 1)
-  # and leaves one the user wrote alone.
+  # OpenCode 2 before 2.3 ignores instructions given through OPENCODE_CONFIG_CONTENT (the model never saw this
+  # prompt), but reads its global AGENTS.md, next to the work folder's own. Buddy owns that file (marked on line 1)
+  # and leaves one the user wrote alone. 2.3 reads both, so there Buddy's copy goes: the prompt came twice.
   if [ "$v2" = 1 ]; then
-    local g=$HOME/.config/opencode/AGENTS.md
+    local g=$HOME/.config/opencode/AGENTS.md ocv
+    ocv=$(jq -r '.version // ""' "$(dirname "$(dirname "$(readlink -f "$(command -v opencode)")")")/package.json" 2>/dev/null)
+    [ -n "$ocv" ] || ocv=$(opencode --version 2>/dev/null | grep -o '[0-9][0-9.]*' | head -1) # (a standalone binary)
     if [ ! -s "$g" ] || head -1 "$g" | grep -q '^<!-- buddy -->'; then
-      mkdir -p "${g%/*}" && { echo '<!-- buddy -->'; cat "$S/system.md"; } > "$g"
+      if [ -n "$ocv" ] && [ "$(printf '%s\n2.3.0\n' "$ocv" | sort -V | head -1)" = 2.3.0 ]; then
+        rm -f "$g"
+      else # (a version it can't tell is taken as an older one: the prompt twice beats none)
+        mkdir -p "${g%/*}" && { echo '<!-- buddy -->'; cat "$S/system.md"; } > "$g"
+      fi
     fi
   fi
   # OpenCode 2 only takes codemode under mcp.servers; without it the phone tools hide behind one "execute" tool
+  local x=$EXTRA
+  [ "${LITE:-0}" = 1 ] && x='[]'
   cfg=$(jq -cn --arg url "$URL/mcp?chat=$SID" --arg base "$URL/mcpx/" --arg auth "Bearer $TOKEN" --arg sys "$S/system.md" \
-    --arg dev "$DEV" --arg v2 "$v2" --argjson x "$EXTRA" '
+    --arg dev "$DEV" --arg v2 "$v2" --arg lite "${LITE:-0}" --arg att "${#ATT[@]}" --argjson x "$x" '
     {type:"remote", url:$url, headers:{Authorization:$auth}, oauth:false} as $phone
     | ({phone:$phone} + ($x | map({key:.name, value:($phone + {url:($base + .name)})}) | from_entries)) as $all
     | (if $v2 == "1" then {mcp:{servers:($all | map_values(. + {codemode:false, timeout:{execution:600000}}))}}
        else {mcp:($all | map_values(. + {timeout:600000}))} end)
     + {instructions:[$sys], autoupdate:false, share:"disabled"}
     + (if $dev == "1" then {} elif $dev == "rule" then {permission:{bash:"ask", edit:"ask", webfetch:"ask"}}
-       else {permission:{bash:"ask", edit:"ask"}} end)')
+       else {permission:{bash:"ask", edit:"ask"}} end)
+    # lite: none of the tools OpenCode has itself (with execute off, its Code Mode tools come as opencode_*)
+    + (if $lite == "1" then {tools:({"opencode_*":false} + ([
+        "shell","bash","read","write","edit","patch","glob","grep","list","question","skill","subagent","task",
+        "webfetch","websearch","todowrite","todoread","execute","experimental_image_generate"]
+        | map(select(. != "read" or $att == "0")) # (attachments are opened with read)
+        | map({key:., value:false}) | from_entries))} else {} end)')
   # an API key service: a provider of its own, pointed at the relay (OpenAI-style when it has that address)
   if [ -n "$SVC" ]; then
     cfg=$(jq -c --argjson c "$cfg" --arg url "$URL/llm/$SVC" --arg t "$TOKEN" --arg id "buddy-$SVC" '

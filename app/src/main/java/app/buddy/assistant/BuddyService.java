@@ -96,6 +96,8 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         new Thread(() -> { // API key services: the key saved per agent by earlier builds, then fresh model lists
             Providers.migrate(this);
             Providers.rewrite(this); // fields added by this build, before any run reads them
+            OnPhone.sync(this); // models on this phone as this build lists them (a context size changed)
+            OnPhone.killOrphans(); // an engine left by Buddy's earlier process holds GBs
             McpServers.rewrite(this);
             Providers.refresh(this);
         }, "providers").start();
@@ -498,7 +500,8 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
 
     @Override
     public JSONArray listTools() throws JSONException {
-        return tools.list();
+        Sessions.Session lite = Lite.caller(this); // a small model's chat: a dozen tools, more on request
+        return lite != null ? Lite.filter(tools.list(), lite) : tools.list();
     }
 
     @Override
@@ -683,7 +686,19 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             return;
         }
         if (getPackageName().equals(foregroundPkg()) || onlyRuleRuns()) return;
+        // every agent at work has a hidden screen of its own (background mode): the user's touches aren't in its way
+        if (!anyOnRealScreen()) return;
         autoPause(R.string.service_autopaused_touch);
+    }
+
+    /** Is an agent working on the user's real screen: a chat without background mode, or a session from outside? */
+    private boolean anyOnRealScreen() {
+        if (Background.outsideOnRealScreenWithin(10 * 60_000)) return true; // (one may think for minutes between taps)
+        for (Sessions.Session s : ChatHub.get(this).sessions.all) {
+            if (!s.running || Triggers.ruleRun(s.id)) continue;
+            if (!Background.on(this, s.id)) return true;
+        }
+        return false;
     }
 
     /** Agents waiting for the user to confirm an install (wait_for_install, update_buddy): touches are theirs. */

@@ -28,6 +28,8 @@ final class Helper {
             {"linux/system-prompt.md", "/root/.buddy/system-prompt.md", "600"},
             {"linux/GUIDE.md", "/root/.buddy/GUIDE.md", "644"}, // Buddy's user guide, for questions about Buddy itself
             {"linux/browser-prompt.md", "/root/.buddy/browser-prompt.md", "600"},
+            {"linux/lite-prompt.md", "/root/.buddy/lite-prompt.md", "600"}, // a lite chat's short prompt (see Lite)
+            {"linux/onphone-get", "/root/bin/onphone-get", "700"}, // fetches models on this phone (see OnPhone)
             {"linux/AGENTS.md", "/root/.buddy/work/AGENTS.md", "600"},
             {"linux/android-app/SKILL.md", "/root/.buddy/work/.claude/skills/android-app/SKILL.md", "600"},
             {"linux/android-app/build-apk.sh", "/root/.buddy/work/.claude/skills/android-app/build-apk.sh", "700"},

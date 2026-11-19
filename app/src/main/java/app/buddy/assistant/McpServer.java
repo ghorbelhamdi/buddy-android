@@ -299,7 +299,7 @@ final class McpServer {
                     return;
                 }
                 CALLER_GONE.set(() -> gone(s, in));
-                serveMcp(method, body, out);
+                serveMcp(method, body, out, headers.get("accept"));
                 return;
             }
             // Anthropic-style clients (OpenCode's) send the token they were given as x-api-key: the relay takes that too
@@ -364,7 +364,7 @@ final class McpServer {
                 }
                 send(out, 204, null, null);
             } else if ("/mcp".equals(path)) {
-                serveMcp(method, body, out);
+                serveMcp(method, body, out, headers.get("accept"));
             } else if (path.startsWith("/file/") && "GET".equals(method)) {
                 // an attachment, fetched by the helper before the agent runs
                 java.io.File f = handler.attachment(path.substring(6));
@@ -434,9 +434,12 @@ final class McpServer {
         try {
             switch (method) {
                 case "initialize": {
+                    // a lite chat's tools change when its agent loads more (see Lite): its client is told so
+                    JSONObject tools = new JSONObject();
+                    if (Lite.caller(BuddyApp.context()) != null) tools.put("listChanged", true);
                     JSONObject result = new JSONObject()
                             .put("protocolVersion", params.optString("protocolVersion", DEFAULT_PROTOCOL))
-                            .put("capabilities", new JSONObject().put("tools", new JSONObject()))
+                            .put("capabilities", new JSONObject().put("tools", tools))
                             .put("serverInfo", new JSONObject().put("name", "buddy-phone").put("version", BuildInfo.VERSION))
                             .put("instructions", INSTRUCTIONS);
                     return res.put("result", result);
@@ -444,6 +447,7 @@ final class McpServer {
                 case "ping":
                     return res.put("result", new JSONObject());
                 case "tools/list":
+                    if (Lite.caller(BuddyApp.context()) != null) Lite.listing(CALLER_CHAT.get()); // (lite chats only)
                     return res.put("result", new JSONObject().put("tools", handler.listTools()));
                 case "tools/call": {
                     String name = params.optString("name");
@@ -606,21 +610,37 @@ final class McpServer {
     }
 
     /** An MCP request: JSON-RPC over POST (one or a batch); no server-initiated stream. */
-    private void serveMcp(String method, byte[] body, OutputStream out) throws Exception {
+    private void serveMcp(String method, byte[] body, OutputStream out, String accept) throws Exception {
+        boolean changed;
         if ("POST".equals(method)) {
             String text = new String(body, StandardCharsets.UTF_8).trim();
             if (text.startsWith("[")) {
                 JSONArray batch = new JSONArray(text);
                 JSONArray replies = new JSONArray();
-                for (int i = 0; i < batch.length(); i++) {
-                    JSONObject r = rpc(batch.getJSONObject(i));
-                    if (r != null) replies.put(r);
+                Lite.CHANGED.remove();
+                try {
+                    for (int i = 0; i < batch.length(); i++) {
+                        JSONObject r = rpc(batch.getJSONObject(i));
+                        if (r != null) replies.put(r);
+                    }
+                } finally {
+                    changed = Boolean.TRUE.equals(Lite.CHANGED.get());
+                    Lite.CHANGED.remove();
                 }
                 if (replies.length() == 0) send(out, 202, null, null);
+                else if (changed && accept != null && accept.contains("text/event-stream")) toolsChanged(out, replies.toString());
                 else send(out, 200, "application/json", replies.toString());
             } else {
-                JSONObject r = rpc(new JSONObject(text));
+                Lite.CHANGED.remove();
+                JSONObject r;
+                try {
+                    r = rpc(new JSONObject(text));
+                } finally {
+                    changed = Boolean.TRUE.equals(Lite.CHANGED.get());
+                    Lite.CHANGED.remove();
+                }
                 if (r == null) send(out, 202, null, null);
+                else if (changed && accept != null && accept.contains("text/event-stream")) toolsChanged(out, r.toString());
                 else send(out, 200, "application/json", r.toString());
             }
         } else if ("DELETE".equals(method)) {
@@ -628,6 +648,27 @@ final class McpServer {
         } else {
             send(out, 405, null, null);
         }
+    }
+
+    /**
+     * A reply as a stream that first says the tool list changed (a lite chat loaded tools, see Lite). The client
+     * fetches the list again while it goes on, so the reply waits for that (up to 3 s): else the agent's very next
+     * step still had the old tools.
+     */
+    private static void toolsChanged(OutputStream out, String reply) throws Exception {
+        long asked = Lite.listed(CALLER_CHAT.get());
+        out.write(("HTTP/1.1 200 OK\r\nContent-Type: text/event-stream; charset=utf-8\r\n"
+                + "Cache-Control: no-cache\r\nConnection: close\r\n\r\nevent: message\ndata: "
+                + new JSONObject().put("jsonrpc", "2.0").put("method", "notifications/tools/list_changed")
+                + "\n\n").getBytes(StandardCharsets.UTF_8));
+        out.flush();
+        long by = android.os.SystemClock.elapsedRealtime() + 3000;
+        while (Lite.listed(CALLER_CHAT.get()) == asked && android.os.SystemClock.elapsedRealtime() < by) {
+            Thread.sleep(50);
+        }
+        Thread.sleep(300); // (for the client to take in the new list)
+        out.write(("event: message\ndata: " + reply + "\n\n").getBytes(StandardCharsets.UTF_8));
+        out.flush();
     }
 
     /** The bearer token matches, compared in constant time (how long it takes says nothing about the token). */

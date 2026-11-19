@@ -462,6 +462,7 @@ final class Tools {
             if (SCREEN.contains(name) && !Background.on(svc, McpServer.CALLER_CHAT.get()))
                 return text(Helpers.refuse("you have no phone screen, only the browser_* tools"));
         }
+        if (Lite.MORE.equals(name)) return text(Lite.more(svc, a)); // lite mode loads a group of tools
         // starting helpers or waiting for them isn't using the phone: no "Using your phone", no wait for a pause to end
         if ("delegate".equals(name)) return text(Helpers.delegate(svc, McpServer.CALLER_CHAT.get(), a));
         if ("subagents".equals(name)) return text(Helpers.status(svc, McpServer.CALLER_CHAT.get(), a));
@@ -2385,7 +2386,8 @@ final class Tools {
 
     /** Is an installer / Play Protect dialog what the user is looking at? */
     private boolean installerOnScreen() {
-        for (AccessibilityWindowInfo w : windows()) {
+        // on the user's real screen, where installers always open (Background.startOnUserScreen)
+        for (AccessibilityWindowInfo w : svc.getWindows()) {
             AccessibilityNodeInfo r = w.getRoot();
             if (r == null || r.getPackageName() == null) continue;
             String p = r.getPackageName().toString();
@@ -2455,12 +2457,12 @@ final class Tools {
             }
         }
         if (!svc.getPackageManager().canRequestPackageInstalls()) {
-            svc.startActivity(new Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+            Background.startOnUserScreen(svc, new Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
                     android.net.Uri.parse("package:" + svc.getPackageName())).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             return "Buddy isn't allowed to install apps yet. Android's settings page for that is open now: ask the user to "
                     + "turn on 'Allow from this source' for Buddy, wait until they say it's done, then call install_apk again.";
         }
-        svc.startActivity(new Intent(Intent.ACTION_VIEW)
+        Background.startOnUserScreen(svc, new Intent(Intent.ACTION_VIEW)
                 .setDataAndType(FilesProvider.apkUri(), "application/vnd.android.package-archive")
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION));
         return "The installer is open. The user must tap Install/Update and confirm (you can't). Call wait_for_install now.";

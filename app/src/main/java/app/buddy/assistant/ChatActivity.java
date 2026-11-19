@@ -1489,6 +1489,12 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             bg.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
             c.addView(bg, full());
         }
+        if ("opencode".equals(ses.backend)) { // lite mode, for small models (on by itself for a model on this phone)
+            LinearLayout lt = switchRow(this, getString(R.string.chat_lite), getString(R.string.chat_lite_info),
+                    Lite.on(ses), on -> hub.setLite(ses, on));
+            lt.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
+            c.addView(lt, full());
+        }
         LinearLayout inc = switchRow(this, getString(R.string.chat_incognito), getString(R.string.chat_incognito_info),
                 ses.incognito, on -> hub.setIncognito(ses, on));
         inc.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
