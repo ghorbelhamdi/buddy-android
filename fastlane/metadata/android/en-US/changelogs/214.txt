@@ -1,0 +1,2 @@
+• Models on this phone: MCP servers from your own OpenCode settings no longer fill the model's window (a large one made every request ~250k tokens)
+• Live voice: the voice's words in the bar are marked with 🔊 and clear when it's done, so they no longer look like something you said
