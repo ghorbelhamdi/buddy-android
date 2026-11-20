@@ -453,6 +453,11 @@ final class Tools {
         if (revoked != null && !"notify".equals(name)) return text(revoked);
         String stopped = stoppedNow();
         if (stopped != null) return text(stopped); // the user stopped this session in Buddy
+        // off in Settings (Tools and connections → Tools): the agent listed its tools before the user turned this one off
+        if (!ToolSwitch.onForCaller(svc, name) && !Lite.MORE.equals(name)) return text(ToolSwitch.refusal(name));
+        // find and collect scroll: not with scrolling off
+        if (("find".equals(name) || "collect".equals(name)) && !ToolSwitch.onForCaller(svc, "scroll"))
+            return text(ToolSwitch.refusal("scroll"));
         String capped = countStep(name, a);
         if (capped != null) return text(capped);
         if (Helpers.is(svc, McpServer.CALLER_CHAT.get())) { // a helper only looks things up, by itself (see Helpers)
@@ -1486,6 +1491,19 @@ final class Tools {
             JSONObject st = steps.getJSONObject(i);
             String action = st.optString("action");
             String tool = "type".equals(action) ? "type_text" : action;
+            // a step is that tool as much as a call of its own would be, and what it does on the way too: a "type" step
+            // with a target taps it first, a target found by its text reads the screen, "until" waits as wait_for does
+            boolean byText = !st.has("element") && !(st.has("x") && st.has("y"))
+                    && !st.optString("tap".equals(action) || "long_press".equals(action) ? "text" : "target").isEmpty();
+            String off = !ToolSwitch.onForCaller(svc, tool) ? tool
+                    : "type".equals(action) && !st.has("element") && (byText || (st.has("x") && st.has("y")))
+                    && !ToolSwitch.onForCaller(svc, "tap") ? "tap"
+                    : byText && !ToolSwitch.onForCaller(svc, "read_screen") ? "read_screen"
+                    : st.has("until") && !ToolSwitch.onForCaller(svc, "wait_for") ? "wait_for" : null;
+            if (off != null) {
+                out.append(i + 1).append(". ").append(ToolSwitch.refusal(off)).append('\n');
+                break;
+            }
             String before = frontPkg();
             String held = svc.awaitResume(tool);
             if (held == null) held = stoppedNow();

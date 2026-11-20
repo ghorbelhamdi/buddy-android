@@ -639,6 +639,21 @@ final class ChatHub {
         changed();
     }
 
+    /** Chat options → Tools: this chat's own on or off for a tool (null: as in Settings again). */
+    void setTool(Sessions.Session ses, String tool, Boolean on) {
+        if (on == null) ses.tools.remove(tool);
+        else ses.tools.put(tool, on);
+        sessions.save(ses);
+        changed();
+    }
+
+    /** Chat options → Tools → Same as Settings. */
+    void clearTools(Sessions.Session ses) {
+        ses.tools.clear();
+        sessions.save(ses);
+        changed();
+    }
+
     /** Lite mode (see Lite): the user's pick for this chat, from its next message on. */
     void setLite(Sessions.Session ses, boolean on) {
         ses.lite = on;
@@ -1489,6 +1504,8 @@ final class ChatHub {
             case "notifications": return BuddyApp.str(R.string.hub_tool_notifications);
             case "media": return BuddyApp.str(R.string.hub_tool_media);
             case "calendar_events": return BuddyApp.str(R.string.hub_tool_calendar_events);
+            case "call_log": return BuddyApp.str(R.string.hub_tool_call_log);
+            case "sms_list": return BuddyApp.str(R.string.hub_tool_sms_list);
             case "add_calendar_event": return BuddyApp.str(R.string.hub_tool_add_event, said(full, in.optString("title"), 40));
             case "wait_for": return BuddyApp.str(R.string.hub_tool_wait_for);
             case "do_steps": {

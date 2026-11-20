@@ -509,7 +509,7 @@ final class Bubble implements ChatHub.Listener {
         countdownRow.setOnClickListener(v -> stopCountdown());
         countdownRow.setVisibility(View.GONE);
         confirmCard.addView(countdownRow, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        LinearLayout row = new LinearLayout(svc);
+        LinearLayout row = new FitRow(svc, dp(8)); // (stacked when the buttons don't fit: issue #69)
         confirmRow = row;
         row.setGravity(Gravity.END);
         Button deny = actionButton(svc.getString(R.string.card_deny), Ui.ERR_SOFT);
@@ -526,20 +526,20 @@ final class Bubble implements ChatHub.Listener {
         approve.setOnClickListener(v -> answerConfirm(true));
         // a question's "Type my own answer…" shares the bottom row with Skip, so it takes no row of its own
         confirmOwn = optionButton(svc.getString(R.string.card_type_own_answer), true, v -> startChange());
-        LinearLayout.LayoutParams ownLp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+        LinearLayout.LayoutParams ownLp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 2);
         ownLp.setMarginEnd(dp(8));
         confirmOwn.setVisibility(View.GONE);
         row.addView(confirmOwn, ownLp);
-        row.addView(deny);
-        LinearLayout.LayoutParams changeLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        // the three share the card's width, as on the chat screen (right-aligned, they left a gap on the left)
+        row.addView(deny, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        LinearLayout.LayoutParams changeLp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
         changeLp.setMarginStart(dp(8));
         row.addView(change, changeLp);
-        LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
         alp.setMarginStart(dp(8));
         row.addView(approve, alp);
-        confirmCard.addView(row);
+        confirmCard.addView(row, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
         confirmCard.setVisibility(View.GONE);
         LinearLayout.LayoutParams clp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -3316,14 +3316,31 @@ final class Bubble implements ChatHub.Listener {
         faceRes = res;
         android.graphics.drawable.Drawable own = Face.bubble(svc);
         if (own == null) face.setImageResource(res);
-        else if (face.getDrawable() != own) face.setImageDrawable(own);
+        else if (face.getDrawable() != own) {
+            face.setImageDrawable(own);
+            // an animated picture (issue #68) plays as it comes on: once, or for good (Settings)
+            if (own instanceof android.graphics.drawable.AnimatedImageDrawable) {
+                ((android.graphics.drawable.AnimatedImageDrawable) own).start();
+            }
+        }
         android.view.ViewOutlineProvider outline = own != null ? null : BODY;
         if (face.getOutlineProvider() != outline) face.setOutlineProvider(outline);
+    }
+
+    /** An animated picture on the bubble plays again from its start: the phone was just unlocked (issue #68). */
+    void replayFace() {
+        if (face.getDrawable() instanceof android.graphics.drawable.AnimatedImageDrawable) {
+            android.graphics.drawable.AnimatedImageDrawable a =
+                    (android.graphics.drawable.AnimatedImageDrawable) face.getDrawable();
+            a.stop();
+            a.start();
+        }
     }
 
     /** Buddy's look changed in Settings: the new face now, and in the chat panel's replies. */
     void applyFace() {
         showFace(faceRes);
+        replayFace(); // (a new picture, or how it plays: from its start)
         if (!expanded && !showingList) renderCurrent();
     }
 

@@ -1495,6 +1495,34 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             lt.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
             c.addView(lt, full());
         }
+        // which phone tools this chat's agent gets (ToolsActivity); the rest follow Settings. A sub-agent goes by its
+        // chat's, so it has no row of its own
+        if (ses.parent.isEmpty()) {
+            int toolsOn = 0, tools = 0;
+            for (String[] g : ToolSwitch.GROUPS) {
+                for (int i = 1; i < g.length; i++) {
+                    tools++;
+                    if (ToolSwitch.on(this, g[i], ses)) toolsOn++;
+                }
+            }
+            LinearLayout tr = row(this);
+            tr.setGravity(Gravity.CENTER_VERTICAL);
+            tr.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
+            tr.setBackgroundResource(ripple(this, false));
+            LinearLayout tt = column(this);
+            tt.addView(title(this, getString(R.string.tools_title), 15));
+            TextView ts = text(this, getString(R.string.tools_row, toolsOn, tools)
+                    + (ses.tools.isEmpty() ? "" : " · " + getString(R.string.tools_chat_own)), 13, MUTED);
+            ts.setPaddingRelative(0, dp(this, 2), 0, 0);
+            tt.addView(ts);
+            tr.addView(tt, weight1());
+            tr.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
+            tr.setOnClickListener(v -> {
+                if (sheet[0] != null) sheet[0].dismiss();
+                startActivity(new android.content.Intent(this, ToolsActivity.class).putExtra(ToolsActivity.EXTRA_CHAT, ses.id));
+            });
+            c.addView(tr, full());
+        }
         LinearLayout inc = switchRow(this, getString(R.string.chat_incognito), getString(R.string.chat_incognito_info),
                 ses.incognito, on -> hub.setIncognito(ses, on));
         inc.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
@@ -2279,7 +2307,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             return;
         }
         if (countdown[0] > 0) card.addView(countdownView(countdown), full());
-        LinearLayout btns = row(this);
+        LinearLayout btns = new FitRow(this, dp(this, 8)); // (stacked when the buttons don't fit: issue #69)
+        btns.setGravity(Gravity.CENTER_VERTICAL);
         Button deny = button(this, getString(R.string.chat_deny), false);
         deny.setTextColor(ERR);
         deny.setBackground(rounded(this, ERR_SOFT, 12));
@@ -2317,7 +2346,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             opts.addView(b, bp);
         }
         card.addView(opts, full());
-        LinearLayout btns = row(this);
+        LinearLayout btns = new FitRow(this, dp(this, 8)); // (stacked when the buttons don't fit: issue #69)
+        btns.setGravity(Gravity.CENTER_VERTICAL);
         Button skip = button(this, getString(R.string.chat_skip), false);
         Button own = button(this, getString(R.string.chat_type_own_answer), false);
         btns.addView(skip, new LinearLayout.LayoutParams(0, dp(this, 44), 1));
@@ -2356,7 +2386,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         what.setPaddingRelative(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
         what.setBackground(rounded(this, BG, 12));
         card.addView(what, full());
-        LinearLayout row = row(this);
+        LinearLayout row = new FitRow(this, dp(this, 8)); // (stacked when they don't fit: issue #69)
+        row.setGravity(Gravity.CENTER_VERTICAL);
         Button back = button(this, getString(R.string.chat_back), false);
         Button send = button(this, getString(answering ? R.string.chat_send_answer : R.string.chat_send_change), true);
         row.addView(back, new LinearLayout.LayoutParams(0, dp(this, 44), 1));

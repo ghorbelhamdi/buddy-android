@@ -10,6 +10,7 @@ import android.graphics.ImageDecoder;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
+import android.graphics.drawable.AnimatedImageDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.widget.ImageView;
@@ -17,11 +18,13 @@ import android.widget.ImageView;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
  * Buddy's face: the built-in drawings, or a picture picked in Settings (issue #10). The picture lives in the app's
- * own storage, so it stays through updates; when it's missing or can't be read, Buddy's own face shows.
+ * own storage, so it stays through updates; when it's missing or can't be read, Buddy's own face shows. An animated
+ * one (GIF, animated WebP) moves on the bubble (issue #68), and shows its first frame everywhere else.
  */
 final class Face {
     /** Longest side of the saved picture, in px: sharp at the bubble's 60dp on any screen. */
@@ -29,12 +32,27 @@ final class Face {
     private static Bitmap picture; // decoded once, dropped when a new picture is saved
     private static Drawable bubble;
     private static boolean loaded;
+    /** The animated picture as the bubble plays it (decoded once), and whether it couldn't be read. */
+    private static AnimatedImageDrawable anim;
+    private static boolean animBroken;
+    /** A bigger animation is kept as a still picture (its first frame): the bubble would decode it on every frame. */
+    private static final long ANIM_MAX = 16L << 20;
 
     private Face() {
     }
 
     private static File file(Context c) {
         return new File(c.getFilesDir(), "face.png");
+    }
+
+    /** The animated picture as it was picked (its first frame is face.png). */
+    private static File animFile(Context c) {
+        return new File(c.getFilesDir(), "face.anim");
+    }
+
+    /** Is the saved picture animated? */
+    static boolean animated(Context c) {
+        return animFile(c).length() > 0;
     }
 
     /** The picked picture while "Your picture" is on, or null for Buddy's own face. */
@@ -75,6 +93,26 @@ final class Face {
     static synchronized Drawable bubble(Context c) {
         Bitmap b = picture(c);
         if (b == null) return null;
+        String play = Prefs.faceAnim(c);
+        if (!"off".equals(play) && animated(c) && !animBroken) {
+            if (anim == null) {
+                try {
+                    Drawable d = ImageDecoder.decodeDrawable(ImageDecoder.createSource(animFile(c)), (dec, info, src) -> {
+                        int w = info.getSize().getWidth(), h = info.getSize().getHeight();
+                        float s = Math.min(1f, (float) SIDE / Math.max(w, h)); // decoded at the bubble's size
+                        if (s < 1f) dec.setTargetSize(Math.max(1, Math.round(w * s)), Math.max(1, Math.round(h * s)));
+                    });
+                    if (d instanceof AnimatedImageDrawable) anim = (AnimatedImageDrawable) d;
+                    else animBroken = true;
+                } catch (IOException e) {
+                    animBroken = true;
+                }
+            }
+            if (anim != null) {
+                anim.setRepeatCount("loop".equals(play) ? AnimatedImageDrawable.REPEAT_INFINITE : 0);
+                return anim; // (no shadow: it would have to follow every frame)
+            }
+        }
         if (bubble == null) bubble = new Shadowed(b);
         return bubble;
     }
@@ -138,11 +176,33 @@ final class Face {
     }
 
     /**
-     * Reads a picked image (PNG, WebP, JPEG…; an animation's first frame), trims its transparent edges, scales it
-     * down and saves it as Buddy's face. Throws if it isn't a picture.
+     * Reads a picked image (PNG, WebP, JPEG…), trims its transparent edges, scales it down and saves it as Buddy's
+     * face. An animated one is kept as it is too, for the bubble, and its first frame isn't trimmed: later frames may
+     * reach past it. Throws if it isn't a picture. True when it was an animation too big to keep moving.
      */
-    static void save(Context c, Uri uri) throws IOException {
+    static boolean save(Context c, Uri uri) throws IOException {
         int box = SIDE * 2;
+        boolean moving;
+        try {
+            moving = ImageDecoder.decodeDrawable(ImageDecoder.createSource(c.getContentResolver(), uri), (d, info, src) -> {
+                int w = info.getSize().getWidth(), h = info.getSize().getHeight();
+                float s = Math.min(1f, (float) box / Math.max(w, h));
+                if (s < 1f) d.setTargetSize(Math.max(1, Math.round(w * s)), Math.max(1, Math.round(h * s)));
+            }) instanceof AnimatedImageDrawable;
+        } catch (IOException e) {
+            moving = false; // the still decode below says whether it's a picture at all
+        }
+        boolean tooBig = false;
+        if (moving) { // known before the first frame is saved: a still one is trimmed as any picture
+            try (android.content.res.AssetFileDescriptor fd = c.getContentResolver().openAssetFileDescriptor(uri, "r")) {
+                long len = fd == null ? -1 : fd.getLength();
+                if (len > ANIM_MAX) {
+                    moving = false;
+                    tooBig = true;
+                }
+            } catch (IOException | RuntimeException e) { // (the copy below counts as it goes, too)
+            }
+        }
         Bitmap b = ImageDecoder.decodeBitmap(ImageDecoder.createSource(c.getContentResolver(), uri), (d, info, src) -> {
             d.setAllocator(ImageDecoder.ALLOCATOR_SOFTWARE); // readable pixels, for the trim
             int w = info.getSize().getWidth(), h = info.getSize().getHeight();
@@ -151,7 +211,7 @@ final class Face {
         });
         // a sticker often sits in a big transparent square: keep only the drawing, so it fills the bubble
         int w = b.getWidth(), h = b.getHeight(), left = w, top = h, right = -1, bottom = -1;
-        if (b.hasAlpha()) {
+        if (b.hasAlpha() && !moving) {
             int[] row = new int[w];
             for (int y = 0; y < h; y++) {
                 b.getPixels(row, 0, w, 0, y, w, 1);
@@ -181,8 +241,32 @@ final class Face {
             tmp.delete();
             throw new IOException("can't save the picture");
         }
+        File a = animFile(c);
+        if (moving) { // the file as picked: the bubble plays it
+            File at = new File(a.getPath() + ".tmp");
+            long n = 0;
+            try (InputStream in = c.getContentResolver().openInputStream(uri); OutputStream os = new FileOutputStream(at)) {
+                if (in == null) throw new IOException("can't read the picture");
+                byte[] buf = new byte[64 * 1024];
+                for (int r; (r = in.read(buf)) > 0; ) {
+                    n += r;
+                    if (n > ANIM_MAX) throw new IOException("too big");
+                    os.write(buf, 0, r);
+                }
+            } catch (IOException e) {
+                at.delete();
+                a.delete(); // the first frame stays, still
+                n = -1;
+            }
+            if (n > 0 && !at.renameTo(a)) at.delete();
+        } else {
+            a.delete();
+        }
         synchronized (Face.class) {
             loaded = false; // read again on next use
+            anim = null;
+            animBroken = false;
         }
+        return tooBig;
     }
 }

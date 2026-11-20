@@ -1,0 +1,4 @@
+• Tools: every phone tool with a switch, in Settings and per chat (Chat options → Tools)
+• Read the call log and SMS (off until you turn them on; needs background mode): read only, codes hidden
+• Animated bubble picture: a GIF or animated WebP moves on the bubble
+• Approval buttons stack when they don't fit (narrow screens, compact panel)

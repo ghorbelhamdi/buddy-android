@@ -133,6 +133,10 @@
             android:exported="false" />
 
         <activity
+            android:name=".ToolsActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".SkillsActivity"
             android:exported="false" />
 

@@ -342,6 +342,15 @@ final class Prefs {
         sp(c).edit().putString("face", face).apply();
     }
 
+    /** An animated picture on the bubble (issue #68): "loop" (the default), "once" each time the phone is unlocked, or "off". */
+    static String faceAnim(Context c) {
+        return sp(c).getString("face_anim", "loop");
+    }
+
+    static void setFaceAnim(Context c, String play) {
+        sp(c).edit().putString("face_anim", play).apply();
+    }
+
     /** Read replies aloud with text-to-speech. */
     static boolean speakReplies(Context c) {
         return sp(c).getBoolean("speak", false);
@@ -725,6 +734,24 @@ final class Prefs {
 
     static void setBrowser(Context c, boolean on) {
         sp(c).edit().putBoolean("browser", on).apply();
+    }
+
+    /** sms_list shows codes (one-time codes, PINs) in messages instead of hiding them (issue #39). */
+    static boolean smsCodes(Context c) {
+        return sp(c).getBoolean("sms_codes", false);
+    }
+
+    static void setSmsCodes(Context c, boolean on) {
+        sp(c).edit().putBoolean("sms_codes", on).apply();
+    }
+
+    /** Settings → Tools and connections → Tools: one phone tool on or off (see ToolSwitch). */
+    static boolean toolOn(Context c, String tool, boolean byDefault) {
+        return sp(c).getBoolean("tool_on:" + tool, byDefault);
+    }
+
+    static void setToolOn(Context c, String tool, boolean on) {
+        sp(c).edit().putBoolean("tool_on:" + tool, on).apply();
     }
 
     /** Terminal text size in sp (pinch to zoom). */

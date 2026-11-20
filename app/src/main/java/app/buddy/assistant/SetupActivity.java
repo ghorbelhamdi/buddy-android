@@ -150,19 +150,20 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         if (code != REQ_FACE || result != RESULT_OK || data == null || data.getData() == null) return;
         Uri uri = data.getData();
         new Thread(() -> {
-            boolean ok;
+            boolean ok, big = false;
             try {
-                Face.save(this, uri);
+                big = Face.save(this, uri);
                 ok = true;
             } catch (Exception e) {
                 ok = false;
             }
-            final boolean saved = ok;
+            final boolean saved = ok, tooBig = big;
             runOnUiThread(() -> {
                 if (!saved) {
                     Toast.makeText(this, R.string.setup_face_unreadable, Toast.LENGTH_LONG).show();
                     return;
                 }
+                if (tooBig) Toast.makeText(this, R.string.setup_face_too_big, Toast.LENGTH_LONG).show();
                 Prefs.setFace(this, "picture");
                 faceChanged();
             });
@@ -445,12 +446,23 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             }
         }), fp);
         ap.addView(fr, topGap(10));
-        ap.addView(text(this, getString(R.string.setup_face_note), 13, MUTED), topGap(8));
+        ap.addView(text(this, getString(R.string.setup_face_note) + " " + getString(R.string.setup_face_gif), 13, MUTED),
+                topGap(8));
         if (own) {
             TextView change = text(this, getString(R.string.setup_face_change), 14, ACCENT_TEXT);
             change.setPaddingRelative(0, dp(this, 4), 0, dp(this, 4));
             change.setOnClickListener(v -> pickFace());
             ap.addView(change, topGap(6));
+        }
+        if (own && Face.animated(this)) { // how an animated picture plays on the bubble (issue #68)
+            ap.addView(fieldLabel(getString(R.string.setup_face_anim), null), topGap(14));
+            ap.addView(segmented(this, new String[][]{{"loop", getString(R.string.setup_face_anim_loop)},
+                    {"once", getString(R.string.setup_face_anim_once)}, {"off", getString(R.string.setup_face_anim_off)}},
+                    Prefs.faceAnim(this), false, v -> {
+                        Prefs.setFaceAnim(this, v);
+                        faceChanged();
+                    }), topGap(8));
+            ap.addView(text(this, getString(R.string.setup_face_anim_note), 13, MUTED), topGap(8));
         }
         addCard(ap);
 
@@ -1061,6 +1073,10 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
     /** MCP servers and skills: what agents get on top of the phone tools. */
     private void connectionsSection() {
         LinearLayout ex = card();
+        View tl = toolsRow();
+        tl.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
+        ex.addView(tl, full());
+        ex.addView(divider(), lineParams());
         View ms = mcpRow();
         ms.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
         ex.addView(ms, full());
@@ -1792,6 +1808,19 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         return navRow(R.drawable.ms_memory, getString(R.string.onphone_title), names.isEmpty()
                 ? getString(R.string.onphone_row_none) : android.text.TextUtils.join(", ", names), !names.isEmpty(),
                 OnPhoneActivity.class);
+    }
+
+    /** Settings → Tools: every phone tool, each with a switch (ToolsActivity). */
+    private View toolsRow() {
+        int on = 0, all = 0;
+        for (String[] g : ToolSwitch.GROUPS) {
+            for (int i = 1; i < g.length; i++) {
+                all++;
+                if (ToolSwitch.on(this, g[i])) on++;
+            }
+        }
+        return navRow(R.drawable.ms_tune, getString(R.string.tools_title), getString(R.string.tools_row, on, all),
+                on == all, ToolsActivity.class);
     }
 
     /** Settings → Skills: instructions the agents share. */

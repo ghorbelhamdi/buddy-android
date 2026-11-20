@@ -29,8 +29,9 @@ final class Lite {
                     + "several steps in one call, open a link, list the apps, point something out to the user",
                     "long_press", "screenshot", "find", "collect", "do_steps", "wait", "open_url", "list_apps", "point_out"},
             {"info", "the phone's status, its notifications (read them, reply to one), location, calendar events, "
-                    + "what's playing, the clipboard",
-                    "device_status", "notifications", "reply_notification", "location", "calendar_events", "media",
+                    + "recent calls and SMS (when the user allowed them), what's playing, the clipboard",
+                    "device_status", "notifications", "reply_notification", "location", "calendar_events", "call_log",
+                    "sms_list", "media",
                     "clipboard_read", "clipboard_write"},
             {"quick", "set an alarm or a timer, add a calendar event, share something, take a photo",
                     "set_alarm", "set_timer", "add_calendar_event", "share", "take_photo"},
@@ -141,17 +142,34 @@ final class Lite {
             return "The background browser is off in Buddy's Settings, so there are no browser tools. Open web pages "
                     + "in the phone's browser with phone_open_app instead.";
         }
+        // the group's tools that are on for this chat (Settings, or its Chat options → Tools); "advanced" is every
+        // tool in no other group
+        StringBuilder names = new StringBuilder();
+        java.util.List<String> members = new java.util.ArrayList<>();
+        if (g.length > 2) {
+            for (int i = 2; i < g.length; i++) members.add(g[i]);
+        } else {
+            for (String[] sg : ToolSwitch.GROUPS) {
+                for (int i = 1; i < sg.length; i++) {
+                    if (!CORE.contains(sg[i]) && group(sg[i]).equals(g[0])) members.add(sg[i]);
+                }
+            }
+        }
+        for (String t : members) {
+            if (!ToolSwitch.offered(c, t, ses)) continue;
+            if ("browser".equals(g[0]) || !t.startsWith("browser_")) {
+                names.append(names.length() > 0 ? ", " : "").append("phone_").append(t);
+            }
+        }
+        if (names.length() == 0) {
+            return "The user turned the " + g[0] + " tools off (Buddy's Settings → Tools and connections → Tools, or "
+                    + "this chat's Chat options → Tools).";
+        }
         boolean added = ses.liteGroups.add(g[0]);
         if (added) { // saved where the chat is (the main thread owns its messages)
             final ChatHub hub = ChatHub.get(c);
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> hub.sessions.save(ses));
             CHANGED.set(true); // (only then: an already loaded group answers at once)
-        }
-        StringBuilder names = new StringBuilder();
-        if (g.length > 2) {
-            for (int i = 2; i < g.length; i++) names.append(names.length() > 0 ? ", " : "").append("phone_").append(g[i]);
-        } else {
-            names.append("the rest of the phone tools");
         }
         return (added ? "Loaded the " : "Already loaded: the ") + g[0] + " tools: " + names
                 + (added ? ". They are ready from your next step." : ".");

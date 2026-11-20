@@ -149,12 +149,17 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         public void onReceive(Context c, Intent i) {
             keepAwake.update(); // locked: the screen may sleep; unlocked: a long task keeps it on again
             if (bubble == null) return;
-            if (Intent.ACTION_USER_PRESENT.equals(i.getAction())) bubble.setLocked(false);
-            else if (Intent.ACTION_SCREEN_OFF.equals(i.getAction())) {
+            if (Intent.ACTION_USER_PRESENT.equals(i.getAction())) {
+                bubble.setLocked(false);
+                bubble.replayFace(); // an animated picture plays once each time the phone is unlocked (issue #68)
+            } else if (Intent.ACTION_SCREEN_OFF.equals(i.getAction())) {
                 bubble.setLocked(true);
                 bubble.noticeWaitingCard(); // a card that was on screen when it went dark: its notification now
+            } else {
+                boolean locked = getSystemService(KeyguardManager.class).isKeyguardLocked();
+                bubble.setLocked(locked);
+                if (!locked) bubble.replayFace(); // (a phone without a lock screen: on is unlocked)
             }
-            else bubble.setLocked(getSystemService(KeyguardManager.class).isKeyguardLocked());
         }
     };
 
@@ -501,7 +506,8 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     @Override
     public JSONArray listTools() throws JSONException {
         Sessions.Session lite = Lite.caller(this); // a small model's chat: a dozen tools, more on request
-        return lite != null ? Lite.filter(tools.list(), lite) : tools.list();
+        JSONArray all = ToolSwitch.filter(this, tools.list()); // (the ones the user turned off aren't offered)
+        return lite != null ? Lite.filter(all, lite) : all;
     }
 
     @Override
