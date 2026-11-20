@@ -69,6 +69,7 @@ public class ApiKeysActivity extends Screen {
         body.removeAllViews();
         body.addView(text(this, getString(R.string.api_keys_intro), 13, MUTED), full());
         List<Providers.P> all = new ArrayList<>(Providers.all());
+        all.removeIf(p -> OnPhone.ID.equals(p.id)); // (it has its own screen: Models on this phone)
         if (all.isEmpty()) body.addView(text(this, getString(R.string.api_keys_none), 15, TEXT), gap(18));
         for (Providers.P p : all) body.addView(serviceRow(p), gap(all.indexOf(p) == 0 ? 14 : 4));
         Button add = button(this, getString(R.string.api_keys_add), all.isEmpty());

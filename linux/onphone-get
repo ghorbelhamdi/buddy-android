@@ -1,0 +1,65 @@
+#!/bin/bash
+# Models on this phone (Buddy's OnPhone): fetches llama.cpp's engine and the models, checked against their SHA-256.
+#   onphone-get engine <url> <sha256>     llama.cpp's official Android build → $D/engine/{bin,lib}
+#   onphone-get model <url> <sha256> <file>   a model → $D/models/<file>
+# A download that stopped goes on where it left off. Prints the reason on failure.
+set -u
+D=/root/.buddy/onphone
+mkdir -p "$D/models" "$D/tmp"
+
+fetch() { # url sha256 target
+  # a partial download of another file (an older engine or model) isn't resumed: it would never match
+  if [ -e "$3" ] && [ "$(cat "$3.sha" 2>/dev/null)" != "$2" ]; then rm -f "$3"; fi
+  echo "$2" > "$3.sha"
+  # (-sS: errors only, no progress numbers that a check for "416" could match)
+  curl -sSfL --retry 3 --retry-delay 2 -C - -o "$3" "$1" 2>"$D/tmp/curl.err" \
+    || { [ -s "$3" ] && grep -q "error: 416" "$D/tmp/curl.err"; } \
+    || { echo "Download failed: $(tail -c 300 "$D/tmp/curl.err")"; return 1; }
+  if ! echo "$2  $3" | sha256sum -c - >/dev/null 2>&1; then
+    rm -f "$3" "$3.sha"
+    echo "The download didn't match its checksum. Try again."
+    return 1
+  fi
+  rm -f "$3.sha"
+}
+
+case "${1:-}" in
+  engine)
+    cd "$D/tmp" || exit 1
+    fetch "$2" "$3" engine.tgz || exit 1
+    rm -rf x new && mkdir -p x new/bin new/lib
+    tar xzf engine.tgz -C x || { echo "Couldn't unpack the engine."; exit 1; }
+    src=$(find x -name llama-server -type f | head -1)
+    [ -n "$src" ] || { echo "The engine has no llama-server."; exit 1; }
+    top=$(dirname "$src")
+    [ "$(basename "$top")" = bin ] && libs=$(dirname "$top")/lib || libs=$top
+    cp "$src" new/bin/ || { echo "Couldn't copy the engine."; exit 1; }
+    for f in "$libs"/lib*.so; do
+      [ -f "$f" ] || continue
+      case "$(basename "$f")" in
+        *-impl.so) [ "$(basename "$f")" = libllama-server-impl.so ] || continue ;;
+      esac
+      cp "$f" new/lib/ || { echo "Couldn't copy the engine's libraries."; exit 1; }
+    done
+    [ -f new/lib/libllama.so ] || { echo "The engine has no libllama.so."; exit 1; }
+    # the official build keeps its debug symbols (about 230 MB): without them it's about 30 MB
+    command -v strip >/dev/null || apk add -q binutils >/dev/null 2>&1
+    if command -v strip >/dev/null; then
+      for f in new/bin/* new/lib/*; do
+        case "$f" in *htp-v*) ;; *) strip --strip-unneeded "$f" 2>/dev/null ;; esac
+      done
+    fi
+    chmod 755 new/bin/* && chmod 644 new/lib/*
+    rm -rf "$D/engine.old"
+    if [ -d "$D/engine" ]; then mv "$D/engine" "$D/engine.old" || { echo "Couldn't replace the engine."; exit 1; }; fi
+    mv new "$D/engine" || { echo "Couldn't put the engine in place."; exit 1; }
+    rm -rf "$D/engine.old" x engine.tgz
+    echo "OK"
+    ;;
+  model)
+    [[ "${4:-}" =~ ^[A-Za-z0-9._-]+\.gguf$ ]] || { echo "Bad file name."; exit 2; }
+    fetch "$2" "$3" "$D/models/$4.part" || exit 1
+    mv "$D/models/$4.part" "$D/models/$4" && echo "OK"
+    ;;
+  *) echo "usage: onphone-get engine|model ..." >&2; exit 2 ;;
+esac

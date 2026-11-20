@@ -166,6 +166,19 @@ final class Background {
         return l;
     }
 
+    /**
+     * An outside session that used the phone on the real screen within ms (and wasn't stopped): it may tap there again
+     * after thinking a while, so the user's touch still pauses it (see BuddyService.onScreenTouched).
+     */
+    static boolean outsideOnRealScreenWithin(long ms) {
+        long now = System.currentTimeMillis();
+        for (java.util.Map.Entry<String, Long> e : outsideUsed.entrySet()) {
+            Long stop = outsideStopped.get(e.getKey());
+            if (now - e.getValue() < ms && !outsideHidden(e.getKey()) && (stop == null || stop <= now)) return true;
+        }
+        return false;
+    }
+
     /** Is this outside session among outsideActive() (without building that list)? */
     static boolean outsideIsActive(String key) {
         long now = System.currentTimeMillis();
@@ -1087,5 +1100,15 @@ final class Background {
             }
         }
         for (int i = 0; i < n.getChildCount(); i++) scan(n.getChild(i), found, depth + 1);
+    }
+
+    /**
+     * Opens a screen on the user's real screen, not a session's hidden one: Android's installer and its "allow from
+     * this source" page are for the user to tap (an agent's taps are refused there), so on a hidden screen they'd
+     * wait where nobody can see them.
+     */
+    static void startOnUserScreen(android.content.Context c, android.content.Intent i) {
+        android.app.ActivityOptions o = android.app.ActivityOptions.makeBasic().setLaunchDisplayId(android.view.Display.DEFAULT_DISPLAY);
+        c.startActivity(i, o.toBundle());
     }
 }

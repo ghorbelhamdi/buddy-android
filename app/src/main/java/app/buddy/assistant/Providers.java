@@ -38,6 +38,8 @@ final class Providers {
 
         /** Can this agent use it? */
         boolean fits(String agent) {
+            // models on this phone: OpenCode only, where their chats get lite mode (see Lite)
+            if (OnPhone.ID.equals(id)) return "opencode".equals(agent);
             if ("claude".equals(agent)) return !anthropic.isEmpty();
             if ("codex".equals(agent)) return !openai.isEmpty(); // an OpenAI-style service is taken to have the Responses API; if not, the agent says so
             return "opencode".equals(agent) && (!anthropic.isEmpty() || !openai.isEmpty());
@@ -345,8 +347,12 @@ final class Providers {
 
     /** A saved service this agent can't use, while another can: why setup is still waiting for this agent. */
     static P mismatch(String agent) {
+        // (models on this phone aren't a key: they're OpenCode's only, see OnPhone)
         if (!forAgent(agent).isEmpty()) return null;
-        for (P p : all()) for (Account a : Account.ALL) if (p.fits(a.agent)) return p;
+        for (P p : all()) {
+            if (OnPhone.ID.equals(p.id)) continue;
+            for (Account a : Account.ALL) if (p.fits(a.agent)) return p;
+        }
         return null;
     }
 
@@ -366,7 +372,8 @@ final class Providers {
             boolean online = now - refreshedAt >= 600_000, local = now - localRefreshedAt >= 5_000;
             if (online) refreshedAt = now;
             if (local) localRefreshedAt = now;
-            for (P p : all()) if (!p.off && (p.local() ? local : online)) todo.add(p);
+            // (models on this phone come from Buddy itself: OnPhone lists them, its engine runs only while used)
+            for (P p : all()) if (!p.off && !OnPhone.ID.equals(p.id) && (p.local() ? local : online)) todo.add(p);
             // a picker opened while a fetch runs (one started as the screen came back): it hears how that one ends
             if (changed != null && (inFlight > 0 || !todo.isEmpty())) waiting.add(changed);
             if (todo.isEmpty()) return;

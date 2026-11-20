@@ -101,6 +101,10 @@ final class Sessions {
         boolean awake;
         /** Background mode: the agent works on a display of its own, the user keeps the screen (see Background). */
         boolean background;
+        /** Lite mode (see Lite): null = automatic (on for a model on this phone), else the user's pick. */
+        Boolean lite;
+        /** The tool groups its agent loaded with more_tools in lite mode (kept: a resumed run's history names them). */
+        final java.util.Set<String> liteGroups = java.util.Collections.synchronizedSet(new java.util.LinkedHashSet<>());
         /**
          * Its start may be missing: it had hit the 150 messages Buddy kept until 2.2.28. The chat then offers to load
          * the earlier ones from its agent's own record (see ChatHub.restoreEarlier), once.
@@ -244,6 +248,7 @@ final class Sessions {
             o.remove("schedule");
             o.remove("allowed");
             o.remove("later");
+            o.remove("lite_groups"); // its agent starts fresh: it loads what it needs again
             Session s = fromJson(o, new boolean[1]);
             s.reseed = true;
             int at = all.indexOf(src);
@@ -420,6 +425,10 @@ final class Sessions {
         synchronized (s.apps) {
             if (!s.apps.isEmpty()) o.put("apps", new JSONArray(s.apps));
         }
+        if (s.lite != null) o.put("lite", s.lite.booleanValue());
+        synchronized (s.liteGroups) {
+            if (!s.liteGroups.isEmpty()) o.put("lite_groups", new JSONArray(s.liteGroups));
+        }
         if (s.schedule != null) {
             JSONArray ok;
             synchronized (s.allowed) {
@@ -451,6 +460,9 @@ final class Sessions {
         s.dev = o.optBoolean("dev", Prefs.devMode(app));
         s.awake = o.optBoolean("awake");
         s.background = o.optBoolean("background");
+        if (o.has("lite")) s.lite = o.optBoolean("lite");
+        JSONArray lg = o.optJSONArray("lite_groups");
+        for (int i = 0; lg != null && i < lg.length(); i++) s.liteGroups.add(lg.optString(i));
         s.approvals = o.optString("approvals", "");
         s.handover = o.optString("handover", "").isEmpty() ? null : o.optString("handover");
         s.reseed = o.optBoolean("reseed");

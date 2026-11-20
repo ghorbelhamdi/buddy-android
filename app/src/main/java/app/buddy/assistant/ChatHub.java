@@ -323,7 +323,8 @@ final class ChatHub {
             // a rule's run works for someone else's message: no shell, files or web, even with Linux tools on
             Helper.runFor(app, ses.id, code -> main.postDelayed(() -> helperGone(ses, run[0], code), HELPER_GONE_MS),
                     "ask", ses.id, ses.backend, rule ? "rule" : devArg(ses), forAgent,
-                    model(ses), hasFiles ? android.text.TextUtils.join(",", files) : "", ses.effort, fresh ? "fresh" : "");
+                    model(ses), hasFiles ? android.text.TextUtils.join(",", files) : "", ses.effort, fresh ? "fresh" : "",
+                    Lite.on(ses) ? "lite" : "");
         } catch (Exception e) {
             return e.getMessage();
         }
@@ -345,12 +346,13 @@ final class ChatHub {
         final int id = ses.runId;
         run[0] = id;
         Providers.P lp = Providers.of(Models.effective(ses));
-        final boolean local = lp != null && lp.local();
+        final boolean local = lp != null && lp.local(), onPhone = lp != null && OnPhone.ID.equals(lp.id);
         final long giveUp = local ? LOCAL_GIVE_UP_MS : GIVE_UP_MS;
         // the agent is running but its model can be slow (free models especially): say so, keep waiting
         main.postDelayed(() -> {
             if (ses.running && id == ses.runId && SystemClock.elapsedRealtime() - ses.lastEventAt >= NO_RESPONSE_MS - 100) {
-                add(ses, Bubble.Kind.STEP, app.getString(local ? R.string.hub_still_reading_local : R.string.hub_still_waiting));
+                add(ses, Bubble.Kind.STEP, app.getString(onPhone ? R.string.hub_still_reading_phone
+                        : local ? R.string.hub_still_reading_local : R.string.hub_still_waiting));
                 changed();
             }
         }, NO_RESPONSE_MS);
@@ -633,6 +635,13 @@ final class ChatHub {
     /** Long-task mode for a chat: the screen stays on while it works (see KeepAwake); a running one gets it at once. */
     void setIncognito(Sessions.Session ses, boolean on) {
         ses.incognito = on;
+        sessions.save(ses);
+        changed();
+    }
+
+    /** Lite mode (see Lite): the user's pick for this chat, from its next message on. */
+    void setLite(Sessions.Session ses, boolean on) {
+        ses.lite = on;
         sessions.save(ses);
         changed();
     }
@@ -1099,7 +1108,8 @@ final class ChatHub {
         try {
             Helper.runFor(app, ses.id, code -> main.postDelayed(() -> helperGone(ses, run[0], code), HELPER_GONE_MS),
                     "ask", ses.id, ses.backend, devArg(ses),
-                    "(Added while you were working; if it asks something, answer it:) " + text, model(ses), "", ses.effort);
+                    "(Added while you were working; if it asks something, answer it:) " + text, model(ses), "", ses.effort,
+                    "", Lite.on(ses) ? "lite" : "");
         } catch (Exception e) {
             add(ses, Bubble.Kind.ERROR, e.getMessage());
             return;

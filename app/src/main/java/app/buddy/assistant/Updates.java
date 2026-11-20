@@ -111,11 +111,11 @@ public final class Updates extends BroadcastReceiver {
                     : "The downloaded file isn't a newer Buddy, so it wasn't opened.";
         }
         if (!c.getPackageManager().canRequestPackageInstalls()) {
-            c.startActivity(new Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+            Background.startOnUserScreen(c, new Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
                     Uri.parse("package:" + c.getPackageName())).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             return NEEDS_PERMISSION;
         }
-        c.startActivity(new Intent(Intent.ACTION_VIEW)
+        Background.startOnUserScreen(c, new Intent(Intent.ACTION_VIEW)
                 .setDataAndType(FilesProvider.apkUri(), "application/vnd.android.package-archive")
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION));
         cancel(c);
