@@ -2169,4 +2169,6 @@
     <string name="onphone_note_qwen_4b">Dari Alibaba. Lebih besar dan kira-kira setengah kecepatan 2B.</string>
     <string name="hub_still_reading_phone">Masih bekerja… Model di ponsel ini butuh waktu sebentar, terutama untuk jawaban pertama.</string>
     <string name="onphone_too_hot">Ponsel terlalu panas untuk menjalankan model sekarang. Biarkan dingin beberapa menit, lalu coba lagi.</string>
+    <string name="onphone_think">Berpikir sebelum menjawab</string>
+    <string name="onphone_think_info">Lebih lambat: tiap langkah bisa 20 detik atau lebih. Tanpa ini, model kecil cepat dan biasanya memilih alat yang sama.</string>
 </resources>

@@ -2168,4 +2168,6 @@
     <string name="onphone_note_qwen_4b">阿里巴巴出品。比 2B 大，速度约为一半。</string>
     <string name="hub_still_reading_phone">仍在处理… 本机模型需要一点时间，尤其是第一次回答。</string>
     <string name="onphone_too_hot">手机现在太热，无法运行模型。请让它冷却几分钟后再试。</string>
+    <string name="onphone_think">回答前先思考</string>
+    <string name="onphone_think_info">更慢：每一步可能需要 20 秒或更久。关闭时小模型很快，而且大多会选同样的工具。</string>
 </resources>

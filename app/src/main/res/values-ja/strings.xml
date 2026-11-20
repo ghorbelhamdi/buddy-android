@@ -1720,4 +1720,6 @@
     <string name="onphone_note_qwen_4b">Alibaba 製。2B より大きく、速度はおよそ半分。</string>
     <string name="hub_still_reading_phone">処理中… このスマホのモデルは、特に最初の返答に少し時間がかかります。</string>
     <string name="onphone_too_hot">スマホが熱すぎるため、今はモデルを動かせません。数分冷ましてから、もう一度試してください。</string>
+    <string name="onphone_think">答える前に考える</string>
+    <string name="onphone_think_info">遅くなります：1 ステップに 20 秒以上かかることがあります。オフでも小さなモデルは速く、ほとんど同じツールを選びます。</string>
 </resources>

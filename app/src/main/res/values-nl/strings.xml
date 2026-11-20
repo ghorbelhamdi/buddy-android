@@ -1734,4 +1734,6 @@
     <string name="onphone_note_qwen_4b">Van Alibaba. Groter en ongeveer half zo snel als de 2B.</string>
     <string name="hub_still_reading_phone">Nog bezig… Het model op deze telefoon heeft even nodig, vooral voor het eerste antwoord.</string>
     <string name="onphone_too_hot">De telefoon is nu te warm om een model te draaien. Laat hem een paar minuten afkoelen en probeer het dan opnieuw.</string>
+    <string name="onphone_think">Nadenken voor het antwoord</string>
+    <string name="onphone_think_info">Trager: elke stap kan 20 seconden of langer duren. Zonder zijn kleine modellen snel en kiezen ze meestal dezelfde tools.</string>
 </resources>

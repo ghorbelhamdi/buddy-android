@@ -1736,4 +1736,6 @@
     <string name="onphone_note_qwen_4b">Alibaba\'dan. Daha büyük ve 2B\'nin yaklaşık yarı hızında.</string>
     <string name="hub_still_reading_phone">Hâlâ çalışıyor… Bu telefondaki model biraz zaman istiyor, özellikle ilk yanıt için.</string>
     <string name="onphone_too_hot">Telefon şu an bir model çalıştırmak için fazla sıcak. Birkaç dakika soğumasını bekle, sonra yeniden dene.</string>
+    <string name="onphone_think">Yanıtlamadan önce düşün</string>
+    <string name="onphone_think_info">Daha yavaş: her adım 20 saniye veya daha uzun sürebilir. Küçük modeller bu olmadan hızlıdır ve çoğu zaman aynı araçları seçer.</string>
 </resources>

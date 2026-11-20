@@ -1762,4 +1762,6 @@
     <string name="onphone_note_qwen_4b">Od Alibaba. Większy i mniej więcej o połowę wolniejszy od 2B.</string>
     <string name="hub_still_reading_phone">Nadal pracuje… Model na tym telefonie potrzebuje chwili, zwłaszcza przy pierwszej odpowiedzi.</string>
     <string name="onphone_too_hot">Telefon jest teraz za gorący, by uruchomić model. Daj mu kilka minut na ostygnięcie i spróbuj ponownie.</string>
+    <string name="onphone_think">Myśl przed odpowiedzią</string>
+    <string name="onphone_think_info">Wolniej: każdy krok może trwać 20 sekund lub dłużej. Bez tego małe modele są szybkie i zwykle wybierają te same narzędzia.</string>
 </resources>

@@ -2168,4 +2168,6 @@
     <string name="onphone_note_qwen_4b">Di Alibaba. Più grande e circa la metà veloce del 2B.</string>
     <string name="hub_still_reading_phone">Ancora al lavoro… Il modello su questo telefono ha bisogno di un momento, soprattutto per la prima risposta.</string>
     <string name="onphone_too_hot">Il telefono è troppo caldo per eseguire un modello ora. Lascialo raffreddare qualche minuto, poi riprova.</string>
+    <string name="onphone_think">Pensa prima di rispondere</string>
+    <string name="onphone_think_info">Più lento: ogni passaggio può richiedere 20 secondi o più. Senza, i modelli piccoli sono rapidi e scelgono quasi sempre gli stessi strumenti.</string>
 </resources>

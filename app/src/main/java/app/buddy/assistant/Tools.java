@@ -474,6 +474,10 @@ final class Tools {
         // do sessions outside Buddy when the user switched that on
         // a background chat may look at the user's real screen (read only): no hidden screen, no helper, no adb
         boolean userScreen = ("read_screen".equals(name) || "screenshot".equals(name)) && "user".equals(a.optString("screen"));
+        // a lite chat has no "screen" choice (small models mixed the two up): while its own screen is still empty,
+        // a look at "the screen" can only mean the user's ("what's on my screen?")
+        if (!userScreen && ("read_screen".equals(name) || "screenshot".equals(name)) && Lite.caller(svc) != null
+                && Background.onFor(svc, screenKey()) && ownScreenEmpty()) userScreen = true;
         USER_SCREEN.set(userScreen && Background.onFor(svc, screenKey()));
         if (SCREEN.contains(name) && !userScreen && Background.onFor(svc, screenKey())) {
             if ("point_out".equals(name)) return text(toScreen("point_out marks things on the user's screen"));
@@ -1083,6 +1087,19 @@ final class Tools {
     }
 
     /** The windows this call reads and touches: the real screen's, or those on the chat's display. */
+    /** This call's hidden screen has no app on it yet (or doesn't exist yet). */
+    private boolean ownScreenEmpty() {
+        int d = Background.displayOf(screenKey());
+        if (d == Display.DEFAULT_DISPLAY) return true;
+        List<AccessibilityWindowInfo> l = svc.getWindowsOnAllDisplays().get(d);
+        if (l == null) return true;
+        for (AccessibilityWindowInfo w : l) {
+            AccessibilityNodeInfo r = w.getRoot();
+            if (w.getType() == AccessibilityWindowInfo.TYPE_APPLICATION && r != null && r.getPackageName() != null) return false;
+        }
+        return true;
+    }
+
     private List<AccessibilityWindowInfo> windows() {
         int d = display();
         if (d == Display.DEFAULT_DISPLAY) return svc.getWindows();

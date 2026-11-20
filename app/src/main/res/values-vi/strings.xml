@@ -2309,4 +2309,6 @@
     <string name="onphone_note_qwen_4b">Của Alibaba. Lớn hơn và chậm khoảng một nửa so với bản 2B.</string>
     <string name="hub_still_reading_phone">Vẫn đang làm… Mô hình trên điện thoại này cần một chút thời gian, nhất là cho câu trả lời đầu tiên.</string>
     <string name="onphone_too_hot">Điện thoại đang quá nóng để chạy mô hình. Hãy để nguội vài phút rồi thử lại.</string>
+    <string name="onphone_think">Suy nghĩ trước khi trả lời</string>
+    <string name="onphone_think_info">Chậm hơn: mỗi bước có thể mất 20 giây trở lên. Không bật, mô hình nhỏ vẫn nhanh và hầu như chọn cùng công cụ.</string>
 </resources>

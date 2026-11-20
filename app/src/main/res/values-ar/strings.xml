@@ -1780,4 +1780,6 @@
     <string name="onphone_note_qwen_4b">من Alibaba. أكبر وأبطأ بنحو النصف من 2B.</string>
     <string name="hub_still_reading_phone">ما زال يعمل… يحتاج النموذج على هذا الهاتف إلى لحظة، خاصةً للرد الأول.</string>
     <string name="onphone_too_hot">الهاتف ساخن جدًا لتشغيل نموذج الآن. اتركه يبرد بضع دقائق ثم حاول مجددًا.</string>
+    <string name="onphone_think">فكّر قبل الرد</string>
+    <string name="onphone_think_info">أبطأ: قد تستغرق كل خطوة 20 ثانية أو أكثر. بدونه تكون النماذج الصغيرة سريعة وتختار الأدوات نفسها في أغلب الأحيان.</string>
 </resources>

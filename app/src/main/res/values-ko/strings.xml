@@ -1719,4 +1719,6 @@
     <string name="onphone_note_qwen_4b">Alibaba 제작. 2B보다 크고 속도는 절반 정도.</string>
     <string name="hub_still_reading_phone">아직 작업 중… 이 휴대폰의 모델은 특히 첫 답변에 시간이 조금 걸립니다.</string>
     <string name="onphone_too_hot">휴대폰이 너무 뜨거워서 지금은 모델을 실행할 수 없습니다. 몇 분 식힌 뒤 다시 시도하세요.</string>
+    <string name="onphone_think">답하기 전에 생각하기</string>
+    <string name="onphone_think_info">느려집니다: 단계마다 20초 이상 걸릴 수 있습니다. 끄면 작은 모델도 빠르고 대부분 같은 도구를 고릅니다.</string>
 </resources>

@@ -1728,4 +1728,6 @@
     <string name="onphone_note_qwen_4b">Alibaba का। बड़ा और 2B से लगभग आधी गति।</string>
     <string name="hub_still_reading_phone">अभी काम चल रहा है… इस फ़ोन पर मॉडल को थोड़ा समय लगता है, खासकर पहले जवाब के लिए।</string>
     <string name="onphone_too_hot">फ़ोन अभी मॉडल चलाने के लिए बहुत गर्म है। कुछ मिनट ठंडा होने दें, फिर दोबारा कोशिश करें।</string>
+    <string name="onphone_think">जवाब से पहले सोचें</string>
+    <string name="onphone_think_info">धीमा: हर कदम में 20 सेकंड या उससे ज़्यादा लग सकते हैं। इसके बिना छोटे मॉडल तेज़ रहते हैं और ज़्यादातर वही टूल चुनते हैं।</string>
 </resources>
