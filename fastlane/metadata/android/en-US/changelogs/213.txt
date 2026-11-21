@@ -1,0 +1,3 @@
+• Models on this phone now start on phones without Snapdragon (Pixel, Exynos, MediaTek)
+• Models on this phone answer without thinking by default: a second or two per step instead of 20-30. A switch turns it back on
+• "What's on my screen?" in a background chat on a small model reads your screen

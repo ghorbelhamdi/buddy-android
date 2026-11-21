@@ -640,12 +640,11 @@ tool, it's not missing, call it again in your next step." > "$S/system.md"
     + {instructions:[$sys], autoupdate:false, share:"disabled"}
     + (if $dev == "1" then {} elif $dev == "rule" then {permission:{bash:"ask", edit:"ask", webfetch:"ask"}}
        else {permission:{bash:"ask", edit:"ask"}} end)
-    # lite: none of the tools OpenCode has itself (with execute off, its Code Mode tools come as opencode_*)
-    + (if $lite == "1" then {tools:({"opencode_*":false} + ([
-        "shell","bash","read","write","edit","patch","glob","grep","list","question","skill","subagent","task",
-        "webfetch","websearch","todowrite","todoread","execute","experimental_image_generate"]
-        | map(select(. != "read" or $att == "0")) # (attachments are opened with read)
-        | map({key:., value:false}) | from_entries))} else {} end)')
+    # lite: only the phone tools. Not those OpenCode has itself, nor those of MCP servers in the OpenCode config of
+    # the user (one there for reverse engineering came to ~245k tokens, five times the window of a small model: #67).
+    # The last matching entry wins, so "*" goes first. (OpenCode keeps its skill tool whatever this says.)
+    + (if $lite == "1" then {tools:({"*":false, "phone_*":true}
+        + (if $att == "0" then {} else {read:true} end))} else {} end)') # (attachments are opened with read)
   # an API key service: a provider of its own, pointed at the relay (OpenAI-style when it has that address)
   if [ -n "$SVC" ]; then
     cfg=$(jq -c --argjson c "$cfg" --arg url "$URL/llm/$SVC" --arg t "$TOKEN" --arg id "buddy-$SVC" '

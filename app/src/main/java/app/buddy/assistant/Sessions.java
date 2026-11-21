@@ -105,6 +105,8 @@ final class Sessions {
         Boolean lite;
         /** The tool groups its agent loaded with more_tools in lite mode (kept: a resumed run's history names them). */
         final java.util.Set<String> liteGroups = java.util.Collections.synchronizedSet(new java.util.LinkedHashSet<>());
+        /** Chat options → Tools: this chat's own on or off for a tool; the rest follow Settings (see ToolSwitch). */
+        final java.util.Map<String, Boolean> tools = new java.util.concurrent.ConcurrentHashMap<>();
         /**
          * Its start may be missing: it had hit the 150 messages Buddy kept until 2.2.28. The chat then offers to load
          * the earlier ones from its agent's own record (see ChatHub.restoreEarlier), once.
@@ -262,7 +264,9 @@ final class Sessions {
 
     Session find(String id) {
         if (id == null) return null;
-        for (Session s : all) if (s.id.equals(id)) return s;
+        // (tool calls look a chat up from the server's threads while the main thread adds and removes chats: a
+        // snapshot of the array, never an iterator over the live list)
+        for (Object o : all.toArray()) if (o != null && ((Session) o).id.equals(id)) return (Session) o;
         return null;
     }
 
@@ -426,6 +430,7 @@ final class Sessions {
             if (!s.apps.isEmpty()) o.put("apps", new JSONArray(s.apps));
         }
         if (s.lite != null) o.put("lite", s.lite.booleanValue());
+        if (!s.tools.isEmpty()) o.put("tools", new JSONObject(new java.util.HashMap<String, Object>(s.tools)));
         synchronized (s.liteGroups) {
             if (!s.liteGroups.isEmpty()) o.put("lite_groups", new JSONArray(s.liteGroups));
         }
@@ -461,6 +466,11 @@ final class Sessions {
         s.awake = o.optBoolean("awake");
         s.background = o.optBoolean("background");
         if (o.has("lite")) s.lite = o.optBoolean("lite");
+        JSONObject tl = o.optJSONObject("tools");
+        if (tl != null) for (java.util.Iterator<String> k = tl.keys(); k.hasNext(); ) {
+            String n = k.next();
+            s.tools.put(n, tl.optBoolean(n, true));
+        }
         JSONArray lg = o.optJSONArray("lite_groups");
         for (int i = 0; lg != null && i < lg.length(); i++) s.liteGroups.add(lg.optString(i));
         s.approvals = o.optString("approvals", "");

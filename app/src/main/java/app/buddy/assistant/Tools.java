@@ -453,6 +453,11 @@ final class Tools {
         if (revoked != null && !"notify".equals(name)) return text(revoked);
         String stopped = stoppedNow();
         if (stopped != null) return text(stopped); // the user stopped this session in Buddy
+        // off in Settings (Tools and connections → Tools): the agent listed its tools before the user turned this one off
+        if (!ToolSwitch.onForCaller(svc, name) && !Lite.MORE.equals(name)) return text(ToolSwitch.refusal(name));
+        // find and collect scroll: not with scrolling off
+        if (("find".equals(name) || "collect".equals(name)) && !ToolSwitch.onForCaller(svc, "scroll"))
+            return text(ToolSwitch.refusal("scroll"));
         String capped = countStep(name, a);
         if (capped != null) return text(capped);
         if (Helpers.is(svc, McpServer.CALLER_CHAT.get())) { // a helper only looks things up, by itself (see Helpers)
@@ -474,6 +479,10 @@ final class Tools {
         // do sessions outside Buddy when the user switched that on
         // a background chat may look at the user's real screen (read only): no hidden screen, no helper, no adb
         boolean userScreen = ("read_screen".equals(name) || "screenshot".equals(name)) && "user".equals(a.optString("screen"));
+        // a lite chat has no "screen" choice (small models mixed the two up): while its own screen is still empty,
+        // a look at "the screen" can only mean the user's ("what's on my screen?")
+        if (!userScreen && ("read_screen".equals(name) || "screenshot".equals(name)) && Lite.caller(svc) != null
+                && Background.onFor(svc, screenKey()) && ownScreenEmpty()) userScreen = true;
         USER_SCREEN.set(userScreen && Background.onFor(svc, screenKey()));
         if (SCREEN.contains(name) && !userScreen && Background.onFor(svc, screenKey())) {
             if ("point_out".equals(name)) return text(toScreen("point_out marks things on the user's screen"));
@@ -1083,6 +1092,19 @@ final class Tools {
     }
 
     /** The windows this call reads and touches: the real screen's, or those on the chat's display. */
+    /** This call's hidden screen has no app on it yet (or doesn't exist yet). */
+    private boolean ownScreenEmpty() {
+        int d = Background.displayOf(screenKey());
+        if (d == Display.DEFAULT_DISPLAY) return true;
+        List<AccessibilityWindowInfo> l = svc.getWindowsOnAllDisplays().get(d);
+        if (l == null) return true;
+        for (AccessibilityWindowInfo w : l) {
+            AccessibilityNodeInfo r = w.getRoot();
+            if (w.getType() == AccessibilityWindowInfo.TYPE_APPLICATION && r != null && r.getPackageName() != null) return false;
+        }
+        return true;
+    }
+
     private List<AccessibilityWindowInfo> windows() {
         int d = display();
         if (d == Display.DEFAULT_DISPLAY) return svc.getWindows();
@@ -1469,6 +1491,19 @@ final class Tools {
             JSONObject st = steps.getJSONObject(i);
             String action = st.optString("action");
             String tool = "type".equals(action) ? "type_text" : action;
+            // a step is that tool as much as a call of its own would be, and what it does on the way too: a "type" step
+            // with a target taps it first, a target found by its text reads the screen, "until" waits as wait_for does
+            boolean byText = !st.has("element") && !(st.has("x") && st.has("y"))
+                    && !st.optString("tap".equals(action) || "long_press".equals(action) ? "text" : "target").isEmpty();
+            String off = !ToolSwitch.onForCaller(svc, tool) ? tool
+                    : "type".equals(action) && !st.has("element") && (byText || (st.has("x") && st.has("y")))
+                    && !ToolSwitch.onForCaller(svc, "tap") ? "tap"
+                    : byText && !ToolSwitch.onForCaller(svc, "read_screen") ? "read_screen"
+                    : st.has("until") && !ToolSwitch.onForCaller(svc, "wait_for") ? "wait_for" : null;
+            if (off != null) {
+                out.append(i + 1).append(". ").append(ToolSwitch.refusal(off)).append('\n');
+                break;
+            }
             String before = frontPkg();
             String held = svc.awaitResume(tool);
             if (held == null) held = stoppedNow();

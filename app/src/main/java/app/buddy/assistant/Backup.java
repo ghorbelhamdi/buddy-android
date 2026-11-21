@@ -42,7 +42,8 @@ final class Backup {
      */
     private static final java.util.Set<String> SAFETY = new java.util.HashSet<>(java.util.Arrays.asList(
             "bg_shell", "bg_shell_ask", "agents_tap_buddy", "dev", "autonomous_default", "guard_builtin", "guard_allow",
-            "ssh_server", "remote_session", "codex_remote", "mcp_servers", "ask_new_apps", "tailnet_tools", "outside_background"));
+            "ssh_server", "remote_session", "codex_remote", "mcp_servers", "ask_new_apps", "tailnet_tools", "outside_background",
+            "sms_codes")); // (whether sms_list shows codes in messages)
 
     private Backup() {
     }
@@ -83,6 +84,8 @@ final class Backup {
             addTree(z, new File(c.getFilesDir(), "attachments"), "files/attachments/");
             File face = new File(c.getFilesDir(), "face.png");
             if (face.isFile()) addFile(z, face, "files/face.png");
+            File anim = new File(c.getFilesDir(), "face.anim"); // an animated face, as picked (issue #68)
+            if (anim.isFile()) addFile(z, anim, "files/face.anim");
             if (linux.isFile()) addFile(z, linux, "linux.tar.gz");
         } finally {
             linux.delete();
@@ -158,6 +161,10 @@ final class Backup {
         }
         File face = new File(staging, "files/face.png");
         if (face.isFile()) copyFile(face, new File(c.getFilesDir(), "face.png"));
+        // the backup's animation with its picture, or none: this phone's old one mustn't play over the backup's picture
+        File anim = new File(staging, "files/face.anim"), myAnim = new File(c.getFilesDir(), "face.anim");
+        if (anim.isFile()) copyFile(anim, myAnim);
+        else if (face.isFile()) myAnim.delete();
         // the chats are the backup's: its chat files (2.2.26 on), or none, and then the chats in its settings (before);
         // the chats in memory save nothing more until the restart, so they can't write over them
         ChatHub.get(c).sessions.freeze();
@@ -171,6 +178,17 @@ final class Backup {
             try { // every restored chat asks as App permissions say: "Routine allowed" is chosen on this phone, by hand
                 org.json.JSONObject o = new org.json.JSONObject(new String(java.nio.file.Files.readAllBytes(f.toPath()), "UTF-8"));
                 o.remove("approvals");
+                // nor does a chat switch on a tool for itself that this phone has off (say, reading SMS): only its
+                // "off" choices come along (Chat options → Tools)
+                org.json.JSONObject tl = o.optJSONObject("tools");
+                if (tl != null) {
+                    org.json.JSONObject off = new org.json.JSONObject();
+                    for (java.util.Iterator<String> k = tl.keys(); k.hasNext(); ) {
+                        String n = k.next();
+                        if (!tl.optBoolean(n, true)) off.put(n, false);
+                    }
+                    o.put("tools", off);
+                }
                 // nor does a chat bring Linux tools along onto a phone that starts chats without them: a chat with a
                 // scheduled task would run with a shell there unseen. The user switches them on again in the chat
                 if (!Prefs.devMode(c)) o.put("dev", false);
@@ -261,7 +279,9 @@ final class Backup {
     private static boolean stays(String k) {
         return OWN.contains(k) || SAFETY.contains(k) || k.startsWith("agent_default_")
                 // where Buddy's Linux downloads from, where an agent's requests go, and who reviews its steps
-                || k.startsWith("mirror") || k.startsWith("api_base_") || k.startsWith("reviewer");
+                || k.startsWith("mirror") || k.startsWith("api_base_") || k.startsWith("reviewer")
+                // which phone tools agents get (Settings → Tools and connections → Tools)
+                || k.startsWith("tool_on:");
     }
 
     /** An app's mode by how much it asks: none or Trust 0, Smart 1, Hard 2. */

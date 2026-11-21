@@ -101,6 +101,10 @@ public class OnPhoneActivity extends Screen {
         TextView ri = text(this, info, 12, MUTED);
         ri.setPaddingRelative(dp(this, 4), dp(this, 8), dp(this, 4), 0);
         body.addView(ri, full());
+        LinearLayout think = switchRow(this, getString(R.string.onphone_think), getString(R.string.onphone_think_info),
+                OnPhone.think(this), on -> OnPhone.setThink(this, on));
+        think.setPaddingRelative(dp(this, 4), dp(this, 16), dp(this, 4), 0);
+        body.addView(think, full());
 
         TextView ml = sectionLabel(this, getString(R.string.onphone_models));
         ml.setPaddingRelative(0, dp(this, 20), 0, dp(this, 8));

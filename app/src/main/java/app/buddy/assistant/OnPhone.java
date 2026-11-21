@@ -147,6 +147,22 @@ final class OnPhone {
         stopWhenIdle(); // the next request starts it there (an answer under way finishes first)
     }
 
+    /**
+     * Thinking before each answer: off unless the user turns it on. llama.cpp's own default ("auto") turns it on for
+     * any model whose template can think, though Qwen3.5 2B is made to answer without: thinking, a small model took
+     * 20-30 s a step and went in circles on a chat's title; without, 1-2 s and the same tool calls (Gemma 4 E2B chose
+     * a little worse without it: one of three steps took the long way).
+     */
+    static boolean think(Context c) {
+        return sp(c).getBoolean("think", false);
+    }
+
+    static void setThink(Context c, boolean on) {
+        if (on == think(c)) return;
+        sp(c).edit().putBoolean("think", on).apply();
+        stopWhenIdle(); // the next request starts it that way
+    }
+
     /** Where it ran last ("npu", "gpu", "cpu"), or "" before its first start. */
     static String ranOn(Context c) {
         return sp(c).getString("ran_on", "");
@@ -487,9 +503,13 @@ final class OnPhone {
                 "-dev", dev, "-ngl", "none".equals(dev) ? "0" : "99", "--alias", m.id, "--no-webui",
                 // small models can think in circles (Qwen3.5 2B spent 7 minutes on a chat's title): capped, and since
                 // the engine answers one request at a time, the chat's own request no longer waits behind it
+                "--reasoning", think(c) ? "on" : "off",
                 "--reasoning-budget", "512", "--reasoning-budget-message", " Enough thinking: answer now."};
         for (String a : args) cmd.add(a);
-        ProcessBuilder pb = new ProcessBuilder(cmd).redirectErrorStream(true).directory(engine);
+        // run from its library folder: the plain build (phones without Snapdragon) loads its CPU code from the
+        // program's folder or the current one, and through linker64 the program's folder is /system/bin (issue #67:
+        // "no backends are loaded" on a Pixel)
+        ProcessBuilder pb = new ProcessBuilder(cmd).redirectErrorStream(true).directory(new File(engine, "lib"));
         String lib = new File(engine, "lib").getAbsolutePath();
         pb.environment().put("LD_LIBRARY_PATH", lib + ":/vendor/lib64");
         pb.environment().put("ADSP_LIBRARY_PATH", lib); // the NPU's half, which it loads from here

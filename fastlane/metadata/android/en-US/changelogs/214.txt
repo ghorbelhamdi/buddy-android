@@ -1,8 +1,2 @@
-• Models on this phone: Gemma 4 or Qwen3.5 run offline on the NPU, GPU or CPU
-• Lite mode for small models: a dozen phone tools, more when needed
-• Bank mode: Buddy's accessibility service off with one tap, or by itself when a bank app opens
-• Lao, and a Language row in Settings → Appearance: Buddy alone changes language
-• Model pickers say what a model takes: images, tools, thinking
-• Fixed: OpenCode got Buddy's instructions twice
-• Fixed: app installer opened on a hidden screen
-• Fixed: background chats paused when you touched the screen
+• Models on this phone: MCP servers from your own OpenCode settings no longer fill the model's window (a large one made every request ~250k tokens)
+• Live voice: the voice's words in the bar are marked with 🔊 and clear when it's done, so they no longer look like something you said
