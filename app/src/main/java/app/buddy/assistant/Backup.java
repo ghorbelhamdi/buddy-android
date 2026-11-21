@@ -86,6 +86,8 @@ final class Backup {
             if (face.isFile()) addFile(z, face, "files/face.png");
             File anim = new File(c.getFilesDir(), "face.anim"); // an animated face, as picked (issue #68)
             if (anim.isFile()) addFile(z, anim, "files/face.anim");
+            File animCrop = new File(c.getFilesDir(), "face.anim.crop"); // (where the bubble crops it)
+            if (animCrop.isFile()) addFile(z, animCrop, "files/face.anim.crop");
             if (linux.isFile()) addFile(z, linux, "linux.tar.gz");
         } finally {
             linux.delete();
@@ -165,6 +167,9 @@ final class Backup {
         File anim = new File(staging, "files/face.anim"), myAnim = new File(c.getFilesDir(), "face.anim");
         if (anim.isFile()) copyFile(anim, myAnim);
         else if (face.isFile()) myAnim.delete();
+        File crop = new File(staging, "files/face.anim.crop"), myCrop = new File(c.getFilesDir(), "face.anim.crop");
+        if (crop.isFile()) copyFile(crop, myCrop);
+        else if (face.isFile()) myCrop.delete();
         // the chats are the backup's: its chat files (2.2.26 on), or none, and then the chats in its settings (before);
         // the chats in memory save nothing more until the restart, so they can't write over them
         ChatHub.get(c).sessions.freeze();

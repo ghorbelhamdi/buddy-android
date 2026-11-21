@@ -202,6 +202,7 @@ final class Bubble implements ChatHub.Listener {
             }
         }
         if (breathing != null) breathing.cancel();
+        stopTalk(); // (the waves have a window of their own)
         try {
             wm.removeView(root);
         } catch (Exception ignored) {
@@ -431,6 +432,22 @@ final class Bubble implements ChatHub.Listener {
         messages.setOrientation(LinearLayout.VERTICAL);
         messages.setPaddingRelative(0, dp(8), 0, dp(8));
         scroll.addView(messages);
+        // the user scrolled up to read: new messages don't pull the chat down meanwhile (issue #73). At the end, it
+        // stays there as the chat grows, once laid out (a post before the layout fell short of a long reply)
+        scroll.setOnScrollChangeListener((v, x, y, ox, oy) -> {
+            boolean was = pinned;
+            pinned = y + scroll.getHeight() >= messages.getHeight() - dp(160);
+            // back at the end: what piled up while the user read goes now (kept meanwhile, so the text stayed put)
+            if (pinned && !was && messages.getChildCount() > Sessions.PAGE) scroll.post(this::scrollToEnd);
+        });
+        final int[] endSeen = new int[2]; // {children, the last one's height} at the last layout
+        messages.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
+            int n = messages.getChildCount(), last = n > 0 ? messages.getChildAt(n - 1).getHeight() : 0;
+            boolean grewAtEnd = n != endSeen[0] || last != endSeen[1]; // (not a log opened further up)
+            endSeen[0] = n;
+            endSeen[1] = last;
+            if (pinned && grewAtEnd && b - t != ob - ot) scroll.scrollTo(0, b - t);
+        });
         helpersList = new LinearLayout(svc);
         helpersList.setOrientation(LinearLayout.VERTICAL);
         helpersList.setBackground(Ui.rounded(svc, Ui.CARD, 12));
@@ -830,7 +847,7 @@ final class Bubble implements ChatHub.Listener {
         if (headButtons != null) headButtons.setVisibility(pad > 0 ? View.GONE : View.VISIBLE); // room for the chat
         if (root.getPaddingBottom() != pad) {
             root.setPaddingRelative(0, 0, 0, pad);
-            scrollToEnd();
+            followEnd();
         }
     }
 
@@ -1099,15 +1116,23 @@ final class Bubble implements ChatHub.Listener {
     /** The bubble can be turned off in the app; it then only appears for approval cards. */
     void applyEnabled() {
         if (locked && expanded && pendingConfirm == null) collapse();
-        boolean show = !locked && (Prefs.bubbleEnabled(svc) || expanded || pendingConfirm != null || controlling || svc.paused());
+        // paused, it stays up (its pill resumes), unless the user dragged it onto ✕ during this pause (issue #72): then
+        // the hidden-bubble notification has Resume and brings it back; left alone, the pause times out and the task stops
+        boolean show = !locked && (Prefs.bubbleEnabled(svc) || expanded || pendingConfirm != null || controlling
+                || (svc.paused() && !hiddenInPause) || talkListening); // (it listens: it stays till that's done)
         boolean wasHidden = root.getVisibility() != View.VISIBLE;
         root.setVisibility(show ? View.VISIBLE : View.GONE);
         if (show && wasHidden && !expanded) popIn();
-        if (!show) showDismissTarget(false);
+        if (!show) {
+            showDismissTarget(false);
+            if (locked) stopTalk(); // locked while listening: its waves stayed on screen (issue #71)
+        }
         updateThumb();
     }
 
     private boolean locked, controlling;
+    /** Dragged onto ✕ while paused: it stays hidden until this pause ends (see applyEnabled). */
+    private boolean hiddenInPause;
 
     /** An agent is operating the phone: show the bubble (even if hidden) in its "in control" state. */
     void setControlling(boolean on) {
@@ -1122,6 +1147,7 @@ final class Bubble implements ChatHub.Listener {
      * so, and the bubble stays up while paused.
      */
     void onPauseChanged() {
+        if (!svc.paused()) hiddenInPause = false; // a new pause shows it again
         applyEnabled();
         refreshStatus();
     }
@@ -1264,13 +1290,15 @@ final class Bubble implements ChatHub.Listener {
 
     private void dismissToNotification() {
         vibrate(40);
+        stopTalk(); // dragged away while listening: that ends it (issue #71)
         final View head = (View) face.getParent();
         // spin and shrink into the target, which pops and drops away
         head.animate().scaleX(0f).scaleY(0f).rotation(180f).alpha(0f)
                 .setInterpolator(new AccelerateInterpolator(1.6f)).setDuration(240)
                 .withEndAction(() -> {
                     Prefs.setBubbleEnabled(svc, false);
-                    HiddenNotice.show(svc);
+                    if (svc.paused()) hiddenInPause = true;
+                    HiddenNotice.show(svc, svc.paused()); // (with Resume while paused: no pill shows it now)
                     applyCollapsedParams();
                     wm.updateViewLayout(root, lp);
                     applyEnabled();
@@ -1422,6 +1450,7 @@ final class Bubble implements ChatHub.Listener {
             answerChange(text);
             return;
         }
+        sentAt = SystemClock.uptimeMillis(); // (its message shows, wherever the user was reading)
         String err = hub.send(sessions.current, text);
         if (err != null) {
             toast(err);
@@ -1651,6 +1680,7 @@ final class Bubble implements ChatHub.Listener {
                     ses = hub.create(Prefs.backend(svc));
                     hub.select(ses);
                 }
+                sentAt = SystemClock.uptimeMillis();
                 String e = hub.send(ses, text);
                 if (e != null) toast(e);
             }
@@ -1686,7 +1716,30 @@ final class Bubble implements ChatHub.Listener {
         talkListening = false;
         showWaves(false);
         noteDone();
+        applyEnabled(); // (kept up only while it listened, it may go now)
     }
+
+    /** Talk mode ends now: the bubble went away (hidden, dragged onto ✕, the screen locked) while it listened. */
+    private void stopTalk() {
+        if (talkListening) Voice.stopListening(); // (its listener's onEnd ends talk mode)
+        if (talkListening || waves != null) talkDone();
+    }
+
+    /**
+     * The waves show only while the bubble really listens: the recognizer can end without a word to its listener
+     * (taken by another app, an error), and then they stayed on screen (issue #71). Checked once a second.
+     */
+    private final Runnable wavesWatch = new Runnable() {
+        @Override
+        public void run() {
+            if (waves == null) return;
+            if (!Voice.listening()) {
+                talkDone();
+                return;
+            }
+            root.postDelayed(this, 1000);
+        }
+    };
 
     /** The waves' own small window, centred under the bubble's face; touches go through it. */
     private void showWaves(boolean on) {
@@ -1716,6 +1769,8 @@ final class Bubble implements ChatHub.Listener {
         p.x = Math.max(0, Math.min(screen().width() - w, loc[0] + face.getWidth() / 2 - w / 2));
         p.y = loc[1] + face.getHeight() + dp(8);
         wm.addView(waves, p);
+        root.removeCallbacks(wavesWatch);
+        root.postDelayed(wavesWatch, 1500); // (the recognizer gets a moment to start)
     }
 
     /** Moves the waves along when the bubble is dragged or snaps to an edge while listening. */
@@ -3319,9 +3374,7 @@ final class Bubble implements ChatHub.Listener {
         else if (face.getDrawable() != own) {
             face.setImageDrawable(own);
             // an animated picture (issue #68) plays as it comes on: once, or for good (Settings)
-            if (own instanceof android.graphics.drawable.AnimatedImageDrawable) {
-                ((android.graphics.drawable.AnimatedImageDrawable) own).start();
-            }
+            if (own instanceof android.graphics.drawable.Animatable) ((android.graphics.drawable.Animatable) own).start();
         }
         android.view.ViewOutlineProvider outline = own != null ? null : BODY;
         if (face.getOutlineProvider() != outline) face.setOutlineProvider(outline);
@@ -3329,9 +3382,8 @@ final class Bubble implements ChatHub.Listener {
 
     /** An animated picture on the bubble plays again from its start: the phone was just unlocked (issue #68). */
     void replayFace() {
-        if (face.getDrawable() instanceof android.graphics.drawable.AnimatedImageDrawable) {
-            android.graphics.drawable.AnimatedImageDrawable a =
-                    (android.graphics.drawable.AnimatedImageDrawable) face.getDrawable();
+        if (face.getDrawable() instanceof android.graphics.drawable.Animatable) {
+            android.graphics.drawable.Animatable a = (android.graphics.drawable.Animatable) face.getDrawable();
             a.stop();
             a.start();
         }
@@ -3371,23 +3423,27 @@ final class Bubble implements ChatHub.Listener {
     /** The open run of tool steps (grouped like the chat screen's log), or null. */
     private StepLog log;
 
-    /** A message with its pictures, as in the chat screen: under a reply, above what the user wrote. Other files by name. */
+    /**
+     * A message with its files, as in the chat screen: under a reply, above what the user wrote. Pictures show, other
+     * files are chips that open them (a PDF an agent saved to Downloads, say).
+     */
     private void showMessage(Sessions.Msg m) {
-        java.util.List<String> pictures = new java.util.ArrayList<>();
-        boolean otherFiles = false;
-        for (String id : m.files) {
-            if (Attachments.isImage(id)) pictures.add(id);
-            else otherFiles = true;
-        }
-        if (pictures.isEmpty() || otherFiles) {
-            showMessage(m.kind, m.label());
+        boolean sent = m.kind == Kind.USER && SystemClock.uptimeMillis() - sentAt < 3000; // (not a rule's or a schedule's)
+        if (m.files.isEmpty()) {
+            showMessage(m.kind, m.text);
+            if (sent) scrollToEnd();
+            else followEnd();
             return;
         }
         boolean user = m.kind == Kind.USER;
         if (!user && !m.text.isEmpty()) showMessage(m.kind, m.text);
-        for (String id : pictures) showPicture(id, user);
+        for (String id : m.files) {
+            if (Attachments.isImage(id)) showPicture(id, user);
+            else showFileChip(id, user);
+        }
         if (user && !m.text.isEmpty()) showMessage(m.kind, m.text);
-        scrollToEnd();
+        if (sent) scrollToEnd(); // what the user just sent shows, wherever they were reading
+        else followEnd();
     }
 
     private void showPicture(final String id, boolean user) {
@@ -3420,6 +3476,33 @@ final class Bubble implements ChatHub.Listener {
         messages.addView(iv, p);
     }
 
+    /** A file that isn't a picture: its name on a chip, a tap opens it in another app. */
+    private void showFileChip(final String id, boolean user) {
+        if (log != null) {
+            log.finish();
+            log = null;
+        }
+        View hint = messages.findViewWithTag("hint");
+        if (hint != null) messages.removeView(hint);
+        LinearLayout chip = new LinearLayout(svc);
+        chip.setOrientation(LinearLayout.HORIZONTAL);
+        chip.setGravity(Gravity.CENTER_VERTICAL);
+        chip.setPaddingRelative(dp(10), dp(8), dp(12), dp(8));
+        chip.setBackground(Ui.outlined(svc, Ui.CARD, 14, Ui.OUTLINE, 1));
+        chip.addView(Ui.icon(svc, R.drawable.ms_description, Ui.ACCENT_TEXT, 20));
+        TextView t = Ui.single(Ui.text(svc, Attachments.name(id), 14, Ui.TEXT));
+        t.setMaxWidth(dp(200));
+        t.setPaddingRelative(dp(8), 0, 0, 0);
+        chip.addView(t);
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        p.topMargin = dp(6);
+        if (user) p.gravity = Gravity.END;
+        else p.setMarginStart(dp(4));
+        chip.setOnClickListener(x -> openPicture(id)); // (opens any attachment in the app for its type)
+        messages.addView(chip, p);
+    }
+
     private void openPicture(String id) {
         collapse();
         android.net.Uri u = FilesProvider.attachmentUri(id);
@@ -3446,7 +3529,7 @@ final class Bubble implements ChatHub.Listener {
             }
             log.add(text);
             log.setLive(sessions.current.running);
-            scrollToEnd();
+            followEnd();
             return;
         }
         if (log != null) {
@@ -3537,8 +3620,7 @@ final class Bubble implements ChatHub.Listener {
         }
         copyOnLongPress(v, text);
         messages.addView(v, p);
-        while (messages.getChildCount() > Sessions.PAGE) messages.removeViewAt(0);
-        scrollToEnd();
+        followEnd(); // (the oldest ones go then: removed above a reader, they moved the text being read)
     }
 
     /** A reply's text (or the text between its tables): Markdown, links tappable, a long press copies it. */
@@ -3717,8 +3799,21 @@ final class Bubble implements ChatHub.Listener {
         }
     }
 
+    /** At (about) the end of the chat, where new messages show: set as the user scrolls. */
+    private boolean pinned = true;
+    /** When the user last sent a message from the bubble: that one shows, wherever they were reading. */
+    private long sentAt;
+
+    /** A new message or step: the chat follows it only while the user is at its end. */
+    private void followEnd() {
+        if (pinned) scrollToEnd();
+    }
+
     private void scrollToEnd() {
-        scroll.post(() -> scroll.fullScroll(View.FOCUS_DOWN));
+        pinned = true;
+        while (messages.getChildCount() > Sessions.PAGE) messages.removeViewAt(0); // the oldest go: none is being read
+        // a jump, not fullScroll's animation: its frames on the way read as "scrolled up" and unpinned the chat
+        scroll.post(() -> scroll.scrollTo(0, messages.getHeight()));
     }
 
     private TextView subtitle, stripText;

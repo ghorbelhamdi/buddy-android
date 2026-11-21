@@ -13,8 +13,14 @@ public final class HiddenNotice extends BroadcastReceiver {
     private static final String CHANNEL = "bubble_hidden";
     private static final int ID = 1;
     static final String ACTION_SHOW = "app.buddy.assistant.SHOW_BUBBLE";
+    /** Resume, on the notice of a bubble hidden while a task was paused (issue #72). */
+    static final String ACTION_RESUME = "app.buddy.assistant.RESUME_HIDDEN";
 
     static void show(Context c) {
+        show(c, false);
+    }
+
+    static void show(Context c, boolean paused) {
         NotificationManager nm = c.getSystemService(NotificationManager.class);
         nm.createNotificationChannel(new NotificationChannel(CHANNEL, c.getString(R.string.notice_channel_name),
                 NotificationManager.IMPORTANCE_LOW));
@@ -24,19 +30,38 @@ public final class HiddenNotice extends BroadcastReceiver {
         PendingIntent openApp = PendingIntent.getActivity(c, 1,
                 new Intent(c, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-        Notification n = new Notification.Builder(c, CHANNEL)
+        Notification.Builder nb = new Notification.Builder(c, CHANNEL)
                 .setSmallIcon(R.drawable.ic_launcher_monochrome)
                 .setContentTitle(c.getString(R.string.notice_hidden_title))
                 .setContentText(c.getString(R.string.notice_hidden_text))
                 .setContentIntent(showBubble)
                 .addAction(new Notification.Action.Builder(null, c.getString(R.string.notice_open_chats), openApp).build())
                 .setOngoing(false)
-                .setAutoCancel(true)
-                .build();
+                .setAutoCancel(true);
+        if (paused) { // the pill that resumes went with the bubble
+            nb.addAction(new Notification.Action.Builder(null, c.getString(R.string.menu_resume), PendingIntent.getBroadcast(c, 2,
+                    new Intent(c, HiddenNotice.class).setAction(ACTION_RESUME),
+                    PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT)).build());
+        }
+        Notification n = nb.build();
         try {
             nm.notify(ID, n);
         } catch (SecurityException ignored) {
             // notifications not allowed; the bubble can still be shown again from Settings
+        }
+    }
+
+    /** A pause ended: the notice of a bubble hidden during it, if it's still up, without Resume now. */
+    static void pauseEnded(Context c) {
+        try {
+            for (android.service.notification.StatusBarNotification n
+                    : c.getSystemService(NotificationManager.class).getActiveNotifications()) {
+                if (n.getId() == ID && n.getNotification().actions != null && n.getNotification().actions.length > 1) {
+                    show(c, false);
+                    return;
+                }
+            }
+        } catch (RuntimeException ignored) {
         }
     }
 
@@ -65,8 +90,14 @@ public final class HiddenNotice extends BroadcastReceiver {
         }
         if (AutoPause.ACTION_RESUME.equals(intent.getAction())) { // "Call ended": resume the paused task
             BuddyService s = BuddyService.get();
-            if (s != null) s.resume();
+            if (s != null) s.resumeFromShade();
             AutoPause.cancelCallEnded(c); // also when it had ended already
+            return;
+        }
+        if (ACTION_RESUME.equals(intent.getAction())) { // the task goes on; the bubble stays hidden (its notice, plain)
+            BuddyService s = BuddyService.get();
+            if (s != null && s.paused()) s.resumeFromShade(); // (a pause still on: the one it was shown for)
+            show(c, false);
             return;
         }
         if (!ACTION_SHOW.equals(intent.getAction())) return;

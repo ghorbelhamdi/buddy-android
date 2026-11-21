@@ -56,7 +56,7 @@ import java.util.Map;
  */
 public final class Shell {
     /** Raised when the protocol changes: Buddy restarts a helper that answers another number. */
-    static final int VERSION = 12;
+    static final int VERSION = 13;
     /** A chat's display goes when nothing was asked of it for this long (Buddy keeps the ones in use alive). */
     private static final long IDLE_MS = 10 * 60_000;
 
@@ -553,7 +553,10 @@ public final class Shell {
                     | (1 << 8) /* destroy content on removal */;
             if (Build.VERSION.SDK_INT >= 33) flags |= (1 << 10) /* trusted */ | (1 << 11) /* own display group */
                     | (1 << 12) /* always unlocked */ | (1 << 13) /* no touch feedback */;
-            if (Build.VERSION.SDK_INT >= 34) flags |= (1 << 14) /* own focus */ | (1 << 15) /* device display group */;
+            // own focus, and it never takes the top focus from the phone's screen: when its app started or was touched,
+            // the phone's own window lost focus and the keyboard wouldn't open in Buddy's chat until it was reopened
+            if (Build.VERSION.SDK_INT >= 34) flags |= (1 << 14) /* own focus */ | (1 << 15) /* device display group */
+                    | (1 << 16) /* steal top focus disabled */;
             s.display = dm.createVirtualDisplay("buddy-" + chat, w, h, dpi, s.reader.getSurface(), flags);
             if (s.display == null) throw new IllegalStateException("the system made no display");
             s.id = s.display.getDisplay().getDisplayId();

@@ -286,7 +286,18 @@ final class PhoneTools {
         v.clear();
         v.put(MediaStore.MediaColumns.IS_PENDING, 0);
         svc.getContentResolver().update(u, v, null, null);
-        return "Saved to Downloads/Buddy/" + name + ".";
+        // the chat shows it under the agent's reply, a tap opens it (it said where it saved it, and nothing to open)
+        String chat = McpServer.CALLER_CHAT.get();
+        boolean chip = false;
+        if (chat != null) {
+            try {
+                ChatHub.get(svc).fileSaved(chat, Attachments.importUri(svc, u));
+                chip = true;
+            } catch (java.io.IOException tooBig) { // (over the attachments' 25 MB: it's in Downloads all the same)
+            }
+        }
+        return "Saved to Downloads/Buddy/" + name + "."
+                + (chip ? " The chat shows it under your reply for the user to open." : "");
     }
 
     private static void copy(InputStream in, OutputStream out) throws Exception {

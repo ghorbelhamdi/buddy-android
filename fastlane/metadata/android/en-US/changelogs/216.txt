@@ -1,0 +1,5 @@
+• Files an agent saves to Downloads show under its reply; a tap opens them (in the bubble too)
+• The keyboard opens right away in background-mode chats
+• Reading earlier messages, the chat no longer jumps down while an agent works
+• Talk mode's waves go with the bubble; a paused bubble can be dragged away (Resume in its notification)
+• Animated pictures fill the bubble like still ones

@@ -224,6 +224,7 @@ final class ChatHub {
     }
 
     void delete(Sessions.Session s) {
+        savedFiles.remove(s.id);
         if (CodexLive.on(s)) CodexLive.end(null);
         StepLog.deleteChat(app, s.id);
         try {
@@ -919,7 +920,7 @@ final class ChatHub {
                             t = t.replace(QUIET, "").trim();
                         }
                         if (!t.isEmpty()) {
-                            add(ses, Bubble.Kind.BUDDY, t, pictures(t));
+                            add(ses, Bubble.Kind.BUDDY, t, replyFiles(ses, t));
                             ses.lastReply = t;
                             ses.gotText = true;
                             CodexLive.agentSaid(ses, t); // a live voice call in this chat tells the user
@@ -966,11 +967,11 @@ final class ChatHub {
                     ses.quietSaid = true;
                     r = r.replace(QUIET, "").trim();
                     if (!ses.gotText && !r.isEmpty()) {
-                        add(ses, Bubble.Kind.BUDDY, r, pictures(r));
+                        add(ses, Bubble.Kind.BUDDY, r, replyFiles(ses, r));
                         ses.lastReply = r;
                     }
                 } else if (!ses.gotText && !r.isEmpty()) {
-                    add(ses, Bubble.Kind.BUDDY, r, pictures(r));
+                    add(ses, Bubble.Kind.BUDDY, r, replyFiles(ses, r));
                     ses.lastReply = r;
                     CodexLive.agentSaid(ses, r);
                 }
@@ -982,7 +983,8 @@ final class ChatHub {
                 for (int i = ses.messages.size() - 1; i >= 0 && !shown; i--) {
                     Sessions.Msg m = ses.messages.get(i);
                     if (m.kind == Bubble.Kind.USER) break;
-                    shown = m.kind == Bubble.Kind.BUDDY && !m.files.isEmpty();
+                    if (m.kind != Bubble.Kind.BUDDY) continue;
+                    for (String f : m.files) if (Attachments.isImage(f)) shown = true; // (a saved PDF's chip isn't one)
                 }
                 if (shown) break;
                 JSONArray paths = ev.optJSONArray("paths");
@@ -1024,6 +1026,8 @@ final class ChatHub {
                 if (ses.running) {
                     ses.running = false;
                     ses.status = "";
+                    List<String> left0 = savedFiles.remove(ses.id); // saved, but no reply came to show them under
+                    if (left0 != null && !left0.isEmpty()) add(ses, Bubble.Kind.BUDDY, "", left0);
                     runEnded(ses);
                     if (!ses.lastReply.isEmpty()) {
                         Prefs.setHadReply(app);
@@ -1300,6 +1304,30 @@ final class ChatHub {
             Voice.speak(app, text);
         Sessions.Msg m = ses.messages.get(ses.messages.size() - 1);
         for (Listener l : new ArrayList<>(listeners)) l.onMessage(ses, m);
+    }
+
+    /** Files a chat's agent saved to Downloads (save_to_downloads), as attachments: its next reply shows them. */
+    private final java.util.Map<String, List<String>> savedFiles = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /** An agent saved a file to Downloads in this chat (any thread): it comes as a chip under the chat's next reply. */
+    void fileSaved(String chat, String attachment) {
+        savedFiles.computeIfAbsent(chat, k -> java.util.Collections.synchronizedList(new ArrayList<>())).add(attachment);
+    }
+
+    /** What a reply shows under it: the pictures it names, and the files saved to Downloads since the last reply. */
+    private List<String> replyFiles(Sessions.Session ses, String text) {
+        List<String> out = pictures(text);
+        List<String> saved = savedFiles.remove(ses.id);
+        if (saved == null) return out;
+        java.util.Set<String> named = new java.util.HashSet<>(); // (the same file has a new id each copy: by its name)
+        for (String id : out) named.add(stem(Attachments.name(id)));
+        for (String id : saved) if (named.add(stem(Attachments.name(id)))) out.add(id);
+        return out;
+    }
+
+    /** "chart.png" → "chart": a photo saved as a copy becomes .jpg, so names are compared without it. */
+    private static String stem(String name) {
+        return name.replaceAll("\\.[A-Za-z0-9]{1,5}$", "").toLowerCase(java.util.Locale.ROOT);
     }
 
     /** A picture's path in Buddy's Linux, as agents write it: /root/.buddy/work/chart.png, ~/out/photo.jpg. */

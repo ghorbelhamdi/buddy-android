@@ -746,6 +746,20 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         if (ses != null) hub.note(ses, Bubble.Kind.STEP, getString(R.string.service_resumed_note));
     }
 
+    /**
+     * Resume from a notification's button: the shade it was tapped in closes first (Android leaves it open, the agent's
+     * next step saw it, and closing it by hand was a touch that paused again), then the task goes on.
+     */
+    void resumeFromShade() {
+        if (!paused) return;
+        performGlobalAction(GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE);
+        main.removeCallbacks(shadeResume);
+        main.postDelayed(shadeResume, 600); // (once it's gone: the agent reads the screen again first)
+    }
+
+    /** Resume from a notification, due once the shade is closed; called off when this pause ends some other way. */
+    private final Runnable shadeResume = this::resume;
+
     /** A chat was stopped while paused (main thread): end the pause without letting waiting actions go ahead. */
     void stopPaused() {
         if (!paused) return;
@@ -755,6 +769,8 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
 
     private void endPause() {
         if (!paused) return;
+        main.removeCallbacks(shadeResume); // (a Resume tap was for this pause: not for the next one)
+        HiddenNotice.pauseEnded(this); // the hidden bubble's notice loses its Resume
         paused = false;
         heldInPause = false;
         main.removeCallbacks(pauseExpired);

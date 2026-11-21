@@ -10,6 +10,7 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -216,6 +217,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         messages = column(this);
         messages.setPaddingRelative(dp(this, 16), dp(this, 8), dp(this, 16), dp(this, 12));
         scroll.addView(messages);
+        watchEnd();
         root.addView(scroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
 
         // a notification rule's chat: "Check again" has the agent look at the conversation now (see Triggers.recheck)
@@ -647,6 +649,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             for (String line : quoted.split("\n")) b.append("> ").append(line).append('\n');
             text = b.append('\n').append(text).toString();
         }
+        sentAt = android.os.SystemClock.uptimeMillis(); // (its message shows, wherever the user was reading)
         String err = hub.send(ses, text, pending);
         if (err != null) {
             Toast.makeText(this, err, Toast.LENGTH_LONG).show();
@@ -674,10 +677,49 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 messages.removeAllViews();
                 hint = null;
             }
+            boolean follow = following || (msg.kind == Bubble.Kind.USER && justSent());
             show(msg);
             lastShown = msg;
-            scrollToEnd();
+            // only when the user is at the end: reading earlier messages, a running chat pulled them down (issue #73)
+            if (follow) scrollToEnd();
         }
+    }
+
+    /** At (about) the end of the chat, where new messages show: set as the user scrolls (issue #73). */
+    private boolean following = true;
+
+    /** Is the chat scrolled to (about) its end? */
+    private boolean atEnd() {
+        View content = scroll.getChildCount() > 0 ? scroll.getChildAt(0) : null;
+        if (content == null) return true;
+        return scroll.getScrollY() + scroll.getHeight() >= content.getHeight() - dp(this, 160);
+    }
+
+    /** When the user last sent a message from this screen: that one shows, wherever they were reading. */
+    private long sentAt;
+
+    private boolean justSent() {
+        return android.os.SystemClock.uptimeMillis() - sentAt < 3000;
+    }
+
+    /** What the end of the chat looked like at the last layout: {children, the last one's height}. */
+    private final int[] endSeen = new int[2];
+
+    /**
+     * Following the end: the user's scrolling decides it, and the chat stays at the end as it grows there (a new
+     * message, a reply getting longer), once laid out. A log the user opens further up doesn't move it.
+     */
+    private void watchEnd() {
+        scroll.setOnScrollChangeListener((v, x, y, ox, oy) -> following = atEnd());
+        View content = scroll.getChildAt(0);
+        if (content instanceof ViewGroup) content.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
+            ViewGroup g = (ViewGroup) v;
+            int n = g.getChildCount(), last = n > 0 ? g.getChildAt(n - 1).getHeight() : 0;
+            boolean grewAtEnd = n != endSeen[0] || last != endSeen[1];
+            endSeen[0] = n;
+            endSeen[1] = last;
+            if (following && grewAtEnd && b - t != ob - ot) scroll.scrollTo(0, b - t);
+        });
     }
 
     /** The agents this chat could run on: its own and every other signed-in one. */
@@ -3107,7 +3149,9 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     }
 
     private void scrollToEnd() {
-        scroll.post(() -> scroll.fullScroll(View.FOCUS_DOWN));
+        following = true; // (the layout listener keeps it there as what was just added gets its height)
+        // a jump: during fullScroll's animation a new message read the chat as scrolled up and didn't follow
+        scroll.post(() -> scroll.scrollTo(0, scroll.getChildCount() > 0 ? scroll.getChildAt(0).getHeight() : 0));
     }
 
     /** Consecutive tool steps, grouped into one collapsible log. */
