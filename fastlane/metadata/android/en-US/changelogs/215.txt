@@ -6,3 +6,5 @@
 • Lao, and a Language row in Settings → Appearance: Buddy alone changes language
 • Model pickers say what a model takes: images, tools, thinking
 • Fixed: OpenCode got Buddy's instructions twice, installers on a hidden screen, background chats paused on touch
+• Navigation: labels below the icons; the active label shows and slides in, inactive ones float
+• New: subtle enter animations on the nav labels

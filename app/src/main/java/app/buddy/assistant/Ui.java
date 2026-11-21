@@ -1353,20 +1353,22 @@ final class Ui {
         for (int i = 0; i < items.length; i++) {
             final int idx = i;
             boolean on = i == active;
-            LinearLayout it = row(a);
+            LinearLayout it = column(a);
             it.setGravity(Gravity.CENTER);
             it.setPaddingRelative(dp(a, 8), 0, dp(a, 8), 0);
-            it.setMinimumHeight(dp(a, 56));
+            it.setMinimumHeight(dp(a, 62));
             if (on) it.setBackground(rounded(a, Theme.withAlpha(ACCENT, 0x29), 28));
             else it.setBackgroundResource(ripple(a, true));
             FrameLayout iconBox = new FrameLayout(a);
-            iconBox.addView(icon(a, (Integer) items[i][0], on ? TEXT : MUTED, 20),
-                    new FrameLayout.LayoutParams(dp(a, 20), dp(a, 20), Gravity.CENTER));
+            iconBox.addView(icon(a, (Integer) items[i][0], on ? TEXT : MUTED, 24),
+                    new FrameLayout.LayoutParams(dp(a, 28), dp(a, 28), Gravity.CENTER));
             it.addView(iconBox, new LinearLayout.LayoutParams(dp(a, 28), dp(a, 28)));
-            TextView label = single(text(a, (String) items[i][1], 14, on ? TEXT : MUTED));
+            TextView label = single(text(a, (String) items[i][1], 11, on ? ACCENT_TEXT : MUTED));
             label.setTypeface(sans(a, on ? 600 : 500));
-            label.setPaddingRelative(dp(a, 6), 0, 0, 0);
-            it.addView(label);
+            label.setGravity(Gravity.CENTER);
+            label.setTranslationY(dp(a, on ? 0 : 9));
+            label.setAlpha(on ? 1f : 0.55f);
+            it.addView(label, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(a, 22)));
             if (i == NAV_SESSIONS && sessionsBadge > 0) {
                 TextView b = text(a, String.valueOf(sessionsBadge), 11, ON_ACCENT);
                 b.setTypeface(sans(a, 700));
@@ -1388,7 +1390,14 @@ final class Ui {
                 a.overridePendingTransition(0, 0);
                 if (!(a instanceof MainActivity)) a.finish();
             });
-            LinearLayout.LayoutParams ip = new LinearLayout.LayoutParams(0, dp(a, 56), 1);
+            // Enter animations: the active item's label glides in; the inactive ones float away.
+            label.animate()
+                    .translationY(dp(a, on ? 0 : 9))
+                    .alpha(on ? 1f : 0.55f)
+                    .setDuration(on ? 420 : 540)
+                    .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                    .start();
+            LinearLayout.LayoutParams ip = new LinearLayout.LayoutParams(0, dp(a, 62), 1);
             if (i > 0) ip.setMarginStart(dp(a, 4));
             bar.addView(it, ip);
         }
