@@ -1146,7 +1146,7 @@
     <string name="settings_tools_sub">MCP 服务器、技能、供其他终端使用的手机工具、Remote Control、SSH</string>
     <string name="settings_appearance_sub">浅色或深色、强调色、表面、Buddy 的外观</string>
     <string name="settings_about">备份与关于</string>
-    <string name="settings_about_sub">备份与迁移、更新、指南、设置检查</string>
+    <string name="settings_about_sub">备份与迁移、更新、指南、检查 Buddy</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <!-- Title of the setup checklist card (noun). -->
@@ -2306,4 +2306,5 @@
     <string name="hub_tool_call_log">正在读取通话记录</string>
     <string name="hub_tool_sms_list">正在读取短信</string>
     <string name="setup_face_too_big">该动画超过 16 MB，气泡会将其显示为静态图片。</string>
+    <string name="background_older">更新前的助手仍在运行，因此后台对话可能仍可使用。要启动新的助手，Buddy 需要一次无线调试：点按“立即启动”。</string>
 </resources>

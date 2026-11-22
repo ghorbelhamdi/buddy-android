@@ -1207,7 +1207,7 @@
     <string name="settings_tools_sub">Máy chủ MCP, kỹ năng, công cụ điện thoại cho terminal khác, Remote Control, SSH</string>
     <string name="settings_appearance_sub">Sáng hoặc tối, màu nhấn, bề mặt, diện mạo của Buddy</string>
     <string name="settings_about">Sao lưu và giới thiệu</string>
-    <string name="settings_about_sub">Sao lưu và chuyển máy, cập nhật, hướng dẫn, kiểm tra thiết lập</string>
+    <string name="settings_about_sub">Sao lưu và chuyển máy, cập nhật, hướng dẫn, Kiểm tra Buddy</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <!-- Title of the setup checklist card (noun). -->
@@ -2447,4 +2447,5 @@
     <string name="hub_tool_call_log">Đang đọc nhật ký cuộc gọi</string>
     <string name="hub_tool_sms_list">Đang đọc SMS</string>
     <string name="setup_face_too_big">Ảnh động này lớn hơn 16 MB nên bong bóng hiển thị nó như ảnh tĩnh.</string>
+    <string name="background_older">Trình trợ giúp từ trước khi cập nhật vẫn đang chạy, nên các cuộc trò chuyện nền có thể vẫn hoạt động. Để khởi động cái mới, Buddy cần Gỡ lỗi không dây một lần: nhấn Khởi động ngay.</string>
 </resources>

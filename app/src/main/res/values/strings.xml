@@ -1222,7 +1222,7 @@
     <string name="settings_tools_sub">MCP servers, skills, phone tools for other terminals, Remote Control, SSH</string>
     <string name="settings_appearance_sub">Light or dark, accent colour, surface, Buddy\'s look</string>
     <string name="settings_about">Backup and about</string>
-    <string name="settings_about_sub">Backup and move, updates, the guide, the setup check</string>
+    <string name="settings_about_sub">Backup and move, updates, the guide, Check Buddy</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <!-- Title of the setup checklist card (noun). -->
@@ -2499,4 +2499,5 @@
     <string name="hub_tool_call_log">Reading the call log</string>
     <string name="hub_tool_sms_list">Reading SMS</string>
     <string name="setup_face_too_big">That animation is over 16 MB, so the bubble shows it as a still picture.</string>
+    <string name="background_older">The helper from before the update still runs, so background chats may still work. Buddy needs Wireless debugging once to start the new one: tap Start now.</string>
 </resources>

@@ -904,7 +904,7 @@
     <string name="settings_tools_sub">خوادم MCP، المهارات، أدوات الهاتف لطرفيات أخرى، Remote Control، ‏SSH</string>
     <string name="settings_appearance_sub">فاتح أو داكن، لون التمييز، السطح، مظهر Buddy</string>
     <string name="settings_about">النسخ الاحتياطي وحول</string>
-    <string name="settings_about_sub">النسخ الاحتياطي والنقل، التحديثات، الدليل، فحص الإعداد</string>
+    <string name="settings_about_sub">النسخ الاحتياطي والنقل، التحديثات، الدليل، فحص Buddy</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">الإعداد</string>
@@ -1918,4 +1918,5 @@
     <string name="hub_tool_call_log">جارٍ قراءة سجل المكالمات</string>
     <string name="hub_tool_sms_list">جارٍ قراءة الرسائل النصية</string>
     <string name="setup_face_too_big">حجم هذه الصورة المتحركة أكبر من 16 ميغابايت، لذا تعرضها الفقاعة كصورة ثابتة.</string>
+    <string name="background_older">المساعد من قبل التحديث ما زال يعمل، لذا قد تعمل محادثات الخلفية. لتشغيل المساعد الجديد يحتاج Buddy مرة واحدة إلى تصحيح الأخطاء اللاسلكي: اضغط البدء الآن.</string>
 </resources>

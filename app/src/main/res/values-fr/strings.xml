@@ -1155,7 +1155,7 @@
     <string name="settings_tools_sub">Serveurs MCP, skills, outils du téléphone pour d\'autres terminaux, Remote Control, SSH</string>
     <string name="settings_appearance_sub">Clair ou sombre, couleur d\'accent, surface, apparence de Buddy</string>
     <string name="settings_about">Sauvegarde et à propos</string>
-    <string name="settings_about_sub">Sauvegarde et transfert, mises à jour, guide, vérification de la configuration</string>
+    <string name="settings_about_sub">Sauvegarde et transfert, mises à jour, guide, Vérifier Buddy</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <!-- Title of the setup checklist card (noun). -->
@@ -2306,4 +2306,5 @@
     <string name="hub_tool_call_log">Lit le journal d\'appels</string>
     <string name="hub_tool_sms_list">Lit les SMS</string>
     <string name="setup_face_too_big">Cette animation dépasse 16 Mo : la bulle l\'affiche comme une image fixe.</string>
+    <string name="background_older">L\'assistant d\'avant la mise à jour tourne encore : les discussions en arrière-plan peuvent encore marcher. Pour lancer le nouveau, Buddy a besoin une fois du débogage sans fil : touchez Démarrer maintenant.</string>
 </resources>

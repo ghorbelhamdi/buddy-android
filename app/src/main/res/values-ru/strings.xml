@@ -1173,7 +1173,7 @@
     <string name="settings_tools_sub">Серверы MCP, навыки, инструменты телефона для других терминалов, Remote Control, SSH</string>
     <string name="settings_appearance_sub">Светлая или тёмная тема, цвет акцента, поверхность, облик Buddy</string>
     <string name="settings_about">Резервная копия и о приложении</string>
-    <string name="settings_about_sub">Резервная копия и перенос, обновления, руководство, проверка настройки</string>
+    <string name="settings_about_sub">Резервная копия и перенос, обновления, руководство, Проверить Buddy</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <!-- Title of the setup checklist card (noun). -->
@@ -2345,4 +2345,5 @@
     <string name="hub_tool_call_log">Читает журнал звонков</string>
     <string name="hub_tool_sms_list">Читает SMS</string>
     <string name="setup_face_too_big">Анимация больше 16 МБ, поэтому пузырёк показывает её как неподвижную картинку.</string>
+    <string name="background_older">Помощник из версии до обновления ещё работает, поэтому фоновые чаты могут работать. Чтобы запустить новый, Buddy один раз нужна отладка по Wi-Fi: нажмите «Запустить сейчас».</string>
 </resources>

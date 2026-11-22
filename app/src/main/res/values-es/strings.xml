@@ -1154,7 +1154,7 @@
     <string name="settings_tools_sub">Servidores MCP, skills, herramientas del teléfono para otras terminales, Remote Control, SSH</string>
     <string name="settings_appearance_sub">Claro u oscuro, color de acento, superficie, aspecto de Buddy</string>
     <string name="settings_about">Copia de seguridad y acerca de</string>
-    <string name="settings_about_sub">Copia y traslado, actualizaciones, la guía, comprobación de la configuración</string>
+    <string name="settings_about_sub">Copia y traslado, actualizaciones, la guía, Revisar Buddy</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <!-- Title of the setup checklist card (noun). -->
@@ -2305,4 +2305,5 @@
     <string name="hub_tool_call_log">Leyendo el registro de llamadas</string>
     <string name="hub_tool_sms_list">Leyendo SMS</string>
     <string name="setup_face_too_big">Esa animación pasa de 16 MB, así que la burbuja la muestra como imagen fija.</string>
+    <string name="background_older">El ayudante de antes de la actualización sigue en marcha, así que los chats en segundo plano pueden funcionar. Para iniciar el nuevo, Buddy necesita una vez la depuración inalámbrica: toca Iniciar ahora.</string>
 </resources>

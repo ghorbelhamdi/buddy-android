@@ -868,7 +868,7 @@
     <string name="settings_tools_sub">MCP सर्वर, स्किल, दूसरे टर्मिनल के लिए फ़ोन टूल, Remote Control, SSH</string>
     <string name="settings_appearance_sub">लाइट या डार्क, एक्सेंट रंग, सतह, Buddy का रूप</string>
     <string name="settings_about">बैकअप और जानकारी</string>
-    <string name="settings_about_sub">बैकअप और स्थानांतरण, अपडेट, गाइड, सेटअप जाँच</string>
+    <string name="settings_about_sub">बैकअप और स्थानांतरण, अपडेट, गाइड, Buddy जाँचें</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">सेटअप</string>
@@ -1866,4 +1866,5 @@
     <string name="hub_tool_call_log">कॉल लॉग पढ़ रहा है</string>
     <string name="hub_tool_sms_list">SMS पढ़ रहा है</string>
     <string name="setup_face_too_big">यह ऐनिमेशन 16 MB से बड़ा है, इसलिए बबल इसे स्थिर तस्वीर की तरह दिखाता है।</string>
+    <string name="background_older">अपडेट से पहले वाला हेल्पर अब भी चल रहा है, इसलिए बैकग्राउंड चैट काम कर सकते हैं। नया शुरू करने के लिए Buddy को एक बार वायरलेस डीबगिंग चाहिए: अभी शुरू करें पर टैप करें।</string>
 </resources>

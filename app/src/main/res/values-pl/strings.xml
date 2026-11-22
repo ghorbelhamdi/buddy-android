@@ -893,7 +893,7 @@
     <string name="settings_tools_sub">Serwery MCP, umiejętności, narzędzia telefonu dla innych terminali, Remote Control, SSH</string>
     <string name="settings_appearance_sub">Jasny lub ciemny, kolor akcentu, powierzchnia, wygląd Buddy\'ego</string>
     <string name="settings_about">Kopia zapasowa i informacje</string>
-    <string name="settings_about_sub">Kopia i przenoszenie, aktualizacje, przewodnik, sprawdzenie konfiguracji</string>
+    <string name="settings_about_sub">Kopia i przenoszenie, aktualizacje, przewodnik, Sprawdź Buddy</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">Konfiguracja</string>
@@ -1900,4 +1900,5 @@
     <string name="hub_tool_call_log">Czyta rejestr połączeń</string>
     <string name="hub_tool_sms_list">Czyta SMS-y</string>
     <string name="setup_face_too_big">Ta animacja ma ponad 16 MB, więc dymek pokazuje ją jako nieruchomy obraz.</string>
+    <string name="background_older">Pomocnik sprzed aktualizacji nadal działa, więc czaty w tle mogą działać. Aby uruchomić nowy, Buddy raz potrzebuje debugowania bezprzewodowego: dotknij Uruchom teraz.</string>
 </resources>

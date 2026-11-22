@@ -862,7 +862,7 @@
     <string name="settings_tools_sub">MCP サーバー、スキル、他のターミナル向けのスマホツール、Remote Control、SSH</string>
     <string name="settings_appearance_sub">ライトまたはダーク、アクセントカラー、サーフェス、Buddy の見た目</string>
     <string name="settings_about">バックアップと情報</string>
-    <string name="settings_about_sub">バックアップと移行、アップデート、ガイド、セットアップの確認</string>
+    <string name="settings_about_sub">バックアップと移行、アップデート、ガイド、Buddy をチェック</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">セットアップ</string>
@@ -1858,4 +1858,5 @@
     <string name="hub_tool_call_log">通話履歴を読み取り中</string>
     <string name="hub_tool_sms_list">SMS を読み取り中</string>
     <string name="setup_face_too_big">このアニメーションは 16 MB を超えるため、バブルには静止画として表示されます。</string>
+    <string name="background_older">アップデート前のヘルパーがまだ動いているため、バックグラウンドのチャットは動くことがあります。新しいヘルパーを起動するには、一度だけワイヤレス デバッグが必要です: 「今すぐ起動」をタップしてください。</string>
 </resources>

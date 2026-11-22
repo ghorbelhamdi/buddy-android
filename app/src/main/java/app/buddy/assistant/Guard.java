@@ -230,7 +230,8 @@ final class Guard {
         for (int up = 0; p != null && up < 2; up++, p = p.getParent()) {
             for (int c = 0; c < Math.min(p.getChildCount(), 8); c++) {
                 AccessibilityNodeInfo ch = p.getChild(c);
-                String h = ch == null ? null : shortLabel(ch);
+                if (ch == null || ch.isClickable() || ch.equals(n)) continue; // another button ("Preview" beside "Submit") isn't its label
+                String h = shortLabel(ch);
                 if (h != null && !GENERIC.matcher(h).matches()) return h;
             }
         }

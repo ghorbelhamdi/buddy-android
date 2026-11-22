@@ -1146,7 +1146,7 @@
     <string name="settings_tools_sub">Server MCP, skill, alat ponsel untuk terminal lain, Remote Control, SSH</string>
     <string name="settings_appearance_sub">Terang atau gelap, warna aksen, permukaan, tampilan Buddy</string>
     <string name="settings_about">Cadangan dan tentang</string>
-    <string name="settings_about_sub">Cadangan dan pemindahan, pembaruan, panduan, pemeriksaan penyiapan</string>
+    <string name="settings_about_sub">Cadangan dan pemindahan, pembaruan, panduan, Periksa Buddy</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <!-- Title of the setup checklist card (noun). -->
@@ -2307,4 +2307,5 @@
     <string name="hub_tool_call_log">Membaca log panggilan</string>
     <string name="hub_tool_sms_list">Membaca SMS</string>
     <string name="setup_face_too_big">Animasi itu lebih dari 16 MB, jadi balon menampilkannya sebagai gambar diam.</string>
+    <string name="background_older">Pembantu dari sebelum pembaruan masih berjalan, jadi chat latar belakang mungkin masih berfungsi. Untuk memulai yang baru, Buddy perlu Debugging nirkabel sekali: ketuk Mulai sekarang.</string>
 </resources>

@@ -872,7 +872,7 @@
     <string name="settings_tools_sub">MCP-Server, Skills, Telefon-Tools für andere Terminals, Remote Control, SSH</string>
     <string name="settings_appearance_sub">Hell oder dunkel, Akzentfarbe, Oberfläche, Buddys Aussehen</string>
     <string name="settings_about">Backup und Info</string>
-    <string name="settings_about_sub">Backup und Umzug, Updates, Anleitung, Einrichtungs-Check</string>
+    <string name="settings_about_sub">Backup und Umzug, Updates, Anleitung, Buddy prüfen</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">Einrichtung</string>
@@ -1873,4 +1873,5 @@
     <string name="hub_tool_call_log">Liest die Anrufliste</string>
     <string name="hub_tool_sms_list">Liest SMS</string>
     <string name="setup_face_too_big">Die Animation ist größer als 16 MB, deshalb zeigt die Bubble sie als Standbild.</string>
+    <string name="background_older">Der Helfer von vor dem Update läuft noch, Hintergrund-Chats können also noch funktionieren. Für den neuen braucht Buddy einmal Drahtloses Debugging: Tippe auf Jetzt starten.</string>
 </resources>

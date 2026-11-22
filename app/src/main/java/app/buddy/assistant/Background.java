@@ -475,6 +475,19 @@ final class Background {
         return nl < 0 ? new String[]{all.trim(), ""} : new String[]{all.substring(0, nl), all.substring(nl + 1)};
     }
 
+    /**
+     * Is a helper from an earlier Buddy still running (it answers, with another version)? Chats still work through
+     * it; only starting this version's needs Wireless debugging (issue #79: it showed as just "not running").
+     */
+    static boolean olderRunning(Context c) {
+        try {
+            String r = call(c, "ping").trim();
+            return !r.isEmpty() && !r.startsWith(Shell.VERSION + " ");
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
     /** Is the helper running, and this version's? */
     static boolean alive(Context c) {
         try {
@@ -605,17 +618,19 @@ final class Background {
                 + " >" + LOG + " 2>&1 </dev/null &";
         // the port Wireless debugging announces on the Wi-Fi first (adb's own discovery): it moves now and then, and a
         // scan can miss it while finding other apps' ports, which adb only calls "offline"
+        // each port on the phone's own address first, then on its Wi-Fi address: a Pixel on Android 17 answered
+        // "failed to connect to 127.0.0.1" while Wireless debugging listened there (issue #79)
         String script = ADB + "adb start-server >/dev/null 2>&1; mp=''; for i in 1 2 3 4; do "
                 + "mp=$(adb mdns services 2>/dev/null | awk '/_adb-tls-connect._tcp/ {n=split($NF,a,\":\"); print a[n]; exit}'); "
-                + "[ -n \"$mp\" ] && break; sleep 1; done; for p in $mp" + list + "; do "
+                + "[ -n \"$mp\" ] && break; sleep 1; done; ok=''; for p in $mp" + list + "; do for h in " + hosts() + "; do "
                 // what adb said for each port, for the reason when none works (it was guessed as "not paired")
-                + "r=$(timeout 8 adb connect 127.0.0.1:$p 2>&1); s=$(timeout 5 adb -s 127.0.0.1:$p get-state 2>&1); "
-                + "echo \"TRIED $p: $r / $s\" | tr '\\n' ' '; echo; "
-                + "if [ \"$s\" = device ]; then echo PORT=$p; "
-                + "adb -s 127.0.0.1:$p shell \"pm grant " + c.getPackageName() + " " + SECURE + "\" >/dev/null 2>&1; "
-                + "adb -s 127.0.0.1:$p shell \"" + helper + "\"; sleep 2; echo LOG=; "
-                + "adb -s 127.0.0.1:$p shell \"tail -c 1500 " + LOG + "\" 2>&1; break; fi; "
-                + "adb disconnect 127.0.0.1:$p >/dev/null 2>&1; done; adb kill-server >/dev/null 2>&1";
+                + "d=$h:$p; r=$(timeout 8 adb connect $d 2>&1); s=$(timeout 5 adb -s $d get-state 2>&1); "
+                + "echo \"TRIED $d: $r / $s\" | tr '\\n' ' '; echo; "
+                + "if [ \"$s\" = device ]; then echo PORT=$p; ok=1; "
+                + "adb -s $d shell \"pm grant " + c.getPackageName() + " " + SECURE + "\" >/dev/null 2>&1; "
+                + "adb -s $d shell \"" + helper + "\"; sleep 2; echo LOG=; "
+                + "adb -s $d shell \"tail -c 1500 " + LOG + "\" 2>&1; break; fi; "
+                + "adb disconnect $d >/dev/null 2>&1; done; [ -n \"$ok\" ] && break; done; adb kill-server >/dev/null 2>&1";
         try {
             String out = Linux.exec(c, script, 150);
             Matcher m = Pattern.compile("PORT=(\\d+)").matcher(out);
@@ -624,6 +639,28 @@ final class Background {
         } catch (Exception e) {
             return String.valueOf(e.getMessage());
         }
+    }
+
+    /**
+     * Where Wireless debugging may listen, in the order to try: the phone's own address, then its Wi-Fi (and other
+     * network) IPv4 addresses. Some phones listen on the Wi-Fi address only (issue #79).
+     */
+    static String hosts() {
+        StringBuilder b = new StringBuilder("127.0.0.1");
+        try {
+            for (java.net.NetworkInterface n : Collections.list(java.net.NetworkInterface.getNetworkInterfaces())) {
+                if (!n.isUp() || n.isLoopback()) continue;
+                for (java.net.InetAddress a : Collections.list(n.getInetAddresses())) {
+                    if (a instanceof java.net.Inet4Address && !a.isLoopbackAddress()) {
+                        // Wi-Fi first: mobile data addresses aren't where Wireless debugging listens
+                        if (n.getName().startsWith("wlan")) b.insert("127.0.0.1".length(), " " + a.getHostAddress());
+                        else b.append(' ').append(a.getHostAddress());
+                    }
+                }
+            }
+        } catch (Exception ignored) { // (the phone's own address only, as before)
+        }
+        return b.toString();
     }
 
     private static boolean listening(int port) {
@@ -836,9 +873,11 @@ final class Background {
                     set(Step.FAILED, svc.getString(R.string.background_no_dialog) + "\n(no pairing port found)");
                     return;
                 }
-                String paired = Linux.exec(svc, ADB + "adb start-server >/dev/null 2>&1; for p in" + tryPorts + "; do "
-                        + "r=$(timeout 15 adb pair 127.0.0.1:$p " + found[0] + " 2>&1 | tail -2); echo \"$p: $r\"; "
-                        + "case \"$r\" in *'Successfully paired'*) break;; esac; done; "
+                // (on the phone's own address, then its Wi-Fi one, as for connecting: issue #79)
+                String paired = Linux.exec(svc, ADB + "adb start-server >/dev/null 2>&1; ok=''; for p in" + tryPorts + "; do "
+                        + "for h in " + hosts() + "; do "
+                        + "r=$(timeout 15 adb pair $h:$p " + found[0] + " 2>&1 | tail -2); echo \"$h:$p: $r\"; "
+                        + "case \"$r\" in *'Successfully paired'*) ok=1; break;; esac; done; [ -n \"$ok\" ] && break; done; "
                         + "adb kill-server >/dev/null 2>&1", 150);
                 if (!paired.contains("Successfully paired")) {
                     set(Step.FAILED, paired.trim());

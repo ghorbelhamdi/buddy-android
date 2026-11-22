@@ -872,7 +872,7 @@
     <string name="settings_tools_sub">MCP-servers, skills, telefoontools voor andere terminals, Remote Control, SSH</string>
     <string name="settings_appearance_sub">Licht of donker, accentkleur, oppervlak, Buddy\'s uiterlijk</string>
     <string name="settings_about">Back-up en over</string>
-    <string name="settings_about_sub">Back-up en verhuizen, updates, de handleiding, de installatiecontrole</string>
+    <string name="settings_about_sub">Back-up en verhuizen, updates, de handleiding, Buddy controleren</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">Instellen</string>
@@ -1872,4 +1872,5 @@
     <string name="hub_tool_call_log">Leest de belgeschiedenis</string>
     <string name="hub_tool_sms_list">Leest sms\'jes</string>
     <string name="setup_face_too_big">Die animatie is groter dan 16 MB, dus de bubbel toont hem als stilstaand beeld.</string>
+    <string name="background_older">De helper van vóór de update draait nog, dus achtergrondchats kunnen nog werken. Om de nieuwe te starten heeft Buddy één keer Draadloze foutopsporing nodig: tik op Nu starten.</string>
 </resources>

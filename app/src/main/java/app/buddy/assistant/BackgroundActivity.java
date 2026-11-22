@@ -178,11 +178,13 @@ public class BackgroundActivity extends Screen {
         });
         Runnable check = () -> new Thread(() -> {
             boolean alive = Background.alive(this);
+            boolean older = !alive && Background.olderRunning(this);
             String problem = alive ? Background.problem(this) : null;
             runOnUiThread(() -> {
                 status.setText(alive ? R.string.background_ready : R.string.background_paired);
                 if (problem != null) info.setText(getString(R.string.background_failed, problem));
-                else info.setText(alive ? R.string.background_ready_info : R.string.background_asleep);
+                else info.setText(alive ? R.string.background_ready_info
+                        : older ? R.string.background_older : R.string.background_asleep);
                 start.setVisibility(alive ? View.GONE : View.VISIBLE);
                 start.setEnabled(true);
             });

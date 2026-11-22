@@ -1155,7 +1155,7 @@
     <string name="settings_tools_sub">Server MCP, skill, strumenti del telefono per altri terminali, Remote Control, SSH</string>
     <string name="settings_appearance_sub">Chiaro o scuro, colore d\'accento, superficie, aspetto di Buddy</string>
     <string name="settings_about">Backup e informazioni</string>
-    <string name="settings_about_sub">Backup e trasferimento, aggiornamenti, guida, controllo della configurazione</string>
+    <string name="settings_about_sub">Backup e trasferimento, aggiornamenti, guida, Controlla Buddy</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <!-- Title of the setup checklist card (noun). -->
@@ -2306,4 +2306,5 @@
     <string name="hub_tool_call_log">Legge il registro chiamate</string>
     <string name="hub_tool_sms_list">Legge gli SMS</string>
     <string name="setup_face_too_big">L\'animazione supera i 16 MB, quindi la bolla la mostra come immagine fissa.</string>
+    <string name="background_older">L\'helper di prima dell\'aggiornamento è ancora attivo, quindi le chat in background possono ancora funzionare. Per avviare quello nuovo Buddy ha bisogno una volta del debug wireless: tocca Avvia ora.</string>
 </resources>

@@ -875,7 +875,7 @@
     <string name="settings_tools_sub">MCP sunucuları, beceriler, başka terminaller için telefon araçları, Remote Control, SSH</string>
     <string name="settings_appearance_sub">Açık veya koyu, vurgu rengi, yüzey, Buddy\'nin görünümü</string>
     <string name="settings_about">Yedekleme ve hakkında</string>
-    <string name="settings_about_sub">Yedekleme ve taşıma, güncellemeler, kılavuz, kurulum denetimi</string>
+    <string name="settings_about_sub">Yedekleme ve taşıma, güncellemeler, kılavuz, Buddy\'yi kontrol et</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">Kurulum</string>
@@ -1874,4 +1874,5 @@
     <string name="hub_tool_call_log">Arama kaydını okuyor</string>
     <string name="hub_tool_sms_list">SMS\'leri okuyor</string>
     <string name="setup_face_too_big">Bu animasyon 16 MB\'tan büyük, bu yüzden baloncuk onu sabit resim olarak gösterir.</string>
+    <string name="background_older">Güncellemeden önceki yardımcı hâlâ çalışıyor, bu yüzden arka plan sohbetleri çalışabilir. Yenisini başlatmak için Buddy\'nin bir kez Kablosuz hata ayıklamaya ihtiyacı var: Şimdi başlat\'a dokunun.</string>
 </resources>

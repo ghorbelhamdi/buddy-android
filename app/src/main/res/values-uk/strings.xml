@@ -1173,7 +1173,7 @@
     <string name="settings_tools_sub">Сервери MCP, навички, інструменти телефона для інших терміналів, Remote Control, SSH</string>
     <string name="settings_appearance_sub">Світла чи темна тема, колір акценту, поверхня, вигляд Buddy</string>
     <string name="settings_about">Резервна копія та про застосунок</string>
-    <string name="settings_about_sub">Резервна копія й перенесення, оновлення, посібник, перевірка налаштування</string>
+    <string name="settings_about_sub">Резервна копія й перенесення, оновлення, посібник, Перевірити Buddy</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <!-- Title of the setup checklist card (noun). -->
@@ -2345,4 +2345,5 @@
     <string name="hub_tool_call_log">Читає журнал дзвінків</string>
     <string name="hub_tool_sms_list">Читає SMS</string>
     <string name="setup_face_too_big">Анімація більша за 16 МБ, тому бульбашка показує її як нерухоме зображення.</string>
+    <string name="background_older">Помічник із версії до оновлення ще працює, тож фонові чати можуть працювати. Щоб запустити новий, Buddy один раз потрібне налагодження через Wi-Fi: натисніть «Запустити зараз».</string>
 </resources>

@@ -862,7 +862,7 @@
     <string name="settings_tools_sub">MCP 서버, 스킬, 다른 터미널용 휴대폰 도구, Remote Control, SSH</string>
     <string name="settings_appearance_sub">라이트 또는 다크, 강조 색, 표면, Buddy의 모습</string>
     <string name="settings_about">백업 및 정보</string>
-    <string name="settings_about_sub">백업과 이동, 업데이트, 가이드, 설정 점검</string>
+    <string name="settings_about_sub">백업과 이동, 업데이트, 가이드, Buddy 점검</string>
 
     <!-- Settings screen: the setup checklist card (5 steps). -->
     <string name="setup_card_title">초기 설정</string>
@@ -1857,4 +1857,5 @@
     <string name="hub_tool_call_log">통화 기록 읽는 중</string>
     <string name="hub_tool_sms_list">SMS 읽는 중</string>
     <string name="setup_face_too_big">이 애니메이션은 16MB가 넘어서 버블에 정지 이미지로 표시됩니다.</string>
+    <string name="background_older">업데이트 이전의 도우미가 아직 실행 중이라 백그라운드 채팅은 작동할 수 있습니다. 새 도우미를 시작하려면 Buddy에 무선 디버깅이 한 번 필요합니다: 지금 시작을 탭하세요.</string>
 </resources>

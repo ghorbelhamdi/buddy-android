@@ -1,0 +1,4 @@
+• Background mode starts on phones where Wireless debugging can't be reached at 127.0.0.1 (seen on a Pixel with Android 17): Buddy also tries the phone's Wi-Fi address
+• Background mode says when the helper from before an update still runs
+• Approval cards name the right button on web pages ("Submit", not the "Preview" beside it)
+• Clearer description of Backup and about
