@@ -711,9 +711,12 @@ final class Bubble implements ChatHub.Listener {
     /** Live voice: the button in the composer, and the bar in its place during a call in the chat on screen. */
     private ImageButton live;
     private VoiceBar liveBar;
+    /** A live voice call was on when the bubble last decided whether it shows. */
+    private boolean liveUp;
 
     /** The live button for Codex chats, and the live bar instead of the composer while this chat has the call. */
     private void paintLive() {
+        if (root != null && CodexLive.on() != liveUp) applyEnabled(); // a call began or ended: the bubble stays up for it (see there)
         if (liveBar == null) return;
         Sessions.Session ses = sessions.current;
         live.setVisibility(CodexLive.available(svc, ses) ? View.VISIBLE : View.GONE);
@@ -1118,7 +1121,17 @@ final class Bubble implements ChatHub.Listener {
         if (locked && expanded && pendingConfirm == null) collapse();
         // paused, it stays up (its pill resumes), unless the user dragged it onto ✕ during this pause (issue #72): then
         // the hidden-bubble notification has Resume and brings it back; left alone, the pause times out and the task stops
-        boolean show = !locked && (Prefs.bubbleEnabled(svc) || expanded || pendingConfirm != null || controlling
+        // in Buddy's own screens it keeps out of the way (issue #73, "Hide while Buddy is open"). That takes away only
+        // the two reasons that are about no one waiting: the bubble being switched on, and an agent operating the phone.
+        // The second on purpose: Buddy is in front then, its chat shows each step, the "using your phone" notification
+        // keeps its Stop, and touches inside Buddy never pause a task anyway (BuddyService.onScreenTouched), so nothing
+        // of the pause flow hangs on the bubble there; the moment the agent opens another app it is back. A card or a
+        // question, the open panel, a pause and listening bring or keep it up in Buddy as anywhere else. Not before
+        // Buddy's first reply either: until then the setup card and the guide tell the user to tap the bubble. And not
+        // during a live voice call, which only its own chat's screen can end otherwise.
+        liveUp = CodexLive.on();
+        boolean inBuddy = Screen.anyOpen() && Prefs.bubbleHideInApp(svc) && Prefs.hadReply(svc) && !noteListening && !liveUp;
+        boolean show = !locked && (((Prefs.bubbleEnabled(svc) || controlling) && !inBuddy) || expanded || pendingConfirm != null
                 || (svc.paused() && !hiddenInPause) || talkListening); // (it listens: it stays till that's done)
         boolean wasHidden = root.getVisibility() != View.VISIBLE;
         root.setVisibility(show ? View.VISIBLE : View.GONE);
@@ -1624,8 +1637,9 @@ final class Bubble implements ChatHub.Listener {
     void assist() {
         if (pendingConfirm != null || hub.runningCount() > 0 || CodexLive.on()) expand();
         else if ("live".equals(Prefs.assistMode(svc)) && liveReady()) goLive();
-        else if (expanded || root.getVisibility() != View.VISIBLE) { // panel open, or hidden (dragged onto ✕):
-            expand();                                                  // the chat's own mic listens
+        else if (expanded || !Prefs.bubbleEnabled(svc)) { // panel open, or the bubble switched off (dragged onto ✕):
+            expand();                                       // the chat's own mic listens. (Only hidden because one of
+            // Buddy's screens is open, it listens beside the bubble as anywhere: talk() brings it up for that)
             if (!Voice.listening()) toggleMic();
         } else if (!talkListening) talk();
     }
@@ -1708,6 +1722,7 @@ final class Bubble implements ChatHub.Listener {
         }
         talkListening = true;
         noteListening = true; // the pill shows what's heard
+        applyEnabled(); // (kept out of Buddy's own screens until now: it's up while it listens)
         noteStatus(svc.getString(R.string.bubble_listening));
         showWaves(true);
     }
@@ -1798,6 +1813,7 @@ final class Bubble implements ChatHub.Listener {
     private void noteDone() {
         noteListening = false;
         refreshStatus();
+        applyEnabled(); // (dictated over one of Buddy's screens: it stayed up for that)
     }
 
     /** Talk in the bubble: tap, speak, it sends when you stop. Tap again to send right away. */
@@ -2673,6 +2689,7 @@ final class Bubble implements ChatHub.Listener {
             else showCard(next);
         }
         paintCardLabel();
+        applyEnabled(); // no card left: a bubble that was up only for it goes again (answered while it was folded)
     }
 
     private void setCardLabel(String label) {

@@ -1009,6 +1009,8 @@
     <string name="setup_voice">الصوت</string>
     <string name="setup_assist">عندما يكون Buddy مساعد الهاتف</string>
     <string name="setup_assist_info">اختر Buddy في إعدادات أندرويد ← التطبيقات ← التطبيقات الافتراضية ← تطبيق المساعد الرقمي. بعدها يبدأ Buddy عند الضغط المطوّل على زر التشغيل: «تحدّث» يرسل طلبًا واحدًا، و«صوت مباشر» يبدأ محادثة منطوقة (يحتاج تسجيل الدخول إلى Codex، وإلا يكون «تحدّث»).</string>
+    <string name="setup_assist_unlocked">فقط عندما يكون الهاتف مفتوح القفل</string>
+    <string name="setup_assist_unlocked_info">الضغط المطوّل على زر التشغيل لا يفعل شيئًا على شاشة القفل أو في وضع الاستعداد.</string>
     <string name="setup_live_agent">الصوت المباشر يستخدم</string>
     <string name="setup_live_agent_default">الافتراضي</string>
     <string name="setup_live_agent_info">الصوت المباشر من الضغط المطوّل على الفقاعة أو زر التشغيل يبدأ محادثة جديدة مع هذا الوكيل. الافتراضي هو وكيلك الافتراضي (حاليًا %1$s).</string>
@@ -1074,6 +1076,8 @@
     <!-- Settings screen: Experience. -->
     <string name="setup_chat_bubble">فقاعة المحادثة</string>
     <string name="setup_chat_bubble_info">تطفو فوق التطبيقات الأخرى. اسحبها إلى ✕ لإخفائها؛ وستظل بطاقات الموافقة تظهر عندما يحتاج الوكيل إلى موافقتك.</string>
+    <string name="setup_bubble_hide_in_app">إخفاؤها أثناء فتح Buddy</string>
+    <string name="setup_bubble_hide_in_app_info">لا تظهر الفقاعة فوق شاشات Buddy نفسها. ستظهر هناك مع ذلك عند وجود بطاقة موافقة أو سؤال، وتعود عندما تغادر Buddy.</string>
     <string name="setup_tap_action">النقر على الفقاعة</string>
     <string name="setup_tap_panel">اللوحة</string>
     <string name="setup_tap_talk">الصوت</string>
@@ -1542,6 +1546,9 @@
     <string name="background_remove_text">ينسى Buddy الإقران ويوقف برنامجه المساعد. تعود المحادثات إلى العمل على الشاشة الحقيقية.</string>
     <string name="background_default">المحادثات الجديدة تعمل في الخلفية</string>
     <string name="background_default_info">يبقى لكل محادثة مفتاحها الخاص في خيارات المحادثة.</string>
+    <string name="background_restart">البدء من جديد بعد إعادة التشغيل</string>
+    <string name="background_restart_info">بعد إعادة تشغيل الهاتف، يفعّل Buddy «تصحيح الأخطاء اللاسلكي» ويشغّل البرنامج المساعد بنفسه، بعد فتح قفل الهاتف. يحتاج ذلك إلى Wi-Fi بعد إعادة التشغيل، على شبكة يُسمح فيها دائمًا بتصحيح الأخطاء اللاسلكي. إذا لم ينجح ذلك، انقر على «البدء الآن».</string>
+    <string name="background_restart_cant">هذا الهاتف لا يسمح لـ Buddy بتفعيل «تصحيح الأخطاء اللاسلكي» بنفسه، لذلك لا يعمل هذا هنا: بعد إعادة التشغيل، انقر على «البدء الآن».</string>
     <string name="chat_bg_connected">متصل</string>
     <string name="chat_bg_disconnected">غير متصل</string>
     <string name="chat_bg_not_set_up">غير مُعَدّ</string>

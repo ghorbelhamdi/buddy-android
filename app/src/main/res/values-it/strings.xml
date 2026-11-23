@@ -1292,6 +1292,8 @@
     <string name="setup_voice">Voce</string>
     <string name="setup_assist">Quando Buddy è l’assistente del telefono</string>
     <string name="setup_assist_info">Scegli Buddy in Impostazioni di Android → App → App predefinite → App assistente digitale. Tenendo premuto il tasto di accensione si avvia Buddy: Parla invia una richiesta, Voce dal vivo avvia una conversazione parlata (serve Codex con accesso, altrimenti è Parla).</string>
+    <string name="setup_assist_unlocked">Solo con il telefono sbloccato</string>
+    <string name="setup_assist_unlocked_info">Tenere premuto il tasto di accensione non fa nulla nella schermata di blocco o in standby.</string>
     <string name="setup_live_agent">La voce dal vivo usa</string>
     <string name="setup_live_agent_default">Predefinito</string>
     <string name="setup_live_agent_info">La voce dal vivo avviata tenendo premuta la bolla o il tasto di accensione apre una nuova chat con questo agente. Predefinito è il tuo agente predefinito (ora %1$s).</string>
@@ -1362,6 +1364,8 @@
     <string name="setup_chat_bubble">Bolla della chat</string>
     <!-- ✕ is the close target that appears while dragging the bubble. -->
     <string name="setup_chat_bubble_info">Resta sopra le altre app. Trascinala sulla ✕ per nasconderla; le schede di approvazione compaiono comunque quando un agente ha bisogno del tuo OK.</string>
+    <string name="setup_bubble_hide_in_app">Nascondi quando Buddy è aperto</string>
+    <string name="setup_bubble_hide_in_app_info">Nessuna bolla sopra le schermate di Buddy. Lì compare comunque per una scheda di approvazione o una domanda, e torna quando esci da Buddy.</string>
     <string name="setup_tap_action">Tocco sulla bolla</string>
     <string name="setup_tap_panel">Pannello</string>
     <string name="setup_tap_talk">Parla</string>
@@ -1930,6 +1934,9 @@
     <string name="background_remove_text">Buddy dimentica l\'accoppiamento e ferma il suo programma di supporto. Le chat tornano a lavorare sullo schermo vero.</string>
     <string name="background_default">Le nuove chat lavorano in background</string>
     <string name="background_default_info">Ogni chat ha comunque il suo interruttore in Opzioni della chat.</string>
+    <string name="background_restart">Riavvia dopo un riavvio del telefono</string>
+    <string name="background_restart_info">Dopo un riavvio del telefono, Buddy attiva da solo Debug wireless e avvia il programma di supporto, una volta sbloccato il telefono. Dopo il riavvio serve il Wi-Fi, su una rete in cui Debug wireless è sempre consentito. Se non ha funzionato, tocca Avvia ora.</string>
+    <string name="background_restart_cant">Questo telefono non permette a Buddy di attivare da solo Debug wireless, quindi qui non può funzionare: dopo un riavvio tocca Avvia ora.</string>
     <string name="chat_bg_connected">Connesso</string>
     <string name="chat_bg_disconnected">Non connesso</string>
     <string name="chat_bg_not_set_up">Non configurato</string>

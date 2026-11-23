@@ -180,9 +180,12 @@ public class BackgroundActivity extends Screen {
             boolean alive = Background.alive(this);
             boolean older = !alive && Background.olderRunning(this);
             String problem = alive ? Background.problem(this) : null;
+            // (not started again after a restart although that's switched on: why, where it would say it isn't running)
+            String restart = alive || older || !Prefs.backgroundRestart(this) ? null : Background.restartNote();
             runOnUiThread(() -> {
                 status.setText(alive ? R.string.background_ready : R.string.background_paired);
                 if (problem != null) info.setText(getString(R.string.background_failed, problem));
+                else if (restart != null) info.setText(getString(R.string.background_failed, restart));
                 else info.setText(alive ? R.string.background_ready_info
                         : older ? R.string.background_older : R.string.background_asleep);
                 start.setVisibility(alive ? View.GONE : View.VISIBLE);
@@ -216,6 +219,13 @@ public class BackgroundActivity extends Screen {
                 Prefs.backgroundDefault(this), on -> Prefs.setBackgroundDefault(this, on));
         sw.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
         body.addView(sw, gap(14));
+        // after a restart of the phone Buddy starts the helper again itself, where the phone lets it switch Wireless
+        // debugging on (it says so where it doesn't: the switch can't do anything there)
+        LinearLayout again = switchRow(this, getString(R.string.background_restart),
+                getString(Background.canSwitchWireless(this) ? R.string.background_restart_info : R.string.background_restart_cant),
+                Prefs.backgroundRestart(this), on -> Background.setRestart(this, on));
+        again.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
+        body.addView(again, full());
         // phone commands (issue #22): the agent's own command line on the phone, through the same helper
         TextView pc = sectionLabel(this, getString(R.string.background_shell));
         body.addView(pc, gap(18));

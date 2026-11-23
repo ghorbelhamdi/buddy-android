@@ -1292,6 +1292,8 @@
     <string name="setup_voice">Voix</string>
     <string name="setup_assist">Quand Buddy est l’assistant du téléphone</string>
     <string name="setup_assist_info">Choisis Buddy dans Paramètres Android → Applications → Applications par défaut → Application d’assistant numérique. Un appui long sur le bouton marche/arrêt lance alors Buddy : Parler envoie une demande, Voix en direct lance une conversation parlée (Codex doit être connecté, sinon c’est Parler).</string>
+    <string name="setup_assist_unlocked">Seulement quand le téléphone est déverrouillé</string>
+    <string name="setup_assist_unlocked_info">Un appui long sur le bouton Marche/Arrêt ne fait rien sur l’écran de verrouillage ni en veille.</string>
     <string name="setup_live_agent">La voix en direct utilise</string>
     <string name="setup_live_agent_default">Par défaut</string>
     <string name="setup_live_agent_info">La voix en direct lancée en maintenant la bulle ou le bouton marche/arrêt ouvre un nouveau chat avec cet agent. Par défaut, c’est ton agent par défaut (actuellement %1$s).</string>
@@ -1362,6 +1364,8 @@
     <string name="setup_chat_bubble">Bulle de discussion</string>
     <!-- ✕ is the close target that appears while dragging the bubble. -->
     <string name="setup_chat_bubble_info">Flotte au-dessus des autres applis. Faites-la glisser sur le ✕ pour la masquer ; les cartes d\'approbation s\'affichent quand même lorsqu\'un agent a besoin de votre accord.</string>
+    <string name="setup_bubble_hide_in_app">Masquer quand Buddy est ouvert</string>
+    <string name="setup_bubble_hide_in_app_info">Pas de bulle par-dessus les écrans de Buddy. Elle s\'y affiche quand même pour une carte d\'approbation ou une question, et revient quand vous quittez Buddy.</string>
     <string name="setup_tap_action">Appui sur la bulle</string>
     <string name="setup_tap_panel">Panneau</string>
     <string name="setup_tap_talk">Parler</string>
@@ -1930,6 +1934,9 @@
     <string name="background_remove_text">Buddy oublie l\'association et arrête son programme auxiliaire. Les discussions travaillent de nouveau sur le vrai écran.</string>
     <string name="background_default">Les nouvelles discussions travaillent en arrière-plan</string>
     <string name="background_default_info">Chaque discussion garde son propre interrupteur dans Options de la discussion.</string>
+    <string name="background_restart">Redémarrer après un redémarrage du téléphone</string>
+    <string name="background_restart_info">Après un redémarrage du téléphone, Buddy active lui-même le Débogage sans fil et démarre le programme auxiliaire, une fois le téléphone déverrouillé. Il faut du Wi-Fi après le redémarrage, sur un réseau où le Débogage sans fil est toujours autorisé. Si cela n\'a pas marché, appuyez sur Démarrer maintenant.</string>
+    <string name="background_restart_cant">Ce téléphone ne laisse pas Buddy activer lui-même le Débogage sans fil, donc cela ne peut pas fonctionner ici : après un redémarrage, appuyez sur Démarrer maintenant.</string>
     <string name="chat_bg_connected">Connecté</string>
     <string name="chat_bg_disconnected">Non connecté</string>
     <string name="chat_bg_not_set_up">Non configuré</string>

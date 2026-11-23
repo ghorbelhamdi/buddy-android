@@ -1291,6 +1291,8 @@
     <string name="setup_voice">Voz</string>
     <string name="setup_assist">Cuando Buddy es el asistente del teléfono</string>
     <string name="setup_assist_info">Elige Buddy en Ajustes de Android → Aplicaciones → Aplicaciones predeterminadas → Aplicación de asistente digital. Al mantener pulsado el botón de encendido se abre Buddy: Hablar envía una petición, Voz en directo inicia una conversación hablada (necesita Codex con sesión iniciada; si no, es Hablar).</string>
+    <string name="setup_assist_unlocked">Solo con el teléfono desbloqueado</string>
+    <string name="setup_assist_unlocked_info">Mantener pulsado el botón de encendido no hace nada en la pantalla de bloqueo ni en reposo.</string>
     <string name="setup_live_agent">Voz en directo usa</string>
     <string name="setup_live_agent_default">Predeterminado</string>
     <string name="setup_live_agent_info">La voz en directo desde la burbuja mantenida o el botón de encendido abre un chat nuevo con este agente. Predeterminado es tu agente predeterminado (ahora %1$s).</string>
@@ -1361,6 +1363,8 @@
     <string name="setup_chat_bubble">Burbuja de chat</string>
     <!-- ✕ is the close target that appears while dragging the bubble. -->
     <string name="setup_chat_bubble_info">Flota sobre otras apps. Arrástrala hasta la ✕ para ocultarla; las tarjetas de aprobación seguirán apareciendo cuando un agente necesite que apruebes algo.</string>
+    <string name="setup_bubble_hide_in_app">Ocultar mientras Buddy está abierto</string>
+    <string name="setup_bubble_hide_in_app_info">Sin burbuja sobre las pantallas de Buddy. Ahí sigue apareciendo para una tarjeta de aprobación o una pregunta, y vuelve cuando sales de Buddy.</string>
     <string name="setup_tap_action">Al tocar la burbuja</string>
     <string name="setup_tap_panel">Panel</string>
     <string name="setup_tap_talk">Hablar</string>
@@ -1929,6 +1933,9 @@
     <string name="background_remove_text">Buddy olvida el emparejamiento y detiene su ayudante. Los chats vuelven a trabajar en la pantalla real.</string>
     <string name="background_default">Los chats nuevos trabajan en segundo plano</string>
     <string name="background_default_info">Cada chat sigue teniendo su propio interruptor en Opciones del chat.</string>
+    <string name="background_restart">Iniciar de nuevo tras un reinicio</string>
+    <string name="background_restart_info">Después de reiniciar el teléfono, Buddy activa Depuración inalámbrica e inicia el ayudante por sí mismo, una vez desbloqueado el teléfono. Necesita Wi-Fi tras el reinicio, en una red donde la Depuración inalámbrica esté siempre permitida. Si no ha funcionado, toca Iniciar ahora.</string>
+    <string name="background_restart_cant">Este teléfono no deja que Buddy active Depuración inalámbrica por sí mismo, así que aquí no puede funcionar: después de un reinicio, toca Iniciar ahora.</string>
     <string name="chat_bg_connected">Conectado</string>
     <string name="chat_bg_disconnected">Sin conexión</string>
     <string name="chat_bg_not_set_up">Sin configurar</string>

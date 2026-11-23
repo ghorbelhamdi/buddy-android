@@ -969,6 +969,8 @@
     <string name="setup_voice">音声</string>
     <string name="setup_assist">Buddyをスマホのアシスタントにしたとき</string>
     <string name="setup_assist_info">Androidの設定 → アプリ → デフォルトのアプリ → デジタルアシスタントアプリでBuddyを選びます。電源ボタンを長押しするとBuddyが起動します：話すは依頼を1回送信、ライブ音声は音声での会話を開始します（Codexへのログインが必要。ない場合は話す）。</string>
+    <string name="setup_assist_unlocked">ロック解除中のみ</string>
+    <string name="setup_assist_unlocked_info">ロック画面やスタンバイ中は、電源ボタンを長押ししても何も起こりません。</string>
     <string name="setup_live_agent">ライブ音声で使うエージェント</string>
     <string name="setup_live_agent_default">デフォルト</string>
     <string name="setup_live_agent_info">バブルや電源ボタンの長押しから始めるライブ音声は、このエージェントで新しいチャットを開きます。デフォルトは既定のエージェント（現在は%1$s）です。</string>
@@ -1024,6 +1026,8 @@
     <!-- Settings screen: Experience. -->
     <string name="setup_chat_bubble">チャットバブル</string>
     <string name="setup_chat_bubble_info">他のアプリの上に表示されます。✕ までドラッグすると非表示になりますが、エージェントが承認を必要とするときは承認カードが表示されます。</string>
+    <string name="setup_bubble_hide_in_app">Buddy を開いている間は非表示</string>
+    <string name="setup_bubble_hide_in_app_info">Buddy 自身の画面の上にはバブルを表示しません。承認カードや質問があるときはそこにも表示され、Buddy を離れると元に戻ります。</string>
     <string name="setup_tap_action">バブルをタップしたとき</string>
     <string name="setup_tap_panel">パネル</string>
     <string name="setup_tap_talk">話す</string>
@@ -1482,6 +1486,9 @@
     <string name="background_remove_text">Buddy はペア設定を破棄し、ヘルパーを停止します。チャットは再び実際の画面で作業します。</string>
     <string name="background_default">新しいチャットはバックグラウンドで作業する</string>
     <string name="background_default_info">チャットごとのスイッチは、これまでどおりチャットのオプションにあります。</string>
+    <string name="background_restart">再起動後に自動で起動し直す</string>
+    <string name="background_restart_info">スマートフォンの再起動後、ロックが解除されると、Buddy が自分で「ワイヤレス デバッグ」をオンにしてヘルパーを起動します。再起動後に Wi-Fi が必要で、ワイヤレス デバッグが常に許可されているネットワークに限ります。うまくいかなかった場合は「今すぐ起動」をタップしてください。</string>
+    <string name="background_restart_cant">このスマートフォンでは Buddy が自分で「ワイヤレス デバッグ」をオンにできないため、ここでは使えません。再起動後は「今すぐ起動」をタップしてください。</string>
     <string name="chat_bg_connected">接続中</string>
     <string name="chat_bg_disconnected">未接続</string>
     <string name="chat_bg_not_set_up">未設定</string>

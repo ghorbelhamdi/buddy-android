@@ -1310,6 +1310,8 @@
     <string name="setup_voice">Голос</string>
     <string name="setup_assist">Коли Buddy — асистент телефона</string>
     <string name="setup_assist_info">Виберіть Buddy в Налаштуваннях Android → Додатки → Додатки за умовчанням → Цифровий помічник. Довге натискання кнопки живлення запустить Buddy: «Говорити» надсилає один запит, «Живий голос» починає розмову голосом (потрібен вхід у Codex, інакше «Говорити»).</string>
+    <string name="setup_assist_unlocked">Лише коли телефон розблоковано</string>
+    <string name="setup_assist_unlocked_info">Довге натискання кнопки живлення нічого не робить на екрані блокування та в режимі очікування.</string>
     <string name="setup_live_agent">Живий голос використовує</string>
     <string name="setup_live_agent_default">За замовчуванням</string>
     <string name="setup_live_agent_info">Живий голос, запущений утриманням бульбашки чи кнопки живлення, відкриває новий чат із цим агентом. «За замовчуванням» — ваш агент за замовчуванням (зараз %1$s).</string>
@@ -1384,6 +1386,8 @@
     <string name="setup_chat_bubble">Бульбашка чату</string>
     <!-- ✕ is the close target that appears while dragging the bubble. -->
     <string name="setup_chat_bubble_info">Показується поверх інших додатків. Перетягніть її на ✕, щоб сховати; картки схвалення все одно з\'являтимуться, коли агентові потрібен ваш дозвіл.</string>
+    <string name="setup_bubble_hide_in_app">Ховати, поки відкрито Buddy</string>
+    <string name="setup_bubble_hide_in_app_info">Бульбашка не показується поверх екранів самого Buddy. Для картки схвалення чи запитання вона все одно з\'явиться й там, а коли ви вийдете з Buddy, повернеться.</string>
     <!-- Setting: what a tap on the floating bubble does. Title above three short choices. -->
     <string name="setup_tap_action">Натискання бульбашки</string>
     <!-- Choice: a tap opens the floating chat panel. Keep it short (it shares a row with two more). -->
@@ -1969,6 +1973,9 @@
     <string name="background_remove_text">Buddy забуде підключення й зупинить допоміжну програму. Чати знову працюватимуть на справжньому екрані.</string>
     <string name="background_default">Нові чати працюють у фоні</string>
     <string name="background_default_info">Кожен чат, як і раніше, має власний перемикач у налаштуваннях чату.</string>
+    <string name="background_restart">Запускати знову після перезавантаження</string>
+    <string name="background_restart_info">Після перезавантаження телефона Buddy сам увімкне налагодження через Wi-Fi і запустить допоміжну програму, щойно телефон буде розблоковано. Після перезавантаження потрібен Wi-Fi, причому мережа, у якій налагодження через Wi-Fi дозволено завжди. Якщо не вдалося, натисніть «Запустити зараз».</string>
+    <string name="background_restart_cant">Цей телефон не дозволяє Buddy самому вмикати налагодження через Wi-Fi, тому тут це не спрацює: після перезавантаження натисніть «Запустити зараз».</string>
     <string name="chat_bg_connected">Підключено</string>
     <string name="chat_bg_disconnected">Не підключено</string>
     <string name="chat_bg_not_set_up">Не налаштовано</string>

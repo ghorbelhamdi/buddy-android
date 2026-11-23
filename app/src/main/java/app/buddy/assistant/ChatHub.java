@@ -308,6 +308,7 @@ final class ChatHub {
         // the phone tools live in Buddy's accessibility service: without it the agent can't reach them and its run
         // ends a few seconds in, which looked like Buddy's Linux had failed. Said as what it is (issue #54)
         if (BuddyService.get() == null) {
+            BuddyService.restoreAccess(app); // dropped by Android: back on for the next message, where Buddy may
             return app.getString(SetupState.accessibilityEnabled(app) ? R.string.hub_accessibility_dead
                     : R.string.hub_accessibility_off);
         }

@@ -979,6 +979,8 @@
     <string name="setup_voice">Stimme</string>
     <string name="setup_assist">Wenn Buddy der Assistent des Handys ist</string>
     <string name="setup_assist_info">Wähle Buddy in Androids Einstellungen → Apps → Standard-Apps → App für digitalen Assistenten. Langes Drücken der Ein-/Aus-Taste startet dann Buddy: Sprechen schickt eine Anfrage, Live-Stimme startet ein gesprochenes Gespräch (braucht ein angemeldetes Codex, sonst Sprechen).</string>
+    <string name="setup_assist_unlocked">Nur bei entsperrtem Handy</string>
+    <string name="setup_assist_unlocked_info">Langes Drücken der Ein/Aus-Taste bewirkt auf dem Sperrbildschirm und im Standby nichts.</string>
     <string name="setup_live_agent">Live-Stimme nutzt</string>
     <string name="setup_live_agent_default">Standard</string>
     <string name="setup_live_agent_info">Live-Stimme über die gehaltene Blase oder die Ein-/Aus-Taste startet einen neuen Chat mit diesem Agenten. Standard ist dein Standard-Agent (gerade %1$s).</string>
@@ -1036,6 +1038,8 @@
     <!-- Settings screen: Experience. -->
     <string name="setup_chat_bubble">Chat-Bubble</string>
     <string name="setup_chat_bubble_info">Schwebt über anderen Apps. Ziehe sie auf das ✕, um sie auszublenden; Freigabekarten erscheinen trotzdem, wenn ein Agent dein OK braucht.</string>
+    <string name="setup_bubble_hide_in_app">Ausblenden, solange Buddy geöffnet ist</string>
+    <string name="setup_bubble_hide_in_app_info">Keine Bubble über Buddys eigenen Bildschirmen. Für eine Freigabekarte oder eine Frage erscheint sie dort trotzdem, und sie ist wieder da, sobald du Buddy verlässt.</string>
     <string name="setup_tap_action">Tippen auf die Bubble</string>
     <string name="setup_tap_panel">Chatfenster</string>
     <string name="setup_tap_talk">Sprechen</string>
@@ -1497,6 +1501,9 @@
     <string name="background_remove_text">Buddy vergisst die Kopplung und beendet seinen Helfer. Chats arbeiten wieder auf dem echten Bildschirm.</string>
     <string name="background_default">Neue Chats arbeiten im Hintergrund</string>
     <string name="background_default_info">Jeder Chat hat weiterhin seinen eigenen Schalter in den Chat-Optionen.</string>
+    <string name="background_restart">Nach einem Neustart wieder starten</string>
+    <string name="background_restart_info">Nach einem Neustart des Handys schaltet Buddy „Debugging über WLAN“ selbst ein und startet den Helfer, sobald das Handy entsperrt ist. Dafür braucht es nach dem Neustart WLAN, und zwar ein Netzwerk, in dem Debugging über WLAN immer erlaubt ist. Hat es nicht geklappt, tippe auf „Jetzt starten“.</string>
+    <string name="background_restart_cant">Dieses Handy lässt Buddy „Debugging über WLAN“ nicht selbst einschalten, deshalb funktioniert das hier nicht: Tippe nach einem Neustart auf „Jetzt starten“.</string>
     <string name="chat_bg_connected">Verbunden</string>
     <string name="chat_bg_disconnected">Nicht verbunden</string>
     <string name="chat_bg_not_set_up">Nicht eingerichtet</string>

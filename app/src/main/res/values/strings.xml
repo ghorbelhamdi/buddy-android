@@ -1362,6 +1362,9 @@
     <string name="setup_voice">Voice</string>
     <string name="setup_assist">When Buddy is the phone\'s assistant</string>
     <string name="setup_assist_info">Pick Buddy in Android\'s Settings → Apps → Default apps → Digital assistant app. Long-pressing the power button then starts Buddy: Talk sends one request, Live voice starts a spoken conversation (it needs Codex signed in; otherwise it\'s Talk).</string>
+    <!-- Switch under "When Buddy is the phone's assistant": the power-button gesture is ignored while the phone is locked (issue #80). -->
+    <string name="setup_assist_unlocked">Only when the phone is unlocked</string>
+    <string name="setup_assist_unlocked_info">Long-pressing the power button does nothing on the lock screen or in standby.</string>
     <string name="setup_live_agent">Live voice uses</string>
     <string name="setup_live_agent_default">Default</string>
     <string name="setup_live_agent_info">Live voice from holding the bubble or the power button starts a new chat with this agent. Default is your default agent (now %1$s).</string>
@@ -1437,6 +1440,9 @@
     <string name="setup_chat_bubble">Chat bubble</string>
     <!-- ✕ is the close target that appears while dragging the bubble. -->
     <string name="setup_chat_bubble_info">Floats over other apps. Drag it onto the ✕ to hide it; approval cards still pop up when an agent needs your OK.</string>
+    <!-- Switch under "Chat bubble": the bubble doesn't show over Buddy's own screens (the app, its settings). -->
+    <string name="setup_bubble_hide_in_app">Hide while Buddy is open</string>
+    <string name="setup_bubble_hide_in_app_info">No bubble over Buddy\'s own screens. It still comes up there for an approval card or a question, and it\'s back when you leave Buddy.</string>
     <!-- Setting: what a tap on the floating bubble does. Title above three short choices. -->
     <string name="setup_tap_action">Tapping the bubble</string>
     <!-- Choice: a tap opens the floating chat panel. Keep it short (it shares a row with two more). -->
@@ -2105,6 +2111,11 @@
     <!-- Switch on the Background mode screen. -->
     <string name="background_default">New chats work in the background</string>
     <string name="background_default_info">Each chat still has its own switch in Chat options.</string>
+    <!-- Switch on the Background mode screen. "Start now" is the button background_start_now; "Wireless debugging" is Android's own name: use the one this language's Android shows. -->
+    <string name="background_restart">Start again after a restart</string>
+    <string name="background_restart_info">After a restart of the phone, Buddy switches Wireless debugging on and starts the helper by itself, once the phone is unlocked. It needs Wi-Fi after the restart, on a network Wireless debugging is always allowed on. If it didn\'t work, tap Start now.</string>
+    <!-- Shown under that switch instead, on a phone where Buddy can't do it. -->
+    <string name="background_restart_cant">This phone doesn\'t let Buddy switch Wireless debugging on by itself, so this can\'t work here: after a restart, tap Start now.</string>
     <string name="chat_bg_connected">Connected</string>
     <string name="chat_bg_disconnected">Not connected</string>
     <string name="chat_bg_not_set_up">Not set up</string>

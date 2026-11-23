@@ -752,6 +752,8 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             render();
         }), topGap(10));
         vc.addView(text(this, getString(R.string.setup_assist_info), 13, MUTED), topGap(8));
+        vc.addView(switchRow(this, getString(R.string.setup_assist_unlocked), getString(R.string.setup_assist_unlocked_info),
+                Prefs.assistUnlockedOnly(this), on -> Prefs.setAssistUnlockedOnly(this, on)), topGap(8));
         // the agent of the new chat that live voice starts from the hold menu or the power button
         vc.addView(fieldLabel(getString(R.string.setup_live_agent), null), topGap(16));
         vc.addView(segmented(this, new String[][]{{"", getString(R.string.setup_live_agent_default)},
@@ -929,6 +931,14 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 Prefs.bubbleEnabled(this), on -> {
             Prefs.setBubbleEnabled(this, on);
             if (on) HiddenNotice.cancel(this);
+            BuddyService svc = BuddyService.get();
+            if (svc != null) svc.applyBubbleSetting();
+        }), full());
+        ex.addView(divider(), lineParams());
+        // not over Buddy's own screens (issue #73); this screen is one of them, so the change shows at once
+        ex.addView(switchRow(this, getString(R.string.setup_bubble_hide_in_app), getString(R.string.setup_bubble_hide_in_app_info),
+                Prefs.bubbleHideInApp(this), on -> {
+            Prefs.setBubbleHideInApp(this, on);
             BuddyService svc = BuddyService.get();
             if (svc != null) svc.applyBubbleSetting();
         }), full());

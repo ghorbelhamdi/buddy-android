@@ -982,6 +982,8 @@
     <string name="setup_voice">Ses</string>
     <string name="setup_assist">Buddy telefonun asistanı olduğunda</string>
     <string name="setup_assist_info">Android Ayarları → Uygulamalar → Varsayılan uygulamalar → Dijital asistan uygulaması\'ndan Buddy\'yi seç. Güç tuşuna uzun basınca Buddy başlar: Konuş tek bir istek gönderir, Canlı ses sesli bir sohbet başlatır (Codex\'te oturum açık olmalı, yoksa Konuş).</string>
+    <string name="setup_assist_unlocked">Yalnızca telefonun kilidi açıkken</string>
+    <string name="setup_assist_unlocked_info">Güç düğmesine uzun basmak kilit ekranında veya bekleme modunda hiçbir şey yapmaz.</string>
     <string name="setup_live_agent">Canlı ses şunu kullanır</string>
     <string name="setup_live_agent_default">Varsayılan</string>
     <string name="setup_live_agent_info">Baloncuğa veya güç tuşuna uzun basarak başlatılan canlı ses bu ajanla yeni bir sohbet açar. Varsayılan, varsayılan ajanındır (şu an %1$s).</string>
@@ -1039,6 +1041,8 @@
     <!-- Settings screen: Experience. -->
     <string name="setup_chat_bubble">Sohbet baloncuğu</string>
     <string name="setup_chat_bubble_info">Diğer uygulamaların üzerinde durur. Gizlemek için ✕ işaretine sürükleyin; bir ajanın onayınıza ihtiyacı olduğunda onay kartları yine de açılır.</string>
+    <string name="setup_bubble_hide_in_app">Buddy açıkken gizle</string>
+    <string name="setup_bubble_hide_in_app_info">Buddy\'nin kendi ekranlarının üzerinde baloncuk olmaz. Bir onay kartı ya da soru için orada yine de belirir ve Buddy\'den çıktığınızda geri gelir.</string>
     <string name="setup_tap_action">Baloncuğa dokununca</string>
     <string name="setup_tap_panel">Panel</string>
     <string name="setup_tap_talk">Konuş</string>
@@ -1498,6 +1502,9 @@
     <string name="background_remove_text">Buddy eşlemeyi unutur ve yardımcısını durdurur. Sohbetler yeniden gerçek ekranda çalışır.</string>
     <string name="background_default">Yeni sohbetler arka planda çalışır</string>
     <string name="background_default_info">Her sohbetin Sohbet seçenekleri\'nde yine kendi anahtarı vardır.</string>
+    <string name="background_restart">Yeniden başlatmadan sonra tekrar başlat</string>
+    <string name="background_restart_info">Telefon yeniden başlatıldıktan sonra, telefonun kilidi açılınca Buddy Kablosuz hata ayıklama\'yı kendisi açar ve yardımcıyı başlatır. Yeniden başlatmadan sonra Wi-Fi gerekir; Kablosuz hata ayıklama\'ya her zaman izin verilen bir ağ olmalıdır. İşe yaramadıysa Şimdi başlat\'a dokunun.</string>
+    <string name="background_restart_cant">Bu telefon Buddy\'nin Kablosuz hata ayıklama\'yı kendisinin açmasına izin vermiyor, bu yüzden burada çalışamaz: yeniden başlatmadan sonra Şimdi başlat\'a dokunun.</string>
     <string name="chat_bg_connected">Bağlı</string>
     <string name="chat_bg_disconnected">Bağlı değil</string>
     <string name="chat_bg_not_set_up">Kurulmadı</string>

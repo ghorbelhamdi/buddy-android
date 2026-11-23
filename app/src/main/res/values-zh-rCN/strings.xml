@@ -1283,6 +1283,8 @@
     <string name="setup_voice">语音</string>
     <string name="setup_assist">当 Buddy 是手机的助理时</string>
     <string name="setup_assist_info">在 Android 设置 → 应用 → 默认应用 → 数字助理应用中选择 Buddy。之后长按电源键会启动 Buddy：“说话”发送一个请求，“实时语音”开始语音对话（需要登录 Codex，否则就是“说话”）。</string>
+    <string name="setup_assist_unlocked">仅在手机已解锁时</string>
+    <string name="setup_assist_unlocked_info">在锁屏界面或待机状态下，长按电源键不会有任何反应。</string>
     <string name="setup_live_agent">实时语音使用</string>
     <string name="setup_live_agent_default">默认</string>
     <string name="setup_live_agent_info">长按气泡或电源键开始的实时语音会用这个代理开启新对话。默认即你的默认代理（当前为 %1$s）。</string>
@@ -1351,6 +1353,8 @@
     <string name="setup_chat_bubble">聊天气泡</string>
     <!-- ✕ is the close target that appears while dragging the bubble. -->
     <string name="setup_chat_bubble_info">悬浮在其他应用上方。将它拖到 ✕ 上即可隐藏；当智能体需要你确认时，确认卡片仍会弹出。</string>
+    <string name="setup_bubble_hide_in_app">打开 Buddy 时隐藏</string>
+    <string name="setup_bubble_hide_in_app_info">Buddy 自己的界面上方不显示气泡。有确认卡片或问题时，它仍会在那里出现；离开 Buddy 后它会回来。</string>
     <!-- Setting: what a tap on the floating bubble does. Title above three short choices. -->
     <string name="setup_tap_action">点按气泡时</string>
     <!-- Choice: a tap opens the floating chat panel. Keep it short (it shares a row with two more). -->
@@ -1930,6 +1934,9 @@
     <string name="background_remove_text">Buddy 会忘记这次配对并停止助手程序。对话将重新在真实屏幕上工作。</string>
     <string name="background_default">新对话在后台工作</string>
     <string name="background_default_info">每个对话在“对话选项”中仍有自己的开关。</string>
+    <string name="background_restart">重启后重新启动</string>
+    <string name="background_restart_info">手机重启后，一旦手机解锁，Buddy 会自行开启“无线调试”并启动助手程序。重启后需要连接 Wi-Fi，并且是始终允许无线调试的网络。如果没有成功，请点按“立即启动”。</string>
+    <string name="background_restart_cant">这部手机不允许 Buddy 自行开启“无线调试”，所以此功能在这里无法使用：重启后请点按“立即启动”。</string>
     <string name="chat_bg_connected">已连接</string>
     <string name="chat_bg_disconnected">未连接</string>
     <string name="chat_bg_not_set_up">未设置</string>

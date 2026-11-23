@@ -84,6 +84,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     protected void onServiceConnected() {
         super.onServiceConnected();
         instance = this;
+        Prefs.setAccessWanted(this, true); // the user has it on (see restoreAccess)
         Theme.load(this);
         orientation = getResources().getConfiguration().orientation;
         Models.set("claude", Prefs.claudeModels(this));
@@ -133,6 +134,9 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         main.postDelayed(() -> CodexRemote.ensure(this), 4000);
         main.postDelayed(updateCheck, 20_000);
         Schedules.serviceStarted(this); // scheduled tasks' alarms, again after an update or a restart
+        // background mode's helper, when the phone was restarted and the user asked for that (not right away: the
+        // phone is still busy starting up, and Wi-Fi may not be there yet)
+        main.postDelayed(() -> Background.afterRestart(this), 20_000);
         // the helper's answer refreshes Codex's model list
         main.postDelayed(() -> {
             if (Linux.installed(this)) {
@@ -150,6 +154,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             keepAwake.update(); // locked: the screen may sleep; unlocked: a long task keeps it on again
             if (bubble == null) return;
             if (Intent.ACTION_USER_PRESENT.equals(i.getAction())) {
+                Background.afterRestart(BuddyService.this); // (it waits for the phone to be unlocked)
                 bubble.setLocked(false);
                 bubble.replayFace(); // an animated picture plays once each time the phone is unlocked (issue #68)
             } else if (Intent.ACTION_SCREEN_OFF.equals(i.getAction())) {
@@ -311,9 +316,148 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     public void onInterrupt() {
     }
 
+    /**
+     * Android unbinds the service in an orderly way when it is switched off in Settings: the user's own doing, so
+     * Buddy won't switch it back on. A force stop, an update or a crash ends the process without coming here.
+     */
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Prefs.setAccessWanted(this, false);
+        return super.onUnbind(intent);
+    }
+
+    private static final String SECURE = "android.permission.WRITE_SECURE_SETTINGS";
+    private static final long RESTORE_EVERY_MS = 3 * 60_000L;
+    /** When restoreAccess last wrote the setting (uptime ms): the service connects a moment later. */
+    private static volatile long restoredAt;
+
+    /**
+     * Android dropped Buddy's accessibility service although the user had it on (after a force stop; on some phones
+     * after an update or a crash): Buddy puts it back in Android's list itself. Only with the right background mode's
+     * set-up gave it (WRITE_SECURE_SETTINGS; without it this does nothing and the user is asked as before), only when
+     * the service last ended without the user switching it off (Prefs.accessWanted), and at most once every few
+     * minutes, so a service Android keeps dropping isn't fought over. The other services in the list stay as they are.
+     * True when it was put back: the service connects a moment later.
+     */
+    static boolean restoreAccess(Context c) {
+        try {
+            if (instance != null) return false;
+            if (!Prefs.accessWanted(c)) return not("it was switched off by you");
+            if (!Background.setUp(c)) return not("background mode isn't set up");
+            if (!stoppedFromOutside(c)) return not("Buddy last ended with reason " + lastEnd(c) + ", not a stop from outside");
+            long now = System.currentTimeMillis(), last = Prefs.accessRestoredAt(c);
+            if (last <= now && now - last < RESTORE_EVERY_MS) return not("it was put back less than 3 minutes ago");
+            if (c.checkSelfPermission(SECURE) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                restoreThroughHelper(c.getApplicationContext());
+                return false; // (it answers a moment later: see accessRestoring)
+            }
+            android.content.ContentResolver cr = c.getContentResolver();
+            String me = new android.content.ComponentName(c, BuddyService.class).flattenToString();
+            String list = android.provider.Settings.Secure.getString(cr, android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            boolean anyOn = android.provider.Settings.Secure.getInt(cr, android.provider.Settings.Secure.ACCESSIBILITY_ENABLED, 0) == 1;
+            // no list although accessibility is on, or although Android names services that are: this phone doesn't
+            // let Buddy read it (issue #41), and writing one with only Buddy in it would switch the user's others off
+            if ((list == null || list.isEmpty()) && (anyOn || !c.getSystemService(android.view.accessibility.AccessibilityManager.class)
+                    .getEnabledAccessibilityServiceList(android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_ALL_MASK).isEmpty())) {
+                return false;
+            }
+            if (list == null || list.isEmpty()) { // read as empty: Buddy doesn't trust that enough to write a list of its
+                restoreThroughHelper(c.getApplicationContext()); // own (early after a boot the checks above say nothing
+                return false;                                    // yet); the helper reads Android's real list
+            }
+            if (list != null) for (String s : list.split(":")) {
+                android.content.ComponentName n = android.content.ComponentName.unflattenFromString(s);
+                // listed: it's on and Android will bind it, or it's on and dead, which only off and on again mends
+                if (n != null && n.flattenToString().equals(me)) return false;
+            }
+            Prefs.setAccessRestoredAt(c, now); // (before writing: a write that fails isn't tried over and over either)
+            if (!android.provider.Settings.Secure.putString(cr, android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+                    list + ":" + me)) return false;
+            android.provider.Settings.Secure.putInt(cr, android.provider.Settings.Secure.ACCESSIBILITY_ENABLED, 1);
+            restoredAt = android.os.SystemClock.uptimeMillis();
+            return true;
+        } catch (Exception e) { // (a phone that refuses the write after all: as before, the user switches it on)
+            return false;
+        }
+    }
+
+    /**
+     * Did Buddy's process last end by a stop from outside (a force stop, the package stopped or updated)? That is when
+     * Android takes the service out of its list by itself. After a crash or a kill it stays listed, so "not listed"
+     * then means the user switched it off, in Settings, while Buddy wasn't running to notice (onUnbind never came):
+     * that choice stands. Unknown (an older Android, no record) counts as no.
+     */
+    private static boolean stoppedFromOutside(Context c) {
+        int why = lastEnd(c);
+        // REASON_USER_REQUESTED, REASON_USER_STOPPED, REASON_PACKAGE_STATE_CHANGE, REASON_PACKAGE_UPDATED
+        return why == 10 || why == 11 || why == 15 || why == 16;
+    }
+
+    /** Why Buddy's process last ended (ApplicationExitInfo's reason), or -1 when Android doesn't say. */
+    private static int lastEnd(Context c) {
+        if (android.os.Build.VERSION.SDK_INT < 30) return -1;
+        try {
+            java.util.List<android.app.ApplicationExitInfo> ends = c.getSystemService(android.app.ActivityManager.class)
+                    .getHistoricalProcessExitReasons(c.getPackageName(), 0, 1);
+            return ends.isEmpty() ? -1 : ends.get(0).getReason();
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    private static volatile String notRestored;
+
+    /** Why Buddy didn't switch its service back on by itself, for Check Buddy's report (English, like other reasons). */
+    static String notRestored() {
+        return notRestored;
+    }
+
+    private static boolean not(String why) {
+        notRestored = why;
+        return false;
+    }
+
+    private static final java.util.concurrent.atomic.AtomicBoolean helperRestoring = new java.util.concurrent.atomic.AtomicBoolean();
+
+    /**
+     * The same on phones that don't give Buddy that right (OxygenOS refuses the grant): background mode's helper runs
+     * as the shell user, which may write the setting, and it outlives the force stop or update that dropped the
+     * service. Only a helper that already runs is asked (starting one would open Settings on the user's screen), so
+     * not after a restart of the phone. The helper reads Android's real list, also where an app can't (issue #41).
+     */
+    private static void restoreThroughHelper(Context c) {
+        if (!helperRestoring.compareAndSet(false, true)) return;
+        new Thread(() -> {
+            try {
+                android.content.ComponentName n = new android.content.ComponentName(c, BuddyService.class);
+                String me = n.flattenToString(), brief = n.flattenToShortString(); // (Android lists either form)
+                String cmd = "l=$(settings get secure enabled_accessibility_services); "
+                        + "case \":$l:\" in *\":" + me + ":\"*|*\":" + brief + ":\"*) exit 3;; esac; "
+                        + "if [ -z \"$l\" ] || [ \"$l\" = null ]; then n='" + me + "'; else n=\"$l:" + me + "\"; fi; "
+                        + "settings put secure enabled_accessibility_services \"$n\" && settings put secure accessibility_enabled 1";
+                String[] r = Background.execIfRunning(c, cmd, 10);
+                // no helper, back meanwhile, or listed after all (exit 3): nothing was written, the limit isn't spent
+                not(r == null ? "background mode's helper isn't running" : "the helper answered " + r[0].trim() + " " + r[1].trim());
+                if (r == null || instance != null || "3".equals(r[0].trim())) return;
+                Prefs.setAccessRestoredAt(c, System.currentTimeMillis());
+                if ("0".equals(r[0].trim())) restoredAt = android.os.SystemClock.uptimeMillis();
+            } catch (Exception ignored) { // as before: the user switches it on
+            } finally {
+                helperRestoring.set(false);
+            }
+        }, "buddy-access").start();
+    }
+
+    /** restoreAccess put the service back within the last seconds: it may not have connected yet. */
+    static boolean accessRestoring() {
+        return instance == null && (helperRestoring.get() // (the helper is being asked: Check Buddy waits for it)
+                || (restoredAt > 0 && android.os.SystemClock.uptimeMillis() - restoredAt < 5000));
+    }
+
     @Override
     public void onDestroy() {
         try {
+            Background.stopWifiWait(this);
             unregisterReceiver(lockReceiver);
             unregisterReceiver(cardReceiver);
             getSystemService(android.hardware.display.DisplayManager.class).unregisterDisplayListener(screenListener);

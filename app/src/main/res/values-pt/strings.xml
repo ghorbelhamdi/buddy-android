@@ -1291,6 +1291,8 @@
     <string name="setup_voice">Voz</string>
     <string name="setup_assist">Quando o Buddy é o assistente do telefone</string>
     <string name="setup_assist_info">Escolha o Buddy em Configurações do Android → Apps → Apps padrão → App assistente digital. Segurar o botão liga/desliga abre o Buddy: Falar envia um pedido, Voz ao vivo começa uma conversa falada (precisa do Codex conectado; senão, é Falar).</string>
+    <string name="setup_assist_unlocked">Só com o telefone desbloqueado</string>
+    <string name="setup_assist_unlocked_info">Manter o botão ligar/desligar pressionado não faz nada na tela de bloqueio nem em espera.</string>
     <string name="setup_live_agent">Voz ao vivo usa</string>
     <string name="setup_live_agent_default">Padrão</string>
     <string name="setup_live_agent_info">A voz ao vivo iniciada segurando a bolha ou o botão liga/desliga abre um chat novo com este agente. Padrão é o seu agente padrão (agora %1$s).</string>
@@ -1361,6 +1363,8 @@
     <string name="setup_chat_bubble">Balão de chat</string>
     <!-- ✕ is the close target that appears while dragging the bubble. -->
     <string name="setup_chat_bubble_info">Flutua sobre outros apps. Arraste-o até o ✕ para ocultá-lo; os cartões de aprovação continuam aparecendo quando um agente precisa do seu OK.</string>
+    <string name="setup_bubble_hide_in_app">Ocultar enquanto o Buddy está aberto</string>
+    <string name="setup_bubble_hide_in_app_info">Sem balão sobre as telas do próprio Buddy. Ele ainda aparece ali para um cartão de aprovação ou uma pergunta, e volta quando você sai do Buddy.</string>
     <!-- Setting: what a tap on the floating bubble does. Title above three short choices. -->
     <string name="setup_tap_action">Ao tocar no balão</string>
     <!-- Choice: a tap opens the floating chat panel. Keep it short (it shares a row with two more). -->
@@ -1942,6 +1946,9 @@
     <string name="background_remove_text">O Buddy esquece o pareamento e para o ajudante. Os chats voltam a trabalhar na tela real.</string>
     <string name="background_default">Novos chats trabalham em segundo plano</string>
     <string name="background_default_info">Cada chat continua com seu próprio botão em Opções do chat.</string>
+    <string name="background_restart">Iniciar de novo após reiniciar o telefone</string>
+    <string name="background_restart_info">Depois de reiniciar o telefone, o Buddy ativa a Depuração por Wi-Fi e inicia o ajudante sozinho, assim que o telefone é desbloqueado. É preciso Wi-Fi depois de reiniciar, em uma rede onde a Depuração por Wi-Fi é sempre permitida. Se não funcionou, toque em Iniciar agora.</string>
+    <string name="background_restart_cant">Este telefone não deixa o Buddy ativar a Depuração por Wi-Fi sozinho, então isso não funciona aqui: depois de reiniciar, toque em Iniciar agora.</string>
     <string name="chat_bg_connected">Conectado</string>
     <string name="chat_bg_disconnected">Não conectado</string>
     <string name="chat_bg_not_set_up">Não configurado</string>

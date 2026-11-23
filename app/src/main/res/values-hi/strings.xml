@@ -973,6 +973,8 @@
     <string name="setup_voice">आवाज़</string>
     <string name="setup_assist">जब Buddy फ़ोन का असिस्टेंट हो</string>
     <string name="setup_assist_info">Android की सेटिंग → ऐप्स → डिफ़ॉल्ट ऐप्स → डिजिटल असिस्टेंट ऐप में Buddy चुनें। फिर पावर बटन देर तक दबाने पर Buddy शुरू होगा: बोलें एक अनुरोध भेजता है, लाइव आवाज़ बोलकर बातचीत शुरू करता है (इसके लिए Codex में साइन इन चाहिए, वरना बोलें)।</string>
+    <string name="setup_assist_unlocked">सिर्फ़ तब जब फ़ोन अनलॉक हो</string>
+    <string name="setup_assist_unlocked_info">लॉक स्क्रीन पर या स्टैंडबाय में पावर बटन देर तक दबाने से कुछ नहीं होता।</string>
     <string name="setup_live_agent">लाइव आवाज़ इस्तेमाल करती है</string>
     <string name="setup_live_agent_default">डिफ़ॉल्ट</string>
     <string name="setup_live_agent_info">बबल या पावर बटन दबाकर रखने से शुरू हुई लाइव आवाज़ इस एजेंट के साथ नई चैट शुरू करती है। डिफ़ॉल्ट आपका डिफ़ॉल्ट एजेंट है (अभी %1$s)।</string>
@@ -1030,6 +1032,8 @@
     <!-- Settings screen: Experience. -->
     <string name="setup_chat_bubble">चैट बबल</string>
     <string name="setup_chat_bubble_info">दूसरे ऐप के ऊपर तैरता रहता है. इसे छिपाने के लिए ✕ पर खींचें; किसी एजेंट को आपकी मंज़ूरी चाहिए होने पर मंज़ूरी कार्ड तब भी दिखेंगे.</string>
+    <string name="setup_bubble_hide_in_app">Buddy खुला होने पर छिपाएं</string>
+    <string name="setup_bubble_hide_in_app_info">Buddy की अपनी स्क्रीन के ऊपर बबल नहीं दिखता. मंज़ूरी कार्ड या सवाल के लिए यह वहां तब भी आ जाता है, और Buddy से बाहर जाते ही वापस दिखने लगता है.</string>
     <string name="setup_tap_action">बबल पर टैप करने पर</string>
     <string name="setup_tap_panel">चैट पैनल</string>
     <string name="setup_tap_talk">बोलें</string>
@@ -1490,6 +1494,9 @@
     <string name="background_remove_text">Buddy पेयरिंग भूल जाता है और अपना हेल्पर बंद कर देता है. चैट फिर से असली स्क्रीन पर काम करती हैं.</string>
     <string name="background_default">नई चैट बैकग्राउंड में काम करती हैं</string>
     <string name="background_default_info">हर चैट का अपना स्विच अब भी “चैट के विकल्प” में रहता है.</string>
+    <string name="background_restart">रीस्टार्ट के बाद फिर से शुरू करें</string>
+    <string name="background_restart_info">फ़ोन रीस्टार्ट होने के बाद, फ़ोन अनलॉक होते ही Buddy खुद “वॉयरलेस डीबगिंग” चालू करके हेल्पर शुरू कर देता है. इसके लिए रीस्टार्ट के बाद Wi-Fi चाहिए, ऐसे नेटवर्क पर जहां वॉयरलेस डीबगिंग की अनुमति हमेशा के लिए दी गई हो. अगर यह काम न करे, तो “अभी शुरू करें” पर टैप करें.</string>
+    <string name="background_restart_cant">यह फ़ोन Buddy को खुद “वॉयरलेस डीबगिंग” चालू नहीं करने देता, इसलिए यह यहां काम नहीं कर सकता: रीस्टार्ट के बाद “अभी शुरू करें” पर टैप करें.</string>
     <string name="chat_bg_connected">कनेक्ट है</string>
     <string name="chat_bg_disconnected">कनेक्ट नहीं है</string>
     <string name="chat_bg_not_set_up">सेट अप नहीं है</string>

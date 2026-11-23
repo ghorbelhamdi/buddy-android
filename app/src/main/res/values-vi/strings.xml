@@ -1347,6 +1347,8 @@
     <string name="setup_voice">Giọng nói</string>
     <string name="setup_assist">Khi Buddy là trợ lý của điện thoại</string>
     <string name="setup_assist_info">Chọn Buddy trong Cài đặt Android → Ứng dụng → Ứng dụng mặc định → Ứng dụng trợ lý kỹ thuật số. Nhấn giữ nút nguồn sẽ mở Buddy: Nói gửi một yêu cầu, Giọng nói trực tiếp bắt đầu cuộc trò chuyện bằng giọng (cần đăng nhập Codex; nếu không thì là Nói).</string>
+    <string name="setup_assist_unlocked">Chỉ khi điện thoại đã mở khóa</string>
+    <string name="setup_assist_unlocked_info">Nhấn giữ nút nguồn sẽ không làm gì trên màn hình khóa hoặc khi máy đang ở chế độ chờ.</string>
     <string name="setup_live_agent">Giọng nói trực tiếp dùng</string>
     <string name="setup_live_agent_default">Mặc định</string>
     <string name="setup_live_agent_info">Giọng nói trực tiếp khi giữ bong bóng hoặc nút nguồn sẽ mở cuộc trò chuyện mới với tác tử này. Mặc định là tác tử mặc định của bạn (hiện là %1$s).</string>
@@ -1420,6 +1422,8 @@
     <string name="setup_chat_bubble">Bong bóng trò chuyện</string>
     <!-- ✕ is the close target that appears while dragging the bubble. -->
     <string name="setup_chat_bubble_info">Nổi trên các ứng dụng khác. Kéo nó vào dấu ✕ để ẩn; thẻ duyệt vẫn bật lên khi agent cần bạn đồng ý.</string>
+    <string name="setup_bubble_hide_in_app">Ẩn khi Buddy đang mở</string>
+    <string name="setup_bubble_hide_in_app_info">Không có bong bóng trên các màn hình của chính Buddy. Nó vẫn hiện ở đó khi có thẻ duyệt hoặc câu hỏi, và trở lại khi bạn rời Buddy.</string>
     <!-- Setting: what a tap on the floating bubble does. Title above three short choices. -->
     <string name="setup_tap_action">Khi nhấn bong bóng</string>
     <!-- Choice: a tap opens the floating chat panel. Keep it short (it shares a row with two more). -->
@@ -2071,6 +2075,9 @@
     <string name="background_remove_text">Buddy sẽ quên ghép nối và dừng trình trợ giúp. Các cuộc trò chuyện lại làm việc trên màn hình thật.</string>
     <string name="background_default">Cuộc trò chuyện mới làm việc ở chế độ nền</string>
     <string name="background_default_info">Mỗi cuộc trò chuyện vẫn có công tắc riêng trong Tùy chọn trò chuyện.</string>
+    <string name="background_restart">Khởi động lại sau khi điện thoại khởi động lại</string>
+    <string name="background_restart_info">Sau khi điện thoại khởi động lại, Buddy tự bật Gỡ lỗi qua Wi-Fi và khởi động trình trợ giúp, ngay khi điện thoại được mở khóa. Việc này cần Wi-Fi sau khi khởi động lại, trên mạng luôn cho phép Gỡ lỗi qua Wi-Fi. Nếu không được, hãy nhấn Khởi động ngay.</string>
+    <string name="background_restart_cant">Điện thoại này không cho Buddy tự bật Gỡ lỗi qua Wi-Fi, nên tính năng này không dùng được ở đây: sau khi khởi động lại, hãy nhấn Khởi động ngay.</string>
     <string name="chat_bg_connected">Đã kết nối</string>
     <string name="chat_bg_disconnected">Chưa kết nối</string>
     <string name="chat_bg_not_set_up">Chưa thiết lập</string>

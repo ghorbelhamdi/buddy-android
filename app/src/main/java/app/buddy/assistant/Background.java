@@ -476,6 +476,23 @@ final class Background {
     }
 
     /**
+     * A command through the helper only if it already runs (this version's or an earlier one's): never starts it, so
+     * nothing opens on the user's screen. {exit code, output}, or null when no helper answers. Blocks: not for the
+     * main thread.
+     */
+    static String[] execIfRunning(Context c, String command, int seconds) {
+        try {
+            if (call(c, "ping").trim().isEmpty()) return null;
+            String all = new String(request(c, "exec\t" + seconds + "\t" + android.util.Base64.encodeToString(
+                    command.getBytes(StandardCharsets.UTF_8), android.util.Base64.NO_WRAP), (seconds + 20) * 1000), StandardCharsets.UTF_8);
+            int nl = all.indexOf('\n');
+            return nl < 0 ? new String[]{all.trim(), ""} : new String[]{all.substring(0, nl), all.substring(nl + 1)};
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    /**
      * Is a helper from an earlier Buddy still running (it answers, with another version)? Chats still work through
      * it; only starting this version's needs Wireless debugging (issue #79: it showed as just "not running").
      */
@@ -510,6 +527,12 @@ final class Background {
      * Settings (a phone that lets Buddy's adb grant it the right needs no walk).
      */
     static String start(Context c, boolean asked) {
+        String why = startNow(c, asked);
+        if (why == null) restartNote = null; // (it runs: why it didn't after the restart is history)
+        return why;
+    }
+
+    private static String startNow(Context c, boolean asked) {
         synchronized (starting) {
             if (alive(c)) return null;
             if (!setUp(c)) return "background mode isn't set up (Settings → Background mode)";
@@ -788,6 +811,204 @@ final class Background {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private static boolean wirelessDebuggingOn(Context c) {
+        return android.provider.Settings.Global.getInt(c.getContentResolver(), "adb_wifi_enabled", 0) == 1;
+    }
+
+    /** May Buddy switch Wireless debugging on by itself (the right its adb gave it when it paired, where the phone allows that)? */
+    static boolean canSwitchWireless(Context c) {
+        return c.checkSelfPermission(SECURE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    // ------------------------------------------------------------------ after a restart of the phone
+
+    private static final int RESTART_TRIES = 3;
+    /** How long Buddy waits for Wi-Fi after a restart before it leaves the helper to Start now. */
+    private static final long RESTART_WIFI_MS = 30 * 60_000L;
+    private static volatile boolean restarting;
+    private static volatile String restartNote;
+    private static android.net.ConnectivityManager.NetworkCallback wifiWait;
+    /** Until when Buddy waits for Wi-Fi after this restart (ms since boot, sleep included; 0: it hasn't had to yet). */
+    private static long wifiUntil;
+    /** No try before then (ms since boot): the wait between two tries, which an unlock in between doesn't cut short. */
+    private static volatile long restartNotBefore;
+
+    /** Android's count of this phone's boots, or -1. */
+    private static int boot(Context c) {
+        return android.provider.Settings.Global.getInt(c.getContentResolver(), android.provider.Settings.Global.BOOT_COUNT, -1);
+    }
+
+    /**
+     * The switch "Start again after a restart". Turned on, it is for the restarts to come: the boot the phone is in
+     * counts as done, so a helper that isn't running now is still the user's to start.
+     */
+    static void setRestart(Context c, boolean on) {
+        Prefs.setBackgroundRestart(c, on);
+        restartNote = null;
+        if (on) Prefs.setBackgroundRestartTries(c, boot(c), RESTART_TRIES);
+    }
+
+    /** Why the helper wasn't started again after this restart, for the Background mode screen, or null. */
+    static String restartNote() {
+        return restartNote;
+    }
+
+    /**
+     * The phone was restarted, which ended the helper, and the user asked Buddy to start it again by itself (main
+     * thread; called when the accessibility service connects and each time the phone is unlocked, and it does
+     * something once per boot). With the phone unlocked and on Wi-Fi (it waits RESTART_WIFI_MS for one), Buddy switches Wireless debugging on if the
+     * phone gave it the right to, and starts the helper the way Start now does, only without walking Settings on the
+     * user's screen. At most RESTART_TRIES tries per boot, a minute and then two apart, kept in Prefs so that Buddy
+     * being restarted doesn't begin anew. It stops at once where trying again can't help: Buddy has no right to
+     * switch Wireless debugging on, Android took the switch back (on a Wi-Fi that isn't "always allowed" it asks the
+     * user instead), or the pairing is gone. Nothing is said to the user; the Background mode screen shows why.
+     */
+    static void afterRestart(final BuddyService svc) {
+        if (BuddyService.get() != svc || !Prefs.backgroundRestart(svc) || !setUp(svc) || restarting) return;
+        final int boot = boot(svc);
+        if (boot < 0) return;
+        if (Prefs.backgroundRestartBoot(svc) != boot) Prefs.setBackgroundRestartTries(svc, boot, 0);
+        if (Prefs.backgroundRestartTries(svc) >= RESTART_TRIES) return;
+        if (android.os.SystemClock.elapsedRealtime() < restartNotBefore) return; // (its turn comes: see below)
+        if (svc.getSystemService(android.app.KeyguardManager.class).isKeyguardLocked()) return; // again when it's unlocked
+        restarting = true;
+        new Thread(() -> {
+            long again = 0;
+            try {
+                again = restartTry(svc, boot);
+            } catch (Exception ignored) {
+            } finally {
+                restarting = false;
+            }
+            if (again > 0) {
+                restartNotBefore = android.os.SystemClock.elapsedRealtime() + again;
+                svc.mainHandler().postDelayed(() -> afterRestart(svc), again + 500);
+            }
+        }, "background-restart").start();
+    }
+
+    /** One try. When to try again (ms from now), or 0: it runs, it waits for Wi-Fi, or it's given up for this boot. */
+    private static long restartTry(BuddyService svc, int boot) {
+        if (alive(svc)) { // nothing to do in this boot (the switch came on, or the service came back, with it running)
+            Prefs.setBackgroundRestartTries(svc, boot, RESTART_TRIES);
+            return 0;
+        }
+        // the wait for Wi-Fi ran out, whether or not anything was still listening for one (a Wi-Fi that came while the
+        // phone was locked ended that) and however long the phone slept: not hours later on whatever Wi-Fi it finds
+        synchronized (Background.class) {
+            if (wifiUntil != 0 && android.os.SystemClock.elapsedRealtime() >= wifiUntil) {
+                stopWifiWait(svc);
+                return gaveUp(svc, boot, "there was no Wi-Fi after the restart");
+            }
+        }
+        if (!onWifi(svc)) { // Wireless debugging only exists on Wi-Fi: waiting for it isn't a try
+            waitForWifi(svc, boot);
+            return 0;
+        }
+        int tries = Prefs.backgroundRestartTries(svc) + 1;
+        Prefs.setBackgroundRestartTries(svc, boot, tries);
+        boolean was = wirelessDebuggingOn(svc);
+        if (!was) {
+            if (!wirelessDebugging(svc, true)) {
+                return gaveUp(svc, boot, "this phone doesn't let Buddy switch Wireless debugging on by itself after a restart");
+            }
+            sleep(3000);
+            if (!wirelessDebuggingOn(svc)) {
+                // (off again in Buddy's own words too: Android may be asking the user about this Wi-Fi, and a yes
+                // after Buddy has left would leave Wireless debugging on with nothing using it)
+                wirelessDebugging(svc, false);
+                return gaveUp(svc, boot, "Android didn't keep Wireless debugging on after the restart (it asks first on a "
+                        + "Wi-Fi it isn't always allowed on)");
+            }
+        }
+        String why;
+        try {
+            why = start(svc);
+        } catch (RuntimeException e) {
+            if (!was) wirelessDebugging(svc, false); // not started: as it was
+            throw e;
+        }
+        if (why == null) { // (Wireless debugging stays on, as after Start now; it goes off with the Wi-Fi)
+            restartNote = null;
+            Prefs.setBackgroundRestartTries(svc, boot, RESTART_TRIES);
+            return 0;
+        }
+        if (!was) wirelessDebugging(svc, false); // not started: as it was
+        restartNote = why;
+        // the pairing is gone, or Wireless debugging didn't come up although it was switched on: no use trying again
+        if (tries >= RESTART_TRIES || why.contains("paired") || why.startsWith("Wireless debugging is off")) {
+            Prefs.setBackgroundRestartTries(svc, boot, RESTART_TRIES);
+            return 0;
+        }
+        return tries * 60_000L;
+    }
+
+    private static long gaveUp(Context c, int boot, String why) {
+        restartNote = why;
+        Prefs.setBackgroundRestartTries(c, boot, RESTART_TRIES);
+        return 0;
+    }
+
+    /** Is the phone on a Wi-Fi network (under a VPN or not)? */
+    private static boolean onWifi(Context c) {
+        try {
+            android.net.ConnectivityManager cm = c.getSystemService(android.net.ConnectivityManager.class);
+            for (android.net.Network n : cm.getAllNetworks()) {
+                android.net.NetworkCapabilities nc = cm.getNetworkCapabilities(n);
+                if (nc != null && nc.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI)
+                        && !nc.hasTransport(android.net.NetworkCapabilities.TRANSPORT_VPN)) return true;
+            }
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
+
+    /**
+     * No Wi-Fi after the restart: afterRestart goes on when one connects. If none does within RESTART_WIFI_MS, that
+     * was it for this boot: Wireless debugging isn't switched on hours later, on whatever Wi-Fi the phone then finds.
+     */
+    private static synchronized void waitForWifi(final BuddyService svc, final int boot) {
+        if (wifiWait != null) return;
+        long now = android.os.SystemClock.elapsedRealtime();
+        if (wifiUntil == 0) wifiUntil = now + RESTART_WIFI_MS; // (one wait in all: a Wi-Fi that comes and goes doesn't stretch it)
+        if (now >= wifiUntil) {
+            gaveUp(svc, boot, "there was no Wi-Fi after the restart");
+            return;
+        }
+        final android.net.ConnectivityManager.NetworkCallback cb = new android.net.ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(android.net.Network n) {
+                stopWifiWait(svc);
+                restartNotBefore = android.os.SystemClock.elapsedRealtime() + 5000; // (a moment for it to settle)
+                svc.mainHandler().postDelayed(() -> afterRestart(svc), 5500);
+            }
+        };
+        try {
+            svc.getSystemService(android.net.ConnectivityManager.class).registerNetworkCallback(
+                    new android.net.NetworkRequest.Builder().addTransportType(android.net.NetworkCapabilities.TRANSPORT_WIFI).build(), cb);
+        } catch (Exception e) {
+            return;
+        }
+        wifiWait = cb;
+        svc.mainHandler().postDelayed(() -> {
+            synchronized (Background.class) {
+                if (wifiWait != cb) return;
+                stopWifiWait(svc);
+                gaveUp(svc, boot, "there was no Wi-Fi after the restart");
+            }
+        }, wifiUntil - now);
+    }
+
+    /** Stops waiting for Wi-Fi (it came, it took too long, or the accessibility service ends). */
+    static synchronized void stopWifiWait(Context c) {
+        if (wifiWait == null) return;
+        try {
+            c.getSystemService(android.net.ConnectivityManager.class).unregisterNetworkCallback(wifiWait);
+        } catch (Exception ignored) {
+        }
+        wifiWait = null;
     }
 
     private static void sleep(long ms) {

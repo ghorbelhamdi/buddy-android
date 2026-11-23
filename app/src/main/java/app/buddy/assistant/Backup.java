@@ -34,7 +34,9 @@ final class Backup {
      * phone's own set-up (its pairing, its API key services).
      */
     private static final java.util.Set<String> OWN = new java.util.HashSet<>(java.util.Arrays.asList(
-            "token", "bg_token", "bg_paired", "bg_adb_port", "providers", "tailnet_devices"));
+            "token", "bg_token", "bg_paired", "bg_adb_port", "providers", "tailnet_devices",
+            // (what this phone did after its last restart, and whether its accessibility service is on)
+            "bg_restart_boot", "bg_restart_tries", "a11y_wanted", "a11y_restored_at"));
     /**
      * Settings a backup can't loosen: on restore this phone's own values stay. A backup is a file from outside, and
      * one made to harm (or just made on a phone set up differently) shouldn't switch on phone commands, Linux tools
@@ -43,7 +45,8 @@ final class Backup {
     private static final java.util.Set<String> SAFETY = new java.util.HashSet<>(java.util.Arrays.asList(
             "bg_shell", "bg_shell_ask", "agents_tap_buddy", "dev", "autonomous_default", "guard_builtin", "guard_allow",
             "ssh_server", "remote_session", "codex_remote", "mcp_servers", "ask_new_apps", "tailnet_tools", "outside_background",
-            "sms_codes")); // (whether sms_list shows codes in messages)
+            "sms_codes", // (whether sms_list shows codes in messages)
+            "bg_restart")); // (Buddy switching Wireless debugging on by itself after a restart)
 
     private Backup() {
     }
@@ -76,7 +79,7 @@ final class Backup {
                 // services and their choices only make sense with their keys, which stay on this phone
                 // nor the tokens and this phone's pairing (see OWN)
                 if (p.equals("buddy")) xml = xml.replaceAll("\\s*<string name=\"(token|bg_token|providers|agent_default_[a-z]+)\">[^<]*</string>", "")
-                        .replaceAll("\\s*<(boolean|int) name=\"(bg_paired|bg_adb_port)\"[^>]*/>", "");
+                        .replaceAll("\\s*<(boolean|int|long) name=\"(bg_paired|bg_adb_port|bg_restart_boot|bg_restart_tries|a11y_wanted|a11y_restored_at)\"[^>]*/>", "");
                 z.putNextEntry(new ZipEntry("prefs/" + p + ".xml"));
                 z.write(xml.getBytes("UTF-8"));
             }

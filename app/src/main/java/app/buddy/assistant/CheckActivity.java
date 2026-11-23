@@ -110,7 +110,18 @@ public class CheckActivity extends Screen {
     private List<Result> checks() {
         List<Result> r = new ArrayList<>();
         BuddyService svc = BuddyService.get();
-        r.add(new Result(getString(R.string.check_a11y), svc != null, svc != null ? null : getString(R.string.check_a11y_bad),
+        // dropped by Android, and Buddy may switch it back on itself: that first, and a moment for it to connect
+        if (svc == null && (BuddyService.restoreAccess(this) || BuddyService.accessRestoring())) {
+            for (int i = 0; i < 15 && (svc = BuddyService.get()) == null; i++) {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException ignored) {
+                }
+            }
+        }
+        String notBack = BuddyService.notRestored(); // (why Buddy didn't put it back itself: for the report)
+        r.add(new Result(getString(R.string.check_a11y), svc != null, svc != null ? null : getString(R.string.check_a11y_bad)
+                + (notBack == null ? "" : "\n(" + notBack + ")"),
                 getString(R.string.check_open_settings), () -> Ui.openAccessibilitySettings(this)));
 
         boolean rules = false;

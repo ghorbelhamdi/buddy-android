@@ -11,6 +11,9 @@ public class BuddyApp extends Application {
     public void onCreate() {
         super.onCreate();
         ctx = this;
+        // Buddy starts (opened, or woken by the phone after a restart or an update): its accessibility service, if
+        // Android dropped it and Buddy may put it back
+        BuddyService.restoreAccess(this);
     }
 
     static Context context() {

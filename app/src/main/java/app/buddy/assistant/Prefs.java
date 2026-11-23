@@ -113,6 +113,50 @@ final class Prefs {
         sp(c).edit().putInt("bg_adb_port", port).apply();
     }
 
+    /** Background mode's helper is started again by Buddy itself after a restart of the phone (see Background.afterRestart). */
+    static boolean backgroundRestart(Context c) {
+        return sp(c).getBoolean("bg_restart", false);
+    }
+
+    static void setBackgroundRestart(Context c, boolean on) {
+        sp(c).edit().putBoolean("bg_restart", on).apply();
+    }
+
+    /** The boot (Android's count of them) Buddy last tried that in, and how often: at most a few tries per boot. */
+    static int backgroundRestartBoot(Context c) {
+        return sp(c).getInt("bg_restart_boot", -1);
+    }
+
+    static int backgroundRestartTries(Context c) {
+        return sp(c).getInt("bg_restart_tries", 0);
+    }
+
+    static void setBackgroundRestartTries(Context c, int boot, int tries) {
+        sp(c).edit().putInt("bg_restart_boot", boot).putInt("bg_restart_tries", tries).apply();
+    }
+
+    /**
+     * The user has Buddy's accessibility service on: set when it connects, cleared when Android unbinds it in an
+     * orderly way, which is what turning it off in Settings does. A force stop, an update or a crash ends Buddy's
+     * process without that, so this stays set and Buddy may switch the service back on (see BuddyService.restoreAccess).
+     */
+    static boolean accessWanted(Context c) {
+        return sp(c).getBoolean("a11y_wanted", false);
+    }
+
+    static void setAccessWanted(Context c, boolean on) {
+        if (accessWanted(c) != on) sp(c).edit().putBoolean("a11y_wanted", on).commit(); // (at once: the process may end right after)
+    }
+
+    /** When Buddy last switched its accessibility service back on by itself (not again for a while: never in a loop). */
+    static long accessRestoredAt(Context c) {
+        return sp(c).getLong("a11y_restored_at", 0);
+    }
+
+    static void setAccessRestoredAt(Context c, long at) {
+        sp(c).edit().putLong("a11y_restored_at", at).apply();
+    }
+
     static int[] bubblePos(Context c) {
         return new int[]{sp(c).getInt("bx", -1), sp(c).getInt("by", 400)};
     }
@@ -283,6 +327,15 @@ final class Prefs {
         sp(c).edit().putBoolean("bubble", on).apply();
     }
 
+    /** The bubble keeps out of the way while one of Buddy's own screens is open (issue #73); cards still bring it up. */
+    static boolean bubbleHideInApp(Context c) {
+        return sp(c).getBoolean("bubble_hide_in_app", true);
+    }
+
+    static void setBubbleHideInApp(Context c, boolean on) {
+        sp(c).edit().putBoolean("bubble_hide_in_app", on).apply();
+    }
+
     /**
      * What a tap on the bubble does: "panel" (open the chat panel), "talk" (start the microphone when no task runs)
      * or "app" (open the chat in the app). Before this was a choice, a switch turned "talk" on.
@@ -331,6 +384,15 @@ final class Prefs {
 
     static void setAssistMode(Context c, String mode) {
         sp(c).edit().putString("assist_mode", mode).apply();
+    }
+
+    /** The assistant gesture does nothing while the phone is locked (issue #80: power held in a pocket or on standby). */
+    static boolean assistUnlockedOnly(Context c) {
+        return sp(c).getBoolean("assist_unlocked_only", false);
+    }
+
+    static void setAssistUnlockedOnly(Context c, boolean on) {
+        sp(c).edit().putBoolean("assist_unlocked_only", on).apply();
     }
 
     /** Buddy's face on the bubble and in the chats: "buddy" (the drawn one) or "picture" (one the user picked). */

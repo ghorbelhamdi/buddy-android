@@ -1,0 +1,4 @@
+• The bubble keeps out of Buddy's own screens (it still comes up for an approval card or a question); a switch under Chat bubble
+• Buddy's accessibility service comes back by itself after a force stop or an update, while background mode is running
+• Background mode can start again after a restart of the phone (a switch, on phones that allow it)
+• Assistant gesture: an option to ignore it while the phone is locked

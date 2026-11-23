@@ -979,6 +979,8 @@
     <string name="setup_voice">Spraak</string>
     <string name="setup_assist">Als Buddy de assistent van je telefoon is</string>
     <string name="setup_assist_info">Kies Buddy in Androids Instellingen → Apps → Standaard-apps → App voor digitale assistent. Lang op de aan/uit-knop drukken start dan Buddy: Spreken stuurt één verzoek, Live stem start een gesproken gesprek (Codex moet ingelogd zijn, anders is het Spreken).</string>
+    <string name="setup_assist_unlocked">Alleen als de telefoon ontgrendeld is</string>
+    <string name="setup_assist_unlocked_info">De aan/uit-knop lang indrukken doet niets op het vergrendelscherm of in stand-by.</string>
     <string name="setup_live_agent">Live stem gebruikt</string>
     <string name="setup_live_agent_default">Standaard</string>
     <string name="setup_live_agent_info">Live stem via de vastgehouden bubbel of de aan/uit-knop start een nieuwe chat met deze agent. Standaard is je standaardagent (nu %1$s).</string>
@@ -1036,6 +1038,8 @@
     <!-- Settings screen: Experience. -->
     <string name="setup_chat_bubble">Chatbubbel</string>
     <string name="setup_chat_bubble_info">Zweeft boven andere apps. Sleep hem naar het ✕ om hem te verbergen; goedkeuringskaarten verschijnen nog steeds als een agent je akkoord nodig heeft.</string>
+    <string name="setup_bubble_hide_in_app">Verbergen terwijl Buddy open is</string>
+    <string name="setup_bubble_hide_in_app_info">Geen bubbel boven Buddy\'s eigen schermen. Voor een goedkeuringskaart of een vraag verschijnt hij daar toch, en hij is terug zodra je Buddy verlaat.</string>
     <string name="setup_tap_action">Tikken op de bubbel</string>
     <string name="setup_tap_panel">Chatpaneel</string>
     <string name="setup_tap_talk">Spreken</string>
@@ -1496,6 +1500,9 @@
     <string name="background_remove_text">Buddy vergeet de koppeling en stopt de helper. Chats werken weer op het echte scherm.</string>
     <string name="background_default">Nieuwe chats werken op de achtergrond</string>
     <string name="background_default_info">Elke chat heeft nog steeds een eigen schakelaar in Chatopties.</string>
+    <string name="background_restart">Opnieuw starten na een herstart</string>
+    <string name="background_restart_info">Na een herstart van de telefoon zet Buddy zelf Draadloze foutopsporing aan en start de helper, zodra de telefoon ontgrendeld is. Daarvoor is na de herstart wifi nodig, op een netwerk waar Draadloze foutopsporing altijd is toegestaan. Is het niet gelukt, tik dan op Nu starten.</string>
+    <string name="background_restart_cant">Deze telefoon laat Buddy Draadloze foutopsporing niet zelf aanzetten, dus dit kan hier niet werken: tik na een herstart op Nu starten.</string>
     <string name="chat_bg_connected">Verbonden</string>
     <string name="chat_bg_disconnected">Niet verbonden</string>
     <string name="chat_bg_not_set_up">Niet ingesteld</string>

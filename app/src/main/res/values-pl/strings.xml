@@ -1000,6 +1000,8 @@
     <string name="setup_voice">Głos</string>
     <string name="setup_assist">Gdy Buddy jest asystentem telefonu</string>
     <string name="setup_assist_info">Wybierz Buddy w Ustawieniach Androida → Aplikacje → Aplikacje domyślne → Aplikacja asystenta cyfrowego. Przytrzymanie przycisku zasilania uruchomi wtedy Buddy: Mów wysyła jedną prośbę, Głos na żywo zaczyna rozmowę głosową (wymaga zalogowanego Codex, inaczej Mów).</string>
+    <string name="setup_assist_unlocked">Tylko przy odblokowanym telefonie</string>
+    <string name="setup_assist_unlocked_info">Przytrzymanie przycisku zasilania nic nie robi na ekranie blokady ani w trybie czuwania.</string>
     <string name="setup_live_agent">Głos na żywo używa</string>
     <string name="setup_live_agent_default">Domyślny</string>
     <string name="setup_live_agent_info">Głos na żywo z przytrzymanej bańki lub przycisku zasilania zaczyna nowy czat z tym agentem. Domyślny to twój domyślny agent (teraz %1$s).</string>
@@ -1061,6 +1063,8 @@
     <!-- Settings screen: Experience. -->
     <string name="setup_chat_bubble">Dymek czatu</string>
     <string name="setup_chat_bubble_info">Unosi się nad innymi aplikacjami. Przeciągnij go na ✕, by go ukryć – karty zatwierdzenia i tak się pojawią, gdy agent będzie potrzebować twojej zgody.</string>
+    <string name="setup_bubble_hide_in_app">Ukryj, gdy Buddy jest otwarty</string>
+    <string name="setup_bubble_hide_in_app_info">Bez dymka nad własnymi ekranami Buddy\'ego. Pojawi się tam mimo to, gdy czeka karta zatwierdzenia albo pytanie, i wróci, gdy wyjdziesz z Buddy\'ego.</string>
     <string name="setup_tap_action">Kliknięcie dymka</string>
     <string name="setup_tap_panel">Panel</string>
     <string name="setup_tap_talk">Mów</string>
@@ -1524,6 +1528,9 @@
     <string name="background_remove_text">Buddy zapomni parowanie i zatrzyma pomocnika. Czaty znów będą pracować na prawdziwym ekranie.</string>
     <string name="background_default">Nowe czaty pracują w tle</string>
     <string name="background_default_info">Każdy czat nadal ma własny przełącznik w Opcjach czatu.</string>
+    <string name="background_restart">Uruchom ponownie po restarcie telefonu</string>
+    <string name="background_restart_info">Po ponownym uruchomieniu telefonu Buddy sam włączy Debugowanie bezprzewodowe i uruchomi pomocnika, gdy telefon zostanie odblokowany. Po restarcie potrzebne jest Wi-Fi, w sieci, w której Debugowanie bezprzewodowe jest zawsze dozwolone. Jeśli się nie udało, kliknij Uruchom teraz.</string>
+    <string name="background_restart_cant">Ten telefon nie pozwala Buddy\'emu samodzielnie włączyć Debugowania bezprzewodowego, więc tutaj to nie zadziała: po ponownym uruchomieniu telefonu kliknij Uruchom teraz.</string>
     <string name="chat_bg_connected">Połączono</string>
     <string name="chat_bg_disconnected">Brak połączenia</string>
     <string name="chat_bg_not_set_up">Nie skonfigurowano</string>

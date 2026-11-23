@@ -20,6 +20,14 @@ public final class AssistActivity extends Activity {
             finish();
             return;
         }
+        // the user's choice (issue #80): not from the lock screen or standby, where power is held by accident
+        android.app.KeyguardManager lock = getSystemService(android.app.KeyguardManager.class);
+        android.os.PowerManager pm = getSystemService(android.os.PowerManager.class);
+        // (a dark screen too: with no lock set, or in the minutes before the lock comes on, the keyguard says "unlocked")
+        if (Prefs.assistUnlockedOnly(this) && ((lock != null && lock.isKeyguardLocked()) || (pm != null && !pm.isInteractive()))) {
+            finish();
+            return;
+        }
         BuddyService svc = BuddyService.get();
         Bubble bubble = svc == null ? null : svc.bubble();
         if (bubble != null) bubble.assist(); // hidden or not: assist() opens the chat when it is

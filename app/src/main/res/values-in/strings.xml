@@ -1283,6 +1283,8 @@
     <string name="setup_voice">Suara</string>
     <string name="setup_assist">Saat Buddy jadi asisten ponsel</string>
     <string name="setup_assist_info">Pilih Buddy di Setelan Android → Aplikasi → Aplikasi default → Aplikasi asisten digital. Menekan lama tombol daya lalu memulai Buddy: Bicara mengirim satu permintaan, Suara langsung memulai percakapan lisan (perlu Codex masuk; jika tidak, jadi Bicara).</string>
+    <string name="setup_assist_unlocked">Hanya saat ponsel tidak terkunci</string>
+    <string name="setup_assist_unlocked_info">Menekan lama tombol daya tidak melakukan apa-apa di layar kunci atau saat siaga.</string>
     <string name="setup_live_agent">Suara langsung memakai</string>
     <string name="setup_live_agent_default">Default</string>
     <string name="setup_live_agent_info">Suara langsung dari menahan gelembung atau tombol daya memulai chat baru dengan agen ini. Default adalah agen default-mu (sekarang %1$s).</string>
@@ -1351,6 +1353,8 @@
     <string name="setup_chat_bubble">Balon chat</string>
     <!-- ✕ is the close target that appears while dragging the bubble. -->
     <string name="setup_chat_bubble_info">Mengambang di atas aplikasi lain. Tarik ke ✕ untuk menyembunyikannya; kartu persetujuan tetap muncul saat agen memerlukan persetujuan Anda.</string>
+    <string name="setup_bubble_hide_in_app">Sembunyikan saat Buddy terbuka</string>
+    <string name="setup_bubble_hide_in_app_info">Tidak ada balon di atas layar Buddy sendiri. Balon tetap muncul di sana untuk kartu persetujuan atau pertanyaan, dan kembali saat Anda keluar dari Buddy.</string>
     <!-- Setting: what a tap on the floating bubble does. Title above three short choices. -->
     <string name="setup_tap_action">Saat balon diketuk</string>
     <!-- Choice: a tap opens the floating chat panel. Keep it short (it shares a row with two more). -->
@@ -1931,6 +1935,9 @@
     <string name="background_remove_text">Buddy melupakan penyambungan dan menghentikan pembantunya. Chat kembali bekerja di layar asli.</string>
     <string name="background_default">Chat baru bekerja di latar belakang</string>
     <string name="background_default_info">Setiap chat tetap punya tombolnya sendiri di Opsi chat.</string>
+    <string name="background_restart">Mulai lagi setelah ponsel dimulai ulang</string>
+    <string name="background_restart_info">Setelah ponsel dimulai ulang, Buddy mengaktifkan Proses debug nirkabel dan memulai pembantunya sendiri, begitu kunci ponsel dibuka. Ini memerlukan Wi-Fi setelah mulai ulang, di jaringan yang selalu mengizinkan Proses debug nirkabel. Jika tidak berhasil, ketuk Mulai sekarang.</string>
+    <string name="background_restart_cant">Ponsel ini tidak mengizinkan Buddy mengaktifkan Proses debug nirkabel sendiri, jadi fitur ini tidak bisa berfungsi di sini: setelah mulai ulang, ketuk Mulai sekarang.</string>
     <string name="chat_bg_connected">Terhubung</string>
     <string name="chat_bg_disconnected">Tidak terhubung</string>
     <string name="chat_bg_not_set_up">Belum disiapkan</string>

@@ -969,6 +969,8 @@
     <string name="setup_voice">음성</string>
     <string name="setup_assist">Buddy를 휴대폰 어시스턴트로 쓸 때</string>
     <string name="setup_assist_info">Android 설정 → 애플리케이션 → 기본 앱 → 디지털 어시스턴트 앱에서 Buddy를 고르세요. 그러면 전원 버튼을 길게 누를 때 Buddy가 시작돼요: 말하기는 요청 하나를 보내고, 라이브 음성은 말로 하는 대화를 시작해요(Codex 로그인 필요, 아니면 말하기).</string>
+    <string name="setup_assist_unlocked">휴대폰 잠금이 풀려 있을 때만</string>
+    <string name="setup_assist_unlocked_info">잠금 화면이나 대기 상태에서는 전원 버튼을 길게 눌러도 아무 일도 일어나지 않습니다.</string>
     <string name="setup_live_agent">라이브 음성에 쓸 에이전트</string>
     <string name="setup_live_agent_default">기본</string>
     <string name="setup_live_agent_info">버블이나 전원 버튼을 길게 눌러 시작하는 라이브 음성은 이 에이전트로 새 채팅을 열어요. 기본은 기본 에이전트(지금은 %1$s)예요.</string>
@@ -1024,6 +1026,8 @@
     <!-- Settings screen: Experience. -->
     <string name="setup_chat_bubble">채팅 버블</string>
     <string name="setup_chat_bubble_info">다른 앱 위에 떠 있어요. ✕로 끌어다 놓으면 숨길 수 있지만, 에이전트가 승인을 받아야 할 때는 승인 카드가 계속 나타나요.</string>
+    <string name="setup_bubble_hide_in_app">Buddy가 열려 있는 동안 숨기기</string>
+    <string name="setup_bubble_hide_in_app_info">Buddy 자체 화면 위에는 버블이 뜨지 않아요. 승인 카드나 질문이 있으면 거기에도 나타나고, Buddy를 나가면 다시 보여요.</string>
     <string name="setup_tap_action">버블을 탭하면</string>
     <string name="setup_tap_panel">채팅 패널</string>
     <string name="setup_tap_talk">말하기</string>
@@ -1481,6 +1485,9 @@
     <string name="background_remove_text">Buddy가 페어링 정보를 지우고 도우미를 중지해요. 채팅은 다시 실제 화면에서 작업해요.</string>
     <string name="background_default">새 채팅은 백그라운드에서 작업</string>
     <string name="background_default_info">채팅마다 채팅 옵션에 자체 스위치가 그대로 있어요.</string>
+    <string name="background_restart">다시 시작한 뒤 자동으로 다시 시작</string>
+    <string name="background_restart_info">휴대전화를 다시 시작한 뒤 잠금이 해제되면 Buddy가 직접 ‘무선 디버깅’을 켜고 도우미를 시작해요. 다시 시작한 뒤 Wi-Fi가 필요하고, 무선 디버깅이 항상 허용된 네트워크여야 해요. 안 되면 ‘지금 시작’을 탭하세요.</string>
+    <string name="background_restart_cant">이 휴대전화에서는 Buddy가 직접 ‘무선 디버깅’을 켤 수 없어서 여기서는 작동하지 않아요. 다시 시작한 뒤에는 ‘지금 시작’을 탭하세요.</string>
     <string name="chat_bg_connected">연결됨</string>
     <string name="chat_bg_disconnected">연결 안 됨</string>
     <string name="chat_bg_not_set_up">설정 안 됨</string>
