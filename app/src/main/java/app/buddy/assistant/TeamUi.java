@@ -312,7 +312,9 @@ final class TeamUi {
         p.addView(single(text(a, shown, 13, TEXT)), weight1());
         p.addView(icon(a, R.drawable.ms_expand_more, MUTED, 20));
         p.setOnClickListener(v -> {
-            android.widget.PopupMenu menu = new android.widget.PopupMenu(a, p);
+            // (the phone's own menu look, light or dark, as the app's other dropdown)
+            android.widget.PopupMenu menu = new android.widget.PopupMenu(
+                    new android.view.ContextThemeWrapper(a, android.R.style.Theme_DeviceDefault_DayNight), p);
             for (int i = 0; i < options.size(); i++) {
                 String[] o = options.get(i);
                 android.view.MenuItem item = menu.getMenu().add(0, i, i, o.length > 1 ? o[1] : o[0]);

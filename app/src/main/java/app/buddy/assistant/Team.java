@@ -169,9 +169,14 @@ final class Team {
 
     /** What the next member added in the setup is called. */
     static String nextName(Context c, Team t) {
-        int n = t.members.size() + 1;
-        return c.getString(LEAD.equals(t.structure) ? R.string.team_worker_n : PIPE.equals(t.structure) ? R.string.team_step_n
-                : CHECK.equals(t.structure) && n % 2 == 0 ? R.string.team_checker_n : R.string.team_doer_n, n);
+        int kind = LEAD.equals(t.structure) ? R.string.team_worker_n : PIPE.equals(t.structure) ? R.string.team_step_n
+                : CHECK.equals(t.structure) && t.members.size() % 2 == 1 ? R.string.team_checker_n : R.string.team_doer_n;
+        // (a name no member has: after one was removed, counting them would give a name twice, and the leader and
+        // the boxes over the message box tell members apart by name)
+        for (int n = t.members.size() + 1; ; n++) {
+            String name = c.getString(kind, n);
+            if (t.member(name) == null) return name;
+        }
     }
 
     /** How work is handed on, for the leader to offer (the first is what a team starts with). English: the leader reads them. */
@@ -276,8 +281,9 @@ final class Team {
                 + "be open in one place, and other members may use the others.\n")
                 : "- You have no phone screen: use the browser_* tools" + (parent.dev ? " and your Linux tools" : "") + ".\n")
                 + (!parent.dev ? "" : look ? "- Files: read what you need; make nothing outside " + Helpers.folder(h.id) + " (create it first).\n"
-                : SEP.equals(t.workspace) ? "- Files: you work in a folder of your own (where you start); the chat's own "
-                + "work is one folder up. Name in your answer every file you made or changed, with its full path.\n"
+                : SEP.equals(t.workspace) ? "- Files: you work in a folder of your own (where you start). The chat's own "
+                + "work is in /root/.buddy/work" + (parent.folder.isEmpty() ? "" : "/" + parent.folder) + ": read there what "
+                + "you need, and leave it as it is. Name in your answer every file you made or changed, with its full path.\n"
                 : "- Files: you work in the chat's own folder (where you start), where the others work too: change only what "
                 + "your part is about, and name in your answer every file you made or changed.\n")
                 + (t.rules.isEmpty() ? "" : "- The team's rules: " + t.rules + "\n")
@@ -322,11 +328,18 @@ final class Team {
         for (Sessions.Session h : all(hub, parent)) if (h.running) hub.stop(h);
     }
 
-    /** A member's own folder (workspace: each in its own), in the chat's project or, without one, beside the others'. */
-    static String folder(Sessions.Session parent, Member m) {
+    /**
+     * A member's own folder (workspace: each in its own), in the chat's project or, without one, in a folder of the
+     * chat's team: named after the member when its chat is made, and its own from then on (a member that is renamed
+     * keeps its folder, and its work with it).
+     */
+    private static String folder(ChatHub hub, Sessions.Session parent, Member m, Sessions.Session h) {
+        String base = (parent.folder.isEmpty() ? "team-" + parent.id : parent.folder + "/team") + "/";
+        if (h.folder.startsWith(base)) return h.folder;
         String slug = m.name.toLowerCase(java.util.Locale.ROOT).replaceAll("[^a-z0-9]+", "-").replaceAll("^-+|-+$", "");
         if (slug.isEmpty()) slug = m.id;
-        return (parent.folder.isEmpty() ? "team-" + parent.id : parent.folder + "/team") + "/" + slug;
+        for (Sessions.Session o : all(hub, parent.id)) if (o != h && o.folder.equals(base + slug)) slug += "-" + m.id;
+        return base + slug;
     }
 
     /**
@@ -351,10 +364,18 @@ final class Team {
         h.title = m.name;
         h.dev = parent.dev;
         h.works = !LOOK.equals(t.workspace);
-        h.folder = LOOK.equals(t.workspace) ? "" : SEP.equals(t.workspace) ? folder(parent, m) : parent.folder;
+        String folder = LOOK.equals(t.workspace) ? "" : SEP.equals(t.workspace) ? folder(hub, parent, m, h) : parent.folder;
+        if (!folder.equals(h.folder) && !h.running) { // (another folder: its agent starts anew there, with the chat so far, as a chat's does)
+            if (!h.messages.isEmpty()) h.reseed = true;
+            h.folder = folder;
+        }
         boolean screen = Background.setUp(hub.app) && !NONE.equals(t.apps);
         if (!h.running) h.background = screen;
         hub.sessions.save(h);
+        if (from == null) { // the user's own message lifts a Stop, as one to the chat's own agent does
+            BuddyService svc = BuddyService.get();
+            if (svc != null) svc.allowControl();
+        }
         h.toldBy = from == null ? "" : from;
         h.told = text;
         String who = from == null ? "[From the user, directly]\n" : "[From the leader]\n";
@@ -549,9 +570,11 @@ final class Team {
                 card.add(svc.getString(R.string.team_card_rename, m.name, name));
                 m.name = ChatHub.clip(name, 40);
             }
+            String agentWas = m.agent, modelWas = m.model;
             String err = agentAndModel(svc, m, o, m.agent);
             if (err != null) return err;
-            if (o.has("agent") || o.has("model")) card.add(svc.getString(R.string.team_card_on, m.name, m.on()));
+            // (only what changes: the leader often sends a member's agent along with its new goal)
+            if (!m.agent.equals(agentWas) || !m.model.equals(modelWas)) card.add(svc.getString(R.string.team_card_on, m.name, m.on()));
         }
         JSONArray add = a.optJSONArray("add");
         for (int i = 0; add != null && i < add.length(); i++) {
