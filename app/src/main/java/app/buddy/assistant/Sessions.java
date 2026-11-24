@@ -107,10 +107,6 @@ final class Sessions {
          * ("flappy"; see FilePlaces.validProject). "" is the workspace itself, which chats without one share.
          */
         String folder = "";
-        /** The team the chat works with (Teams), or "": none. */
-        String team = "";
-        /** A helper that is a team's member: it works like its chat (cards, Linux tools in the chat's folder), see Helpers. */
-        boolean member;
         /** Files sent to Linux tools (LinuxFiles) stay, in ~/.buddy/work/incoming, when the chat is deleted. */
         boolean keepFiles = true;
         /** Background mode: the agent works on a display of its own, the user keeps the screen (see Background). */
@@ -134,6 +130,15 @@ final class Sessions {
         String parent = "";
         /** A helper's place among its parent's (0, 1, 2), in the order they were started. */
         int slot;
+        /**
+         * A helper that works like its chat (delegate's "work"): with the chat's cards, in the chat's project folder; the
+         * others only look things up (see Helpers).
+         */
+        boolean works;
+        /** A helper's round: the slot of the first helper its delegate call started (the round's reports go together). */
+        int round;
+        /** A helper's turn: how many messages the user had sent in the parent chat when it started (a new one clears them). */
+        int turn;
         /** The chat's scheduled task (see Schedules), or null. */
         Schedules.Plan schedule;
         /** Messages the agent scheduled for itself in this chat (schedule_message), soonest first. Main thread. */
@@ -455,9 +460,9 @@ final class Sessions {
         }
         JSONObject o = new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model)
                 .put("effort", s.effort).put("actual_model", s.actualModel).put("ctx_used", s.ctxUsed).put("ctx_window", s.ctxWindow)
-                .put("interrupted", s.interrupted).put("incognito", s.incognito).put("dev", s.dev).put("awake", s.awake).put("keep_files", s.keepFiles).put("folder", s.folder).put("team", s.team).put("member", s.member).put("background", s.background).put("approvals", s.approvals).put("handover", s.handover == null ? "" : s.handover).put("reseed", s.reseed)
+                .put("interrupted", s.interrupted).put("incognito", s.incognito).put("dev", s.dev).put("awake", s.awake).put("keep_files", s.keepFiles).put("folder", s.folder).put("background", s.background).put("approvals", s.approvals).put("handover", s.handover == null ? "" : s.handover).put("reseed", s.reseed)
                 .put("handover_model", s.handoverModel).put("handover_effort", s.handoverEffort)
-                .put("pinned", s.pinned).put("archived", s.archived).put("updated", s.updated).put("cut", s.cut).put("parent", s.parent).put("slot", s.slot).put("messages", msgs);
+                .put("pinned", s.pinned).put("archived", s.archived).put("updated", s.updated).put("cut", s.cut).put("parent", s.parent).put("slot", s.slot).put("works", s.works).put("round", s.round).put("turn", s.turn).put("messages", msgs);
         synchronized (s.apps) {
             if (!s.apps.isEmpty()) o.put("apps", new JSONArray(s.apps));
         }
@@ -498,8 +503,6 @@ final class Sessions {
         s.awake = o.optBoolean("awake");
         s.keepFiles = o.optBoolean("keep_files", true);
         s.folder = FilePlaces.validProject(o.optString("folder")) ? o.optString("folder") : "";
-        s.team = o.optString("team");
-        s.member = o.optBoolean("member");
         s.background = o.optBoolean("background");
         if (o.has("lite")) s.lite = o.optBoolean("lite");
         JSONObject tl = o.optJSONObject("tools");
@@ -520,6 +523,9 @@ final class Sessions {
         s.archived = o.optBoolean("archived");
         s.parent = o.optString("parent");
         s.slot = o.optInt("slot");
+        s.works = o.optBoolean("works");
+        s.round = o.optInt("round");
+        s.turn = o.optInt("turn");
         s.schedule = Schedules.Plan.of(o.optJSONObject("schedule"));
         JSONArray ok = s.schedule == null ? null : o.optJSONArray("allowed"); // kept for its scheduled runs
         if (ok != null) for (int j = 0; j < ok.length(); j++) s.allowed.add(ok.getString(j));

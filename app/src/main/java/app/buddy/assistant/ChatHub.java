@@ -343,9 +343,6 @@ final class ChatHub {
                     : R.string.hub_accessibility_off);
         }
         String forAgent = prompt != null ? prompt : text.isEmpty() && hasFiles ? "Have a look at what I attached." : text;
-        // a chat that works with a team: its agent is told who is in it and how to use them, with each message
-        Teams.Team team = rule || !ses.parent.isEmpty() ? null : Teams.find(app, ses.team);
-        if (team != null && !team.members.isEmpty()) forAgent = Teams.brief(team) + forAgent;
         // the chat was switched to this agent: it begins anew, with the chat so far (before this message is added)
         // or it's a fork, or the user edited a message (issue #44): the agent starts fresh with the chat up to here
         final boolean fresh = ses.handover != null || ses.reseed;
@@ -824,13 +821,6 @@ final class ChatHub {
             if (!s.messages.isEmpty()) s.reseed = true;
             sessions.save(s);
         }
-        changed();
-    }
-
-    /** The team a chat works with ("" none); its next message uses it. */
-    void setTeam(Sessions.Session ses, String team) {
-        ses.team = team == null ? "" : team;
-        sessions.save(ses);
         changed();
     }
 

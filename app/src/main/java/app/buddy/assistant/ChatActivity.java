@@ -1072,10 +1072,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             LinearLayout cards = row(this);
             int cardW = (getResources().getDisplayMetrics().widthPixels - dp(this, 48)) / 3;
             int picH = Math.round((cardW - dp(this, 8)) * 1.75f); // about a phone screen's shape
-            if (own) cards.addView(helperCard(ses.id, getString(R.string.helper_this_chat), picH, true).view,
+            if (own) cards.addView(helperCard(ses.id, getString(R.string.helper_this_chat), null, picH, true).view,
                     new LinearLayout.LayoutParams(cardW, LinearLayout.LayoutParams.WRAP_CONTENT));
             for (Sessions.Session h : l)
-                cards.addView(helperCard(h.id, h.title, picH, false).view,
+                cards.addView(helperCard(h.id, h.title, h, picH, false).view,
                         new LinearLayout.LayoutParams(cardW, LinearLayout.LayoutParams.WRAP_CONTENT));
             android.widget.HorizontalScrollView across = new android.widget.HorizontalScrollView(this);
             across.setHorizontalScrollBarEnabled(false);
@@ -1111,7 +1111,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         return s;
     }
 
-    private HelperCard helperCard(final String chat, String title, int picH, final boolean own) {
+    /** h: the sub-agent (its agent and model go under its name), or null for this chat's own card. */
+    private HelperCard helperCard(final String chat, String title, Sessions.Session h, int picH, final boolean own) {
         HelperCard c = new HelperCard(chat);
         c.view = column(this);
         c.view.setBackgroundResource(ripple(this, false));
@@ -1120,7 +1121,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         c.picture.setBackground(rounded(this, CARD2, 10));
         c.picture.setClipToOutline(true);
         // until its first picture: a quiet placeholder of the same size
-        c.empty = icon(this, R.drawable.ms_auto_awesome, OUTLINE, 28);
+        // (one with no phone screen that works with Linux tools: a terminal, its browser tab's picture if it opens one)
+        c.empty = icon(this, h != null && !h.background && h.dev ? R.drawable.ms_terminal : R.drawable.ms_auto_awesome, OUTLINE, 28);
         FrameLayout frame = new FrameLayout(this);
         frame.addView(c.picture, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         frame.addView(c.empty, new FrameLayout.LayoutParams(dp(this, 28), dp(this, 28), Gravity.CENTER));
@@ -1138,6 +1140,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         c.name.setPaddingRelative(dp(this, 6), 0, 0, 0);
         nm.addView(c.name, weight1());
         c.view.addView(nm, full());
+        if (h != null) { // which agent it runs on (#75): the chat's own or another
+            String model = h.model == null || h.model.isEmpty() ? "" : Models.label(h.backend, h.model);
+            String who = Account.of(h.backend).name() + (model.isEmpty() ? "" : " · " + model);
+            c.view.addView(single(text(this, who, 11, TEXT2)), full());
+        }
         c.state = single(text(this, "", 11, MUTED));
         c.view.addView(c.state, full());
         c.view.setOnClickListener(v -> {
@@ -1651,7 +1658,6 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 ses.incognito, on -> hub.setIncognito(ses, on));
         inc.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
         c.addView(inc, full());
-        if (ses.parent.isEmpty()) teamRow(c, sheet);
         if (ses.parent.isEmpty() && Linux.installed(this) && (linuxFiles() || LinuxFiles.dir(this, ses.id).isDirectory())) {
             linuxFilesRows(c, sheet);
         }
@@ -1742,60 +1748,6 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
      * Chat options: Files (the browser of Buddy's Linux, opened at this chat's place; the row says how much was sent to
      * this chat's Linux tools, which can be a lot), and whether those files stay when the chat is deleted.
      */
-    /** Chat options: the team the chat works with (see Teams), and a sheet to pick one. */
-    private void teamRow(LinearLayout c, Dialog[] sheet) {
-        Teams.Team team = Teams.find(this, ses.team);
-        LinearLayout r = row(this);
-        r.setGravity(Gravity.CENTER_VERTICAL);
-        r.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
-        r.setBackgroundResource(ripple(this, false));
-        LinearLayout t = column(this);
-        t.addView(title(this, getString(R.string.chat_team), 15));
-        TextView sub = text(this, team == null ? getString(R.string.chat_team_none) : team.name, 13, MUTED);
-        sub.setPaddingRelative(0, dp(this, 2), 0, 0);
-        t.addView(sub);
-        r.addView(t, weight1());
-        r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
-        r.setOnClickListener(v -> {
-            if (sheet[0] != null) sheet[0].dismiss();
-            teamSheet();
-        });
-        c.addView(r, full());
-    }
-
-    private void teamSheet() {
-        LinearLayout c = column(this);
-        c.addView(title(this, getString(R.string.chat_team), 18));
-        TextView info = text(this, getString(R.string.chat_team_info), 13, MUTED);
-        info.setPaddingRelative(0, dp(this, 4), 0, dp(this, 10));
-        c.addView(info);
-        final Dialog[] d = new Dialog[1];
-        c.addView(projectRow(getString(R.string.chat_team_none), getString(R.string.chat_team_none_info), ses.team.isEmpty(), () -> {
-            hub.setTeam(ses, "");
-            d[0].dismiss();
-        }), full());
-        for (Teams.Team t : Teams.all(this)) {
-            String about = getString(Teams.STAGES.equals(t.flow) ? R.string.teams_flow_stages : R.string.teams_flow_lead) + " · "
-                    + getResources().getQuantityString(R.plurals.teams_members_count, t.members.size(), t.members.size());
-            c.addView(projectRow(t.name, about, t.id.equals(ses.team), () -> {
-                hub.setTeam(ses, t.id);
-                d[0].dismiss();
-            }), full());
-        }
-        Button edit = button(this, getString(R.string.chat_team_manage), false);
-        edit.setOnClickListener(v -> {
-            d[0].dismiss();
-            startActivity(new android.content.Intent(this, TeamsActivity.class));
-        });
-        LinearLayout.LayoutParams ep = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 44));
-        ep.topMargin = dp(this, 12);
-        c.addView(edit, ep);
-        ScrollView sv = new ScrollView(this);
-        sv.addView(c);
-        d[0] = bottomSheet(this, sv);
-        d[0].show();
-    }
-
     private void linuxFilesRows(LinearLayout c, Dialog[] sheet) {
         LinearLayout pr = row(this);
         pr.setGravity(Gravity.CENTER_VERTICAL);

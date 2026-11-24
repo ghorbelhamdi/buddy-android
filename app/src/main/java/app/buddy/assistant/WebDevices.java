@@ -609,8 +609,7 @@ final class WebDevices {
             return new JSONObject().put("agent", s.backend).put("agents", agents).put("model", s.model).put("models", models)
                     .put("effort", s.effort).put("efforts", efforts).put("title", s.label()).put("pinned", s.pinned).put("archived", s.archived)
                     .put("running", s.running).put("dev", s.dev).put("folder", s.folder)
-                    .put("background", s.background).put("canBackground", Prefs.backgroundPaired(c)).put("linux", Linux.installed(c))
-                    .put("team", s.team).put("teams", teams(c));
+                    .put("background", s.background).put("canBackground", Prefs.backgroundPaired(c)).put("linux", Linux.installed(c));
         });
         return out == null ? new JSONObject().put("error", "no such chat") : out;
     }
@@ -637,17 +636,6 @@ final class WebDevices {
                     .put("dev", Prefs.devMode(c)).put("linux", Linux.installed(c))
                     .put("background", Prefs.backgroundPaired(c) && Prefs.backgroundDefault(c)).put("canBackground", Prefs.backgroundPaired(c));
         });
-    }
-
-    /** The teams, for the page's team picker: name, how it works, its members (name, agent). */
-    private static JSONArray teams(Context c) throws Exception {
-        JSONArray a = new JSONArray();
-        for (Teams.Team t : Teams.all(c)) {
-            JSONArray m = new JSONArray();
-            for (Teams.Member x : t.members) m.put(new JSONObject().put("name", x.name).put("agent", Teams.describe(x)).put("stage", x.stage));
-            a.put(new JSONObject().put("id", t.id).put("name", t.name).put("flow", t.flow).put("members", m));
-        }
-        return a;
     }
 
     /** One change from the page's pickers: model, effort, agent, title, pinned, archived, Linux tools or background mode. */
@@ -686,10 +674,6 @@ final class WebDevices {
                 hub.rename(s, ChatHub.clip(in.optString("title"), 120));
             } else if (in.has("pinned")) {
                 hub.setPinned(s, in.optBoolean("pinned"));
-            } else if (in.has("team")) { // the team the chat works with ("" none); teams themselves are set in the app
-                String t = in.optString("team");
-                if (!t.isEmpty() && Teams.find(c, t) == null) return "that team isn't there any more";
-                hub.setTeam(s, t);
             } else if (in.has("unread")) { // read on the page (or marked unread again), as opening it in the app does
                 s.unread = in.optBoolean("unread");
                 hub.sessions.save(s);

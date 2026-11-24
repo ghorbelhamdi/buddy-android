@@ -24,7 +24,7 @@ import java.util.zip.ZipOutputStream;
  */
 final class Backup {
     /** Buddy's settings and chats (the services' list and choices stay out, as their keys do). */
-    private static final String[] PREFS = {"buddy", "buddy_sessions", "browser", "routines", "teams"};
+    private static final String[] PREFS = {"buddy", "buddy_sessions", "browser", "routines"};
     /** In Buddy's Linux, what to keep (no sign-ins): projects without their builds, skills, the agents' conversations. */
     private static final String LINUX_PARTS = "root/.buddy/sessions root/.buddy/work root/.agents/skills root/.claude/projects "
             + "root/.codex/sessions root/.local/share/opencode/opencode.db";

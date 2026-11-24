@@ -295,9 +295,11 @@ final class Tools {
                         + "are done. Give as many tasks as the work has parts: they all start at once. Each sub-agent uses the user's plan as you do, so don't delegate what you can do "
                         + "quickly yourself, and never a step whose result you need before you can go on: a lone "
                         + "sub-agent you only wait for is slower than doing it yourself. A sub-agent can run on another "
-                        + "agent than you, and another model (agent, model): one the user asked for, or one better at "
-                        + "that part. In a chat with a team you lead, name a member in member: it works on its own agent "
-                        + "with its role, and like you (its sends and deletes come to the user on a card).",
+                        + "agent and model than you (agent, model): when the user names one (\"have Codex write it and "
+                        + "Claude review it\"), or one better at that part. By default a sub-agent only looks things up; "
+                        + "with work it works like you, in this chat's folder (its sends and deletes come to the user on a "
+                        + "card): for writing or changing things. For steps one after another (write, then review), call "
+                        + "delegate once per step: the reports of the step before go in the next one's task.",
                 props().put("tasks", new JSONObject().put("type", "array").put("minItems", 1)
                         .put("description", "One per sub-agent")
                         .put("items", new JSONObject().put("type", "object")
@@ -308,19 +310,15 @@ final class Tools {
                                         .put("phone", boolProp("Default true. False for a part that needs no app "
                                                 + "(the web, files, thinking): that sub-agent takes no phone screen"))
                                         .put("agent", strProp("Optional: another signed-in agent for this sub-agent: claude, "
-                                                + "codex, opencode, agy, grok, copilot or pi. Default: yours"))
-                                        .put("model", strProp("Optional, with agent: one of that agent's model ids. Default: its own"))
-                                        .put("member", strProp("Optional: the name of a member of this chat's team (when you "
-                                                + "lead it): its agent, model and role are used")))
+                                                + "codex, opencode, agy, grok, copilot or pi (if it isn't signed in, the "
+                                                + "answer lists the ones that are). Default: yours"))
+                                        .put("model", strProp("Optional: one of that agent's model ids. Default: its own"))
+                                        .put("work", boolProp("Default false: it only looks things up. True: it works "
+                                                + "like you, in this chat's folder, and can make, change and send things "
+                                                + "(the user approves sends and deletes on a card)")))
                                 .put("required", new JSONArray().put("task"))))
                         .put("wait", boolProp("Default true: wait here for the reports. False: return at once, so you "
                                 + "can work on your own part at the same time; call subagents afterwards.")), "tasks"));
-        t.put(tool("team",
-                "Only in a chat that works with a team in fixed stages (its messages say so): the task goes through "
-                        + "the team's members stage by stage, each stage with the reports of the stages before, and you "
-                        + "get every report. Call it first with the user's task; it waits up to 8 minutes, and if the team "
-                        + "still works then, call it again without a task to wait for the rest.",
-                props().put("task", strProp("The task as the user gave it, with anything the members need to know"))));
         t.put(tool("subagents",
                 "Your sub-agents from delegate: waits for the ones still working (up to 8 minutes) and returns every "
                         + "report. With stop, ends the ones still working first.",
@@ -530,10 +528,10 @@ final class Tools {
         }
         String capped = countStep(name, a);
         if (capped != null) return text(capped);
-        if (Helpers.member(svc, McpServer.CALLER_CHAT.get())) { // a team's member works like its chat, but for the chat's own things
-            if (MEMBER_NO.contains(name)) return text(Helpers.refuse("\"" + name + "\" is for the chat the user talks to"));
+        if (Helpers.works(svc, McpServer.CALLER_CHAT.get())) { // a working helper works like its chat, but for the chat's own things
+            if (WORKER_NO.contains(name)) return text(Helpers.refuse("\"" + name + "\" is for the chat the user talks to"));
             if ("ask".equals(name)) return text("NO ANSWER: " + Helpers.refuse("asking the user"));
-            // (the phone's own screen is the user's and the chat's: a member uses a hidden one, or none)
+            // (the phone's own screen is the user's and the chat's: a working helper uses a hidden one, or none)
             if (SCREEN.contains(name) && !Background.on(svc, McpServer.CALLER_CHAT.get()))
                 return text(Helpers.refuse("you have no phone screen, only the browser_* tools"));
         } else if (Helpers.is(svc, McpServer.CALLER_CHAT.get())) { // a helper only looks things up, by itself (see Helpers)
@@ -547,7 +545,6 @@ final class Tools {
         // starting helpers or waiting for them isn't using the phone: no "Using your phone", no wait for a pause to end
         if ("delegate".equals(name)) return text(Helpers.delegate(svc, McpServer.CALLER_CHAT.get(), a));
         if ("subagents".equals(name)) return text(Helpers.status(svc, McpServer.CALLER_CHAT.get(), a));
-        if ("team".equals(name)) return text(Helpers.team(svc, McpServer.CALLER_CHAT.get(), a));
         if (name.startsWith("browser_")) { // the background browser: it doesn't need the phone's screen
             svc.onToolActivity(name, false);
             return browser.call(name, a);
@@ -947,11 +944,11 @@ final class Tools {
             "read_screen", "tap", "long_press", "type_text", "scroll", "swipe", "press", "open_app", "open_url",
             "screenshot", "point_out", "wait_for", "do_steps", "collect", "find", "routine"));
 
-    /** Not for a helper (see Helpers): what reaches the user, the phone's own settings or a later time. */
-    /** What a team's member (which works like its chat, see Helpers) still may not: what belongs to the chat itself. */
-    private static final java.util.Set<String> MEMBER_NO = new java.util.HashSet<>(java.util.Arrays.asList(
-            "delegate", "subagents", "team", "schedule_message", "add_notification_rule", "cancel_scheduled", "update_buddy"));
+    /** What a working helper (which works like its chat, see Helpers) still may not: what belongs to the chat itself. */
+    private static final java.util.Set<String> WORKER_NO = new java.util.HashSet<>(java.util.Arrays.asList(
+            "delegate", "subagents", "schedule_message", "add_notification_rule", "cancel_scheduled", "update_buddy"));
 
+    /** Not for a helper (see Helpers): what reaches the user, the phone's own settings or a later time. */
     private static final java.util.Set<String> HELPER_NO = new java.util.HashSet<>(java.util.Arrays.asList(
             "delegate", "subagents", "phone_shell", "run_on_computer", "install_apk", "update_buddy", "wait_for_install", "schedule_message",
             "add_notification_rule",

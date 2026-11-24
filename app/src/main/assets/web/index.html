@@ -998,7 +998,6 @@ function chatMenu(id, anchor) {
   pop.append(item('Rename', () => rename(id, title)));
   pop.append(item('Files', () => openView('files', id, title))); // (this chat's: its project folder, what was sent to it, its attachments)
   pop.append(item('Schedule…', () => editSchedule(id, title)));
-  pop.append(item('Team…', () => pickTeam(id)));
   pop.append(c.archived ? item('Bring back', () => change({archived: false}, id)) : item('Archive', () => change({archived: true}, id)));
   const d = id === open && chatData && !chatData.error ? chatData : null;
   if (d && anchor.id === 'optbtn' && window.matchMedia('(max-width: 820px)').matches) {
@@ -1023,22 +1022,6 @@ function rename(id, title) {
     name.addEventListener('keydown', e => { if (e.key === 'Enter') save(); });
     box.append(el('h2', {}, 'Rename'), el('div', {class: 'line'}, name, el('button', {class: 'btn primary', onclick: save}, 'Save')));
     setTimeout(() => { name.focus(); name.select(); }, 0);
-  });
-}
-
-/** The team a chat works with: none, or one of the teams set in the app (Settings → Teams). */
-async function pickTeam(id) {
-  const o = await options(id);
-  if (!o) return;
-  sheet((box, close) => {
-    box.append(el('h2', {}, 'Team'), el('p', {}, 'The team this chat hands its tasks to. Teams and their members are set in the app, in Settings → Teams.'));
-    box.append(option('No team', !o.team, () => { close(); change({team: ''}, id); }));
-    for (const t of o.teams || []) {
-      const b = option(t.name, t.id === o.team, () => { close(); change({team: t.id}, id); });
-      b.querySelector('.n').append(el('small', {style: 'display:block;color:var(--muted);font-size:12.5px'},
-        (t.flow === 'lead' ? 'The chat’s agent leads' : 'Fixed stages') + ' · ' + t.members.map(m => m.name + ' (' + m.agent + ')').join(', ')));
-      box.append(b);
-    }
   });
 }
 

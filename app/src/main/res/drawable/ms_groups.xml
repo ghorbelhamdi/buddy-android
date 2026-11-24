@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Three people (a team), drawn in lines to match the Material Symbols icons, as ms_devices. -->
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp" android:height="24dp" android:viewportWidth="960" android:viewportHeight="960">
-    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="60" android:fillColor="#00000000" android:strokeLineJoin="round" android:strokeLineCap="round"
-        android:pathData="M480,450A90,90 0,1 1,480,270A90,90 0,1 1,480,450ZM300,720Q300,560 480,560Q660,560 660,720" />
-    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="60" android:fillColor="#00000000" android:strokeLineJoin="round" android:strokeLineCap="round"
-        android:pathData="M250,470A65,65 0,1 1,250,340M120,700Q120,590 220,580M710,470A65,65 0,1 0,710,340M840,700Q840,590 740,580" />
-</vector>
