@@ -2946,6 +2946,10 @@
     <string name="team_card_structure">Как работает: %1$s</string>
     <string name="team_card_workspace">Где работают участники: %1$s</string>
     <string name="team_card_apps">Приложения: %1$s</string>
+    <string name="team_fact_handoff">Передача работы: %1$s</string>
+    <string name="team_fact_rules">Правила: %1$s</string>
+    <string name="team_change_hint">Чтобы изменить команду, скажите лидеру.</string>
+    <string name="team_show_shape">%1$s: показать команду в виде схемы</string>
     <string name="team_note_on">Команда включена: %1$s, участники: %2$s</string>
     <string name="team_note_off">Команда выключена</string>
     <string name="hub_tool_team">Поручение для: %1$s</string>

@@ -2541,6 +2541,10 @@
     <string name="team_card_structure">طريقة العمل: %1$s</string>
     <string name="team_card_workspace">مكان عمل الأعضاء: %1$s</string>
     <string name="team_card_apps">التطبيقات: %1$s</string>
+    <string name="team_fact_handoff">تسليم العمل: %1$s</string>
+    <string name="team_fact_rules">القواعد: %1$s</string>
+    <string name="team_change_hint">لتغيير الفريق، أخبر القائد.</string>
+    <string name="team_show_shape">%1$s: عرض الفريق بشكله</string>
     <string name="team_note_on">تم تفعيل الفريق: %1$s مع %2$s</string>
     <string name="team_note_off">تم إيقاف الفريق</string>
     <string name="hub_tool_team">جارٍ توجيه %1$s</string>

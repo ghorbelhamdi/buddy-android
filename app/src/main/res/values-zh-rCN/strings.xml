@@ -2874,6 +2874,10 @@
     <string name="team_card_structure">工作方式：%1$s</string>
     <string name="team_card_workspace">成员工作位置：%1$s</string>
     <string name="team_card_apps">应用：%1$s</string>
+    <string name="team_fact_handoff">交接：%1$s</string>
+    <string name="team_fact_rules">规则：%1$s</string>
+    <string name="team_change_hint">要更改团队，请告诉负责人。</string>
+    <string name="team_show_shape">%1$s：以结构图显示团队</string>
     <string name="team_note_on">团队已开启：%1$s，成员：%2$s</string>
     <string name="team_note_off">团队已关闭</string>
     <string name="hub_tool_team">正在指示 %1$s</string>

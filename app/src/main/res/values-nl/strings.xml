@@ -2451,6 +2451,10 @@
     <string name="team_card_structure">Hoe het werkt: %1$s</string>
     <string name="team_card_workspace">Waar leden werken: %1$s</string>
     <string name="team_card_apps">Apps: %1$s</string>
+    <string name="team_fact_handoff">Overdracht: %1$s</string>
+    <string name="team_fact_rules">Regels: %1$s</string>
+    <string name="team_change_hint">Vertel het de leider als je het team wilt wijzigen.</string>
+    <string name="team_show_shape">%1$s: het team in zijn vorm tonen</string>
     <string name="team_note_on">Team aan: %1$s met %2$s</string>
     <string name="team_note_off">Team uit</string>
     <string name="hub_tool_team">Opdracht aan %1$s</string>

@@ -2884,6 +2884,10 @@
     <string name="team_card_structure">Cómo funciona: %1$s</string>
     <string name="team_card_workspace">Dónde trabajan los miembros: %1$s</string>
     <string name="team_card_apps">Apps: %1$s</string>
+    <string name="team_fact_handoff">Traspaso: %1$s</string>
+    <string name="team_fact_rules">Reglas: %1$s</string>
+    <string name="team_change_hint">Para cambiar el equipo, díselo al líder.</string>
+    <string name="team_show_shape">%1$s: mostrar el equipo en su forma</string>
     <string name="team_note_on">Equipo activado: %1$s con %2$s</string>
     <string name="team_note_off">Equipo desactivado</string>
     <string name="hub_tool_team">Dando instrucciones a %1$s</string>

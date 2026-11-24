@@ -2425,6 +2425,10 @@
     <string name="team_card_structure">작동 방식: %1$s</string>
     <string name="team_card_workspace">멤버 작업 위치: %1$s</string>
     <string name="team_card_apps">앱: %1$s</string>
+    <string name="team_fact_handoff">인계: %1$s</string>
+    <string name="team_fact_rules">규칙: %1$s</string>
+    <string name="team_change_hint">팀을 바꾸려면 리더에게 말하세요.</string>
+    <string name="team_show_shape">%1$s: 팀 형태 보기</string>
     <string name="team_note_on">팀 켜짐: %1$s, 멤버: %2$s</string>
     <string name="team_note_off">팀 꺼짐</string>
     <string name="hub_tool_team">%1$s에게 지시하는 중</string>

@@ -2426,6 +2426,10 @@
     <string name="team_card_structure">進め方: %1$s</string>
     <string name="team_card_workspace">メンバーの作業場所: %1$s</string>
     <string name="team_card_apps">アプリ: %1$s</string>
+    <string name="team_fact_handoff">引き継ぎ: %1$s</string>
+    <string name="team_fact_rules">ルール: %1$s</string>
+    <string name="team_change_hint">チームを変更するには、リーダーに伝えてください。</string>
+    <string name="team_show_shape">%1$s: チームの形を表示</string>
     <string name="team_note_on">チームをオンにしました: %1$s、メンバー: %2$s</string>
     <string name="team_note_off">チームをオフにしました</string>
     <string name="hub_tool_team">%1$s に指示中</string>

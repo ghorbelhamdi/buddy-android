@@ -2445,6 +2445,10 @@
     <string name="team_card_structure">काम का तरीका: %1$s</string>
     <string name="team_card_workspace">सदस्य कहाँ काम करते हैं: %1$s</string>
     <string name="team_card_apps">ऐप: %1$s</string>
+    <string name="team_fact_handoff">काम आगे सौंपना: %1$s</string>
+    <string name="team_fact_rules">नियम: %1$s</string>
+    <string name="team_change_hint">टीम बदलने के लिए लीडर से कहें।</string>
+    <string name="team_show_shape">%1$s: टीम को उसके ढाँचे में दिखाएँ</string>
     <string name="team_note_on">टीम चालू: %1$s, सदस्य: %2$s</string>
     <string name="team_note_off">टीम बंद</string>
     <string name="hub_tool_team">%1$s को बता रहा है</string>
