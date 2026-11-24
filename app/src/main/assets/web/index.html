@@ -233,6 +233,31 @@ h2.sec{margin:8px 0 0;font-size:13px;letter-spacing:.5px;text-transform:uppercas
 .rate{font:inherit;font-size:13px;min-height:34px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text);padding:0 8px}
 .shell.view #quote,.shell.view #atts,.shell.view .composer,.shell.view #run{display:none}
 .buddy{max-width:100%}
+.tm{--mc:var(--md)}
+.tm.lead{--md:#E89B7F;--ml:#B4502E}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .tm{--mc:var(--ml)}}
+:root[data-theme="light"] .tm{--mc:var(--ml)}
+.dotc{width:8px;height:8px;border-radius:4px;background:var(--mc);flex:none}
+.team{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 20px;border-bottom:1px solid var(--line)}
+.team .m{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:5px 12px;font-size:13px;min-width:0}
+.team .m.lead{border-color:color-mix(in srgb,var(--mc) 55%,transparent)}
+.team .m b{font-weight:600}
+.team .m small{color:var(--muted);font-size:12px}
+.team .m .st{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;color:var(--muted);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.team .m .st.on{color:var(--accent-text)}
+.team .ar{color:var(--muted)}
+.sendto{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.sendto label{display:flex;align-items:center;gap:6px;min-height:34px;border-radius:17px;padding:0 12px 0 8px;border:1px solid var(--line);color:var(--text);cursor:pointer}
+.sendto label.on{background:var(--card2)}
+.sendto input{accent-color:var(--mc);width:16px;height:16px;margin:0}
+.from{align-self:flex-start;max-width:min(92%,760px);background:color-mix(in srgb,var(--mc) 14%,transparent);border-radius:18px 18px 18px 6px;padding:10px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.from .who{display:flex;align-items:center;gap:6px;font-size:13px}
+.from .who b{color:var(--mc)}
+.from .who small{color:var(--muted);font-size:11px}
+.from .qt{background:color-mix(in srgb,var(--bg) 55%,transparent);border-radius:10px;padding:6px 10px;font-size:12px;color:var(--soft);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap}
+.from .error{background:none;padding:0}
+.to{align-self:flex-end;font-size:11px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.shell.view #sendto{display:none}
 .buddy>*:first-child{margin-top:0}
 .buddy>*:last-child{margin-bottom:0}
 .buddy p{margin:0 0 10px;white-space:pre-wrap}
@@ -452,6 +477,7 @@ function start() {
         el('button', {class: 'btn small', id: 'runbtn', hidden: true, onclick: () => { runOpen = !runOpen; runData = null; fetchRun(); }}, 'Running now'),
         el('button', {class: 'btn small deny', id: 'stopbtn', hidden: true, onclick: () => stopRun()}, 'Stop'),
         el('button', {class: 'icon', id: 'optbtn', hidden: true, 'aria-label': 'Chat menu', title: 'Pin, rename, archive, delete', 'aria-haspopup': 'menu', onclick: e => chatMenu(open, e.currentTarget)}, '⋯')),
+      el('div', {class: 'team', id: 'team', hidden: true, role: 'group', 'aria-label': 'This chat’s team'}),
       pane,
       el('button', {class: 'jump', id: 'jump', 'aria-label': 'Go to the end', title: 'Go to the end', onclick: () => { end(); jump(); }}, icon(I.up, 20)),
       el('div', {class: 'scrpanel', id: 'scrpanel', hidden: true, role: 'group', 'aria-label': 'This chat’s hidden screen'},
@@ -461,6 +487,7 @@ function start() {
           el('button', {'aria-label': 'Hide the screen here', title: 'Hide here (the Screen chip in the header shows it again)', onclick: () => panelHide(open, true)}, icon(I.x, 16)))),
       el('div', {class: 'col dock'}, el('div', {id: 'run'}), el('div', {id: 'cards'}),
         el('div', {id: 'quote'}), el('div', {class: 'atts', id: 'atts'}),
+        el('div', {class: 'sendto', id: 'sendto', hidden: true, role: 'group', 'aria-label': 'Who the message goes to'}),
         el('div', {class: 'composer'},
           el('button', {class: 'clip', 'aria-label': 'Attach files', title: 'Attach files (pictures, documents; over 25 MB they go to the chat’s Linux tools)',
             onclick: () => $('pick').click()}, icon(I.attach, 20)),
@@ -611,7 +638,7 @@ function rows(d) {
   d.messages.forEach((m, i) => {
     const at = (d.first || 0) + i, last = out[out.length - 1];
     if (m.k === 'step') { if (last && last.k === 'steps') last.steps.push(m.t); else out.push({k: 'steps', at, steps: [m.t]}); }
-    else out.push({k: m.k, at, t: m.t, s: m.s, f: m.f, lx: m.lx});
+    else out.push({k: m.k, at, t: m.t, s: m.s, f: m.f, lx: m.lx, to: m.to, fn: m.fn, fo: m.fo, c: m.c, q: m.q, qf: m.qf});
   });
   return out;
 }
@@ -639,9 +666,12 @@ function drawChat() {
   if (d && d.model) { $('model').textContent = ''; $('model').append(el('span', {}, d.model), icon(I.chev, 14)); }
   $('msg').placeholder = open ? 'Message this chat' : 'Ask Buddy something';
   document.title = d && d.title ? d.title + ' · Buddy' : 'Buddy';
-  const working = !!(d && d.running);
-  $('work').hidden = $('runbtn').hidden = $('stopbtn').hidden = !working;
-  $('worktext').textContent = working ? d.status || 'Working' : '';
+  // (a team's members can work while the chat's own agent doesn't: the line and Stop are theirs then)
+  const working = !!(d && (d.running || d.busy));
+  $('work').hidden = $('stopbtn').hidden = !working;
+  $('runbtn').hidden = !(d && d.running);
+  $('worktext').textContent = working ? (d.running ? d.status || 'Working' : d.busy) : '';
+  drawTeam(d);
   const now = JSON.stringify([open, chatData, shown, [...unfolded], open ? null : draft]);
   if (now === drawn) return; // nothing new: what is unfolded or selected stays as it is
   drawn = now;
@@ -665,6 +695,52 @@ function drawChat() {
   else if (stick) { end(); toBottom = false; }
   else pane.scrollTop = top;
   jump();
+}
+
+/** A member's (or the leader's) colours on an element: its dot, name and frame take them. */
+function tint(node, c) {
+  node.classList.add('tm');
+  if (c) { node.style.setProperty('--md', c[0]); node.style.setProperty('--ml', c[1]); } else node.classList.add('lead');
+  return node;
+}
+
+/** Who the next message goes to in a chat with a team: "leader" and members' ids (the leader alone unless more are ticked). */
+let sendTo = new Set(['leader']), sendToChat = null, teamDrawn = '';
+
+/** A chat with a team: its members over the chat, each with its state, and the boxes over the message box. */
+function drawTeam(d) {
+  const t = d && d.team, strip = $('team'), boxes = $('sendto');
+  strip.hidden = boxes.hidden = !t;
+  if (!t) { teamDrawn = ''; return; }
+  if (sendToChat !== open) { sendToChat = open; sendTo = new Set(['leader']); }
+  const ids = new Set(['leader', ...t.members.map(m => m.id)]);
+  for (const id of [...sendTo]) if (!ids.has(id)) sendTo.delete(id);
+  if (!sendTo.size) sendTo.add('leader');
+  const now = JSON.stringify([open, t, d.running, d.status, [...sendTo]]);
+  if (now === teamDrawn) return;
+  teamDrawn = now;
+  strip.textContent = '';
+  strip.append(tint(el('span', {class: 'm'}, el('span', {class: 'dotc'}), el('b', {}, 'Leader'), el('small', {}, AGENTS[d.agent] || d.agent),
+    el('span', {class: 'st' + (d.running ? ' on' : '')}, d.running ? d.status || 'Working' : 'Ready')), null));
+  t.members.forEach((m, i) => {
+    strip.append(el('span', {class: 'ar', 'aria-hidden': 'true'}, i === 0 || t.structure === 'pipe' ? '→' : t.structure === 'check' ? '⇄' : '·'),
+      tint(el('span', {class: 'm'}, el('span', {class: 'dotc'}), el('b', {}, m.name), el('small', {}, m.on),
+        el('span', {class: 'st' + (m.running ? ' on' : '')}, m.state)), m.c));
+  });
+  boxes.textContent = '';
+  boxes.append(el('span', {}, 'Send to'));
+  for (const m of [{id: 'leader', name: 'Leader', c: null}, ...t.members]) {
+    const box = el('input', {type: 'checkbox', onchange: () => { if (!sendTo.delete(m.id)) sendTo.add(m.id); teamDrawn = ''; drawTeam(chatData); }});
+    box.checked = sendTo.has(m.id);
+    boxes.append(tint(el('label', {class: sendTo.has(m.id) ? 'on' : ''}, box, m.name), m.c));
+  }
+}
+
+/** What the leader or a member said, in a team's chat: under its name, in its colour, with the message it answers. */
+function from(r, body) {
+  return tint(el('div', {class: 'from'},
+    el('div', {class: 'who'}, el('span', {class: 'dotc'}), el('b', {}, r.fn), el('small', {}, r.fo || '')),
+    r.q ? el('div', {class: 'qt'}, el('b', {}, (r.qf || 'You') + ': '), r.q) : null, body), r.c);
 }
 
 /** One step: a long one (a script in a command) shows its first lines, and all of it on a click. */
@@ -698,7 +774,7 @@ function row(r, live) {
     if (fs) b.append(fs);
     // your own message, as in the app: copy, quote, edit (it is asked again from there) and fork
     const say1 = q ? q[1] : r.t;
-    return el('div', {class: 'mine'}, b, el('div', {class: 'acts own'},
+    return el('div', {class: 'mine'}, r.to ? el('span', {class: 'to'}, '→ ' + r.to) : null, b, el('div', {class: 'acts own'},
       el('button', {'aria-label': 'Copy', title: 'Copy', onclick: e => copy(say1, e.currentTarget)}, icon(I.copy, 18)),
       el('button', {'aria-label': 'Quote', title: 'Quote in your next message', onclick: () => setQuote(r.t)}, icon(I.quote, 18)),
       r.s ? null : el('button', {'aria-label': 'Edit', title: 'Edit and ask again from here', onclick: () => edit(r.at, say1)}, icon(I.edit, 18)),
@@ -710,13 +786,14 @@ function row(r, live) {
     const fs = msgFiles(r);
     if (fs) b.append(fs);
     const f = document.createDocumentFragment();
-    f.append(b, el('div', {class: 'acts'},
+    f.append(r.fn ? from(r, b) : b, el('div', {class: 'acts'},
       el('button', {'aria-label': 'Copy', title: 'Copy', onclick: e => copy(r.t, e.currentTarget)}, icon(I.copy, 18)),
       el('button', {'aria-label': 'Quote', title: 'Quote in your next message', onclick: () => setQuote(r.t)}, icon(I.quote, 18)),
       el('button', {'aria-label': 'Fork from here', title: 'Fork: a new chat with the conversation up to here', onclick: () => fork(r.at)}, icon(I.fork, 18))));
     return f;
   }
-  return el('div', {class: r.k === 'error' ? 'error' : 'note'}, r.t);
+  const line = el('div', {class: r.k === 'error' ? 'error' : 'note'}, r.t);
+  return r.fn && r.k === 'error' ? from(r, line) : line; // (a member that failed: its own error, under its name)
 }
 
 // ------------------------------------------------------------ a reply's formatting (built as elements: never as HTML text)
@@ -1146,7 +1223,7 @@ async function sendIt() {
   const files = ok.filter(a => a.id).map(a => a.id), linux = ok.filter(a => a.path).map(a => a.path);
   sending = true; $('send').disabled = true; say('');
   try {
-    const r = await api('/web/send', Object.assign(open ? {chat: open, text}
+    const r = await api('/web/send', Object.assign(open ? (chatData && chatData.team ? {chat: open, text, to: [...sendTo]} : {chat: open, text})
       : draft ? {text, agent: draft.agent, model: draft.model, dev: draft.dev, background: draft.background} : {text}, {files, linux}));
     if (r.error) { say(r.error); return; }
     ta.value = ''; grow(ta); setQuote(null); clearAtts();

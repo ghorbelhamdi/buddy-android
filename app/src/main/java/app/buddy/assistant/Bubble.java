@@ -3457,7 +3457,8 @@ final class Bubble implements ChatHub.Listener {
     private void showMessage(Sessions.Msg m) {
         boolean sent = m.kind == Kind.USER && SystemClock.uptimeMillis() - sentAt < 3000; // (not a rule's or a schedule's)
         if (m.files.isEmpty()) {
-            showMessage(m.kind, m.text);
+            // (in a chat with a team: which member said it; the chat screen shows it in the member's colour)
+            showMessage(m.kind, m.from.isEmpty() ? m.text : "**" + m.fromName + ":** " + m.text);
             if (sent) scrollToEnd();
             else followEnd();
             return;

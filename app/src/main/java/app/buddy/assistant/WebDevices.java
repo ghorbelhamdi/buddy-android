@@ -779,15 +779,41 @@ final class WebDevices {
                     o.put("f", f);
                 }
                 if (!m.linux.isEmpty()) o.put("lx", new JSONArray(m.linux));
+                // a chat with a team: who a message went to; who said this one (its colours: on dark, on light), and what it answers
+                if (!m.to.isEmpty()) o.put("to", m.to);
+                if (!m.fromName.isEmpty()) {
+                    o.put("fn", m.fromName).put("fo", m.fromOn).put("q", m.quote).put("qf", m.quoteFrom);
+                    if (!m.from.isEmpty()) o.put("c", new JSONArray(java.util.Arrays.asList(Team.hex(m.color))));
+                }
                 msgs.put(o);
             }
+            JSONObject team = null;
+            String busy = "";
+            if (s.team != null) { // its members as the app's strip shows them
+                ChatHub hub = ChatHub.get(c);
+                JSONArray members = new JSONArray();
+                for (Team.Member m : s.team.members) {
+                    Sessions.Session h = Team.session(hub, s.id, m.id);
+                    boolean on = h != null && h.running;
+                    String state = h == null || h.messages.isEmpty() ? c.getString(R.string.team_ready)
+                            : on ? (h.status.isEmpty() ? c.getString(R.string.helper_working) : h.status)
+                            : c.getString("failed".equals(h.outcome) ? R.string.helper_failed : "stopped".equals(h.outcome) ? R.string.helper_stopped : R.string.helper_done);
+                    if (on && busy.isEmpty()) busy = c.getString(R.string.team_member_working, m.name, state);
+                    members.put(new JSONObject().put("id", m.id).put("name", m.name).put("on", m.on()).put("state", state)
+                            .put("running", on).put("c", new JSONArray(java.util.Arrays.asList(Team.hex(m.color)))));
+                }
+                team = new JSONObject().put("structure", s.team.structure).put("name", c.getString(Team.structureName(s.team.structure)))
+                        .put("members", members);
+            }
+            final JSONObject team0 = team;
+            final String busy0 = busy;
             // first: where these begin in the chat, so the page knows a message again when earlier ones drop off
             return new JSONObject().put("id", s.id).put("title", s.label()).put("agent", Account.cliOf(s.backend))
                     .put("running", s.running).put("status", s.running && s.status != null ? s.status : "")
                     .put("model", Models.chip(s)).put("dev", s.dev).put("background", s.background).put("archived", s.archived)
                     .put("canBackground", Prefs.backgroundPaired(c)).put("linux", Linux.installed(c))
                     .put("screen", Prefs.webScreens(c) && Background.displayOf(s.id) != android.view.Display.DEFAULT_DISPLAY)
-                    .put("first", first).put("messages", msgs);
+                    .put("first", first).put("messages", msgs).put("team", team0 == null ? JSONObject.NULL : team0).put("busy", busy0);
         });
         return out == null ? new JSONObject().put("error", "no such chat") : out;
     }
@@ -830,7 +856,8 @@ final class WebDevices {
                 if (!FilePlaces.inside(real, FilePlaces.incoming(c, s.id).getCanonicalFile())
                         && !FilePlaces.inside(real, FilePlaces.work(c).getCanonicalFile())) return "that file isn't in this chat's places";
             }
-            String e = files.isEmpty() && linux.isEmpty() ? hub.send(s, said) : hub.send(s, said, files, linux);
+            String e = s.team != null ? hub.sendTeam(s, said, files, linux, WebPlaces.list(in.optJSONArray("to"))) // (who it goes to: the page's boxes)
+                    : files.isEmpty() && linux.isEmpty() ? hub.send(s, said) : hub.send(s, said, files, linux);
             return e == null ? "" : e;
         });
         JSONObject o = new JSONObject().put("chat", chat[0] == null ? JSONObject.NULL : chat[0]);

@@ -147,6 +147,24 @@ In background mode an agent works in your apps on a screen of its own that you d
 
 How it's built: the helper is a small program from Buddy's own APK that Buddy starts over adb as Android's shell user, the only one allowed to make a display other apps can run on. It listens on this phone only (`127.0.0.1`) and asks for a secret Buddy made for it. For background mode it can do a short list of things and only on the displays it made itself: open an app or a link there, touch, press Back, take a picture; the one thing it does on your real screen is bring an app there for **Show on my screen**. It also runs a command line as the shell user, which Buddy asks of it only for Phone commands, when you turned those on. Wireless debugging itself lets paired devices control the phone; Buddy pairs only its own adb, which lives in Buddy's Linux on the phone.
 
+### Teams
+
+A chat can have a **team**: the chat's own agent leads, and the members are agents of their own, each on the agent and model you pick for it (Claude Code leading, Codex building, Pi checking). Unlike sub-agents, members last: each keeps its own memory of the chat's work for as long as the team is on.
+
+- **Turn it on in the chat:** Chat options → **Team**. Buddy asks four things, one after another:
+  1. **How the team works:** Leader + workers (the leader splits the task and puts the parts together), Pipeline (one after another, each with the reports before it), Doer + checker (back and forth until it passes), or Doers with their own goals (at the same time, each with its part).
+  2. **Where the members work:** each in its own folder, all in the chat's folder, or only look things up (then only the leader changes things).
+  3. **How they share the phone's apps:** each on a different app, one app at a time (a member waits while another has the app), or no phone apps (the background browser and Linux tools only). Without background mode set up there are no screens to share, so only the last one is offered.
+  4. **The members,** drawn in the shape you picked, each with an **Agent** and a **Model** to choose from what you're signed in to. **Add a member** adds one; tap a name to change it; long-press a member (or its ×) to remove it. The leader is this chat's agent: changing it there changes the chat's.
+- **Then the leader asks the rest** on the usual question cards: what each member is for (it proposes a line each), how work is handed on (for example how often a checker may send work back), and rules for the whole team. The team is on from the moment you finish Buddy's four questions; skipping the leader's keeps what is set.
+- **Who a message goes to:** over the message box, **Send to** has a box for the leader and each member. Only the leader is ticked to begin with; tick members to write to them directly, with or without the leader. The leader hears of what was said past it with its next turn.
+- **In the chat,** a strip under the header shows the members and what each is doing; tap one to open its own chat with its steps and its screen. What the leader or a member says shows under its name, in its colour, with the message it answers (yours, or the leader's to that member). A member that fails shows its own error as it came.
+- **Approvals:** a member can't ask you questions. What it would send, post, buy or delete comes up as a card in the team's chat, saying which member wants it. A team of members that only look things up gets no cards at all: those steps are refused for them.
+- **Changing the team later:** tell the leader ("add a tester on Pi", "have the checker use another model"). New or removed members, another agent or model and changes to how the team works come to you on a card first.
+- **Stop** stops the leader and every member. Turning Team off deletes the members' chats with what they remember; the files they made stay.
+- **Buddy on your computer** shows the same strip, the Send to boxes and the coloured answers. A team is set up on the phone.
+- Each member uses its own agent's plan, like a chat of its own. Not available in a notification rule's run.
+
 ### Sub-agents
 
 For a task that splits into independent parts in different apps or sites ("compare this cable's price on three shops"), a chat's agent can start **sub-agents** with its `delegate` tool. Each sub-agent is an agent like it, with the same Linux tools setting, and its report goes back to the agent that started it, which checks and combines them. The agent either waits for the reports or works on a part of its own at the same time and collects them afterwards.
