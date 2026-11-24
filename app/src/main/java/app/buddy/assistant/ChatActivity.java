@@ -982,6 +982,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     private android.widget.HorizontalScrollView teamStrip, sendToRow;
     private LinearLayout teamChips, sendToChips;
     private String teamShown = "", sendToShown = "";
+    /** The team drawn in its shape (a tap on the strip's first button), while it is open. */
+    private TeamUi.Shown teamSheet;
     /** Who the next message goes to in a chat with a team: Team.LEADER and members' ids. */
     private final java.util.Set<String> sendTo = new java.util.LinkedHashSet<>(java.util.Collections.singleton(Team.LEADER));
 
@@ -1040,18 +1042,20 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         }
         if (!sig.toString().equals(teamShown)) {
             teamShown = sig.toString();
+            if (teamSheet != null && teamSheet.showing()) teamSheet.refresh.run(); // (the team in its shape, while it is open)
             teamChips.removeAllViews();
+            // first: the structure's picture and name, which opens the team drawn in its shape
+            teamChips.addView(TeamUi.shapeButton(this, t.structure, () -> teamSheet = TeamUi.view(this, hub, ses)));
+            teamChips.addView(TeamUi.between(this, ""));
             teamChips.addView(TeamUi.chip(this, getString(R.string.team_leader), ACCENT, ses.running
                     ? (ses.status.isEmpty() ? getString(R.string.helper_working) : ses.status) : getString(R.string.team_ready), true, ses.running));
             for (int i = 0; i < t.members.size(); i++) {
                 Team.Member m = t.members.get(i);
                 final Sessions.Session h = of.get(i);
-                teamChips.addView(TeamUi.between(this, i == 0 || Team.PIPE.equals(t.structure) ? "→" : Team.CHECK.equals(t.structure) ? "⇄" : "·"));
-                boolean failed = h != null && "failed".equals(h.outcome), stopped = h != null && "stopped".equals(h.outcome);
-                String state = h == null || h.messages.isEmpty() ? getString(R.string.team_ready)
-                        : h.running ? (h.status.isEmpty() ? getString(R.string.helper_working) : h.status)
-                        : getString(failed ? R.string.helper_failed : stopped ? R.string.helper_stopped : R.string.helper_done);
-                View chip = TeamUi.chip(this, m.name, Team.color(this, m.color), state, false, h != null && h.running);
+                // (a pipeline's steps follow each other; a doer and its checker go back and forth, pair by pair)
+                teamChips.addView(TeamUi.between(this, i == 0 || Team.PIPE.equals(t.structure) ? "→"
+                        : Team.CHECK.equals(t.structure) && i % 2 == 1 ? "⇄" : "·"));
+                View chip = TeamUi.chip(this, m.name, Team.color(this, m.color), TeamUi.state(this, h), false, h != null && h.running);
                 if (h != null) { // its own chat: its steps, its screen
                     chip.setOnClickListener(v -> startActivity(new android.content.Intent(this, ChatActivity.class).putExtra("id", h.id)));
                 }

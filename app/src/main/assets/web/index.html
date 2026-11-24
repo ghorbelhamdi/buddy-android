@@ -246,6 +246,27 @@ h2.sec{margin:8px 0 0;font-size:13px;letter-spacing:.5px;text-transform:uppercas
 .team .m .st{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;color:var(--muted);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .team .m .st.on{color:var(--accent-text)}
 .team .ar{color:var(--muted)}
+.team .shapebtn{display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:4px 10px 4px 6px;font-size:13px;font-weight:600;color:var(--text);margin-inline-end:6px}
+.team .shapebtn:hover{border-color:var(--accent)}
+.shapepic{flex:none;color:var(--soft)}
+.shapepic .a{color:#E89B7F}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .shapepic .a{color:#B4502E}}
+:root[data-theme="light"] .shapepic .a{color:#B4502E}
+.tshape{display:flex;flex-direction:column;align-items:center;gap:6px;padding:4px 6px 0}
+.tshape .ar{color:var(--muted);font-size:16px;line-height:1}
+.tshape .fan{width:min(100%,640px);height:20px;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round}
+.tshape .rowm{display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:8px;width:100%}
+.tshape .tpair{display:flex;flex-direction:row;align-items:stretch;gap:6px}
+.tshape .tpair .ar{align-self:center}
+.tcard{display:flex;flex-direction:column;gap:3px;background:var(--card2);border:2px solid transparent;border-radius:16px;padding:10px 12px;width:200px;box-sizing:border-box;text-align:start;font-size:13px}
+.tcard.lead{border-color:color-mix(in srgb,var(--mc) 70%,transparent)}
+.tcard .nm{display:flex;align-items:center;gap:6px;font-weight:600;font-size:14px}
+.tcard .on{color:var(--soft);font-size:12px}
+.tcard .goal{color:var(--muted);font-size:12px}
+.tcard .st{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tcard .st.on2{color:var(--accent-text)}
+.tfacts{display:flex;flex-direction:column;gap:6px;background:var(--card2);border-radius:14px;padding:10px 12px;margin:14px 6px 0;font-size:13px;color:var(--soft)}
+dialog:has(.sheet.wide){width:min(720px,calc(100vw - 32px))}
 .sendto{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
 .sendto label{display:flex;align-items:center;gap:6px;min-height:34px;border-radius:17px;padding:0 12px 0 8px;border:1px solid var(--line);color:var(--text);cursor:pointer}
 .sendto label.on{background:var(--card2)}
@@ -720,10 +741,13 @@ function drawTeam(d) {
   if (now === teamDrawn) return;
   teamDrawn = now;
   strip.textContent = '';
+  // first: the structure's picture and name, which opens the team drawn in its shape
+  strip.append(el('button', {class: 'shapebtn', title: 'Show the team in its shape', onclick: () => teamShape()}, shapePic(t.structure, 30), t.name));
   strip.append(tint(el('span', {class: 'm'}, el('span', {class: 'dotc'}), el('b', {}, 'Leader'), el('small', {}, AGENTS[d.agent] || d.agent),
     el('span', {class: 'st' + (d.running ? ' on' : '')}, d.running ? d.status || 'Working' : 'Ready')), null));
   t.members.forEach((m, i) => {
-    strip.append(el('span', {class: 'ar', 'aria-hidden': 'true'}, i === 0 || t.structure === 'pipe' ? '→' : t.structure === 'check' ? '⇄' : '·'),
+    // (a pipeline's steps follow each other; a doer and its checker go back and forth, pair by pair)
+    strip.append(el('span', {class: 'ar', 'aria-hidden': 'true'}, i === 0 || t.structure === 'pipe' ? '→' : t.structure === 'check' && i % 2 === 1 ? '⇄' : '·'),
       tint(el('span', {class: 'm'}, el('span', {class: 'dotc'}), el('b', {}, m.name), el('small', {}, m.on),
         el('span', {class: 'st' + (m.running ? ' on' : '')}, m.state)), m.c));
   });
@@ -734,6 +758,59 @@ function drawTeam(d) {
     box.checked = sendTo.has(m.id);
     boxes.append(tint(el('label', {class: sendTo.has(m.id) ? 'on' : ''}, box, m.name), m.c));
   }
+}
+
+/** A structure's shape as a small picture: the leader and what links it in its colour, the members plain. */
+function shapePic(structure, w) {
+  const ns = 'http://www.w3.org/2000/svg', svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('viewBox', '0 0 40 32'); svg.setAttribute('width', w); svg.setAttribute('height', w * 0.8);
+  svg.setAttribute('fill', 'none'); svg.setAttribute('stroke', 'currentColor'); svg.setAttribute('stroke-width', '2');
+  svg.setAttribute('stroke-linecap', 'round'); svg.setAttribute('stroke-linejoin', 'round'); svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('class', 'shapepic');
+  const box = (x, y, bw, bh, a) => { const r = document.createElementNS(ns, 'rect'); r.setAttribute('x', x); r.setAttribute('y', y); r.setAttribute('width', bw); r.setAttribute('height', bh); r.setAttribute('rx', 3); if (a) r.setAttribute('class', 'a'); svg.append(r); };
+  const line = d => { const p = document.createElementNS(ns, 'path'); p.setAttribute('d', d); p.setAttribute('class', 'a'); svg.append(p); };
+  if (structure === 'lead') { box(14, 2, 12, 8, true); line('M20 10v5M7 15h26M7 15v6M20 15v6M33 15v6'); box(2, 21, 10, 8); box(15, 21, 10, 8); box(28, 21, 10, 8); }
+  else if (structure === 'check') { box(2, 11, 12, 10); box(26, 11, 12, 10); line('M16 14h8M21 11.5l3 2.5-3 2.5M24 18.5h-8M19 16l-3 2.5 3 2.5'); }
+  else if (structure === 'doers') { box(2, 3, 16, 10); box(22, 3, 16, 10); line('M10 13v6h20v-6M20 19v4'); box(14, 23, 12, 7, true); }
+  else { box(1, 12, 10, 8); box(15, 12, 10, 8); box(29, 12, 10, 8); line('M11 16h4M25 16h4'); }
+  return svg;
+}
+
+/** The open chat's team drawn in its shape: the leader, the members where the structure puts them, and what was set. To look at. */
+function teamShape() {
+  const d = chatData, t = d && d.team;
+  if (!t) return;
+  sheet(box => {
+    box.classList.add('wide');
+    box.append(el('h2', {}, t.name), el('p', {}, t.how || ''));
+    const card = (name, on, goal, state, running, c, lead) => tint(el('div', {class: 'tcard' + (lead ? ' lead' : '')},
+      el('span', {class: 'nm'}, el('span', {class: 'dotc'}), name), el('span', {class: 'on'}, on),
+      goal ? el('span', {class: 'goal'}, goal) : null, el('span', {class: 'st' + (running ? ' on2' : '')}, state)), c);
+    const arrow = s => el('span', {class: 'ar', 'aria-hidden': 'true'}, s);
+    const shape = el('div', {class: 'tshape'});
+    shape.append(card('Leader', (AGENTS[d.agent] || d.agent) + (d.model ? ' · ' + d.model : ''), 'this chat', d.running ? d.status || 'Working' : 'Ready', d.running, null, true));
+    const cards = t.members.map(m => card(m.name, m.on, m.goal, m.state, m.running, m.c));
+    // down to the one under it; or, to members side by side, a line that parts to them (drawn: sideways arrows come out as emoji)
+    if (cards.length && (t.structure === 'pipe' || t.structure === 'check' || cards.length === 1)) shape.append(arrow('↓'));
+    else if (cards.length) {
+      const ns = 'http://www.w3.org/2000/svg', fan = document.createElementNS(ns, 'svg'), path = document.createElementNS(ns, 'path');
+      fan.setAttribute('viewBox', '0 0 100 20'); fan.setAttribute('preserveAspectRatio', 'none'); fan.setAttribute('class', 'fan'); fan.setAttribute('aria-hidden', 'true');
+      path.setAttribute('d', 'M50 2V10M18 10H82M18 10V18M82 10V18' + (cards.length > 2 ? 'M50 10V18' : '')); path.setAttribute('vector-effect', 'non-scaling-stroke');
+      fan.append(path); shape.append(fan);
+    }
+    if (t.structure === 'pipe') cards.forEach((c, i) => { if (i) shape.append(arrow('↓')); shape.append(c); }); // one after another
+    else {
+      const line = el('div', {class: 'rowm'});
+      if (t.structure === 'check') { // a doer beside its checker, pair by pair
+        for (let i = 0; i < cards.length; i += 2) line.append(el('div', {class: 'tpair'}, cards[i], cards[i + 1] ? arrow('⇄') : null, cards[i + 1] || null));
+      } else line.append(...cards);
+      shape.append(line);
+    }
+    box.append(shape);
+    box.append(el('div', {class: 'tfacts'}, el('span', {}, 'Where members work: ' + t.workspace), el('span', {}, 'Apps: ' + t.apps),
+      t.handoff ? el('span', {}, 'Hand-off: ' + t.handoff) : null, t.rules ? el('span', {}, 'Rules: ' + t.rules) : null));
+    box.append(el('p', {style: 'margin:10px 6px 0'}, 'To change the team, tell the leader.'));
+  });
 }
 
 /** What the leader or a member said, in a team's chat: under its name, in its colour, with the message it answers. */

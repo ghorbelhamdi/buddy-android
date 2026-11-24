@@ -3177,6 +3177,10 @@
     <string name="team_card_structure">How it works: %1$s</string>
     <string name="team_card_workspace">Where members work: %1$s</string>
     <string name="team_card_apps">Apps: %1$s</string>
+    <string name="team_fact_handoff">Hand-off: %1$s</string>
+    <string name="team_fact_rules">Rules: %1$s</string>
+    <string name="team_change_hint">To change the team, tell the leader.</string>
+    <string name="team_show_shape">%1$s: show the team in its shape</string>
     <string name="team_note_on">Team on: %1$s with %2$s</string>
     <string name="team_note_off">Team off</string>
     <string name="hub_tool_team">Telling %1$s</string>

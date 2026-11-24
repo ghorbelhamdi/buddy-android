@@ -795,15 +795,21 @@ final class WebDevices {
                 for (Team.Member m : s.team.members) {
                     Sessions.Session h = Team.session(hub, s.id, m.id);
                     boolean on = h != null && h.running;
-                    String state = h == null || h.messages.isEmpty() ? c.getString(R.string.team_ready)
-                            : on ? (h.status.isEmpty() ? c.getString(R.string.helper_working) : h.status)
-                            : c.getString("failed".equals(h.outcome) ? R.string.helper_failed : "stopped".equals(h.outcome) ? R.string.helper_stopped : R.string.helper_done);
+                    String state = TeamUi.state(c, h);
                     if (on && busy.isEmpty()) busy = c.getString(R.string.team_member_working, m.name, state);
-                    members.put(new JSONObject().put("id", m.id).put("name", m.name).put("on", m.on()).put("state", state)
+                    members.put(new JSONObject().put("id", m.id).put("name", m.name).put("on", m.on()).put("goal", m.goal).put("state", state)
                             .put("running", on).put("c", new JSONArray(java.util.Arrays.asList(Team.hex(m.color)))));
                 }
                 team = new JSONObject().put("structure", s.team.structure).put("name", c.getString(Team.structureName(s.team.structure)))
-                        .put("members", members);
+                        .put("members", members)
+                        // the team in its shape (the page's own view of it): how it works, and what was set
+                        .put("how", c.getString(Team.LEAD.equals(s.team.structure) ? R.string.team_lead_info : Team.CHECK.equals(s.team.structure)
+                                ? R.string.team_check_info : Team.DOERS.equals(s.team.structure) ? R.string.team_doers_info : R.string.team_pipe_info))
+                        .put("workspace", c.getString(Team.SEP.equals(s.team.workspace) ? R.string.team_ws_sep
+                                : Team.LOOK.equals(s.team.workspace) ? R.string.team_ws_look : R.string.team_ws_same))
+                        .put("apps", c.getString(Team.TURN.equals(s.team.apps) ? R.string.team_apps_turn
+                                : Team.NONE.equals(s.team.apps) ? R.string.team_apps_none : R.string.team_apps_diff))
+                        .put("handoff", s.team.handoff).put("rules", s.team.rules);
             }
             final JSONObject team0 = team;
             final String busy0 = busy;
