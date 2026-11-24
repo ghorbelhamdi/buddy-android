@@ -462,7 +462,9 @@ final class BrowserTools {
         if (Guard.takeApproval(send)) return null;
         String summary = draft == null || draft.trim().isEmpty() ? card
                 : svc.getString(R.string.tools_card_detail, card, svc.getString(R.string.tools_card_quote, ChatHub.clip(draft.trim(), 300)));
-        String answer = svc.askConfirm(summary, false);
+        // (paying, buying, ordering: answered on the phone only, never from a paired browser)
+        String answer = WebDevices.money(what) || WebDevices.money(summary) ? WebDevices.askOnPhone(svc, summary)
+                : svc.askConfirm(summary, false);
         if (answer.startsWith("APPROVED")) return null;
         if (answer.startsWith("CHANGES")) return "Not done: the user wants changes first. " + answer;
         return "BLOCKED by Buddy's safety rule: the user did not approve “" + what + "”. Don't retry it; ask the user what they want.";
@@ -502,7 +504,8 @@ final class BrowserTools {
         }
         boolean ok = approved || !RISKY_DIALOG.matcher(msg).find();
         if (!ok) {
-            String answer = svc.askConfirm(svc.getString(R.string.browser_card_dialog, host(key), msg), false);
+            String ask = svc.getString(R.string.browser_card_dialog, host(key), msg);
+            String answer = WebDevices.money(msg) ? WebDevices.askOnPhone(svc, ask) : svc.askConfirm(ask, false);
             ok = answer.startsWith("APPROVED");
         }
         Browser.answerDialog(key, ok);

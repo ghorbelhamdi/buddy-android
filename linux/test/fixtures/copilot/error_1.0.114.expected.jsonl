@@ -1,0 +1,2 @@
+{"buddy_session":"fixture","model":"no-such-model-xyz","session_id":"98e37775-714c-4433-b724-a31aeee0a7d8","subtype":"init","type":"system"}
+{"buddy_session":"fixture","is_error":true,"result":"Copilot: Execution failed: Model \"no-such-model-xyz\" is not available.","subtype":"error","type":"result"}

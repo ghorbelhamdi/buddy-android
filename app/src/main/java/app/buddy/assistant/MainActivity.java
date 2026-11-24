@@ -83,10 +83,15 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         setContentView(root);
     }
 
+    /** The chat list is in front: it lists the cards waiting, so the bubble needn't bring them up (issue #73). */
+    static volatile boolean shown;
+
     @Override
     protected void onResume() {
         super.onResume();
         if (isFinishing()) return;
+        shown = true;
+        bubbleFollows();
         hub.addListener(this);
         Waiting.listener = waitingChanged;
         Providers.refresh(this); // fresh model lists before a picker opens (a local server's every time)
@@ -97,9 +102,16 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         Account.OPENCODE.refresh(this);
         Account.AGY.refresh(this);
         Account.GROK.refresh(this);
+        Account.COPILOT.refresh(this);
+        Account.PI.refresh(this);
     }
 
     private final Runnable waitingChanged = this::render;
+
+    private static void bubbleFollows() {
+        BuddyService svc = BuddyService.get();
+        if (svc != null && svc.bubble() != null) svc.bubble().applyEnabled();
+    }
 
     @Override
     public void onAccountChanged() {
@@ -108,6 +120,8 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
 
     @Override
     protected void onPause() {
+        shown = false;
+        bubbleFollows();
         hub.removeListener(this);
         if (Waiting.listener == waitingChanged) Waiting.listener = null;
         Account.removeListener(this);

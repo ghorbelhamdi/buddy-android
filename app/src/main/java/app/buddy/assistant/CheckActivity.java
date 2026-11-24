@@ -85,12 +85,158 @@ public class CheckActivity extends Screen {
         frame.setFitsSystemWindows(true);
         frame.addView(root);
         setContentView(protect(frame));
+        if (state != null) {
+            walking = state.getBoolean("walking");
+            started = state.getBoolean("started");
+            pending = state.getString("pending");
+            ArrayList<String> w = state.getStringArrayList("walked");
+            if (w != null) walked = w;
+        } else if (getIntent().getBooleanExtra("walk", false)) {
+            walking = true; // from Settings' setup card: the walk starts as the screen shows (onResume)
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        paused = false;
         run(); // again after a fix in Android's settings
+        if (fallback != null) { // the settings Android's question gave way to: the walk goes on after them
+            Intent f = fallback;
+            fallback = null;
+            openScreen(f);
+            return;
+        }
+        if (walking && (pending != null || !started)) { // back from the last one's screen (or just opened): the next
+            pending = null;
+            started = true;
+            body.post(this::walkNext);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        paused = true;
+        super.onPause();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle out) {
+        super.onSaveInstanceState(out);
+        out.putBoolean("walking", walking);
+        out.putBoolean("started", started);
+        out.putString("pending", pending);
+        out.putStringArrayList("walked", walked);
+    }
+
+    // ------------------------------------------------------- set up what's missing
+
+    /**
+     * "Set up what's missing": each permission the user's setup needs and doesn't have, one after another. The first
+     * one's screen opens; coming back to Buddy opens the next one's, whether it was granted or not (each opens once
+     * per walk, so one the user leaves off doesn't come back), until none is left.
+     */
+    private boolean walking, started;
+    /** The one whose screen is open, or null. */
+    private String pending;
+    private ArrayList<String> walked = new ArrayList<>();
+    /** Before Buddy asked Android for a permission itself: would Android have explained it (the user said no once)? */
+    private boolean rationaleBefore, paused;
+    /** Android didn't put its question to the user: the app's settings, to open once Buddy is in front again. */
+    private Intent fallback;
+    private static final int ASK_NOTIFY = 41; // (each permission Buddy asks for itself)
+
+    private void startWalk() {
+        walking = true;
+        started = true;
+        pending = null;
+        walked = new ArrayList<>();
+        walkNext();
+    }
+
+    private void walkNext() {
+        if (!walking || isFinishing()) return;
+        List<String> left = SetupState.missing(this);
+        for (String id : left) {
+            if (walked.contains(id)) continue;
+            int total = walked.size() + countNew(left);
+            walked.add(id);
+            pending = id;
+            Toast.makeText(this, getString(R.string.walk_step, SetupState.name(this, id), walked.size(), total),
+                    Toast.LENGTH_LONG).show();
+            open(id);
+            return;
+        }
+        walking = false;
+        pending = null;
+        if (left.isEmpty()) {
+            Toast.makeText(this, R.string.walk_all_set, Toast.LENGTH_LONG).show();
+        } else {
+            StringBuilder b = new StringBuilder();
+            for (String id : left) b.append(b.length() > 0 ? ", " : "").append(SetupState.name(this, id));
+            messageSheet(this, getString(R.string.walk_left_title), getString(R.string.walk_left_text, b.toString()),
+                    getString(R.string.walk_again), false, this::startWalk);
+        }
+        run();
+    }
+
+    /** Of those left, the ones this walk hasn't opened yet. */
+    private int countNew(List<String> left) {
+        int k = 0;
+        for (String id : left) if (!walked.contains(id)) k++;
+        return k;
+    }
+
+    /** Opens the screen that grants it (or asks Android for it); a walk goes on when the user comes back. */
+    private void open(String id) {
+        if (SetupState.A11Y.equals(id)) { // after the disclosure; "No thanks" goes on to the next
+            Ui.openAccessibilitySettings(this, () -> {
+                if (walking && SetupState.A11Y.equals(pending)) {
+                    pending = null;
+                    walkNext();
+                }
+            });
+            return;
+        }
+        String[] perms = SetupState.asked(id);
+        if (perms != null) {
+            rationaleBefore = shouldShowRequestPermissionRationale(perms[0]);
+            requestPermissions(perms, ASK_NOTIFY);
+            return;
+        }
+        openScreen(SetupState.screen(this, id));
+    }
+
+    private void openScreen(Intent i) {
+        try {
+            startActivity(i);
+        } catch (Exception e) { // this phone has no such screen after all: on to the next
+            if (walking) {
+                pending = null;
+                body.post(this::walkNext);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int code, String[] perms, int[] results) {
+        super.onRequestPermissionsResult(code, perms, results);
+        if (code != ASK_NOTIFY) return;
+        boolean ok = results.length > 0 && results[0] == android.content.pm.PackageManager.PERMISSION_GRANTED;
+        // Android didn't put the question to the user (they said no for good before: no explanation offered before
+        // nor after; a no in the question itself leaves one, or was said with one): the app's own settings instead (its notification settings for notifications), where it can still be
+        // allowed. Opened once Buddy is in front again, not over Android's question as it goes.
+        if (!ok && perms.length > 0 && !rationaleBefore && !shouldShowRequestPermissionRationale(perms[0])) {
+            fallback = SetupState.NOTIFY.equals(pending)
+                    ? new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName())
+                    : new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getPackageName()));
+            if (!paused) {
+                Intent f = fallback;
+                fallback = null;
+                openScreen(f);
+            }
+        }
+        // otherwise coming back from Android's question goes on to the next (onResume)
     }
 
     private void run() {
@@ -124,20 +270,15 @@ public class CheckActivity extends Screen {
                 + (notBack == null ? "" : "\n(" + notBack + ")"),
                 getString(R.string.check_open_settings), () -> Ui.openAccessibilitySettings(this)));
 
-        boolean rules = false;
-        for (Rules.Rule rule : Rules.all(this)) rules |= rule.on;
-        if (rules) {
-            boolean granted = getSystemService(android.app.NotificationManager.class)
-                    .isNotificationListenerAccessGranted(new ComponentName(this, NotificationWatcher.class));
+        if (SetupState.rulesWanted(this)) {
+            boolean granted = SetupState.granted(this, SetupState.LISTENER);
             r.add(new Result(getString(R.string.check_notifications), granted, granted ? null : getString(R.string.check_notifications_bad),
-                    getString(R.string.check_open_settings),
-                    () -> startActivity(new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))));
+                    getString(R.string.check_open_settings), () -> open(SetupState.LISTENER)));
         }
 
-        boolean battery = getSystemService(PowerManager.class).isIgnoringBatteryOptimizations(getPackageName());
+        boolean battery = SetupState.granted(this, SetupState.BATTERY);
         r.add(new Result(getString(R.string.check_battery), battery, battery ? null : getString(R.string.check_battery_bad),
-                getString(R.string.check_fix), () -> startActivity(new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-                Uri.parse("package:" + getPackageName())))));
+                getString(R.string.check_fix), () -> open(SetupState.BATTERY)));
 
         Runnable openSettings = () -> startActivity(new Intent(this, SetupActivity.class));
         if (!Linux.installed(this)) {
@@ -233,6 +374,8 @@ public class CheckActivity extends Screen {
             case "opencode": return "opencode.ai";
             case "agy": return "generativelanguage.googleapis.com";
             case "grok": return "api.x.ai";
+            case "copilot": return "api.githubcopilot.com";
+            case "pi": return "pi.dev"; // (its models come from the provider the user connected)
             default: return "api.anthropic.com";
         }
     }
@@ -245,6 +388,14 @@ public class CheckActivity extends Screen {
                 : BuddyApp.plural(R.plurals.check_failed, failed, failed), 15);
         sum.setPaddingRelative(0, dp(this, 8), 0, dp(this, 12));
         body.addView(sum, full());
+        int missing = SetupState.missing(this).size();
+        if (missing > 0 && !walking) {
+            Button walk = button(this, getString(R.string.walk_button, missing), true);
+            walk.setOnClickListener(v -> startWalk());
+            LinearLayout.LayoutParams wp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(this, 48));
+            wp.bottomMargin = dp(this, 12);
+            body.addView(walk, wp);
+        }
         LinearLayout card = column(this);
         card.setBackground(rounded(this, CARD, 16));
         for (int i = 0; i < results.size(); i++) {

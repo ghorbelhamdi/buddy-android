@@ -3,7 +3,7 @@
 <resources>
     <string name="app_name" translatable="false">Buddy</string>
     <string name="service_label">Buddy assistant</string>
-    <string name="service_description">Shows the Buddy chat bubble and lets the agent you choose (Claude Code, Codex, OpenCode, Antigravity or Grok), running inside Buddy on this phone, read the screen and tap, type and scroll for you. Nothing leaves the phone except what the agent itself sends to its AI service (Anthropic, OpenAI, Google, xAI or your OpenCode model\'s provider).</string>
+    <string name="service_description">Shows the Buddy chat bubble and lets the agent you choose (Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot or Pi), running inside Buddy on this phone, read the screen and tap, type and scroll for you. Nothing leaves the phone except what the agent itself sends to its AI service (Anthropic, OpenAI, Google, xAI, GitHub or the provider of your OpenCode or Pi model).</string>
 
     <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
 
@@ -29,7 +29,7 @@
     <!-- Two example requests a user could type. Translate them naturally and use your language's quotation marks. -->
     <string name="onboarding_welcome_ask_text">\"Reply to Sam that I\'m late\", \"add milk to my basket\".</string>
     <string name="onboarding_welcome_plan_title">Your own plan, no API key</string>
-    <string name="onboarding_welcome_plan_text">Runs Claude Code from your Claude subscription. Codex with a ChatGPT plan, Antigravity with a Google account, Grok with a Google or X account and OpenCode\'s free models work too.</string>
+    <string name="onboarding_welcome_plan_text">Runs Claude Code from your Claude subscription. Codex with a ChatGPT plan, Antigravity with a Google account, Grok with a Google or X account, Copilot with a GitHub account, Pi with a plan or API key you connect, and OpenCode\'s free models work too.</string>
     <string name="onboarding_welcome_control_title">You stay in control</string>
     <string name="onboarding_welcome_control_text">Sending, posting, buying and deleting always ask first.</string>
     <!-- Small lowercase mono line under the list. -->
@@ -55,6 +55,10 @@
     <string name="onboarding_brain_agy">Uses your Google account, also with Google AI Pro or Ultra.</string>
     <!-- Under "Grok" (xAI's agent) in the agent choice. Grok, xAI and X stay as they are; "X" is the social network. -->
     <string name="onboarding_brain_grok">Uses your Grok account (sign in with Google or X).</string>
+    <!-- Under "Copilot" (GitHub Copilot CLI) in the agent choice. GitHub, Copilot and Copilot Free stay as they are. -->
+    <string name="onboarding_brain_copilot">Uses your GitHub Copilot plan (Copilot Free works too).</string>
+    <!-- Under "Pi" (the Pi coding agent, pi.dev) in the agent choice. Pi, Claude, ChatGPT, GitHub Copilot stay as they are. -->
+    <string name="onboarding_brain_pi">Uses your Claude, ChatGPT or GitHub Copilot plan, or an API key, which you connect in Pi\'s own screen.</string>
     <!-- The option that installs both Claude Code and Codex. -->
     <string name="onboarding_brain_both">Install both; pick per chat. Claude Code stays the default.</string>
     <!-- Small lowercase tag next to "Claude Code". Keep very short. -->
@@ -66,6 +70,8 @@
     <string name="onboarding_access_text">Buddy\'s accessibility service shows the bubble and lets the agent read the screen, tap and type, only when you ask it to do something.</string>
     <!-- %1$s = the agent's name (Claude Code or Codex); %2$s = the company it sends to (Anthropic or OpenAI). -->
     <string name="onboarding_access_privacy">Nothing leaves the phone except what %1$s sends to %2$s to answer you. Sending, posting, buying and deleting always ask for your OK first.</string>
+    <!-- Fills %2$s of onboarding_access_privacy for Pi ("… what Pi sends to the provider you connect to it …"). -->
+    <string name="onboarding_pi_provider">the provider you connect to it</string>
     <!-- Same as onboarding_access_privacy, when both Claude Code and Codex are set up. -->
     <string name="onboarding_access_privacy_both">Nothing leaves the phone except what Claude Code and Codex send to Anthropic and OpenAI to answer you. Sending, posting, buying and deleting always ask for your OK first.</string>
     <!-- Same as onboarding_access_privacy, for OpenCode. %1$s = OpenCode. The model's provider = whichever AI company runs the chosen model. -->
@@ -112,12 +118,16 @@
     <string name="onboarding_agent_sign_in_agy">Sign in with your Google account. Your browser opens; sign in there and Buddy picks up the code by itself.</string>
     <!-- Grok: the browser opens with a one-time code that the user confirms on the page. -->
     <string name="onboarding_agent_sign_in_grok">Sign in with your Grok account. Your browser opens; confirm the code there and Buddy comes back by itself.</string>
+    <string name="onboarding_agent_sign_in_copilot">Sign in with your GitHub account: Buddy shows a code, you enter it on GitHub\'s page, and Buddy finishes by itself.</string>
+    <string name="onboarding_agent_sign_in_pi">Connect a provider in Pi\'s own screen: type /login there and pick your plan or an API key.</string>
     <!-- "Buddy's Linux" = the small Linux system built into Buddy. -->
     <string name="onboarding_agent_download_claude">Downloads about 235 MB once (Buddy\'s Linux and Claude Code from Anthropic).</string>
     <string name="onboarding_agent_download_opencode">Downloads about 230 MB once (Buddy\'s Linux, Node.js and OpenCode). No account needed.</string>
     <string name="onboarding_agent_download_codex">Downloads about 150 MB once (Buddy\'s Linux, Node.js and Codex from OpenAI).</string>
     <string name="onboarding_agent_download_agy">Downloads about 200 MB once (Buddy\'s Linux and the Antigravity CLI from Google).</string>
     <string name="onboarding_agent_download_grok">Downloads about 170 MB once (Buddy\'s Linux and Grok Build from xAI).</string>
+    <string name="onboarding_agent_download_copilot">Downloads about 190 MB once (Buddy\'s Linux, Node.js and GitHub Copilot CLI).</string>
+    <string name="onboarding_agent_download_pi">Downloads about 220 MB once (Buddy\'s Linux, Node.js and Pi).</string>
     <!-- Buttons on the agent card. -->
     <string name="onboarding_sign_in_claude">Sign in with Claude</string>
     <string name="onboarding_sign_in_chatgpt">Sign in with ChatGPT</string>
@@ -182,7 +192,7 @@
     <string name="main_section_recent">Recent</string>
     <string name="main_empty_title">No chats yet</string>
     <!-- "New chat" = the button (main_new_chat). -->
-    <string name="main_empty_text">Tap New chat to start one with Claude Code, Codex, OpenCode, Antigravity or Grok. Long-press a chat to delete it.</string>
+    <string name="main_empty_text">Tap New chat to start one with Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot or Pi. Long-press a chat to delete it.</string>
     <!-- Status of a chat with a running task, until the agent reports what it's doing. Small lowercase mono text. -->
     <string name="main_chat_working">working…</string>
     <string name="main_chat_waiting">waiting for you…</string>
@@ -687,6 +697,30 @@
     <string name="chat_attach_files">Files</string>
     <string name="chat_attach_files_sub">PDFs, documents, anything up to 25 MB</string>
     <string name="chat_no_app_for_action">No app on this phone can do that.</string>
+    <!-- Attach sheet, only in a chat with Linux tools on: a file of any size copied into the chat's folder in Buddy's Linux (issue #76). -->
+    <!-- Notification title and chat row while a file is copied into Buddy's Linux. %1$s = file name. -->
+    <string name="linux_file_sending">Sending %1$s to Linux tools</string>
+    <!-- How far the copy is. %1$s = done, %2$s = the file's size (e.g. "1.2 GB of 3.1 GB"). -->
+    <string name="linux_file_progress">%1$s of %2$s</string>
+    <!-- After the progress: files picked at the same time that wait their turn. -->
+    <plurals name="linux_file_more">
+        <item quantity="one">%1$d more waiting</item>
+        <item quantity="other">%1$d more waiting</item>
+    </plurals>
+    <!-- Line in the chat when a file reached Linux. %1$s = file name, %2$s = its size, %3$s = its path inside Linux. -->
+    <string name="linux_file_done">%1$s, %2$s → %3$s</string>
+    <!-- %1$s = file name. -->
+    <!-- %1$s = file name. Cancelled while it waited its turn: nothing was copied. -->
+    <string name="linux_file_not_sent">%1$s wasn\'t sent to Linux tools.</string>
+    <string name="linux_file_cancelled">Stopped sending %1$s to Linux tools. The part copied was removed.</string>
+    <!-- %1$s = file name, %2$s = its size, %3$s = free space on the phone. -->
+    <string name="linux_file_no_room">%1$s wasn\'t sent to Linux tools: it needs %2$s and the phone has %3$s free.</string>
+    <!-- %1$s = file name. -->
+    <string name="linux_file_full">%1$s wasn\'t sent to Linux tools: the phone ran out of room. The part copied was removed.</string>
+    <!-- %1$s = file name, %2$s = the error as the system gave it. -->
+    <string name="linux_file_write_failed">%1$s wasn\'t sent to Linux tools: %2$s. The part copied was removed.</string>
+    <!-- %1$s = file name. The file came from another app and could no longer be read. -->
+    <string name="linux_file_gone">%1$s wasn\'t sent to Linux tools: the file went away while it was read (the app it came from closed it, or it was moved). The part copied was removed.</string>
     <!-- Toast while one picked photo or file is added. -->
     <string name="chat_adding">Adding…</string>
     <!-- Toast while several picked photos or files are added (always 2 or more). -->
@@ -733,7 +767,7 @@
     <!-- After "Continue in Buddy" on an earlier session. %1$s = agent name. -->
     <string name="hub_continuing">Continuing an earlier %1$s session. If it\'s still open in a terminal, close it there first.</string>
     <string name="hub_still_working_attachments">This chat is still working. Send attachments when it\'s done.</string>
-    <string name="hub_service_off">%1$s is switched off (Settings → Agents and models → API keys). Switch it on, or pick another model for this chat.</string>
+    <string name="hub_service_off">%1$s is switched off (Settings → Agents and models). Switch it on, or pick another model for this chat.</string>
     <string name="hub_accessibility_dead">Buddy\'s accessibility service isn\'t running, although it\'s switched on: Android stopped Buddy and didn\'t start the service again, so agents can\'t reach the phone. Switch Buddy off and on in Android\'s Settings → Accessibility. So it doesn\'t happen again: allow Buddy to auto-start in the phone\'s app settings, if your phone has that, and give the microphone “While using the app”, not “Only this time”.</string>
     <string name="hub_accessibility_off">Buddy\'s accessibility service is off, so agents can\'t reach the phone. Turn on Buddy in Android\'s Settings → Accessibility.</string>
     <string name="voice_mic_while_using">Choose “While using the app”: with “Only this time”, Android stops Buddy a minute after you leave it, even in the middle of a task.</string>
@@ -908,7 +942,7 @@
     <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
     <string name="ui_a11y_title">How Buddy uses accessibility</string>
     <string name="ui_a11y_what">Buddy uses Android\'s accessibility service to do what you ask in other apps: it reads what\'s on the screen and taps, types and scrolls for you. It also shows the floating bubble.</string>
-    <string name="ui_a11y_data">While a task runs, the screen content, which can include personal information such as messages, names or addresses, is sent to the AI service of the agent you choose (Anthropic for Claude Code, OpenAI for Codex, Google for Antigravity, xAI for Grok, or your OpenCode model\'s provider), only to carry out your request.</string>
+    <string name="ui_a11y_data">While a task runs, the screen content, which can include personal information such as messages, names or addresses, is sent to the AI service of the agent you choose (Anthropic for Claude Code, OpenAI for Codex, Google for Antigravity, xAI for Grok, GitHub for Copilot, or the provider of your OpenCode or Pi model), only to carry out your request.</string>
     <string name="ui_a11y_no_servers">Buddy has no servers of its own. It doesn\'t collect, sell or share this data, and doesn\'t use it for ads.</string>
     <string name="ui_a11y_asks">Before anything that sends, posts, buys or deletes, Buddy asks for your OK. You can turn the service off anytime in Android\'s accessibility settings.</string>
     <string name="ui_privacy_policy">Privacy policy</string>
@@ -959,8 +993,9 @@
 
     <!-- ===== Sign-in, agents and models (SignInActivity, Account, Models, Sessions, RemoteSession, Attachments) ===== -->
 
-    <!-- Sign-in screen (one per agent: Claude Code, Codex, OpenCode, Antigravity or Grok). Product and plan names
-         (Claude, ChatGPT, Codex, OpenCode, Grok, Anthropic, OpenAI, xAI, X, Pro, Max, Plus, Business) stay as they are. -->
+    <!-- Sign-in screen (one per agent: Claude Code, Codex, OpenCode, Antigravity, Grok or Copilot). Product and plan
+         names (Claude, ChatGPT, Codex, OpenCode, Grok, Copilot, GitHub, Anthropic, OpenAI, xAI, X, Pro, Max, Plus, Business,
+         Copilot Free) stay as they are. -->
     <!-- Content description of the back arrow in the top bar (read by TalkBack). -->
     <string name="signin_back">Back</string>
     <!-- Subtitle while Buddy checks whether the agent is installed and signed in. -->
@@ -974,12 +1009,16 @@
     <string name="signin_install_sub_codex">Runs Codex inside Buddy on your ChatGPT plan.</string>
     <string name="signin_install_sub_agy">Runs Google\'s Antigravity CLI inside Buddy on your Google account: its free plan, or Google AI Pro or Ultra.</string>
     <string name="signin_install_sub_grok">Runs xAI\'s Grok Build inside Buddy on your Grok account (signing in with Google or X works).</string>
+    <string name="signin_install_sub_copilot">Runs GitHub Copilot CLI inside Buddy on your GitHub Copilot plan (Copilot Free works too).</string>
+    <string name="signin_install_sub_pi">Runs Pi inside Buddy on a provider you connect: your Claude, ChatGPT or GitHub Copilot plan, or an API key.</string>
     <!-- "Buddy's Linux" = the small Linux system Buddy installs inside the app. -->
     <string name="signin_install_size_claude">Downloads about 235 MB once: Buddy\'s Linux and Claude Code from Anthropic. Use Wi-Fi if you can.</string>
     <string name="signin_install_size_opencode">Downloads about 230 MB once: Buddy\'s Linux, Node.js and OpenCode. Use Wi-Fi if you can.</string>
     <string name="signin_install_size_codex">Downloads about 150 MB once: Buddy\'s Linux, Node.js and Codex from OpenAI. Use Wi-Fi if you can.</string>
     <string name="signin_install_size_agy">Downloads about 200 MB once: Buddy\'s Linux and the Antigravity CLI from Google. Use Wi-Fi if you can.</string>
     <string name="signin_install_size_grok">Downloads about 170 MB once: Buddy\'s Linux and Grok Build from xAI. Use Wi-Fi if you can.</string>
+    <string name="signin_install_size_copilot">Downloads about 190 MB once: Buddy\'s Linux, Node.js and GitHub Copilot CLI. It takes about 300 MB once installed. Use Wi-Fi if you can.</string>
+    <string name="signin_install_size_pi">Downloads about 220 MB once: Buddy\'s Linux, Node.js and Pi. Use Wi-Fi if you can.</string>
 
     <!-- Sign-in screen: install or update in progress (screen titles). -->
     <string name="signin_installing">Installing</string>
@@ -991,15 +1030,18 @@
     <string name="signin_title_chatgpt">Sign in to ChatGPT</string>
     <string name="signin_title_google">Sign in to Google</string>
     <string name="signin_title_grok">Sign in to Grok</string>
+    <string name="signin_title_github">Sign in to GitHub</string>
     <string name="signin_sub_claude">Use your Claude account (Pro or Max). Your browser opens; approve there and Buddy comes back by itself.</string>
     <string name="signin_sub_chatgpt">Use your ChatGPT account (Plus, Pro or Business). Your browser opens; approve there and Buddy comes back by itself.</string>
     <string name="signin_sub_agy">Use your Google account. Your browser opens; sign in there and Buddy picks up the code by itself. Antigravity waits about a minute.</string>
     <string name="signin_sub_grok">Use your Grok account; signing in with Google or X works too. Your browser opens with a code; confirm it there and Buddy comes back by itself.</string>
+    <string name="signin_sub_copilot">Use the GitHub account you have Copilot with. Buddy shows a code; enter it on GitHub\'s page and Buddy finishes by itself.</string>
     <!-- Main button. -->
     <string name="signin_with_claude">Sign in with Claude</string>
     <string name="signin_with_chatgpt">Sign in with ChatGPT</string>
     <string name="signin_with_google">Sign in with Google</string>
     <string name="signin_with_grok">Sign in with Grok</string>
+    <string name="signin_with_github">Sign in with GitHub</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <!-- Button on Claude Code's sign-in screen: sign in by pasting a token instead. Keep short. -->
     <string name="signin_token">Use a token</string>
@@ -1007,8 +1049,8 @@
     <string name="signin_token_title">Claude Code token</string>
     <!-- "claude setup-token" is a command and "sk-ant-oat" the start of the token: keep both as they are. -->
     <string name="signin_token_info">Paste the token that “claude setup-token” prints on a computer; it starts with sk-ant-oat. It covers chats. Voice input and Remote Control need the full sign-in.</string>
-    <!-- Under the field when what was pasted isn't such a token. "API keys" is the name of Buddy's settings screen (api_keys_title). -->
-    <string name="signin_token_wrong">That\'s not a Claude Code token. An API key (sk-ant-api…) goes under Settings → Agents and models → API keys.</string>
+    <!-- Under the field when what was pasted isn't such a token. "Agents and models" and "Add a connection" are Buddy's settings page and its button (settings_agents, agents_add). -->
+    <string name="signin_token_wrong">That\'s not a Claude Code token. An API key (sk-ant-api…) goes under Settings → Agents and models → Add a connection.</string>
     <!-- On the signed-in screen when it's a token. -->
     <string name="signin_token_on">Signed in with a token: it covers chats. Voice input and Remote Control need the full sign-in.</string>
     <string name="signin_other_device">Sign in on another device</string>
@@ -1043,6 +1085,7 @@
     <string name="signin_remote_codex">On any device, open the link below, sign in to ChatGPT and enter the code. Buddy finishes by itself.</string>
     <string name="signin_remote_agy">Open this link on any device and sign in. Then copy the code the page shows and paste it below, within about a minute.</string>
     <string name="signin_remote_grok">On any device, open the link below, sign in to Grok and confirm the code. Buddy finishes by itself.</string>
+    <string name="signin_remote_copilot">Open the link here or on any device, sign in to GitHub and enter the code. Open here copies the code for you. Buddy finishes by itself.</string>
     <!-- Buttons and the toasts after them. -->
     <string name="signin_copy_code">Copy code</string>
     <string name="signin_code_copied">Code copied</string>
@@ -1075,6 +1118,8 @@
     <string name="signin_signed_in">Signed in</string>
     <!-- %1$s = agent name (Claude Code or Codex). -->
     <string name="signin_agent_ready">%1$s is ready.</string>
+    <!-- Copilot is signed in only through the GitHub CLI login that Buddy keeps for git (Settings → GitHub). -->
+    <string name="signin_copilot_via_gh">Copilot uses the GitHub sign-in from Settings → Agents and models → GitHub. To sign Copilot out, sign out of GitHub there.</string>
     <!-- Button that closes the screen. -->
     <string name="signin_done">Done</string>
     <!-- Button, and the button of the confirmation sheet. -->
@@ -1089,6 +1134,13 @@
     <string name="signin_opencode_connected">Connected: %1$s. OpenCode\'s free models stay available too.</string>
     <!-- %1$s = the command "opencode auth login", %2$s = the command "opencode auth logout" (both stay as they are). -->
     <string name="signin_opencode_connect_note">Connecting a provider opens Buddy\'s terminal with %1$s: pick a provider and follow its steps. To remove one later, run %2$s there.</string>
+    <string name="signin_pi_ready">Pi is ready</string>
+    <!-- %1$s = the providers connected to Pi, e.g. "anthropic, github-copilot". -->
+    <string name="signin_pi_connected">Connected: %1$s. Pick a model per chat with the model chip.</string>
+    <string name="signin_pi_connect_title">Connect a provider</string>
+    <string name="signin_pi_connect_text">Pi has no models of its own. Connect your Claude, ChatGPT or GitHub Copilot plan, or an API key, and Pi uses it.</string>
+    <!-- %1$s and %2$s are Pi's own commands (/login, /logout): keep them as they are. -->
+    <string name="signin_pi_connect_note">Sign in here to your Claude, ChatGPT or GitHub Copilot plan. For another provider or an API key, Pi’s own screen opens: type %1$s there. %2$s there removes one.</string>
     <!-- Button. -->
     <string name="signin_connect_provider">Connect a provider</string>
     <!-- Installed version. %1$s = agent name, %2$s = version number (e.g. "Claude Code 2.1.40."). -->
@@ -1111,7 +1163,9 @@
     <string name="account_tagline_codex">Uses your ChatGPT plan</string>
     <string name="account_tagline_agy">Uses your Google account</string>
     <string name="account_tagline_grok">Uses your Grok account</string>
-    <!-- Small tag beside an agent's name in the agent pickers (OpenCode, Antigravity, Grok): usable for free, within limits. -->
+    <string name="account_tagline_copilot">Uses your GitHub Copilot plan</string>
+    <string name="account_tagline_pi">Uses a plan or API key you connect</string>
+    <!-- Small tag beside an agent's name in the agent pickers (OpenCode, Antigravity, Grok, Copilot): usable for free, within limits. -->
     <string name="agent_tag_free">free · limited</string>
     <!-- Install progress. -->
     <string name="account_setting_up_linux">Setting up Buddy\'s Linux…</string>
@@ -1156,6 +1210,8 @@
     <string name="models_default_opencode">OpenCode\'s default model</string>
     <string name="models_default_agy">Antigravity\'s default model</string>
     <string name="models_default_grok">Grok\'s default model</string>
+    <string name="models_default_copilot">Copilot\'s default model</string>
+    <string name="models_default_pi">Pi\'s default model</string>
     <!-- Effort levels in a row of up to 6 segments: keep each very short (about 5 characters).
          "Auto" = the agent decides how much to think. -->
     <string name="models_effort_auto">Auto</string>
@@ -1208,9 +1264,9 @@
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">Settings</string>
-    <string name="setup_settings_subtitle">Buddy runs Claude Code, Codex, OpenCode, Antigravity or Grok inside the app, on your own subscription (or OpenCode\'s free models and Antigravity\'s free plan).</string>
+    <string name="setup_settings_subtitle">Buddy runs Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot or Pi inside the app, on your own subscription (or OpenCode\'s free models and Antigravity\'s free plan).</string>
     <string name="settings_agents">Agents and models</string>
-    <string name="settings_agents_sub">Default agent, sign-in, API keys, default models, GitHub, download server</string>
+    <string name="settings_agents_sub">What new chats use, what’s connected, adding a plan, key or model, GitHub, download server</string>
     <string name="settings_bubble">Bubble and chat</string>
     <string name="settings_bubble_sub">Show the bubble, what a tap on it does, the panel\'s size</string>
     <string name="settings_voice_sub">Voice input and output, languages, live voice, reading replies aloud</string>
@@ -1250,6 +1306,8 @@
     <!-- %1$s = Codex. -->
     <string name="setup_step_install_codex">Buddy downloads its own small Linux and %1$s from OpenAI (about 150 MB).</string>
     <string name="setup_step_install_grok">Buddy downloads its own small Linux and %1$s from xAI (about 170 MB).</string>
+    <string name="setup_step_install_copilot">Buddy downloads its own small Linux and %1$s from GitHub (about 190 MB with Node.js).</string>
+    <string name="setup_step_install_pi">Buddy downloads its own small Linux and %1$s (about 220 MB with Node.js).</string>
     <!-- Button (verb). -->
     <string name="setup_install">Install</string>
     <!-- Name of the sign-in setup step. -->
@@ -1262,6 +1320,8 @@
     <string name="setup_step_signin_claude">With your Claude account (Pro or Max). Your browser opens; approve there and Buddy comes back by itself.</string>
     <string name="setup_step_signin_codex">With your ChatGPT account. Your browser opens; approve there and Buddy comes back by itself.</string>
     <string name="setup_step_signin_grok">With your Grok account. Your browser opens; confirm the code there and Buddy comes back by itself.</string>
+    <string name="setup_step_signin_copilot">With your GitHub account. Buddy shows a code to enter on GitHub\'s page, then finishes by itself.</string>
+    <string name="setup_step_signin_pi">Connect a provider in Pi\'s own screen (/login there): your Claude, ChatGPT or GitHub Copilot plan, or an API key.</string>
     <!-- Button (verb). -->
     <string name="setup_sign_in">Sign in</string>
     <string name="setup_step_background_title">Let Buddy run in the background</string>
@@ -1324,7 +1384,7 @@
     <!-- Which AI agent answers new chats. -->
     <string name="setup_default_brain">Default brain</string>
     <!-- "New chat" is the name of a button in Buddy. -->
-    <string name="setup_default_brain_info">Who answers new chats from the bubble or the New chat button. Claude Code uses your Claude plan, Codex your ChatGPT plan, Antigravity your Google account, Grok your Grok account, OpenCode its free models or your own providers. Only agents that are set up can be picked.</string>
+    <string name="setup_default_brain_info">Who answers new chats from the bubble or the New chat button. Claude Code uses your Claude plan, Codex your ChatGPT plan, Antigravity your Google account, Grok your Grok account, Copilot your GitHub Copilot plan, Pi the plan or API key you connect to it, OpenCode its free models or your own providers. Only agents that are set up can be picked.</string>
     <!-- Toast. %1$s = agent name. "New chat" is the name of a button in Buddy. -->
     <string name="setup_default_brain_set">New chats will use %1$s. You can pick per chat with the New chat button.</string>
     <!-- Toast. %1$s = agent name. -->
@@ -1339,8 +1399,7 @@
     <!-- %1$s = the account's email address. -->
     <string name="setup_agent_signed_in_email">signed in · %1$s</string>
     <string name="setup_agent_not_signed_in">not signed in</string>
-    <string name="setup_agent_api_key">not signed in · API key</string>
-    <string name="signin_key_only">Using an API key</string>
+    <string name="signin_key_only">Running on a service</string>
 
     <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
     <string name="setup_phone_tools">Phone tools in your own sessions</string>
@@ -1544,7 +1603,7 @@
     <string name="terminal_close">Close</string>
     <!-- Button (verb): starts a new shell. -->
     <string name="terminal_restart">Restart</string>
-    <string name="terminal_needs_linux">Install Claude Code, Codex, OpenCode, Antigravity or Grok in Settings first: that sets up Buddy\'s Linux.</string>
+    <string name="terminal_needs_linux">Install Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot or Pi in Settings first: that sets up Buddy\'s Linux.</string>
     <!-- %1$s = error message. -->
     <string name="terminal_start_failed">Couldn\'t start the terminal: %1$s</string>
     <!-- Sheet title. %1$s = the tab's name, e.g. "shell 1". -->
@@ -1572,7 +1631,7 @@
 
     <!-- Sessions screen: every agent session running on the phone, and recent history. -->
     <string name="monitor_title">Sessions</string>
-    <string name="monitor_subtitle">Every Claude Code, Codex, OpenCode, Antigravity and Grok session on this phone.</string>
+    <string name="monitor_subtitle">Every Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot and Pi session on this phone.</string>
     <string name="monitor_terminal_running">A shell is running · tap to return</string>
     <string name="monitor_terminal_idle">A shell in Buddy\'s Linux</string>
     <string name="monitor_running_now">Running now</string>
@@ -1633,7 +1692,7 @@
     <!-- Toast when the user picks a reviewer that isn't signed in. %1$s = Claude Code or Codex. -->
     <string name="perms_reviewer_sign_in">Sign in to %1$s first (Settings).</string>
     <!-- Under the reviewer choice. “allow”, “ask you” and “advise against” are the reviewer's three possible answers. -->
-    <string name="perms_reviewer_about">A temporary session per tap, without tools: it sees your request, the agent\'s note and the screen, and says allow, ask you, or advise against. About 3 seconds a tap. OpenCode, Antigravity and Grok chats are reviewed by Claude Code (or Codex).</string>
+    <string name="perms_reviewer_about">A temporary session per tap, without tools: it sees your request, the agent\'s note and the screen, and says allow, ask you, or advise against. About 3 seconds a tap. OpenCode, Antigravity, Grok, Copilot and Pi chats are reviewed by Claude Code (or Codex).</string>
     <!-- Under the reviewer's description: it also does the check before a notification rule's countdown. -->
     <string name="perms_reviewer_rules">It also checks replies before a notification rule\'s countdown sends them.</string>
     <!-- In the reviewer's model picker, the first choice ("Default") described: for Claude Code it is Haiku. -->
@@ -2026,6 +2085,11 @@
     <string name="share_label">Ask Buddy</string>
     <string name="share_title">Share with Buddy</string>
     <string name="share_new_chat">New chat with %1$s</string>
+    <!-- Share to Buddy: a shared file over the attachment limit, to a chat with Linux tools on. -->
+    <string name="share_linux_title">Too big to attach</string>
+    <!-- %1$s = file name(s), comma-separated. -->
+    <string name="share_linux_text">%1$s: more than the 25 MB an attachment can be. Send it straight to this chat\'s folder in Buddy\'s Linux instead? The agent gets its path, for tools like unzip.</string>
+    <string name="share_linux_send">Send to Linux</string>
     <string name="usage_five">5-hour %1$d%% · resets %2$s</string>
     <string name="usage_week">weekly %1$d%% · resets %2$s</string>
     <string name="usage_five_short">5h %1$d%%</string>
@@ -2172,16 +2236,10 @@
     <string name="setup_help_info">Buddy\'s user guide, on GitHub. You can also ask any agent how Buddy works.</string>
     <string name="signin_api_key">Use an API key instead</string>
     <string name="signin_api_base_bad">Enter an address that starts with https:// (or http:// on this phone or your own network)</string>
-    <string name="account_plan_api_key_at">API key · %1$s</string>
+    <string name="account_plan_api_key_at">Runs on %1$s</string>
     <string name="models_via">%1$s via %2$s</string>
-    <string name="signin_api_keys">API keys</string>
-    <string name="api_keys_title">API keys</string>
-    <string name="api_keys_row_none">Other services\' models, with your key</string>
-    <string name="api_keys_intro">Use other services\' models with Claude Code, Codex and OpenCode, next to your plans or instead of them. Each chat picks its model in its model sheet. Use with a key is billed to that key\'s account. Keys are stored encrypted on this phone and never reach the agents: Buddy adds them to each request.</string>
-    <string name="api_keys_none">No API keys yet.</string>
-    <string name="api_keys_add">Add API key</string>
-    <string name="api_keys_models">%1$s · %2$d models</string>
-    <string name="api_keys_for">For %1$s</string>
+    <string name="signin_api_keys">Services saved in Buddy</string>
+    <string name="api_keys_add">Add a service</string>
     <string name="api_keys_use">Use this service</string>
     <string name="api_keys_use_info">Off: the key stays saved, but no chat or agent uses it.</string>
     <string name="api_keys_off">Off</string>
@@ -2223,18 +2281,19 @@
     <string name="api_keys_name_hint">Name</string>
     <string name="api_keys_key_hint">API key</string>
     <string name="api_keys_key_keep_hint">API key (leave empty to keep it)</string>
+    <!-- The key field of a service on the user's own computer or network (Ollama, LM Studio, llama.cpp), which needs none. -->
+    <string name="api_keys_key_optional_hint">API key (optional)</string>
     <string name="api_keys_anthropic_hint">Anthropic-style address</string>
     <string name="api_keys_openai_hint">OpenAI-style address</string>
-    <string name="api_keys_addresses_info">Claude Code uses the Anthropic-style address. Codex uses the OpenAI-style one, when the service has OpenAI\'s Responses API. OpenCode uses either. Leave an address empty if the service doesn\'t have it.</string>
+    <string name="api_keys_addresses_info">Claude Code uses the Anthropic-style address. Codex uses the OpenAI-style one, when the service has OpenAI\'s Responses API. OpenCode and Pi use either. Leave an address empty if the service doesn\'t have it.</string>
     <string name="api_keys_check">Check now</string>
     <string name="api_keys_check_info">Optional: sends a very small test request, which may use a tiny bit of API credit.</string>
     <string name="api_keys_check_ok">%1$s: works.</string>
-    <string name="api_keys_check_chat">%1$s: works with OpenCode, but has no Responses API, so not with Codex.</string>
+    <string name="api_keys_check_chat">%1$s: works with OpenCode and Pi, but has no Responses API, so not with Codex.</string>
     <string name="api_keys_check_none">%1$s: nothing answered at this address. %2$s</string>
     <string name="api_keys_check_unsure">%1$s: no clear answer. %2$s</string>
     <string name="api_keys_service">Service</string>
-    <string name="api_keys_custom">Custom</string>
-    <string name="setup_step_signin_key_mismatch">Your API keys (%2$s) don\'t work with %1$s. They work with %3$s.</string>
+    <string name="setup_step_signin_key_mismatch">Your services (%2$s) don\'t work with %1$s. They work with %3$s.</string>
     <string name="setup_step_signin_free">No account? OpenCode has free models and needs no sign-in.</string>
     <string name="setup_use_agent">Use %1$s</string>
     <string name="api_keys_save">Save</string>
@@ -2245,7 +2304,6 @@
     <string name="api_keys_remove">Remove</string>
     <string name="api_keys_remove_title">Remove %1$s?</string>
     <string name="api_keys_remove_text">Its key is deleted from this phone. Chats that use its models go back to Default.</string>
-    <string name="api_keys_choose">Models in pickers: %1$d of %2$d</string>
     <string name="api_keys_choose_title">%1$s models</string>
     <string name="api_keys_choose_info">Pick the ones chats offer. With none picked, all of them.</string>
     <string name="api_keys_choose_search">Search</string>
@@ -2301,6 +2359,9 @@
     <string name="backup_not_one">That file isn\'t a Buddy backup.</string>
     <string name="chat_incognito">Incognito</string>
     <string name="chat_incognito_info">This chat is deleted, with what its agent kept of it, when Buddy restarts.</string>
+    <!-- Chat options: whether the files sent to the chat's Linux tools (issue #76) stay after the chat. -->
+    <string name="chat_linux_files_keep">Keep files sent to Linux tools after the chat</string>
+    <string name="chat_linux_files_keep_info">When the chat is deleted, they move to ~/.buddy/work/incoming instead of going with it</string>
     <string name="chat_lite">Lite mode</string>
     <string name="chat_lite_info">For small models: a short start with a dozen phone tools, the agent loads more when it needs them. On by itself for a model on this phone. No Linux tools while it\'s on.</string>
     <string name="models_context">%1$s context</string>
@@ -2312,12 +2373,14 @@
     <string name="hub_compacting">Compacting the conversation…</string>
     <string name="hub_compacted">Conversation compacted: %1$s → %2$s tokens</string>
     <string name="signin_api_models_none">The service didn\'t list any models.</string>
-    <string name="setup_step_signin_api_key">Or use an API key: Settings → Agents and models → API keys.</string>
+    <string name="setup_step_signin_api_key">Or use an API key or a model server of your own: Settings → Agents and models → Add a connection.</string>
     <string name="setup_step_signin_others">%1$s is your default brain, but these are ready: %2$s. Make one of them the default and Buddy works right away.</string>
     <string name="setup_switch_default">Switch default</string>
     <string name="setup_switch_default_title">Default brain</string>
-    <string name="signin_api_key_on">%1$s runs on your API keys: pick a model in a chat\'s model sheet, or its default under API keys.</string>
-    <string name="signin_api_key_on_plan">Chats can also use your API keys\' models (pick one in a chat\'s model sheet). Voice and the other plan features use your plan.</string>
+    <string name="signin_api_key_on">%1$s runs on the services saved in Buddy: pick a model in a chat\'s model sheet, or its default in Settings → Agents and models.</string>
+    <string name="signin_api_key_on_plan">Chats can also use the models of the services saved in Buddy (pick one in a chat\'s model sheet). Voice and the other plan features use your plan.</string>
+    <!-- %1$s: Pi, signed in to a provider of its own and also able to use the services saved in Buddy -->
+    <string name="signin_services_also">%1$s chats can also use the models of the services saved in Buddy: pick one in the chat\'s model sheet.</string>
     <!-- F-Droid build only, after what Buddy downloads (its Linux, an agent, the browser): F-Droid requires saying these downloads skip its checks. -->
     <string name="fdroid_download_note">These come from their makers, not from F-Droid, so F-Droid hasn\'t checked them.</string>
     <!-- API keys form, when a local server preset (Ollama, LM Studio, llama.cpp) is picked. Keep the address example as is. -->
@@ -2511,4 +2574,527 @@
     <string name="hub_tool_sms_list">Reading SMS</string>
     <string name="setup_face_too_big">That animation is over 16 MB, so the bubble shows it as a still picture.</string>
     <string name="background_older">The helper from before the update still runs, so background chats may still work. Buddy needs Wireless debugging once to start the new one: tap Start now.</string>
+
+    <!-- Routines: tasks saved as their steps, done again without the agent (RoutinesActivity, the routine tool). -->
+    <string name="routines_title">Routines</string>
+    <string name="routines_row">Tasks saved to do again in seconds</string>
+    <string name="routines_intro">An agent can save a task it did as a routine: after it went well, ask it to “save that as a routine”. A routine does the same steps again in seconds, without the agent, and approval cards still come up. Text it types is a blank you fill in each time.</string>
+    <string name="routines_none">No routines yet.</string>
+    <string name="routines_blanks">Blanks: %1$s</string>
+    <string name="routines_last_run">Ran %1$s</string>
+    <string name="routines_stopped_at">stopped at step %1$d</string>
+    <string name="routines_card_waiting">A card is waiting for your answer: the routine starts once you’ve answered it.</string>
+    <string name="routines_hidden">Run on the hidden screen</string>
+    <string name="routines_hidden_info">Routines you start here run on a screen of their own, so you can keep using the phone. A card or a question still comes up for you.</string>
+    <string name="routines_run">Run</string>
+    <string name="routines_running">Running…</string>
+    <string name="routines_delete">Delete</string>
+    <string name="routines_delete_title">Delete “%1$s”?</string>
+    <string name="routines_delete_text">Its steps are gone for good. An agent can save it again another time.</string>
+    <string name="routines_step_open">Open %1$s</string>
+    <string name="routines_step_tap">Tap %1$s</string>
+    <string name="routines_step_hold">Long-press %1$s</string>
+    <string name="routines_step_type">Type %1$s%2$s</string>
+    <string name="routines_step_scroll">Scroll</string>
+    <string name="routines_step_swipe">Swipe</string>
+    <string name="routines_step_back">Press Back</string>
+    <string name="routines_step_press">Press a button</string>
+    <string name="routines_step_find">Scroll to “%1$s”</string>
+    <string name="routines_step_wait">Wait</string>
+    <string name="routines_blanks_info">What should it type this time?</string>
+    <string name="routines_blanks_need">Fill in every blank.</string>
+    <string name="routines_need_access">Buddy’s accessibility service is off, so it can’t use the screen.</string>
+    <string name="routines_done_title">“%1$s” is done</string>
+    <string name="routines_done_text">Every step went through.</string>
+    <string name="routines_stopped_title">“%1$s” stopped</string>
+    <string name="routines_finish">Ask an agent to finish</string>
+    <string name="routine_saved_note">Saved the routine “%1$s” (Settings → Routines)</string>
+    <string name="activity_routine">Doing “%1$s”</string>
+    <string name="hub_tool_routine">Looking at routines</string>
+    <string name="hub_tool_routine_run">Running “%1$s”</string>
+    <string name="hub_tool_routine_save">Saving the routine “%1$s”</string>
+    <string name="tool_routine">Routines</string>
+    <string name="tool_routine_info">Saves a task’s steps, and does them again without working them out</string>
+    <plurals name="routines_steps">
+        <item quantity="one">%d step</item>
+        <item quantity="other">%d steps</item>
+    </plurals>
+    <plurals name="routines_row_saved">
+        <item quantity="one">%d routine</item>
+        <item quantity="other">%d routines</item>
+    </plurals>
+
+    <!-- Other devices: chats and approval cards in a browser on another device, over Tailscale (WebDevices). -->
+    <string name="web_title">Other devices</string>
+    <string name="web_row">Your chats and cards in a browser on your computer</string>
+    <string name="web_intro">Your chats and approval cards in a browser on your computer or another phone. No account and no server: it goes straight to this phone over Tailscale. A paired device can read your chats, send messages and answer cards, but not cards about money (paying, buying, money apps) or letting devices in: those stay on the phone. It can’t use the phone’s screen.</string>
+    <string name="web_switch">Let paired devices in</string>
+    <string name="web_switch_info">Off: no device can open the page, paired or not.</string>
+    <string name="web_screens_switch">Screens on paired devices</string>
+    <string name="web_screens_info">Paired devices can look at the phone’s screen and the hidden screens agents work on. Never to touch, and never while a money app is in front.</string>
+    <string name="web_address_label">Open this on the other device</string>
+    <string name="web_no_tailscale">Tailscale isn’t connected on this phone. Turn it on, signed in to the same account as the other device.</string>
+    <string name="web_copy">Copy address</string>
+    <string name="web_copied">Address copied</string>
+    <string name="web_devices_title">Paired devices</string>
+    <string name="web_none">None yet.</string>
+    <string name="web_device_seen">Last seen %1$s</string>
+    <string name="web_remove">Remove</string>
+    <string name="web_remove_title">Remove “%1$s”?</string>
+    <string name="web_remove_text">It can’t open your chats any more. It can pair again only with your OK on the phone.</string>
+    <string name="web_pair_how">To add a device, open the address on it and tap Pair. You approve it here, on a card that shows the same code.</string>
+    <string name="web_card_pair">“%1$s” wants to see your chats and answer approval cards. Same code on that screen: %2$s (from %3$s)</string>
+    <string name="web_card_computer">Add the computer “%1$s” (%2$s)? Agents could then run commands on it; each command still shows on a card first.</string>
+    <string name="web_device_unnamed">A browser</string>
+    <plurals name="web_row_paired">
+        <item quantity="one">%d device paired</item>
+        <item quantity="other">%d devices paired</item>
+    </plurals>
+
+    <!-- Computers agents can work on, over SSH (Computers, run_on_computer). -->
+    <string name="computers_title">Computers agents can work on</string>
+    <string name="computers_intro">Agents run commands on your own computers over SSH, the way you would in a terminal. The commands show on a card first.</string>
+    <string name="computers_mode_each">Asks before each command</string>
+    <string name="computers_remove_text">Agents can’t reach it any more. Buddy’s key stays in its authorized_keys until you take it out there.</string>
+    <string name="computers_add">Add a computer</string>
+    <string name="computers_need_linux">Adding a computer needs Buddy’s Linux tools: install them in Settings first.</string>
+    <string name="computers_name">Name</string>
+    <string name="computers_name_default">My PC</string>
+    <string name="computers_host">Address (Tailscale name or IP)</string>
+    <string name="computers_user">User on that computer</string>
+    <string name="computers_port">SSH port</string>
+    <string name="computers_key_info">Add this line to the computer’s ~/.ssh/authorized_keys (on Windows: turn on OpenSSH Server, then the same file in your user folder, or administrators_authorized_keys for an admin account):</string>
+    <string name="computers_key_making">Making Buddy’s key…</string>
+    <string name="computers_key_failed">Buddy couldn’t make its key: %1$s</string>
+    <string name="computers_copy_key">Copy key</string>
+    <string name="computers_key_copied">Key copied</string>
+    <string name="computers_check_add">Check and add</string>
+    <string name="computers_fill_in">Fill in the name, the address and the user.</string>
+    <string name="computers_checking">Checking that the computer lets Buddy in…</string>
+    <string name="computers_check_failed">It didn’t let Buddy in:\n%1$s</string>
+    <string name="computers_added">Added %1$s</string>
+    <string name="tools_card_computer">Run on %1$s:\n%2$s</string>
+    <string name="activity_computer">On %1$s</string>
+    <string name="hub_tool_computer">On %1$s: %2$s</string>
+    <string name="tool_run_on_computer">Commands on your computers</string>
+    <string name="tool_run_on_computer_info">Runs commands on computers you add in Other devices, over SSH</string>
+    <!-- What a running command is doing (issue #81) -->
+    <string name="cmd_sheet_title">Running now</string>
+    <string name="cmd_sheet_command">Command</string>
+    <string name="cmd_sheet_running_for">Running for %1$s</string>
+    <string name="cmd_sheet_started">Started %1$s ago. Its process isn\'t in the list below: it may have ended.</string>
+    <string name="cmd_sheet_no_command">%1$s isn\'t running a command right now.</string>
+    <string name="cmd_sheet_ended">This chat isn\'t working now.</string>
+    <string name="cmd_sheet_processes">Running under %1$s</string>
+    <string name="cmd_sheet_loading">Looking…</string>
+    <string name="cmd_sheet_no_agent">%1$s isn\'t running in Buddy\'s Linux right now.</string>
+    <string name="cmd_sheet_none">Nothing is running under %1$s right now.</string>
+    <string name="cmd_sheet_proc_line">pid %1$d · running %2$s · CPU %3$s</string>
+    <string name="cmd_sheet_proc_line_idle">pid %1$d · running %2$s</string>
+    <string name="cmd_sheet_output_note">A command\'s output isn\'t shown here: %1$s gets it when the command ends.</string>
+    <string name="cmd_sheet_stop">Stop this command</string>
+    <string name="cmd_sheet_stop_one">Stop</string>
+    <string name="cmd_sheet_stop_title">Stop this process?</string>
+    <string name="cmd_sheet_stop_text">It stops with what it started. %1$s keeps working and sees it fail.</string>
+    <string name="cmd_sheet_done">This command has finished.</string>
+
+    <!-- Set up what's missing -->
+    <string name="walk_button">Set up what\'s missing (%1$d)</string>
+    <string name="walk_step">%1$s (%2$d of %3$d): allow it, then come back to Buddy</string>
+    <string name="walk_all_set">All set</string>
+    <string name="walk_left_title">Still missing</string>
+    <string name="walk_left_text">These are still off: %1$s. Buddy works without them, with less.</string>
+    <string name="walk_again">Go through them again</string>
+    <string name="walk_notify">Notifications</string>
+    <string name="walk_exact">Alarms and reminders</string>
+
+    <!-- Scheduled tasks that start on events -->
+    <string name="event_charger_on">Charger connected</string>
+    <string name="event_charger_off">Charger disconnected</string>
+    <string name="event_wifi_on">Wi-Fi connected</string>
+    <string name="event_wifi_on_named">Wi-Fi “%1$s” connected</string>
+    <string name="event_wifi_off">Wi-Fi disconnected</string>
+    <string name="event_bt_on">Bluetooth device connected</string>
+    <string name="event_bt_on_named">“%1$s” connected</string>
+    <string name="event_unlock">First unlock of the day</string>
+    <string name="schedule_at_times">At set times</string>
+    <string name="schedule_events">On events</string>
+    <string name="schedule_events_info">The message is also sent when one of these happens, at least 10 minutes apart.</string>
+    <string name="schedule_wifi_any">Any network</string>
+    <string name="schedule_wifi_location">Allow location to pick a network: Android shows Wi-Fi names only to apps with location access.</string>
+    <string name="schedule_wifi_named_note">When Buddy can\'t read the network\'s name (location off), this doesn\'t run.</string>
+    <string name="schedule_bt_any">Any device</string>
+    <string name="schedule_bt_allow">Allow nearby devices: Android tells Buddy about Bluetooth devices only with it.</string>
+    <string name="schedule_bt_none">No paired devices.</string>
+    <string name="schedule_cap">Runs from events a day</string>
+    <string name="schedule_cap_info">At most this many, so a flapping Wi-Fi can\'t use up your plan.</string>
+    <string name="schedule_cap_less">Fewer</string>
+    <string name="schedule_cap_more">More</string>
+    <string name="schedule_need_start">Pick a time or an event.</string>
+    <string name="schedule_on_events">Runs on: %1$s</string>
+    <string name="schedule_events_today">From events today: %1$d of %2$d</string>
+    <string name="walk_bluetooth">Nearby devices</string>
+    <string name="walk_location">Location</string>
+
+    <!-- Mute apps on hidden screens -->
+    <string name="background_mute">Mute apps on hidden screens</string>
+    <string name="background_mute_info">An app in front on a hidden screen makes no sound (a video that starts by itself), unless it\'s on your screen too. Buddy puts its sound back when it leaves the hidden screen, and never touches an app you muted yourself. Needs the helper running.</string>
+
+    <!-- Keep Wireless debugging on (DebugLock). -->
+    <string name="debug_lock">Keep Wireless debugging on</string>
+    <string name="debug_lock_info">When the phone switches it off, Buddy turns it back on (on Wi-Fi), so the helper can always start again.</string>
+    <string name="debug_lock_channel">Wireless debugging</string>
+    <string name="debug_lock_off_title">Wireless debugging is off</string>
+    <string name="debug_lock_off_text">The phone switched it off and Buddy couldn’t turn it back on. Background mode stops until it’s on again: tap to start it.</string>
+    <!-- Settings → Agents and models (2.4.0). "Small jobs": the smart reviewer's safety checks (see Reviewer). -->
+    <string name="agents_lead">Which agent works for you, and what it runs on.</string>
+    <string name="agents_new_chats">New chats use</string>
+    <string name="agents_model_default">The agent’s default model</string>
+    <string name="agents_not_set_up">Not set up yet</string>
+    <string name="agents_on_claude">On your Claude plan</string>
+    <string name="agents_on_chatgpt">On your ChatGPT plan</string>
+    <string name="agents_on_google">On your Google account</string>
+    <string name="agents_on_grok">On your xAI account</string>
+    <string name="agents_on_copilot">On your GitHub Copilot plan</string>
+    <!-- %1$s: what the agent is connected to, e.g. "free models" or "anthropic, openrouter" -->
+    <string name="agents_on">On %1$s</string>
+    <string name="agents_change">Change</string>
+    <!-- %1$s: a model name, e.g. "Haiku" -->
+    <string name="agents_small">Safety checks use %1$s</string>
+    <!-- %1$s: the agent that runs the checks, Claude Code or Codex -->
+    <string name="agents_small_info_cheap">A cheaper model, run by %1$s.</string>
+    <string name="agents_small_info">Run by %1$s.</string>
+    <string name="agents_small_codex">Codex’s small model</string>
+    <string name="agents_small_none">Safety checks need Claude Code or Codex</string>
+    <string name="agents_small_none_info">They run the checks for apps set to Smart. Set up either one.</string>
+    <string name="agents_pick_title">New chats use</string>
+    <string name="agents_pick_set_up">Not set up yet: tap to set it up</string>
+    <string name="agents_connected">Connected</string>
+    <string name="agents_none_connected">Nothing connected yet.</string>
+    <string name="agents_claude_plan">Claude plan</string>
+    <string name="agents_chatgpt_plan">ChatGPT plan</string>
+    <string name="agents_google">Google account</string>
+    <string name="agents_grok">xAI account</string>
+    <string name="agents_copilot">GitHub Copilot</string>
+    <!-- %1$s: an agent's name -->
+    <string name="agents_runs_in">Runs in %1$s</string>
+    <!-- %1$s: agents' names, e.g. "Claude Code, Codex, OpenCode" -->
+    <string name="agents_can_run_in">Can run in %1$s</string>
+    <!-- %1$s: OpenCode; "lite" is lite mode for small models -->
+    <string name="agents_runs_in_lite">Runs in %1$s, lite</string>
+    <!-- %1$s: a model's name -->
+    <string name="agents_on_phone">%1$s, on this phone</string>
+    <string name="agents_engine_missing">Engine missing</string>
+    <string name="agents_cost_subscription">Subscription</string>
+    <string name="agents_cost_pay">Pay per use</string>
+    <string name="agents_cost_free">Free</string>
+    <string name="agents_cost_free_or_plan">Free or paid plan</string>
+    <string name="agents_cost_offline">Offline</string>
+    <string name="agents_cost_private">Private</string>
+    <string name="agents_see_what">See what to change</string>
+    <string name="agents_add">Add a connection</string>
+    <string name="agents_installed">Agents installed</string>
+    <!-- %1$s: an agent's name -->
+    <string name="agents_not_installed">%1$s, not installed</string>
+    <string name="agents_installed_info">These are the agents’ own programs, running inside Buddy. That’s why your Claude and ChatGPT plans work here.</string>
+    <string name="agents_more">More</string>
+    <string name="agents_github_none">Not connected</string>
+    <plurals name="agents_defaults_set">
+        <item quantity="one">%1$d agent set</item>
+        <item quantity="other">%1$d agents set</item>
+    </plurals>
+
+    <!-- A tab, for a screen reader. %1$s: its label, %2$d: its place, %3$d: how many tabs there are -->
+    <string name="ui_tab">%1$s, tab %2$d of %3$d</string>
+
+    <!-- Agents and models → Add a connection -->
+    <string name="conn_add_title">Add a connection</string>
+    <!-- The five tabs' labels: side by side on a narrow phone, so as short as the language allows -->
+    <string name="conn_free">Free</string>
+    <string name="conn_tab_plans">Plans</string>
+    <string name="conn_tab_keys">API keys</string>
+    <string name="conn_tab_phone">This phone</string>
+    <string name="conn_tab_servers">Servers</string>
+    <!-- Free tab. Each "fact" line is a provider's own statement about its free use: translate what it says, add nothing. -->
+    <string name="conn_free_lead">Ways to start without paying. Each provider sets its own limits and can change them.</string>
+    <string name="conn_free_checked">The lines about limits, payment and privacy come from each provider’s own pages, read in November 2026. Those are the provider’s to set and can change.</string>
+    <string name="conn_open">Open</string>
+    <string name="conn_opencode_free">OpenCode’s free models</string>
+    <string name="conn_fact_opencode_get">A changing list of models, each free for a limited time.</string>
+    <string name="conn_fact_opencode_account">No account and no sign-in: they work once OpenCode is installed.</string>
+    <string name="conn_fact_opencode_privacy">Some of the free models keep what you send and use it to improve the model. OpenCode’s Zen page says which.</string>
+    <string name="conn_agy_free">Antigravity’s free plan</string>
+    <string name="conn_fact_agy_get">Google’s $0 plan, with a quota that refills every week. In Buddy’s own use it stopped after about 300 requests and came back about a week later. Google sets the quota and can change it.</string>
+    <string name="conn_fact_agy_account">You sign in with a Google account.</string>
+    <string name="conn_fact_agy_privacy">Google uses what you send to improve its products, and people at Google may read it. Don’t send anything confidential.</string>
+    <string name="conn_google_sub">Sign in with Google</string>
+    <string name="conn_or_free">OpenRouter’s free models</string>
+    <string name="conn_fact_or_get">Models whose name ends in “:free”: 50 requests a day, 20 a minute. 1,000 a day once the account has bought 10 credits.</string>
+    <string name="conn_fact_or_account">You sign in from the browser: no key to copy.</string>
+    <string name="conn_fact_or_privacy">OpenRouter doesn’t keep your prompts unless you opt in. Providers of free models may train on them: your privacy settings on OpenRouter decide whether those providers are used.</string>
+    <string name="conn_copilot_free">GitHub Copilot Free</string>
+    <string name="conn_fact_copilot_get">GitHub’s free plan includes Copilot’s command-line agent, with an allowance of AI credits. The model is picked for you.</string>
+    <string name="conn_fact_copilot_who">Only for personal accounts that don’t get Copilot from an organization.</string>
+    <string name="conn_fact_copilot_privacy">GitHub may train its models on what you send. “Allow GitHub to use my data for AI model training” in your Copilot settings on GitHub turns that off.</string>
+    <string name="conn_gemini_free">Google AI Studio’s free tier</string>
+    <string name="conn_fact_gemini_get">Some Gemini models, free within limits per minute and per day. Google AI Studio shows yours.</string>
+    <string name="conn_fact_gemini_card">No billing account needed: that’s for the paid tiers.</string>
+    <string name="conn_fact_gemini_privacy">Google uses what you send to improve its products, and reviewers may read it: nothing personal or confidential. In the EEA, Switzerland and the UK the paid terms apply, and it isn’t used that way.</string>
+    <string name="conn_fact_gemini_region">Only in the countries Google lists for the Gemini API.</string>
+    <!-- Plans tab -->
+    <string name="conn_plans_lead">Sign in with the plan you already pay for: no API key and no second bill.</string>
+    <string name="conn_claude_plan">Claude Pro or Max</string>
+    <string name="conn_claude_plan_sub">Sign in with Claude</string>
+    <string name="conn_chatgpt_plan">ChatGPT Plus or Pro</string>
+    <string name="conn_chatgpt_plan_sub">Sign in with ChatGPT</string>
+    <string name="conn_google_plan">Google AI plan</string>
+    <string name="conn_supergrok">SuperGrok</string>
+    <string name="conn_supergrok_sub">Sign in with your xAI account</string>
+    <string name="conn_copilot">GitHub Copilot</string>
+    <string name="conn_copilot_sub">Sign in with GitHub</string>
+    <string name="conn_pi">Your plan, in Pi</string>
+    <string name="conn_pi_sub">Claude, ChatGPT or Copilot: sign in from Pi’s own screen</string>
+    <!-- %1$s: what Pi is connected to, e.g. "anthropic" -->
+    <string name="conn_pi_connected">Connected: %1$s</string>
+    <string name="conn_signed_in">Signed in</string>
+    <string name="conn_ready">Ready</string>
+    <string name="conn_add_foot">Signing in to a plan installs its agent first if it isn’t there yet.</string>
+    <!-- API keys tab -->
+    <string name="conn_keys_lead">A key from a service that bills by use, to the key’s account. Buddy keeps keys encrypted on the phone, and the agents never see them.</string>
+    <string name="conn_keys_many">Many models behind one key</string>
+    <string name="conn_keys_makers">From the company that makes the models</string>
+    <string name="conn_keys_fast">Fast</string>
+    <string name="conn_keys_other">Something else</string>
+    <string name="conn_what_openrouter">Models from many companies on one account. Sign in, or paste a key.</string>
+    <!-- %1$s: a family of models, e.g. Claude, GPT, Grok -->
+    <string name="conn_what_models">%1$s models</string>
+    <string name="conn_what_gemini">Gemini models. Has a free tier: see Free.</string>
+    <string name="conn_what_fast">A choice of models, served for speed</string>
+    <string name="conn_paste_key">Paste a key</string>
+    <string name="conn_custom">Another service</string>
+    <string name="conn_custom_sub">Any address that speaks OpenAI’s or Anthropic’s format</string>
+    <string name="conn_custom_agents">Depends on its addresses</string>
+    <!-- This phone tab -->
+    <string name="conn_phone_lead">Models that run on the phone itself.</string>
+    <string name="conn_phone_private">Private: nothing leaves the phone, and it works without internet.</string>
+    <string name="conn_phone_small">Small models are slow next to the ones online, and make mistakes on tasks with several steps. Best for one-step requests: the battery, a timer, a quick look at an app.</string>
+    <!-- %1$s: the phone's memory, e.g. "12 GB" -->
+    <string name="conn_phone_ram">This phone has %1$s of memory. A model has to fit in it next to everything else that’s open.</string>
+    <!-- %1$s: the model's download size, e.g. "5.2 GB" -->
+    <!-- Servers tab -->
+    <string name="conn_servers_lead">A model server you run on your computer or your network.</string>
+    <string name="conn_servers_yours">Your servers</string>
+    <string name="conn_servers_title">Your own model server</string>
+    <!-- %1$s: "Ollama, LM Studio, llama.cpp" -->
+    <string name="conn_servers_what">Any server that speaks OpenAI’s format: %1$s and others.</string>
+    <string name="conn_servers_address">Enter its address and Buddy loads the models it serves. For a server on a computer, that’s the computer’s address on your network, not localhost.</string>
+    <string name="conn_servers_private">Private: what you send goes to your server and stays on your network.</string>
+    <string name="conn_servers_key">No key needed, unless your server asks for one.</string>
+    <string name="conn_servers_start">With its usual address filled in:</string>
+    <string name="conn_servers_add">Add a server</string>
+    <string name="conn_or_choice_info">Sign in and OpenRouter makes Buddy a key of its own: nothing to copy. Or paste a key you made on OpenRouter.</string>
+    <string name="conn_or_sign_in">Sign in with OpenRouter</string>
+    <string name="conn_or_paste">Paste a key</string>
+    <string name="conn_or_needs_service_title">Buddy’s service is off</string>
+    <string name="conn_or_needs_service">OpenRouter sends you back to Buddy at an address on this phone, which only answers while Buddy’s accessibility service is on. Turn it on and try again, or paste a key instead.</string>
+    <string name="conn_or_busy">Getting the key from OpenRouter…</string>
+    <!-- The web page the browser shows when OpenRouter sends it back to Buddy -->
+    <string name="conn_or_page_done">You can go back to Buddy.</string>
+    <string name="conn_or_page_expired">This sign-in has expired or was already used. Start again in Buddy.</string>
+    <!-- %1$s: OpenRouter's own error text -->
+    <string name="conn_or_failed">OpenRouter sign-in failed: %1$s</string>
+    <string name="conn_or_no_free">OpenRouter listed no free models just now, so its pickers show all of its models. Free ones end in “:free”.</string>
+
+    <!-- Agents and models → one service (a key at a service online, or a server of the user's own) -->
+    <string name="conn_status_signed_in">Signed in</string>
+    <string name="conn_status_key">Key saved</string>
+    <string name="conn_status_ready">Ready</string>
+    <string name="conn_status_off">Switched off</string>
+    <string name="conn_status_checking">Checking…</string>
+    <string name="conn_status_failed">Didn’t answer</string>
+    <string name="conn_status_no_tools">Can’t use tools</string>
+    <!-- %1$s: an amount, e.g. "$4.20" -->
+    <string name="conn_balance_left">%1$s left</string>
+    <!-- %1$d: requests to free models OpenRouter still allows today -->
+    <string name="conn_free_left">%1$d free-model requests left today.</string>
+    <string name="conn_or_own_key">OpenRouter made Buddy a key of its own. Delete it on OpenRouter’s Keys page to cut Buddy off.</string>
+    <string name="conn_checked">Checked when you connected</string>
+    <string name="conn_checking">Checking…</string>
+    <string name="conn_not_checked">Not checked yet.</string>
+    <string name="conn_check_answers">The model answers</string>
+    <string name="conn_check_tools">It can call a tool, so it can use the phone</string>
+    <string name="conn_check_tools_failed">It didn’t call a tool when asked</string>
+    <!-- %1$s: the service's name -->
+    <string name="conn_no_tools_warning">%1$s answered, but couldn’t call a tool when Buddy tested it. It can’t use the phone like this.</string>
+    <!-- %1$s, %2$s: token counts, e.g. "12K", "128K" -->
+    <string name="conn_check_fits">Buddy’s tools and instructions (about %1$s tokens) fit its memory of %2$s. The agent’s own prompt comes on top.</string>
+    <string name="conn_check_fits_not">Buddy’s tools and instructions alone (about %1$s tokens) don’t fit its memory of %2$s.</string>
+    <string name="conn_check_no_model">It lists no model to check.</string>
+    <string name="conn_check_no_call">It answered in words instead of calling the tool.</string>
+    <!-- %1$s: model id, %2$s: agent name, %3$s: when, e.g. "5 minutes ago" -->
+    <string name="conn_checked_how">%1$s, asked as %2$s does, %3$s</string>
+    <string name="conn_check_stale">The agent or model changed since: check again.</string>
+    <string name="conn_check_now">Check now</string>
+    <string name="conn_check_again">Check again</string>
+    <string name="conn_check_cost">Two very small requests: a tiny bit of API credit at most.</string>
+    <string name="conn_runs_in">Runs in</string>
+    <string name="conn_runs_in_info">Ticked agents use this service for their chats on Default.</string>
+    <!-- %1$s: Claude Code or Codex, signed in with an API key only -->
+    <string name="conn_runs_in_keep">%1$s has no plan, so its chats need a service. Pick another one for it under Default model.</string>
+    <string name="conn_models">Models</string>
+    <string name="conn_for_chats">For chats</string>
+    <!-- %1$s: the service's name -->
+    <string name="conn_for_chats_title">%1$s model for chats</string>
+    <string name="conn_edit">Addresses and key</string>
+    <!-- A service's screen: the row that opens the list of its models to tick the ones the model pickers offer. Its value is conn_shown_count. -->
+    <string name="conn_shown">Shown in pickers</string>
+    <!-- %1$d: how many of its models the pickers show, %2$d: how many it has -->
+    <string name="conn_shown_count">%1$d of %2$d</string>
+    <!-- %1$s: the agent that will run it -->
+    <string name="conn_use_for_new">Use this for new chats, in %1$s</string>
+    <!-- %1$s: an agent's name -->
+    <string name="conn_used_now">New chats use this, in %1$s.</string>
+    <!-- %1$s: the service's name -->
+    <string name="conn_sign_out">Sign out of %1$s</string>
+    <string name="conn_sign_out_text">Its key is deleted from this phone, and chats that use its models go back to Default. The key stays on OpenRouter until you delete it there.</string>
+    <string name="conn_remove">Remove %1$s</string>
+
+    <!-- Pi's sign-in to a plan, without its own screen (PiSignIn). -->
+    <string name="signin_pi_with">Sign in with %1$s</string>
+    <string name="signin_pi_other">Another provider or API key</string>
+    <string name="signin_pi_starting">Starting Pi’s sign-in…</string>
+    <string name="signin_pi_open_page">Open the sign-in page</string>
+    <string name="signin_pi_paste_hint">The code the page shows</string>
+    <string name="signin_pi_send_code">Send the code</string>
+    <string name="signin_pi_enter_code">Enter this code on the page (it’s copied when you open it):</string>
+    <string name="signin_pi_copy_code">Sign in on the page, then copy the code it shows and come back: Buddy takes it from there.</string>
+    <string name="signin_pi_checking">Checking…</string>
+    <string name="signin_pi_signed_in">Pi is signed in with %1$s</string>
+    <string name="signin_pi_failed">Not signed in:\n%1$s</string>
+    <string name="debug_lock_ask_title">Allow Wireless debugging on this Wi-Fi</string>
+    <string name="debug_lock_ask_text">Your phone asks once for each Wi-Fi access point (a mesh network has several). Tap here, then tick “Always allow on this network” and tap Allow.</string>
+    <string name="chat_attach_files_linux_sub">PDFs, documents, anything. Over 25 MB, it goes straight to this chat’s Linux tools, at any size.</string>
+    <string name="chat_attach_big_to_linux">Too big to attach: sending it to this chat’s Linux tools instead. When it’s there, see it in Files (chat options).</string>
+    <string name="chat_attach_in_linux">In Linux tools</string>
+    <!-- Files: the screen that shows what is in Buddy's Linux (the agents' workspace and a chat's own folders), where files are uploaded, opened, shared and deleted. Also the name of its rows in Settings and in a chat's options. -->
+    <string name="files_title">Files</string>
+    <!-- Settings row, under the title "Files". -->
+    <string name="files_row_info">What’s in Buddy’s Linux: upload files of any size, open, share or delete them</string>
+    <!-- Chat options row, under the title "Files". -->
+    <string name="chat_files_row">Projects and this chat’s files in Buddy’s Linux</string>
+    <!-- The same, when files were sent to this chat's Linux tools. %1$s = their size ("3.1 GB"). -->
+    <string name="chat_files_row_size">Projects and this chat’s files · %1$s sent to this chat</string>
+    <!-- Files, at the top: what the screen is. -->
+    <string name="files_intro">What’s in Buddy’s Linux, where agents with Linux tools work. Upload a file into a folder for them, or take out what they made.</string>
+    <!-- Files: the place where agents keep projects (/root/.buddy/work). -->
+    <string name="files_projects">Workspace</string>
+    <string name="files_projects_info">Where the agents work, one folder per project</string>
+    <string name="files_projects_shared_info">This chat works here, like every chat without a project folder</string>
+    <string name="files_project_info">This chat’s project: its agent works here</string>
+    <string name="files_all_chats">All chats</string>
+    <string name="files_project_here">This chat’s project: its agent starts in this folder.</string>
+    <string name="files_project_hint">This chat works in the whole workspace. To keep it to one project, open a folder’s menu and choose “Make this the chat’s project”.</string>
+    <string name="files_project_make">Make this the chat’s project</string>
+    <string name="files_project_end">No longer this chat’s project</string>
+    <string name="files_project_title">Work in “%1$s” in this chat?</string>
+    <string name="files_project_none_title">Work in the whole workspace again?</string>
+    <string name="files_project_text">From your next message the agent starts there. It begins a new conversation of its own and gets this chat so far as text.</string>
+    <string name="files_project_yes">Work there</string>
+    <string name="files_project_set">This chat now works in %1$s</string>
+    <string name="files_project_none_set">This chat works in the whole workspace again</string>
+    <string name="chat_project">Project folder</string>
+    <string name="chat_project_none">Whole workspace</string>
+    <string name="chat_project_none_info">Shared by every chat without a project folder</string>
+    <string name="chat_project_info">Where this chat’s agent starts and keeps its work. Several chats can work on the same project.</string>
+    <string name="chat_folder_busy">The chat is working. Change its project folder when it’s done.</string>
+    <string name="jump_to_end">Go to the end</string>
+    <string name="models_pi_group">Through your %1$s sign-in</string>
+    <string name="models_opencode_free">OpenCode’s free models</string>
+    <!-- Files opened from a chat: that chat's own folders. -->
+    <string name="files_this_chat">This chat</string>
+    <!-- Files, in "This chat": the folder of files sent for Linux tools (over 25 MB, or uploaded here). -->
+    <string name="files_incoming">Sent to Linux tools</string>
+    <string name="files_incoming_info">Files for the agent’s tools, of any size</string>
+    <!-- Files, in "This chat": the folder with copies of the chat's attachments. -->
+    <string name="files_attachments">Attachments</string>
+    <string name="files_attachments_info">Copies of what you attached, as the agent got them</string>
+    <!-- Files: button. Opens the phone's file picker; the files picked are copied into the folder shown. -->
+    <string name="files_upload">Upload files</string>
+    <string name="files_new_folder">New folder</string>
+    <!-- Button of the New folder sheet. Verb. -->
+    <string name="files_create">Create</string>
+    <!-- Hint in the field for a file's or folder's name. -->
+    <string name="files_name_hint">Name</string>
+    <string name="files_bad_name">A name can’t be empty, “.” or “..”, or have a slash in it.</string>
+    <!-- Description of the three-dot buttons (screen readers). -->
+    <string name="files_menu">More</string>
+    <!-- Files menu: a switch. -->
+    <string name="files_show_hidden">Show hidden files</string>
+    <string name="files_show_hidden_info">Files and folders whose name starts with a dot</string>
+    <string name="files_empty">Nothing here yet.</string>
+    <!-- Under the list, when hidden files aren't shown. -->
+    <plurals name="files_hidden_count">
+        <item quantity="one">%1$d hidden item isn’t shown.</item>
+        <item quantity="other">%1$d hidden items aren’t shown.</item>
+    </plurals>
+    <!-- A long folder shows its first 200 entries; this row shows the next ones. %1$d = how many aren't shown yet. -->
+    <string name="files_show_more">Show more (%1$d left)</string>
+    <!-- %1$s = the system's error ("Permission denied"). -->
+    <string name="files_list_failed">Can’t show this folder: %1$s</string>
+    <!-- Under a link's name. %1$s = where it points. -->
+    <string name="files_link">Link to %1$s</string>
+    <string name="files_link_info">A link made inside Buddy’s Linux. Buddy never opens or follows links here: where one points can be outside these folders.</string>
+    <!-- Files: what can be done with a file or folder. Verbs. -->
+    <string name="files_open">Open</string>
+    <string name="files_share">Share</string>
+    <string name="files_save">Save to Downloads</string>
+    <string name="files_rename">Rename</string>
+    <string name="files_delete">Delete</string>
+    <!-- Copies the path of the file as the agent sees it inside Linux. -->
+    <string name="files_copy_path">Copy path</string>
+    <!-- Goes back to the chat and adds the file to the next message, as a chip above the message box. -->
+    <string name="files_mention">Mention in chat</string>
+    <!-- Title while several files are ticked. -->
+    <plurals name="files_selected">
+        <item quantity="one">%1$d selected</item>
+        <item quantity="other">%1$d selected</item>
+    </plurals>
+    <!-- %1$s = the file's or folder's name. -->
+    <string name="files_delete_title">Delete %1$s?</string>
+    <!-- Always 2 or more. -->
+    <plurals name="files_delete_many">
+        <item quantity="one">Delete %1$d item?</item>
+        <item quantity="other">Delete %1$d items?</item>
+    </plurals>
+    <string name="files_delete_counting">Counting what goes…</string>
+    <!-- %1$d = files and folders in all, %2$s = their size ("56 MB"). -->
+    <plurals name="files_delete_info">
+        <item quantity="one">%1$d item (%2$s) will be deleted for good.</item>
+        <item quantity="other">%1$d files and folders (%2$s) will be deleted for good.</item>
+    </plurals>
+    <!-- While a delete runs. %1$d = files and folders deleted so far. -->
+    <string name="files_deleting">Deleting… %1$d done</string>
+    <!-- %1$s = the first thing that couldn't be deleted and the system's error ("notes.txt: Permission denied"). -->
+    <string name="files_delete_failed">Not everything could be deleted. %1$s</string>
+    <!-- While files are copied to the phone's Downloads. %1$s = file name, %2$s = how much is copied ("1.2 GB"). -->
+    <string name="files_saving">Saving %1$s to Downloads… %2$s</string>
+    <plurals name="files_saved_many">
+        <item quantity="one">Saved %1$d file to Downloads/Buddy.</item>
+        <item quantity="other">Saved %1$d files to Downloads/Buddy.</item>
+    </plurals>
+    <!-- %1$s = file name, %2$s = the system's error. -->
+    <string name="files_save_failed">Couldn’t save %1$s: %2$s</string>
+    <string name="files_rename_failed">Couldn’t rename %1$s: %2$s</string>
+    <!-- %1$s = the new folder's name, %2$s = the system's error. -->
+    <string name="files_folder_failed">Couldn’t make the folder %1$s: %2$s</string>
+    <!-- Why a folder can't be renamed now. Used after a colon, like a system error: no capital, no full stop. -->
+    <string name="files_copying_into">a file is still being copied into it</string>
+    <!-- A delete or a save to Downloads is still running. -->
+    <string name="files_busy">Wait for the delete or save that’s running to finish.</string>
+    <!-- Why something can't be opened, renamed, deleted or copied: it isn't in the folders this screen may show (it was moved, or a link leads elsewhere). Used after a colon, like a system error: no capital, no full stop. -->
+    <string name="files_outside">it isn’t inside the folders Files shows</string>
+    <string name="files_uploaded">Added %1$s</string>
+    <string name="files_attachments_hint">These are copies of what you attached in this chat. To give the agent another file, upload it to the workspace or to Sent to Linux tools.</string>
+    <string name="debug_lock_settings_text">Background mode can’t start again until it’s on. If the phone asks, tick “Always allow on this network”, then Allow.</string>
+    <string name="debug_lock_turn_on">Turn it on</string>
 </resources>

@@ -18,11 +18,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * One agent (Claude Code, Codex, OpenCode, Antigravity or Grok) inside Buddy's built-in Linux: install it, sign in,
- * check the account. Claude Code's and Antigravity's sign-ins show a one-time code in the browser; Buddy reads it off
- * the screen (accessibility), the clipboard, or a paste box. Codex's sign-in returns to a local address inside Linux by
- * itself; Grok's is a device code the user confirms in the browser. OpenCode needs no sign-in (its free models work
- * right away); providers are connected in the terminal.
+ * One agent (Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot or Pi) inside Buddy's built-in Linux: install it,
+ * sign in, check the account. Claude Code's and Antigravity's sign-ins show a one-time code in the browser; Buddy reads
+ * it off the screen (accessibility), the clipboard, or a paste box. Codex's sign-in returns to a local address inside
+ * Linux by itself; Grok's is a device code the user confirms in the browser, Copilot's one they type on GitHub's page.
+ * OpenCode needs no sign-in (its free models work right away); providers are connected in the terminal, as they are
+ * for Pi, which has no models of its own.
  */
 final class Account {
     enum Step { CHECKING, NEED_INSTALL, INSTALLING, SIGNED_OUT, WAITING_BROWSER, FINISHING, SIGNED_IN, ERROR }
@@ -36,27 +37,29 @@ final class Account {
     static final Account OPENCODE = new Account("opencode");
     static final Account AGY = new Account("agy");
     static final Account GROK = new Account("grok");
-    static final Account[] ALL = {CLAUDE, CODEX, OPENCODE, AGY, GROK};
+    static final Account COPILOT = new Account("copilot");
+    static final Account PI = new Account("pi");
+    static final Account[] ALL = {CLAUDE, CODEX, OPENCODE, AGY, GROK, COPILOT, PI};
 
     static Account of(String agent) {
         return "codex".equals(agent) ? CODEX : "opencode".equals(agent) ? OPENCODE : "agy".equals(agent) ? AGY
-                : "grok".equals(agent) ? GROK : CLAUDE;
+                : "grok".equals(agent) ? GROK : "copilot".equals(agent) ? COPILOT : "pi".equals(agent) ? PI : CLAUDE;
     }
 
-    /** Is this one of Buddy's agents ("claude", "codex", "opencode", "agy" or "grok")? */
+    /** Is this one of Buddy's agents ("claude", "codex", "opencode", "agy", "grok", "copilot" or "pi")? */
     static boolean known(String agent) {
         return of(agent).agent.equals(agent);
     }
 
-    /** The agent's display name: "Claude Code", "Codex", "OpenCode", "Antigravity" or "Grok". */
+    /** The agent's display name: "Claude Code", "Codex", "OpenCode", "Antigravity", "Grok", "Copilot" or "Pi". */
     static String nameOf(String agent) {
         return of(agent).name();
     }
 
-    /** Its command-line name, shown in mono labels: "claude-code", "codex", "opencode", "agy" or "grok". */
+    /** Its command-line name, shown in mono labels: "claude-code", "codex", "opencode", "agy", "grok", "copilot" or "pi". */
     static String cliOf(String agent) {
         return "codex".equals(agent) ? "codex" : "opencode".equals(agent) ? "opencode" : "agy".equals(agent) ? "agy"
-                : "grok".equals(agent) ? "grok" : "claude-code";
+                : "grok".equals(agent) ? "grok" : "copilot".equals(agent) ? "copilot" : "pi".equals(agent) ? "pi" : "claude-code";
     }
 
     final String agent;
@@ -66,7 +69,7 @@ final class Account {
     volatile String url, state;
     /** Signing in from another device: show the link (and Codex's one-time code) instead of opening the browser here. */
     volatile boolean remote;
-    /** Codex's device code ("ABCD-12345") in remote mode; Grok's ("ABCD-1234") always. */
+    /** Codex's device code ("ABCD-12345") in remote mode; Grok's and Copilot's ("ABCD-1234") always. */
     volatile String userCode;
     /** OpenCode 2 (npm @opencode/cli) rather than 1.x: its commands need --standalone, or it leaves a background service. */
     volatile boolean opencode2;
@@ -82,8 +85,14 @@ final class Account {
      * run chats, but voice and Remote Control, which need the full sign-in, don't.
      */
     volatile boolean token;
-    /** Claude Code or Codex can use an API key service (Settings → API keys), with or without the plan. */
+    /**
+     * Claude Code, Codex or Pi can use a service saved in Buddy (Settings → Agents and models), with or without its
+     * own sign-in. (For Pi, planIn says it has a provider of its own: a plan or a key it was signed in to.)
+     */
     volatile boolean apiKey;
+    /** Copilot is signed in only through the GitHub CLI's login (Settings > GitHub), which it uses too: Buddy's
+     *  sign-out can't end that one. */
+    volatile boolean viaGh;
     /** A failed install's own output, behind Details when detail says it in plain words ("" otherwise). */
     volatile String errorDetail = "";
 
@@ -114,13 +123,61 @@ final class Account {
         return "grok".equals(agent);
     }
 
-    /** Usable without paying, within limits (OpenCode's free models, Antigravity's and Grok's free plans). */
+    boolean copilot() {
+        return "copilot".equals(agent);
+    }
+
+    boolean pi() {
+        return "pi".equals(agent);
+    }
+
+    /** Signs in to providers in its own screen (Buddy's terminal), not through Buddy: OpenCode and Pi. */
+    boolean connectsInTerminal() {
+        return opencode() || pi();
+    }
+
+    /** Usable without paying, within limits (OpenCode's free models, Antigravity's, Grok's and Copilot's free plans). */
     boolean freeTier() {
-        return opencode() || agy() || grok();
+        return opencode() || agy() || grok() || copilot();
     }
 
     String name() {
-        return claude() ? "Claude Code" : opencode() ? "OpenCode" : agy() ? "Antigravity" : grok() ? "Grok" : "Codex";
+        return claude() ? "Claude Code" : opencode() ? "OpenCode" : agy() ? "Antigravity" : grok() ? "Grok"
+                : copilot() ? "Copilot" : pi() ? "Pi" : "Codex";
+    }
+
+    /** Pi's names for its providers, as people know them ("anthropic" is their Claude plan or key). */
+    /** Pi's sign-ins as "provider:type" (oauth: a plan; api_key), comma-separated; "" when not known. */
+    volatile String piTypes = "";
+
+    /** Is Pi signed in to this provider with an account (a plan), not a key? */
+    boolean piPlan(String provider) {
+        for (String t : piTypes.split(",")) if (t.trim().equals(provider + ":oauth")) return true;
+        return false;
+    }
+
+    static String piName(String provider) {
+        return piNames(provider);
+    }
+
+    private static String piNames(String providers) {
+        java.util.List<String> out = new java.util.ArrayList<>();
+        for (String p : providers.split(",\\s*")) {
+            String n;
+            switch (p.trim()) {
+                case "anthropic": n = "Claude"; break;
+                case "openai-codex": n = "ChatGPT"; break;
+                case "github-copilot": n = "GitHub Copilot"; break;
+                case "openai": n = "OpenAI"; break;
+                case "openrouter": n = "OpenRouter"; break;
+                case "google": n = "Google"; break;
+                case "xai": n = "xAI"; break;
+                case "deepseek": n = "DeepSeek"; break;
+                default: n = p.trim();
+            }
+            if (!n.isEmpty() && !out.contains(n)) out.add(n);
+        }
+        return android.text.TextUtils.join(", ", out);
     }
 
     /** The plan to show: OpenCode's "free models" marker in the user's language, anything else as it is. */
@@ -131,7 +188,8 @@ final class Account {
     /** One line on what the agent runs on, for pickers. */
     String tagline() {
         return BuddyApp.str(claude() ? R.string.account_tagline_claude : opencode() ? R.string.account_tagline_opencode
-                : agy() ? R.string.account_tagline_agy : grok() ? R.string.account_tagline_grok : R.string.account_tagline_codex);
+                : agy() ? R.string.account_tagline_agy : grok() ? R.string.account_tagline_grok
+                : copilot() ? R.string.account_tagline_copilot : pi() ? R.string.account_tagline_pi : R.string.account_tagline_codex);
     }
 
     static void addListener(Listener l) {
@@ -193,7 +251,7 @@ final class Account {
                         return;
                     }
                     JSONObject j = new JSONObject(out.substring(from, to + 1));
-                    // signed in = the plan, or an API key service it can use (or both)
+                    // signed in = the plan, or a service saved in Buddy that it can use (or both)
                     // a token (in Claude Code's settings, see useToken) signs it in for chats only
                     token = j.optBoolean("loggedIn") && "oauth_token".equals(j.optString("authMethod"));
                     planIn = j.optBoolean("loggedIn") && !"api_key".equals(j.optString("authMethod")) && !token;
@@ -311,6 +369,104 @@ final class Account {
                     } else {
                         set(Step.SIGNED_OUT, "");
                     }
+                } else if (pi()) {
+                    // ready once a provider is connected: a login or key in its auth.json (/login in its own screen), or a
+                    // provider of the user's own in its models.json. Those are shown as the plan. Or, as for Claude Code
+                    // and Codex, with a service saved in Buddy that it can use: then its chats run on that.
+                    String out = Linux.exec(app, "command -v pi >/dev/null || { echo NOTINSTALLED; exit 0; }; "
+                            + "echo PI_TYPES=$(jq -r 'to_entries[] | \"\\(.key):\\(.value.type // \"\")\"' " + PI_DIR
+                            + "/auth.json 2>/dev/null | paste -sd, -); "
+                            + "echo PI_PROVIDERS=$({ jq -r 'keys[]' " + PI_DIR + "/auth.json; jq -r '.providers // {} | keys[]' "
+                            + PI_DIR + "/models.json; } 2>/dev/null | sort -u | paste -sd, - | sed 's/,/, /g'); "
+                            + "echo VER=$(PI_SKIP_VERSION_CHECK=1 pi --version 2>/dev/null)", 60);
+                    version = ver(out);
+                    Matcher m = Pattern.compile("PI_PROVIDERS=(.*)").matcher(out);
+                    String providers = m.find() ? m.group(1).trim() : "";
+                    if (out.contains("NOTINSTALLED")) {
+                        set(Step.NEED_INSTALL, "");
+                        return;
+                    }
+                    planIn = !providers.isEmpty();
+                    apiKey = !Providers.forAgent(agent).isEmpty();
+                    if (planIn || apiKey) {
+                        email = "";
+                        plan = planIn ? piNames(providers) : keyPlan();
+                        Matcher tm = Pattern.compile("PI_TYPES=(.*)").matcher(out);
+                        piTypes = planIn && tm.find() ? tm.group(1).trim() : "";
+                        set(Step.SIGNED_IN, "");
+                        if (!planIn) return; // (no models of its own to list)
+                        // the models of the providers connected ("provider  model  context …" rows), for the model
+                        // picker; at most every 10 minutes
+                        long now = System.currentTimeMillis();
+                        if (piModelsBusy || now - piModelsAt < 600_000) return;
+                        piModelsBusy = true;
+                        String list;
+                        try {
+                            list = Linux.exec(app, "PI_SKIP_VERSION_CHECK=1 timeout 40 pi --list-models 2>/dev/null", 50);
+                        } finally {
+                            piModelsBusy = false;
+                        }
+                        org.json.JSONArray a = new org.json.JSONArray();
+                        for (String line : list.split("\n")) {
+                            String[] f = line.trim().split("\\s+");
+                            if (f.length >= 2 && !"provider".equals(f[0]) && f[0].matches("[A-Za-z0-9._-]+"))
+                                a.put(new org.json.JSONArray().put(f[0] + "/" + f[1]).put(f[1]));
+                        }
+                        if (a.length() > 0) {
+                            piModelsAt = now;
+                            Prefs.setPiModels(app, a.toString());
+                            Models.set("pi", a.toString());
+                        }
+                    } else {
+                        set(Step.SIGNED_OUT, "");
+                    }
+                } else if (copilot()) {
+                    // signed in = its own saved login (with the account name), or the GitHub CLI's, which it uses too
+                    String out = Linux.exec(app, "[ -x " + COPILOT_BIN + " ] || { echo NOTINSTALLED; exit 0; }; "
+                            + "u=$(sed '/^ *\\/\\//d' " + COPILOT_CONFIG + " 2>/dev/null | jq -r 'select((.authTokens // {}) | length > 0)"
+                            + " | .lastLoggedInUser.login // .loggedInUsers[0].login // \"?\"' 2>/dev/null); "
+                            + "if [ -n \"$u\" ]; then echo COPILOT_SIGNED=$u; elif grep -qs 'oauth_token:' " + GH_HOSTS + "; then "
+                            + "echo COPILOT_GH=$(sed -n 's/^ *user: *//p' " + GH_HOSTS + " | head -1); fi; "
+                            + "echo VER=$(" + COPILOT_BIN + " --version 2>/dev/null)", 60);
+                    version = ver(out);
+                    Matcher own = Pattern.compile("COPILOT_SIGNED=(\\S*)").matcher(out);
+                    Matcher gh = Pattern.compile("COPILOT_GH=(\\S*)").matcher(out);
+                    if (out.contains("NOTINSTALLED")) {
+                        set(Step.NEED_INSTALL, "");
+                    } else if (own.find() || gh.find()) {
+                        viaGh = !own.reset().find();
+                        email = viaGh ? gh.group(1) : "?".equals(own.group(1)) ? "" : own.group(1);
+                        plan = "";
+                        set(Step.SIGNED_IN, "");
+                        // the model ids its settings accept (`copilot help config`), as the helper's ping finds them;
+                        // at most every 10 minutes
+                        long now = System.currentTimeMillis();
+                        if (copilotModelsBusy || now - copilotModelsAt < 600_000) return;
+                        copilotModelsBusy = true;
+                        String list;
+                        try {
+                            list = Linux.exec(app, "timeout 40 " + COPILOT_BIN + " help config 2>/dev/null", 50);
+                        } finally {
+                            copilotModelsBusy = false;
+                        }
+                        org.json.JSONArray a = new org.json.JSONArray();
+                        boolean in = false;
+                        for (String line : list.split("\n")) {
+                            if (line.matches("^\\s*`model`:.*")) in = true;
+                            else if (in && line.trim().isEmpty()) break;
+                            else if (in) {
+                                Matcher m = Pattern.compile("^\\s*- \"([A-Za-z0-9._-]+)\"$").matcher(line);
+                                if (m.find()) a.put(new org.json.JSONArray().put(m.group(1)).put(m.group(1)));
+                            }
+                        }
+                        if (a.length() > 0) {
+                            copilotModelsAt = now;
+                            Prefs.setCopilotModels(app, a.toString());
+                            Models.set("copilot", a.toString());
+                        }
+                    } else {
+                        set(Step.SIGNED_OUT, "");
+                    }
                 } else {
                     String out = Linux.exec(app, "command -v codex >/dev/null || { echo NOTINSTALLED; exit 0; }; "
                             + "codex login status 2>&1; echo VER=$(codex --version 2>/dev/null)", 60);
@@ -386,6 +542,18 @@ final class Account {
                             + " && { [ -x " + GROK_BIN + " ] || ln -sf /root/.grok/bin/grok " + GROK_BIN + "; }"
                             + " && " + GROK_BIN + " --version && echo AGENT_OK", 1800);
                     if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
+                } else if (pi()) {
+                    set(Step.INSTALLING, app.getString(R.string.account_downloading, name()));
+                    // as Pi's own guide says for npm: it needs no install scripts
+                    String o = Linux.exec(app, "npm install -g --ignore-scripts " + PI_PACKAGE + " >/tmp/npm.log 2>&1;"
+                            + " tail -5 /tmp/npm.log; PI_SKIP_VERSION_CHECK=1 pi --version && echo AGENT_OK", 1800);
+                    if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
+                } else if (copilot()) {
+                    set(Step.INSTALLING, app.getString(R.string.account_downloading, name()));
+                    // npm @github/copilot, always a fresh install (COPILOT_REMOVE), then unpacked (COPILOT_UNPACK)
+                    String o = Linux.exec(app, COPILOT_REMOVE + " npm install -g @github/copilot >/tmp/npm.log 2>&1;"
+                            + " tail -5 /tmp/npm.log;" + COPILOT_UNPACK + " " + COPILOT_BIN + " --version && echo AGENT_OK", 1800);
+                    if (!o.contains("AGENT_OK")) throw new IOException(tail(o));
                 } else if (opencode()) {
                     set(Step.INSTALLING, app.getString(R.string.account_downloading, name()));
                     // OpenCode 2 (npm @opencode/cli), always a fresh install (OC_REMOVE)
@@ -431,6 +599,44 @@ final class Account {
     private static volatile boolean grokModelsBusy;
     private static volatile long grokModelsAt;
 
+    private static final String PI_PACKAGE = "@earendil-works/pi-coding-agent";
+    private static final String PI_DIR = "/root/.pi/agent";
+    private static volatile boolean piModelsBusy;
+    private static volatile long piModelsAt;
+
+    /** Buddy's wrapper (linux/buddy-copilot), linked here once Copilot is installed: npm's copilot doesn't run here. */
+    private static final String COPILOT_BIN = "/root/.local/bin/copilot";
+    /** Its saved login (and its comment lines, which jq can't read); the GitHub CLI's, which it also signs in with. */
+    private static final String COPILOT_CONFIG = "/root/.copilot/config.json";
+    private static final String GH_HOSTS = "/root/.config/gh/hosts.yml";
+    private static volatile boolean copilotModelsBusy;
+    private static volatile long copilotModelsAt;
+
+    /** Removes npm's Copilot (its platform package is inside it) before installing it again: the unpack below deletes
+     *  its executable, which npm would not bring back for the same version. */
+    private static final String COPILOT_REMOVE = " g=$(npm root -g 2>/dev/null)/@github;"
+            + " [ \"$g\" = /@github ] || rm -rf $g/copilot; rm -f /usr/local/bin/copilot;";
+
+    /**
+     * npm's copilot is a single-file executable that fails under proot ("Node-API symbol ... has not been loaded"). Run
+     * once (any command but --version), it unpacks its JavaScript package into Copilot's cache, which Buddy's wrapper
+     * runs on Node. Then the executable (~200 MB) and the other unpacked versions (~250 MB each) go.
+     */
+    private static final String COPILOT_UNPACK = " g=$(npm root -g)/@github; v=$(jq -r .version $g/copilot/package.json 2>/dev/null);"
+            + " p=/root/.cache/copilot/pkg/linuxmusl-arm64; e=$g/copilot/node_modules/@github/copilot-linuxmusl-arm64/copilot;"
+            + " [ -f $p/$v/.extraction-complete ] || (cd /tmp && $e help >/dev/null 2>&1);"
+            + " if [ -n \"$v\" ] && [ -f $p/$v/.extraction-complete ]; then"
+            + " mkdir -p /root/.local/bin && ln -sf /root/bin/buddy-copilot " + COPILOT_BIN + ";"
+            + " rm -f $e;"
+            + " for d in $p/*/; do [ \"$d\" = \"$p/$v/\" ] || rm -rf \"$d\"; done;"
+            + " else echo \"Copilot $v did not unpack into $p\"; fi;";
+
+    /** Copilot keeps its login in the system keychain, which Buddy's Linux hasn't got; without this setting it signs in
+     *  but saves nothing ("the token was not saved"). The file is the user's settings: only this one key is set. */
+    private static final String COPILOT_PLAINTEXT = "f=/root/.copilot/settings.json; mkdir -p /root/.copilot;"
+            + " if [ -s $f ]; then sed '/^ *\\/\\//d' $f | jq '.storeTokenPlaintext = true' > $f.new && mv $f.new $f;"
+            + " else echo '{\"storeTokenPlaintext\": true}' > $f; fi; chmod 600 $f;";
+
     private static String ver(String out) {
         java.util.regex.Matcher m = java.util.regex.Pattern.compile("VER=\\D*(\\d+\\.\\d+\\.\\d+)").matcher(out);
         return m.find() ? m.group(1) : "";
@@ -461,6 +667,20 @@ final class Account {
                     o = Linux.exec(app, AGY_BIN + " update 2>&1 | tail -3; echo VER=$(" + AGY_BIN + " --version)", 900);
                 } else if (grok()) {
                     o = Linux.exec(app, GROK_BIN + " update 2>&1 | tail -3; echo VER=$(" + GROK_BIN + " --version)", 900);
+                } else if (pi()) {
+                    // npm's latest, when it isn't the one installed (Pi's own `pi update` is for its installer's copy)
+                    o = Linux.exec(app, ": >/tmp/npm.log; v=$(npm view " + PI_PACKAGE + " version 2>>/tmp/npm.log);"
+                            + " [ -n \"$v\" ] || { tail -3 /tmp/npm.log; exit 0; };"
+                            + " [ \"$(PI_SKIP_VERSION_CHECK=1 pi --version 2>/dev/null)\" = \"$v\" ]"
+                            + " || npm install -g --ignore-scripts " + PI_PACKAGE + "@$v >>/tmp/npm.log 2>&1;"
+                            + " tail -3 /tmp/npm.log; echo VER=$(PI_SKIP_VERSION_CHECK=1 pi --version)", 1800);
+                } else if (copilot()) {
+                    // npm's latest, when it isn't the one unpacked already; the unpacked one keeps working if this fails
+                    o = Linux.exec(app, ": >/tmp/npm.log; v=$(npm view @github/copilot version 2>>/tmp/npm.log);"
+                            + " [ -n \"$v\" ] || { tail -3 /tmp/npm.log; exit 0; };"
+                            + " if [ ! -f /root/.cache/copilot/pkg/linuxmusl-arm64/$v/.extraction-complete ]; then"
+                            + COPILOT_REMOVE + " npm install -g @github/copilot@$v >>/tmp/npm.log 2>&1;" + COPILOT_UNPACK + " fi;"
+                            + " tail -3 /tmp/npm.log; echo VER=$(" + COPILOT_BIN + " --version)", 1800);
                 } else if (opencode()) {
                     // Reinstalls only when npm has a newer version (1.x counts: OpenCode 2 is a new npm package that
                     // keeps 1.x's connected providers). The install removes the old copy first (OC_REMOVE), so it
@@ -501,15 +721,16 @@ final class Account {
      *  elsewhere. Antigravity has no login command: a one-line prompt asks for the sign-in first, then answers. It only
      *  offers the sign-in on a terminal ("no controlling terminal; cannot complete interactive login"), so it runs
      *  under script, which gives it one. Grok always signs in with a device code: its link carries the code, so here
-     *  it opens in the browser and the user confirms the code there; remote shows the link and code as for Codex. */
+     *  it opens in the browser and the user confirms the code there; remote shows the link and code as for Codex.
+     *  Copilot's device code is typed on GitHub's page, which its link doesn't fill in: it always gets that screen. */
     void startLogin(Context c, boolean onOtherDevice) {
         app = c.getApplicationContext();
-        if (busy() || opencode()) return; // OpenCode: providers are connected in the terminal (opencode auth login)
+        if (busy() || connectsInTerminal()) return; // providers are connected in the terminal (opencode auth login, pi)
         final Context app = c.getApplicationContext();
         url = null;
         state = null;
         userCode = null;
-        remote = onOtherDevice;
+        remote = onOtherDevice || copilot();
         set(Step.WAITING_BROWSER, app.getString(R.string.signin_starting));
         new Thread(() -> {
             StringBuilder out = new StringBuilder();
@@ -519,6 +740,8 @@ final class Account {
                         : agy() ? Linux.builder(app, "/bin/sh", "-c", "command -v script >/dev/null || apk add -q util-linux-misc;"
                                 + " exec script -qec \"" + AGY_BIN + " -p 'Reply with just: ok'\" /dev/null")
                         : grok() ? Linux.builder(app, GROK_BIN, "login", "--device-auth")
+                        : copilot() ? Linux.builder(app, "/bin/sh", "-c", COPILOT_PLAINTEXT + " exec " + COPILOT_BIN
+                                + " login --device-code")
                         : onOtherDevice ? Linux.builder(app, "codex", "login", "--device-auth")
                         : Linux.builder(app, "codex", "login")).start();
                 synchronized (this) {
@@ -538,9 +761,10 @@ final class Account {
                     } catch (Exception ignored) {
                     }
                 }).start();
-                boolean device = grok() || onOtherDevice && !claude() && !agy(); // Codex's or Grok's device code
+                boolean device = grok() || copilot() || onOtherDevice && !claude() && !agy(); // a device code
                 Pattern u = Pattern.compile(agy() ? "https://accounts\\.google\\.com/o/oauth2/auth\\?\\S+"
                         : grok() ? "https://accounts\\.x\\.ai/oauth2/device\\S*"
+                        : copilot() ? "https://github\\.com/login/device"
                         : device ? "https://\\S*/codex/device\\S*" : "https://\\S*/oauth/authorize\\?\\S+");
                 Pattern code = Pattern.compile("one-time code[^\\n]*\\n\\s*([A-Z0-9][A-Z0-9-]{4,15})");
                 try (InputStream in = p.getInputStream()) {
@@ -554,7 +778,7 @@ final class Account {
                             if (m.find()) {
                                 url = m.group();
                                 state = Uri.parse(url).getQueryParameter("state");
-                                // a device flow (Codex, Grok) also needs its code before the screen is useful
+                                // a device flow (Codex, Grok, Copilot) also needs its code before the screen is useful
                                 if (!device) set(Step.WAITING_BROWSER, "");
                             }
                         }
@@ -648,14 +872,17 @@ final class Account {
         }).start();
     }
 
-    /** Signs out of the plan (or the account). API key services stay (Settings → API keys). */
+    /** Signs out of the plan (or the account). Services saved in Buddy stay (Settings → Agents and models). */
     void logout(Context c) {
         final Context app = c.getApplicationContext();
         new Thread(() -> {
             try {
                 if (agy()) Linux.exec(app, "rm -f " + AGY_TOKEN, 60); // agy only signs out from its own screen (/logout)
                 else if (grok()) Linux.exec(app, GROK_BIN + " logout", 60);
-                else if (!opencode()) Linux.exec(app, claude() ? "claude auth logout" : "codex logout", 60);
+                // Copilot has no sign-out command: its saved login goes (the GitHub CLI's, if any, stays)
+                else if (copilot()) Linux.exec(app, "f=" + COPILOT_CONFIG + "; [ -f $f ] && sed '/^ *\\/\\//d' $f"
+                        + " | jq 'del(.authTokens, .loggedInUsers, .lastLoggedInUser)' > $f.new && mv $f.new $f", 60);
+                else if (claude() || "codex".equals(agent)) Linux.exec(app, claude() ? "claude auth logout" : "codex logout", 60);
                 // a token signs Claude Code in as well: signing out takes it away too
                 if (claude()) Linux.exec(app, CLAUDE_SETTINGS + "jq 'del(.env.CLAUDE_CODE_OAUTH_TOKEN) | if (.env // {}) == {} "
                         + "then del(.env) else . end' $f > $f.new && mv $f.new $f", 60);
@@ -665,7 +892,7 @@ final class Account {
         }).start();
     }
 
-    /** "API key · DeepSeek, OpenRouter": the services this agent can use, for when it has no plan. */
+    /** "Services · DeepSeek, OpenRouter": the services this agent can use, for when it has no plan. */
     private String keyPlan() {
         StringBuilder b = new StringBuilder();
         for (Providers.P p : Providers.forAgent(agent)) b.append(b.length() == 0 ? "" : ", ").append(p.name);

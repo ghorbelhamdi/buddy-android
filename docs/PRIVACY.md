@@ -2,7 +2,7 @@
 
 *Last updated: 22 October 2026*
 
-Buddy is an open-source Android app (Apache 2.0) by Hamdi Ghorbel. It lets an AI agent of your choice (Claude Code, Codex, OpenCode, Antigravity or Grok) use your phone's apps for you. This policy explains what data Buddy handles. The source code is public at https://github.com/ghorbelhamdi/buddy-android, so every statement here can be checked.
+Buddy is an open-source Android app (Apache 2.0) by Hamdi Ghorbel. It lets an AI agent of your choice (Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot or Pi) use your phone's apps for you. This policy explains what data Buddy handles. The source code is public at https://github.com/ghorbelhamdi/buddy-android, so every statement here can be checked.
 
 ## Buddy has no servers
 
@@ -36,6 +36,8 @@ The agent runs inside the app and talks directly to its own provider. What you t
 - **OpenCode:** the provider of the model you pick (by default OpenCode's free models). See https://opencode.ai
 - **Antigravity:** Google, under your Google account. See https://policies.google.com/privacy
 - **Grok:** xAI, under your Grok account. See https://x.ai/legal/privacy-policy
+- **Copilot:** GitHub, under your GitHub account. See https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement
+- **Pi:** the provider you connect to it (for example Anthropic, OpenAI or GitHub), under that account or API key. See that provider's policy, and https://pi.dev
 
 You sign in with these services yourself; Buddy never sees your passwords. Their own privacy policies apply to what they receive.
 

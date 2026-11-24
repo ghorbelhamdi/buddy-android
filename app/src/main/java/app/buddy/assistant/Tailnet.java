@@ -97,7 +97,7 @@ final class Tailnet {
         if (n.isEmpty()) n = c.getString(R.string.setup_tailnet_computer, devices(c).size() + 1);
         if (!pairing.compareAndSet(false, true)) return null;
         try {
-            String answer = svc.askConfirm(c.getString(R.string.tools_card_pair, n, from.getHostAddress()), false);
+            String answer = WebDevices.askOnPhone(svc, c.getString(R.string.tools_card_pair, n, from.getHostAddress()));
             if (!answer.startsWith("APPROVED")) return null;
             // the computer gave up waiting (or its connection was closed): a key nobody receives isn't made
             java.util.function.BooleanSupplier gone = McpServer.CALLER_GONE.get();
@@ -130,7 +130,7 @@ final class Tailnet {
      * Tailscale's range (100.64.0.0/10) on a VPN network counts: carriers hand out that range on mobile data too.
      */
     static InetAddress address(Context c) {
-        if (!Prefs.tailnetTools(c)) return null;
+        if (!Prefs.tailnetTools(c) && !WebDevices.on(c)) return null; // (Other devices use it too)
         try {
             ConnectivityManager cm = c.getSystemService(ConnectivityManager.class);
             for (Network n : cm.getAllNetworks()) {
@@ -146,6 +146,11 @@ final class Tailnet {
         } catch (Exception ignored) {
         }
         return null;
+    }
+
+    /** Is this address in Tailscale's range? */
+    static boolean inRange(InetAddress a) {
+        return a instanceof Inet4Address && cgnat(a.getAddress());
     }
 
     private static boolean cgnat(byte[] b) {

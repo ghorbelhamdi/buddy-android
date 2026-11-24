@@ -1,0 +1,4 @@
+{"buddy_session":"fixture","model":"","subtype":"init","type":"system"}
+{"buddy_session":"fixture","model":"gpt-6-luna","subtype":"model","type":"system"}
+{"buddy_session":"fixture","message":{"content":[{"text":"hello","type":"text"}]},"type":"assistant"}
+{"buddy_session":"fixture","result":"","subtype":"success","type":"result"}

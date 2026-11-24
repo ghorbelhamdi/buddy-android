@@ -1,0 +1,5 @@
+{"buddy_session":"fixture","session_id":"01a20a1a-a5cc-73ac-a59d-64b79c9c1485","subtype":"init","type":"system"}
+{"buddy_session":"fixture","model":"stub/stub","subtype":"model","type":"system"}
+{"buddy_session":"fixture","message":{"content":[{"text":"ok","type":"text"}]},"type":"assistant"}
+{"buddy_session":"fixture","model":"stub/stub","subtype":"model","type":"system"}
+{"buddy_session":"fixture","result":"","subtype":"success","type":"result"}

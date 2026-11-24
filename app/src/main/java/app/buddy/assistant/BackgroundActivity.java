@@ -25,6 +25,8 @@ public class BackgroundActivity extends Screen {
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
+        // from the lock's "allow it on this Wi-Fi" notification: once more, so Android's question shows now
+        if (getIntent().getBooleanExtra("debug_lock_again", false)) DebugLock.changed(BuddyService.get());
         LinearLayout root = column(this);
         root.setBackgroundColor(BG);
         LinearLayout top = row(this);
@@ -226,6 +228,42 @@ public class BackgroundActivity extends Screen {
                 Prefs.backgroundRestart(this), on -> Background.setRestart(this, on));
         again.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
         body.addView(again, full());
+        // off right now: said here too, not only in a notification, with the way to turn it on
+        if (Background.setUp(this) && !DebugLock.on(this)) {
+            LinearLayout warn = column(this);
+            warn.setBackground(outlined(this, CARD, 16, ERR, 1));
+            warn.setPaddingRelative(dp(this, 14), dp(this, 12), dp(this, 14), dp(this, 12));
+            warn.addView(title(this, getString(R.string.debug_lock_off_title), 15));
+            TextView wt = text(this, getString(R.string.debug_lock_settings_text), 13, MUTED);
+            wt.setPaddingRelative(0, dp(this, 4), 0, dp(this, 10));
+            warn.addView(wt);
+            android.widget.Button on = button(this, getString(R.string.debug_lock_turn_on), true);
+            on.setOnClickListener(v -> {
+                DebugLock.changed(BuddyService.get()); // one more try: Android's question comes up if it has one
+                v.postDelayed(this::recreate, 6000); // (it tries after a moment, and the phone answers after another)
+            });
+            warn.addView(on, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 40)));
+            LinearLayout.LayoutParams wp = full();
+            wp.topMargin = dp(this, 8);
+            wp.bottomMargin = dp(this, 8);
+            body.addView(protect(warn), wp);
+        }
+        // the phone switches Wireless debugging off now and then; without it the helper can't be started again
+        LinearLayout lock = switchRow(this, getString(R.string.debug_lock), getString(R.string.debug_lock_info),
+                Prefs.debugLock(this), on -> {
+                    Prefs.setDebugLock(this, on);
+                    DebugLock.changed(BuddyService.get());
+                });
+        lock.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
+        body.addView(lock, full());
+        // a video that plays by itself on a hidden screen would be heard through the speaker
+        LinearLayout mute = switchRow(this, getString(R.string.background_mute), getString(R.string.background_mute_info),
+                Prefs.muteHidden(this), on -> {
+                    Prefs.setMuteHidden(this, on);
+                    HiddenMute.check(this);
+                });
+        mute.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
+        body.addView(mute, full());
         // phone commands (issue #22): the agent's own command line on the phone, through the same helper
         TextView pc = sectionLabel(this, getString(R.string.background_shell));
         body.addView(pc, gap(18));

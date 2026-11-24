@@ -19,7 +19,7 @@ import android.widget.Toast;
 import static app.buddy.assistant.Ui.*;
 
 /**
- * Install an agent (Claude Code, Codex, OpenCode, Antigravity or Grok) in Buddy's built-in Linux and sign in: one
+ * Install an agent (Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot or Pi) in Buddy's built-in Linux and sign in: one
  * button, approve in the browser, done. OpenCode needs no sign-in; its providers are connected in Buddy's terminal.
  */
 public class SignInActivity extends Screen implements Account.Listener {
@@ -76,10 +76,26 @@ public class SignInActivity extends Screen implements Account.Listener {
         render();
     }
 
+    /** Pi's Claude sign-in waiting for the page's code: the state it ends with, and what takes the code. */
+    private String piState;
+    private java.util.function.Consumer<String> piCode;
+
     /** Coming back from the browser with the code copied: use it. */
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
+        if (hasFocus && piCode != null && piState != null) { // Pi's sign-in to Claude: the same kind of code
+            try {
+                ClipData clip = getSystemService(ClipboardManager.class).getPrimaryClip();
+                if (clip != null && clip.getItemCount() > 0) {
+                    java.util.regex.Matcher m = java.util.regex.Pattern.compile("[A-Za-z0-9_\\-]{16,}#"
+                            + java.util.regex.Pattern.quote(piState)).matcher(clip.getItemAt(0).coerceToText(this));
+                    if (m.find()) piCode.accept(m.group());
+                }
+            } catch (Exception ignored) {
+            }
+            return;
+        }
         if (!hasFocus || !acc.waitingForCode()) return;
         try {
             ClipData clip = getSystemService(ClipboardManager.class).getPrimaryClip();
@@ -105,11 +121,15 @@ public class SignInActivity extends Screen implements Account.Listener {
                         : acc.opencode() ? R.string.signin_install_sub_opencode
                         : acc.agy() ? R.string.signin_install_sub_agy
                         : acc.grok() ? R.string.signin_install_sub_grok
+                        : acc.copilot() ? R.string.signin_install_sub_copilot
+                        : acc.pi() ? R.string.signin_install_sub_pi
                         : R.string.signin_install_sub_codex), false);
                 note(Ui.downloadNote(this, getString(acc.claude() ? R.string.signin_install_size_claude
                         : acc.opencode() ? R.string.signin_install_size_opencode
                         : acc.agy() ? R.string.signin_install_size_agy
                         : acc.grok() ? R.string.signin_install_size_grok
+                        : acc.copilot() ? R.string.signin_install_size_copilot
+                        : acc.pi() ? R.string.signin_install_size_pi
                         : R.string.signin_install_size_codex)));
                 primary(getString(R.string.signin_install, acc.name()), v -> acc.install(this));
                 break;
@@ -124,19 +144,30 @@ public class SignInActivity extends Screen implements Account.Listener {
                     openCodeReady();
                     break;
                 }
+                if (acc.pi()) {
+                    piProviders(false);
+                    break;
+                }
                 header(R.drawable.ms_shield_person, getString(acc.claude() ? R.string.signin_title_claude
                                 : acc.agy() ? R.string.signin_title_google : acc.grok() ? R.string.signin_title_grok
-                                : R.string.signin_title_chatgpt),
+                                : acc.copilot() ? R.string.signin_title_github : R.string.signin_title_chatgpt),
                         getString(acc.claude() ? R.string.signin_sub_claude : acc.agy() ? R.string.signin_sub_agy
-                                : acc.grok() ? R.string.signin_sub_grok : R.string.signin_sub_chatgpt), false);
+                                : acc.grok() ? R.string.signin_sub_grok : acc.copilot() ? R.string.signin_sub_copilot
+                                : R.string.signin_sub_chatgpt), false);
                 primary(getString(acc.claude() ? R.string.signin_with_claude : acc.agy() ? R.string.signin_with_google
-                        : acc.grok() ? R.string.signin_with_grok : R.string.signin_with_chatgpt), v -> acc.startLogin(this));
-                secondary(getString(acc.pastesCode() || acc.grok() ? R.string.signin_other_device : R.string.signin_with_code), v -> {
+                        : acc.grok() ? R.string.signin_with_grok : acc.copilot() ? R.string.signin_with_github
+                        : R.string.signin_with_chatgpt), v -> acc.startLogin(this));
+                // Copilot's sign-in already shows its code and link, for this device or another one
+                if (!acc.copilot()) secondary(getString(acc.pastesCode() || acc.grok() ? R.string.signin_other_device
+                        : R.string.signin_with_code), v -> {
                     pasteOpen = true;
                     acc.startLogin(this, true);
                 });
                 if (acc.claude()) secondary(getString(R.string.signin_token), v -> tokenSheet()); // issue #19
-                if (acc.claude() || "codex".equals(acc.agent)) secondary(getString(R.string.signin_api_key), v -> apiKeys());
+                // a key at another service, or a server of your own: added like any connection
+                if (acc.claude() || "codex".equals(acc.agent)) secondary(getString(R.string.signin_api_key),
+                        v -> startActivity(new Intent(this, AddConnectionActivity.class)
+                                .putExtra(AddConnectionActivity.EXTRA_TAB, AddConnectionActivity.KEYS)));
                 break;
             case WAITING_BROWSER:
                 if (acc.url == null) {
@@ -168,6 +199,10 @@ public class SignInActivity extends Screen implements Account.Listener {
                     openCodeReady();
                     break;
                 }
+                if (acc.pi()) {
+                    piProviders(true);
+                    break;
+                }
                 boolean keyOnly = (acc.claude() || "codex".equals(acc.agent)) && acc.apiKey && !acc.planIn;
                 header(R.drawable.ms_check, getString(keyOnly ? R.string.signin_key_only : R.string.signin_signed_in), (acc.email.isEmpty()
                         ? getString(R.string.signin_agent_ready, acc.name()) : acc.email)
@@ -182,8 +217,11 @@ public class SignInActivity extends Screen implements Account.Listener {
                 if (acc.token) note(getString(R.string.signin_token_on));
                 primary(getString(R.string.signin_done), v -> finish());
                 updateButton();
-                if (keys) secondary(getString(R.string.signin_api_keys), v -> apiKeys());
-                if (acc.planIn || acc.token || !keys) {
+                // only when it runs on services: the button goes to the one it uses (not back to the list it came from)
+                if (keys && acc.apiKey) secondary(getString(R.string.signin_api_keys), v -> services());
+                // signed in through the GitHub CLI only: that sign-in is GitHub's (Settings > GitHub), not Copilot's
+                if (acc.copilot() && acc.viaGh) note(getString(R.string.signin_copilot_via_gh));
+                else if (acc.planIn || acc.token || !keys) {
                     secondary(getString(R.string.signin_sign_out), v -> confirmSheet(this, getString(R.string.signin_sign_out_title, acc.name()),
                             getString(R.string.signin_sign_out_text, acc.name()), getString(R.string.signin_sign_out), true,
                             () -> acc.logout(this)));
@@ -228,6 +266,152 @@ public class SignInActivity extends Screen implements Account.Listener {
                 .putExtra("run", acc.opencode2 ? "opencode auth login --standalone" : "opencode auth login")));
     }
 
+    /** Pi has no models of its own: it signs in to a provider the user picks (their Claude, ChatGPT or Copilot plan, an
+     *  API key) with /login in its own screen, which runs in Buddy's terminal. connected: one is there already. */
+    private void piProviders(boolean ready) {
+        // ready with no provider of its own: it's there for the services saved in Buddy, and can still get one
+        boolean connected = ready && acc.planIn;
+        header(connected ? R.drawable.ms_check : R.drawable.ms_shield_person,
+                getString(connected ? R.string.signin_pi_ready : R.string.signin_pi_connect_title),
+                connected ? getString(R.string.signin_pi_connected, acc.plan) : getString(R.string.signin_pi_connect_text), connected);
+        note(getString(R.string.signin_pi_connect_note, "/login", "/logout"));
+        if (ready && acc.apiKey) note(getString(connected ? R.string.signin_services_also : R.string.signin_api_key_on, acc.name()));
+        versionNote();
+        Runnable open = () -> startActivity(new Intent(this, TerminalActivity.class).putExtra("run", "pi"));
+        if (ready) primary(getString(R.string.signin_done), v -> finish());
+        // the plans Pi signs in to with a page and a code: here, without Pi's own screen (see PiSignIn)
+        // (one it's signed in to already isn't offered again: /logout in Pi's own screen removes it)
+        if (!acc.piPlan("anthropic")) secondary(getString(R.string.signin_pi_with, "Claude"), v -> piSheet("anthropic", "Claude"));
+        if (!acc.piPlan("openai-codex")) secondary(getString(R.string.signin_pi_with, "ChatGPT"), v -> piSheet("openai-codex", "ChatGPT"));
+        if (!acc.piPlan("github-copilot"))
+            secondary(getString(R.string.signin_pi_with, "GitHub Copilot"), v -> piSheet("github-copilot", "GitHub Copilot"));
+        secondary(getString(R.string.signin_pi_other), v -> open.run()); // API keys and every other provider
+        if (ready) updateButton();
+    }
+
+    private LinearLayout.LayoutParams piGap(int top) {
+        LinearLayout.LayoutParams p = full();
+        p.topMargin = dp(this, top);
+        return p;
+    }
+
+    /** Signs Pi in to a plan: the page and its code, or the page and a field for the code it shows (Claude). */
+    private void piSheet(String provider, String name) {
+        LinearLayout c = column(this);
+        c.addView(title(this, getString(R.string.signin_pi_with, name), 18));
+        TextView status = text(this, getString(R.string.signin_pi_starting), 14, MUTED);
+        c.addView(status, piGap(8));
+        TextView code = monoText(this, "", 30, TEXT);
+        code.setVisibility(View.GONE);
+        c.addView(code, piGap(10));
+        android.widget.Button openPage = button(this, getString(R.string.signin_pi_open_page), true);
+        openPage.setVisibility(View.GONE);
+        c.addView(openPage, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(this, 52)));
+        android.widget.EditText paste = new android.widget.EditText(this);
+        paste.setHint(R.string.signin_pi_paste_hint);
+        paste.setHintTextColor(MUTED);
+        paste.setTextColor(TEXT);
+        paste.setSingleLine(true);
+        paste.setBackground(outlined(this, BG, 12, OUTLINE, 1));
+        paste.setPaddingRelative(dp(this, 12), dp(this, 12), dp(this, 12), dp(this, 12));
+        paste.setVisibility(View.GONE);
+        c.addView(paste, piGap(10));
+        android.widget.Button sendCode = button(this, getString(R.string.signin_pi_send_code), true);
+        sendCode.setVisibility(View.GONE);
+        c.addView(sendCode, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(this, 52)));
+        android.app.Dialog d = bottomSheet(this, protect(c));
+        final PiSignIn[] run = new PiSignIn[1];
+        d.setOnDismissListener(x -> {
+            piCode = null;
+            piState = null;
+            BuddyService svc = BuddyService.get();
+            if (svc != null) svc.stopCodeWatch();
+            if (run[0] != null) run[0].cancel();
+        });
+        d.show();
+        try {
+            run[0] = PiSignIn.start(this, provider, new PiSignIn.Listener() {
+                @Override
+                public void link(String url, String shown) {
+                    // Claude's page ends with "code#state": the state is in the page's address
+                    java.util.regex.Matcher st = java.util.regex.Pattern.compile("[?&]state=([A-Za-z0-9_\\-]+)").matcher(url);
+                    if (shown == null && st.find()) piState = st.group(1);
+                    runOnUiThread(() -> {
+                        status.setText(shown != null ? getString(R.string.signin_pi_enter_code) : getString(R.string.signin_pi_copy_code));
+                        if (shown != null) {
+                            code.setText(shown);
+                            code.setVisibility(View.VISIBLE);
+                        }
+                        openPage.setVisibility(View.VISIBLE);
+                        openPage.setOnClickListener(v -> {
+                            if (shown != null) { // the page wants it typed: it's on the clipboard
+                                getSystemService(android.content.ClipboardManager.class)
+                                        .setPrimaryClip(android.content.ClipData.newPlainText("code", shown));
+                            }
+                            startActivity(new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url)));
+                        });
+                    });
+                }
+
+                @Override
+                public void wantsCode() {
+                    runOnUiThread(() -> {
+                        paste.setVisibility(View.VISIBLE);
+                        sendCode.setVisibility(View.VISIBLE);
+                        java.util.function.Consumer<String> take = got -> {
+                            if (got.isEmpty() || !sendCode.isEnabled()) return;
+                            piCode = null; // once
+                            paste.setText(got);
+                            sendCode.setEnabled(false);
+                            status.setText(R.string.signin_pi_checking);
+                            new Thread(() -> run[0].send(got)).start();
+                        };
+                        piCode = take; // copied on the page, back here: it goes by itself (see onWindowFocusChanged)
+                        // or straight from Anthropic's page, as Claude Code's own sign-in does: Buddy reads the screen
+                        BuddyService svc = BuddyService.get();
+                        if (svc != null && piState != null) svc.watchForCode(java.util.regex.Pattern.compile(
+                                "[A-Za-z0-9_\\-]{16,}#" + java.util.regex.Pattern.quote(piState)), got -> {
+                            take.accept(got);
+                            // back to Buddy, where the sheet says how it went
+                            startActivity(new Intent(SignInActivity.this, SignInActivity.class).putExtra("agent", acc.agent)
+                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
+                        });
+                        sendCode.setOnClickListener(v -> take.accept(paste.getText().toString().trim()));
+                    });
+                }
+
+                @Override
+                public void done(String error) {
+                    // Pi's own word on it, whatever the run printed
+                    String check;
+                    try {
+                        check = Linux.exec(SignInActivity.this, "pi auth check --provider " + provider + " 2>&1", 60);
+                    } catch (Exception e) {
+                        check = String.valueOf(e.getMessage());
+                    }
+                    final boolean ready = java.util.regex.Pattern.compile("(?m)^ready\\s*$").matcher(check).find();
+                    final String why = error != null ? error : check.replaceAll("\\[exit \\d+\\]", "").trim();
+                    runOnUiThread(() -> {
+                        if (ready) {
+                            d.setOnDismissListener(null);
+                            d.dismiss();
+                            android.widget.Toast.makeText(SignInActivity.this, getString(R.string.signin_pi_signed_in, name),
+                                    android.widget.Toast.LENGTH_LONG).show();
+                            acc.refresh(SignInActivity.this);
+                        } else {
+                            status.setText(getString(R.string.signin_pi_failed, why)); // Pi's own words
+                            openPage.setVisibility(View.GONE);
+                            sendCode.setVisibility(View.GONE);
+                            paste.setVisibility(View.GONE);
+                        }
+                    });
+                }
+            });
+        } catch (Exception e) {
+            status.setText(getString(R.string.signin_pi_failed, String.valueOf(e.getMessage())));
+        }
+    }
+
     /** The installed version, and what the last update did. */
     private void versionNote() {
         if (!acc.updateNote.isEmpty()) note(acc.updateNote);
@@ -240,7 +424,8 @@ public class SignInActivity extends Screen implements Account.Listener {
                 v -> acc.update(this));
     }
 
-    /** Sign in on another device: show the link (and Codex's or Grok's code) to use anywhere; nothing opens here. */
+    /** Sign in on another device: show the link (and Codex's, Grok's or Copilot's code) to use anywhere; nothing opens
+     *  here. Copilot always signs in so: GitHub's page wants its code typed. */
     private void remoteSignIn() {
         final String link = acc.url;
         if (acc.pastesCode()) {
@@ -248,7 +433,8 @@ public class SignInActivity extends Screen implements Account.Listener {
                     getString(acc.agy() ? R.string.signin_remote_agy : R.string.signin_remote_claude), false);
         } else {
             header(R.drawable.ms_shield_person, getString(acc.grok() ? R.string.signin_other_device : R.string.signin_enter_code),
-                    getString(acc.grok() ? R.string.signin_remote_grok : R.string.signin_remote_codex), false);
+                    getString(acc.grok() ? R.string.signin_remote_grok : acc.copilot() ? R.string.signin_remote_copilot
+                            : R.string.signin_remote_codex), false);
             TextView code = monoText(this, acc.userCode == null ? "…" : acc.userCode, 34, TEXT);
             code.setTypeface(mono(this, 600));
             code.setLetterSpacing(0.08f);
@@ -264,7 +450,7 @@ public class SignInActivity extends Screen implements Account.Listener {
             LinearLayout.LayoutParams ccp = wrap();
             ccp.topMargin = dp(this, 8);
             body.addView(copyCode, ccp);
-            if (!acc.grok()) { // Codex's code works for 15 minutes; Grok doesn't say how long its code does
+            if (!acc.grok()) { // Codex's and GitHub's codes work for 15 minutes; Grok doesn't say how long its code does
                 TextView exp = text(this, getString(R.string.signin_code_expiry), 13, MUTED);
                 exp.setPaddingRelative(0, dp(this, 6), 0, 0);
                 body.addView(exp);
@@ -291,6 +477,8 @@ public class SignInActivity extends Screen implements Account.Listener {
         btns.addView(share, sp);
         Button here = button(this, getString(R.string.signin_open_here), false);
         here.setOnClickListener(v -> {
+            // GitHub's page asks for the code: have it ready to paste
+            if (acc.copilot()) copy(acc.userCode, getString(R.string.signin_code_copied));
             try {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
             } catch (Exception e) {
@@ -414,8 +602,16 @@ public class SignInActivity extends Screen implements Account.Listener {
         d.show();
     }
 
-    private void apiKeys() {
-        startActivity(new Intent(this, ApiKeysActivity.class));
+    /** The services saved in Buddy: listed, and added, on Settings → Agents and models. */
+    private void services() {
+        // the service this agent's chats use by default has a screen of its own; else the list
+        String d = Models.agentDefault(acc.agent);
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("^@([a-z0-9-]+)/").matcher(d == null ? "" : d);
+        if (m.find() && Providers.find(m.group(1)) != null) {
+            startActivity(new Intent(this, ConnectionActivity.class).putExtra("id", m.group(1)));
+            return;
+        }
+        startActivity(new Intent(this, SetupActivity.class).putExtra("page", "agents"));
     }
 
     // ------------------------------------------------------------ pieces

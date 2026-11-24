@@ -1,0 +1,1822 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<title>Buddy</title>
+<style>
+:root{--bg:#121110;--side:#171614;--card:#1D1B19;--card2:#262320;--line:#2A2724;--text:#F3EFE8;--muted:#A39D93;--soft:#C9C3B9;
+  --accent:#4F8BFF;--accent-text:#8FB4FF;--bubble:#22314F;--bubble-text:#EEF3FF;--err:#F0A090;--err-bg:#3A2220;--ok:#5CC08A;--shadow:0 8px 28px rgba(0,0,0,.45)}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){--bg:#FAF8F4;--side:#F3EFE8;--card:#FFFFFF;--card2:#F1EDE6;--line:#E3DDD3;--text:#1B1916;--muted:#6B655C;--soft:#4A453E;
+  --accent:#2F6FE4;--accent-text:#1F56C0;--bubble:#DDE8FF;--bubble-text:#14233F;--err:#B3261E;--err-bg:#FBE4E1;--ok:#1E8A52;--shadow:0 8px 28px rgba(60,50,30,.16)}}
+:root[data-theme="light"]{--bg:#FAF8F4;--side:#F3EFE8;--card:#FFFFFF;--card2:#F1EDE6;--line:#E3DDD3;--text:#1B1916;--muted:#6B655C;--soft:#4A453E;
+  --accent:#2F6FE4;--accent-text:#1F56C0;--bubble:#DDE8FF;--bubble-text:#14233F;--err:#B3261E;--err-bg:#FBE4E1;--ok:#1E8A52;--shadow:0 8px 28px rgba(60,50,30,.16)}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,a:focus-visible,textarea:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+[hidden]{display:none!important}
+.btn{border-radius:12px;min-height:40px;padding:0 16px;background:var(--card2);font-weight:600}
+.btn:hover{filter:brightness(1.12)}
+.btn.small{min-height:34px;padding:0 12px;font-size:13.5px;border-radius:10px;flex:none}
+.btn.primary{background:var(--accent);color:#fff}
+.grow{flex:1}
+.btn.deny{background:var(--err-bg);color:var(--err)}
+.muted{color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+svg{display:block}
+
+/* ---------- the two panes: each scrolls by itself, the page never does */
+.shell{display:flex;height:100vh;height:100dvh}
+aside{flex:0 0 320px;min-width:0;display:flex;flex-direction:column;min-height:0;background:var(--side);border-right:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;padding:16px 16px 10px 20px}
+.brand b{font-size:19px;letter-spacing:-.2px}
+.status{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;min-width:0}
+.status span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dot{flex:none;width:8px;height:8px;border-radius:4px;background:var(--ok)}
+.dot.off{background:var(--err)}
+.theme{flex:none;width:36px;height:36px;border-radius:18px;display:flex;align-items:center;justify-content:center;color:var(--muted);margin-inline-start:auto}
+.theme:hover{background:var(--card2);color:var(--text)}
+.new{margin:4px 12px 8px;display:flex;align-items:center;gap:10px;min-height:44px;padding:0 14px;border-radius:14px;background:var(--card2);font-weight:600;text-align:start}
+.new:hover{filter:brightness(1.12)}
+nav{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:0 8px 16px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+nav h2{font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin:16px 12px 6px;font-weight:600}
+nav a{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border-radius:12px;color:var(--text);text-decoration:none}
+nav a:hover{background:var(--card)}
+nav a.on,nav a.on:hover{background:none}
+nav a .b{flex:1;min-width:0}
+nav a .t,nav a .s{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+nav a .t{font-weight:600}
+nav a .s{font-size:13px;color:var(--muted)}
+nav a .w{flex:none;font-size:12px;color:var(--muted);padding-top:2px}
+nav a.wait .s{color:var(--accent-text)}
+.pulse{flex:none;width:8px;height:8px;border-radius:4px;background:var(--accent);margin-top:7px;animation:pulse 1.4s ease-in-out infinite}
+.pulse.ask{animation:none}
+@keyframes pulse{50%{opacity:.25}}
+
+.chat{flex:1;min-width:0;display:flex;flex-direction:column;position:relative}
+.head{display:flex;align-items:center;gap:10px;min-height:56px;padding:8px 20px;border-bottom:1px solid var(--line)}
+.head h1{margin:0;font-size:17px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.chip{flex:none;font-size:12px;font-weight:600;color:var(--soft);background:var(--card2);border-radius:999px;padding:3px 10px}
+.back{display:none;flex:none;width:40px;height:40px;border-radius:20px;align-items:center;justify-content:center;margin-inline-start:-8px}
+.back:hover{background:var(--card)}
+#pane{flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+#pane:focus{outline:none}
+.col{width:100%;max-width:800px;margin:0 auto;padding:0 20px}
+#col{display:flex;flex-direction:column;gap:14px;min-height:100%;padding-top:20px;padding-bottom:24px;overflow-wrap:anywhere}
+.dock{padding-bottom:max(16px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}
+#cards{display:flex;flex-direction:column;gap:10px}
+#cards:empty{display:none}
+.jump{position:absolute;left:50%;transform:translateX(-50%);bottom:100px;display:none;align-items:center;justify-content:center;width:40px;height:40px;border-radius:20px;
+  background:var(--card2);border:1px solid var(--line);box-shadow:var(--shadow)}
+.jump:hover{filter:brightness(1.15)}
+.jump svg{transform:rotate(180deg)}
+.jump.show{display:flex}
+
+/* ---------- messages */
+.mine .user{align-self:flex-end}
+.user{align-self:flex-end;max-width:min(78%,620px);background:var(--bubble);color:var(--bubble-text);border-radius:20px 20px 6px 20px;padding:10px 16px;white-space:pre-wrap}
+.user .lab{display:block;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;opacity:.7;margin-bottom:2px}
+.user.fold .tx{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.more{display:block;margin-top:4px;font-size:13px;font-weight:600;color:var(--accent-text);padding:0}
+.acts{display:flex;gap:2px;margin-top:-8px}
+.acts.own{align-self:flex-end;opacity:0;transition:opacity .12s}
+.mine{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.mine:hover .acts.own,.mine:focus-within .acts.own{opacity:1}
+@media (hover:none){.acts.own{opacity:1}}
+.find{display:flex;gap:6px;padding:0 12px 6px}
+.find input{flex:1;min-width:0;min-height:38px;border-radius:12px;font-size:14px}
+.filters{display:flex;gap:6px;padding:0 12px 6px;flex-wrap:wrap}
+.filters button{min-height:30px;padding:0 12px;border-radius:15px;font-size:13px;font-weight:600;color:var(--muted);background:none;border:1px solid var(--line)}
+.filters button.on{color:var(--text);background:var(--card2);border-color:transparent}
+.item{display:flex;align-items:center;border-radius:12px}
+.item:hover{background:var(--card)}
+.item.on,.item.on:hover{background:var(--line)}
+.item a{flex:1;min-width:0}
+.item a:hover,.item a.on{background:none}
+.item .menu{flex:none;width:32px;height:36px;border-radius:10px;color:var(--muted);opacity:0;font-size:18px;line-height:1}
+.item:hover .menu,.item .menu:focus-visible{opacity:1}
+@media (hover:none){.item .menu{opacity:1}}
+.item .menu:hover{background:var(--card2);color:var(--text)}
+.unread .t::after{content:"";display:inline-block;width:7px;height:7px;border-radius:4px;background:var(--accent);margin-inline-start:6px;vertical-align:middle}
+.sheet textarea{min-height:120px;max-height:50vh;height:auto;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--bg);overflow-y:auto;margin:0 6px}
+.acts button{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.acts button:hover{background:var(--card);color:var(--text)}
+.user .q,.quote{border-inline-start:3px solid var(--accent);padding:2px 0 2px 10px;color:var(--soft);font-size:14px;white-space:pre-wrap}
+.user .q{margin-bottom:6px;opacity:.85;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.quotebox{display:flex;align-items:flex-start;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 8px 10px 12px}
+.quotebox .quote{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.quotebox button{flex:none;width:30px;height:30px;border-radius:15px;color:var(--muted)}
+.quotebox button:hover{background:var(--card2);color:var(--text)}
+.model{flex:none;max-width:42%;height:40px;padding:0 10px;border-radius:12px;display:flex;align-items:center;gap:4px;font-size:13px;color:var(--soft)}
+.model:hover{background:var(--card2)}
+.model span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+button.chip{cursor:pointer;display:flex;align-items:center;gap:4px}
+button.chip.tog{color:var(--muted)}
+button.chip.tog.on{color:var(--accent-text);background:color-mix(in srgb,var(--accent) 16%,transparent)}
+.setup{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:22px}
+.setup button{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:14px;background:var(--card);border:1px solid var(--line);font-size:14px}
+.setup button:hover{background:var(--card2)}
+.setup button small{font-size:12px;color:var(--muted);display:block;text-align:start;line-height:1.2}
+.setup button b{font-weight:600;display:block;text-align:start;line-height:1.3}
+.setup .sw{flex:none;width:34px;height:20px;border-radius:10px;background:var(--line);position:relative}
+.setup .sw::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:8px;background:var(--muted)}
+.setup .on .sw{background:var(--accent)}
+.setup .on .sw::after{left:16px;background:#fff}
+button.chip:hover{filter:brightness(1.15)}
+.pop{position:fixed;z-index:20;min-width:170px;padding:6px;border-radius:14px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column}
+.pop button{min-height:38px;padding:0 12px;border-radius:9px;text-align:start;font-size:14px}
+.pop button:hover,.pop button:focus-visible{background:var(--card2);outline:none}
+.pop .danger{color:var(--err)}
+.icon{font-size:20px;line-height:1;flex:none;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--soft)}
+.icon:hover{background:var(--card2);color:var(--text)}
+dialog{border:1px solid var(--line);border-radius:20px;background:var(--card);color:var(--text);padding:0;width:min(440px,calc(100vw - 32px));max-height:min(640px,calc(100vh - 48px));box-shadow:var(--shadow);overflow:hidden}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+.sheet{display:flex;flex-direction:column;gap:4px;padding:18px 14px 14px;overflow-y:auto;max-height:min(640px,calc(100vh - 48px));box-sizing:border-box;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.sheet h2{margin:2px 6px 10px;font-size:18px}
+.sheet h3{margin:18px 6px 6px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);font-weight:600}
+.sheet h2+h3,.sheet p+h3,.sheet .filter+h3{border-top:0;padding-top:0;margin-top:8px}
+.sheet p{margin:-4px 6px 10px;font-size:13px;color:var(--muted)}
+.sheet .filter{margin:0 6px 8px;min-height:40px}
+.opt{display:flex;align-items:center;gap:10px;min-height:42px;padding:6px 10px;border-radius:12px;text-align:start;width:100%}
+.opt:hover{background:var(--card2)}
+.opt .n{flex:1;min-width:0;overflow-wrap:anywhere}
+.opt .c{flex:none;color:var(--accent-text);visibility:hidden}
+.opt.on .c{visibility:visible}
+.sheet .line{display:flex;gap:8px;padding:0 6px}
+.sheet .line input{flex:1;min-width:0}
+.places{display:flex;flex-direction:column;gap:2px;padding:0 8px 6px}
+.places button{display:flex;align-items:center;gap:10px;min-height:38px;padding:0 12px;border-radius:12px;font-size:14px;color:var(--soft);text-align:start}
+.places button:hover{background:var(--card);color:var(--text)}
+.places button.on{background:var(--line);color:var(--text)}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:2px;font-size:14px;color:var(--muted);min-width:0}
+.crumbs button{padding:4px 6px;border-radius:8px;color:var(--soft)}
+.crumbs button:hover{background:var(--card);color:var(--text)}
+.crumbs button:last-child{color:var(--text);font-weight:600}
+.files{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.frow{display:flex;align-items:center;gap:12px;min-height:52px;padding:6px 8px 6px 14px;border-top:1px solid var(--line)}
+.frow:first-child{border-top:0}
+.frow:hover{background:var(--card2)}
+.frow .nm{flex:1;min-width:0;text-align:start;display:flex;align-items:center;gap:12px;padding:4px 0}
+.frow .nm>span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.frow .nm small{display:block;color:var(--muted);font-size:12px}
+.frow .tile{flex:none;width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--card2);color:var(--soft)}
+.frow .tile.dir{color:var(--accent-text);background:color-mix(in srgb,var(--accent) 16%,transparent)}
+.frow .ops{display:flex;gap:2px;opacity:0}
+.frow:hover .ops,.frow:focus-within .ops{opacity:1}
+@media (hover:none){.frow .ops{opacity:1}}
+.frow .ops button{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.frow .ops button:hover{background:var(--line);color:var(--text)}
+.ups{display:flex;flex-direction:column;gap:6px}
+.up{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:13px}
+.up .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.up progress{width:120px;accent-color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.shot{display:flex;flex-direction:column;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px;text-align:start;min-width:0}
+.shot:hover{border-color:var(--accent)}
+.shot .pic{aspect-ratio:9/19;border-radius:10px;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--muted);font-size:13px;text-align:center;padding:0 8px}
+.shot .pic img{width:100%;height:100%;object-fit:contain;display:block}
+.shot b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.shot small{color:var(--muted);font-size:12px;margin-top:-6px}
+.big{display:flex;justify-content:center}
+.big .pic{height:min(76vh,900px);max-width:100%;aspect-ratio:9/19;border-radius:18px;background:var(--bg);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--muted);text-align:center;padding:16px}
+.big img{width:100%;height:100%;object-fit:contain}
+.pcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.pcard .t{font-weight:600}
+.pcard .x{color:var(--soft);font-size:14px;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.pcard .w{color:var(--muted);font-size:13px}
+.tag{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:1px 6px;margin-inline-start:6px;vertical-align:middle}
+h2.sec{margin:8px 0 0;font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);font-weight:600}
+.clip{flex:none;width:40px;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;color:var(--muted);margin-inline-start:-12px}
+.clip:hover{background:var(--card2);color:var(--text)}
+.atts{display:flex;flex-wrap:wrap;gap:6px}
+.atts:empty{display:none}
+.att{display:flex;align-items:center;gap:6px;max-width:300px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:5px 6px 5px 10px;font-size:13px}
+.att span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.att.err{border-color:var(--err);color:var(--err)}
+.att progress{width:60px;accent-color:var(--accent)}
+.att button{flex:none;width:24px;height:24px;border-radius:12px;color:var(--muted);display:flex;align-items:center;justify-content:center}
+.mfiles{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.user .mfiles{justify-content:flex-end}
+.mfiles img{max-width:280px;max-height:240px;border-radius:12px;display:block;cursor:zoom-in;background:var(--card)}
+.user.bare{background:none;padding:0;border-radius:0}
+.days{display:flex;flex-wrap:wrap;gap:6px;padding:0 6px}
+.days button{min-width:44px;min-height:36px;border-radius:10px;border:1px solid var(--line);font-size:13px;font-weight:600;color:var(--muted)}
+.days button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.times{display:flex;flex-wrap:wrap;gap:6px;padding:0 6px;align-items:center}
+.times span{display:flex;align-items:center;gap:2px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:2px 2px 2px 8px}
+.times input{min-height:34px;border:0;background:none;padding:0}
+.times span button{width:28px;height:28px;border-radius:14px;color:var(--muted);display:flex;align-items:center;justify-content:center}
+.sheet textarea.big{width:auto;resize:vertical;font:inherit;color:var(--text)}
+.sheet select{font:inherit;min-height:40px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--text);padding:0 10px;margin:0 6px}
+.lightbox{width:min(1100px,calc(100vw - 32px));max-height:calc(100vh - 32px)}
+.lightbox .sheet{max-height:calc(100vh - 32px);align-items:center}
+.lightbox img{max-width:100%;max-height:calc(100vh - 140px);border-radius:12px;display:block;object-fit:contain}
+.mfiles .fchip{display:flex;align-items:center;gap:6px;max-width:240px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 10px;font-size:13px;color:var(--text)}
+.mfiles .fchip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.scrpanel{position:absolute;top:68px;right:16px;width:156px;z-index:5;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:6px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:4px}
+.scrpanel .pic{aspect-ratio:9/19;border-radius:11px;overflow:hidden;background:var(--bg);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;text-align:center;padding:0 6px;cursor:zoom-in}
+.scrpanel .pic img{width:100%;height:100%;object-fit:contain;display:block}
+.scrpanel .pb{display:flex;align-items:center;gap:2px;font-size:12px;color:var(--muted);padding:0 2px}
+.scrpanel .pb span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.scrpanel .pb button{flex:none;width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.scrpanel .pb button:hover{background:var(--card2);color:var(--text)}
+@media (max-width: 820px){.scrpanel{width:104px;top:64px;right:10px}}
+.chat.withpanel #col,.chat.withpanel .dock{padding-right:186px}
+@media (max-width: 820px){.chat.withpanel #col,.chat.withpanel .dock{padding-right:124px}}
+.shot .hb{display:flex;gap:6px}
+.shot .hb button{min-height:30px;padding:0 10px;border-radius:9px;font-size:12.5px;font-weight:600;background:var(--card2)}
+.shot .hb button:hover{filter:brightness(1.12)}
+.rate{font:inherit;font-size:13px;min-height:34px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text);padding:0 8px}
+.shell.view #quote,.shell.view #atts,.shell.view .composer,.shell.view #run{display:none}
+.buddy{max-width:100%}
+.buddy>*:first-child{margin-top:0}
+.buddy>*:last-child{margin-bottom:0}
+.buddy p{margin:0 0 10px;white-space:pre-wrap}
+.buddy h3,.buddy h4{margin:16px 0 6px;font-size:16px;line-height:1.3}
+.buddy h4{font-size:15px}
+.buddy ul,.buddy ol{margin:0 0 10px;padding-inline-start:22px}
+.buddy li{margin:2px 0;white-space:pre-wrap}
+.buddy a{color:var(--accent-text)}
+.buddy code{font:13px/1.4 ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;background:var(--card2);border-radius:6px;padding:1px 5px}
+.buddy pre{margin:0 0 10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;overflow-x:auto}
+.buddy pre code{background:none;padding:0;white-space:pre}
+.buddy blockquote{margin:0 0 10px;padding:2px 0 2px 12px;border-inline-start:3px solid var(--line);color:var(--soft);white-space:pre-wrap}
+.buddy hr{border:0;border-top:1px solid var(--line);margin:12px 0}
+.tbl{overflow-x:auto;margin:0 0 10px}
+.buddy table{border-collapse:collapse;font-size:14px}
+.buddy th,.buddy td{border:1px solid var(--line);padding:6px 10px;text-align:start;vertical-align:top}
+.buddy th{background:var(--card);font-weight:600}
+details.steps{background:var(--card);border-radius:14px;max-width:100%}
+details.steps summary{list-style:none;display:flex;align-items:center;gap:10px;min-height:44px;padding:0 14px;cursor:pointer;border-radius:14px;color:var(--soft);font-size:14px}
+details.steps summary::-webkit-details-marker{display:none}
+details.steps summary:hover{background:var(--card2)}
+details.steps summary .n{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+details.steps summary .v{flex:none;color:var(--accent-text);font-weight:600;font-size:13px}
+details.steps[open] summary .v::after{content:"Hide steps"}
+details.steps:not([open]) summary .v::after{content:"View steps"}
+details.steps .tick{flex:none;color:var(--ok)}
+details.steps ol{margin:0;padding:4px 14px 12px 36px;font:13px/1.55 ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;color:var(--muted)}
+details.steps li span{white-space:pre-wrap}
+details.steps li button{display:block;text-align:start;padding:0;font:inherit;color:inherit;width:100%}
+details.steps li button span{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+details.steps li button.all span{display:inline}
+.spin{flex:none;width:14px;height:14px;border-radius:7px;border:2px solid var(--line);border-top-color:var(--accent);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.spin,.pulse{animation:none}}
+.note{font-size:13px;color:var(--muted);white-space:pre-wrap}
+.error{font-size:14px;color:var(--err);background:var(--err-bg);border-radius:12px;padding:10px 14px;white-space:pre-wrap}
+.working{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:14px}
+.earlier{align-self:center}
+.empty{margin:auto;text-align:center;padding:40px 0}
+.empty h2{margin:0 0 6px;font-size:24px;letter-spacing:-.3px}
+
+/* ---------- the card and the message box, pinned under the chat */
+.card{background:var(--card);border:1px solid var(--accent);border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow)}
+.card .lab{font-size:12px;font-weight:700;letter-spacing:.8px;color:var(--accent-text)}
+.card .txt{background:var(--bg);border-radius:12px;padding:10px 12px;white-space:pre-wrap;max-height:32vh;overflow:auto;overflow-wrap:anywhere}
+.run{border-color:var(--line);max-height:46vh;overflow-y:auto}
+.run>*{flex:none}
+.row .btn.small{flex:none}
+.run pre{margin:0;background:var(--bg);border-radius:12px;padding:10px 12px;font:13px/1.5 ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:140px;overflow-y:auto}
+.procs{background:var(--bg);border-radius:12px;padding:4px 6px 4px 12px}
+.proc{display:flex;align-items:center;gap:8px;padding:6px 0}
+.proc .a{flex:1;min-width:0}
+.proc code{display:block;font:13px/1.45 ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.proc small{color:var(--muted);font-size:12px}
+.head .working{min-width:0}
+.head .working span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:38vw}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.row .btn{flex:1 1 110px}
+.change{display:flex;gap:8px}
+.change input{flex:1;min-width:0}
+.composer{display:flex;gap:8px;align-items:flex-end;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:6px 6px 6px 18px}
+.composer:focus-within{border-color:var(--accent)}
+textarea{flex:1;min-width:0;resize:none;overflow-y:hidden;border:0;background:none;color:var(--text);font:inherit;height:40px;max-height:200px;padding:9px 0}
+textarea:focus,textarea:focus-visible{outline:none}
+textarea::placeholder,input::placeholder{color:var(--muted)}
+.send{flex:none;width:40px;height:40px;border-radius:20px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center}
+.send:disabled{background:var(--card2);color:var(--muted);cursor:default}
+.said{font-size:13px;color:var(--err);padding:0 6px}
+input{font:inherit;min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--text);padding:0 12px}
+
+/* ---------- pairing */
+.pair{max-width:440px;margin:0 auto;padding:12vh 24px 24px;display:flex;flex-direction:column;gap:14px;height:100vh;overflow-y:auto}
+.pair h1{margin:0;font-size:28px}
+.pair p{margin:0}
+.code{font:32px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:4px;text-align:center;background:var(--card);border-radius:14px;padding:14px}
+
+/* ---------- a narrow window: the list, or the chat */
+@media (max-width: 820px){
+  aside{flex:1 1 0;border-right:0}
+  .shell:not(.list) aside{display:none}
+  .shell.list .chat{display:none}
+  .back{display:flex}
+  .head{padding:8px 12px 8px 16px;gap:8px}
+  .head .chip,.head .working span:last-child{display:none}
+  .head h1{flex:1 1 60px}
+  .head .grow{display:none}
+  .col{padding:0 16px}
+  .user{max-width:88%}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+'use strict';
+const app = document.getElementById('app');
+let key = null;
+try { key = localStorage.getItem('buddy-key'); } catch (e) {}
+// open: the chat shown (null: a new one). chatData: what the phone last said about it
+let state = null, open = null, chatData = null, v = 0, polling = false, online = true;
+// what the page itself keeps of a chat between the phone's updates: which rows are unfolded, how far back it shows
+const unfolded = new Set(), PAGE = 60;
+let shown = PAGE, drawn = '', drawnCard = '', toBottom = true, keep = null;
+const AGENTS = {'claude-code': 'Claude Code', codex: 'Codex', opencode: 'OpenCode', agy: 'Antigravity', grok: 'Grok', copilot: 'Copilot', pi: 'Pi'};
+const $ = id => document.getElementById(id);
+
+function el(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, val] of Object.entries(attrs || {})) {
+    if (val == null || val === false) continue;
+    if (k === 'class') e.className = val; else if (k.startsWith('on')) e.addEventListener(k.slice(2), val); else e.setAttribute(k, val === true ? '' : val);
+  }
+  for (const k of kids) if (k != null) e.append(k.nodeType ? k : document.createTextNode(String(k)));
+  return e;
+}
+
+function icon(d, size) {
+  const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'), p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  s.setAttribute('width', size || 20); s.setAttribute('height', size || 20); s.setAttribute('aria-hidden', 'true');
+  if (d[0] === '@') { // one of the app's icons: filled, in Material Symbols' box
+    s.setAttribute('viewBox', '0 -960 960 960'); s.setAttribute('fill', 'currentColor');
+    p.setAttribute('d', d.slice(1));
+  } else if (d[0] === '%') { // one of Buddy's own, drawn in lines in a 960-unit box
+    s.setAttribute('viewBox', '0 0 960 960'); s.setAttribute('fill', 'none'); s.setAttribute('stroke', 'currentColor');
+    s.setAttribute('stroke-width', '64'); s.setAttribute('stroke-linejoin', 'round');
+    p.setAttribute('d', d.slice(1));
+  } else if (d[0] === '#') { // one drawn in the older 24-unit box
+    s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('fill', 'currentColor');
+    p.setAttribute('d', d.slice(1));
+  } else {
+    s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('fill', 'none'); s.setAttribute('stroke', 'currentColor'); s.setAttribute('stroke-width', '2');
+    s.setAttribute('stroke-linecap', 'round'); s.setAttribute('stroke-linejoin', 'round');
+    p.setAttribute('d', d);
+  }
+  s.append(p);
+  return s;
+}
+// the app's own icons (Material Symbols Rounded, Apache-2.0), drawn filled; sun and moon are lines
+const I = {devices: '%M520,640H160Q130,640 130,610V230Q130,200 160,200H760Q790,200 790,230V340M280,780H520M400,640V780 M650,420H810Q840,420 840,450V770Q840,800 810,800H650Q620,800 620,770V450Q620,420 650,420Z', folder: '@M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h207q16 0 30.5 6t25.5 17l57 57h320q33 0 56.5 23.5T880-640v400q0 33-23.5 56.5T800-160H160Zm0-80h640v-400H447l-80-80H160v480Zm0 0v-480 480Z', schedule: '@M480-880A400 400 0 1 1 480-80A400 400 0 1 1 480-880ZM480-810A330 330 0 1 0 480-150A330 330 0 1 0 480-810ZM445-690L515-690L515-515L650-515L650-445L445-445Z', phone: '@M280-40q-33 0-56.5-23.5T200-120v-720q0-33 23.5-56.5T280-920h400q33 0 56.5 23.5T760-840v124q18 7 29 22t11 34v80q0 19-11 34t-29 22v404q0 33-23.5 56.5T680-40H280Zm0-80h400v-720H280v720Zm0 0v-720 720Zm228.5-611.5Q520-743 520-760t-11.5-28.5Q497-800 480-800t-28.5 11.5Q440-777 440-760t11.5 28.5Q463-720 480-720t28.5-11.5Z', attach: '@M720-330q0 104-73 177T470-80q-104 0-177-73t-73-177v-370q0-75 52.5-127.5T400-880q75 0 127.5 52.5T580-700v350q0 46-32 78t-78 32q-46 0-78-32t-32-78v-330q0-17 11.5-28.5T400-720q17 0 28.5 11.5T440-680v330q0 13 8.5 21.5T470-320q13 0 21.5-8.5T500-350v-350q-1-42-29.5-71T400-800q-42 0-71 29t-29 71v370q-1 71 49 120.5T470-160q70 0 119-49.5T640-330v-350q0-17 11.5-28.5T680-720q17 0 28.5 11.5T720-680v350Z', download: '@M480-337q-8 0-15-2.5t-13-8.5L308-492q-12-12-11.5-28t11.5-28q12-12 28.5-12.5T365-549l75 75v-286q0-17 11.5-28.5T480-800q17 0 28.5 11.5T520-760v286l75-75q12-12 28.5-11.5T652-548q11 12 11.5 28T652-492L508-348q-6 6-13 8.5t-15 2.5ZM240-160q-33 0-56.5-23.5T160-240v-80q0-17 11.5-28.5T200-360q17 0 28.5 11.5T240-320v80h480v-80q0-17 11.5-28.5T760-360q17 0 28.5 11.5T800-320v80q0 33-23.5 56.5T720-160H240Z', trash: '@M280-120q-33 0-56.5-23.5T200-200v-520q-17 0-28.5-11.5T160-760q0-17 11.5-28.5T200-800h160q0-17 11.5-28.5T400-840h160q17 0 28.5 11.5T600-800h160q17 0 28.5 11.5T800-760q0 17-11.5 28.5T760-720v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM400-280q17 0 28.5-11.5T440-320v-280q0-17-11.5-28.5T400-640q-17 0-28.5 11.5T360-600v280q0 17 11.5 28.5T400-280Zm160 0q17 0 28.5-11.5T600-320v-280q0-17-11.5-28.5T560-640q-17 0-28.5 11.5T520-600v280q0 17 11.5 28.5T560-280ZM280-720v520-520Z', file: '@M360-240h240q17 0 28.5-11.5T640-280q0-17-11.5-28.5T600-320H360q-17 0-28.5 11.5T320-280q0 17 11.5 28.5T360-240Zm0-160h240q17 0 28.5-11.5T640-440q0-17-11.5-28.5T600-480H360q-17 0-28.5 11.5T320-440q0 17 11.5 28.5T360-400ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h287q16 0 30.5 6t25.5 17l194 194q11 11 17 25.5t6 30.5v447q0 33-23.5 56.5T720-80H240Zm280-560v-160H240v640h480v-440H560q-17 0-28.5-11.5T520-640ZM240-800v200-200 640-640Z', screens: '@M520,640H160Q130,640 130,610V230Q130,200 160,200H760Q790,200 790,230V340M280,780H520M400,640V780 M650,420H810Q840,420 840,450V770Q840,800 810,800H650Q620,800 620,770V450Q620,420 650,420Z', full: '#M21,11V3h-8l3.29,3.29 -10,10L3,13v8h8l-3.29,-3.29 10,-10z', up: '@M440-647 244-451q-12 12-28 11.5T188-452q-11-12-11.5-28t11.5-28l264-264q6-6 13-8.5t15-2.5q8 0 15 2.5t13 8.5l264 264q11 11 11 27.5T772-452q-12 12-28.5 12T715-452L520-647v447q0 17-11.5 28.5T480-160q-17 0-28.5-11.5T440-200v-447Z', back: '@m313-440 196 196q12 12 11.5 28T508-188q-12 11-28 11.5T452-188L188-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l264-264q11-11 27.5-11t28.5 11q12 12 12 28.5T508-715L313-520h447q17 0 28.5 11.5T800-480q0 17-11.5 28.5T760-440H313Z', plus: '@M440-440H240q-17 0-28.5-11.5T200-480q0-17 11.5-28.5T240-520h200v-200q0-17 11.5-28.5T480-760q17 0 28.5 11.5T520-720v200h200q17 0 28.5 11.5T760-480q0 17-11.5 28.5T720-440H520v200q0 17-11.5 28.5T480-200q-17 0-28.5-11.5T440-240v-200Z', check: '@m382-354 339-339q12-12 28-12t28 12q12 12 12 28.5T777-636L410-268q-12 12-28 12t-28-12L182-440q-12-12-11.5-28.5T183-497q12-12 28.5-12t28.5 12l142 143Z', copy: '@M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-520q0-17 11.5-28.5T160-720q17 0 28.5 11.5T200-680v520h400q17 0 28.5 11.5T640-120q0 17-11.5 28.5T600-80H200Zm160-240v-480 480Z', quote: '@m262-300 58-100q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 23-5.5 42.5T458-480L331-260q-5 9-14 14.5t-20 5.5q-23 0-34.5-20t-.5-40Zm360 0 58-100q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 23-5.5 42.5T818-480L691-260q-5 9-14 14.5t-20 5.5q-23 0-34.5-20t-.5-40ZM320-500q25 0 42.5-17.5T380-560q0-25-17.5-42.5T320-620q-25 0-42.5 17.5T260-560q0 25 17.5 42.5T320-500Zm360 0q25 0 42.5-17.5T740-560q0-25-17.5-42.5T680-620q-25 0-42.5 17.5T620-560q0 25 17.5 42.5T680-500Zm0-60Zm-360 0Z', fork: '@M240-664v64q0 17-11.5 28.5T200-560q-17 0-28.5-11.5T160-600v-160q0-17 11.5-28.5T200-800h160q17 0 28.5 11.5T400-760q0 17-11.5 28.5T360-720h-64l201 201q11 11 17 25.5t6 30.5v263q0 17-11.5 28.5T480-160q-17 0-28.5-11.5T440-200v-264L240-664Zm480 0-98 99q-12 12-28.5 12T565-565q-12-12-12-29t12-29l99-97h-64q-17 0-28.5-11.5T560-760q0-17 11.5-28.5T600-800h160q17 0 28.5 11.5T800-760v160q0 17-11.5 28.5T760-560q-17 0-28.5-11.5T720-600v-64Z', tune: '@M480-120q-17 0-28.5-11.5T440-160v-160q0-17 11.5-28.5T480-360q17 0 28.5 11.5T520-320v40h280q17 0 28.5 11.5T840-240q0 17-11.5 28.5T800-200H520v40q0 17-11.5 28.5T480-120Zm-320-80q-17 0-28.5-11.5T120-240q0-17 11.5-28.5T160-280h160q17 0 28.5 11.5T360-240q0 17-11.5 28.5T320-200H160Zm160-160q-17 0-28.5-11.5T280-400v-40H160q-17 0-28.5-11.5T120-480q0-17 11.5-28.5T160-520h120v-40q0-17 11.5-28.5T320-600q17 0 28.5 11.5T360-560v160q0 17-11.5 28.5T320-360Zm160-80q-17 0-28.5-11.5T440-480q0-17 11.5-28.5T480-520h320q17 0 28.5 11.5T840-480q0 17-11.5 28.5T800-440H480Zm160-160q-17 0-28.5-11.5T600-640v-160q0-17 11.5-28.5T640-840q17 0 28.5 11.5T680-800v40h120q17 0 28.5 11.5T840-720q0 17-11.5 28.5T800-680H680v40q0 17-11.5 28.5T640-600Zm-480-80q-17 0-28.5-11.5T120-720q0-17 11.5-28.5T160-760h320q17 0 28.5 11.5T520-720q0 17-11.5 28.5T480-680H160Z', chev: '@M480-362q-8 0-15-2.5t-13-8.5L268-557q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-373q-6 6-13 8.5t-15 2.5Z', x: '@M480-424 284-228q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536-480l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480-424Z', edit: '@M200-200h57l391-391-57-57-391 391v57Zm-40 80q-17 0-28.5-11.5T120-160v-97q0-16 6-30.5t17-25.5l505-504q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L313-143q-11 11-25.5 17t-30.5 6h-97Zm600-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z',
+  sun: 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4', moon: 'M20 14.5A8 8 0 0 1 9.500 4a8 8 0 1 0 10.500 10.500z'};
+
+async function api(path, body) {
+  const r = await fetch(path, {method: body ? 'POST' : 'GET', headers: Object.assign({'Content-Type': 'application/json'},
+    key ? {'Authorization': 'Bearer ' + key} : {}), body: body ? JSON.stringify(body) : undefined});
+  if (r.status === 401) { forget(); throw new Error('This device was removed on the phone.'); }
+  return r.json();
+}
+
+function forget() { key = null; try { localStorage.removeItem('buddy-key'); } catch (e) {} pairScreen(); }
+
+function deviceName() {
+  const u = navigator.userAgent;
+  const b = /Edg\//.test(u) ? 'Edge' : /Firefox\//.test(u) ? 'Firefox' : /Chrome\//.test(u) ? 'Chrome' : /Safari\//.test(u) ? 'Safari' : 'Browser';
+  const o = /iPhone|iPad/.test(u) ? 'iPhone' : /Android/.test(u) ? 'Android' : /Windows/.test(u) ? 'Windows' : /Mac OS/.test(u) ? 'Mac' : /Linux/.test(u) ? 'Linux' : 'a computer';
+  return b + ' on ' + o;
+}
+
+function pairScreen(msg) {
+  app.textContent = '';
+  const name = el('input', {id: 'name', value: deviceName(), maxlength: '40'});
+  const box = el('div', {class: 'pair'},
+    el('h1', {}, 'Buddy'),
+    el('p', {class: 'muted'}, 'Pair this device to see your chats and answer approval cards. You approve it on the phone.'),
+    el('label', {for: 'name'}, 'This device'), name,
+    msg ? el('p', {class: 'said'}, msg) : null);
+  const go = el('button', {class: 'btn primary', onclick: async () => {
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    go.disabled = true;
+    box.append(el('p', {}, 'Approve it on the phone. The card shows this code:'), el('div', {class: 'code'}, code.slice(0, 3) + ' ' + code.slice(3)));
+    try {
+      const r = await api('/web/pair', {name: name.value, code});
+      if (r.key) { key = r.key; try { localStorage.setItem('buddy-key', key); } catch (e) {} start(); }
+      else pairScreen('Not paired. Check that Other devices is on in Buddy, then try again.');
+    } catch (e) { pairScreen('Not paired: ' + e.message); }
+  }}, 'Pair');
+  box.append(go);
+  app.append(box);
+}
+
+// ------------------------------------------------------------ the frame (built once: the message box keeps what is typed)
+
+function start() {
+  app.textContent = '';
+  const ta = el('textarea', {rows: '1', placeholder: 'Ask Buddy something', id: 'msg'});
+  const send = el('button', {class: 'send', id: 'send', 'aria-label': 'Send', disabled: true, onclick: () => sendIt()}, icon(I.up));
+  ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); sendIt(); } });
+  ta.addEventListener('input', () => { grow(ta); canSend(); });
+  // a file pasted (a screenshot) or dropped on the chat: attached as with the paperclip
+  ta.addEventListener('paste', e => { const f = [...(e.clipboardData ? e.clipboardData.files : [])]; if (f.length) { e.preventDefault(); attach(f); } });
+  const pane = el('div', {id: 'pane', tabindex: '-1'}, el('div', {id: 'col', class: 'col'}));
+  pane.addEventListener('scroll', jump);
+  pane.addEventListener('dragover', e => { if (!view) e.preventDefault(); });
+  pane.addEventListener('drop', e => { if (view) return; e.preventDefault(); attach([...e.dataTransfer.files]); });
+  app.append(el('div', {class: 'shell list', id: 'shell'},
+    el('aside', {},
+      el('div', {class: 'brand'}, el('b', {}, 'Buddy'), el('span', {class: 'status'}, el('span', {class: 'dot', id: 'dot'}), el('span', {id: 'status'}, 'Your phone')),
+        el('button', {class: 'theme', id: 'theme', onclick: () => theme(true)})),
+      el('button', {class: 'new', onclick: () => show(null)}, icon(I.plus, 18), 'New chat'),
+      el('div', {class: 'places', id: 'places'},
+        el('button', {id: 'go-files', onclick: () => openView('files')}, icon(I.folder, 18), 'Files'),
+        el('button', {id: 'go-screens', onclick: () => openView('screens')}, icon(I.phone, 18), 'Screens'),
+        el('button', {id: 'go-plans', onclick: () => openView('plans')}, icon(I.schedule, 18), 'Schedules and routines'),
+        el('button', {id: 'go-devices', onclick: () => openView('devices')}, icon(I.devices, 18), 'Devices and computers')),
+      el('div', {class: 'find'}, el('input', {id: 'find', type: 'search', placeholder: 'Search chats', 'aria-label': 'Search chats',
+        oninput: e => { query = e.target.value.trim().toLowerCase(); drawList(); }})),
+      el('div', {class: 'filters', id: 'filters'}),
+      el('nav', {id: 'nav', 'aria-label': 'Chats'})),
+    el('section', {class: 'chat'},
+      el('div', {class: 'head'},
+        el('button', {class: 'back', 'aria-label': 'All chats', onclick: () => $('shell').classList.add('list')}, icon(I.back)),
+        el('h1', {id: 'title'}, 'New chat'), el('button', {class: 'chip', id: 'agent', hidden: true, title: 'Switch agent', onclick: () => pickAgent()}),
+        el('button', {class: 'chip tog', id: 'devchip', hidden: true, onclick: () => change({dev: !chatData.dev})}, 'Linux tools'),
+        el('button', {class: 'chip tog', id: 'bgchip', hidden: true, onclick: () => change({background: !chatData.background})}, 'Background'),
+        el('button', {class: 'chip tog', id: 'scrchip', hidden: true, title: 'Show or hide this chat’s hidden screen here', onclick: () => panelHide(open, !panelHidden(open))}, icon(I.phone, 14), 'Screen'),
+        el('span', {class: 'grow'}),
+        el('span', {class: 'working', id: 'work', hidden: true}, el('span', {class: 'spin'}), el('span', {id: 'worktext'})),
+        el('button', {class: 'btn small', id: 'runbtn', hidden: true, onclick: () => { runOpen = !runOpen; runData = null; fetchRun(); }}, 'Running now'),
+        el('button', {class: 'btn small deny', id: 'stopbtn', hidden: true, onclick: () => stopRun()}, 'Stop'),
+        el('button', {class: 'icon', id: 'optbtn', hidden: true, 'aria-label': 'Chat menu', title: 'Pin, rename, archive, delete', 'aria-haspopup': 'menu', onclick: e => chatMenu(open, e.currentTarget)}, '⋯')),
+      pane,
+      el('button', {class: 'jump', id: 'jump', 'aria-label': 'Go to the end', title: 'Go to the end', onclick: () => { end(); jump(); }}, icon(I.up, 20)),
+      el('div', {class: 'scrpanel', id: 'scrpanel', hidden: true, role: 'group', 'aria-label': 'This chat’s hidden screen'},
+        el('div', {class: 'pic', id: 'scrpic', title: 'Show it large', onclick: () => openView('screens', open)}, 'Loading…'),
+        el('div', {class: 'pb'}, el('span', {id: 'scrapp'}, 'Hidden screen'),
+          el('button', {'aria-label': 'Show it large', title: 'Show it large', onclick: () => openView('screens', open)}, icon(I.full, 16)),
+          el('button', {'aria-label': 'Hide the screen here', title: 'Hide here (the Screen chip in the header shows it again)', onclick: () => panelHide(open, true)}, icon(I.x, 16)))),
+      el('div', {class: 'col dock'}, el('div', {id: 'run'}), el('div', {id: 'cards'}),
+        el('div', {id: 'quote'}), el('div', {class: 'atts', id: 'atts'}),
+        el('div', {class: 'composer'},
+          el('button', {class: 'clip', 'aria-label': 'Attach files', title: 'Attach files (pictures, documents; over 25 MB they go to the chat’s Linux tools)',
+            onclick: () => $('pick').click()}, icon(I.attach, 20)),
+          el('input', {type: 'file', id: 'pick', multiple: true, hidden: true, onchange: e => { attach([...e.target.files]); e.target.value = ''; }}),
+          el('label', {for: 'msg', class: 'sr'}, 'Message'), ta,
+          el('button', {class: 'model', id: 'model', hidden: true, title: 'Model and effort', onclick: () => pickModel()}), send),
+        el('div', {class: 'said', id: 'said', role: 'alert', hidden: true})))));
+  theme(false);
+  render();
+  newDraft();
+  if (!polling) poll();
+}
+
+/** Light or dark: as the device says until the button picks one (kept in this browser); next: the button was pressed. */
+function theme(next) {
+  let t = null;
+  try { t = localStorage.getItem('buddy-theme'); } catch (e) {}
+  if (next) {
+    const dark = t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    t = dark ? 'light' : 'dark';
+    try { localStorage.setItem('buddy-theme', t); } catch (e) {}
+  }
+  if (t === 'light' || t === 'dark') { document.documentElement.setAttribute('data-theme', t); document.documentElement.style.colorScheme = t; }
+  const dark = t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches, b = $('theme');
+  if (!b) return;
+  b.textContent = '';
+  b.append(icon(dark ? I.sun : I.moon, 18));
+  b.setAttribute('aria-label', dark ? 'Light mode' : 'Dark mode');
+  b.title = dark ? 'Light mode' : 'Dark mode';
+}
+
+function grow(ta) { ta.style.height = '40px'; ta.style.height = Math.min(200, ta.scrollHeight) + 'px'; ta.style.overflowY = ta.scrollHeight > 200 ? 'auto' : 'hidden'; }
+function atEnd() { const p = $('pane'); return p.scrollHeight - p.scrollTop - p.clientHeight < 80; }
+function end() { const p = $('pane'); p.scrollTop = p.scrollHeight; }
+/** The arrow to the end: there while the end is most of a screen away or more (a long chat is a long way to scroll). */
+function jump() { const p = $('pane'); $('jump').classList.toggle('show', p.scrollHeight - p.scrollTop - p.clientHeight > p.clientHeight * 0.75); }
+function say(msg) { const s = $('said'); s.hidden = !msg; s.textContent = msg || ''; }
+
+/** Another chat (null: a new one): it opens at its newest message. */
+async function show(id) {
+  leaveView();
+  open = id; chatData = null; shown = PAGE; drawn = ''; toBottom = true; unfolded.clear(); say('');
+  runOpen = false; runData = null; drawRun(); setQuote(null); clearAtts();
+  if (!id) newDraft();
+  $('shell').classList.remove('list');
+  render();
+  if (id) {
+    try { const d = await api('/web/chat?id=' + encodeURIComponent(id)); if (open === id) chatData = d; } catch (e) { say(e.message); }
+    render();
+    markRead(id);
+  }
+  if (window.matchMedia('(min-width: 821px)').matches) $('msg').focus();
+}
+
+async function poll() {
+  polling = true;
+  for (;;) {
+    try {
+      const s = await api('/web/state?v=' + v);
+      if (s.error) throw new Error(s.error);
+      v = s.v; state = s; online = true;
+      if (open) { const id = open, d = await api('/web/chat?id=' + encodeURIComponent(id)); if (open === id) chatData = d; }
+      render();
+      if (open && !document.hidden) markRead(open); // (a reply that came while it's open here is read)
+    } catch (e) {
+      if (!key) { polling = false; return; }
+      online = false;
+      render();
+      await new Promise(r => setTimeout(r, 4000));
+    }
+  }
+}
+
+// ------------------------------------------------------------ what the phone says, drawn
+
+function when(t) {
+  const d = Date.now() - t, day = 86400000;
+  if (d < 60000) return 'now';
+  if (d < 3600000) return Math.floor(d / 60000) + ' min';
+  if (d < day) return Math.floor(d / 3600000) + ' h';
+  const x = new Date(t);
+  return d < 6 * day ? x.toLocaleDateString(undefined, {weekday: 'short'}) : x.toLocaleDateString(undefined, {day: 'numeric', month: 'short'});
+}
+
+/** A reply's first line as plain words (the list has no room for its marks). */
+function plain(s) { return (s || '').replace(/\*\*|__|`|^#+\s+|^[-*]\s+/g, '').trim(); }
+
+function render() {
+  if (!$('nav')) return;
+  $('status').textContent = online ? 'Your phone' : 'Phone not reachable, trying again…';
+  $('dot').classList.toggle('off', !online);
+  if (state) drawList();
+  $('shell').classList.toggle('view', !!view);
+  for (const v of ['files', 'screens', 'plans', 'devices']) $('go-' + v).classList.toggle('on', view === v);
+  if (view) drawView(); else drawChat();
+  drawCards();
+}
+
+/** The chat is read here: the phone's unread mark goes, as when it's opened in the app. */
+function markRead(id) {
+  const c = state && state.chats.find(x => x.id === id);
+  if (c && c.unread) { c.unread = false; api('/web/set', {chat: id, unread: false}).catch(() => {}); drawList(); }
+}
+
+// the list's search words and its filter: all (not the archived), pinned, unread or archived
+let query = '', filter = 'all';
+
+function drawList() {
+  if (document.querySelector('.pop')) return; // (a menu is open on one of its rows: the list waits for it)
+  const nav = $('nav'), top = nav.scrollTop, fb = $('filters');
+  nav.textContent = ''; fb.textContent = '';
+  const count = f => state.chats.filter(f).length;
+  for (const [id, name, n] of [['all', 'All', 0], ['unread', 'Unread', count(c => c.unread && !c.archived)], ['pinned', 'Pinned', count(c => c.pinned)],
+      ['archived', 'Archived', count(c => c.archived)]]) {
+    if (id !== 'all' && !n && filter !== id) continue; // (a filter with nothing in it isn't offered)
+    fb.append(el('button', {class: filter === id ? 'on' : '', 'aria-pressed': filter === id ? 'true' : 'false',
+      onclick: () => { filter = id; drawList(); }}, name + (n ? ' ' + n : '')));
+  }
+  let chats = state.chats.slice().sort((a, b) => b.updated - a.updated).filter(c => filter === 'archived' ? c.archived : !c.archived);
+  if (filter === 'pinned') chats = chats.filter(c => c.pinned);
+  if (filter === 'unread') chats = chats.filter(c => c.unread);
+  if (query) chats = chats.filter(c => ((c.title || '') + ' ' + (c.preview || '') + ' ' + (AGENTS[c.agent] || c.agent)).toLowerCase().includes(query));
+  const groups = filter === 'all' && !query ? [['Waiting for you', c => c.waiting], ['Working', c => c.running && !c.waiting],
+    ['Pinned', c => c.pinned && !c.running && !c.waiting], ['Recent', c => !c.pinned && !c.running && !c.waiting]]
+    : [[query ? 'Found' : filter === 'archived' ? 'Archived' : filter === 'pinned' ? 'Pinned' : 'Unread', () => true]];
+  for (const [title, f] of groups) {
+    const list = chats.filter(f);
+    if (!list.length) continue;
+    nav.append(el('h2', {}, title));
+    for (const c of list.slice(0, 80)) {
+      const agent = AGENTS[c.agent] || c.agent;
+      nav.append(el('div', {class: 'item' + (c.id === open ? ' on' : '') + (c.unread && c.id !== open ? ' unread' : '')},
+        el('a', {href: '#', class: c.waiting ? 'wait' : '', 'aria-current': c.id === open ? 'page' : null, onclick: e => { e.preventDefault(); show(c.id); }},
+          c.waiting ? el('span', {class: 'pulse ask'}) : c.running ? el('span', {class: 'pulse'}) : null,
+          el('span', {class: 'b'}, el('span', {class: 't'}, c.title || 'Chat'),
+            el('span', {class: 's'}, c.waiting ? 'Waiting for you · ' + agent : c.running ? 'Working · ' + agent : plain(c.preview) || agent)),
+          c.running || c.waiting ? null : el('span', {class: 'w'}, when(c.updated))),
+        el('button', {class: 'menu', 'aria-label': 'Menu for ' + (c.title || 'this chat'), 'aria-haspopup': 'menu', onclick: e => chatMenu(c.id, e.currentTarget)}, '⋯')));
+    }
+  }
+  if (!chats.length) nav.append(el('p', {class: 'muted', style: 'padding:12px'}, query ? 'No chat matches.' : filter === 'all' ? 'No chats yet.' : 'Nothing here.'));
+  nav.scrollTop = top;
+}
+
+/** The chat's messages as rows: a run of steps is one row, folded. */
+function rows(d) {
+  const out = [];
+  d.messages.forEach((m, i) => {
+    const at = (d.first || 0) + i, last = out[out.length - 1];
+    if (m.k === 'step') { if (last && last.k === 'steps') last.steps.push(m.t); else out.push({k: 'steps', at, steps: [m.t]}); }
+    else out.push({k: m.k, at, t: m.t, s: m.s, f: m.f, lx: m.lx});
+  });
+  return out;
+}
+
+function drawChat() {
+  const col = $('col'), pane = $('pane'), d = open && chatData && !chatData.error ? chatData : null;
+  $('title').textContent = d ? d.title || 'Chat' : open ? '' : 'New chat';
+  $('agent').hidden = !d;
+  if (d) { $('agent').textContent = ''; $('agent').append(AGENTS[d.agent] || d.agent, icon(I.chev, 14)); }
+  $('optbtn').hidden = !d;
+  $('scrchip').hidden = !d || !d.screen;
+  if (d) $('scrchip').classList.toggle('on', !!d.screen && !panelHidden(open));
+  drawPanel(d);
+  $('devchip').hidden = !d || !d.linux;
+  $('bgchip').hidden = !d || !d.canBackground;
+  if (d) {
+    $('devchip').classList.toggle('on', !!d.dev);
+    $('devchip').title = d.dev ? 'Linux tools are on in this chat: the agent may run commands and edit files. Click to turn them off.' : 'Linux tools are off in this chat. Click to turn them on from the next message.';
+    $('devchip').setAttribute('aria-pressed', d.dev ? 'true' : 'false');
+    $('bgchip').classList.toggle('on', !!d.background);
+    $('bgchip').title = d.background ? 'Background mode is on: the agent works on a hidden screen. Click to turn it off.' : 'Background mode is off: the agent works on the phone’s own screen. Click to turn it on.';
+    $('bgchip').setAttribute('aria-pressed', d.background ? 'true' : 'false');
+  }
+  $('model').hidden = !d || !d.model;
+  if (d && d.model) { $('model').textContent = ''; $('model').append(el('span', {}, d.model), icon(I.chev, 14)); }
+  $('msg').placeholder = open ? 'Message this chat' : 'Ask Buddy something';
+  document.title = d && d.title ? d.title + ' · Buddy' : 'Buddy';
+  const working = !!(d && d.running);
+  $('work').hidden = $('runbtn').hidden = $('stopbtn').hidden = !working;
+  $('worktext').textContent = working ? d.status || 'Working' : '';
+  const now = JSON.stringify([open, chatData, shown, [...unfolded], open ? null : draft]);
+  if (now === drawn) return; // nothing new: what is unfolded or selected stays as it is
+  drawn = now;
+  const stick = toBottom || atEnd(), top = pane.scrollTop;
+  col.textContent = '';
+  if (!d) {
+    col.append(open ? el('div', {class: 'working', style: 'margin:auto'}, chatData && chatData.error ? null : el('span', {class: 'spin'}),
+        chatData && chatData.error ? 'This chat isn’t on the phone any more.' : 'Opening…')
+      : el('div', {class: 'empty'}, el('h2', {}, 'What should Buddy do?'),
+          el('p', {class: 'muted'}, draft ? 'Set up the new chat, then write your message below.' : 'A new chat starts with the agent your phone uses for new chats.'),
+          draft ? setup() : null));
+    jump();
+    return;
+  }
+  const all = rows(d), from = Math.max(0, all.length - shown);
+  if (from > 0) col.append(el('button', {class: 'btn earlier', onclick: () => { keep = pane.scrollHeight - pane.scrollTop; shown += PAGE; drawChat(); }}, 'Show earlier messages'));
+  else if (d.first > 0) col.append(el('div', {class: 'note', style: 'align-self:center'}, 'Earlier messages are on the phone.'));
+  for (let i = from; i < all.length; i++) col.append(row(all[i], d.running && i === all.length - 1));
+  if (d.running && (!all.length || all[all.length - 1].k !== 'steps')) col.append(el('div', {class: 'working'}, el('span', {class: 'spin'}), 'Working…'));
+  if (keep != null) { pane.scrollTop = pane.scrollHeight - keep; keep = null; } // (earlier messages came in above: the view stays where it was)
+  else if (stick) { end(); toBottom = false; }
+  else pane.scrollTop = top;
+  jump();
+}
+
+/** One step: a long one (a script in a command) shows its first lines, and all of it on a click. */
+function step(s) {
+  if (s.length <= 280 && s.split('\n').length <= 4) return el('li', {}, el('span', {}, s));
+  const b = el('button', {title: 'Show all of it', onclick: () => b.classList.toggle('all')}, el('span', {}, s));
+  return el('li', {}, b);
+}
+
+function row(r, live) {
+  if (r.k === 'steps') {
+    const n = r.steps.length;
+    const dt = el('details', {class: 'steps', open: unfolded.has(r.at)},
+      el('summary', {}, live ? el('span', {class: 'spin'}) : el('span', {class: 'tick'}, icon(I.check, 18)),
+        el('span', {class: 'n'}, live ? r.steps[n - 1] : n + (n === 1 ? ' tool call' : ' tool calls')), el('span', {class: 'v'})),
+      el('ol', {}, ...r.steps.map(step)));
+    // (the phone's next update draws the chat again: it must find this row as the user left it)
+    dt.addEventListener('toggle', () => { if (dt.open) unfolded.add(r.at); else unfolded.delete(r.at); drawn = JSON.stringify([open, chatData, shown, [...unfolded], open ? null : draft]); });
+    return dt;
+  }
+  if (r.k === 'user') {
+    // a schedule's message is its whole instruction: three lines of it, the rest on a tap
+    const long = r.s && r.t.length > 220, key = 'u' + r.at, fold = long && !unfolded.has(key);
+    const q = r.s ? null : splitQuote(r.t); // a message that quotes another: the quote in its own block
+    const b = el('div', {class: 'user' + (fold ? ' fold' : '')}, r.s ? el('span', {class: 'lab'}, 'Scheduled') : null,
+      q ? el('div', {class: 'q'}, q[0]) : null, el('span', {class: 'tx'}, q ? q[1] : r.t));
+    if (long) b.append(el('button', {class: 'more', onclick: () => { if (unfolded.has(key)) unfolded.delete(key); else unfolded.add(key); keep = $('pane').scrollHeight - $('pane').scrollTop; drawChat(); }},
+      fold ? 'Show all' : 'Show less'));
+    if (!r.t) { b.querySelector('.tx').remove(); b.classList.add('bare'); } // (files alone: no bubble around them)
+    const fs = msgFiles(r);
+    if (fs) b.append(fs);
+    // your own message, as in the app: copy, quote, edit (it is asked again from there) and fork
+    const say1 = q ? q[1] : r.t;
+    return el('div', {class: 'mine'}, b, el('div', {class: 'acts own'},
+      el('button', {'aria-label': 'Copy', title: 'Copy', onclick: e => copy(say1, e.currentTarget)}, icon(I.copy, 18)),
+      el('button', {'aria-label': 'Quote', title: 'Quote in your next message', onclick: () => setQuote(r.t)}, icon(I.quote, 18)),
+      r.s ? null : el('button', {'aria-label': 'Edit', title: 'Edit and ask again from here', onclick: () => edit(r.at, say1)}, icon(I.edit, 18)),
+      el('button', {'aria-label': 'Fork from here', title: 'Fork: a new chat with the conversation up to here', onclick: () => fork(r.at)}, icon(I.fork, 18))));
+  }
+  if (r.k === 'buddy') {
+    const b = el('div', {class: 'buddy'});
+    markdown(b, r.t);
+    const fs = msgFiles(r);
+    if (fs) b.append(fs);
+    const f = document.createDocumentFragment();
+    f.append(b, el('div', {class: 'acts'},
+      el('button', {'aria-label': 'Copy', title: 'Copy', onclick: e => copy(r.t, e.currentTarget)}, icon(I.copy, 18)),
+      el('button', {'aria-label': 'Quote', title: 'Quote in your next message', onclick: () => setQuote(r.t)}, icon(I.quote, 18)),
+      el('button', {'aria-label': 'Fork from here', title: 'Fork: a new chat with the conversation up to here', onclick: () => fork(r.at)}, icon(I.fork, 18))));
+    return f;
+  }
+  return el('div', {class: r.k === 'error' ? 'error' : 'note'}, r.t);
+}
+
+// ------------------------------------------------------------ a reply's formatting (built as elements: never as HTML text)
+
+function inline(into, s) {
+  const re = /(`[^`\n]+`)|(\*\*[^\n]+?\*\*)|(\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\))|(https?:\/\/[^\s<>()]*[^\s<>().,;:!?'"*])|(\*[^*\s](?:[^*\n]*[^*\s])?\*)/g;
+  let at = 0, m;
+  while ((m = re.exec(s))) {
+    if (m.index > at) into.append(s.slice(at, m.index));
+    if (m[1]) into.append(el('code', {}, m[1].slice(1, -1)));
+    else if (m[2]) { const b = el('strong'); inline(b, m[2].slice(2, -2)); into.append(b); }
+    else if (m[3]) into.append(el('a', {href: m[5], target: '_blank', rel: 'noopener noreferrer'}, m[4]));
+    else if (m[6]) into.append(el('a', {href: m[6], target: '_blank', rel: 'noopener noreferrer'}, m[6]));
+    else { const i = el('em'); inline(i, m[7].slice(1, -1)); into.append(i); }
+    at = re.lastIndex;
+  }
+  if (at < s.length) into.append(s.slice(at));
+}
+
+function markdown(into, text) {
+  const lines = text.replace(/\r/g, '').split('\n');
+  const cells = l => l.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+  let i = 0, para = [];
+  const flush = () => { if (para.length) { const p = el('p'); inline(p, para.join('\n')); into.append(p); para = []; } };
+  while (i < lines.length) {
+    const l = lines[i];
+    let m;
+    if (/^\s*```/.test(l)) { // a code block, to its closing line (or the end)
+      flush();
+      const code = [];
+      for (i++; i < lines.length && !/^\s*```\s*$/.test(lines[i]); i++) code.push(lines[i]);
+      i++;
+      into.append(el('pre', {}, el('code', {}, code.join('\n'))));
+    } else if (!l.trim()) { flush(); i++; }
+    else if ((m = /^(#{1,6})\s+(.*)$/.exec(l))) { flush(); const h = el(m[1].length <= 2 ? 'h3' : 'h4'); inline(h, m[2]); into.append(h); i++; }
+    else if (/^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(l)) { flush(); into.append(el('hr')); i++; }
+    else if (/^\s*\|.*\|\s*$/.test(l) && i + 1 < lines.length && /^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/.test(lines[i + 1])) {
+      flush();
+      const t = el('table'), hr = el('tr');
+      for (const c of cells(l)) { const th = el('th'); inline(th, c); hr.append(th); }
+      t.append(el('thead', {}, hr));
+      const body = el('tbody');
+      for (i += 2; i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i]); i++) {
+        const tr = el('tr');
+        for (const c of cells(lines[i])) { const td = el('td'); inline(td, c); tr.append(td); }
+        body.append(tr);
+      }
+      t.append(body);
+      into.append(el('div', {class: 'tbl'}, t));
+    } else if ((m = /^\s*([-*•]|\d+[.)])\s+/.exec(l))) { // a list: its lines, and the lines that go on under an item
+      flush();
+      const ordered = /\d/.test(m[1]), list = el(ordered ? 'ol' : 'ul');
+      const item = ordered ? /^\s*\d+[.)]\s+(.*)$/ : /^\s*[-*•]\s+(.*)$/;
+      let li = null;
+      for (; i < lines.length; i++) {
+        const x = item.exec(lines[i]);
+        if (x) { li = el('li'); inline(li, x[1]); list.append(li); }
+        else if (li && /^\s{2,}\S/.test(lines[i])) { li.append('\n'); inline(li, lines[i].trim()); }
+        else break;
+      }
+      into.append(list);
+    } else if (/^\s*>/.test(l)) {
+      flush();
+      const q = [];
+      for (; i < lines.length && (m = /^\s*>\s?(.*)$/.exec(lines[i])); i++) q.push(m[1]);
+      const b = el('blockquote'); inline(b, q.join('\n')); into.append(b);
+    } else { para.push(l); i++; }
+  }
+  flush();
+}
+
+// ------------------------------------------------------------ a reply's buttons: copy, quote, fork
+
+/** The page is served over plain http on the tailnet, where browsers give no clipboard API: the old way does it. */
+function copy(text, button) {
+  const t = el('textarea', {style: 'position:fixed;opacity:0;top:0'});
+  t.value = text;
+  document.body.append(t);
+  t.select();
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch (e) {}
+  t.remove();
+  if (!ok) { say('This browser didn’t allow copying. Select the text and copy it yourself.'); return; }
+  const was = [...button.childNodes]; // (all of it: an icon, and a label beside it)
+  button.replaceChildren(icon(I.check, 18), ...was.slice(1));
+  setTimeout(() => button.replaceChildren(...was), 1200);
+}
+
+let quoted = null;
+
+/** [what a message quotes, what it says itself] for one that begins with "> " lines, else null. */
+function splitQuote(text) {
+  if (!text.startsWith('>')) return null;
+  const lines = text.split('\n'), q = [];
+  let i = 0;
+  for (; i < lines.length && lines[i].startsWith('>'); i++) q.push(lines[i].replace(/^> ?/, ''));
+  return [q.join('\n').trim(), lines.slice(i).join('\n').trim()];
+}
+
+/** A reply quoted above the message box until it's sent or taken away (as much of it as the app quotes). */
+function setQuote(text) {
+  const own = text ? splitQuote(text) : null;
+  let q = text ? (own ? own[1] : text).trim() : null;
+  if (q && q.length > 800) q = q.slice(0, 800).trim() + '…';
+  quoted = q || null;
+  const box = $('quote');
+  if (!box) return;
+  box.textContent = '';
+  if (!quoted) return;
+  box.append(el('div', {class: 'quotebox'}, el('div', {class: 'quote'}, quoted),
+    el('button', {'aria-label': 'Remove the quote', title: 'Remove the quote', onclick: () => setQuote(null)}, icon(I.x, 16))));
+  $('msg').focus();
+}
+
+/** Your own message, changed: the chat goes on from there with the new words (the phone keeps the old chat, archived). */
+function edit(index, text) {
+  if (chatData && chatData.running) { say('The chat is working: edit the message when it’s done.'); return; }
+  sheet((box, close) => {
+    const ta = el('textarea', {'aria-label': 'Your message'});
+    ta.value = text;
+    box.append(el('h2', {}, 'Edit your message'),
+      el('p', {}, 'It’s asked again from here: what came after it goes. The chat as it was is kept in Archived.'), ta,
+      el('div', {class: 'line', style: 'justify-content:flex-end;margin-top:8px'}, el('button', {class: 'btn', onclick: close}, 'Cancel'),
+        el('button', {class: 'btn primary', onclick: async () => {
+          const t = ta.value.trim(), id = open;
+          if (!t) return;
+          close();
+          try {
+            const r = await api('/web/edit', {chat: id, index, text: t});
+            say(r.error || '');
+            if (open === id) { toBottom = true; drawn = ''; chatData = await api('/web/chat?id=' + encodeURIComponent(id)); render(); }
+          } catch (e) { say(e.message); }
+        }}, 'Ask again')));
+  });
+}
+
+async function fork(index) {
+  if (!open) return;
+  try {
+    const r = await api('/web/fork', {chat: open, index});
+    if (r.error) say(r.error); else show(r.chat);
+  } catch (e) { say(e.message); }
+}
+
+// ------------------------------------------------------------ a new chat's setup: agent, model, Linux tools, background
+
+// what the next new chat starts with (null until the phone said what it offers): {agent, model, dev, background, o}
+let draft = null;
+
+async function newDraft(agent) {
+  try {
+    const o = await api('/web/new' + (agent ? '?agent=' + encodeURIComponent(agent) : ''));
+    if (o.error || open) return;
+    // another agent: its own models, so the model goes back to Default; the switches stay as they were set
+    draft = {agent: o.agent, model: '', dev: draft && agent ? draft.dev : o.dev, background: draft && agent ? draft.background : o.background, o};
+    render();
+  } catch (e) {}
+}
+
+function setup() {
+  const o = draft.o, agent = o.agents.find(a => a.id === draft.agent), model = o.models.find(m => m.id === draft.model);
+  const pick = (label, value, onclick) => el('button', {onclick}, el('span', {}, el('small', {}, label), el('b', {}, value)), icon(I.chev, 16));
+  const flip = (label, key, hint) => el('button', {class: draft[key] ? 'on' : '', 'aria-pressed': draft[key] ? 'true' : 'false', title: hint,
+    onclick: () => { draft[key] = !draft[key]; render(); }}, el('span', {class: 'sw'}), el('span', {}, el('small', {}, label), el('b', {}, draft[key] ? 'On' : 'Off')));
+  const row = el('div', {class: 'setup'});
+  if (!o.agents.length) { row.append(el('p', {class: 'muted'}, 'No agent is signed in on the phone yet.')); return row; }
+  row.append(pick('Agent', agent ? agent.name : draft.agent, () => sheet((box, close) => {
+    box.append(el('h2', {}, 'Agent'));
+    for (const a of o.agents) box.append(option(a.name + (a.def ? ' · default' : ''), a.id === draft.agent, () => { close(); if (a.id !== draft.agent) newDraft(a.id); }));
+  })));
+  row.append(pick('Model', model ? model.name || 'Default' : 'Default', () => sheet((box, close) => {
+    box.append(el('h2', {}, 'Model'));
+    for (const m of o.models) box.append(m.heading ? el('h3', {}, m.heading) : option(m.name || m.id || 'Default', m.id === draft.model, () => { close(); draft.model = m.id; render(); }));
+    filterable(box);
+  })));
+  if (o.linux) row.append(flip('Linux tools', 'dev', 'The agent may run commands, install packages and edit files in Buddy’s Linux.'));
+  if (o.canBackground) row.append(flip('Background mode', 'background', 'The agent works on a hidden screen, so the phone stays free.'));
+  return row;
+}
+
+// ------------------------------------------------------------ pickers: model and effort, agent, the chat's options
+
+function sheet(build) {
+  const d = el('dialog', {}), box = el('div', {class: 'sheet'});
+  d.append(box);
+  d.addEventListener('click', e => { if (e.target === d) d.close(); }); // (a click outside it)
+  d.addEventListener('close', () => d.remove());
+  build(box, () => d.close());
+  document.body.append(d);
+  d.showModal();
+}
+
+/** A search box over a long list of options: what doesn't match hides, and a heading with nothing left under it. */
+function filterable(box) {
+  const n = box.querySelectorAll('.opt').length;
+  if (n < 12) return;
+  const f = el('input', {class: 'filter', type: 'search', placeholder: 'Search ' + n + ' models', 'aria-label': 'Search models'});
+  f.addEventListener('input', () => {
+    const q = f.value.trim().toLowerCase();
+    let head = null, any = false;
+    const end = () => { if (head) head.hidden = !any; };
+    for (const c of box.children) {
+      if (c.tagName === 'H3') { end(); head = c; any = false; }
+      else if (c.classList.contains('opt')) { const hit = !q || c.textContent.toLowerCase().includes(q); c.hidden = !hit; any = any || hit; }
+    }
+    end();
+  });
+  box.querySelector('h2').after(f);
+  setTimeout(() => f.focus(), 0);
+}
+
+function option(name, on, pick) {
+  return el('button', {class: 'opt' + (on ? ' on' : ''), 'aria-pressed': on ? 'true' : 'false', onclick: pick},
+    el('span', {class: 'n'}, name), el('span', {class: 'c'}, icon(I.check, 18)));
+}
+
+/** One change on the phone, then the chat as it is now. */
+async function change(body, chat) {
+  const id = chat || open;
+  try {
+    const r = await api('/web/set', Object.assign({chat: id}, body));
+    say(r.error || '');
+    if (open === id) { chatData = await api('/web/chat?id=' + encodeURIComponent(id)); render(); }
+  } catch (e) { say(e.message); }
+}
+
+async function options(chat) {
+  try { const o = await api('/web/options?id=' + encodeURIComponent(chat || open)); if (o.error) { say(o.error); return null; } return o; }
+  catch (e) { say(e.message); return null; }
+}
+
+async function pickModel() {
+  const o = await options();
+  if (!o) return;
+  sheet((box, close) => {
+    box.append(el('h2', {}, 'Model'), el('p', {}, 'The next message uses it. The conversation goes on.'));
+    for (const m of o.models) {
+      box.append(m.heading ? el('h3', {}, m.heading) : option(m.name || m.id || 'Default', m.id === o.model, () => { close(); change({model: m.id}); }));
+    }
+    filterable(box);
+    if (o.efforts.length) {
+      box.append(el('h3', {}, 'Effort'));
+      for (const e of o.efforts) box.append(option(e.name, e.id === o.effort, () => { close(); change({effort: e.id}); }));
+    }
+  });
+}
+
+async function pickAgent() {
+  const o = await options();
+  if (!o) return;
+  sheet((box, close) => {
+    box.append(el('h2', {}, 'Agent'), el('p', {}, o.running ? 'The chat is working: switch its agent when it’s done.'
+      : 'The new agent takes over from your next message. It starts a conversation of its own and gets this chat so far as text.'));
+    for (const a of o.agents) {
+      const b = option(a.name, a.id === o.agent, () => { close(); if (a.id !== o.agent) change({agent: a.id}); });
+      if (o.running) b.disabled = true;
+      box.append(b);
+    }
+  });
+}
+
+/**
+ * A chat's menu, dropped down from its ⋯ in the list or from the header's button: pin, rename, archive, delete. On a
+ * narrow window the header's chips are hidden, so the open chat's menu has the Linux tools and background switches too.
+ */
+function chatMenu(id, anchor) {
+  const old = document.querySelector('.pop');
+  if (old) { old.remove(); if (old.dataset.for === id + anchor.className) return; } // (the same button again: closed)
+  const c = (state && state.chats.find(x => x.id === id)) || {}, title = c.title || (chatData && chatData.title) || 'Chat';
+  const pop = el('div', {class: 'pop', role: 'menu'});
+  pop.dataset.for = id + anchor.className;
+  const shut = () => { pop.remove(); document.removeEventListener('pointerdown', away, true); document.removeEventListener('keydown', esc, true); };
+  const away = e => { if (!pop.contains(e.target) && e.target !== anchor && !anchor.contains(e.target)) shut(); };
+  const esc = e => { if (e.key === 'Escape') { shut(); anchor.focus(); } };
+  const item = (name, run, danger) => el('button', {role: 'menuitem', class: danger ? 'danger' : '', onclick: () => { shut(); run(); }}, name);
+  if (!c.archived) pop.append(item(c.pinned ? 'Unpin' : 'Pin', () => change({pinned: !c.pinned}, id)));
+  // (marked unread, the open chat closes: open, it would be read again at once)
+  pop.append(item(c.unread ? 'Mark as read' : 'Mark as unread', () => { change({unread: !c.unread}, id); if (!c.unread && id === open) show(null); }));
+  pop.append(item('Rename', () => rename(id, title)));
+  pop.append(item('Files', () => openView('files', id, title))); // (this chat's: its project folder, what was sent to it, its attachments)
+  pop.append(item('Schedule…', () => editSchedule(id, title)));
+  pop.append(c.archived ? item('Bring back', () => change({archived: false}, id)) : item('Archive', () => change({archived: true}, id)));
+  const d = id === open && chatData && !chatData.error ? chatData : null;
+  if (d && anchor.id === 'optbtn' && window.matchMedia('(max-width: 820px)').matches) {
+    if (d.linux) pop.append(item('Linux tools: turn ' + (d.dev ? 'off' : 'on'), () => change({dev: !d.dev}, id)));
+    if (d.canBackground) pop.append(item('Background mode: turn ' + (d.background ? 'off' : 'on'), () => change({background: !d.background}, id)));
+  }
+  pop.append(item('Delete', () => remove(id, title), true));
+  document.body.append(pop);
+  // under the button, kept inside the window
+  const r = anchor.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight;
+  pop.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, r.right - w)) + 'px';
+  pop.style.top = (r.bottom + h + 8 > window.innerHeight ? Math.max(8, r.top - h - 4) : r.bottom + 4) + 'px';
+  document.addEventListener('pointerdown', away, true);
+  document.addEventListener('keydown', esc, true);
+  pop.firstChild.focus();
+}
+
+function rename(id, title) {
+  sheet((box, close) => {
+    const name = el('input', {value: title, maxlength: '120', 'aria-label': 'Chat name'});
+    const save = () => { close(); if (name.value.trim() !== title) change({title: name.value}, id); };
+    name.addEventListener('keydown', e => { if (e.key === 'Enter') save(); });
+    box.append(el('h2', {}, 'Rename'), el('div', {class: 'line'}, name, el('button', {class: 'btn primary', onclick: save}, 'Save')));
+    setTimeout(() => { name.focus(); name.select(); }, 0);
+  });
+}
+
+/** Deleting a chat, asked first: it can't be brought back (Archive can). */
+function remove(id, title) {
+  sheet((box, close) => {
+    box.append(el('h2', {}, 'Delete “' + title + '”?'),
+      el('p', {}, 'The chat and its attachments are deleted from the phone for good. To only put it away, use Archive.'),
+      el('div', {class: 'line', style: 'justify-content:flex-end;margin-top:8px'}, el('button', {class: 'btn', onclick: close}, 'Cancel'),
+        el('button', {class: 'btn deny', onclick: async () => {
+          close();
+          try {
+            const r = await api('/web/delete', {chat: id});
+            say(r.error || '');
+            if (!r.error && open === id) { open = null; chatData = null; drawn = ''; $('shell').classList.add('list'); newDraft(); render(); }
+          } catch (e) { say(e.message); }
+        }}, 'Delete')));
+  });
+}
+
+// ------------------------------------------------------------ what the agent runs now, and Stop
+
+let runOpen = false, runData = null, runAt = 0, runTimer = null;
+
+/** Asks the phone every 2 s while the panel is open and the chat works. */
+async function fetchRun() {
+  clearTimeout(runTimer);
+  drawRun();
+  if (!runOpen || !open) return;
+  const id = open;
+  try { const r = await api('/web/run?id=' + encodeURIComponent(id)); if (open === id && runOpen) { runData = r; runAt = Date.now(); } } catch (e) {}
+  drawRun();
+  if (runOpen && open === id && (!runData || runData.running)) runTimer = setTimeout(fetchRun, 2000);
+}
+
+function clock(s) { s = Math.max(0, Math.floor(s)); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+
+function drawRun() {
+  const box = $('run');
+  if (!box) return;
+  box.textContent = '';
+  if (!runOpen) return;
+  const r = runData, card = el('div', {class: 'card run', role: 'group', 'aria-label': 'Running now'},
+    el('div', {class: 'row', style: 'align-items:center'}, el('span', {class: 'lab', style: 'flex:1'}, 'RUNNING NOW'),
+      el('button', {class: 'btn small', onclick: () => { runOpen = false; fetchRun(); }}, 'Close')));
+  if (!r) card.append(el('div', {class: 'working'}, el('span', {class: 'spin'}), 'Looking…'));
+  else if (r.error) card.append(el('div', {class: 'muted'}, r.error));
+  else if (!r.running) card.append(el('div', {class: 'muted'}, 'This chat isn’t working any more.'));
+  else {
+    if (r.cmd) card.append(el('pre', {}, r.cmd), el('div', {}, 'Running for ' + clock(r.since + (Date.now() - runAt) / 1000)));
+    else card.append(el('div', {class: 'muted'}, 'The agent isn’t running a command right now.'));
+    if (r.procs && r.procs.length) {
+      const list = el('div', {class: 'procs'});
+      for (const p of r.procs) list.append(el('div', {class: 'proc', style: 'padding-inline-start:' + 14 * Math.min(p.depth, 4) + 'px'},
+        el('div', {class: 'a'}, el('code', {}, p.args), el('small', {}, 'pid ' + p.pid + ' · running ' + clock(p.seconds) + (p.cpu > 0 ? ' · CPU ' + clock(p.cpu) : ''))),
+        p.depth === 0 ? el('button', {class: 'btn small deny', onclick: () => stopRun(p.pid)}, 'Stop') : null));
+      card.append(list);
+    } else if (r.procs) card.append(el('div', {class: 'muted'}, 'Nothing is running under the agent right now.'));
+    card.append(el('div', {class: 'note'}, 'A command’s output isn’t shown here: the agent gets it when the command ends.'));
+  }
+  box.append(card);
+}
+
+/** Stop: the whole run, or with a pid one process the agent started (and what that started). */
+async function stopRun(pid) {
+  if (!open) return;
+  try {
+    const r = await api('/web/stop', pid ? {chat: open, pid} : {chat: open});
+    say(r.error || '');
+  } catch (e) { say(e.message); }
+  if (runOpen) fetchRun();
+}
+
+// ------------------------------------------------------------ cards and sending
+
+function drawCards() {
+  const box = $('cards'), card = state && state.card, mine = card && (card.chat === null || card.chat === open);
+  const other = card && !mine ? (state.chats.find(c => c.id === card.chat) || {}).title || 'another chat' : null;
+  const now = JSON.stringify([state && state.phoneCard, card, mine, other]);
+  if (now === drawnCard) return; // (the same card: what is being typed into it stays)
+  drawnCard = now;
+  box.textContent = '';
+  if (state && state.phoneCard) box.append(el('div', {class: 'card'}, el('span', {class: 'lab'}, 'ON THE PHONE'),
+    el('span', {}, 'A card is waiting on the phone: paying, buying and letting devices in are approved there.')));
+  if (mine) box.append(cardView(card, card.chat === null ? 'From another session' : null));
+  else if (card) box.append(el('div', {class: 'card'}, el('span', {class: 'lab'}, 'WAITING FOR YOU'),
+    el('div', {class: 'row', style: 'align-items:center'}, el('span', {style: 'flex:1 1 200px'}, 'A card is waiting in “' + other + '”.'),
+      el('button', {class: 'btn primary', style: 'flex:none', onclick: () => show(card.chat)}, 'Open'))));
+}
+
+function cardView(card, from) {
+  const box = el('div', {class: 'card', role: 'group', 'aria-label': 'Approval'}, el('span', {class: 'lab'}, (card.options ? 'QUESTION' : 'NEEDS YOUR OK') + (from ? ' · ' + from : '')),
+    el('div', {class: 'txt'}, card.text));
+  const answer = async body => {
+    body.text = card.text;
+    try { const r = await api('/web/answer', body); say(r.error || ''); } catch (e) { say(e.message); }
+  };
+  const row = el('div', {class: 'row'});
+  if (card.options) {
+    for (const o of card.options) row.append(el('button', {class: 'btn', onclick: () => answer({option: o})}, o));
+    box.append(row);
+  } else {
+    const what = el('input', {placeholder: 'What should it change?', 'aria-label': 'What should it change?'});
+    const tell = el('div', {class: 'change', hidden: true}, what, el('button', {class: 'btn primary', onclick: () => { if (what.value.trim()) answer({change: what.value.trim()}); }}, 'Send'));
+    what.addEventListener('keydown', e => { if (e.key === 'Enter' && what.value.trim()) answer({change: what.value.trim()}); });
+    row.append(el('button', {class: 'btn deny', onclick: () => answer({approve: false})}, 'Deny'),
+      el('button', {class: 'btn', onclick: () => { tell.hidden = !tell.hidden; if (!tell.hidden) what.focus(); }}, 'Change'),
+      el('button', {class: 'btn primary', onclick: () => answer({approve: true})}, 'Approve'));
+    box.append(row, tell);
+  }
+  return box;
+}
+
+let sending = false;
+async function sendIt() {
+  const ta = $('msg'), typed = ta.value.trim();
+  if (atts.some(a => a.busy)) { say('Wait for the files to finish uploading.'); return; }
+  const ok = atts.filter(a => a.id || a.path);
+  if ((!typed && !ok.length) || sending) return;
+  // (a quote goes in as Markdown above the text, the way the app sends one)
+  const text = quoted && typed ? quoted.split('\n').map(l => '> ' + l).join('\n') + '\n\n' + typed : typed;
+  const files = ok.filter(a => a.id).map(a => a.id), linux = ok.filter(a => a.path).map(a => a.path);
+  sending = true; $('send').disabled = true; say('');
+  try {
+    const r = await api('/web/send', Object.assign(open ? {chat: open, text}
+      : draft ? {text, agent: draft.agent, model: draft.model, dev: draft.dev, background: draft.background} : {text}, {files, linux}));
+    if (r.error) { say(r.error); return; }
+    ta.value = ''; grow(ta); setQuote(null); clearAtts();
+    if (r.chat && r.chat !== open) { open = r.chat; shown = PAGE; unfolded.clear(); }
+    toBottom = true; drawn = '';
+    chatData = await api('/web/chat?id=' + encodeURIComponent(open));
+    render();
+  } catch (e) { say(e.message); }
+  finally { sending = false; canSend(); }
+}
+
+function canSend() { $('send').disabled = !$('msg').value.trim() && !atts.some(a => a.id || a.path); }
+
+// ------------------------------------------------------------ files with a message, and files on messages
+
+// what goes with the next message: {name, size, busy, id (an attachment), path (in the chat's Linux tools), error, xhr, done}
+let atts = [];
+
+/** Sends each file to the phone as it's picked (any size: over 25 MB it goes to the chat's Linux tools, if it has them). */
+function attach(list) {
+  for (const f of list) {
+    const a = {name: f.name, size: f.size, busy: true, done: 0};
+    atts.push(a);
+    const x = new XMLHttpRequest();
+    a.xhr = x;
+    x.open('POST', '/web/upload?to=attach&name=' + encodeURIComponent(f.name) + (open ? '&chat=' + encodeURIComponent(open) : ''));
+    x.setRequestHeader('Authorization', 'Bearer ' + key);
+    x.setRequestHeader('Content-Type', 'application/octet-stream');
+    x.upload.onprogress = e => { if (e.lengthComputable) { a.done = e.loaded / e.total; if (a.bar) a.bar.value = a.done; } };
+    x.onload = () => {
+      a.busy = false;
+      let r = {};
+      try { r = JSON.parse(x.responseText); } catch (e) { r = {error: 'The phone didn’t take it (' + x.status + ').'}; }
+      if (r.error) a.error = r.error; else if (r.id) a.id = r.id; else a.path = r.path;
+      drawAtts(); canSend();
+    };
+    x.onerror = () => { a.busy = false; a.error = 'The upload stopped.'; drawAtts(); canSend(); };
+    x.send(f);
+  }
+  drawAtts(); canSend();
+}
+
+function clearAtts() { for (const a of atts) if (a.busy && a.xhr) a.xhr.abort(); atts = []; drawAtts(); }
+
+function drawAtts() {
+  const box = $('atts');
+  if (!box) return;
+  box.textContent = '';
+  for (const a of atts) {
+    a.bar = a.busy ? el('progress', {max: '1', value: String(a.done)}) : null;
+    box.append(el('div', {class: 'att' + (a.error ? ' err' : ''), title: a.error || (a.path ? 'Goes to the chat’s Linux tools: ' + a.path : a.name)},
+      icon(a.path ? I.folder : I.attach, 16), el('span', {}, a.error ? a.name + ': ' + a.error : a.name), a.bar,
+      el('button', {'aria-label': 'Remove ' + a.name, onclick: () => { if (a.busy && a.xhr) a.xhr.abort(); atts = atts.filter(x => x !== a); drawAtts(); canSend(); }}, icon(I.x, 14))));
+  }
+}
+
+const pics = new Map(); // a picture attachment's id → its address in this page (fetched once, with the key)
+
+/** A message's files: pictures shown, other files as chips that download (by a one-use link). */
+function msgFiles(r) {
+  if (!(r.f && r.f.length) && !(r.lx && r.lx.length)) return null;
+  const box = el('div', {class: 'mfiles'}), chat = open;
+  for (const f of r.f || []) {
+    if (f.image) {
+      const img = el('img', {alt: f.name, title: f.name, loading: 'lazy', onclick: () => enlarge(img.src, f.name, {att: f.id, chat})});
+      box.append(img);
+      if (pics.has(f.id)) img.src = pics.get(f.id);
+      else fetch('/web/pic?chat=' + encodeURIComponent(chat) + '&id=' + encodeURIComponent(f.id), {headers: {Authorization: 'Bearer ' + key}})
+        .then(x => x.ok ? x.blob() : null).then(b => { if (b) { const u = URL.createObjectURL(b); pics.set(f.id, u); img.src = u; } }).catch(() => {});
+    } else box.append(el('button', {class: 'fchip', title: 'Download ' + f.name, onclick: () => download({att: f.id, chat})}, icon(I.file, 16), el('span', {}, f.name)));
+  }
+  for (const p of r.lx || []) {
+    const name = p.split('/').pop();
+    box.append(el('button', {class: 'fchip', title: p + ' · click to download', onclick: () => download({path: p, chat})}, icon(I.folder, 16), el('span', {}, name)),
+      el('button', {class: 'fchip', title: 'Show it in this chat’s files', onclick: () => { const t = chatData && chatData.title; openView('files', chat, t); goFiles(p.slice(0, p.lastIndexOf('/'))); }}, el('span', {}, 'Show in Files')));
+  }
+  return box;
+}
+
+/** A picture large, over the page, with Download. */
+function enlarge(src, name, what) {
+  if (!src) return;
+  sheet((box, close) => {
+    box.parentNode.classList.add('lightbox');
+    box.append(el('img', {src, alt: name}),
+      el('div', {class: 'line', style: 'justify-content:center;gap:10px;margin-top:10px;flex-wrap:wrap'},
+        el('span', {class: 'muted', style: 'align-self:center;font-size:13px;max-width:60vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'}, name),
+        el('button', {class: 'btn primary', style: 'display:flex;align-items:center;gap:6px', onclick: () => download(what)}, icon(I.download, 16), 'Download'),
+        el('button', {class: 'btn', onclick: close}, 'Close')));
+  });
+}
+
+/** A download by a plain link: the phone gives a one-use ticket for it first (a link can't carry the key). */
+async function download(what) {
+  try {
+    const r = await api('/web/ticket', what);
+    if (r.error) { say(r.error); return; }
+    const a = el('a', {href: '/web/dl?t=' + r.t, download: ''});
+    document.body.append(a); a.click(); a.remove();
+  } catch (e) { say(e.message); }
+}
+
+// ------------------------------------------------------------ the other views: Files, Screens, Schedules and routines
+
+let view = null, viewGen = 0, viewDrawn = '';
+
+function openView(v, arg, title) {
+  leaveView();
+  view = v; viewDrawn = ''; open = null; chatData = null; drawn = '';
+  if (v === 'files') fsv = {chat: arg || null, title: title || '', path: null, data: null, hidden: fsv ? fsv.hidden : false};
+  if (v === 'screens') scr = {list: null, big: arg || null};
+  if (v === 'plans') plansData = null;
+  if (v === 'devices') devData = null;
+  $('shell').classList.remove('list');
+  render();
+  loadView();
+}
+
+// ---- a chat's hidden screen, small, at the side of the chat (hidden there per chat, as this browser remembers)
+
+let panelFor = null, panelGen = 0;
+
+function panelHidden(id) { try { return (localStorage.getItem('buddy-nopanel') || '').split(',').includes(id); } catch (e) { return false; } }
+
+function panelHide(id, hide) {
+  try {
+    const l = (localStorage.getItem('buddy-nopanel') || '').split(',').filter(x => x && x !== id);
+    if (hide) l.push(id);
+    localStorage.setItem('buddy-nopanel', l.slice(-200).join(','));
+  } catch (e) {}
+  panelFor = null; drawn = ''; render();
+}
+
+function drawPanel(d) {
+  const show = !!(d && d.screen && !view && !panelHidden(open));
+  $('scrpanel').hidden = !show;
+  document.querySelector('.chat').classList.toggle('withpanel', show); // (the chat moves over, so the picture covers none of it)
+  if (!show) { panelFor = null; panelGen++; return; }
+  if (panelFor === open) return; // (its loop is at it)
+  panelFor = open;
+  const g = ++panelGen, id = open;
+  $('scrpic').textContent = 'Loading…';
+  (async () => {
+    while (g === panelGen) {
+      if (!document.hidden) {
+        try {
+          const x = await fetch('/web/shot?id=' + encodeURIComponent(id) + '&w=360', {headers: {Authorization: 'Bearer ' + key}});
+          if (g !== panelGen) return;
+          const box = $('scrpic');
+          if (x.ok) {
+            const u = URL.createObjectURL(await x.blob());
+            let img = box.querySelector('img');
+            if (!img) { box.textContent = ''; img = el('img', {alt: 'Hidden screen'}); box.append(img); }
+            const old = img.src;
+            img.src = u;
+            if (old.startsWith('blob:')) setTimeout(() => URL.revokeObjectURL(old), 1000);
+          } else { let why = 'Nothing to show yet.'; try { why = (await x.json()).error || why; } catch (e) {} box.textContent = why; }
+        } catch (e) {}
+      }
+      if (!rate) return;
+      await new Promise(r => setTimeout(r, Math.max(rate, 2000)));
+    }
+  })();
+}
+
+function leaveView() { view = null; viewGen++; for (const u of shots.values()) URL.revokeObjectURL(u); shots.clear(); }
+
+function viewHead(title) {
+  $('title').textContent = title;
+  for (const id of ['agent', 'optbtn', 'scrchip', 'devchip', 'bgchip', 'work', 'runbtn', 'stopbtn']) $(id).hidden = true;
+  $('scrpanel').hidden = true; panelFor = null; panelGen++; document.querySelector('.chat').classList.remove('withpanel');
+  document.title = title + ' · Buddy';
+}
+
+async function loadView() {
+  const g = viewGen;
+  try {
+    if (view === 'files') {
+      const asked = fsv.path; // (another folder opened meanwhile: this answer is for the one before)
+      const d = fsv.path ? await api('/web/files?path=' + encodeURIComponent(fsv.path) + (fsv.chat ? '&chat=' + encodeURIComponent(fsv.chat) : '') + (fsv.hidden ? '&hidden=1' : ''))
+        : await api('/web/places' + (fsv.chat ? '?chat=' + encodeURIComponent(fsv.chat) : ''));
+      if (g === viewGen && fsv.path === asked) { fsv.data = d; viewDrawn = ''; drawView(); }
+    } else if (view === 'screens') {
+      const d = await api('/web/screens');
+      if (g === viewGen) { scr.list = d; viewDrawn = ''; drawView(); shotLoop(g); }
+    } else if (view === 'plans') {
+      const d = await api('/web/plans');
+      if (g === viewGen) { plansData = d; viewDrawn = ''; drawView(); }
+    } else if (view === 'devices') {
+      const d = await api('/web/devices');
+      if (g === viewGen) { devData = d; viewDrawn = ''; drawView(); }
+    }
+  } catch (e) { say(e.message); }
+}
+
+function drawView() {
+  viewHead(view === 'files' ? (fsv.chat ? 'Files · ' + (fsv.title || 'this chat') : 'Files') : view === 'screens' ? 'Screens'
+    : view === 'devices' ? 'Devices and computers' : 'Schedules and routines');
+  const k = JSON.stringify([view, view === 'files' ? [fsv.path, fsv.data, fsv.hidden, ups.map(u => [u.name, u.error, u.busy])] : view === 'screens' ? [scr.list, scr.big]
+    : view === 'devices' ? devData : plansData]);
+  if (k === viewDrawn) return; // (an upload's bar moves on its own; the list stays as it is)
+  viewDrawn = k;
+  const col = $('col');
+  col.textContent = '';
+  if (view === 'files') drawFiles(col); else if (view === 'screens') drawScreens(col); else if (view === 'devices') drawDevices(col); else drawPlans(col);
+  $('pane').scrollTop = 0;
+  jump();
+}
+
+// ---- Files: the same places as the Files screen in the app
+
+let fsv = null, ups = [];
+
+function size(n) {
+  if (n < 1024) return n + ' B';
+  const u = ['KB', 'MB', 'GB', 'TB'];
+  let i = -1;
+  do { n /= 1024; i++; } while (n >= 1024 && i < u.length - 1);
+  return (n < 10 ? n.toFixed(1) : Math.round(n)) + ' ' + u[i];
+}
+
+function goFiles(path) { fsv.path = path; fsv.data = null; viewDrawn = ''; drawView(); loadView(); }
+
+function drawFiles(col) {
+  const d = fsv.data;
+  const crumbs = el('div', {class: 'crumbs'}, el('button', {onclick: () => goFiles(null)}, fsv.chat ? 'This chat' : 'Places'));
+  if (fsv.path) {
+    const parts = fsv.path.split('/').filter(Boolean);
+    // from the place it's in (the workspace, or a chat's folder), not from /
+    const inWork = fsv.path === '/root/.buddy/work' || fsv.path.startsWith('/root/.buddy/work/');
+    const base = inWork ? 3 : Math.min(parts.length, 5);
+    for (let i = base - 1; i < parts.length; i++) {
+      const p = '/' + parts.slice(0, i + 1).join('/');
+      const label = i === base - 1 ? (inWork ? 'Workspace' : parts[i] === 'incoming' ? 'Sent to Linux tools' : parts[i] === 'files' ? 'Attachments' : parts[i]) : parts[i];
+      crumbs.append('/', el('button', {onclick: () => goFiles(p)}, label));
+    }
+  }
+  const pick = el('input', {type: 'file', multiple: true, hidden: true, onchange: e => { upload([...e.target.files]); e.target.value = ''; }});
+  const bar = el('div', {class: 'bar'}, crumbs, el('span', {class: 'grow'}));
+  if (fsv.path && d && !d.error) {
+    const up = icon(I.download, 16);
+    up.style.transform = 'rotate(180deg)';
+    bar.append(el('label', {class: 'muted', style: 'display:flex;align-items:center;gap:6px;font-size:13px'},
+      el('input', {type: 'checkbox', checked: fsv.hidden, onchange: e => { fsv.hidden = e.target.checked; loadView(); }, style: 'min-height:0'}), 'Hidden files'),
+      el('button', {class: 'btn small', onclick: () => newFolder()}, 'New folder'),
+      el('button', {class: 'btn small primary', style: 'display:flex;align-items:center;gap:6px', onclick: () => pick.click()}, up, 'Upload'), pick);
+  }
+  col.append(bar);
+  if (ups.length) {
+    const box = el('div', {class: 'ups'});
+    for (const u of ups) {
+      u.bar = u.busy ? el('progress', {max: '1', value: String(u.done)}) : null;
+      box.append(el('div', {class: 'up'}, el('span', {class: 'nm'}, u.name + ' · ' + size(u.size)), u.bar,
+        u.error ? el('span', {style: 'color:var(--err)'}, u.error) : u.busy ? null : el('span', {class: 'muted'}, 'Done'),
+        u.busy ? el('button', {class: 'btn small', onclick: () => u.xhr.abort()}, 'Cancel')
+          : el('button', {class: 'btn small', onclick: () => { ups = ups.filter(x => x !== u); viewDrawn = ''; drawView(); }}, 'OK')));
+    }
+    col.append(box);
+  }
+  if (!d) { col.append(el('div', {class: 'working'}, el('span', {class: 'spin'}), 'Looking…')); return; }
+  if (d.error) { col.append(el('div', {class: 'error'}, d.error)); return; }
+  const list = el('div', {class: 'files'});
+  if (!fsv.path) {
+    col.append(el('p', {class: 'muted', style: 'margin:0'}, fsv.chat
+      ? 'This chat’s files in Buddy’s Linux: where its agent works, what was sent to its Linux tools, and its attachments.'
+      : 'What’s in Buddy’s Linux, where agents with Linux tools work. Upload a file into a folder for them, or take out what they made. A chat’s own files are in its menu (⋯ → Files).'));
+    for (const p of d.places) list.append(el('div', {class: 'frow'}, el('button', {class: 'nm', onclick: () => goFiles(p.path)},
+      el('span', {class: 'tile dir'}, icon(I.folder, 18)), el('span', {}, p.name, el('small', {}, p.about)))));
+    col.append(list);
+    return;
+  }
+  if (d.busy) col.append(el('p', {class: 'muted', style: 'margin:0'}, 'A file is being copied in here from the phone.'));
+  for (const e of d.entries) {
+    const path = d.path + '/' + e.name;
+    const ops = el('div', {class: 'ops'});
+    if (!e.dir && !e.link) ops.append(el('button', {'aria-label': 'Download ' + e.name, title: 'Download', onclick: () => download({path, chat: fsv.chat})}, icon(I.download, 18)));
+    ops.append(el('button', {'aria-label': 'Rename ' + e.name, title: 'Rename', onclick: () => renameFile(path, e.name)}, icon(I.edit, 18)),
+      el('button', {'aria-label': 'Delete ' + e.name, title: 'Delete', onclick: () => deleteFile(path, e.name, e.dir)}, icon(I.trash, 18)));
+    const about = e.link ? 'Link to ' + e.to : (e.dir ? '' : size(e.size) + ' · ') + when(e.time);
+    list.append(el('div', {class: 'frow'}, el('button', {class: 'nm', title: e.dir ? 'Open' : 'Download',
+        onclick: () => e.dir && !e.link ? goFiles(path) : !e.link ? download({path, chat: fsv.chat}) : null},
+      el('span', {class: 'tile' + (e.dir ? ' dir' : '')}, icon(e.dir ? I.folder : I.file, 18)), el('span', {}, e.name, el('small', {}, about))), ops));
+  }
+  if (!d.entries.length) list.append(el('div', {class: 'frow muted'}, 'Nothing here yet.'));
+  col.append(list);
+  if (d.hidden) col.append(el('p', {class: 'muted', style: 'margin:0;font-size:13px'}, d.hidden + (d.hidden === 1 ? ' hidden file' : ' hidden files') + ' not shown.'));
+  if (d.more) col.append(el('p', {class: 'muted', style: 'margin:0;font-size:13px'}, d.more + ' more not shown.'));
+}
+
+/** Files into the folder shown, at any size, each with its bar and Cancel; a name that's taken gets " (2)". */
+function upload(list) {
+  const path = fsv.path, chat = fsv.chat;
+  for (const f of list) {
+    const u = {name: f.name, size: f.size, busy: true, done: 0};
+    ups.push(u);
+    const x = new XMLHttpRequest();
+    u.xhr = x;
+    x.open('POST', '/web/upload?to=files&dir=' + encodeURIComponent(path) + '&name=' + encodeURIComponent(f.name) + (chat ? '&chat=' + encodeURIComponent(chat) : ''));
+    x.setRequestHeader('Authorization', 'Bearer ' + key);
+    x.setRequestHeader('Content-Type', 'application/octet-stream');
+    x.upload.onprogress = e => { if (e.lengthComputable) { u.done = e.loaded / e.total; if (u.bar) u.bar.value = u.done; } };
+    const fin = err => { u.busy = false; u.error = err; viewDrawn = ''; if (view === 'files') { if (fsv.path === path) loadView(); else drawView(); } };
+    x.onload = () => { let r = {}; try { r = JSON.parse(x.responseText); } catch (e) { r = {error: 'The phone didn’t take it (' + x.status + ').'}; } fin(r.error || null); };
+    x.onerror = () => fin('The upload stopped.');
+    x.onabort = () => fin('Cancelled');
+    x.send(f);
+  }
+  viewDrawn = ''; drawView();
+}
+
+async function fsChange(body) {
+  try { const r = await api('/web/fs', Object.assign({chat: fsv.chat}, body)); say(r.error || ''); } catch (e) { say(e.message); }
+  loadView();
+}
+
+function newFolder() {
+  sheet((box, close) => {
+    const name = el('input', {placeholder: 'Name', 'aria-label': 'Folder name'});
+    const go = () => { const n = name.value.trim(); if (!n) return; close(); fsChange({op: 'mkdir', path: fsv.path, name: n}); };
+    name.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+    box.append(el('h2', {}, 'New folder'), el('div', {class: 'line'}, name, el('button', {class: 'btn primary', onclick: go}, 'Create')));
+    setTimeout(() => name.focus(), 0);
+  });
+}
+
+function renameFile(path, old) {
+  sheet((box, close) => {
+    const name = el('input', {value: old, 'aria-label': 'New name'});
+    const go = () => { const n = name.value.trim(); close(); if (n && n !== old) fsChange({op: 'rename', path, name: n}); };
+    name.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+    box.append(el('h2', {}, 'Rename'), el('div', {class: 'line'}, name, el('button', {class: 'btn primary', onclick: go}, 'Save')));
+    setTimeout(() => { name.focus(); const dot = old.lastIndexOf('.'); name.setSelectionRange(0, dot > 0 ? dot : old.length); }, 0);
+  });
+}
+
+function deleteFile(path, name, dir) {
+  sheet((box, close) => {
+    box.append(el('h2', {}, 'Delete “' + name + '”?'),
+      el('p', {}, (dir ? 'The folder and everything in it are' : 'It’s') + ' deleted from the phone for good.'),
+      el('div', {class: 'line', style: 'justify-content:flex-end;margin-top:8px'}, el('button', {class: 'btn', onclick: close}, 'Cancel'),
+        el('button', {class: 'btn deny', onclick: () => { close(); fsChange({op: 'delete', path}); }}, 'Delete')));
+  });
+}
+
+// ---- Screens: to look at, not to touch
+
+let scr = null;
+const shots = new Map(); // a screen → the address of its newest picture
+// how often the pictures come (ms; 0: paused), kept in this browser. The phone's own screen comes at most about once a
+// second whatever is set: Android lets an app take no more
+let rate = 2000;
+try { rate = Number(localStorage.getItem('buddy-rate') || 2000); } catch (e) {}
+const RATES = [[1000, 'Every second'], [2000, 'Every 2 seconds'], [5000, 'Every 5 seconds'], [10000, 'Every 10 seconds'], [30000, 'Every 30 seconds'], [0, 'Paused']];
+
+function rateBox() {
+  const s = el('select', {'aria-label': 'How often the screens refresh', class: 'rate', onchange: e => {
+    rate = Number(e.target.value);
+    try { localStorage.setItem('buddy-rate', String(rate)); } catch (x) {}
+    if (rate) { viewGen++; shotLoop(viewGen); } // (at once, not after the old wait)
+    panelFor = null; panelGen++; // (a chat's small screen starts again at the new rate too)
+  }});
+  for (const [ms, name] of RATES) s.append(el('option', {value: String(ms), selected: ms === rate}, name));
+  return el('label', {class: 'muted', style: 'display:flex;align-items:center;gap:8px;font-size:13px'}, 'Refresh', s);
+}
+
+function drawScreens(col) {
+  const d = scr.list;
+  if (!d) { col.append(el('div', {class: 'working'}, el('span', {class: 'spin'}), 'Looking…')); return; }
+  if (d.off) { col.append(el('p', {class: 'muted'}, 'Screens are off for other devices. They’re turned on in Settings → Other devices on the phone.')); return; }
+  col.append(el('div', {class: 'bar'}, el('p', {class: 'muted', style: 'margin:0;flex:1 1 320px'}, 'The phone’s screen and the hidden screens agents work on. To look at only: they can’t be used from here. While a money app is in front, its screen is only shown on the phone.'), rateBox()));
+  if (scr.big) {
+    const s = scr.big === 'phone' ? {title: 'Phone screen'} : (d.screens.find(x => x.chat === scr.big) || {title: 'This screen has closed'});
+    col.append(el('div', {class: 'bar'}, el('button', {class: 'btn small', style: 'display:flex;align-items:center;gap:6px', onclick: () => { scr.big = null; viewDrawn = ''; drawView(); }}, icon(I.back, 16), 'All screens'),
+      el('b', {}, s.title + (s.app ? ' · ' + s.app : '')), el('span', {class: 'grow'}),
+      scr.big !== 'phone' && state && state.chats.find(c => c.id === scr.big) ? el('button', {class: 'btn small', onclick: () => show(scr.big)}, 'Open the chat') : null));
+    col.append(el('div', {class: 'big'}, pic(scr.big)));
+    restartShots();
+    return;
+  }
+  const grid = el('div', {class: 'grid'}), hid = hiddenShots();
+  // a tile: its picture opens it large; under it, hide it from this page and, for a chat's hidden screen, close that screen
+  const tile = (id, title, sub, closable) => el('div', {class: 'shot'},
+    pic(id, true),
+    el('b', {}, title), sub ? el('small', {}, sub) : null,
+    el('div', {class: 'hb'}, el('button', {title: 'Not shown on this page until you show it again', onclick: () => { hideShot(id, true); }}, 'Hide'),
+      closable ? el('button', {title: 'Ends this hidden screen on the phone (with what’s open on it)', onclick: () => closeScreen(id, title)}, 'Close screen') : null));
+  let hidden = 0;
+  if (d.phone) { if (hid.includes('phone')) hidden++; else grid.append(tile('phone', 'Phone screen', 'What the phone shows now', false)); }
+  for (const s of d.screens) {
+    if (hid.includes(s.chat)) { hidden++; continue; }
+    grid.append(tile(s.chat, s.title, (s.app || 'Hidden screen') + (s.running ? ' · working' : ''), !s.running));
+  }
+  col.append(grid);
+  if (hidden) col.append(el('p', {class: 'muted', style: 'margin:0;font-size:13px'}, hidden + (hidden === 1 ? ' screen hidden on this page. ' : ' screens hidden on this page. '),
+    el('button', {class: 'btn small', onclick: () => { try { localStorage.removeItem('buddy-noshot'); } catch (e) {} viewDrawn = ''; drawView(); }}, 'Show them')));
+  if (!d.phone && !d.screens.length) col.append(el('p', {class: 'muted'}, 'Nothing to show: Buddy’s accessibility isn’t on on the phone.'));
+  else if (!d.screens.length) col.append(el('p', {class: 'muted', style: 'margin:0;font-size:13px'}, 'No hidden screen is open. A chat in background mode gets one when its agent uses the phone.'));
+  restartShots();
+}
+
+/** A screen's picture box: the last picture it had, if any, at once (a new one comes right after). */
+function pic(id, button) {
+  const kids = shots.has(id) ? [el('img', {alt: 'Screen', src: shots.get(id)})] : ['Loading…'];
+  return button ? el('button', {class: 'pic', 'data-shot': id, title: 'Show it large', onclick: () => { scr.big = id; viewDrawn = ''; drawView(); }}, ...kids)
+    : el('div', {class: 'pic', 'data-shot': id}, ...kids);
+}
+
+/** The pictures fetched again now, for the boxes just drawn (and on at the chosen rate; paused: once). */
+function restartShots() {
+  const g = ++viewGen;
+  setTimeout(() => shotLoop(g), 0);
+}
+
+function hiddenShots() { try { return (localStorage.getItem('buddy-noshot') || '').split(',').filter(Boolean); } catch (e) { return []; } }
+
+function hideShot(id, hide) {
+  try { const l = hiddenShots().filter(x => x !== id); if (hide) l.push(id); localStorage.setItem('buddy-noshot', l.join(',')); } catch (e) {}
+  viewDrawn = ''; drawView();
+}
+
+function closeScreen(chat, title) {
+  sheet((box, close) => box.append(el('h2', {}, 'Close this hidden screen?'),
+    el('p', {}, '“' + title + '”’s hidden screen ends on the phone, with the app open on it. The chat stays; its agent gets a new screen when it next uses the phone.'),
+    el('div', {class: 'line', style: 'justify-content:flex-end;margin-top:8px'}, el('button', {class: 'btn', onclick: close}, 'Cancel'),
+      el('button', {class: 'btn deny', onclick: async () => {
+        close();
+        try { const r = await api('/web/close-screen', {chat}); say(r.error || ''); } catch (e) { say(e.message); }
+        loadView();
+      }}, 'Close screen'))));
+}
+
+/** Fetches the pictures of the screens shown, one after another, while this view is open and the page is in front. */
+async function shotLoop(g) {
+  let n = 0;
+  while (g === viewGen && view === 'screens') {
+    if (!document.hidden) {
+      for (const box of [...document.querySelectorAll('[data-shot]')]) {
+        if (g !== viewGen) return;
+        const id = box.dataset.shot, big = !!scr.big;
+        try {
+          const x = await fetch('/web/shot?id=' + encodeURIComponent(id) + '&w=' + (big ? 1080 : 420), {headers: {Authorization: 'Bearer ' + key}});
+          if (g !== viewGen || !box.isConnected) continue;
+          if (x.ok) {
+            const u = URL.createObjectURL(await x.blob()), old = shots.get(id);
+            shots.set(id, u);
+            let img = box.querySelector('img');
+            if (!img) { box.textContent = ''; img = el('img', {alt: 'Screen'}); box.append(img); }
+            img.src = u;
+            if (old) setTimeout(() => URL.revokeObjectURL(old), 5000);
+          } else {
+            let why = 'Nothing to show yet.';
+            try { why = (await x.json()).error || why; } catch (e) {}
+            box.textContent = why;
+          }
+        } catch (e) {}
+      }
+    }
+    // the list of screens again now and then (a hidden screen opens or closes)
+    if (++n % 10 === 0 && g === viewGen) {
+      try { const d = await api('/web/screens'); if (g === viewGen && JSON.stringify(d) !== JSON.stringify(scr.list)) { scr.list = d; viewDrawn = ''; drawView(); } } catch (e) {}
+    }
+    // paused: nothing is fetched until another rate is picked (which starts this again)
+    if (!rate) return;
+    await new Promise(r => setTimeout(r, rate));
+  }
+}
+
+// ---- Devices and computers
+
+let devData = null;
+
+function drawDevices(col) {
+  const d = devData;
+  if (!d) { col.append(el('div', {class: 'working'}, el('span', {class: 'spin'}), 'Looking…')); return; }
+  col.append(el('h2', {class: 'sec'}, 'Paired devices'));
+  const list = el('div', {class: 'files'});
+  for (const x of d.devices) {
+    list.append(el('div', {class: 'frow'}, el('span', {class: 'nm'}, el('span', {class: 'tile'}, icon(I.devices, 18)),
+        el('span', {}, x.name, x.me ? el('span', {class: 'tag'}, 'This browser') : null, el('small', {}, 'Last seen ' + when(x.seen)))),
+      el('button', {class: 'btn small deny', onclick: () => confirmRemove('Remove “' + x.name + '”?', x.me
+        ? 'This browser is out at once, and pairs again only with a code you approve on the phone.'
+        : 'It’s out at once. To come back it pairs again, with a code you approve on the phone.', 'Remove', async () => {
+          try { await api('/web/device-remove', {id: x.id}); } catch (e) {}
+          if (x.me) forget(); else loadView();
+        })}, 'Remove')));
+  }
+  col.append(list, el('p', {class: 'muted', style: 'margin:0;font-size:13px'}, 'To add a device, open this page’s address on it and click Pair. You approve it on the phone, with the same code.'));
+
+  col.append(el('h2', {class: 'sec', style: 'margin-top:18px'}, 'Computers'),
+    el('p', {class: 'muted', style: 'margin:0'}, 'Agents run commands on your own computers over SSH, the way you would in a terminal. Every command shows on a card first.'));
+  if (d.computers.length) {
+    const cl = el('div', {class: 'files'});
+    for (const m of d.computers) cl.append(el('div', {class: 'frow'}, el('span', {class: 'nm'}, el('span', {class: 'tile'}, icon(I.devices, 18)),
+        el('span', {}, m.name, el('small', {}, m.where))),
+      el('button', {class: 'btn small deny', onclick: () => confirmRemove('Remove “' + m.name + '”?',
+        'Agents can’t reach it any more. Buddy’s key stays in its authorized_keys until you take it out there.', 'Remove', async () => {
+          try { await api('/web/computer-remove', {id: m.id}); } catch (e) {}
+          loadView();
+        })}, 'Remove')));
+    col.append(cl);
+  }
+  col.append(addComputer(d));
+}
+
+function confirmRemove(title, text, yes, run) {
+  sheet((box, close) => box.append(el('h2', {}, title), el('p', {}, text),
+    el('div', {class: 'line', style: 'justify-content:flex-end;margin-top:8px'}, el('button', {class: 'btn', onclick: close}, 'Cancel'),
+      el('button', {class: 'btn deny', onclick: () => { close(); run(); }}, yes))));
+}
+
+/** Adding a computer: its details, Buddy's key to copy onto it, and the phone's OK (a card there), then a try. */
+function addComputer(d) {
+  const box = el('div', {class: 'pcard'});
+  box.append(el('span', {class: 't'}, 'Add a computer'));
+  if (!d.linux) { box.append(el('div', {class: 'w'}, 'This needs Buddy’s Linux: install it on the phone first.')); return box; }
+  const f = (label, attrs) => { const i = el('input', Object.assign({'aria-label': label, placeholder: label}, attrs)); return [i, el('label', {style: 'display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);flex:1 1 180px'}, label, i)]; };
+  const [name, nl] = f('Name', {value: 'My computer', maxlength: '40'}), [host, hl] = f('Address (its Tailscale name or IP)', {}),
+    [user, ul] = f('Your user name on it', {}), [port, pl] = f('Port', {value: '22', inputmode: 'numeric', style: 'max-width:110px'});
+  const keyBox = el('pre', {style: 'margin:0;background:var(--bg);border-radius:12px;padding:10px 12px;font:12.5px/1.5 ui-monospace,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere'}, 'Getting Buddy’s key…');
+  const copyBtn = el('button', {class: 'btn small', disabled: true}, icon(I.copy, 16), 'Copy the key');
+  copyBtn.style.cssText = 'display:flex;align-items:center;gap:6px;align-self:flex-start';
+  const status = el('div', {class: 'w', role: 'status'});
+  const go = el('button', {class: 'btn primary', style: 'align-self:flex-start'}, 'Add, and approve it on the phone');
+  box.append(el('div', {class: 'row'}, nl, hl), el('div', {class: 'row'}, ul, pl),
+    el('div', {class: 'w'}, 'Put Buddy’s key on the computer: add this line to ~/.ssh/authorized_keys there. On Windows, turn on OpenSSH Server and use C:\\Users\\<you>\\.ssh\\authorized_keys, or C:\\ProgramData\\ssh\\administrators_authorized_keys for an administrator account.'),
+    keyBox, copyBtn, go, status);
+  api('/web/computer-key', {}).then(r => {
+    if (r.error) { keyBox.textContent = r.error; return; }
+    keyBox.textContent = r.key; copyBtn.disabled = false;
+    copyBtn.onclick = e => copy(r.key, e.currentTarget);
+  }).catch(e => { keyBox.textContent = e.message; });
+  go.onclick = async () => {
+    go.disabled = true;
+    status.textContent = 'Approve it on your phone: a card asks there. Then Buddy tries to get in…';
+    status.style.color = '';
+    try {
+      const r = await api('/web/computer-add', {name: name.value, host: host.value, user: user.value, port: Number(port.value) || 22});
+      if (r.error) { status.textContent = r.error; status.style.color = 'var(--err)'; }
+      else { status.textContent = 'Added. Agents can use it now: each command asks first.'; loadView(); }
+    } catch (e) { status.textContent = e.message; status.style.color = 'var(--err)'; }
+    go.disabled = false;
+  };
+  return box;
+}
+
+// ---- Schedules and routines
+
+let plansData = null;
+
+function confirmDelete(title, text, run) {
+  sheet((box, close) => box.append(el('h2', {}, title), el('p', {}, text),
+    el('div', {class: 'line', style: 'justify-content:flex-end;margin-top:8px'}, el('button', {class: 'btn', onclick: close}, 'Cancel'),
+      el('button', {class: 'btn deny', onclick: () => { close(); run(); }}, 'Delete'))));
+}
+
+function drawPlans(col) {
+  const d = plansData;
+  if (!d) { col.append(el('div', {class: 'working'}, el('span', {class: 'spin'}), 'Looking…')); return; }
+  col.append(el('div', {class: 'bar'}, el('h2', {class: 'sec', style: 'flex:1'}, 'Schedules'),
+    el('button', {class: 'btn small primary', onclick: () => editSchedule(null, '', null)}, 'New schedule')));
+  if (!d.schedules.length) col.append(el('p', {class: 'muted', style: 'margin:0'}, 'No chat has a schedule yet. A schedule sends a chat its message at the times you pick.'));
+  for (const p of d.schedules) {
+    col.append(el('div', {class: 'pcard'},
+      el('div', {}, el('span', {class: 't'}, p.title), p.paused ? el('span', {class: 'tag'}, 'Paused') : null, p.running ? el('span', {class: 'tag'}, 'Working') : null),
+      el('div', {class: 'x'}, p.text), el('div', {class: 'w'}, p.paused ? 'Doesn’t run while paused' : p.when),
+      el('div', {class: 'row'},
+        el('button', {class: 'btn small', onclick: () => editSchedule(p.chat, p.title, p)}, 'Edit'),
+        el('button', {class: 'btn small', onclick: () => planOp(p.chat, 'run')}, 'Run now'),
+        el('button', {class: 'btn small', onclick: () => planOp(p.chat, p.paused ? 'resume' : 'pause')}, p.paused ? 'Resume' : 'Pause'),
+        el('button', {class: 'btn small', onclick: () => show(p.chat)}, 'Open the chat'),
+        el('button', {class: 'btn small deny', onclick: () => confirmDelete('Delete this schedule?', '“' + p.title + '” stops running on its own. The chat stays.',
+          () => planOp(p.chat, 'delete'))}, 'Delete'))));
+  }
+  col.append(el('h2', {class: 'sec', style: 'margin-top:18px'}, 'Routines'));
+  if (!d.routines.length) col.append(el('p', {class: 'muted', style: 'margin:0'}, 'No routines yet. Ask an agent to save what it just did as a routine.'));
+  for (const r of d.routines) {
+    col.append(el('div', {class: 'pcard'}, el('span', {class: 't'}, r.name), r.about ? el('div', {class: 'x'}, r.about) : null,
+      el('div', {class: 'w'}, r.steps + (r.steps === 1 ? ' step' : ' steps') + (r.blanks.length ? ' · asks for ' + r.blanks.join(', ') : '')),
+      el('div', {class: 'row'},
+        el('button', {class: 'btn small primary', onclick: () => runRoutine(r)}, 'Run on the phone'),
+        el('button', {class: 'btn small deny', onclick: () => confirmDelete('Delete “' + r.name + '”?', 'The routine is deleted from the phone.',
+          async () => { try { await api('/web/routine', {op: 'delete', name: r.name}); } catch (e) {} loadView(); })}, 'Delete'))));
+  }
+}
+
+/**
+ * A chat's schedule: its message, the times and days it's sent, and whether a run with nothing new tells you. A new
+ * one picks its chat. Waking the phone and events are set in the app (waking can take away the lock screen).
+ */
+async function editSchedule(chat, title, plan) {
+  if (chat && plan === undefined) { // (from a chat's menu: what it has now, if anything)
+    try { const d = await api('/web/plans'); plan = d.schedules.find(p => p.chat === chat) || null; } catch (e) { plan = null; }
+  }
+  const p = plan || {text: '', minutes: [9 * 60], days: 127, quiet: false};
+  sheet((box, close) => {
+    box.append(el('h2', {}, plan ? 'Schedule · ' + title : 'New schedule'));
+    let pick = null;
+    if (!chat) {
+      pick = el('select', {'aria-label': 'Chat'});
+      for (const c of (state ? state.chats : []).filter(c => !c.archived)) pick.append(el('option', {value: c.id}, c.title || 'Chat'));
+      box.append(el('h3', {}, 'Chat'), pick, el('p', {style: 'margin-top:6px'}, 'The message is sent in this chat, as if you wrote it, and its agent answers there.'));
+    }
+    const msg = el('textarea', {class: 'big', rows: '4', placeholder: 'What should the agent do each time?', 'aria-label': 'Message'});
+    msg.value = p.text;
+    box.append(el('h3', {}, 'Message'), msg);
+    let times = (p.minutes || [9 * 60]).slice();
+    const tbox = el('div', {class: 'times'});
+    const fmt = m => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+    const drawTimes = () => {
+      tbox.textContent = '';
+      times.forEach((m, i) => {
+        const t = el('input', {type: 'time', value: fmt(m), 'aria-label': 'Time ' + (i + 1), onchange: e => { const [h, mm] = e.target.value.split(':').map(Number); if (!isNaN(h)) times[i] = h * 60 + (mm || 0); }});
+        tbox.append(el('span', {}, t, times.length > 1 ? el('button', {'aria-label': 'Remove this time', onclick: () => { times.splice(i, 1); drawTimes(); }}, icon(I.x, 14)) : null));
+      });
+      if (times.length < 12) tbox.append(el('button', {class: 'btn small', onclick: () => { times.push(times[times.length - 1] || 540); drawTimes(); }}, '+ Add a time'));
+    };
+    drawTimes();
+    box.append(el('h3', {}, 'Times'), tbox);
+    let days = p.days || 127;
+    const dbox = el('div', {class: 'days'});
+    const DAYS = [['Mon', 1], ['Tue', 2], ['Wed', 3], ['Thu', 4], ['Fri', 5], ['Sat', 6], ['Sun', 0]];
+    const drawDays = () => {
+      dbox.textContent = '';
+      for (const [n, b] of DAYS) dbox.append(el('button', {class: days & (1 << b) ? 'on' : '', 'aria-pressed': days & (1 << b) ? 'true' : 'false',
+        onclick: () => { days ^= 1 << b; drawDays(); }}, n));
+      dbox.append(el('button', {onclick: () => { days = 127; drawDays(); }}, 'Every day'), el('button', {onclick: () => { days = 0x3E; drawDays(); }}, 'Weekdays'));
+    };
+    drawDays();
+    box.append(el('h3', {}, 'Days'), dbox);
+    const quiet = el('input', {type: 'checkbox', checked: !!p.quiet, style: 'min-height:0'});
+    box.append(el('label', {style: 'display:flex;gap:10px;align-items:center;margin:14px 6px 4px;font-size:14px'}, quiet, 'Only tell me when there’s news'));
+    if (p.events || p.wake) box.append(el('p', {style: 'margin-top:6px'}, (p.events ? 'It also starts on events. ' : '') + (p.wake ? 'It wakes the phone. ' : '') + 'Those stay as set in the app.'));
+    const said = el('p', {style: 'color:var(--err);margin-top:6px', role: 'alert'});
+    box.append(said, el('div', {class: 'line', style: 'justify-content:flex-end;margin-top:6px'}, el('button', {class: 'btn', onclick: close}, 'Cancel'),
+      el('button', {class: 'btn primary', onclick: async () => {
+        const target = chat || (pick && pick.value);
+        if (!target) { said.textContent = 'Pick a chat.'; return; }
+        try {
+          const r = await api('/web/schedule', {chat: target, text: msg.value, minutes: times, days, quiet: quiet.checked});
+          if (r.error) { said.textContent = r.error; return; }
+          close(); say(''); if (view === 'plans') loadView();
+        } catch (e) { said.textContent = e.message; }
+      }}, plan ? 'Save' : 'Create')));
+    setTimeout(() => msg.focus(), 0);
+  });
+}
+
+async function planOp(chat, op) {
+  try { const r = await api('/web/plan', {chat, op}); say(r.error || ''); } catch (e) { say(e.message); }
+  loadView();
+}
+
+/** A routine runs on the phone, with its cards and checks as always; its blanks are asked here first. */
+function runRoutine(r) {
+  const go = async values => {
+    try { const x = await api('/web/routine', {name: r.name, values}); say(x.error || ''); } catch (e) { say(e.message); }
+  };
+  if (!r.blanks.length) { go({}); return; }
+  sheet((box, close) => {
+    const fields = r.blanks.map(b => [b, el('input', {placeholder: b, 'aria-label': b})]);
+    box.append(el('h2', {}, r.name));
+    for (const [b, f] of fields) box.append(el('h3', {}, b), el('div', {class: 'line'}, f));
+    box.append(el('div', {class: 'line', style: 'justify-content:flex-end;margin-top:10px'}, el('button', {class: 'btn', onclick: close}, 'Cancel'),
+      el('button', {class: 'btn primary', onclick: () => { const v = {}; for (const [b, f] of fields) v[b] = f.value; close(); go(v); }}, 'Run')));
+    setTimeout(() => fields[0][1].focus(), 0);
+  });
+}
+
+
+if (key) start(); else pairScreen();
+</script>
+</body>
+</html>

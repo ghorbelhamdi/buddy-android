@@ -1,0 +1,7 @@
+• Routines: save what an agent did and run it again, with blanks to fill
+• Other devices: your chats, files and screens in a browser on your computer
+• Computers: agents run commands on your PC over SSH, each one asked first
+• Copilot and Pi as agents; Agents and models reworked, Sign in with OpenRouter
+• Files: browse Buddy's Linux, upload files of any size
+• A project folder per chat
+• Event triggers, Keep Wireless debugging on, a jump-to-end arrow

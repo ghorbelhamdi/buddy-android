@@ -23,15 +23,15 @@ import java.util.zip.ZipOutputStream;
  * they're secrets, and the keys can't leave this phone's keystore anyway.
  */
 final class Backup {
-    /** Buddy's settings and chats (the API key services' list and choices stay out, as their keys do). */
-    private static final String[] PREFS = {"buddy", "buddy_sessions", "browser"};
+    /** Buddy's settings and chats (the services' list and choices stay out, as their keys do). */
+    private static final String[] PREFS = {"buddy", "buddy_sessions", "browser", "routines"};
     /** In Buddy's Linux, what to keep (no sign-ins): projects without their builds, skills, the agents' conversations. */
     private static final String LINUX_PARTS = "root/.buddy/sessions root/.buddy/work root/.agents/skills root/.claude/projects "
             + "root/.codex/sessions root/.local/share/opencode/opencode.db";
     /**
      * Settings that never leave this phone in a backup and are never taken from one: the tokens that open Buddy's
      * phone tools and its background helper (anyone holding the file would hold them), and what belongs to this
-     * phone's own set-up (its pairing, its API key services).
+     * phone's own set-up (its pairing, its services).
      */
     private static final java.util.Set<String> OWN = new java.util.HashSet<>(java.util.Arrays.asList(
             "token", "bg_token", "bg_paired", "bg_adb_port", "providers", "tailnet_devices",
@@ -60,7 +60,12 @@ final class Backup {
         if (Linux.installed(c)) {
             String out = Linux.exec(c, "cd / && rm -f /tmp/buddy-backup.tar.gz; p=$(ls -d " + LINUX_PARTS + " 2>/dev/null); "
                     + "[ -z \"$p\" ] || tar czf /tmp/buddy-backup.tar.gz --exclude=node_modules --exclude=build "
-                    + "--exclude=.gradle --exclude=.cxx $p 2>&1 && echo DONE", 1800);
+                    + "--exclude=.gradle --exclude=.cxx "
+                    // files sent to Linux tools (LinuxFiles): copies of the phone's own, and often gigabytes
+                    + "--exclude='root/.buddy/sessions/*/incoming' --exclude=root/.buddy/work/incoming "
+                    // Pi's folder of a chat: made again at every run, and its models.json can be a copy of the
+                    // user's own, keys included
+                    + "--exclude='root/.buddy/sessions/*/pi-home' $p 2>&1 && echo DONE", 1800);
             File made = new File(Linux.root(c), "tmp/buddy-backup.tar.gz");
             if (!out.contains("DONE")) throw new Exception(out);
             if (made.isFile()) {

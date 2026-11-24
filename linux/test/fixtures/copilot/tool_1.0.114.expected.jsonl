@@ -1,0 +1,5 @@
+{"buddy_session":"fixture","model":"","session_id":"ee888575-620b-414c-a77b-e0188a4c385a","subtype":"init","type":"system"}
+{"buddy_session":"fixture","model":"mai-code-2-flash","subtype":"model","type":"system"}
+{"buddy_session":"fixture","message":{"content":[{"input":{"ms":1000},"name":"mcp__phone__wait","type":"tool_use"}]},"type":"assistant"}
+{"buddy_session":"fixture","message":{"content":[{"text":"done","type":"text"}]},"type":"assistant"}
+{"buddy_session":"fixture","result":"","subtype":"success","type":"result"}

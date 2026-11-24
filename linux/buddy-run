@@ -1,6 +1,8 @@
 #!/bin/bash
 # Run by the Buddy app inside its built-in Linux (Alpine, through proot).
-#   buddy-run <token> ask <session> <claude|codex|opencode|agy|grok> <dev:0|1|rule|play> <message> [model] [attachment-ids]
+#   buddy-run <token> ask <session> <claude|codex|opencode|agy|grok|copilot|pi> <dev:0|1|rule|play> <message> [model] [attachment-ids]
+#             [effort] [fresh] [lite] [folder]
+#     (folder: the chat's project folder, a path inside the workspace; none = the workspace itself)
 #     (rule: a notification rule's run, working for someone else's message: no shell, files or web tools;
 #      play: the Play version, which has no Linux tools at all)
 #                                    run the agent on the message in that session, streaming events to the bubble
@@ -9,13 +11,15 @@
 #   buddy-run <token> delete <session>     forget that session
 #   buddy-run <token> prune <id,id,...>    remove the folders of chats not in the list
 #   buddy-run <token> ping                 answer the app's setup check
-#   buddy-run <token> procs                list running Claude Code / Codex / OpenCode / Antigravity / Grok processes (buddy_procs)
+#   buddy-run <token> procs                list running Claude Code / Codex / OpenCode / Antigravity / Grok / Copilot / Pi processes (buddy_procs)
 #   buddy-run <token> kill <pid>           stop a running Claude Code / Codex process and its children
+#   buddy-run <token> cmdprocs <session>   the processes under that chat's agent, on stdout ("agent <pid>", then ps rows)
+#   buddy-run <token> cmdkill <session> <pid>   stop one of them and what it started (never the agent itself)
 #   buddy-run <token> recent               list recent Claude Code / Codex sessions from their history (buddy_recent)
 #   buddy-run <token> transcript <claude|codex> <file>   last messages of a session (buddy_transcript)
 #   buddy-run <token> adopt <session> <claude|codex> <agent-session-id>  continue that session as a Buddy chat
 # Every event sent to the bubble carries "buddy_session" so the app can route it.
-HELPER_VERSION=33
+HELPER_VERSION=39
 set -u
 export PATH=$HOME/.local/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # The claude launcher sets BUN_OPTIONS with a path relative to its folder; never inherit a stale one.
@@ -37,6 +41,45 @@ have() { command -v "$1" >/dev/null 2>&1; }
 valid_sid() { [[ "$1" =~ ^[A-Za-z0-9_-]{1,64}$ ]]; }
 # OpenCode 2 (npm @opencode/cli) rather than 1.x (opencode-ai)? 2 needs --standalone, or it leaves a background service
 oc2() { [[ "$(readlink -f "$(command -v opencode)" 2>/dev/null)" == */@opencode/cli/* ]]; }
+# Copilot as Buddy installs it (see run_copilot); npm's own copilot command doesn't run here
+COPILOT=$HOME/.local/bin/copilot
+# Signed in = its own saved login (plaintext in ~/.copilot/config.json, as Buddy's Linux has no keychain), or the
+# GitHub CLI's, which it uses too (Settings > GitHub)
+copilot_signed() {
+  sed '/^ *\/\//d' "$HOME/.copilot/config.json" 2>/dev/null | jq -e '(.authTokens // {}) | length > 0' >/dev/null 2>&1 \
+    || grep -qs 'oauth_token:' "$HOME/.config/gh/hosts.yml"
+}
+# The model ids from `copilot help config` (on stdin), one a line: the "- \"id\"" lines under its `model` setting
+copilot_models() {
+  sed -n '/^ *`model`:/,/^$/p' | sed -n 's/^ *- "\([A-Za-z0-9._-]*\)"$/\1/p'
+}
+# Pi works once a provider is connected: a login or key in its auth.json (`/login`), or a provider of the user's own
+# in its models.json
+pi_signed() {
+  jq -e 'length > 0' "$HOME/.pi/agent/auth.json" >/dev/null 2>&1 \
+    || jq -e '(.providers // {}) | length > 0' "$HOME/.pi/agent/models.json" >/dev/null 2>&1
+}
+# Or, with no provider of its own, on a service saved in Buddy (Settings, Agents and models): any of them but the
+# models on this phone, which are OpenCode's
+pi_service() {
+  local f
+  for f in "$D"/providers/*.json; do
+    [ -s "$f" ] && [ "${f##*/}" != onphone.json ] && return 0
+  done
+  return 1
+}
+# The model list from `pi --list-models` (on stdin), "provider/model" a line
+pi_models() {
+  awk 'NR > 1 && NF >= 2 && $1 != "provider" { print $1 "/" $2 }'
+}
+
+# A sign-in an agent refreshed during a run (its link in the chat's folder became a file with the new token) goes back
+# to the real folder: at the run's end, or here before the links are made again when a Stop ended that run first. Only
+# when it's newer than the real one, which a sign-in made since then would be.
+keep_login() {
+  [ -f "$1" ] && [ ! -L "$1" ] || return 0
+  if [ "$1" -nt "$2" ] || [ ! -e "$2" ]; then mv -f "$1" "$2"; else rm -f "$1"; fi
+}
 
 # Kill a process and everything it started (claude/codex run a few levels below buddy-run).
 kill_tree() {
@@ -60,11 +103,15 @@ end_run() {
   local all p
   all=$(tree "$1")
   kill -TERM $all 2>/dev/null
-  for p in 1 2 3 4 5; do
-    kill -0 $all 2>/dev/null || return 0
+  local left t
+  for t in 1 2 3 4 5; do
+    # (kill -0 on all of them fails as soon as one is gone: each is looked at on its own)
+    left=""
+    for p in $all; do kill -0 "$p" 2>/dev/null && left="$left $p"; done
+    [ -z "$left" ] && return 0
     sleep 1
   done
-  kill -KILL $all 2>/dev/null
+  kill -KILL $left 2>/dev/null
   return 0
 }
 
@@ -87,31 +134,62 @@ descendants() { # print a pid and all its descendants
 }
 
 
-# Is this pid an agent process (the real claude / codex / opencode / agy / grok program)?
+# Is this pid an agent process (the real claude / codex / opencode / agy / grok / copilot / pi program)?
 agent_of() {
-  local cmd
+  local cmd arg
   cmd=$(tr '\0' ' ' < "/proc/$1/cmdline" 2>/dev/null) || return 1
+  # Copilot runs on Node (see buddy-copilot): node …/copilot/pkg/<platform>/<version>/index.js. So does Pi, which then
+  # names its process "pi" (below).
+  arg=${cmd#* }; arg=${arg%% *}
+  case "${cmd%% *} $arg" in
+    *node\ */copilot/pkg/*/index.js) echo copilot; return 0 ;;
+    *node\ */bin/pi|*node\ */pi-coding-agent/dist/*) echo pi; return 0 ;;
+  esac
   case "${cmd%% *}" in
     */claude/versions/*) echo claude ;;
     */codex-linux-*/*|*/bin/codex) echo codex ;;
     */opencode-ai/*|*/@opencode/cli*/*|*/bin/opencode) echo opencode ;;
     */antigravity-cli/bin/*|*/bin/agy) echo agy ;;
     grok|*/bin/grok|*/grok-linux-*) echo grok ;;
+    pi) echo pi ;;
+    # started by name, as buddy-run starts them: Claude Code's argv[0] is then just "claude"
+    claude|codex|opencode|agy) echo "${cmd%% *}" ;;
     *) return 1 ;;
   esac
+}
+
+# A process and everything under it, parents first, as "pid depth" lines, from one listing of every process ($PS,
+# from ps -e -o pid=,ppid=,...): the chat's "what is it doing" sheet asks every 2 s, and a pgrep per process is slow
+# under proot.
+subtree() {
+  printf '%s\n' "$PS" | awk -v r="$1" '{ kids[$2] = kids[$2] " " $1 }
+    function walk(p, d,   n, a, i) { print p, d; n = split(kids[p], a, " "); for (i = 1; i <= n; i++) walk(a[i], d + 1) }
+    END { walk(r, 0) }'
+}
+
+# The chat's agent program (claude, codex…) in its running request, or nothing: the first one under the run.
+chat_agent() {
+  local r p
+  r=$(cat "$D/sessions/$1/pid" 2>/dev/null)
+  [[ "$r" =~ ^[0-9]+$ ]] || return 1
+  for p in $(subtree "$r" | cut -d' ' -f1); do
+    agent_of "$p" >/dev/null && { echo "$p"; return 0; }
+  done
+  return 1
 }
 
 case "$CMD" in
   ping) # setup check: proves RUN_COMMAND, the helper and the callback all work
     agents=$({ have claude && echo claude; have codex && echo codex; have opencode && echo opencode; have agy && echo agy
-      have grok && echo grok; } | paste -sd, -)
+      have grok && echo grok; [ -x "$COPILOT" ] && echo copilot; have pi && echo pi; } | paste -sd, -)
     # signed in = the agent's saved login exists (OpenCode works without one: its free models)
     # (or Claude Code's API key in its settings' env; Codex keeps an API key in auth.json too)
-    # (or an API key service saved in Buddy that the agent can use: $D/providers, without the keys)
+    # (or a service saved in Buddy that the agent can use: $D/providers, without the keys)
     signed=$({ { [ -s "$HOME/.claude/.credentials.json" ] || grep -qs '"anthropic":true' "$D"/providers/*.json; } && echo claude
       { [ -s "$HOME/.codex/auth.json" ] || grep -qs '"openai":"responses"' "$D"/providers/*.json; } && echo codex
       have opencode && echo opencode; [ -s "$HOME/.gemini/antigravity-cli/antigravity-oauth-token" ] && echo agy
-      [ -s "$HOME/.grok/auth.json" ] && echo grok; } | paste -sd, -)
+      [ -s "$HOME/.grok/auth.json" ] && echo grok; [ -x "$COPILOT" ] && copilot_signed && echo copilot
+      have pi && { pi_signed || pi_service; } && echo pi; } | paste -sd, -)
     # Claude Code's own model list (what its /model shows), asked from Claude Code itself over its control protocol:
     # about 3 s, sends no message. Rows [id, name, effort levels]; the "default" row tells which model its default is.
     # On failure the last good list is kept.
@@ -146,9 +224,22 @@ case "$CMD" in
     fi
     gm=$(jq -Rsc 'split("\n") | map(capture("^\\s*[*-]\\s+(?<id>[A-Za-z0-9._-]+)") | [.id, .id])' "$D/grok-models" 2>/dev/null)
     om=$(jq -Rsc 'split("\n") | map(select(test("^[A-Za-z0-9._-]+/\\S+$"))) | map([., (split("/") | .[1:] | join("/"))])' "$D/opencode-models" 2>/dev/null)
+    # Copilot's: the model ids its settings accept (`copilot help config`), the same for every plan; a model the
+    # plan doesn't have fails with Copilot's own message
+    if [ -x "$COPILOT" ]; then
+      timeout 30 "$COPILOT" help config 2>/dev/null | copilot_models >"$D/copilot-models.new" && [ -s "$D/copilot-models.new" ] \
+        && mv "$D/copilot-models.new" "$D/copilot-models"
+    fi
+    pm=$(jq -Rsc 'split("\n") | map(select(length > 0) | [., .])' "$D/copilot-models" 2>/dev/null)
+    # Pi's: the models of the providers connected (`pi --list-models`: "provider  model  context …" rows)
+    if have pi && pi_signed; then
+      PI_SKIP_VERSION_CHECK=1 timeout 30 pi --list-models 2>/dev/null | pi_models >"$D/pi-models.new" && [ -s "$D/pi-models.new" ] \
+        && mv "$D/pi-models.new" "$D/pi-models"
+    fi
+    im=$(jq -Rsc 'split("\n") | map(select(test("^[^/ ]+/\\S+$")) | [., (split("/") | .[1:] | join("/"))])' "$D/pi-models" 2>/dev/null)
     jq -cn --arg s "${agents:-none}" --arg g "${signed:-none}" --argjson v "$HELPER_VERSION" --argjson cm "${cm:-[]}" \
-      --argjson om "${om:-[]}" --argjson am "${am:-[]}" --argjson gm "${gm:-[]}" --argjson lm "${lm:-[]}" --arg ld "${ld:-}" \
-      '{type:"buddy_pong",text:$s,signed:$g,helper:$v,claude_models:$lm,claude_default:$ld,codex_models:$cm,opencode_models:$om,agy_models:$am,grok_models:$gm}' | post
+      --argjson om "${om:-[]}" --argjson am "${am:-[]}" --argjson gm "${gm:-[]}" --argjson pm "${pm:-[]}" --argjson im "${im:-[]}" --argjson lm "${lm:-[]}" --arg ld "${ld:-}" \
+      '{type:"buddy_pong",text:$s,signed:$g,helper:$v,claude_models:$lm,claude_default:$ld,codex_models:$cm,opencode_models:$om,agy_models:$am,grok_models:$gm,copilot_models:$pm,pi_models:$im}' | post
     exit 0 ;;
   procs)
     # map every process started by a Buddy chat to that chat
@@ -159,7 +250,7 @@ case "$CMD" in
       for q in $(descendants "$(cat "$f")"); do owner[$q]=$sid; done
     done
     {
-      for p in $(pgrep -f 'claude/versions/|codex-linux-|/bin/codex|opencode-ai/|@opencode/cli|/bin/opencode|antigravity-cli/bin/|/bin/agy|^grok( |$)|/bin/grok|grok-linux-' 2>/dev/null); do
+      for p in $(pgrep -f '^claude( |$)|^codex( |$)|^opencode( |$)|^agy( |$)|claude/versions/|codex-linux-|/bin/codex|opencode-ai/|@opencode/cli|/bin/opencode|antigravity-cli/bin/|/bin/agy|^grok( |$)|/bin/grok|grok-linux-|/copilot/pkg/|^pi( |$)|/bin/pi( |$)|pi-coding-agent/' 2>/dev/null); do
         a=$(agent_of "$p") || continue
         [ "$p" = "$$" ] && continue
         cwd=$(readlink "/proc/$p/cwd" 2>/dev/null)
@@ -190,8 +281,28 @@ case "$CMD" in
     exit 0 ;;
   kill)
     P=${3:-}
-    [[ "$P" =~ ^[0-9]+$ ]] && agent_of "$P" >/dev/null || exit 2   # only ever kill claude/codex/opencode/agy/grok
+    [[ "$P" =~ ^[0-9]+$ ]] && agent_of "$P" >/dev/null || exit 2   # only ever kill claude/codex/opencode/agy/grok/copilot/pi
     kill_tree "$P"
+    exit 0 ;;
+  cmdprocs)
+    # what a chat's agent has running (the command it runs, what that started, its MCP servers), for the chat's sheet
+    SID=${3:-}; valid_sid "$SID" || exit 2
+    PS=$(ps -e -o pid=,ppid=,etimes=,times=,args= 2>/dev/null)
+    A=$(chat_agent "$SID") || exit 0
+    echo "agent $A"
+    keep=" $(subtree "$A" | cut -d' ' -f1 | paste -sd' ' -) "
+    printf '%s\n' "$PS" | awk -v keep="$keep" 'index(keep, " " $1 " ") { print substr($0, 1, 2000) }'
+    exit 0 ;;
+  cmdkill)
+    # only ever something under that chat's agent, never the agent itself (that's Stop's job: the run ends with it)
+    SID=${3:-}; P=${4:-}
+    valid_sid "$SID" && [[ "$P" =~ ^[0-9]+$ ]] || exit 2
+    PS=$(ps -e -o pid=,ppid=,etimes=,times=,args= 2>/dev/null)
+    A=$(chat_agent "$SID") || { echo "This chat's agent isn't running."; exit 3; }
+    if [ "$P" = "$A" ] || ! subtree "$A" | cut -d' ' -f1 | grep -qx "$P"; then
+      echo "That process isn't one this chat's agent started, or it has ended."; exit 3
+    fi
+    end_run "$P"
     exit 0 ;;
   recent)
     {
@@ -271,13 +382,19 @@ case "$CMD" in
     # forget (an incognito chat): the agents own records of the conversation go too
     if [ "${4:-}" = forget ]; then
       # (with the conversations an agent had here before the chat was switched away and back: the .old lists)
-      for c in $(cat "$S/claude-session" "$S/claude-session.old" 2>/dev/null); do
+      for c in $({ cat "$S/claude-session" 2>/dev/null; echo; cat "$S/claude-session.old" 2>/dev/null; }); do
         [[ "$c" =~ ^[A-Za-z0-9-]+$ ]] && rm -f "$HOME"/.claude/projects/*/"$c".jsonl
       done
-      for t in $(cat "$S/codex-thread" "$S/codex-thread.old" 2>/dev/null); do
+      for t in $({ cat "$S/codex-thread" 2>/dev/null; echo; cat "$S/codex-thread.old" 2>/dev/null; }); do
         [[ "$t" =~ ^[A-Za-z0-9-]+$ ]] && find "$HOME/.codex/sessions" -name "rollout-*$t.jsonl" -delete 2>/dev/null
       done
-      for o in $(cat "$S/opencode-session" "$S/opencode-session.old" 2>/dev/null); do
+      for p in $({ cat "$S/copilot-session" 2>/dev/null; echo; cat "$S/copilot-session.old" 2>/dev/null; }); do
+        [[ "$p" =~ ^[A-Za-z0-9-]+$ ]] && rm -rf "$HOME/.copilot/session-state/$p"
+      done
+      for p in $({ cat "$S/pi-session" 2>/dev/null; echo; cat "$S/pi-session.old" 2>/dev/null; }); do
+        [[ "$p" =~ ^[A-Za-z0-9._-]+$ ]] && rm -f "$HOME"/.pi/agent/sessions/*/*_"$p".jsonl
+      done
+      for o in $({ cat "$S/opencode-session" 2>/dev/null; echo; cat "$S/opencode-session.old" 2>/dev/null; }); do
         [[ "$o" =~ ^[A-Za-z0-9_-]+$ ]] && have opencode && timeout 30 opencode session delete $(oc2 && echo --standalone) "$o" >/dev/null 2>&1
       done
     fi
@@ -300,13 +417,13 @@ case "$CMD" in
     exit 0 ;;
   ask) SID=${3:-}; BACKEND=${4:-claude}; DEV=${5:-0}; MSG=${6:-}; MODEL=${7:-}; FILES=${8:-}; EFFORT=${9:-}
     [[ "$EFFORT" =~ ^[a-z]{1,16}$ ]] || EFFORT="" # the agent's own level names, whatever they are
-    FRESH=${10:-}; LITE=0; [ "${11:-}" = lite ] && LITE=1 ;;
-  *) echo "usage: buddy-run <token> ask|stop|reap|delete|prune|ping ..." >&2; exit 2 ;;
+    FRESH=${10:-}; LITE=0; [ "${11:-}" = lite ] && LITE=1; FOLDER=${12:-} ;;
+  *) echo "usage: buddy-run <token> ask|stop|reap|delete|prune|ping|cmdprocs|cmdkill ..." >&2; exit 2 ;;
 esac
 
 valid_sid "$SID" || exit 2
 [ -z "$MSG" ] && exit 0
-# A model of an API key service saved in Buddy (Settings, API keys) comes as @service/model. The agent is pointed at
+# A model of a service saved in Buddy (Settings, Agents and models) comes as @service/model. The agent is pointed at
 # the relay on Buddy, which adds the key (it never enters Linux); $D/providers/<service>.json says which kinds of
 # address the service has and its models context sizes.
 SVC="" SVCM=""
@@ -319,6 +436,20 @@ svc_window() {
 }
 S=$D/sessions/$SID
 mkdir -p "$S"
+# The chat's project folder (chat options): where its agent starts. A path inside the workspace, checked here again
+# (never out of it by "..", a link, or an absolute path); with none, or one that isn't, the workspace itself.
+CWD=$W
+if [ -n "${FOLDER:-}" ]; then
+  case "/$FOLDER/" in
+    *//*|*/../*|*/./*|*$'\n'*) FOLDER="" ;;
+  esac
+  if [ -n "$FOLDER" ] && mkdir -p "$W/$FOLDER" 2>/dev/null; then
+    real=$(cd "$W/$FOLDER" 2>/dev/null && pwd -P)
+    case "$real" in "$(cd "$W" && pwd -P)"/*) CWD=$W/$FOLDER ;; *) FOLDER="" ;; esac
+  else
+    FOLDER=""
+  fi
+fi
 # How a run ended when the agent itself said nothing: shown only if the run reported no error and wasn't stopped.
 quiet_end() { jq -cn --arg text "$1" --arg s "$SID" '{type:"buddy_error",text:$text,quiet:true,buddy_session:$s}' | post; }
 event() { jq -cn --arg type "$1" --arg text "${2:-}" --arg s "$SID" '{type:$type,text:$text,buddy_session:$s}' | post; }
@@ -339,6 +470,8 @@ if [ "${FRESH:-}" = fresh ]; then
     opencode) cat "$S/opencode-session" >> "$S/opencode-session.old" 2>/dev/null; echo >> "$S/opencode-session.old"; rm -f "$S/opencode-session" ;;
     agy) rm -f "$S/agy-conversation" "$S/agy-conversation.new" ;;
     grok) rm -f "$S/grok-session" ;;
+    copilot) cat "$S/copilot-session" >> "$S/copilot-session.old" 2>/dev/null; echo >> "$S/copilot-session.old"; rm -f "$S/copilot-session" ;;
+    pi) cat "$S/pi-session" >> "$S/pi-session.old" 2>/dev/null; echo >> "$S/pi-session.old"; rm -f "$S/pi-session" ;;
   esac
 fi
 
@@ -349,7 +482,7 @@ trap 'event buddy_done' EXIT
 trap '[ -n "$RUN" ] && kill_tree "$RUN"; rm -f "$S/pid"; exit 1' TERM INT HUP
 
 if [ -n "$SVC" ] && [ ! -s "$D/providers/$SVC.json" ]; then
-  event buddy_error "This chat's model is from an API key that is no longer in Buddy. Pick another model."
+  event buddy_error "This chat's model is from a service that is no longer in Buddy. Pick another model."
   exit 0
 fi
 
@@ -377,6 +510,17 @@ $(printf -- '- %s\n' "${ATT[@]}")]"
 fi
 
 SYSTEM=$(cat "$D/system-prompt.md" 2>/dev/null)
+# In a project folder, Codex, Antigravity and Copilot no longer read the workspace's AGENTS.md by themselves (measured
+# in a plain folder and in a git one; Claude Code, OpenCode and Pi still do, Grok never did): it comes with Buddy's
+# instructions, so the user's own lines in it (#61) hold in every project.
+if [ "$CWD" != "$W" ] && [ -s "$W/AGENTS.md" ]; then
+  case "$BACKEND" in
+    codex|agy|copilot) SYSTEM="$SYSTEM
+
+The workspace's instructions ($W/AGENTS.md; \"this folder\" in them is $W), which hold in this project too:
+$(head -c 32768 "$W/AGENTS.md")" ;;
+  esac
+fi
 PERMS=$(cat "$D/permissions.md" 2>/dev/null)
 [ -n "$PERMS" ] && SYSTEM="$SYSTEM
 
@@ -390,8 +534,17 @@ $(cat "$D/browser-prompt.md" 2>/dev/null)"
 if [ "$DEV" = 1 ]; then
   SYSTEM="$SYSTEM
 
-Linux tools are ON in this chat: you may run shell commands and create or edit files. Work inside $W (one folder per project).
-Before building an Android app, read the android-app skill (Claude Code) or AGENTS.md (Codex, OpenCode, Antigravity, Grok) in $W and follow it."
+Linux tools are ON in this chat: you may run shell commands and create or edit files. $(if [ "$CWD" = "$W" ]; then
+  echo "Work inside $W (one folder per project)."
+else
+  echo "This chat belongs to the project in $CWD: you start there, and its work stays inside it. $W is the workspace it is in (one folder per project)."
+fi)
+$(if [ "$CWD" = "$W" ]; then
+  echo "Before building an Android app, read the android-app skill (Claude Code) or AGENTS.md (Codex, OpenCode, Antigravity, Grok, Copilot, Pi) in $W and follow it."
+else # (from a project folder not every agent lists the workspace's skill: measured, Claude Code and Copilot in a git one)
+  echo "Before building an Android app, read $W/.claude/skills/android-app/SKILL.md and follow it; where it says ~/.buddy/work/<appname>, this chat's app folder is $CWD."
+fi)
+Files the user sends for Linux tools arrive in $S/incoming (the message gives the path; they can be gigabytes). unzip and tar are installed; 7z needs apk add 7zip first."
   # Settings, GitHub: git and gh are signed in to the user account
   [ -s "$HOME/.config/gh/hosts.yml" ] && SYSTEM="$SYSTEM
 git and the GitHub CLI (gh) are signed in to the user's GitHub account: you can clone, commit, push and open pull requests.
@@ -458,7 +611,7 @@ run_claude() {
   [ -s "$S/claude-session" ] && args+=(--resume "$(cat "$S/claude-session")")
   [ -n "${MODEL:-}" ] && args+=(--model "${SVCM:-$MODEL}")
   [ -n "${EFFORT:-}" ] && args+=(--effort "$EFFORT")
-  # an API key service: every model Claude Code would pick (its helpers and subagents too) is the chosen one, and it
+  # a service saved in Buddy: every model Claude Code would pick (its helpers and subagents too) is the chosen one, and it
   # gets the real context size, not the one it guesses for a model it does not know; the plan stays for the rest
   local keyenv=()
   if [ -n "$SVC" ]; then
@@ -469,7 +622,7 @@ run_claude() {
     win=$(svc_window)
     [ -n "$win" ] && keyenv+=(CLAUDE_CODE_MAX_CONTEXT_TOKENS="$win")
   fi
-  cd "$W" && "${keyenv[@]}" claude "${args[@]}" 2>"$S/last-error.log"
+  cd "$CWD" && "${keyenv[@]}" claude "${args[@]}" 2>"$S/last-error.log"
 }
 
 stream_claude() {
@@ -504,7 +657,7 @@ run_codex() {
   [ "$DEV" = 1 ] && sandbox=(--sandbox danger-full-access)
   # a run with a file attached (not a picture, which goes in with --image) keeps read-only commands to open it
   [ "$DEV" != 1 ] && [ ${#ATT[@]} -gt ${#IMGS[@]} ] && sandbox=(--sandbox read-only)
-  # an API key service: through the relay, over plain requests (no WebSocket, which other services refuse), with the
+  # a service saved in Buddy: through the relay, over plain requests (no WebSocket, which other services refuse), with the
   # real context size
   if [ -n "$SVC" ]; then
     # another service than OpenAI's own: none of the ChatGPT plan's extras (apps, sub-agents, goals), which its
@@ -524,7 +677,7 @@ run_codex() {
   [ -n "${EFFORT:-}" ] && cfg+=(-c "model_reasoning_effort=\"$EFFORT\"")
   local img=() f
   for f in "${IMGS[@]}"; do img+=("--image=$f"); done
-  cd "$W" || return 1
+  cd "$CWD" || return 1
   if [ -s "$S/codex-thread" ]; then
     BUDDY_TOKEN=$TOKEN codex exec "${cfg[@]}" "${sandbox[@]}" --json --skip-git-repo-check \
       resume "${img[@]}" -- "$(cat "$S/codex-thread")" "$prompt" </dev/null 2>"$S/last-error.log"
@@ -645,7 +798,7 @@ tool, it's not missing, call it again in your next step." > "$S/system.md"
     # The last matching entry wins, so "*" goes first. (OpenCode keeps its skill tool whatever this says.)
     + (if $lite == "1" then {tools:({"*":false, "phone_*":true}
         + (if $att == "0" then {} else {read:true} end))} else {} end)') # (attachments are opened with read)
-  # an API key service: a provider of its own, pointed at the relay (OpenAI-style when it has that address)
+  # a service saved in Buddy: a provider of its own, pointed at the relay (OpenAI-style when it has that address)
   if [ -n "$SVC" ]; then
     cfg=$(jq -c --argjson c "$cfg" --arg url "$URL/llm/$SVC" --arg t "$TOKEN" --arg id "buddy-$SVC" '
       (if .local == true then {timeout:900000} else {} end) as $wait   # a local model: 15 minutes, as Buddy waits
@@ -662,7 +815,7 @@ tool, it's not missing, call it again in your next step." > "$S/system.md"
   [ -n "${MODEL:-}" ] && args+=(-m "$MODEL")
   local f
   for f in "${ATT[@]}"; do args+=(-f "$f"); done
-  cd "$W" && OPENCODE_CONFIG_CONTENT=$cfg opencode "${args[@]}" -- "$MSG" </dev/null 2>"$S/last-error.log"
+  cd "$CWD" && OPENCODE_CONFIG_CONTENT=$cfg opencode "${args[@]}" -- "$MSG" </dev/null 2>"$S/last-error.log"
 }
 
 # Translate OpenCode's JSON events into the Claude Code stream format the bubble understands.
@@ -730,6 +883,7 @@ AGY_PHONE_TOOLS='["read_screen","tap","long_press","type_text","scroll","swipe",
 run_agy() {
   local h=$S/agy-home g=$HOME/.gemini/antigravity-cli f list tools sigs
   mkdir -p "$h/.gemini/config" "$h/.gemini/antigravity-cli" "$g" "$HOME/.gemini/config"
+  keep_login "$h/.gemini/antigravity-cli/antigravity-oauth-token" "$g/antigravity-oauth-token"
   for f in "$g"/* "$g"/.[!.]*; do
     [ -e "$f" ] || continue
     case "${f##*/}" in settings.json|brain) continue ;; esac
@@ -779,7 +933,7 @@ $h/.gemini/antigravity-cli/mcp/phone/<tool>.json.$(mcp_extra_note)"
   [ -n "${EFFORT:-}" ] && args+=(--effort "$EFFORT")
   [ "$DEV" = 1 ] && args+=(--dangerously-skip-permissions)
   rm -f "$S/agy-error"
-  cd "$W" && HOME=$h agy "${args[@]}" </dev/null 2>"$S/last-error.log"
+  cd "$CWD" && HOME=$h agy "${args[@]}" </dev/null 2>"$S/last-error.log"
   local status=$?
   # a token refresh that replaced the link with a file: keep the new token in the real folder
   f=$h/.gemini/antigravity-cli/antigravity-oauth-token
@@ -911,6 +1065,7 @@ run_grok() {
   local h=$S/grok-home g=$HOME/.grok f sigs note
   # sessions/ and logs/ must be links before grok first writes them, or a chat's would stay in its own home
   mkdir -p "$h" "$g/sessions" "$g/logs"
+  keep_login "$h/auth.json" "$g/auth.json"
   for f in "$g"/* "$g"/.[!.]*; do
     [ -e "$f" ] || continue
     [ "${f##*/}" = config.toml ] || ln -sfn "$f" "$h/${f##*/}"
@@ -956,7 +1111,7 @@ optional one: $sigs}). You don't need search_tool for them.$(mcp_extra_note | se
   [ "$DEV" = 1 ] || lean=(GROK_MEMORY=0 GROK_CLAUDE_SKILLS_ENABLED=0 GROK_CURSOR_SKILLS_ENABLED=0 GROK_CLAUDE_RULES_ENABLED=0
     GROK_CURSOR_RULES_ENABLED=0 GROK_CLAUDE_AGENTS_ENABLED=0 GROK_CURSOR_AGENTS_ENABLED=0 GROK_CLAUDE_HOOKS_ENABLED=0
     GROK_CURSOR_HOOKS_ENABLED=0)
-  cd "$W" && env "${lean[@]}" GROK_HOME=$h GROK_CLAUDE_MCPS_ENABLED=0 GROK_CURSOR_MCPS_ENABLED=0 GROK_DISABLE_AUTOUPDATER=1 \
+  cd "$CWD" && env "${lean[@]}" GROK_HOME=$h GROK_CLAUDE_MCPS_ENABLED=0 GROK_CURSOR_MCPS_ENABLED=0 GROK_DISABLE_AUTOUPDATER=1 \
     grok "${args[@]}" </dev/null 2>"$S/last-error.log"
   local status=$?
   # a token refresh that replaced the link with a file: keep the new login in the real folder
@@ -1010,6 +1165,261 @@ stream_grok() {
       elif .type == "error" then {type:"result", subtype:"error", is_error:true, result:("Grok: " + (.message // "error"))}
       else empty end) | . + {buddy_session:$s}' 2>/dev/null | while IFS= read -r ev; do printf '%s' "$ev" | post; done
   done
+}
+
+# -------------------------------------------------------------------- Copilot
+# GitHub Copilot CLI, through Buddy's wrapper (linux/buddy-copilot, linked as ~/.local/bin/copilot: its own executable
+# fails under proot). Each run gets the phone (?chat=, 10-minute timeout: an approval card may wait for the user) and
+# the user's MCP servers set up in Buddy from a file of its own, as the token can't go on the command line. Buddy's
+# instructions go in as a custom instructions folder, which Copilot reads on every run. A -p run refuses what nothing
+# allows (no one to ask): the phone is allowed. Normal mode offers only the phone, web fetch, file reads (the chat's
+# attachments and Buddy's guide) and skills; a rule's run only the phone; developer mode everything but sub-agents,
+# which Buddy can't show (as for Claude Code).
+run_copilot() {
+  local c=$S/copilot n f sys=$SYSTEM
+  mkdir -p "$c/instructions/.github/instructions" "$c/read"
+  ( umask 077
+    jq -n --arg url "$URL/mcp?chat=$SID" --arg base "$URL/mcpx/" --arg auth "Bearer $TOKEN" --argjson x "$EXTRA" \
+      '{mcpServers:({phone:{type:"http", url:$url, headers:{Authorization:$auth}, tools:["*"], timeout:600000}}
+        + ($x | map({key:.name, value:{type:"http", url:($base + .name), headers:{Authorization:$auth}, tools:["*"],
+            timeout:600000}}) | from_entries))}' > "$c/mcp.json" )
+  # (--prompt=: a message that starts with "-" would be read as an option)
+  local args=("--prompt=$MSG" --output-format json --additional-mcp-config "@$c/mcp.json" --allow-tool phone
+    --no-ask-user --no-auto-update)
+  for n in $(jq -r '.[].name' <<<"$EXTRA"); do args+=(--allow-tool "$n"); done
+  case "$DEV" in
+    1) args+=(--allow-all --excluded-tools task read_agent list_agents write_agent) ;;
+    rule) args+=(--available-tools phone --disable-builtin-mcps) ;;
+    *) # a file is only read inside the folders it is given: the attachments, and a copy of Buddy's guide, whose
+       # path the instructions name instead (the rest of ~/.buddy has other chats' files)
+       cp -f "$D/GUIDE.md" "$c/read/GUIDE.md" 2>/dev/null && sys=${sys//$D\/GUIDE.md/$c/read/GUIDE.md}
+       args+=(--available-tools phone $(jq -r '.[].name' <<<"$EXTRA") view web_fetch skill --allow-all-urls
+         --add-dir "$c/read" --disallow-temp-dir --disable-builtin-mcps)
+       [ -d "$S/files" ] && args+=(--add-dir "$S/files") ;;
+  esac
+  # the user's own servers in ~/.copilot/mcp-config.json stay out of phone chats (Buddy's MCP servers come above, and
+  # replace one of the same name, like the phone that Settings > Phone tools adds there)
+  if [ "$DEV" != 1 ]; then
+    for n in $(sed '/^ *\/\//d' "$HOME/.copilot/mcp-config.json" 2>/dev/null | jq -r --argjson x "$EXTRA" \
+        '(.mcpServers // {}) | keys - ["phone"] - [$x[].name] | .[]' 2>/dev/null); do
+      args+=(--disable-mcp-server "$n")
+    done
+  fi
+  { printf -- '---\napplyTo: "**"\n---\n%s\n' "$sys"
+    [ "$DEV" = 1 ] || printf '\nShell commands are not available in this chat; don'"'"'t try them.\n'
+  } > "$c/instructions/.github/instructions/buddy.instructions.md"
+  for f in "${IMGS[@]}"; do args+=(--attachment "$f"); done
+  [ -s "$S/copilot-session" ] && args+=("--resume=$(cat "$S/copilot-session")")
+  [ -n "${MODEL:-}" ] && args+=(--model "$MODEL")
+  [ -n "${EFFORT:-}" ] && args+=(--reasoning-effort "$EFFORT")
+  rm -f "$S/copilot-error"
+  cd "$CWD" && COPILOT_CUSTOM_INSTRUCTIONS_DIRS=$c/instructions COPILOT_SKILLS_DIRS=$HOME/.agents/skills \
+    "$COPILOT" "${args[@]}" </dev/null 2>"$S/last-error.log"
+}
+
+# Translate Copilot's JSONL events into the Claude Code stream format. Text comes whole (assistant.message, its
+# deltas are left out), steps when a tool starts (MCP tools carry their server and tool names), its own bookkeeping
+# isn't shown. A step the chat refused (headless Copilot can't ask) ends with error code "denied": said under the
+# steps. session.error is the run's failure, in Copilot's words.
+stream_copilot() {
+  local line typ id
+  declare -A tools=()
+  rm -f "$S/copilot-error"
+  while IFS= read -r line; do
+    [ -z "$line" ] && continue
+    [ "$line" = "$AGENT_END" ] && break
+    printf '%s\n' "$line" >> "$S/copilot-last.jsonl"   # the run's raw events stay, for checking how Copilot reports them
+    typ=$(printf '%s' "$line" | jq -r '.type // empty' 2>/dev/null)
+    case "$typ" in
+      session.start)
+        id=$(printf '%s' "$line" | jq -r '.data.sessionId // empty' 2>/dev/null)
+        [ -n "$id" ] && printf '%s' "$id" > "$S/copilot-session" ;;
+      tool.execution_start)
+        id=$(printf '%s' "$line" | jq -r '.data.toolCallId // empty' 2>/dev/null)
+        # what it was, for a refusal: "read /etc/hosts", "git push", "tap"
+        [ -n "$id" ] && tools[$id]=$(printf '%s' "$line" | jq -r '.data | (.arguments // {}) as $in
+          | if .toolName == "view" then "read " + ($in.path // "") elif .toolName == "bash" then ($in.command // "bash")
+            else .mcpToolName // .toolName // "" end' 2>/dev/null) ;;
+      tool.execution_complete)
+        if [ "$(printf '%s' "$line" | jq -r '.data.error.code // empty' 2>/dev/null)" = denied ]; then
+          id=$(printf '%s' "$line" | jq -r '.data.toolCallId // empty' 2>/dev/null)
+          jq -cn --arg t "Not allowed in this chat: ${tools[$id]:-a step}" --arg s "$SID" \
+            '{type:"buddy_step", text:$t, buddy_session:$s}' | post
+        fi
+        continue ;;
+      session.error)
+        printf '%s' "$line" | jq -r '.data.message // "the request failed"' 2>/dev/null > "$S/copilot-error" ;;
+    esac
+    printf '%s' "$line" | jq -c --arg s "$SID" --arg failed "$([ -s "$S/copilot-error" ] && echo 1)" '
+      .data as $d
+      | (if .type == "session.start" or .type == "session.resume" then {type:"system", subtype:"init",
+          model:(($d.selectedModel // "") | if . == "auto" then "" else . end)}
+          + (if $d.sessionId then {session_id:$d.sessionId} else {} end)
+      # the model Copilot picked or switched to, shown when the chat is on "Default"
+      elif .type == "session.auto_mode_resolved" and ($d.chosenModel // "") != "" then {type:"system", subtype:"model", model:$d.chosenModel}
+      elif .type == "session.model_change" and ($d.newModel // "auto") != "auto" then {type:"system", subtype:"model", model:$d.newModel}
+      elif .type == "assistant.message" and (($d.content // "") | test("\\S")) then
+        {type:"assistant", message:{content:[{type:"text", text:$d.content}]}}
+      elif .type == "tool.execution_start" then
+        ($d.arguments // {}) as $in | ($d.toolName // "") as $t
+        | if ($d.mcpServerName // "") != "" then {type:"assistant", message:{content:[{type:"tool_use",
+              name:("mcp__" + $d.mcpServerName + "__" + ($d.mcpToolName // "")), input:$in}]}}
+          elif $t | IN("read_bash", "write_bash", "stop_bash", "list_bash", "report_intent", "sql", "session_store_sql",
+              "fetch_copilot_cli_documentation", "task_complete", "update_todo") then empty
+          else {type:"assistant", message:{content:[{type:"tool_use",
+              name:({bash:"Bash", view:"Read", create:"Edit", edit:"Edit", str_replace_editor:"Edit", apply_patch:"Edit",
+                     web_fetch:"WebFetch", web_search:"WebSearch", grep:"Grep", glob:"Glob", skill:"Skill",
+                     task:"Task"}[$t] // $t),
+              input:(if $t == "bash" then {command:($in.command // "")}
+                     elif $t | IN("view", "create", "edit", "str_replace_editor") then {file_path:($in.path // "")}
+                     elif $t == "web_fetch" then {url:($in.url // "")} else $in end)}]}}
+          end
+      elif .type == "session.error" then {type:"result", subtype:"error", is_error:true,
+        result:("Copilot: " + ($d.message // "the request failed"))}
+      # its last word: a failed run already said why (session.error) or leaves it to its exit status and stderr
+      elif .type == "result" and (.exitCode // 1) == 0 and $failed == "" then {type:"result", subtype:"success", result:""}
+      else empty end) | . + {buddy_session:$s}' 2>/dev/null | while IFS= read -r ev; do printf '%s' "$ev" | post; done
+  done
+}
+
+# ------------------------------------------------------------------------- Pi
+# Pi (pi.dev) reads MCP servers from its agent folder, but each chat needs its own phone address (?chat=). So every
+# run gets its own PI_CODING_AGENT_DIR: the phone (and Buddy's MCP servers) declared to the model directly, with a
+# 10-minute timeout (an approval card may wait for the user) and Buddy's token from the environment, and everything
+# else (logins, settings, sessions) linked to the real ~/.pi/agent. Pi has no permission checks of its own, so a chat
+# only gets the tools it may use: normal mode and a rule's run the phone (a normal chat also Buddy's MCP servers, and
+# its attachments in the message), developer mode Pi's own read, bash, edit and write as well.
+# A model of a service saved in Buddy: the chat's folder gets a models.json of its own, the user's with one more
+# provider, "buddy-<service>", which is Buddy's relay (Chat Completions when the service has an OpenAI-style address,
+# as for OpenCode, else Anthropic's Messages), again with Buddy's token from the environment.
+run_pi() {
+  local h=$S/pi-home g=$HOME/.pi/agent f n id
+  mkdir -p "$h" "$g/sessions"
+  # what an earlier run wrote for this chat alone goes first: the user's own files are linked again below, and
+  # nothing is ever written through a link into their folder
+  for f in models.json settings.json; do
+    [ -L "$h/$f" ] || rm -f "$h/$f"
+  done
+  keep_login "$h/auth.json" "$g/auth.json"
+  for f in "$g"/* "$g"/.[!.]*; do
+    [ -e "$f" ] || continue
+    [ "${f##*/}" = mcp.json ] || ln -sfn "$f" "$h/${f##*/}"
+  done
+  if [ -n "$SVC" ]; then
+    local own
+    own=$(jq -c 'select(type == "object")' "$g/models.json" 2>/dev/null)
+    [ -n "$own" ] || own='{}'
+    rm -f "$h/models.json"
+    # the chat's model is listed even when the service didn't name it (one typed in by hand). Sizes as the service
+    # said them; an answer of at most a quarter of the context, and never more than Pi's own 16384 (services turn
+    # down a request that asks for more than the model can write). Pictures only for a model known to take them:
+    # Pi leaves them out for the others.
+    jq --argjson own "$own" --arg url "$URL/llm/$SVC" --arg id "buddy-$SVC" --arg m "$SVCM" '
+      ((.models // {}) | if has($m) then . else . + {($m): {name: $m}} end) as $models
+      | $own + {providers: (($own.providers // {}) + {($id): ({name: (.name // $id), apiKey: "$BUDDY_TOKEN"}
+          + (if (.openai // "") != "" then {baseUrl: ($url + "/o"), api: "openai-completions"}
+             else {baseUrl: ($url + "/a"), api: "anthropic-messages"} end)
+          + {models: [$models | to_entries[] | {id: .key, name: (if (.value.name // "") == "" then .key else .value.name end)}
+              + (if (.value.window // 0) > 0 then {contextWindow: .value.window,
+                  maxTokens: ([.value.window / 4, 16384] | min | floor)} else {} end)
+              + (if .value.image == true then {input: ["text", "image"]} else {} end)]})})}' \
+      "$D/providers/$SVC.json" > "$h/models.json" || return 1
+    # a model on the user's own computer can read for many minutes before its first word: 15, as Buddy waits
+    if [ "$(jq -r '.local // false' "$D/providers/$SVC.json" 2>/dev/null)" = true ]; then
+      own=$(jq -c 'select(type == "object")' "$g/settings.json" 2>/dev/null)
+      [ -n "$own" ] || own='{}'
+      rm -f "$h/settings.json"
+      jq -n --argjson own "$own" '$own + {httpIdleTimeoutMs: 900000}' > "$h/settings.json"
+    fi
+  fi
+  jq -n --arg url "$URL/mcp?chat=$SID" --arg base "$URL/mcpx/" --argjson x "$EXTRA" \
+    '{autoEnableCodemode:false, mcpServers:({phone:{url:$url, headers:{Authorization:"Bearer ${BUDDY_TOKEN}"}, timeout:600,
+        exposure:"direct"}}
+      + ($x | map({key:.name, value:{url:($base + .name), headers:{Authorization:"Bearer ${BUDDY_TOKEN}"}, timeout:600,
+        exposure:"direct"}}) | from_entries))}' > "$h/mcp.json"
+  printf '%s\n' "$SYSTEM" > "$S/pi-system.md"
+  [ "$DEV" = 1 ] || printf '\nShell commands are not available in this chat; don'"'"'t try them.\n' >> "$S/pi-system.md"
+  # its session is named by Buddy: the same name opens it again, or starts it when it's gone
+  [ -s "$S/pi-session" ] || printf 'buddy-%s-%s' "$SID" "$(date +%s)" > "$S/pi-session"
+  id=$(cat "$S/pi-session")
+  local args=(--mode json --session-id "$id" --append-system-prompt "$S/pi-system.md")
+  # the tools are named on every run: a session keeps the set it last had (Linux tools switched on or off in between)
+  if [ "$DEV" = 1 ]; then
+    args+=(--tools "read,bash,edit,write,grep,find,ls,mcp__*")
+  else
+    local t="mcp__phone__*"
+    for n in $(jq -r '.[].name' <<<"$EXTRA"); do t="$t,mcp__${n}__*"; done
+    args+=(--tools "$t" --no-skills)
+  fi
+  if [ -n "$SVC" ]; then args+=(--model "buddy-$SVC/$SVCM")
+  elif [ -n "${MODEL:-}" ]; then args+=(--model "$MODEL"); fi
+  [ -n "${EFFORT:-}" ] && args+=(--thinking "$EFFORT")
+  args+=(--)
+  # attachments go in with the message, as a normal chat has no file reads: pictures, and files that are text (another
+  # file would go in as its raw bytes)
+  for f in "${ATT[@]}"; do
+    case " ${IMGS[*]} " in *" $f "*) args+=("@$f"); continue ;; esac
+    grep -Iq . "$f" 2>/dev/null && args+=("@$f")
+  done
+  # a message that starts with "@" would be taken for a file to attach ("@anna said…": "File not found"): a space
+  # before it makes it a message again
+  local msg=$MSG
+  [[ "$msg" == @* ]] && msg=" $msg"
+  cd "$CWD" && BUDDY_TOKEN=$TOKEN PI_CODING_AGENT_DIR=$h PI_SKIP_VERSION_CHECK=1 pi "${args[@]}" "$msg" \
+    </dev/null 2>"$S/last-error.log"
+  local status=$?
+  # a login refreshed during the run replaced the link with a file: keep it in the real folder
+  f=$h/auth.json
+  [ -f "$f" ] && [ ! -L "$f" ] && mv -f "$f" "$g/auth.json" && ln -sfn "$g/auth.json" "$f"
+  return $status
+}
+
+# Translate Pi's JSON events into the Claude Code stream format. A message comes whole at message_end (its deltas are
+# left out), steps when a tool starts (MCP tools are already named mcp__<server>__<tool>). An assistant message that
+# ends in error is kept until the run settles: Pi retries some failures itself (an overloaded service), and a later
+# answer means it went through. The error left at the end is the run's, in Pi's words.
+stream_pi() {
+  local line typ settled=""
+  rm -f "$S/pi-error"
+  while IFS= read -r line; do
+    [ -z "$line" ] && continue
+    [ "$line" = "$AGENT_END" ] && break
+    printf '%s\n' "$line" >> "$S/pi-last.jsonl"   # the run's raw events stay, for checking how Pi reports them
+    typ=$(printf '%s' "$line" | jq -r '.type // empty' 2>/dev/null)
+    case "$typ" in
+      session|message_end|tool_execution_start|agent_settled) ;;
+      *) continue ;;
+    esac
+    if [ "$typ" = message_end ]; then
+      case "$(printf '%s' "$line" | jq -r 'select(.message.role == "assistant") | .message.stopReason // "stop"' 2>/dev/null)" in
+        error) printf '%s' "$line" | jq -r '.message.errorMessage // "the request failed"' 2>/dev/null > "$S/pi-error" ;;
+        ?*) rm -f "$S/pi-error" ;;
+      esac
+    fi
+    [ "$typ" = agent_settled ] && settled=1
+    printf '%s' "$line" | jq -c --arg s "$SID" --arg error "$(cat "$S/pi-error" 2>/dev/null)" '
+      (if .type == "session" then {type:"system", subtype:"init", session_id:.id}
+      elif .type == "message_end" and .message.role == "assistant" then .message as $m
+        | (select($m.stopReason != "error")
+           | [$m.content[]? | select(.type == "text" and ((.text // "") | test("\\S"))) | {type:"text", text}]
+           | select(length > 0) | {type:"assistant", message:{content:.}}),
+          # the model that answered, shown when the chat is on "Default"
+          (select(($m.model // "") != "") | {type:"system", subtype:"model", model:(($m.provider // "") as $p
+            | if $p != "" then $p + "/" + $m.model else $m.model end)})
+      elif .type == "tool_execution_start" then (.args // {}) as $in | (.toolName // "") as $t
+        | select($t != "codemode" and $t != "tool_search")
+        | {type:"assistant", message:{content:[{type:"tool_use",
+            name:({bash:"Bash", read:"Read", edit:"Edit", write:"Edit", grep:"Grep", find:"Glob", ls:"Glob"}[$t] // $t),
+            input:(if $t == "bash" then {command:($in.command // "")}
+                   elif $t | IN("read", "edit", "write") then {file_path:($in.path // "")} else $in end)}]}}
+      elif .type == "agent_settled" and $error != "" then {type:"result", subtype:"error", is_error:true, result:("Pi: " + $error)}
+      elif .type == "agent_settled" and (.aborted | not) then {type:"result", subtype:"success", result:""}
+      else empty end) | . + {buddy_session:$s}' 2>/dev/null | while IFS= read -r ev; do printf '%s' "$ev" | post; done
+  done
+  # it ended without settling (it was stopped, or it died) after an error: say it
+  if [ -z "$settled" ] && [ -s "$S/pi-error" ]; then
+    jq -cn --arg e "Pi: $(cat "$S/pi-error")" --arg s "$SID" '{type:"result", subtype:"error", is_error:true, result:$e, buddy_session:$s}' | post
+  fi
 }
 
 # Tests (linux/test/run.sh): translate an agent's recorded output from stdin with its stream_ function and print the
@@ -1071,6 +1481,28 @@ tools (call_mcp_tool, ServerName \"phone\") and finish the user's request."
     # the same error, which would show it twice
     [ -s "$S/grok-error" ] && status=0
     name=Grok
+  elif [ "$BACKEND" = copilot ]; then
+    if [ ! -x "$COPILOT" ]; then event buddy_error "Copilot isn't installed yet. Install it in Buddy's Settings."; exit 0; fi
+    : > "$S/copilot-last.jsonl"
+    ended run_copilot | stream_copilot
+    status=${PIPESTATUS[0]}
+    if [ "$status" -ne 0 ] && [ -s "$S/copilot-session" ] \
+        && grep -q -i -E 'no session, task, or name matched|session.*(not found|does not exist)' "$S/last-error.log" 2>/dev/null; then
+      rm -f "$S/copilot-session"   # old session is gone; retry as a new conversation
+      ended run_copilot | stream_copilot
+      status=${PIPESTATUS[0]}
+    fi
+    # a failed turn is already in the chat from its session.error; Copilot also exits non-zero
+    [ -s "$S/copilot-error" ] && status=0
+    name=Copilot
+  elif [ "$BACKEND" = pi ]; then
+    if ! have pi; then event buddy_error "Pi isn't installed yet. Install it in Buddy's Settings."; exit 0; fi
+    : > "$S/pi-last.jsonl"
+    ended run_pi | stream_pi
+    status=${PIPESTATUS[0]}
+    # a failed turn is already in the chat from its message; Pi may also exit non-zero
+    [ -s "$S/pi-error" ] && status=0
+    name=Pi
   elif [ "$BACKEND" = codex ]; then
     if ! have codex; then event buddy_error "Codex isn't installed yet. Install it in Buddy's Settings."; exit 0; fi
     ended run_codex | stream_codex

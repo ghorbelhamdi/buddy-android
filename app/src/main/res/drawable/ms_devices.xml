@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A computer screen with a phone in front (other devices), drawn to match the Material Symbols icons. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="960" android:viewportHeight="960">
+    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="64" android:fillColor="#00000000" android:strokeLineJoin="round"
+        android:pathData="M520,640H160Q130,640 130,610V230Q130,200 160,200H760Q790,200 790,230V340M280,780H520M400,640V780" />
+    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="64" android:fillColor="#00000000" android:strokeLineJoin="round"
+        android:pathData="M650,420H810Q840,420 840,450V770Q840,800 810,800H650Q620,800 620,770V450Q620,420 650,420Z" />
+</vector>

@@ -32,7 +32,7 @@ import static app.buddy.assistant.Ui.*;
  * appearance, backup and about. One long screen of everything had become hard to find anything on.
  */
 public class SetupActivity extends Screen implements Account.Listener, RemoteSession.Listener, SshServer.Listener,
-        CodexRemote.Listener, Browser.Listener {
+        CodexRemote.Listener, Browser.Listener, Connections.Listener {
     private ScrollView scroll;
     private LinearLayout list;
     /** Setup card open state; null = automatic (open until all steps are done). */
@@ -83,11 +83,14 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         SshServer.addListener(this);
         CodexRemote.addListener(this);
         Browser.addListener(this);
+        Connections.addListener(this);
         Account.CLAUDE.refresh(this);
         Account.CODEX.refresh(this);
         Account.OPENCODE.refresh(this);
         Account.AGY.refresh(this);
         Account.GROK.refresh(this);
+        Account.COPILOT.refresh(this);
+        Account.PI.refresh(this);
         render();
     }
 
@@ -98,6 +101,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         SshServer.removeListener(this);
         CodexRemote.removeListener(this);
         Browser.removeListener(this);
+        Connections.removeListener(this);
         super.onPause();
     }
 
@@ -120,6 +124,12 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         // (only the page that shows the browser: on the others nothing of it is drawn, and browserShown stays unset)
         if (!"background".equals(page) || now.equals(browserShown) || isFinishing() || isDestroyed()) return;
         render();
+    }
+
+    /** A connection's check ended or OpenRouter said its balance: the Agents and models page shows both. */
+    @Override
+    public void onConnectionsChanged() {
+        if ("agents".equals(page) && !isFinishing() && !isDestroyed()) render();
     }
 
     @Override
@@ -318,9 +328,10 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 : signed ? (acc.email.isEmpty() ? getString(R.string.setup_step_signin_done)
                 : getString(R.string.setup_step_signin_done_email, acc.email))
                 : getString(acc.claude() ? R.string.setup_step_signin_claude : acc.grok() ? R.string.setup_step_signin_grok
+                : acc.copilot() ? R.string.setup_step_signin_copilot : acc.pi() ? R.string.setup_step_signin_pi
                 : R.string.setup_step_signin_codex);
-        // Claude Code and Codex also take an API key (on their sign-in screen)
-        // a saved key this agent can't use: say so, and offer the agent that can
+        // Claude Code, Codex and Pi also run on a service saved in Buddy
+        // a saved one this agent can't use: say so, and offer the agent that can
         Providers.P misfit = !signed && (acc.claude() || "codex".equals(backend)) ? Providers.mismatch(backend) : null;
         java.util.List<String> keyAgents = new java.util.ArrayList<>();
         if (misfit != null) {
@@ -334,7 +345,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             }
             signText += "\n\n" + getString(R.string.setup_step_signin_key_mismatch, acc.name(),
                     android.text.TextUtils.join(", ", keys), android.text.TextUtils.join(", ", fit));
-        } else if (!signed && (acc.claude() || "codex".equals(backend))) {
+        } else if (!signed && (acc.claude() || "codex".equals(backend) || acc.pi())) {
             signText += "\n\n" + getString(R.string.setup_step_signin_api_key);
         }
         // the default agent isn't signed in, but others are: making one of them the default is enough
@@ -368,6 +379,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 : acc.step == Account.Step.INSTALLING ? acc.detail
                 : Ui.downloadNote(this, getString(acc.claude() ? R.string.setup_step_install_claude : acc.opencode()
                 ? R.string.setup_step_install_opencode : acc.grok() ? R.string.setup_step_install_grok
+                : acc.copilot() ? R.string.setup_step_install_copilot : acc.pi() ? R.string.setup_step_install_pi
                 : R.string.setup_step_install_codex, acc.name()));
         boolean offerOther = !installed && misfit != null && !keyAgents.isEmpty() && acc.step != Account.Step.INSTALLING;
         if (offerOther) {
@@ -387,8 +399,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                     else switchDefaultSheet(keyAgents, misfit);
                 });
 
-        PowerManager pm = getSystemService(PowerManager.class);
-        boolean buddyBg = pm.isIgnoringBatteryOptimizations(getPackageName());
+        boolean buddyBg = SetupState.batteryOk(this);
         steps[3] = step(getString(R.string.setup_step_background_title), getString(buddyBg
                         ? R.string.setup_step_background_done : R.string.setup_step_background_body),
                 buddyBg, buddyBg ? null : getString(R.string.setup_allow), v -> startActivity(new Intent(
@@ -468,51 +479,369 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
 
     }
 
-    /** Agents and models: the default agent, each agent, API keys, default models, GitHub, the download server. */
+    /**
+     * Agents and models: what new chats use (the default agent and its model) and what safety checks run on, then
+     * everything that's connected (plans, services, models on this phone) with its state and what it costs,
+     * Add a connection, the agents installed, GitHub and the download server. Each row opens the screen that already
+     * sets that thing up.
+     */
     private void agentSection() {
-        String backend = Prefs.backend(this);
-        LinearLayout ag = card();
-        ag.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
-        ag.addView(title(this, getString(R.string.setup_default_brain), 15));
-        TextView brainInfo = text(this, getString(R.string.setup_default_brain_info), 13, MUTED);
-        brainInfo.setPaddingRelative(0, dp(this, 2), 0, 0);
-        ag.addView(brainInfo);
-        ag.addView(segmented(this, new String[][]{{"claude", "Claude Code"}, {"codex", "Codex"}, {"opencode", "OpenCode"},
-                        {"agy", "Antigravity"}, {"grok", "Grok"}},
-                backend, false, v -> {
-                    Prefs.setBackend(this, v);
-                    Toast.makeText(this, getString(R.string.setup_default_brain_set, Account.nameOf(v)),
-                            Toast.LENGTH_LONG).show();
-                    render();
-                }, notReady(), v -> {
-                    Toast.makeText(this, getString(R.string.setup_set_up_first, Account.nameOf(v)), Toast.LENGTH_SHORT).show();
-                    openAgent(v);
-                }), topGap(12));
-        for (Account a : Account.ALL) ag.addView(agentRow(a.agent), topGap(a == Account.CLAUDE ? 12 : 4));
-        ag.addView(apiKeysRow(), topGap(4));
-        ag.addView(onPhoneRow(), topGap(4));
-        // what a chat on Default uses, per agent (issue #20; API keys has the same rows for its services)
-        List<String> defaults = new ArrayList<>();
-        for (Account one : Account.ALL) {
-            String d = Models.agentDefault(one.agent);
-            if (!d.isEmpty()) defaults.add(Account.nameOf(one.agent) + ": " + Models.label(one.agent, d));
-        }
-        View dm = navRow(R.drawable.ms_tune, getString(R.string.api_keys_defaults), defaults.isEmpty()
-                ? getString(R.string.api_keys_own_default) : android.text.TextUtils.join(" · ", defaults), !defaults.isEmpty(),
-                SetupActivity.class);
-        dm.setOnClickListener(v -> defaultsSheet(this)); // a sheet, not a screen
-        ag.addView(dm, topGap(4));
-        ag.addView(navRow(R.drawable.ms_terminal, "GitHub", GitHub.login == null || GitHub.login.isEmpty()
-                ? getString(R.string.github_row_none) : "@" + GitHub.login, GitHub.login != null && !GitHub.login.isEmpty(),
-                GitHubActivity.class), topGap(4));
-        // where Buddy's Linux downloads from: Alpine's and npm's own servers, a mirror in the country, or the user's own
-        Mirrors.M server = Mirrors.current(this);
-        View ds = navRow(R.drawable.ms_build_circle, getString(R.string.setup_mirror), mirrorLabel(server), !server.id.isEmpty(),
-                SetupActivity.class);
-        ds.setOnClickListener(v -> mirrorSheet());
-        ag.addView(ds, topGap(4));
-        addCard(ag);
+        TextView lead = text(this, getString(R.string.agents_lead), 15, TEXT2);
+        lead.setPaddingRelative(dp(this, 20), 0, dp(this, 20), 0);
+        list.addView(lead, full());
 
+        // ---- new chats use
+        String backend = Prefs.backend(this);
+        list.addView(sectionLabel(this, getString(R.string.agents_new_chats)));
+        LinearLayout nc = card();
+        nc.setPaddingRelative(dp(this, 16), dp(this, 16), dp(this, 16), dp(this, 14));
+        LinearLayout top = row(this);
+        top.setGravity(Gravity.CENTER_VERTICAL);
+        top.addView(agentTile(this, backend));
+        LinearLayout tt = column(this);
+        tt.setPaddingRelative(dp(this, 12), 0, dp(this, 8), 0);
+        tt.addView(title(this, Account.nameOf(backend), 17));
+        String d = Models.agentDefault(backend);
+        tt.addView(single(text(this, d.isEmpty() ? getString(R.string.agents_model_default) : Models.label(backend, d), 14, TEXT2)));
+        boolean ready = SetupState.signedIn(this, backend);
+        String on = ready ? runsOn(backend, d) : getString(R.string.agents_not_set_up);
+        if (!on.isEmpty()) tt.addView(single(text(this, on, 13, ready ? MUTED : ERR)));
+        top.addView(tt, weight1());
+        top.addView(pill(getString(R.string.agents_change), v -> pickAgentSheet()));
+        nc.addView(top, full());
+        View line = divider();
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(this, 1));
+        lp.topMargin = dp(this, 14);
+        nc.addView(line, lp);
+        nc.addView(protect(smallJobsRow()), full()); // what checks the agents' taps: the user's own choice
+        addCard(nc);
+
+        // ---- connected
+        list.addView(sectionLabel(this, getString(R.string.agents_connected)));
+        LinearLayout g = card();
+        for (Object[] c : connected()) {
+            if (g.getChildCount() > 0) g.addView(divider(), lineParams());
+            g.addView(connectionRow((View) c[0], (String) c[1], (String) c[2], (String) c[3], (Integer) c[4], (String) c[5],
+                    (View.OnClickListener) c[6]), full());
+        }
+        if (g.getChildCount() == 0) {
+            TextView none = text(this, getString(R.string.agents_none_connected), 15, MUTED);
+            none.setPaddingRelative(dp(this, 16), dp(this, 16), dp(this, 16), dp(this, 16));
+            g.addView(none, full());
+        }
+        addCard(g);
+        for (Providers.P p : Providers.all()) { // the check's warning: it answered, but can't use the phone
+            if (p.off || OnPhone.ID.equals(p.id) || !Connections.noTools(this, p.id)) continue;
+            LinearLayout w = card();
+            w.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 4));
+            LinearLayout wr = row(this);
+            wr.setGravity(Gravity.TOP);
+            wr.addView(icon(this, R.drawable.ms_warning, ERR, 20));
+            LinearLayout wt = column(this);
+            wt.setPaddingRelative(dp(this, 12), 0, 0, 0);
+            wt.addView(text(this, getString(R.string.conn_no_tools_warning, p.name), 14, TEXT2));
+            TextView see = text(this, getString(R.string.agents_see_what), 14, ACCENT_TEXT);
+            see.setTypeface(sans(this, 600));
+            see.setMinHeight(dp(this, 44));
+            see.setGravity(Gravity.CENTER_VERTICAL);
+            see.setOnClickListener(v -> startActivity(new Intent(this, ConnectionActivity.class).putExtra("id", p.id)));
+            wt.addView(see, wrap());
+            wr.addView(wt, weight1());
+            w.addView(wr, full());
+            LinearLayout.LayoutParams wp = full();
+            wp.setMargins(dp(this, 16), dp(this, 10), dp(this, 16), 0);
+            list.addView(w, wp);
+        }
+        Button add = button(this, getString(R.string.agents_add), true);
+        add.setCompoundDrawablesRelativeWithIntrinsicBounds(tinted(R.drawable.ms_add, ON_ACCENT), null, null, null);
+        add.setOnClickListener(v -> startActivity(new Intent(this, AddConnectionActivity.class)));
+        LinearLayout.LayoutParams ap = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(this, 54));
+        ap.setMargins(dp(this, 16), dp(this, 16), dp(this, 16), 0);
+        list.addView(add, ap);
+
+        // ---- agents installed
+        list.addView(sectionLabel(this, getString(R.string.agents_installed)));
+        LinearLayout ai = card();
+        ai.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));
+        Ui.Flow chips = new Ui.Flow(this, 8);
+        for (Account a : Account.ALL) chips.addView(agentChip(a));
+        ai.addView(chips, full());
+        TextView why = text(this, getString(R.string.agents_installed_info), 13, MUTED);
+        ai.addView(why, topGap(12));
+        addCard(ai);
+
+        // ---- more
+        list.addView(sectionLabel(this, getString(R.string.agents_more)));
+        LinearLayout more = card();
+        boolean gh = GitHub.login != null && !GitHub.login.isEmpty();
+        more.addView(valueRow("GitHub", gh ? "@" + GitHub.login : getString(R.string.agents_github_none),
+                v -> startActivity(new Intent(this, GitHubActivity.class))), full());
+        more.addView(divider(), lineParams());
+        // what a chat on Default uses, per agent (issue #20)
+        int set = 0;
+        for (Account one : Account.ALL) if (!Models.agentDefault(one.agent).isEmpty()) set++;
+        more.addView(valueRow(getString(R.string.api_keys_defaults), set == 0 ? getString(R.string.api_keys_own_default)
+                : getResources().getQuantityString(R.plurals.agents_defaults_set, set, set), v -> defaultsSheet(this)), full());
+        more.addView(divider(), lineParams());
+        // where Buddy's Linux downloads from: Alpine's and npm's own servers, a mirror in the country, or the user's own
+        more.addView(valueRow(getString(R.string.setup_mirror), mirrorLabel(Mirrors.current(this)), v -> mirrorSheet()), full());
+        addCard(more);
+    }
+
+    /** "On your Claude plan": what the default agent's chats run on, "" when its model line says it already. */
+    private String runsOn(String agent, String model) {
+        if (Providers.of(model) != null) return ""; // "… via OpenRouter"
+        Account a = Account.of(agent);
+        switch (agent) {
+            case "claude": return SetupState.ownModels(this, agent) ? getString(R.string.agents_on_claude) : "";
+            case "codex": return SetupState.planSignedIn(this, agent) ? getString(R.string.agents_on_chatgpt) : "";
+            case "agy": return getString(R.string.agents_on_google);
+            case "grok": return getString(R.string.agents_on_grok);
+            case "copilot": return getString(R.string.agents_on_copilot);
+            default: return a.plan.isEmpty() ? "" : getString(R.string.agents_on, a.planLabel()); // OpenCode, Pi
+        }
+    }
+
+    /** "Small jobs use Haiku": the model the smart reviewer runs on, for chats of the default agent (Reviewer.harness). */
+    private View smallJobsRow() {
+        String h = Reviewer.harness(this, Prefs.backend(this));
+        LinearLayout r = row(this);
+        r.setGravity(Gravity.CENTER_VERTICAL);
+        r.setPaddingRelative(0, dp(this, 12), 0, 0);
+        LinearLayout t = column(this);
+        t.setPaddingRelative(0, 0, dp(this, 8), 0);
+        r.addView(t, weight1());
+        if (h == null) { // neither Claude Code nor Codex: nothing to run the checks on
+            t.addView(title(this, getString(R.string.agents_small_none), 15));
+            t.addView(text(this, getString(R.string.agents_small_none_info), 13, MUTED));
+            return r;
+        }
+        String m = Prefs.reviewerModel(this, h);
+        // Claude Code without its plan runs on a service, and Buddy maps every model it names, Haiku too, to that
+        // service's model (Providers.claudeEnv): that's the one it really uses, and picking another changes nothing
+        Providers.P svc = null;
+        if ("claude".equals(h) && !SetupState.ownModels(this, h)) {
+            svc = Providers.of(Models.agentDefault("claude"));
+            if (svc == null && !Providers.forAgent("claude").isEmpty()) svc = Providers.forAgent("claude").get(0);
+        }
+        String shown = svc != null ? Models.label(h, Providers.ref(svc, svc.defaultModel()))
+                : !m.isEmpty() ? Models.label(h, m) : "claude".equals(h) ? "Haiku" : getString(R.string.agents_small_codex);
+        t.addView(title(this, getString(R.string.agents_small, shown), 15));
+        t.addView(text(this, getString(m.isEmpty() && svc == null ? R.string.agents_small_info_cheap : R.string.agents_small_info,
+                Account.nameOf(h)), 13, MUTED));
+        if (svc == null) {
+            r.addView(pill(getString(R.string.agents_change), v -> modelSheet(this, h, m, getString("claude".equals(h)
+                    ? R.string.reviewer_default_claude : R.string.reviewer_default_codex), false, picked -> {
+                Prefs.setReviewerModel(this, h, picked);
+                render();
+            })));
+        }
+        return r;
+    }
+
+    /** The default agent: the ones ready to answer, then the others, which lead to their setup. Then its model. */
+    private void pickAgentSheet() {
+        LinearLayout c = column(this);
+        TextView h = title(this, getString(R.string.agents_pick_title), 18);
+        h.setPaddingRelative(0, 0, 0, dp(this, 8));
+        c.addView(h);
+        final Dialog[] d = new Dialog[1];
+        java.util.Set<String> off = notReady();
+        for (int pass = 0; pass < 2; pass++) {
+            for (Account a : Account.ALL) {
+                boolean ready = !off.contains(a.agent);
+                if (ready != (pass == 0)) continue;
+                LinearLayout r = row(this);
+                r.setGravity(Gravity.CENTER_VERTICAL);
+                r.setPaddingRelative(dp(this, 4), dp(this, 10), dp(this, 4), dp(this, 10));
+                r.setBackgroundResource(ripple(this, false));
+                r.addView(agentTile(this, a.agent));
+                LinearLayout t = column(this);
+                t.setPaddingRelative(dp(this, 14), 0, 0, 0);
+                LinearLayout nm = row(this);
+                nm.setGravity(Gravity.CENTER_VERTICAL);
+                nm.addView(title(this, a.name(), 15));
+                if (a.freeTier()) {
+                    LinearLayout.LayoutParams fp = wrap();
+                    fp.setMarginStart(dp(this, 8));
+                    nm.addView(freeTag(this), fp);
+                }
+                t.addView(nm);
+                t.addView(text(this, ready ? a.tagline() : getString(R.string.agents_pick_set_up), 13, MUTED));
+                r.addView(t, weight1());
+                if (a.agent.equals(Prefs.backend(this))) r.addView(icon(this, R.drawable.ms_check, ACCENT, 22));
+                if (!ready) r.setAlpha(0.6f);
+                r.setOnClickListener(v -> {
+                    d[0].dismiss();
+                    if (!ready) {
+                        openAgent(a.agent);
+                        return;
+                    }
+                    Prefs.setBackend(this, a.agent);
+                    render();
+                    pickDefault(this, a.agent, this::render); // then its model (closed: it keeps the one it has)
+                });
+                c.addView(r, full());
+            }
+        }
+        d[0] = bottomSheet(this, c);
+        d[0].show();
+    }
+
+    /**
+     * Everything that's set up and usable, as rows {tile, name, runs in, status, status color, cost, on tap}: the
+     * agents' own sign-ins, the services, the models on this phone. A cost Buddy can't know (a provider
+     * connected inside OpenCode or Pi) is left blank rather than guessed.
+     */
+    private List<Object[]> connected() {
+        List<Object[]> out = new ArrayList<>();
+        String signedIn = getString(R.string.conn_status_signed_in), freeOrPlan = getString(R.string.agents_cost_free_or_plan);
+        if (SetupState.ownModels(this, "claude")) out.add(plan("claude", getString(R.string.agents_claude_plan), signedIn,
+                getString(R.string.agents_cost_subscription)));
+        if (SetupState.planSignedIn(this, "codex")) out.add(plan("codex", getString(R.string.agents_chatgpt_plan), signedIn,
+                getString(R.string.agents_cost_subscription)));
+        if (SetupState.signedIn(this, "opencode")) {
+            out.add(plan("opencode", getString(R.string.conn_opencode_free), getString(R.string.conn_status_ready),
+                    getString(R.string.agents_cost_free)));
+            String p = Account.OPENCODE.plan; // providers connected in OpenCode itself: a plan or a key, Buddy can't tell
+            if (!p.isEmpty() && !"free models".equals(p)) out.add(plan("opencode", p, signedIn, ""));
+        }
+        // (these three have free use within limits and paid plans; which one the account has, they don't say)
+        if (SetupState.signedIn(this, "agy")) out.add(plan("agy", getString(R.string.agents_google), signedIn, freeOrPlan));
+        if (SetupState.signedIn(this, "grok")) out.add(plan("grok", getString(R.string.agents_grok), signedIn, freeOrPlan));
+        if (SetupState.signedIn(this, "copilot")) out.add(plan("copilot", getString(R.string.agents_copilot), signedIn, freeOrPlan));
+        if (SetupState.ownModels(this, "pi")) { // (not when Pi is there for Buddy's services alone: their rows say so)
+            // one row per provider Pi is signed in to: a plan when it's an account's sign-in, else a key
+            String types = Account.PI.piTypes;
+            if (types.isEmpty()) out.add(plan("pi", Account.PI.planLabel(), signedIn, ""));
+            else for (String t : types.split(",")) {
+                String id = t.trim().replaceFirst(":.*", "");
+                if (id.isEmpty()) continue;
+                boolean account = Account.PI.piPlan(id);
+                String name = !account ? Account.piName(id) : "anthropic".equals(id) ? getString(R.string.agents_claude_plan)
+                        : "openai-codex".equals(id) ? getString(R.string.agents_chatgpt_plan)
+                        : "github-copilot".equals(id) ? getString(R.string.agents_copilot) : Account.piName(id);
+                out.add(plan("pi", name, account ? signedIn : getString(R.string.conn_status_key), !account
+                        ? getString(R.string.agents_cost_pay) : "github-copilot".equals(id) ? freeOrPlan
+                        : getString(R.string.agents_cost_subscription)));
+            }
+        }
+        for (Providers.P p : Providers.all()) {
+            if (OnPhone.ID.equals(p.id)) continue; // (below, by model)
+            // every service the same way, a key online or a server of your own: who runs it, its state (or what's
+            // left, where it says), what it costs
+            Connections.refreshBalance(this, p, false);
+            String runs = Connections.runs(this, p);
+            String[] st = ConnectionActivity.status(this, p);
+            String bal = Connections.balance(p.id);
+            if ("ok".equals(st[1]) && bal != null && !bal.isEmpty()) st = new String[]{bal, "text"};
+            int color = "ok".equals(st[1]) ? OK : "err".equals(st[1]) ? ERR : "text".equals(st[1]) ? TEXT : MUTED;
+            out.add(new Object[]{letterTile(p.name), p.name, runs, st[0], color, Connections.cost(this, p),
+                    (View.OnClickListener) v -> startActivity(new Intent(this, ConnectionActivity.class).putExtra("id", p.id))});
+        }
+        // the models on this phone, in one row (they share a screen and an engine): by name when there's one,
+        // else their names on the second line
+        boolean engine = OnPhone.engineReady(this);
+        List<String> onPhone = new ArrayList<>();
+        for (OnPhone.Model m : OnPhone.downloaded(this)) onPhone.add(m.name);
+        if (!onPhone.isEmpty()) {
+            String lite = getString(R.string.agents_runs_in_lite, Account.nameOf("opencode"));
+            out.add(new Object[]{iconTile(this, R.drawable.ms_memory), onPhone.size() == 1 ? getString(R.string.agents_on_phone, onPhone.get(0))
+                    : getString(R.string.onphone_title),
+                    onPhone.size() == 1 ? lite : android.text.TextUtils.join(", ", onPhone) + "\n" + lite,
+                    getString(engine ? R.string.conn_status_ready : R.string.agents_engine_missing), engine ? OK : MUTED,
+                    getString(R.string.agents_cost_offline),
+                    (View.OnClickListener) v -> startActivity(new Intent(this, OnPhoneActivity.class))});
+        }
+        return out;
+    }
+
+    private Object[] plan(String agent, String name, String status, String cost) {
+        return new Object[]{agentTile(this, agent), name, getString(R.string.agents_runs_in, Account.nameOf(agent)), status, OK,
+                cost, (View.OnClickListener) v -> openAgent(agent)};
+    }
+
+    private View connectionRow(View tile, String name, String runs, String status, int color, String cost, View.OnClickListener l) {
+        LinearLayout r = row(this);
+        r.setGravity(Gravity.CENTER_VERTICAL);
+        r.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 14));
+        r.setBackgroundResource(ripple(this, false));
+        r.addView(tile);
+        LinearLayout t = column(this);
+        t.setPaddingRelative(dp(this, 12), 0, dp(this, 8), 0);
+        t.addView(single(title(this, name, 16)));
+        t.addView(runs.contains("\n") ? text(this, runs, 13, MUTED) : single(text(this, runs, 13, MUTED))); // (names, then the agent)
+        r.addView(t, weight1());
+        LinearLayout s = column(this);
+        s.setGravity(Gravity.END);
+        TextView st = text(this, status, 13, color);
+        st.setTypeface(sans(this, 600));
+        s.addView(st, wrap());
+        if (!cost.isEmpty()) s.addView(text(this, cost, 12, MUTED), wrap());
+        r.addView(s, wrap());
+        r.setOnClickListener(l);
+        return r;
+    }
+
+    /** A service's tile: its first letter. */
+    private View letterTile(String name) {
+        TextView t = text(this, name.isEmpty() ? "?" : name.substring(0, 1).toUpperCase(locale(this)), 16, TEXT);
+        t.setTypeface(sans(this, 700));
+        t.setGravity(Gravity.CENTER);
+        t.setBackground(rounded(this, CARD2, 11));
+        t.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
+        return t;
+    }
+
+    /** An agent with its version, or "not installed" (dashed); tap to install, sign in or update. */
+    private View agentChip(Account a) {
+        boolean has = SetupState.installed(this, a.agent);
+        String label = has ? a.name() : getString(R.string.agents_not_installed, a.name());
+        TextView t = text(this, label, 13, has ? TEXT : MUTED);
+        t.setTypeface(sans(this, 500));
+        if (has && !a.version.isEmpty()) {
+            android.text.SpannableStringBuilder b = new android.text.SpannableStringBuilder(label + " ");
+            int from = b.length();
+            b.append(a.version);
+            b.setSpan(new android.text.style.ForegroundColorSpan(MUTED), from, b.length(), 0);
+            b.setSpan(new android.text.style.TypefaceSpan(mono(this, 400)), from, b.length(), 0);
+            t.setText(b);
+        }
+        t.setPaddingRelative(dp(this, 11), dp(this, 7), dp(this, 11), dp(this, 7));
+        android.graphics.drawable.GradientDrawable bg = rounded(this, has ? CARD2 : 0x00000000, 12);
+        if (!has) bg.setStroke(dp(this, 1), MUTED, dp(this, 4), dp(this, 3));
+        t.setBackground(bg);
+        t.setOnClickListener(v -> openAgent(a.agent));
+        return t;
+    }
+
+    /** "Change": a small rounded button. */
+    private View pill(String label, View.OnClickListener l) {
+        Button b = button(this, label, false);
+        b.setBackground(rounded(this, CARD2, 22));
+        b.setOnClickListener(l);
+        return b;
+    }
+
+    private LinearLayout valueRow(String title, String value, View.OnClickListener l) {
+        LinearLayout r = row(this);
+        r.setGravity(Gravity.CENTER_VERTICAL);
+        r.setPaddingRelative(dp(this, 16), dp(this, 8), dp(this, 16), dp(this, 8));
+        r.setMinimumHeight(dp(this, 56));
+        r.setBackgroundResource(ripple(this, false));
+        r.addView(text(this, title, 16, TEXT), weight1());
+        TextView v = single(text(this, value, 14, MUTED));
+        v.setMaxWidth(dp(this, 200));
+        r.addView(v, wrap());
+        r.setOnClickListener(l);
+        return r;
+    }
+
+    private android.graphics.drawable.Drawable tinted(int res, int color) {
+        android.graphics.drawable.Drawable dr = getDrawable(res).mutate();
+        dr.setTint(color);
+        dr.setBounds(0, 0, dp(this, 18), dp(this, 18));
+        return dr;
     }
 
     /** The command that gives an agent in another terminal Buddy's phone tools. */
@@ -522,7 +851,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         mcp.setPaddingRelative(dp(this, 16), dp(this, 14), dp(this, 16), dp(this, 16));
         mcp.addView(text(this, getString(R.string.setup_phone_tools_info), 14, MUTED));
         mcp.addView(segmented(this, new String[][]{{"claude", "claude"}, {"codex", "codex"}, {"opencode", "opencode"},
-                        {"agy", "agy"}, {"grok", "grok"}},
+                        {"agy", "agy"}, {"grok", "grok"}, {"copilot", "copilot"}, {"pi", "pi"}},
                 mcpAgent, true, v -> {
                     mcpAgent = v;
                     render();
@@ -549,6 +878,20 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 // (running it again rewrites the table, so the line is never doubled)
                 ? "grok mcp add --transport http phone " + url + " --header 'Authorization: Bearer " + token + "'"
                 + " && sed -i '/^\\[mcp_servers\\.phone\\]$/a tool_timeout_sec = 600' ~/.grok/config.toml"
+                : "copilot".equals(mcpAgent)
+                // Copilot keeps it in ~/.copilot/mcp-config.json. `copilot mcp add` can't write that file in Buddy's Linux
+                // (proot turns its lock's hard link into a symlink, which it refuses), so Node, which Copilot runs on,
+                // adds the phone itself and keeps the other servers (run again to update)
+                ? "node -e 'const fs=require(\"fs\"),f=require(\"os\").homedir()+\"/.copilot/mcp-config.json\";let c={};"
+                + "try{c=JSON.parse(fs.readFileSync(f,\"utf8\").replace(/^\\s*\\/\\/.*$/gm,\"\"))}catch(e){}"
+                + "c.mcpServers=c.mcpServers||{};c.mcpServers.phone={type:\"http\",url:\"" + url + "\",headers:{Authorization:\"Bearer "
+                + token + "\"},tools:[\"*\"],timeout:600000};fs.mkdirSync(require(\"path\").dirname(f),{recursive:true});"
+                + "fs.writeFileSync(f,JSON.stringify(c,null,2)+\"\\n\")'"
+                : "pi".equals(mcpAgent)
+                // Pi keeps it in ~/.pi/agent/mcp.json, its timeout in seconds; "direct" declares the tools to the model
+                // (otherwise they are reached through its code tool)
+                ? "pi mcp add phone --url " + url + " --header 'Authorization=Bearer " + token + "' --exposure direct"
+                + " && f=~/.pi/agent/mcp.json && jq '.mcpServers.phone.timeout = 600' $f > $f.new && mv $f.new $f"
                 // add-json refuses a name that's already there, so the earlier setup goes first (run again to update)
                 : "claude mcp remove -s user phone >/dev/null 2>&1; claude mcp add-json -s user phone '{\"type\":\"http\",\"url\":\"" + url
                 + "\",\"headers\":{\"Authorization\":\"Bearer " + token + "\"},\"timeout\":600000}'";
@@ -758,7 +1101,7 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         vc.addView(fieldLabel(getString(R.string.setup_live_agent), null), topGap(16));
         vc.addView(segmented(this, new String[][]{{"", getString(R.string.setup_live_agent_default)},
                         {"claude", "Claude Code"}, {"codex", "Codex"}, {"opencode", "OpenCode"}, {"agy", "Antigravity"},
-                        {"grok", "Grok"}}, Prefs.liveAgent(this), false, v -> {
+                        {"grok", "Grok"}, {"copilot", "Copilot"}, {"pi", "Pi"}}, Prefs.liveAgent(this), false, v -> {
                     Prefs.setLiveAgent(this, v);
                     render();
                 }, notReady(), v -> {
@@ -1051,6 +1394,18 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             Prefs.setDevMode(this, on);
             render();
         })), full());
+        if (Linux.installed(this)) { // what is in Buddy's Linux, and the way to get files in and out of it
+            ex.addView(divider(), lineParams());
+            LinearLayout files = listRow(this);
+            files.setGravity(Gravity.CENTER_VERTICAL);
+            LinearLayout ft = column(this);
+            ft.addView(title(this, getString(R.string.files_title), 15));
+            ft.addView(text(this, getString(R.string.files_row_info), 13, MUTED), topGap(2));
+            files.addView(ft, weight1());
+            files.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 20));
+            files.setOnClickListener(v -> startActivity(new android.content.Intent(this, FilesActivity.class)));
+            ex.addView(files, full());
+        }
         ex.addView(divider(), lineParams());
         ex.addView(protect(switchRow(this, getString(R.string.setup_agents_tap), getString(R.string.setup_agents_tap_info),
                 Prefs.agentsTapBuddy(this), on -> {
@@ -1077,6 +1432,12 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 SchedulesActivity.class);
         sch.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
         ex.addView(sch, full());
+        ex.addView(divider(), lineParams());
+        int saved = Routines.all(this).size();
+        View rt = navRow(R.drawable.ms_replay, getString(R.string.routines_title), saved == 0 ? getString(R.string.routines_row)
+                : getResources().getQuantityString(R.plurals.routines_row_saved, saved, saved), saved > 0, RoutinesActivity.class);
+        rt.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
+        ex.addView(rt, full());
         addCard(ex);
     }
 
@@ -1094,6 +1455,12 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         View sk = skillsRow();
         sk.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
         ex.addView(sk, full());
+        ex.addView(divider(), lineParams());
+        int paired = WebDevices.devices(this).size();
+        View od = navRow(R.drawable.ms_devices, getString(R.string.web_title), !WebDevices.on(this) ? getString(R.string.web_row)
+                : getResources().getQuantityString(R.plurals.web_row_paired, paired, paired), WebDevices.on(this), OtherDevicesActivity.class);
+        od.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
+        ex.addView(od, full());
         addCard(ex);
     }
 
@@ -1231,6 +1598,14 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
             guide.setPaddingRelative(0, dp(this, 12), 0, 0);
             guide.setOnClickListener(v -> startActivity(new Intent(this, OnboardingActivity.class).putExtra("again", complete)));
             c.addView(guide);
+        }
+        int missing = SetupState.missing(this).size();
+        if (missing > 0) { // each permission Buddy still needs, one screen after another (Check Buddy walks them)
+            TextView walk = text(this, getString(R.string.walk_button, missing), 14, ACCENT_TEXT);
+            walk.setTypeface(sans(this, 600));
+            walk.setPaddingRelative(0, dp(this, 12), 0, 0);
+            walk.setOnClickListener(v -> startActivity(new Intent(this, CheckActivity.class).putExtra("walk", true)));
+            c.addView(walk);
         }
         if (!open) {
             TextView s = text(this, complete ? getString(R.string.setup_all_set)
@@ -1763,36 +2138,6 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         d[0].show();
     }
 
-    /** An agent with its state (not installed / signed out / signed in); tap to install or sign in. */
-    private View agentRow(String agent) {
-        Account a = Account.of(agent);
-        String st = Prefs.agentState(this, agent);
-        boolean busy = a.step == Account.Step.INSTALLING;
-        String state = busy ? getString(R.string.setup_agent_installing)
-                : !Linux.installed(this) || st == null || "NEED_INSTALL".equals(st) ? getString(R.string.setup_agent_not_installed)
-                : a.opencode() ? (a.plan.isEmpty() ? getString(R.string.setup_agent_ready)
-                : getString(R.string.setup_agent_ready_plan, a.planLabel()))
-                // ready through an API key isn't being signed in: the plan's features still need that
-                : "SIGNED_IN".equals(st) && (a.claude() || "codex".equals(agent)) && a.apiKey && !a.planIn ? getString(R.string.setup_agent_api_key)
-                : "SIGNED_IN".equals(st) ? (a.email.isEmpty() ? getString(R.string.setup_agent_signed_in)
-                : getString(R.string.setup_agent_signed_in_email, a.email))
-                : getString(R.string.setup_agent_not_signed_in);
-        LinearLayout r = row(this);
-        r.setPaddingRelative(0, dp(this, 10), 0, dp(this, 10));
-        r.setBackgroundResource(ripple(this, false));
-        r.addView(agentTile(this, agent));
-        LinearLayout t = column(this);
-        t.setPaddingRelative(dp(this, 12), 0, dp(this, 8), 0);
-        t.addView(title(this, a.name(), 15));
-        t.addView(single(monoText(this, state, 12, "SIGNED_IN".equals(st) && !busy ? OK : MUTED)));
-        String usage = "SIGNED_IN".equals(st) ? Usage.line(this, agent) : null;
-        if (usage != null) t.addView(monoText(this, usage, 12, MUTED));
-        r.addView(t, weight1());
-        r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
-        r.setOnClickListener(v -> openAgent(agent));
-        return r;
-    }
-
     /** Settings → MCP servers: the user's own servers, whose tools the agents get next to the phone's. */
     private View mcpRow() {
         List<String> names = new ArrayList<>();
@@ -1800,24 +2145,6 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         return navRow(R.drawable.ms_layers, getString(R.string.mcp_title), names.isEmpty()
                 ? getString(R.string.mcp_row_none) : android.text.TextUtils.join(", ", names), !names.isEmpty(),
                 McpServersActivity.class);
-    }
-
-    /** Settings → API keys: other services' models for Claude Code, Codex and OpenCode. */
-    private View apiKeysRow() {
-        List<String> names = new ArrayList<>();
-        for (Providers.P p : Providers.all()) if (!OnPhone.ID.equals(p.id)) names.add(p.name);
-        return navRow(R.drawable.ms_key, getString(R.string.api_keys_title), names.isEmpty()
-                ? getString(R.string.api_keys_row_none) : android.text.TextUtils.join(", ", names), !names.isEmpty(),
-                ApiKeysActivity.class);
-    }
-
-    /** Settings → Models on this phone: a model Buddy runs itself, offline (see OnPhone). */
-    private View onPhoneRow() {
-        List<String> names = new ArrayList<>();
-        for (OnPhone.Model m : OnPhone.downloaded(this)) names.add(m.name);
-        return navRow(R.drawable.ms_memory, getString(R.string.onphone_title), names.isEmpty()
-                ? getString(R.string.onphone_row_none) : android.text.TextUtils.join(", ", names), !names.isEmpty(),
-                OnPhoneActivity.class);
     }
 
     /** Settings → Tools: every phone tool, each with a switch (ToolsActivity). */

@@ -125,7 +125,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                 for (String a : wanted(c)) if (!SetupState.signedIn(c, a)) return false;
                 return !Prefs.localSetup(c) || localServer() != null; // "Local model": its server too
             case BACKGROUND:
-                return c.getSystemService(PowerManager.class).isIgnoringBatteryOptimizations(c.getPackageName());
+                return SetupState.batteryOk(c);
             default:
                 return false;
         }
@@ -192,6 +192,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                             : "both".equals(agents) ? getString(R.string.onboarding_access_privacy_both)
                             : getString(R.string.onboarding_access_privacy, agentNames(),
                             "codex".equals(agents) ? "OpenAI" : "agy".equals(agents) ? "Google" : "grok".equals(agents) ? "xAI"
+                            : "copilot".equals(agents) ? "GitHub" : "pi".equals(agents) ? getString(R.string.onboarding_pi_provider)
                             : "Anthropic"));
                     if (accessTries > 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) restrictedHelp();
                     note(getString(R.string.onboarding_access_list_hint));
@@ -281,6 +282,8 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                 {"opencode", "OpenCode", getString(R.string.onboarding_brain_opencode)},
                 {"agy", "Antigravity", getString(R.string.onboarding_brain_agy)},
                 {"grok", "Grok", getString(R.string.onboarding_brain_grok)},
+                {"copilot", "Copilot", getString(R.string.onboarding_brain_copilot)},
+                {"pi", "Pi", getString(R.string.onboarding_brain_pi)},
                 {"both", "Claude Code + Codex", getString(R.string.onboarding_brain_both)},
                 // a model server of your own, driven by OpenCode (it needs no account)
                 {"local", getString(R.string.onboarding_brain_local_title), getString(R.string.onboarding_brain_local)},
@@ -359,7 +362,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
             LinearLayout t = column(this);
             t.setPaddingRelative(dp(this, 12), 0, 0, 0);
             t.addView(title(this, acc.name(), 15));
-            t.addView(single(monoText(this, signed ? (acc.opencode() ? getString(R.string.onboarding_agent_ready,
+            t.addView(single(monoText(this, signed ? (acc.connectsInTerminal() ? getString(R.string.onboarding_agent_ready,
                     acc.plan.isEmpty() ? getString(R.string.onboarding_agent_free_models) : acc.planLabel())
                     : acc.email.isEmpty() ? getString(R.string.onboarding_agent_signed_in)
                     : getString(R.string.onboarding_agent_signed_in_as, acc.email))
@@ -375,11 +378,15 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                         : acc.step == Account.Step.ERROR ? acc.detail
                         : installed ? getString(acc.claude() ? R.string.onboarding_agent_sign_in_claude : acc.opencode()
                         ? R.string.onboarding_agent_checking_opencode : acc.agy() ? R.string.onboarding_agent_sign_in_agy
-                        : acc.grok() ? R.string.onboarding_agent_sign_in_grok : R.string.onboarding_agent_sign_in_codex)
+                        : acc.grok() ? R.string.onboarding_agent_sign_in_grok
+                        : acc.copilot() ? R.string.onboarding_agent_sign_in_copilot
+                        : acc.pi() ? R.string.onboarding_agent_sign_in_pi : R.string.onboarding_agent_sign_in_codex)
                         : Ui.downloadNote(this, getString(acc.claude() ? R.string.onboarding_agent_download_claude
                         : acc.opencode() ? R.string.onboarding_agent_download_opencode
                         : acc.agy() ? R.string.onboarding_agent_download_agy
                         : acc.grok() ? R.string.onboarding_agent_download_grok
+                        : acc.copilot() ? R.string.onboarding_agent_download_copilot
+                        : acc.pi() ? R.string.onboarding_agent_download_pi
                         : R.string.onboarding_agent_download_codex)), 14,
                         acc.step == Account.Step.ERROR ? ERR : MUTED);
                 how.setPaddingRelative(0, dp(this, 10), 0, installing ? 0 : dp(this, 10));
@@ -387,6 +394,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
                 if (!installing && !(installed && acc.opencode())) {
                     Button b = button(this, installed ? getString(acc.claude() ? R.string.onboarding_sign_in_claude
                             : acc.agy() ? R.string.onboarding_sign_in_google : acc.grok() ? R.string.onboarding_sign_in_grok
+                            : acc.copilot() ? R.string.signin_with_github : acc.pi() ? R.string.signin_connect_provider
                             : R.string.onboarding_sign_in_chatgpt)
                             : getString(R.string.onboarding_install_agent, acc.name()), first);
                     b.setOnClickListener(v -> {
@@ -409,7 +417,7 @@ public class OnboardingActivity extends Screen implements Account.Listener {
         }
     }
 
-    /** "Local model": the user's own server, added on the API keys screen (which comes back here once it's saved). */
+    /** "Local model": the user's own server, added in the sheet every service is (the guide goes on once it's saved). */
     private void localServerCard() {
         Providers.P p = localServer();
         // a server saved before "Local model" was picked: OpenCode's chats use it from now on, unless the user
@@ -436,7 +444,10 @@ public class OnboardingActivity extends Screen implements Account.Listener {
             how.setPaddingRelative(0, dp(this, 10), 0, dp(this, 10));
             card.addView(how);
             Button b = button(this, getString(R.string.onboarding_local_server_add), SetupState.signedIn(this, "opencode"));
-            b.setOnClickListener(v -> startActivity(new Intent(this, ApiKeysActivity.class).putExtra("add_local", true)));
+            b.setOnClickListener(v -> ServiceEditor.add(this, "Ollama", saved -> {
+                render();
+                checkAdvance();
+            }));
             card.addView(b, wrap());
         }
         LinearLayout.LayoutParams lp = full();

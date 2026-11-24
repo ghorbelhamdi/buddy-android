@@ -1,0 +1,3 @@
+{"buddy_session":"fixture","session_id":"buddy-pitest00test-1795464890","subtype":"init","type":"system"}
+{"buddy_session":"fixture","model":"stub/fail","subtype":"model","type":"system"}
+{"buddy_session":"fixture","is_error":true,"result":"Pi: 400: {\"message\":\"The requested model is not supported.\",\"type\":\"invalid_request_error\"}","subtype":"error","type":"result"}

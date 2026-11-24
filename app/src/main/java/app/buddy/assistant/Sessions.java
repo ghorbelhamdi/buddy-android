@@ -30,6 +30,8 @@ final class Sessions {
         final String text;
         /** Attachment ids (see Attachments); empty for most messages. */
         final List<String> files;
+        /** Files in the chat's Linux tools this message is about (their paths there): chips, like attachments. */
+        List<String> linux = new ArrayList<>();
         /** A user message Buddy sent on its own at a scheduled time (see Schedules): the chat marks it so. */
         boolean scheduled;
         /** A user message the user edited (issue #44): the chat marks it so. */
@@ -52,9 +54,10 @@ final class Sessions {
 
         /** Text for places that can't show attachments (bubble panel). */
         String label() {
-            if (files.isEmpty()) return text;
-            String n = files.size() == 1 ? "📎 " + Attachments.name(files.get(0))
-                    : BuddyApp.plural(R.plurals.attach_count, files.size(), files.size());
+            if (files.isEmpty() && linux.isEmpty()) return text;
+            int count = files.size() + linux.size();
+            String one = !files.isEmpty() ? Attachments.name(files.get(0)) : linux.get(0).substring(linux.get(0).lastIndexOf('/') + 1);
+            String n = count == 1 ? "📎 " + one : BuddyApp.plural(R.plurals.attach_count, count, count);
             return text.isEmpty() ? n : kind == Bubble.Kind.BUDDY ? text + "\n" + n : n + "\n" + text;
         }
     }
@@ -99,6 +102,13 @@ final class Sessions {
         boolean dev;
         /** Long-task mode: the screen stays on while this chat works, and its end is a notification (see KeepAwake). */
         boolean awake;
+        /**
+         * The chat's project folder: where its agent starts and keeps the chat's work, a path inside the workspace
+         * ("flappy"; see FilePlaces.validProject). "" is the workspace itself, which chats without one share.
+         */
+        String folder = "";
+        /** Files sent to Linux tools (LinuxFiles) stay, in ~/.buddy/work/incoming, when the chat is deleted. */
+        boolean keepFiles = true;
         /** Background mode: the agent works on a display of its own, the user keeps the screen (see Background). */
         boolean background;
         /** Lite mode (see Lite): null = automatic (on for a model on this phone), else the user's pick. */
@@ -132,6 +142,12 @@ final class Sessions {
         volatile long otherToolAt;
         /** When its agent last started a phone tool in this run (elapsedRealtime; not saved). */
         volatile long phoneToolAt;
+        /**
+         * The shell command its agent started last in this run, while that is its latest step (null otherwise), and
+         * when (elapsedRealtime): the chat's "what is it doing" sheet (issue #81). Not saved.
+         */
+        volatile String cmd;
+        volatile long cmdAt;
         String status = "";
         String lastReply = "";
         long lastEventAt;
@@ -234,7 +250,7 @@ final class Sessions {
 
     /**
      * A new chat that is a copy of src with its first count messages (issue #44): same agent, model, effort, Linux
-     * tools, background and incognito; nothing of its schedule, approvals choice, allowed apps, pin or archive.
+     * tools, project folder, background and incognito; nothing of its schedule, approvals choice, allowed apps, pin or archive.
      * Placed just after src in the list (a fork then moves to the top with its first note, as any chat with a new
      * message does). Its agent starts fresh with the chat so far (reseed).
      */
@@ -251,6 +267,17 @@ final class Sessions {
             o.remove("allowed");
             o.remove("later");
             o.remove("lite_groups"); // its agent starts fresh: it loads what it needs again
+            // files sent to the first chat's Linux tools are in its own folder, which the fork can't reach (and which goes
+            // with that chat): their paths stay in the messages as text
+            for (int i = 0; i < kept.length(); i++) {
+                JSONObject m = kept.optJSONObject(i);
+                JSONArray lx = m == null ? null : m.optJSONArray("lx");
+                if (lx == null) continue;
+                StringBuilder t = new StringBuilder(m.optString("t"));
+                for (int k = 0; k < lx.length(); k++) t.append(t.length() > 0 ? "\n" : "").append(lx.optString(k));
+                m.put("t", t.toString());
+                m.remove("lx");
+            }
             Session s = fromJson(o, new boolean[1]);
             s.reseed = true;
             int at = all.indexOf(src);
@@ -417,13 +444,14 @@ final class Sessions {
         for (Msg m : s.messages) {
             JSONObject mo = new JSONObject().put("k", m.kind.name()).put("t", m.text);
             if (!m.files.isEmpty()) mo.put("f", new JSONArray(m.files));
+            if (!m.linux.isEmpty()) mo.put("lx", new JSONArray(m.linux));
             if (m.scheduled) mo.put("s", true);
             if (m.edited) mo.put("e", true);
             msgs.put(mo);
         }
         JSONObject o = new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model)
                 .put("effort", s.effort).put("actual_model", s.actualModel).put("ctx_used", s.ctxUsed).put("ctx_window", s.ctxWindow)
-                .put("interrupted", s.interrupted).put("incognito", s.incognito).put("dev", s.dev).put("awake", s.awake).put("background", s.background).put("approvals", s.approvals).put("handover", s.handover == null ? "" : s.handover).put("reseed", s.reseed)
+                .put("interrupted", s.interrupted).put("incognito", s.incognito).put("dev", s.dev).put("awake", s.awake).put("keep_files", s.keepFiles).put("folder", s.folder).put("background", s.background).put("approvals", s.approvals).put("handover", s.handover == null ? "" : s.handover).put("reseed", s.reseed)
                 .put("handover_model", s.handoverModel).put("handover_effort", s.handoverEffort)
                 .put("pinned", s.pinned).put("archived", s.archived).put("updated", s.updated).put("cut", s.cut).put("parent", s.parent).put("slot", s.slot).put("messages", msgs);
         synchronized (s.apps) {
@@ -464,6 +492,8 @@ final class Sessions {
         older[0] |= !o.has("dev");
         s.dev = o.optBoolean("dev", Prefs.devMode(app));
         s.awake = o.optBoolean("awake");
+        s.keepFiles = o.optBoolean("keep_files", true);
+        s.folder = FilePlaces.validProject(o.optString("folder")) ? o.optString("folder") : "";
         s.background = o.optBoolean("background");
         if (o.has("lite")) s.lite = o.optBoolean("lite");
         JSONObject tl = o.optJSONObject("tools");
@@ -502,6 +532,8 @@ final class Sessions {
             JSONArray f = m.optJSONArray("f");
             if (f != null) for (int k = 0; k < f.length(); k++) files.add(f.getString(k));
             Msg msg = new Msg(Bubble.Kind.valueOf(m.getString("k")), m.getString("t"), files);
+            JSONArray lx = m.optJSONArray("lx");
+            if (lx != null) for (int k = 0; k < lx.length(); k++) msg.linux.add(lx.getString(k));
             msg.scheduled = m.optBoolean("s");
             msg.edited = m.optBoolean("e");
             s.messages.add(msg);

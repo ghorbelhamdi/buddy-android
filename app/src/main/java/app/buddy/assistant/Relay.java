@@ -12,7 +12,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * An agent's requests to another service's API with an API key saved in Buddy (Settings → API keys): the agent is
+ * An agent's requests to a service saved in Buddy (Settings → Agents and models), with its API key: the agent is
  * pointed at http://127.0.0.1:8765/llm/&lt;service&gt;/a/… (its Anthropic-style address) or …/o/… (its OpenAI-style one),
  * with Buddy's per-install token, and this sends each request on with the real key, streaming the reply back. The key
  * stays in Buddy's encrypted storage (Secrets) and never enters Buddy's Linux, so no agent, command or page it reads
@@ -34,13 +34,14 @@ final class Relay {
     }
 
     /** Anthropic's own API takes the key as x-api-key; other services (and OpenAI) as a bearer token. */
-    private static boolean xApiKey(boolean anthropic, String base) {
+    static boolean xApiKey(boolean anthropic, String base) {
         return anthropic && "api.anthropic.com".equals(Uri.parse(base).getHost());
     }
 
     /**
-     * The service's models, straight from the app (the key is here): [{id, name, window, efforts}], window the context
-     * size in tokens (0 if not said), efforts the reasoning levels it lists. Services keep the list in different places
+     * The service's models, straight from the app (the key is here): [{id, name, window, efforts, image}], window the
+     * context size in tokens (0 if not said), efforts the reasoning levels it lists, image when it says the model takes
+     * pictures. Services keep the list in different places
      * (DeepSeek's Anthropic-style address has none, its main one has), so the usual ones are tried in turn. Throws with
      * the service's own error when none answers.
      */
@@ -191,7 +192,7 @@ final class Relay {
     }
 
     /** The error a service's JSON answer states, "" if it isn't one: a web page's words about models mean nothing. */
-    private static String errorText(String body) {
+    static String errorText(String body) {
         try {
             org.json.JSONObject o = new org.json.JSONObject(body.trim());
             org.json.JSONObject e = o.optJSONObject("error");
@@ -240,8 +241,13 @@ final class Relay {
             }
             org.json.JSONObject effort = m.optJSONObject("effort");
             org.json.JSONArray levels = effort == null ? null : effort.optJSONArray("supported_levels");
-            out.put(new org.json.JSONObject().put("id", id).put("name", name.isEmpty() ? id : name).put("window", window)
-                    .put("efforts", levels == null ? new org.json.JSONArray() : levels));
+            org.json.JSONObject o = new org.json.JSONObject().put("id", id).put("name", name.isEmpty() ? id : name)
+                    .put("window", window).put("efforts", levels == null ? new org.json.JSONArray() : levels);
+            // what it takes in, where the service says (OpenRouter: architecture.input_modalities)
+            org.json.JSONObject arch = m.optJSONObject("architecture");
+            org.json.JSONArray takes = arch == null ? null : arch.optJSONArray("input_modalities");
+            for (int j = 0; takes != null && j < takes.length(); j++) if ("image".equals(takes.optString(j))) o.put("image", true);
+            out.put(o);
         }
         return out;
     }
@@ -287,15 +293,15 @@ final class Relay {
         boolean anthropic = parts.length >= 2 && "a".equals(parts[1]);
         String base = p == null ? "" : anthropic ? p.anthropic : "o".equals(parts[1]) ? p.openai : "";
         String key = p == null ? null : Secrets.get(c, Providers.secretName(p.id));
-        if (p != null && p.off) { // the user switched this service off (Settings → API keys): nothing goes to it
+        if (p != null && p.off) { // the user switched this service off (on its screen): nothing goes to it
             if (body == null) drain(from, length);
             error(out, 403, "permission_error", p.name + " is switched off in Buddy. Switch it on in Buddy's Settings, "
-                    + "under API keys, or pick another model for this chat.");
+                    + "under Agents and models, or pick another model for this chat.");
             return;
         }
         if (key == null || base.isEmpty()) {
             if (body == null) drain(from, length); // the caller reads the answer only once its request is through
-            error(out, 401, "No API key saved in Buddy for this service. Add one in Buddy's Settings, under API keys.");
+            error(out, 401, "No key saved in Buddy for this service. Add it in Buddy's Settings, under Agents and models.");
             return;
         }
         String rest = parts.length == 3 ? "/" + parts[2] : "";

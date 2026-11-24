@@ -274,18 +274,8 @@ final class PhoneTools {
         File f = agentFile(a.getString("path"));
         String name = a.optString("name", f.getName()).replaceAll("[/\\\\]", "_");
         if (name.isEmpty()) name = f.getName();
-        ContentValues v = new ContentValues();
-        v.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
-        v.put(MediaStore.MediaColumns.RELATIVE_PATH, "Download/Buddy");
-        v.put(MediaStore.MediaColumns.IS_PENDING, 1);
-        Uri u = svc.getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, v);
+        Uri u = toDownloads(svc, new FileInputStream(f), name, null);
         if (u == null) return "Couldn't save to Downloads.";
-        try (OutputStream o = svc.getContentResolver().openOutputStream(u)) {
-            copy(new FileInputStream(f), o);
-        }
-        v.clear();
-        v.put(MediaStore.MediaColumns.IS_PENDING, 0);
-        svc.getContentResolver().update(u, v, null, null);
         // the chat shows it under the agent's reply, a tap opens it (it said where it saved it, and nothing to open)
         String chat = McpServer.CALLER_CHAT.get();
         boolean chip = false;
@@ -298,6 +288,45 @@ final class PhoneTools {
         }
         return "Saved to Downloads/Buddy/" + name + "."
                 + (chip ? " The chat shows it under your reply for the user to open." : "");
+    }
+
+    /**
+     * Copies a file into the phone's Downloads/Buddy under this name and returns its address there, or null when
+     * Android refused to make it (save_to_downloads, and Save to Downloads on the Files screen). With t, its bytes go
+     * up as they're written and its stop ends the copy (an InterruptedIOException). Nothing half-written stays.
+     */
+    static Uri toDownloads(Context c, InputStream in, String name, FilePlaces.Tally t) throws Exception {
+        ContentValues v = new ContentValues();
+        v.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
+        v.put(MediaStore.MediaColumns.RELATIVE_PATH, "Download/Buddy");
+        v.put(MediaStore.MediaColumns.IS_PENDING, 1);
+        Uri u;
+        try {
+            u = c.getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, v);
+        } catch (Exception e) {
+            in.close();
+            throw e;
+        }
+        if (u == null) {
+            in.close();
+            return null;
+        }
+        try (InputStream i = in; OutputStream o = c.getContentResolver().openOutputStream(u)) {
+            byte[] buf = new byte[256 * 1024];
+            int n;
+            while ((n = i.read(buf)) > 0) {
+                if (t != null && t.stop) throw new java.io.InterruptedIOException();
+                o.write(buf, 0, n);
+                if (t != null) t.bytes += n;
+            }
+        } catch (Exception e) {
+            c.getContentResolver().delete(u, null, null);
+            throw e;
+        }
+        v.clear();
+        v.put(MediaStore.MediaColumns.IS_PENDING, 0);
+        c.getContentResolver().update(u, v, null, null);
+        return u;
     }
 
     private static void copy(InputStream in, OutputStream out) throws Exception {

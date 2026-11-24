@@ -8,11 +8,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
- * API keys for other services (Settings → API keys): each with an Anthropic-style address (Claude Code, OpenCode), an
- * OpenAI-style one (OpenCode, and Codex when it has the Responses API), or both, and the models it lists. A chat picks
- * one of its models in the model sheet ("@id/model"); an agent can also use one by default. Keys stay in Secrets and
- * never enter Buddy's Linux: the agents talk to Relay, which adds them. Linux only gets $D/providers/&lt;id&gt;.json
- * (no key), so buddy-run knows how to point each agent there.
+ * The services saved in Buddy (Settings → Agents and models): a key at a service online (OpenRouter, Anthropic,
+ * OpenAI, DeepSeek…) or a server of the user's own (Ollama, LM Studio, llama.cpp), each with an Anthropic-style address
+ * (Claude Code, OpenCode, Pi), an OpenAI-style one (OpenCode, Pi, and Codex when it has the Responses API), or both,
+ * and the models it lists. A chat picks one of its models in the model sheet ("@id/model"); an agent can also use one
+ * by default. Keys stay in Secrets and never enter Buddy's Linux: the agents talk to Relay, which adds them. Linux
+ * only gets $D/providers/&lt;id&gt;.json (no key), so buddy-run knows how to point each agent there.
  */
 final class Providers {
     static final class P {
@@ -36,13 +37,27 @@ final class Providers {
             this.id = id;
         }
 
+        /**
+         * At an address known to have no Responses API (a preset marked "chat": its address answered 404 there when
+         * asked, 2026-11-24), so Codex can't use it; OpenCode and Pi, which send Chat Completions, can.
+         */
+        boolean chatOnly() {
+            String mine = openai.replaceAll("/+$", "");
+            if (mine.isEmpty()) return false;
+            for (String[] pre : PRESETS) if ("chat".equals(pre[3]) && pre[2].replaceAll("/+$", "").equals(mine)) return true;
+            return false;
+        }
+
         /** Can this agent use it? */
         boolean fits(String agent) {
             // models on this phone: OpenCode only, where their chats get lite mode (see Lite)
             if (OnPhone.ID.equals(id)) return "opencode".equals(agent);
             if ("claude".equals(agent)) return !anthropic.isEmpty();
-            if ("codex".equals(agent)) return !openai.isEmpty(); // an OpenAI-style service is taken to have the Responses API; if not, the agent says so
-            return "opencode".equals(agent) && (!anthropic.isEmpty() || !openai.isEmpty());
+            // an OpenAI-style service is taken to have the Responses API (if not, the agent says so), except the ones
+            // known to have none (see chatOnly)
+            if ("codex".equals(agent)) return !openai.isEmpty() && !chatOnly();
+            // OpenCode and Pi take either kind of address (the OpenAI-style one when it has both: Chat Completions)
+            return ("opencode".equals(agent) || "pi".equals(agent)) && (!anthropic.isEmpty() || !openai.isEmpty());
         }
 
         /** The models the pickers offer: the ones picked to show, or all. */
@@ -79,9 +94,15 @@ final class Providers {
     /** Presets for the editor: name, Anthropic-style address, OpenAI-style address, Chat Completions only. */
     static final String[][] PRESETS = {
             {"DeepSeek", "https://api.deepseek.com/anthropic", "https://api.deepseek.com", ""},
-            {"OpenRouter", "https://openrouter.ai/api", "https://openrouter.ai/api/v1", "chat"},
+            {"OpenRouter", "https://openrouter.ai/api", "https://openrouter.ai/api/v1", ""}, // (has a Responses API: asked 2026-11-24)
             {"Anthropic", "https://api.anthropic.com", "", ""},
             {"OpenAI", "", "https://api.openai.com/v1", ""},
+            // (each address as the service's own docs give it; "chat" where they show no Responses API there)
+            {"Google AI Studio", "", "https://generativelanguage.googleapis.com/v1beta/openai", "chat"},
+            {"Mistral", "", "https://api.mistral.ai/v1", ""},
+            {"xAI", "", "https://api.x.ai/v1", ""},
+            {"Groq", "", "https://api.groq.com/openai/v1", ""},
+            {"Cerebras", "", "https://api.cerebras.ai/v1", "chat"},
             // your own server: on this phone as given, or on a PC with its address on your network instead of localhost
             {"Ollama", "", "http://localhost:11434/v1", ""},
             {"LM Studio", "", "http://localhost:1234/v1", ""},
@@ -146,7 +167,7 @@ final class Providers {
     }
 
     /**
-     * Switches a service off or on again (Settings → API keys). Off, its key and settings stay, but the pickers
+     * Switches a service off or on again (on its screen). Off, its key and settings stay, but the pickers
      * don't offer it, an agent that used it by default goes back to its own (and returns to it when it's on again),
      * a chat set to one of its models says so instead of running, and Buddy doesn't ask it for its models.
      */
@@ -227,15 +248,18 @@ final class Providers {
         if (!Linux.installed(c)) return;
         dir.mkdirs();
         for (P p : all()) {
+            // Anthropic's and OpenAI's own models take pictures; elsewhere only the ones the service says do
+            // (Pi leaves pictures out for a model that isn't known to take them)
+            boolean pictures = !p.openai.isEmpty() ? Relay.isOpenAi(p.openai) : Relay.xApiKey(true, p.anthropic);
             JSONObject windows = new JSONObject();
             for (int i = 0; i < p.models.length(); i++) {
                 JSONObject m = p.models.getJSONObject(i);
                 windows.put(m.getString("id"), new JSONObject().put("name", m.optString("name"))
-                        .put("window", m.optLong("window")));
+                        .put("window", m.optLong("window")).put("image", pictures || m.optBoolean("image")));
             }
             Linux.write(new File(dir, p.id + ".json"), new JSONObject().put("name", p.name)
                     .put("anthropic", !p.anthropic.isEmpty())
-                    .put("openai", p.openai.isEmpty() ? "" : "responses")
+                    .put("openai", p.openai.isEmpty() ? "" : p.chatOnly() ? "chat" : "responses")
                     .put("openai_own", !p.openai.isEmpty() && Relay.isOpenAi(p.openai)) // Codex keeps its extras there
                     .put("local", p.local()) // a model on the user's computer: the agents wait longer for it
                     .put("models", windows).toString());

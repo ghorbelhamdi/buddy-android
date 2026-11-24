@@ -87,6 +87,7 @@ final class ChatHub {
             forgetting.add(s.id); // its folder is the delete's to remove: it reads it first
             sessions.remove(s);
             StepLog.deleteChat(app, s.id);
+            Routines.forget(s.id);
             if (Linux.installed(app)) {
                 try {
                     Helper.run(app, "delete", s.id, "forget");
@@ -227,6 +228,14 @@ final class ChatHub {
         savedFiles.remove(s.id);
         if (CodexLive.on(s)) CodexLive.end(null);
         StepLog.deleteChat(app, s.id);
+        Routines.forget(s.id);
+        LinuxFiles.cancel(s.id);
+        try { // and what the Files screen was copying into the chat's own folders: they go with it
+            LinuxFiles.cancelUnder(FilePlaces.chat(app, s.id));
+        } catch (java.io.IOException ignored) {
+        }
+        // files sent to Linux tools stay if the chat says so (not an incognito one's: it leaves nothing behind)
+        if (s.keepFiles && !s.incognito && s.parent.isEmpty() && Linux.installed(app)) LinuxFiles.keepAfterChat(app, s.id);
         try {
             Helper.run(app, "delete", s.id);
         } catch (Exception ignored) {
@@ -244,6 +253,7 @@ final class ChatHub {
         if (s.parent.isEmpty()) for (Sessions.Session h : Helpers.of(this, s.id)) delete(h); // its helpers go with it
         sessions.remove(s);
         Schedules.cancelAll(app, s);
+        Events.forget(app, s.id);
         changed();
     }
 
@@ -256,8 +266,28 @@ final class ChatHub {
     String send(final Sessions.Session ses, String text, List<String> files) {
         String skill = ses.running ? null : Skills.prompt(app, ses.backend, text); // "/name …": a skill picked with /
         if (skill != null) return send(ses, text, files, skill, false, false);
-        return send(ses, text, files, null);
+        return send(ses, text, files, (String) null);
     }
+
+    /**
+     * A message with files in the chat's Linux tools (see LinuxFiles): the chat shows them as chips, the agent gets
+     * where they are after the message (one path a line: a name can have spaces).
+     */
+    String send(final Sessions.Session ses, String text, List<String> files, List<String> linux) {
+        if (linux == null || linux.isEmpty()) return send(ses, text, files);
+        if (ses.running) return app.getString(R.string.hub_still_working_attachments);
+        String skill = Skills.prompt(app, ses.backend, text);
+        String forAgent = (skill != null ? skill : text.isEmpty() ? "Have a look at these files." : text)
+                + "\n\nFiles in Linux tools:\n" + android.text.TextUtils.join("\n", linux);
+        sendingLinux = linux; // (main thread: the message made in there takes them, before the chat hears of it)
+        try {
+            return send(ses, text, files, forAgent, false, false);
+        } finally {
+            sendingLinux = null;
+        }
+    }
+
+    private List<String> sendingLinux;
 
     /** A notification rule's run (see Triggers): the chat shows a short line, the agent gets the whole prompt. */
     String sendFromRule(Sessions.Session ses, String shown, String prompt) {
@@ -302,7 +332,7 @@ final class ChatHub {
             return addNote(ses, text);
         }
         boolean hasFiles = files != null && !files.isEmpty();
-        if (text.isEmpty() && !hasFiles) return null;
+        if (text.isEmpty() && !hasFiles && sendingLinux == null) return null;
         Providers.P service = Providers.of(ses.model); // the chat's own pick: said, not quietly swapped for another model
         if (service != null && service.off) return app.getString(R.string.hub_service_off, service.name);
         // the phone tools live in Buddy's accessibility service: without it the agent can't reach them and its run
@@ -326,7 +356,7 @@ final class ChatHub {
             Helper.runFor(app, ses.id, code -> main.postDelayed(() -> helperGone(ses, run[0], code), HELPER_GONE_MS),
                     "ask", ses.id, ses.backend, rule ? "rule" : devArg(ses), forAgent,
                     model(ses), hasFiles ? android.text.TextUtils.join(",", files) : "", ses.effort, fresh ? "fresh" : "",
-                    Lite.on(ses) ? "lite" : "");
+                    Lite.on(ses) ? "lite" : "", ses.folder);
         } catch (Exception e) {
             return e.getMessage();
         }
@@ -336,6 +366,12 @@ final class ChatHub {
         sessions.add(ses, Bubble.Kind.USER, text, hasFiles ? new ArrayList<>(files) : null);
         if (!scheduled && !rule) SpeechPause.sent(app);
         Sessions.Msg um = ses.messages.get(ses.messages.size() - 1);
+        if (sendingLinux != null) {
+            um.linux.addAll(sendingLinux);
+            // (a chat that starts with only a file is named after it, as one that starts with an attachment is)
+            if (ses.title.isEmpty()) ses.title = Sessions.autoTitle(sendingLinux.get(0).substring(sendingLinux.get(0).lastIndexOf('/') + 1), null);
+            sessions.save(ses);
+        }
         if (scheduled) {
             um.scheduled = true;
             sessions.save(ses);
@@ -453,8 +489,11 @@ final class ChatHub {
             ses.ctxWindow = ses.handoverCtxWindow;
             ses.cut = ses.handoverCut;
             ses.handover = null;
+            java.util.Set<String> switched = new java.util.HashSet<>();
+            for (Account acc : Account.ALL) switched.add(app.getString(R.string.hub_agent_switched, acc.name()));
             for (int i = ses.messages.size() - 1; i >= 0 && ses.messages.get(i).kind == Bubble.Kind.NOTE; i--) {
-                ses.messages.remove(i); // the lines that said it was switched
+                // the lines that said it was switched (a file sent to Linux tools meanwhile keeps its line)
+                if (switched.contains(ses.messages.get(i).text)) ses.messages.remove(i);
             }
             sessions.save(ses);
             changed();
@@ -518,8 +557,8 @@ final class ChatHub {
     private static String reseedText(Sessions.Session ses) {
         String[] t = transcript(ses);
         if (t[0].isEmpty()) return "";
-        return "[This chat starts from an earlier conversation: the user forked it here, or edited their message and "
-                + "is asking again from this point. Below is the conversation so far" + (t[1].isEmpty() ? "" : " (its "
+        return "[This chat starts from an earlier conversation: the user forked it here, edited their message and "
+                + "is asking again from this point, or gave the chat another project folder. Below is the conversation so far" + (t[1].isEmpty() ? "" : " (its "
                 + "earlier part is left out)") + ", oldest first. It is context: what was asked and answered. You don't "
                 + "have the steps, files or tool results from then, so look again at anything you need (read the "
                 + "screen, open the file) rather than assuming. Don't redo actions it reports as done.]\n\n" + t[0]
@@ -754,6 +793,44 @@ final class ChatHub {
     }
 
     /**
+     * The chat's project folder ("" = the workspace itself): its agent starts there from the next message. The
+     * agent's own conversation was begun in the folder the chat had, and agents keep them by folder each in its own
+     * way (Pi and Claude Code file them under the folder's name). So, the same for all of them and as after a fork, a
+     * chat that has messages starts its agent anew there, with the chat so far as text. Null when done, else why not.
+     */
+    String setFolder(Sessions.Session ses, String folder) {
+        String f = folder == null ? "" : folder;
+        if (!f.isEmpty() && !FilePlaces.validProject(f)) return app.getString(R.string.files_outside);
+        if (f.equals(ses.folder)) return null;
+        if (ses.running) return app.getString(R.string.chat_folder_busy);
+        ses.folder = f;
+        if (!ses.messages.isEmpty()) ses.reseed = true;
+        sessions.save(ses);
+        changed();
+        return null;
+    }
+
+    /**
+     * A folder of the workspace was renamed on the Files screen: the chats whose project it was, or was in, follow it
+     * (not a working one: its agent is in the folder under its old name, and makes it again).
+     */
+    void folderRenamed(String from, String to) {
+        for (Sessions.Session s : new ArrayList<>(sessions.all)) {
+            if (s.running || (!s.folder.equals(from) && !s.folder.startsWith(from + "/"))) continue;
+            s.folder = to + s.folder.substring(from.length());
+            if (!s.messages.isEmpty()) s.reseed = true;
+            sessions.save(s);
+        }
+        changed();
+    }
+
+    void setKeepFiles(Sessions.Session ses, boolean on) {
+        ses.keepFiles = on;
+        sessions.save(ses);
+        changed();
+    }
+
+    /**
      * Add or take away an app from a chat's "Allowed without asking" (until its run ends, see Guard.runRule; with a
      * schedule, kept for its scheduled runs).
      */
@@ -921,6 +998,7 @@ final class ChatHub {
                             t = t.replace(QUIET, "").trim();
                         }
                         if (!t.isEmpty()) {
+                            ses.cmd = null; // it speaks again: the command it ran before is behind it
                             add(ses, Bubble.Kind.BUDDY, t, replyFiles(ses, t));
                             ses.lastReply = t;
                             ses.gotText = true;
@@ -933,6 +1011,14 @@ final class ChatHub {
                         else if (!BOOKKEEPING.contains(tn)) ses.otherToolAt = SystemClock.elapsedRealtime();
                         ses.reseed = false; // its agent got the conversation and is at work on it
                         String step = describeTool(c.optString("name"), c.optJSONObject("input"));
+                        // (every agent's shell step comes here as Bash: see buddy-run's stream_<agent>)
+                        JSONObject tin = c.optJSONObject("input");
+                        if ("Bash".equals(tn) && tin != null && !tin.optString("command").trim().isEmpty()) {
+                            ses.cmd = tin.optString("command");
+                            ses.cmdAt = SystemClock.elapsedRealtime();
+                        } else if (step != null) {
+                            ses.cmd = null;
+                        }
                         if (step != null) {
                             add(ses, Bubble.Kind.STEP, describeTool(c.optString("name"), c.optJSONObject("input"), true));
                             ses.status = step;
@@ -1242,6 +1328,7 @@ final class ChatHub {
     private void startRun(Sessions.Session ses) {
         ses.running = true;
         ses.phoneToolAt = 0; // (what its earlier run did says nothing about this one)
+        ses.cmd = null;
         ses.otherToolAt = 0;
         ses.outcome = null;
         ses.gotText = false;
@@ -1541,6 +1628,12 @@ final class ChatHub {
                 JSONArray st = in.optJSONArray("steps");
                 return BuddyApp.str(R.string.hub_tool_do_steps, st == null ? 0 : st.length());
             }
+            case "run_on_computer": return BuddyApp.str(R.string.hub_tool_computer, in.optString("computer"),
+                    said(full, in.optString("command"), 60));
+            case "routine":
+                return "run".equals(in.optString("action")) ? BuddyApp.str(R.string.hub_tool_routine_run, said(full, in.optString("name"), 40))
+                        : "save".equals(in.optString("action")) ? BuddyApp.str(R.string.hub_tool_routine_save, said(full, in.optString("name"), 40))
+                        : BuddyApp.str(R.string.hub_tool_routine);
             case "collect": return BuddyApp.str(R.string.hub_tool_collect);
             case "find": // (its text can come a moment after the call itself: no “” meanwhile)
                 return in.optString("text").trim().isEmpty() ? BuddyApp.str(R.string.hub_tool_read_screen)

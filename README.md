@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/banner.png" alt="Buddy: Claude Code, Codex, OpenCode, Antigravity and Grok in a bubble on your Android phone" width="100%">
+  <img src="docs/banner.png" alt="Buddy: Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot and Pi in a bubble on your Android phone" width="100%">
 </p>
 
 <p align="center">
@@ -14,11 +14,11 @@
 
 # Buddy
 
-**A floating chat bubble that lets Claude Code, Codex, OpenCode, Antigravity or Grok use your Android phone.**
+**A floating chat bubble that lets Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot or Pi use your Android phone.**
 
 Type or say what you want, like "reply to Sam that I'm running late" or "add a Switch 2 to my Amazon cart". Buddy reads the screen, taps and types to get it done, and asks you before anything is sent, posted, bought or deleted.
 
-It runs inside the app, on your own plan: [Claude Code](https://docs.claude.com/en/docs/claude-code) with your Claude plan, Codex with your ChatGPT plan, Google's [Antigravity CLI](https://antigravity.google) with your Google account, xAI's [Grok Build](https://x.ai/build) with your Google or X account, or [OpenCode](https://opencode.ai) with its free models and no account at all. No PC, no adb, no root, and no API key needed (you can add keys for other services, such as DeepSeek or OpenRouter, and use them with Claude Code, Codex or OpenCode).
+It runs inside the app, on your own plan: [Claude Code](https://docs.claude.com/en/docs/claude-code) with your Claude plan, Codex with your ChatGPT plan, Google's [Antigravity CLI](https://antigravity.google) with your Google account, xAI's [Grok Build](https://x.ai/build) with your Google or X account, [GitHub Copilot CLI](https://github.com/github/copilot-cli) with your GitHub Copilot plan (Copilot Free works too), [Pi](https://pi.dev) with the plan or API key you connect to it, or [OpenCode](https://opencode.ai) with its free models and no account at all. No PC, no adb, no root, and no API key needed (you can add keys for other services, such as DeepSeek or OpenRouter, and use them with Claude Code, Codex or OpenCode).
 
 <p align="center"><a href="https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk"><b>Download the APK</b></a> · <a href="https://f-droid.org/packages/app.buddy.assistant/">F-Droid</a> · <a href="https://ghorbelhamdi.github.io/buddy-android/">Website</a> · Android 11+, 64-bit</p>
 
@@ -50,19 +50,19 @@ https://github.com/user-attachments/assets/d07936fc-4788-4ab5-a105-31b3e9aeba4f
 | **Sub-agents** | "Compare this on eBay, Amazon and AliExpress": the agent starts sub-agents that each work in an app on a hidden screen of their own, at the same time, and report back. They only look things up; you see every screen in the chat. |
 | **Background browser** | Web pages in a browser inside Buddy, without taking over your screen, even while the phone is locked. Watch and use it live in the chat; it marks what you need to do (sign in, a captcha) and never types your passwords. |
 | **Builds apps** | Turn on Linux tools in a chat and "make me a calculator app" builds a real APK on the phone; the GitHub version also installs it for you. |
-| **Phone tools anywhere** | The same tools as a local MCP server for your own Claude Code, Codex, OpenCode, Antigravity or Grok sessions, or over stdio with [mcp-bridge](mcp-bridge) for clients that start servers as commands. |
+| **Phone tools anywhere** | The same tools as a local MCP server for your own Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot or Pi sessions, or over stdio with [mcp-bridge](mcp-bridge) for clients that start servers as commands. |
 
 <p align="center">
   <a href="https://youtube.com/shorts/wPZvwy08BTE"><img src="docs/screens/sub-agents.gif" alt="Three sub-agents comparing a price on eBay, Amazon and AliExpress at the same time" width="320"></a><br>
   <sub>Three sub-agents, three shops, at the same time (<a href="https://youtube.com/shorts/wPZvwy08BTE">30 s video</a>)</sub>
 </p>
 
-> **Status: 2.3, early.** It works well day to day but has rough edges. Tested most on a OnePlus 12 (Android 16). Buddy is an independent project, not made by or affiliated with Anthropic, OpenAI, Google or xAI.
+> **Status: 2.3, early.** It works well day to day but has rough edges. Tested most on a OnePlus 12 (Android 16). Buddy is an independent project, not made by or affiliated with Anthropic, OpenAI, Google, xAI or GitHub.
 
 ## How it works
 
 ```
-Buddy app / bubble ──► Buddy's Linux (Alpine via proot): claude, codex, opencode, agy or grok
+Buddy app / bubble ──► Buddy's Linux (Alpine via proot): claude, codex, opencode, agy, grok, copilot or pi
         ▲                                                     │
         └──────────── streamed replies ◄──────────────────────┤
                                                               ▼
@@ -73,7 +73,7 @@ Buddy is a normal Android app with an accessibility service, the kind of permiss
 
 ## Setup
 
-You need a 64-bit Android 11+ phone, plus a Claude, ChatGPT or Google account for those agents (Grok: a Google or X account). OpenCode's free models need no account.
+You need a 64-bit Android 11+ phone, plus a Claude, ChatGPT or Google account for those agents (Grok: a Google or X account; Copilot: a GitHub account; Pi: any plan or API key it supports). OpenCode's free models need no account.
 
 1. **Install Buddy:** [download buddy.apk](https://github.com/ghorbelhamdi/buddy-android/releases/latest/download/buddy.apk) and open it, or get it from [F-Droid](https://f-droid.org/packages/app.buddy.assistant/). The APK updates itself; on F-Droid each version arrives a few days later, and F-Droid updates it for you. Both are the same app with the same signature, so you can switch between them without reinstalling. Buddy also installs the apps it builds for you. (Google Play turned Buddy down for production: its policy doesn't allow apps that use accessibility to carry out tasks.)
 2. **Follow the setup guide** that opens on first launch: pick your agent, turn on the accessibility service, install and sign in, and try a first task.
@@ -82,9 +82,9 @@ You need a 64-bit Android 11+ phone, plus a Claude, ChatGPT or Google account fo
 
 ## Local models
 
-**On the phone itself:** Settings → Agents and models → **Models on this phone**. Download Gemma 4 or Qwen3.5 (1.2–5.2 GB) and Buddy runs it with llama.cpp on the phone's NPU (Snapdragon 8 Gen 2 and newer), GPU or CPU, offline. Chats with it use lite mode: a short prompt and a dozen phone tools, more when needed. On a OnePlus 12, Gemma 4 E2B on the NPU reads about 2,000 tokens/s and writes about 24/s: fine for simple requests like the battery or a timer, not reliable for long tasks.
+**On the phone itself:** Settings → Agents and models → Add a connection → **This phone**. Download Gemma 4 or Qwen3.5 (1.2–5.2 GB) and Buddy runs it with llama.cpp on the phone's NPU (Snapdragon 8 Gen 2 and newer), GPU or CPU, offline. Chats with it use lite mode: a short prompt and a dozen phone tools, more when needed. On a OnePlus 12, Gemma 4 E2B on the NPU reads about 2,000 tokens/s and writes about 24/s: fine for simple requests like the battery or a timer, not reliable for long tasks.
 
-**On your computer:** Run the model on your own computer and nothing goes to an AI company. Start [Ollama](https://ollama.com), LM Studio or llama.cpp's server on a PC (for Ollama, set `OLLAMA_HOST=0.0.0.0` and a context of at least 48k tokens, e.g. `OLLAMA_CONTEXT_LENGTH=49152`; OpenCode keeps a big part of the context free for the answer, and with less it fails before the first one). In Buddy, pick **Local model** in the setup guide (Settings → the setup card → *Open the step-by-step guide* opens it again later): it sets up OpenCode, asks for your server and makes it the default for OpenCode's chats. Or add it by hand: Settings → Agents and models → API keys → Add API key → **Ollama** (or LM Studio, llama.cpp). Either way, put the PC's address on your Wi-Fi instead of `localhost` and leave the key empty. Plain `http://` works on your own network and over Tailscale.
+**On your computer:** Run the model on your own computer and nothing goes to an AI company. Start [Ollama](https://ollama.com), LM Studio or llama.cpp's server on a PC (for Ollama, set `OLLAMA_HOST=0.0.0.0` and a context of at least 48k tokens, e.g. `OLLAMA_CONTEXT_LENGTH=49152`; OpenCode keeps a big part of the context free for the answer, and with less it fails before the first one). In Buddy, pick **Local model** in the setup guide (Settings → the setup card → *Open the step-by-step guide* opens it again later): it sets up OpenCode, asks for your server and makes it the default for OpenCode's chats. Or add it by hand: Settings → Agents and models → Add a connection → **Servers**, then **Ollama**, **LM Studio** or **llama.cpp** for a sheet with its usual address filled in (**Add a server** opens the same sheet; its Service menu switches to another). Either way, put the PC's address on your Wi-Fi instead of `localhost` and leave the key empty. Plain `http://` works on your own network and over Tailscale.
 
 What to expect, from tests on an RTX 2060 Super (8 GB): Qwen3 8B and Qwen3 4B handle simple one-step requests, like the battery level or the phone's status. Multi-step tasks on the screen are another matter: in a calculator test the 4B tapped the wrong buttons and then said it had worked. For real tasks, use a bigger model that's good at tool calling. The first answer of a chat takes longest, since the model first reads about 13k tokens of instructions and tool descriptions.
 

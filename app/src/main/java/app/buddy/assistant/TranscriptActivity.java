@@ -60,7 +60,7 @@ public class TranscriptActivity extends Screen implements ChatHub.MonitorListene
         messages.setPaddingRelative(dp(this, 16), dp(this, 8), dp(this, 16), dp(this, 12));
         messages.addView(note(getString(R.string.transcript_loading)), full());
         scroll.addView(messages);
-        root.addView(scroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
+        root.addView(withJumpToEnd(this, scroll, null), new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
 
         boolean canContinue = id != null && id.matches("[A-Za-z0-9-]{8,64}");
         if (canContinue) {

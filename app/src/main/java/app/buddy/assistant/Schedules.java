@@ -39,6 +39,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * off skips the task, with a notification; another chat at work, a pause or no internet make it wait, for an hour at
  * most. Main thread, except awaitUnlock (a phone tool's thread).
  *
+ * A schedule can also start on events instead of, or as well as, times (see Events): the charger, Wi-Fi, a Bluetooth
+ * device, the first unlock of the day. Those runs take the same way, within a daily cap and 10 minutes apart.
+ *
  * The agent can schedule messages to itself too (schedule_message, see agentTool): "check the price again tomorrow at
  * 9". Each is sent once, into its own chat, and runs like a scheduled task; the chat lists them above its composer,
  * where the user can cancel them.
@@ -95,6 +98,14 @@ public final class Schedules extends BroadcastReceiver {
         boolean quiet;
         /** Paused on the Scheduled page: kept, but doesn't run. */
         boolean paused;
+        /** It runs at its times (minutes, days); off for a schedule that only starts on events. */
+        boolean timed = true;
+        /** The events that start it too (Events.ALL), in no order. */
+        final java.util.Set<String> events = new java.util.LinkedHashSet<>();
+        /** Wi-Fi connected: only this network's name ("" any); Bluetooth: only this device's address ("" any), its name. */
+        String wifi = "", bt = "", btName = "";
+        /** Runs from events a day at most. */
+        int cap = Events.CAP_DEFAULT;
 
         Plan copy() {
             Plan p = new Plan();
@@ -104,6 +115,12 @@ public final class Schedules extends BroadcastReceiver {
             p.wake = wake;
             p.quiet = quiet;
             p.paused = paused;
+            p.timed = timed;
+            p.events.addAll(events);
+            p.wifi = wifi;
+            p.bt = bt;
+            p.btName = btName;
+            p.cap = cap;
             return p;
         }
 
@@ -111,21 +128,34 @@ public final class Schedules extends BroadcastReceiver {
             try {
                 // "minute" (the first time) is what versions before several times read
                 return new JSONObject().put("minute", minutes[0]).put("minutes", new org.json.JSONArray(minutes))
-                        .put("days", days).put("text", text).put("wake", wake).put("quiet", quiet).put("paused", paused);
+                        .put("days", days).put("text", text).put("wake", wake).put("quiet", quiet).put("paused", paused)
+                        .put("timed", timed).put("events", new org.json.JSONArray(events)).put("wifi", wifi).put("bt", bt)
+                        .put("bt_name", btName).put("cap", cap);
             } catch (Exception e) {
                 return new JSONObject();
             }
         }
 
         static Plan of(JSONObject o) {
-            if (o == null || o.optString("text").trim().isEmpty() || (o.optInt("days") & EVERY_DAY) == 0) return null;
+            if (o == null || o.optString("text").trim().isEmpty()) return null;
             Plan p = new Plan();
+            p.timed = o.optBoolean("timed", true);
+            org.json.JSONArray ev = o.optJSONArray("events");
+            for (int i = 0; ev != null && i < ev.length(); i++) {
+                if (java.util.Arrays.asList(Events.ALL).contains(ev.optString(i))) p.events.add(ev.optString(i));
+            }
+            if (p.timed && (o.optInt("days") & EVERY_DAY) == 0 || !p.timed && p.events.isEmpty()) return null;
+            p.wifi = o.optString("wifi");
+            p.bt = o.optString("bt");
+            p.btName = o.optString("bt_name", p.bt);
+            p.cap = Math.max(Events.CAP_MIN, Math.min(Events.CAP_MAX, o.optInt("cap", Events.CAP_DEFAULT)));
             org.json.JSONArray ms = o.optJSONArray("minutes");
             int[] in = new int[ms == null || ms.length() == 0 ? 1 : ms.length()];
             if (ms == null || ms.length() == 0) in[0] = o.optInt("minute");
             else for (int i = 0; i < in.length; i++) in[i] = ms.optInt(i);
             p.minutes = tidy(in);
             p.days = o.optInt("days") & EVERY_DAY;
+            if (p.days == 0) p.days = EVERY_DAY; // (an events-only schedule: what its times would be if switched on)
             p.text = o.optString("text");
             p.wake = o.optBoolean("wake");
             p.quiet = o.optBoolean("quiet");
@@ -147,8 +177,9 @@ public final class Schedules extends BroadcastReceiver {
             return (days & (1 << (dayOfWeek - 1))) != 0;
         }
 
-        /** The first time after this moment (wall clock), or 0 with no days picked. */
+        /** The first time after this moment (wall clock), or 0 with no days picked or no times at all. */
         long next(long after) {
+            if (!timed) return 0;
             Calendar c = Calendar.getInstance();
             c.setTimeInMillis(after);
             for (int i = 0; i < 8; i++) {
@@ -180,8 +211,15 @@ public final class Schedules extends BroadcastReceiver {
             return android.text.format.DateFormat.getTimeFormat(c).format(t.getTime());
         }
 
-        /** "Every day at 14:00", "Weekdays at 14:00", "Mon, Thu at 14:00". */
+        /** Its times, then its events: "Every day at 14:00 · Charger connected". */
         String summary(Context c) {
+            if (events.isEmpty()) return times(c);
+            String ev = Events.summary(c, this);
+            return timed ? times(c) + " · " + ev : ev;
+        }
+
+        /** "Every day at 14:00", "Weekdays at 14:00", "Mon, Thu at 14:00". */
+        String times(Context c) {
             if (days == EVERY_DAY) return c.getString(R.string.schedule_summary_daily, time(c));
             if (days == WEEKDAYS) return c.getString(R.string.schedule_summary_weekdays, time(c));
             String[] names = new java.text.DateFormatSymbols(Ui.locale(c)).getShortWeekdays();
@@ -190,8 +228,17 @@ public final class Schedules extends BroadcastReceiver {
             return c.getString(R.string.schedule_summary_days, b.toString(), time(c));
         }
 
-        /** For the agent: "every day at 14:00", in English like the rest of its instructions. */
+        /** For the agent: "every day at 14:00", "when the charger is connected", in English like its instructions. */
         String english() {
+            StringBuilder w = new StringBuilder();
+            for (String k : Events.ALL) {
+                if (events.contains(k)) w.append(w.length() == 0 ? "when " : " or when ").append(Events.english(this, k));
+            }
+            if (!timed) return w.toString();
+            return w.length() == 0 ? englishTimes() : englishTimes() + ", and " + w;
+        }
+
+        private String englishTimes() {
             StringBuilder t = new StringBuilder(" at ");
             for (int i = 0; i < minutes.length; i++) {
                 t.append(i == 0 ? "" : i == minutes.length - 1 ? " and " : ", ")
@@ -221,6 +268,8 @@ public final class Schedules extends BroadcastReceiver {
     private static final Handler main = new Handler(Looper.getMainLooper());
     /** Tasks whose time came while Buddy was busy: chat id → when they're given up (elapsedRealtime). Main thread. */
     private static final Map<String, Long> waiting = new LinkedHashMap<>();
+    /** Of those, the ones an event started: chat id → the event, for the agent ("the charger is connected"). */
+    private static final Map<String, String> because = new java.util.HashMap<>();
     /** Chats in a scheduled task's run (the phone tools look them up from their own threads). */
     private static final Set<String> running = ConcurrentHashMap.newKeySet();
     /** Runs waiting for the user to unlock, by chat id: until when (elapsedRealtime). */
@@ -261,6 +310,11 @@ public final class Schedules extends BroadcastReceiver {
 
     private static void set(Context c, Sessions.Session s, long after) {
         long at = s.schedule == null || s.schedule.paused ? 0 : s.schedule.next(after);
+        if (at == 0 && s.schedule != null && !s.schedule.paused) {
+            // no time of its own (a plan of events only): no alarm, but a run an event started still waits its turn
+            c.getSystemService(AlarmManager.class).cancel(alarm(c, s.id, 0));
+            return;
+        }
         if (at == 0) {
             cancel(c, s.id);
             return;
@@ -284,6 +338,7 @@ public final class Schedules extends BroadcastReceiver {
     static void cancel(Context c, String id) {
         c.getSystemService(AlarmManager.class).cancel(alarm(c, id, 0));
         waiting.remove(id);
+        because.remove(id);
         clearNotice(c, id);
     }
 
@@ -363,6 +418,21 @@ public final class Schedules extends BroadcastReceiver {
         pump();
     }
 
+    /**
+     * An event this chat's schedule waits for happened (see Events; main thread): its run starts, or waits as a
+     * scheduled one does. Not past the chat's cap for today, nor within 10 minutes of the last event that came for it.
+     */
+    static boolean fireEvent(Context c, Sessions.Session s, String english) {
+        if (s.schedule == null || s.schedule.paused || waiting.containsKey(s.id)) return false;
+        if (!Events.allowed(c, s)) return false;
+        Events.tried(c, s.id);
+        because.put(s.id, english);
+        waiting.put(s.id, SystemClock.elapsedRealtime() + WAIT_MS);
+        listen(c);
+        pump();
+        return true; // (taken: it runs, or waits its turn)
+    }
+
     /** Pause or resume a chat's schedule. */
     static void setPaused(Context c, Sessions.Session s, boolean paused) {
         if (s.schedule == null) return;
@@ -411,6 +481,7 @@ public final class Schedules extends BroadcastReceiver {
                 Later l = s == null || slash < 0 ? null : later(s, key.substring(slash + 1));
                 if (until == null || s == null || (slash < 0 ? s.schedule == null : l == null)) {
                     waiting.remove(key);
+                    because.remove(key);
                     continue;
                 }
                 BuddyService svc = BuddyService.get();
@@ -422,13 +493,14 @@ public final class Schedules extends BroadcastReceiver {
                     skip = app.getString(R.string.schedule_skip_busy);
                 }
                 waiting.remove(key);
+                String event = because.remove(key);
                 if (l != null) {
                     s.later.remove(l); // sent once, whatever happens now
                     hub.sessions.save(s);
                     hub.changed();
                 }
                 if (skip != null) notice(app, s, app.getString(R.string.schedule_skipped_title, s.label()), skip);
-                else start(s, l);
+                else start(s, l, event);
             }
             main.removeCallbacks(look);
             if (!waiting.isEmpty()) main.postDelayed(look, LOOK_MS);
@@ -446,13 +518,17 @@ public final class Schedules extends BroadcastReceiver {
                 || svc.controlRevoked() != null || !online();
     }
 
-    private static void start(Sessions.Session s, Later l) {
+    /** event: what started it, when an event did (for the agent: "the charger is connected"), else null. */
+    private static void start(Sessions.Session s, Later l, String event) {
         String text = l != null ? l.text : s.schedule.text;
         boolean locked = Triggers.locked(app);
         StringBuilder prompt = new StringBuilder(l != null
                 ? "[BUDDY_SCHEDULED] Earlier in this chat you scheduled the message below for " + english(l.at)
                 + " (schedule_message), and Buddy sent it now: the user may not be watching. Do what it says; approval "
                 + "cards still wait for them.\n"
+                : event != null ? "[BUDDY_SCHEDULED] The user set this chat to send the message below when " + event
+                + ", and that just happened, so Buddy sent it now on its own: they may not be watching. Do it as if they "
+                + "had just typed it; approval cards still wait for them.\n"
                 : "[BUDDY_SCHEDULED] The user set this chat to send the message below " + s.schedule.english()
                 + ", and Buddy sent it now on its own: they may not be watching. Do it as if they had just typed it; "
                 + "approval cards still wait for them.\n");
@@ -480,6 +556,7 @@ public final class Schedules extends BroadcastReceiver {
             return;
         }
         s.quietRun = quiet;
+        if (event != null) Events.ran(app, s.id); // counts toward the chat's cap for today
         clearNotice(app, s.id);
         running.add(s.id);
         holdWake();

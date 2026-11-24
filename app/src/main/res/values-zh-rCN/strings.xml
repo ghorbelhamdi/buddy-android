@@ -2,7 +2,7 @@
 <!-- Every text Buddy shows, in Simplified Chinese (zh-CN). English source: res/values/strings.xml. -->
 <resources>
     <string name="service_label">Buddy 助手</string>
-    <string name="service_description">显示 Buddy 聊天气泡，并让在本机 Buddy 中运行的、你所选的智能体（Claude Code、Codex、OpenCode、Antigravity 或 Grok）替你读取屏幕、点按、输入和滚动。除了智能体自身发送给其 AI 服务（Anthropic、OpenAI、Google、xAI 或你所用 OpenCode 模型的提供商）的内容外，任何数据都不会离开手机。</string>
+    <string name="service_description">显示 Buddy 聊天气泡，并让在本机 Buddy 中运行的、你所选的智能体（Claude Code、Codex、OpenCode、Antigravity、Grok、Copilot 或 Pi）替你读取屏幕、点按、输入和滚动。除了智能体自身发送给其 AI 服务（Anthropic、OpenAI、Google、xAI、GitHub 或你所用 OpenCode 或 Pi 模型的提供商）的内容外，任何数据都不会离开手机。</string>
 
     <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
 
@@ -28,7 +28,7 @@
     <!-- Two example requests a user could type. Translate them naturally and use your language's quotation marks. -->
     <string name="onboarding_welcome_ask_text">“回复小王说我要迟到了”、“把牛奶加入购物车”。</string>
     <string name="onboarding_welcome_plan_title">用你自己的套餐，无需 API 密钥</string>
-    <string name="onboarding_welcome_plan_text">通过你的 Claude 订阅运行 Claude Code。也可以用 ChatGPT 套餐运行 Codex、用 Google 账号运行 Antigravity、用 Google 或 X 账号运行 Grok，或使用 OpenCode 的免费模型。</string>
+    <string name="onboarding_welcome_plan_text">通过你的 Claude 订阅运行 Claude Code。也可以用 ChatGPT 套餐运行 Codex、用 Google 账号运行 Antigravity、用 Google 或 X 账号运行 Grok、用 GitHub 账号运行 Copilot、用你连接的套餐或 API 密钥运行 Pi，或使用 OpenCode 的免费模型。</string>
     <string name="onboarding_welcome_control_title">一切由你掌控</string>
     <string name="onboarding_welcome_control_text">发送、发布、购买和删除之前，总会先问你。</string>
     <!-- Small lowercase mono line under the list. -->
@@ -177,7 +177,7 @@
     <string name="main_section_recent">最近</string>
     <string name="main_empty_title">还没有对话</string>
     <!-- "New chat" = the button (main_new_chat). -->
-    <string name="main_empty_text">点按“新对话”，即可与 Claude Code、Codex、OpenCode、Antigravity 或 Grok 开始对话。长按对话可将其删除。</string>
+    <string name="main_empty_text">点按“新对话”，即可与 Claude Code、Codex、OpenCode、Antigravity、Grok、Copilot 或 Pi 开始对话。长按对话可将其删除。</string>
     <!-- Status of a chat with a running task, until the agent reports what it's doing. Small lowercase mono text. -->
     <string name="main_chat_working">处理中…</string>
     <string name="main_chat_waiting">等你处理…</string>
@@ -675,7 +675,7 @@
     <!-- After "Continue in Buddy" on an earlier session. %1$s = agent name. -->
     <string name="hub_continuing">正在继续之前的 %1$s 会话。如果它仍在终端中打开，请先在那里关闭。</string>
     <string name="hub_still_working_attachments">此对话仍在处理中。请等它完成后再发送附件。</string>
-    <string name="hub_service_off">%1$s 已关闭（设置 → 智能体与模型 → API 密钥）。请开启它，或为此对话选择其他模型。</string>
+    <string name="hub_service_off">%1$s 已关闭（设置 → 智能体与模型）。请开启它，或为此对话选择其他模型。</string>
     <string name="hub_accessibility_dead">Buddy 的无障碍服务虽已开启，但没有运行：Android 停止了 Buddy，且没有重新启动该服务，所以智能体无法操作手机。请在 Android 设置 → 无障碍 中关闭再重新开启 Buddy。为避免再次发生：如果手机的应用设置里有自启动选项，请允许 Buddy 自启动；麦克风权限请选“仅在使用该应用时允许”，而不是“仅限这一次”。</string>
     <string name="hub_accessibility_off">Buddy 的无障碍服务已关闭，所以智能体无法操作手机。请在 Android 设置 → 无障碍 中开启 Buddy。</string>
     <string name="voice_mic_while_using">请选择“仅在使用该应用时允许”：选“仅限这一次”的话，你离开 Buddy 一分钟后 Android 就会停止它，即使任务正在进行。</string>
@@ -846,7 +846,7 @@
     <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
     <string name="ui_a11y_title">Buddy 如何使用无障碍功能</string>
     <string name="ui_a11y_what">Buddy 使用 Android 的无障碍服务在其他应用中完成你的要求：它会读取屏幕上的内容，并替你点按、输入和滚动。它还会显示悬浮气泡。</string>
-    <string name="ui_a11y_data">任务运行期间，屏幕内容（可能包含消息、姓名或地址等个人信息）会被发送到你所选智能体的 AI 服务（Claude Code 对应 Anthropic，Codex 对应 OpenAI，Antigravity 对应 Google，Grok 对应 xAI，OpenCode 则对应你所用模型的提供商），仅用于执行你的请求。</string>
+    <string name="ui_a11y_data">任务运行期间，屏幕内容（可能包含消息、姓名或地址等个人信息）会被发送到你所选智能体的 AI 服务（Claude Code 对应 Anthropic，Codex 对应 OpenAI，Antigravity 对应 Google，Grok 对应 xAI，Copilot 对应 GitHub，OpenCode 和 Pi 则对应你所用模型的提供商），仅用于执行你的请求。</string>
     <string name="ui_a11y_no_servers">Buddy 没有自己的服务器。它不会收集、出售或分享这些数据，也不会将其用于广告。</string>
     <string name="ui_a11y_asks">在执行任何发送、发布、购买或删除操作之前，Buddy 都会先请你确认。你可以随时在 Android 的无障碍设置中关闭此服务。</string>
     <string name="ui_privacy_policy">隐私政策</string>
@@ -941,7 +941,7 @@
     <string name="signin_token">使用令牌</string>
     <string name="signin_token_title">Claude Code 令牌</string>
     <string name="signin_token_info">粘贴在电脑上运行“claude setup-token”后显示的令牌，它以 sk-ant-oat 开头。令牌可用于对话。语音输入和远程控制需要完整登录。</string>
-    <string name="signin_token_wrong">这不是 Claude Code 令牌。API 密钥（sk-ant-api…）请在“设置 → 智能体与模型 → API 密钥”中添加。</string>
+    <string name="signin_token_wrong">这不是 Claude Code 令牌。API 密钥（sk-ant-api…）请在“设置 → 智能体与模型 → 添加连接”中添加。</string>
     <string name="signin_token_on">已使用令牌登录：可用于对话。语音输入和远程控制需要完整登录。</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <string name="signin_other_device">在其他设备上登录</string>
@@ -1132,9 +1132,9 @@
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">设置</string>
-    <string name="setup_settings_subtitle">Buddy 在应用内运行 Claude Code、Codex、OpenCode、Antigravity 或 Grok，使用你自己的订阅（或 OpenCode 的免费模型和 Antigravity 的免费套餐）。</string>
+    <string name="setup_settings_subtitle">Buddy 在应用内运行 Claude Code、Codex、OpenCode、Antigravity、Grok、Copilot 或 Pi，使用你自己的订阅（或 OpenCode 的免费模型和 Antigravity 的免费套餐）。</string>
     <string name="settings_agents">智能体与模型</string>
-    <string name="settings_agents_sub">默认智能体、登录、API 密钥、默认模型、GitHub、下载服务器</string>
+    <string name="settings_agents_sub">新对话使用什么、已连接的内容、添加套餐、密钥或模型、GitHub、下载服务器</string>
     <string name="settings_bubble">气泡与对话</string>
     <string name="settings_bubble_sub">显示气泡、点按气泡的操作、面板大小</string>
     <string name="settings_voice_sub">语音输入与输出、语言、实时语音、朗读回复</string>
@@ -1245,7 +1245,7 @@
     <!-- Which AI agent answers new chats. -->
     <string name="setup_default_brain">默认智能体</string>
     <!-- "New chat" is the name of a button in Buddy. -->
-    <string name="setup_default_brain_info">决定由谁回复从气泡或“新对话”按钮发起的新对话。Claude Code 使用你的 Claude 套餐，Codex 使用你的 ChatGPT 套餐，Antigravity 使用你的 Google 账号，Grok 使用你的 Grok 账号，OpenCode 使用其免费模型或你自己的提供商。只能选择已设置好的智能体。</string>
+    <string name="setup_default_brain_info">决定由谁回复从气泡或“新对话”按钮发起的新对话。Claude Code 使用你的 Claude 套餐，Codex 使用你的 ChatGPT 套餐，Antigravity 使用你的 Google 账号，Grok 使用你的 Grok 账号，Copilot 使用你的 GitHub Copilot 套餐，Pi 使用你为其连接的套餐或 API 密钥，OpenCode 使用其免费模型或你自己的提供商。只能选择已设置好的智能体。</string>
     <!-- Toast. %1$s = agent name. "New chat" is the name of a button in Buddy. -->
     <string name="setup_default_brain_set">新对话将使用 %1$s。你也可以通过“新对话”按钮为每个对话单独选择。</string>
     <!-- Toast. %1$s = agent name. -->
@@ -1260,8 +1260,7 @@
     <!-- %1$s = the account's email address. -->
     <string name="setup_agent_signed_in_email">已登录 · %1$s</string>
     <string name="setup_agent_not_signed_in">未登录</string>
-    <string name="setup_agent_api_key">未登录 · API 密钥</string>
-    <string name="signin_key_only">正在使用 API 密钥</string>
+    <string name="signin_key_only">通过服务运行</string>
 
     <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
     <string name="setup_phone_tools">在你自己的会话中使用手机工具</string>
@@ -1452,7 +1451,7 @@
     <string name="terminal_close">关闭</string>
     <!-- Button (verb): starts a new shell. -->
     <string name="terminal_restart">重新启动</string>
-    <string name="terminal_needs_linux">请先在“设置”中安装 Claude Code、Codex、OpenCode、Antigravity 或 Grok，这会同时设置好 Buddy 的 Linux。</string>
+    <string name="terminal_needs_linux">请先在“设置”中安装 Claude Code、Codex、OpenCode、Antigravity、Grok、Copilot 或 Pi，这会同时设置好 Buddy 的 Linux。</string>
     <!-- %1$s = error message. -->
     <string name="terminal_start_failed">无法启动终端：%1$s</string>
     <!-- Sheet title. %1$s = the tab's name, e.g. "shell 1". -->
@@ -1480,7 +1479,7 @@
 
     <!-- Sessions screen: every agent session running on the phone, and recent history. -->
     <string name="monitor_title">会话</string>
-    <string name="monitor_subtitle">这部手机上的所有 Claude Code、Codex、OpenCode、Antigravity 和 Grok 会话。</string>
+    <string name="monitor_subtitle">这部手机上的所有 Claude Code、Codex、OpenCode、Antigravity、Grok、Copilot 和 Pi 会话。</string>
     <string name="monitor_terminal_running">有 shell 正在运行 · 点按返回</string>
     <string name="monitor_terminal_idle">Buddy 的 Linux 中的 shell</string>
     <string name="monitor_running_now">正在运行</string>
@@ -1541,7 +1540,7 @@
     <!-- Toast when the user picks a reviewer that isn't signed in. %1$s = Claude Code or Codex. -->
     <string name="perms_reviewer_sign_in">请先登录 %1$s（在“设置”中）。</string>
     <!-- Under the reviewer choice. “allow”, “ask you” and “advise against” are the reviewer's three possible answers. -->
-    <string name="perms_reviewer_about">每次点按都会开启一个不带工具的临时会话：它会查看你的请求、智能体的说明和屏幕，然后给出“允许”“询问你”或“建议不要”。每次点按约需 3 秒。OpenCode、Antigravity 和 Grok 对话由 Claude Code（或 Codex）审核。</string>
+    <string name="perms_reviewer_about">每次点按都会开启一个不带工具的临时会话：它会查看你的请求、智能体的说明和屏幕，然后给出“允许”“询问你”或“建议不要”。每次点按约需 3 秒。OpenCode、Antigravity、Grok、Copilot 和 Pi 对话由 Claude Code（或 Codex）审核。</string>
     <!-- Under the reviewer's description: it also does the check before a notification rule's countdown. -->
     <string name="perms_reviewer_rules">在通知规则的倒计时发送回复之前，它也会检查这些回复。</string>
     <!-- In the reviewer's model picker, the first choice ("Default") described: for Claude Code it is Haiku. -->
@@ -1978,10 +1977,9 @@
     <string name="setup_help_info">GitHub 上的 Buddy 使用指南。你也可以问任何智能体 Buddy 怎么用。</string>
     <string name="signin_api_key">改用 API 密钥</string>
     <string name="signin_api_base_bad">请输入以 https:// 开头的地址（在本机或你自己的网络上也可用 http://）</string>
-    <string name="account_plan_api_key_at">API 密钥 · %1$s</string>
+    <string name="account_plan_api_key_at">通过 %1$s 运行</string>
     <string name="models_via">%1$s（经由 %2$s）</string>
     <string name="api_keys_remove_text">它的密钥将从这部手机上删除。使用其模型的对话会回到默认。</string>
-    <string name="api_keys_choose">菜单中的模型:%1$d / %2$d</string>
     <string name="api_keys_choose_title">%1$s 的模型</string>
     <string name="api_keys_choose_info">选择对话中显示的模型。都不选则全部显示。</string>
     <string name="api_keys_choose_search">搜索</string>
@@ -2046,16 +2044,15 @@
     <string name="api_keys_need_key">请输入 API 密钥。</string>
     <string name="api_keys_saving">正在检查密钥…</string>
     <string name="api_keys_save">保存</string>
-    <string name="api_keys_addresses_info">Claude Code 使用 Anthropic 风格地址。若服务支持 OpenAI 的 Responses API,Codex 使用 OpenAI 风格地址。OpenCode 两者皆可。服务没有的地址请留空。</string>
+    <string name="api_keys_addresses_info">Claude Code 使用 Anthropic 风格地址。若服务支持 OpenAI 的 Responses API，Codex 使用 OpenAI 风格地址。OpenCode 和 Pi 两者皆可。服务没有的地址请留空。</string>
     <string name="api_keys_check">立即检查</string>
     <string name="api_keys_check_info">可选:发送一个很小的测试请求,可能会消耗极少量的 API 额度。</string>
     <string name="api_keys_check_ok">%1$s:可用。</string>
-    <string name="api_keys_check_chat">%1$s:可用于 OpenCode,但没有 Responses API,因此不能用于 Codex。</string>
+    <string name="api_keys_check_chat">%1$s：可用于 OpenCode 和 Pi，但没有 Responses API，因此不能用于 Codex。</string>
     <string name="api_keys_check_none">%1$s:此地址没有响应。%2$s</string>
     <string name="api_keys_check_unsure">%1$s:没有明确回应。%2$s</string>
     <string name="api_keys_service">服务</string>
-    <string name="api_keys_custom">自定义</string>
-    <string name="setup_step_signin_key_mismatch">你的 API 密钥（%2$s）无法用于 %1$s。它们适用于 %3$s。</string>
+    <string name="setup_step_signin_key_mismatch">你的服务（%2$s）无法用于 %1$s。它们适用于 %3$s。</string>
     <string name="setup_step_signin_free">没有账号?OpenCode 有免费模型,无需登录。</string>
     <string name="setup_use_agent">使用 %1$s</string>
     <string name="api_keys_openai_hint">OpenAI 风格地址</string>
@@ -2066,7 +2063,6 @@
     <string name="api_keys_own_default">智能体自己的默认</string>
     <string name="api_keys_defaults_info">对话的模型为默认时所用的模型。智能体自己的默认模型使用其订阅。</string>
     <string name="api_keys_defaults">默认模型</string>
-    <string name="api_keys_for">适用于 %1$s</string>
     <string name="api_keys_use">使用此服务</string>
     <string name="api_keys_use_info">已关闭：密钥仍会保存，但不会有任何对话或智能体使用它。</string>
     <string name="api_keys_off">已关闭</string>
@@ -2102,13 +2098,8 @@
     <string name="mcp_name_taken">该名称已被使用。</string>
     <string name="mcp_import_info">粘贴其他应用保存的列表（“mcpServers”）。有地址的服务器会被添加；在电脑上以命令方式运行的会被跳过。</string>
     <string name="mcp_imported">已添加：%1$d · 已跳过：%2$d</string>
-    <string name="api_keys_models">%1$s · %2$d 个模型</string>
-    <string name="api_keys_add">添加 API 密钥</string>
-    <string name="api_keys_none">还没有 API 密钥。</string>
-    <string name="api_keys_intro">在 Claude Code、Codex 和 OpenCode 中使用其他服务的模型,可与订阅并用或代替订阅。每个对话在模型菜单中选择模型。使用密钥产生的费用记在该密钥的账户上。密钥加密保存在这部手机上,永远不会交给智能体:Buddy 会在每个请求中加上它。</string>
-    <string name="api_keys_row_none">用你的密钥使用其他服务的模型</string>
-    <string name="api_keys_title">API 密钥</string>
-    <string name="signin_api_keys">API 密钥</string>
+    <string name="api_keys_add">添加服务</string>
+    <string name="signin_api_keys">Buddy 中保存的服务</string>
     <string name="models_context">%1$s 上下文</string>
     <string name="models_chip_context">上下文 %1$d%%</string>
     <string name="chat_context">上下文</string>
@@ -2118,12 +2109,12 @@
     <string name="hub_compacting">正在压缩对话…</string>
     <string name="hub_compacted">对话已压缩:%1$s → %2$s 个 token</string>
     <string name="signin_api_models_none">该服务未列出任何模型。</string>
-    <string name="setup_step_signin_api_key">或使用 API 密钥:设置 → 智能体与模型 → API 密钥。</string>
+    <string name="setup_step_signin_api_key">或使用 API 密钥或你自己的模型服务器：设置 → 智能体与模型 → 添加连接。</string>
     <string name="setup_step_signin_others">你的默认大脑是 %1$s，但这些已经就绪：%2$s。把其中一个设为默认，Buddy 就能立即使用。</string>
     <string name="setup_switch_default">切换默认</string>
     <string name="setup_switch_default_title">默认大脑</string>
-    <string name="signin_api_key_on">%1$s 使用你的 API 密钥运行:在对话的模型菜单中选择模型,或在 API 密钥中设置默认。</string>
-    <string name="signin_api_key_on_plan">对话也可以使用你的 API 密钥的模型(在对话的模型菜单中选择)。语音和其他订阅功能使用你的订阅。</string>
+    <string name="signin_api_key_on">%1$s 通过 Buddy 中保存的服务运行：在对话的模型菜单中选择模型，或在“设置 → 智能体与模型”中设置默认。</string>
+    <string name="signin_api_key_on_plan">对话也可以使用 Buddy 中保存的服务的模型（在对话的模型菜单中选择）。语音和其他订阅功能使用你的订阅。</string>
     <string name="fdroid_download_note">这些内容直接来自其开发者，而非 F-Droid，因此 F-Droid 未对其进行检查。</string>
     <string name="api_keys_local_info">如果是你自己的服务器（Ollama、LM Studio、llama.cpp）：API 密钥留空。若在电脑上运行，请把 localhost 换成电脑在 Wi-Fi 中的地址，例如 http://192.168.1.20:11434/v1。</string>
     <string name="main_section_pinned">已置顶</string>
@@ -2314,4 +2305,494 @@
     <string name="hub_tool_sms_list">正在读取短信</string>
     <string name="setup_face_too_big">该动画超过 16 MB，气泡会将其显示为静态图片。</string>
     <string name="background_older">更新前的助手仍在运行，因此后台对话可能仍可使用。要启动新的助手，Buddy 需要一次无线调试：点按“立即启动”。</string>
+
+    <!-- Routines: tasks saved as their steps, done again without the agent (RoutinesActivity, the routine tool). -->
+    <string name="routines_title">例行任务</string>
+    <string name="routines_row">保存下来、几秒内可重做的任务</string>
+    <string name="routines_intro">智能体可以把做过的任务保存为例行任务：顺利完成后，让它“把这个存为例行任务”。例行任务无需智能体，几秒内重做相同的步骤，审批卡片照常出现。它输入的文字是每次由你填写的空白。</string>
+    <string name="routines_none">还没有例行任务。</string>
+    <string name="routines_blanks">空白：%1$s</string>
+    <string name="routines_last_run">%1$s运行过</string>
+    <string name="routines_stopped_at">在第 %1$d 步停止</string>
+    <string name="routines_card_waiting">有一张卡片在等你回答：回答后例行任务就会开始。</string>
+    <string name="routines_hidden">在隐藏屏幕上运行</string>
+    <string name="routines_hidden_info">从这里启动的例行任务在单独的屏幕上运行，你可以继续使用手机。卡片和问题仍会显示给你。</string>
+    <string name="routines_run">运行</string>
+    <string name="routines_running">运行中…</string>
+    <string name="routines_delete">删除</string>
+    <string name="routines_delete_title">删除“%1$s”？</string>
+    <string name="routines_delete_text">它的步骤将永久删除。智能体以后可以再次保存。</string>
+    <string name="routines_step_open">打开 %1$s</string>
+    <string name="routines_step_tap">点按 %1$s</string>
+    <string name="routines_step_hold">长按 %1$s</string>
+    <string name="routines_step_type">输入 %1$s%2$s</string>
+    <string name="routines_step_scroll">滚动</string>
+    <string name="routines_step_swipe">滑动</string>
+    <string name="routines_step_back">按返回</string>
+    <string name="routines_step_press">按一个按钮</string>
+    <string name="routines_step_find">滚动到“%1$s”</string>
+    <string name="routines_step_wait">等待</string>
+    <string name="routines_blanks_info">这次要输入什么？</string>
+    <string name="routines_blanks_need">请填写每个空白。</string>
+    <string name="routines_need_access">Buddy 的无障碍服务已关闭，因此无法使用屏幕。</string>
+    <string name="routines_done_title">“%1$s”已完成</string>
+    <string name="routines_done_text">所有步骤都已完成。</string>
+    <string name="routines_stopped_title">“%1$s”已停止</string>
+    <string name="routines_finish">让智能体完成剩余部分</string>
+    <string name="routine_saved_note">已保存例行任务“%1$s”（设置 → 例行任务）</string>
+    <string name="activity_routine">正在执行“%1$s”</string>
+    <string name="hub_tool_routine">正在查看例行任务</string>
+    <string name="hub_tool_routine_run">正在运行“%1$s”</string>
+    <string name="hub_tool_routine_save">正在保存例行任务“%1$s”</string>
+    <string name="tool_routine">例行任务</string>
+    <string name="tool_routine_info">保存任务的步骤，无需重新摸索即可重做</string>
+    <plurals name="routines_steps">
+        <item quantity="other">%d 个步骤</item>
+    </plurals>
+    <plurals name="routines_row_saved">
+        <item quantity="other">%d 个例行任务</item>
+    </plurals>
+
+    <!-- Files for Linux tools (#76): any size, straight into the chat's folder in Buddy's Linux. -->
+    <string name="linux_file_sending">正在把 %1$s 发送到 Linux 工具</string>
+    <string name="linux_file_progress">%1$s / %2$s</string>
+    <string name="linux_file_done">%1$s，%2$s → %3$s</string>
+    <string name="linux_file_not_sent">%1$s 未发送到 Linux 工具。</string>
+    <string name="linux_file_cancelled">已停止发送 %1$s。已复制的部分已删除。</string>
+    <string name="linux_file_no_room">%1$s 未发送到 Linux 工具：需要 %2$s，手机只剩 %3$s。</string>
+    <string name="linux_file_full">%1$s 未发送到 Linux 工具：手机空间不足。已复制的部分已删除。</string>
+    <string name="linux_file_write_failed">%1$s 未发送到 Linux 工具：%2$s。已复制的部分已删除。</string>
+    <string name="linux_file_gone">%1$s 未发送到 Linux 工具：读取时文件不见了（来源应用关闭了它，或它被移走了）。已复制的部分已删除。</string>
+    <string name="share_linux_title">太大，无法作为附件</string>
+    <string name="share_linux_text">%1$s：超过附件的 25 MB 上限。改为直接发送到 Buddy 的 Linux 中此聊天的文件夹？智能体会拿到路径，供 unzip 等工具使用。</string>
+    <string name="share_linux_send">发送到 Linux</string>
+    <string name="chat_linux_files_keep">聊天结束后保留发送到 Linux 的文件</string>
+    <string name="chat_linux_files_keep_info">删除聊天时，它们会移到 ~/.buddy/work/incoming，而不是随聊天一起删除</string>
+    <plurals name="linux_file_more">
+        <item quantity="other">还有 %1$d 个在等待</item>
+    </plurals>
+
+    <!-- 2.4.0: Other devices, Computers over SSH, the running command sheet, set up what's missing, scheduled tasks on events, mute apps on hidden screens. -->
+    <string name="web_title">其他设备</string>
+    <string name="web_row">在电脑的浏览器中使用你的对话和卡片</string>
+    <string name="web_intro">在电脑或另一部手机的浏览器中使用你的对话和确认卡片。无需账号，也没有服务器：通过 Tailscale 直接连到这部手机。已配对的设备可以读取你的对话、发送消息和回答卡片，但涉及钱的卡片（付款、购买、金融应用）和允许设备接入的卡片除外：这些只留在手机上。它不能使用手机的屏幕。</string>
+    <string name="web_switch">允许已配对的设备接入</string>
+    <string name="web_switch_info">关闭时：无论是否已配对，任何设备都无法打开页面。</string>
+    <string name="web_screens_switch">在已配对设备上显示屏幕</string>
+    <string name="web_screens_info">已配对设备可以查看手机屏幕和智能体工作的隐藏屏幕。只能查看，且有金钱类应用在前台时不会显示。</string>
+    <string name="web_address_label">在另一台设备上打开这个地址</string>
+    <string name="web_no_tailscale">这台手机上的 Tailscale 未连接。请打开它，并登录与另一台设备相同的账号。</string>
+    <string name="web_copy">复制地址</string>
+    <string name="web_copied">地址已复制</string>
+    <string name="web_devices_title">已配对的设备</string>
+    <string name="web_none">还没有。</string>
+    <string name="web_device_seen">上次访问 %1$s</string>
+    <string name="web_remove">移除</string>
+    <string name="web_remove_title">移除“%1$s”吗？</string>
+    <string name="web_remove_text">它将无法再打开你的对话。只有你在手机上同意后，它才能再次配对。</string>
+    <string name="web_pair_how">要添加设备，请在该设备上打开这个地址并点按“Pair”。然后在这里通过显示相同代码的卡片确认。</string>
+    <string name="web_card_pair">“%1$s”想查看你的对话并回答确认卡片。那个屏幕上应显示相同的代码：%2$s（来自 %3$s）</string>
+    <string name="web_card_computer">添加电脑“%1$s”（%2$s）？之后智能体可以在上面运行命令，每条命令仍会先显示在卡片上。</string>
+    <string name="web_device_unnamed">一个浏览器</string>
+    <plurals name="web_row_paired">
+        <item quantity="other">已配对 %d 台设备</item>
+    </plurals>
+    <string name="computers_title">智能体可以操作的电脑</string>
+    <string name="computers_intro">智能体通过 SSH 在你自己的电脑上运行命令，就像你在终端里操作一样。命令会先显示在卡片上。</string>
+    <string name="computers_mode_each">每条命令前先询问</string>
+    <string name="computers_remove_text">智能体将无法再访问它。Buddy 的密钥会一直留在它的 authorized_keys 中，直到你在那里删除。</string>
+    <string name="computers_add">添加电脑</string>
+    <string name="computers_need_linux">添加电脑需要 Buddy 的 Linux 工具：请先在设置中安装。</string>
+    <string name="computers_name">名称</string>
+    <string name="computers_name_default">我的电脑</string>
+    <string name="computers_host">地址（Tailscale 名称或 IP）</string>
+    <string name="computers_user">那台电脑上的用户</string>
+    <string name="computers_port">SSH 端口</string>
+    <string name="computers_key_info">把这一行添加到电脑的 ~/.ssh/authorized_keys 中（Windows：先开启 OpenSSH Server，然后是你用户文件夹中的同一文件；管理员账号则用 administrators_authorized_keys）：</string>
+    <string name="computers_key_making">正在生成 Buddy 的密钥…</string>
+    <string name="computers_key_failed">Buddy 无法生成密钥：%1$s</string>
+    <string name="computers_copy_key">复制密钥</string>
+    <string name="computers_key_copied">密钥已复制</string>
+    <string name="computers_check_add">检查并添加</string>
+    <string name="computers_fill_in">请填写名称、地址和用户。</string>
+    <string name="computers_checking">正在检查电脑是否允许 Buddy 登录…</string>
+    <string name="computers_check_failed">它没有让 Buddy 登录：\n%1$s</string>
+    <string name="computers_added">已添加 %1$s</string>
+    <string name="tools_card_computer">在 %1$s 上运行：\n%2$s</string>
+    <string name="activity_computer">在 %1$s 上</string>
+    <string name="hub_tool_computer">在 %1$s 上：%2$s</string>
+    <string name="tool_run_on_computer">在你的电脑上运行命令</string>
+    <string name="tool_run_on_computer_info">通过 SSH 在你于“其他设备”中添加的电脑上运行命令</string>
+    <string name="cmd_sheet_title">正在运行</string>
+    <string name="cmd_sheet_command">命令</string>
+    <string name="cmd_sheet_running_for">已运行 %1$s</string>
+    <string name="cmd_sheet_started">%1$s前开始。它的进程不在下面的列表中：可能已经结束。</string>
+    <string name="cmd_sheet_no_command">%1$s 现在没有在运行命令。</string>
+    <string name="cmd_sheet_ended">这个对话现在没有在工作。</string>
+    <string name="cmd_sheet_processes">在 %1$s 下运行</string>
+    <string name="cmd_sheet_loading">正在查看…</string>
+    <string name="cmd_sheet_no_agent">%1$s 现在没有在 Buddy 的 Linux 中运行。</string>
+    <string name="cmd_sheet_none">%1$s 下现在没有任何东西在运行。</string>
+    <string name="cmd_sheet_proc_line">pid %1$d · 已运行 %2$s · CPU %3$s</string>
+    <string name="cmd_sheet_proc_line_idle">pid %1$d · 已运行 %2$s</string>
+    <string name="cmd_sheet_output_note">命令的输出不会显示在这里：命令结束时由 %1$s 接收。</string>
+    <string name="cmd_sheet_stop">停止这条命令</string>
+    <string name="cmd_sheet_stop_one">停止</string>
+    <string name="cmd_sheet_stop_title">停止这个进程吗？</string>
+    <string name="cmd_sheet_stop_text">它启动的进程也会一起停止。%1$s 会继续工作，并看到命令失败。</string>
+    <string name="cmd_sheet_done">这条命令已结束。</string>
+    <string name="walk_button">设置缺少的项目（%1$d）</string>
+    <string name="walk_step">%1$s（第 %2$d 项，共 %3$d 项）：允许后回到 Buddy</string>
+    <string name="walk_all_set">全部完成</string>
+    <string name="walk_left_title">仍然缺少</string>
+    <string name="walk_left_text">这些仍然关闭：%1$s。没有它们 Buddy 也能用，只是能做的更少。</string>
+    <string name="walk_again">再设置一遍</string>
+    <string name="walk_notify">通知</string>
+    <string name="walk_exact">闹钟和提醒</string>
+    <string name="event_charger_on">已连接充电器</string>
+    <string name="event_charger_off">已断开充电器</string>
+    <string name="event_wifi_on">已连接 Wi-Fi</string>
+    <string name="event_wifi_on_named">已连接 Wi-Fi“%1$s”</string>
+    <string name="event_wifi_off">已断开 Wi-Fi</string>
+    <string name="event_bt_on">已连接蓝牙设备</string>
+    <string name="event_bt_on_named">已连接“%1$s”</string>
+    <string name="event_unlock">当天首次解锁</string>
+    <string name="schedule_at_times">在设定的时间</string>
+    <string name="schedule_events">在发生事件时</string>
+    <string name="schedule_events_info">发生以下任一事件时也会发送消息，至少间隔 10 分钟。</string>
+    <string name="schedule_wifi_any">任意网络</string>
+    <string name="schedule_wifi_location">要选择网络，请允许位置信息：Android 只向有位置权限的应用显示 Wi-Fi 名称。</string>
+    <string name="schedule_wifi_named_note">当 Buddy 无法读取网络名称时（位置信息关闭），这项不会运行。</string>
+    <string name="schedule_bt_any">任意设备</string>
+    <string name="schedule_bt_allow">请允许附近的设备：只有获得这项权限，Android 才会告诉 Buddy 蓝牙设备的情况。</string>
+    <string name="schedule_bt_none">没有已配对的设备。</string>
+    <string name="schedule_cap">每天由事件触发的运行次数</string>
+    <string name="schedule_cap_info">最多这么多次，这样 Wi-Fi 反复断连也不会用光你的套餐额度。</string>
+    <string name="schedule_cap_less">减少</string>
+    <string name="schedule_cap_more">增加</string>
+    <string name="schedule_need_start">请选择一个时间或一个事件。</string>
+    <string name="schedule_on_events">触发条件：%1$s</string>
+    <string name="schedule_events_today">今天由事件触发：%1$d / %2$d</string>
+    <string name="walk_bluetooth">附近的设备</string>
+    <string name="walk_location">位置信息</string>
+    <string name="background_mute">将隐藏屏幕上的应用静音</string>
+    <string name="background_mute_info">在隐藏屏幕上处于前台的应用不会发出声音（例如自动开始播放的视频），除非它也在你的屏幕上。应用离开隐藏屏幕后，Buddy 会恢复它的声音，而且从不改动你自己静音的应用。需要助手正在运行。</string>
+
+    <!-- Keep Wireless debugging on (DebugLock). -->
+    <string name="debug_lock">保持无线调试开启</string>
+    <string name="debug_lock_info">手机关闭它时，Buddy 会（在 Wi-Fi 下）重新打开，让助手随时能再次启动。</string>
+    <string name="debug_lock_channel">无线调试</string>
+    <string name="debug_lock_off_title">无线调试已关闭</string>
+    <string name="debug_lock_off_text">手机关闭了它，Buddy 无法重新打开。后台模式会暂停，直到它重新开启：点按即可启动。</string>
+
+    <!-- Copilot and Pi as agents: setup, sign-in, account and model strings. -->
+    <string name="onboarding_brain_copilot">使用你的 GitHub Copilot 套餐（Copilot Free 也可以）。</string>
+    <string name="onboarding_agent_sign_in_copilot">使用你的 GitHub 账号登录：Buddy 会显示一个代码，你在 GitHub 页面上输入后，Buddy 会自动完成。</string>
+    <string name="onboarding_agent_download_copilot">需一次性下载约 190 MB（Buddy 的 Linux、Node.js 和 GitHub Copilot CLI）。</string>
+    <string name="signin_install_sub_copilot">在 Buddy 中通过你的 GitHub Copilot 套餐（Copilot Free 也可以）运行 GitHub Copilot CLI。</string>
+    <string name="signin_install_size_copilot">需一次性下载约 190 MB：Buddy 的 Linux、Node.js 和 GitHub Copilot CLI。安装后约占用 300 MB。建议使用 WLAN。</string>
+    <string name="signin_title_github">登录 GitHub</string>
+    <string name="signin_sub_copilot">使用你开通了 Copilot 的 GitHub 账号。Buddy 会显示一个代码，在 GitHub 页面上输入后，Buddy 会自动完成。</string>
+    <string name="signin_with_github">使用 GitHub 登录</string>
+    <string name="signin_remote_copilot">在这里或任意设备上打开链接，登录 GitHub 并输入代码。点按“在此打开”会自动为你复制代码。Buddy 会自动完成。</string>
+    <string name="signin_copilot_via_gh">Copilot 使用“设置 → 智能体与模型 → GitHub”中的 GitHub 登录。如需退出 Copilot，请在那里退出 GitHub。</string>
+    <string name="account_tagline_copilot">使用你的 GitHub Copilot 套餐</string>
+    <string name="models_default_copilot">Copilot 的默认模型</string>
+    <string name="setup_step_install_copilot">Buddy 会下载自带的小型 Linux 和来自 GitHub 的 %1$s（含 Node.js 约 190 MB）。</string>
+    <string name="setup_step_signin_copilot">使用你的 GitHub 账号。Buddy 会显示一个代码供你在 GitHub 页面上输入，之后自动完成。</string>
+    <string name="onboarding_brain_pi">使用你在 Pi 自己的界面中连接的 Claude、ChatGPT 或 GitHub Copilot 套餐，或 API 密钥。</string>
+    <string name="onboarding_pi_provider">你为其连接的提供商</string>
+    <string name="onboarding_agent_sign_in_pi">在 Pi 自己的界面中连接提供商：在那里输入 /login，然后选择你的套餐或 API 密钥。</string>
+    <string name="onboarding_agent_download_pi">需一次性下载约 220 MB（Buddy 的 Linux、Node.js 和 Pi）。</string>
+    <string name="signin_install_sub_pi">在 Buddy 中通过你连接的提供商运行 Pi：你的 Claude、ChatGPT 或 GitHub Copilot 套餐，或 API 密钥。</string>
+    <string name="signin_install_size_pi">需一次性下载约 220 MB：Buddy 的 Linux、Node.js 和 Pi。建议使用 WLAN。</string>
+    <string name="signin_pi_ready">Pi 已就绪</string>
+    <string name="signin_pi_connected">已连接：%1$s。可通过对话顶部的模型按钮为每个对话选择模型。</string>
+    <string name="signin_pi_connect_title">连接提供商</string>
+    <string name="signin_pi_connect_text">Pi 没有自己的模型。连接你的 Claude、ChatGPT 或 GitHub Copilot 套餐，或 API 密钥，Pi 就会使用它。</string>
+    <string name="signin_pi_connect_note">在这里登录你的 Claude、ChatGPT 或 GitHub Copilot 套餐。其他提供商或 API 密钥会打开 Pi 自己的界面：在那里输入 %1$s。在那里输入 %2$s 可移除。</string>
+    <string name="account_tagline_pi">使用你连接的套餐或 API 密钥</string>
+    <string name="models_default_pi">Pi 的默认模型</string>
+    <string name="setup_step_install_pi">Buddy 会下载自带的小型 Linux 和 %1$s（含 Node.js 约 220 MB）。</string>
+    <string name="setup_step_signin_pi">在 Pi 自己的界面中连接提供商（在那里输入 /login）：你的 Claude、ChatGPT 或 GitHub Copilot 套餐，或 API 密钥。</string>
+
+    <!-- Agents and models (2.4.0): what new chats use, what's connected, Add a connection, Sign in with OpenRouter, one API service's screen. -->
+    <string name="agents_lead">哪个智能体为你工作，以及它靠什么运行。</string>
+    <string name="agents_new_chats">新对话使用</string>
+    <string name="agents_model_default">它自己的默认模型</string>
+    <string name="agents_not_set_up">尚未设置</string>
+    <string name="agents_on_claude">使用你的 Claude 套餐</string>
+    <string name="agents_on_chatgpt">使用你的 ChatGPT 套餐</string>
+    <string name="agents_on_google">使用你的 Google 账号</string>
+    <string name="agents_on_grok">使用你的 xAI 账号</string>
+    <string name="agents_on_copilot">使用你的 GitHub Copilot 套餐</string>
+    <string name="agents_on">通过 %1$s</string>
+    <string name="agents_change">修改</string>
+    <string name="agents_small">安全检查使用 %1$s</string>
+    <string name="agents_small_info_cheap">较便宜的模型，由 %1$s 运行。</string>
+    <string name="agents_small_info">由 %1$s 运行。</string>
+    <string name="agents_small_codex">Codex 的小模型</string>
+    <string name="agents_small_none">安全检查需要 Claude Code 或 Codex</string>
+    <string name="agents_small_none_info">设为智能的应用由它们来检查。请设置其中一个。</string>
+    <string name="agents_pick_title">新对话使用</string>
+    <string name="agents_pick_set_up">尚未设置：点按进行设置</string>
+    <string name="agents_connected">已连接</string>
+    <string name="agents_none_connected">还没有连接任何内容。</string>
+    <string name="agents_claude_plan">Claude 套餐</string>
+    <string name="agents_chatgpt_plan">ChatGPT 套餐</string>
+    <string name="agents_google">Google 账号</string>
+    <string name="agents_grok">xAI 账号</string>
+    <string name="agents_copilot">GitHub Copilot</string>
+    <string name="agents_runs_in">在 %1$s 中运行</string>
+    <string name="agents_can_run_in">可在 %1$s 中运行</string>
+    <string name="agents_runs_in_lite">在 %1$s 中运行，轻量</string>
+    <string name="agents_on_phone">%1$s，本机</string>
+    <string name="agents_engine_missing">缺少引擎</string>
+    <string name="agents_cost_subscription">订阅</string>
+    <string name="agents_cost_pay">按用量付费</string>
+    <string name="agents_cost_free">免费</string>
+    <string name="agents_cost_free_or_plan">免费或套餐</string>
+    <string name="agents_cost_offline">离线</string>
+    <string name="agents_cost_private">私密</string>
+    <string name="agents_see_what">查看需要修改什么</string>
+    <string name="agents_add">添加连接</string>
+    <string name="agents_installed">已安装的智能体</string>
+    <string name="agents_not_installed">%1$s，未安装</string>
+    <string name="agents_installed_info">这些是智能体自己的程序，在 Buddy 里运行。所以你的 Claude 和 ChatGPT 套餐能在这里使用。</string>
+    <string name="agents_more">更多</string>
+    <string name="agents_github_none">未连接</string>
+    <plurals name="agents_defaults_set">
+        <item quantity="other">已设置 %1$d 个智能体</item>
+    </plurals>
+    <string name="conn_add_title">添加连接</string>
+    <string name="conn_free">免费</string>
+    <string name="conn_opencode_free">OpenCode 的免费模型</string>
+    <string name="conn_google_sub">使用 Google 登录</string>
+    <string name="conn_or_free">OpenRouter 的免费模型</string>
+    <string name="conn_claude_plan">Claude Pro 或 Max</string>
+    <string name="conn_claude_plan_sub">使用 Claude 登录</string>
+    <string name="conn_chatgpt_plan">ChatGPT Plus 或 Pro</string>
+    <string name="conn_chatgpt_plan_sub">使用 ChatGPT 登录</string>
+    <string name="conn_google_plan">Google AI 套餐</string>
+    <string name="conn_supergrok">SuperGrok</string>
+    <string name="conn_supergrok_sub">使用你的 xAI 账号登录</string>
+    <string name="conn_copilot">GitHub Copilot</string>
+    <string name="conn_copilot_sub">使用 GitHub 登录</string>
+    <string name="conn_pi">你的套餐，在 Pi 中</string>
+    <string name="conn_pi_sub">Claude、ChatGPT 或 Copilot：在 Pi 自己的界面中登录</string>
+    <string name="conn_pi_connected">已连接：%1$s</string>
+    <string name="conn_paste_key">粘贴密钥</string>
+    <string name="conn_custom">其他服务</string>
+    <string name="conn_custom_sub">任何支持 OpenAI 或 Anthropic 格式的地址</string>
+    <string name="conn_custom_agents">取决于它的地址</string>
+    <string name="conn_signed_in">已登录</string>
+    <string name="conn_ready">就绪</string>
+    <string name="conn_add_foot">登录某个套餐时，如果它的智能体还没装，会先安装。</string>
+    <string name="conn_or_choice_info">登录后 OpenRouter 会为 Buddy 创建专用密钥：无需复制。或者粘贴你在 OpenRouter 上创建的密钥。</string>
+    <string name="conn_or_sign_in">使用 OpenRouter 登录</string>
+    <string name="conn_or_paste">粘贴密钥</string>
+    <string name="conn_or_needs_service_title">Buddy 的服务已关闭</string>
+    <string name="conn_or_needs_service">OpenRouter 会通过本机上的一个地址把你送回 Buddy，而这个地址只在 Buddy 的无障碍服务开启时才响应。请开启后重试，或改为粘贴密钥。</string>
+    <string name="conn_or_busy">正在从 OpenRouter 获取密钥…</string>
+    <string name="conn_or_page_done">你可以回到 Buddy 了。</string>
+    <string name="conn_or_page_expired">此次登录已过期或已被使用。请在 Buddy 中重新开始。</string>
+    <string name="conn_or_failed">OpenRouter 登录失败：%1$s</string>
+    <string name="conn_or_no_free">OpenRouter 刚才没有列出免费模型，所以选择器显示它的全部模型。免费模型以“:free”结尾。</string>
+    <string name="conn_status_signed_in">已登录</string>
+    <string name="conn_status_key">密钥已保存</string>
+    <string name="conn_status_ready">就绪</string>
+    <string name="conn_status_off">已关闭</string>
+    <string name="conn_status_checking">正在检查…</string>
+    <string name="conn_status_failed">没有响应</string>
+    <string name="conn_status_no_tools">无法使用工具</string>
+    <string name="conn_balance_left">剩余 %1$s</string>
+    <string name="conn_free_left">今天还剩 %1$d 次免费模型请求。</string>
+    <string name="conn_or_own_key">OpenRouter 为 Buddy 创建了专用密钥。在 OpenRouter 的 Keys 页面删除它即可切断 Buddy 的访问。</string>
+    <string name="conn_checked">连接时已检查</string>
+    <string name="conn_checking">正在检查…</string>
+    <string name="conn_not_checked">尚未检查。</string>
+    <string name="conn_check_answers">模型能回答</string>
+    <string name="conn_check_tools">它能调用工具，所以能操作手机</string>
+    <string name="conn_check_tools_failed">要求时它没有调用工具</string>
+    <string name="conn_no_tools_warning">%1$s 回答了，但 Buddy 测试时它无法调用工具。这样它就无法操作手机。</string>
+    <string name="conn_check_fits">Buddy 的工具和指令（约 %1$s 个 token）能放进它 %2$s 的记忆。智能体自己的提示词还要另算。</string>
+    <string name="conn_check_fits_not">仅 Buddy 的工具和指令（约 %1$s 个 token）就放不进它 %2$s 的记忆。</string>
+    <string name="conn_check_no_model">它没有列出可检查的模型。</string>
+    <string name="conn_check_no_call">它用文字回答，而没有调用工具。</string>
+    <string name="conn_checked_how">%1$s，按 %2$s 的方式提问，%3$s</string>
+    <string name="conn_check_stale">此后智能体或模型已更改：请重新检查。</string>
+    <string name="conn_check_now">立即检查</string>
+    <string name="conn_check_again">重新检查</string>
+    <string name="conn_check_cost">两个非常小的请求：最多花掉一丁点 API 额度。</string>
+    <string name="conn_runs_in">运行于</string>
+    <string name="conn_runs_in_info">勾选的智能体在默认设置下的对话中使用此服务。</string>
+    <string name="conn_runs_in_keep">%1$s 没有套餐，所以它的对话需要一个服务。请在默认模型下为它另选一个。</string>
+    <string name="conn_models">模型</string>
+    <string name="conn_for_chats">用于对话</string>
+    <string name="conn_for_chats_title">%1$s 的对话模型</string>
+    <string name="conn_edit">地址和密钥</string>
+    <string name="conn_use_for_new">用于新对话，在 %1$s 中</string>
+    <string name="conn_used_now">新对话正在使用此项，在 %1$s 中。</string>
+    <string name="conn_sign_out">退出 %1$s 账号</string>
+    <string name="conn_sign_out_text">它的密钥会从本机删除，使用它的模型的对话会回到默认。密钥会保留在 OpenRouter 上，直到你在那里删除它。</string>
+    <string name="conn_remove">移除 %1$s</string>
+
+    <!-- Pi's sign-in to a plan, without its own screen (PiSignIn). -->
+    <string name="signin_pi_with">使用 %1$s 登录</string>
+    <string name="signin_pi_other">其他提供商或 API 密钥</string>
+    <string name="signin_pi_starting">正在启动 Pi 登录…</string>
+    <string name="signin_pi_open_page">打开登录页面</string>
+    <string name="signin_pi_paste_hint">页面显示的代码</string>
+    <string name="signin_pi_send_code">发送代码</string>
+    <string name="signin_pi_enter_code">在页面上输入此代码（打开时会自动复制）：</string>
+    <string name="signin_pi_copy_code">在页面上登录，复制显示的代码后返回：剩下的交给 Buddy。</string>
+    <string name="signin_pi_checking">正在检查…</string>
+    <string name="signin_pi_signed_in">Pi 已使用 %1$s 登录</string>
+    <string name="signin_pi_failed">未登录：\n%1$s</string>
+    <string name="debug_lock_ask_title">允许在此 Wi-Fi 上使用无线调试</string>
+    <string name="debug_lock_ask_text">手机会针对每个 Wi-Fi 接入点询问一次（Mesh 网络有多个）。点按这里，勾选“始终允许在此网络上”，然后点按允许。</string>
+
+    <!-- Services (2.4.0): a service's optional key, its models shown in pickers, Pi and the services saved in Buddy. -->
+    <string name="api_keys_key_optional_hint">API 密钥（可选）</string>
+    <string name="conn_shown">在选择器中显示</string>
+    <string name="conn_shown_count">%1$d / %2$d</string>
+    <string name="signin_services_also">%1$s 的对话也可以使用 Buddy 中保存的服务的模型：在对话的模型菜单中选择。</string>
+    <string name="chat_attach_files_linux_sub">PDF、文档等任何文件。超过 25 MB 的会直接送到此聊天的 Linux 工具，大小不限。</string>
+    <string name="chat_attach_big_to_linux">太大，无法作为附件：改为发送到此聊天的 Linux 工具。送达后，可在“文件”（对话选项）中查看。</string>
+    <string name="chat_attach_in_linux">在 Linux 工具中</string>
+    <!-- Add a connection in tabs (2.4.0): Free, Plans, API keys, This phone, Servers. -->
+    <string name="ui_tab">%1$s，第 %2$d 个标签页，共 %3$d 个</string>
+    <string name="conn_tab_plans">套餐</string>
+    <string name="conn_tab_keys">API 密钥</string>
+    <string name="conn_tab_phone">本机</string>
+    <string name="conn_tab_servers">服务器</string>
+    <string name="conn_free_lead">不花钱就能开始的方式。各提供商自行设定限制，并可能更改。</string>
+    <string name="conn_free_checked">有关限制、付费和隐私的说明来自各提供商自己的页面，查阅于 2026 年 11 月。这些由提供商决定，可能会变。</string>
+    <string name="conn_open">打开</string>
+    <string name="conn_fact_opencode_get">一份不断变化的模型列表，每个模型限时免费。</string>
+    <string name="conn_fact_opencode_account">无需账号，无需登录：装好 OpenCode 就能用。</string>
+    <string name="conn_fact_opencode_privacy">部分免费模型会保留你发送的内容，并用来改进模型。具体是哪些，见 OpenCode 的 Zen 页面。</string>
+    <string name="conn_agy_free">Antigravity 的免费套餐</string>
+    <string name="conn_fact_agy_get">Google 的 $0 套餐，配额每周恢复。Buddy 自己使用时，大约 300 次请求后停止，大约一周后恢复。配额由 Google 设定，可能更改。</string>
+    <string name="conn_fact_agy_account">使用 Google 账号登录。</string>
+    <string name="conn_fact_agy_privacy">Google 会用你发送的内容改进其产品，Google 的人员可能会阅读。不要发送任何机密内容。</string>
+    <string name="conn_fact_or_get">名称以“:free”结尾的模型：每天 50 次请求，每分钟 20 次。账号购买过 10 点额度后，每天 1,000 次。</string>
+    <string name="conn_fact_or_account">在浏览器中登录：无需复制密钥。</string>
+    <string name="conn_fact_or_privacy">除非你主动选择开启，OpenRouter 不会保留你的提示词。免费模型的提供商可能会用它们训练：是否使用这些提供商，由你在 OpenRouter 上的隐私设置决定。</string>
+    <string name="conn_copilot_free">GitHub Copilot Free</string>
+    <string name="conn_fact_copilot_get">GitHub 的免费套餐包含 Copilot 的命令行智能体，并附带一定量的 AI 额度。模型由系统为你选择。</string>
+    <string name="conn_fact_copilot_who">仅适用于不是由组织提供 Copilot 的个人账号。</string>
+    <string name="conn_fact_copilot_privacy">GitHub 可能会用你发送的内容训练其模型。可在 GitHub 上你的 Copilot 设置中通过“Allow GitHub to use my data for AI model training”关闭。</string>
+    <string name="conn_gemini_free">Google AI Studio 的免费层级</string>
+    <string name="conn_fact_gemini_get">部分 Gemini 模型，在每分钟和每天的限制内免费。你的限制可在 Google AI Studio 查看。</string>
+    <string name="conn_fact_gemini_card">无需结算账号：那是付费层级才需要的。</string>
+    <string name="conn_fact_gemini_privacy">Google 会用你发送的内容改进其产品，审核人员可能会阅读：不要发送任何个人或机密内容。在欧洲经济区、瑞士和英国，适用付费条款，内容不会被这样使用。</string>
+    <string name="conn_fact_gemini_region">仅限 Google 为 Gemini API 列出的国家。</string>
+    <string name="conn_plans_lead">用你已经在付费的套餐登录：无需 API 密钥，也不会多一份账单。</string>
+    <string name="conn_keys_lead">来自按用量计费的服务的密钥，费用记在密钥所属的账号上。Buddy 把密钥加密保存在手机上，智能体永远看不到它们。</string>
+    <string name="conn_keys_many">一个密钥，许多模型</string>
+    <string name="conn_keys_makers">来自开发模型的公司</string>
+    <string name="conn_keys_fast">快速</string>
+    <string name="conn_keys_other">其他</string>
+    <string name="conn_what_openrouter">一个账号用多家公司的模型。登录，或粘贴密钥。</string>
+    <string name="conn_what_models">%1$s 模型</string>
+    <string name="conn_what_gemini">Gemini 模型。有免费层级：见“免费”。</string>
+    <string name="conn_what_fast">精选模型，主打速度</string>
+    <string name="conn_phone_lead">在手机本身上运行的模型。</string>
+    <string name="conn_phone_private">私密：数据不离开手机，没有网络也能用。</string>
+    <string name="conn_phone_small">小模型比在线模型慢，在多步骤任务上会出错。最适合一步完成的请求：电量、计时器、快速看一眼某个应用。</string>
+    <string name="conn_phone_ram">这部手机有 %1$s 内存。模型必须和其他所有打开的东西一起放得下。</string>
+    <string name="conn_servers_lead">你在自己的电脑或网络上运行的模型服务器。</string>
+    <string name="conn_servers_yours">你的服务器</string>
+    <string name="conn_servers_title">你自己的模型服务器</string>
+    <string name="conn_servers_what">任何支持 OpenAI 格式的服务器：%1$s 等。</string>
+    <string name="conn_servers_address">输入它的地址，Buddy 会加载它提供的模型。如果服务器在电脑上，要填电脑在你网络中的地址，而不是 localhost。</string>
+    <string name="conn_servers_private">私密：你发送的内容会发到你的服务器，并留在你的网络内。</string>
+    <string name="conn_servers_key">无需密钥，除非你的服务器要求。</string>
+    <string name="conn_servers_start">已填好常用地址：</string>
+    <string name="conn_servers_add">添加服务器</string>
+    <!-- Files (2.4.0): the browser of Buddy's Linux (Projects and a chat's own folders), its rows in Settings and in a chat's options. -->
+    <string name="files_title">文件</string>
+    <string name="files_row_info">Buddy 的 Linux 里有什么：上传任意大小的文件，打开、分享或删除</string>
+    <string name="chat_files_row">项目和此对话在 Buddy 的 Linux 中的文件</string>
+    <string name="chat_files_row_size">项目和此对话的文件 · 已向此对话发送 %1$s</string>
+    <string name="files_intro">Buddy 的 Linux 里有什么，带 Linux 工具的智能体就在这里工作。把文件上传到某个文件夹供它们使用，或取出它们做好的东西。</string>
+    <string name="files_projects">工作区</string>
+    <string name="files_projects_info">智能体的工作区，每个项目一个文件夹</string>
+    <string name="files_projects_shared_info">此对话在这里工作，和所有没有项目文件夹的对话一样</string>
+    <string name="files_project_info">此对话的项目：它的智能体在这里工作</string>
+    <string name="files_all_chats">所有对话</string>
+    <string name="files_project_here">此对话的项目：它的智能体从这个文件夹开始。</string>
+    <string name="files_project_hint">此对话在整个工作区中工作。想让它只做一个项目，请打开某个文件夹的菜单，选择“设为此对话的项目”。</string>
+    <string name="files_project_make">设为此对话的项目</string>
+    <string name="files_project_end">不再作为此对话的项目</string>
+    <string name="files_project_title">让此对话在“%1$s”中工作？</string>
+    <string name="files_project_none_title">重新在整个工作区中工作？</string>
+    <string name="files_project_text">从你的下一条消息起，智能体从那里开始。它会开始一段属于自己的新会话，并以文本形式获得此对话到目前为止的内容。</string>
+    <string name="files_project_yes">在那里工作</string>
+    <string name="files_project_set">此对话现在在 %1$s 中工作</string>
+    <string name="files_project_none_set">此对话重新在整个工作区中工作</string>
+    <string name="chat_project">项目文件夹</string>
+    <string name="chat_project_none">整个工作区</string>
+    <string name="chat_project_none_info">所有没有项目文件夹的对话共用</string>
+    <string name="chat_project_info">此对话的智能体从这里开始，并把工作保存在这里。多个对话可以做同一个项目。</string>
+    <string name="chat_folder_busy">对话正在工作。等它完成后再更改项目文件夹。</string>
+    <string name="jump_to_end">跳到末尾</string>
+    <string name="models_pi_group">通过你的 %1$s 登录</string>
+    <string name="models_opencode_free">OpenCode 免费模型</string>
+    <string name="files_this_chat">此对话</string>
+    <string name="files_incoming">已发送到 Linux 工具</string>
+    <string name="files_incoming_info">供智能体的工具使用的文件，大小不限</string>
+    <string name="files_attachments">附件</string>
+    <string name="files_attachments_info">你所添加附件的副本，与智能体收到的一致</string>
+    <string name="files_upload">上传文件</string>
+    <string name="files_new_folder">新建文件夹</string>
+    <string name="files_create">创建</string>
+    <string name="files_name_hint">名称</string>
+    <string name="files_bad_name">名称不能为空，不能是“.”或“..”，也不能包含斜杠。</string>
+    <string name="files_menu">更多</string>
+    <string name="files_show_hidden">显示隐藏文件</string>
+    <string name="files_show_hidden_info">名称以点开头的文件和文件夹</string>
+    <string name="files_empty">这里还没有内容。</string>
+    <plurals name="files_hidden_count">
+        <item quantity="other">有 %1$d 个隐藏项目未显示。</item>
+    </plurals>
+    <string name="files_show_more">显示更多（还有 %1$d 个）</string>
+    <string name="files_list_failed">无法显示此文件夹：%1$s</string>
+    <string name="files_link">指向 %1$s 的链接</string>
+    <string name="files_link_info">在 Buddy 的 Linux 中创建的链接。Buddy 在这里从不打开或跟随链接：链接指向的位置可能在这些文件夹之外。</string>
+    <string name="files_open">打开</string>
+    <string name="files_share">分享</string>
+    <string name="files_save">保存到 Downloads</string>
+    <string name="files_rename">重命名</string>
+    <string name="files_delete">删除</string>
+    <string name="files_copy_path">复制路径</string>
+    <string name="files_mention">在对话中提及</string>
+    <plurals name="files_selected">
+        <item quantity="other">已选择 %1$d 项</item>
+    </plurals>
+    <string name="files_delete_title">删除 %1$s？</string>
+    <plurals name="files_delete_many">
+        <item quantity="other">删除 %1$d 个项目？</item>
+    </plurals>
+    <string name="files_delete_counting">正在统计要删除的内容…</string>
+    <plurals name="files_delete_info">
+        <item quantity="other">%1$d 个项目（%2$s）将永久删除。</item>
+    </plurals>
+    <string name="files_deleting">正在删除… 已完成 %1$d 个</string>
+    <string name="files_delete_failed">未能全部删除。%1$s</string>
+    <string name="files_saving">正在将 %1$s 保存到 Downloads… %2$s</string>
+    <plurals name="files_saved_many">
+        <item quantity="other">已将 %1$d 个文件保存到 Downloads/Buddy。</item>
+    </plurals>
+    <string name="files_save_failed">无法保存 %1$s：%2$s</string>
+    <string name="files_rename_failed">无法重命名 %1$s：%2$s</string>
+    <string name="files_folder_failed">无法创建文件夹 %1$s：%2$s</string>
+    <string name="files_copying_into">仍有文件正在复制到其中</string>
+    <string name="files_busy">请等待正在进行的删除或保存完成。</string>
+    <string name="files_outside">它不在“文件”显示的文件夹内</string>
+    <string name="files_uploaded">已添加 %1$s</string>
+    <string name="files_attachments_hint">这些是你在此对话中附加内容的副本。要给智能体另一个文件，请上传到工作区或“发送到 Linux 工具的文件”。</string>
+    <string name="debug_lock_settings_text">在它开启之前，后台模式无法再次启动。如果手机询问，请勾选“始终允许在此网络上”，然后点按允许。</string>
+    <string name="debug_lock_turn_on">开启</string>
 </resources>

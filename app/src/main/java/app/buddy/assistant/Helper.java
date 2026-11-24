@@ -21,6 +21,7 @@ final class Helper {
             {"linux/buddy-run", "/root/bin/buddy-run", "700"},
             {"linux/codex-remote", "/root/bin/codex-remote", "700"}, // the Codex session (CodexRemote)
             {"linux/buddy-browser", "/root/bin/buddy-browser", "700"}, // the background browser (Browser)
+            {"linux/buddy-copilot", "/root/bin/buddy-copilot", "755"}, // runs Copilot on Node (linked by Account.install)
             {"linux/profile.sh", "/etc/profile.d/buddy.sh", "644"},
             {"linux/arecord", "/usr/local/bin/arecord", "755"},
             {"linux/asound-cards", "/etc/buddy/asound-cards", "644"},
@@ -138,8 +139,9 @@ final class Helper {
                     + "Settings. So, unlike the rule above, you may open Buddy and use its screens when the user asks: "
                     + "the Chats list, a chat, and the main Settings screen. These parts stay the user's own, and a tap "
                     + "there answers BLOCKED: the bubble and its cards, approval cards, a chat's Linux tools chip and "
-                    + "Chat options (with its scheduled task), and the screens for App permissions, API keys, MCP "
-                    + "servers, Notification rules, Scheduled, Skills, Background mode, Backup, GitHub and sign-in. "
+                    + "Chat options (with its scheduled task), and the screens for App permissions, Add a connection, a "
+                    + "service's own screen (its key, addresses and models), MCP servers, Notification rules, "
+                    + "Scheduled, Skills, Background mode, Backup, GitHub and sign-in. "
                     + "When the user asks for something there, say it's theirs to do; that isn't them asking you to "
                     + "break a rule.\n";
         }

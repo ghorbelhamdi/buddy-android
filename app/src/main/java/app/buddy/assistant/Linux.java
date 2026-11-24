@@ -365,7 +365,7 @@ final class Linux {
         }
     }
 
-    private static boolean isLink(File f) {
+    static boolean isLink(File f) {
         try {
             return android.system.OsConstants.S_ISLNK(Os.lstat(f.getPath()).st_mode);
         } catch (Exception e) {

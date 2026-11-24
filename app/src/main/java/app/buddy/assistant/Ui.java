@@ -189,6 +189,53 @@ final class Ui {
         return b;
     }
 
+    /**
+     * The scroll view in a frame, with a round arrow over its lower edge that jumps to the end: there while the end
+     * is most of a screen away or more, gone near it (a long chat is a long way to scroll back down). toEnd does the
+     * jump; null is a plain scroll to the end. The frame goes where the scroll view would.
+     */
+    static android.widget.FrameLayout withJumpToEnd(Context c, final android.widget.ScrollView sv, final Runnable toEnd) {
+        android.widget.FrameLayout f = new android.widget.FrameLayout(c);
+        f.addView(sv, new android.widget.FrameLayout.LayoutParams(android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+                android.widget.FrameLayout.LayoutParams.MATCH_PARENT));
+        final ImageButton b = new ImageButton(c); // (built here: the bubble's panel has no theme for iconButton's ripple)
+        b.setImageResource(R.drawable.ms_arrow_upward);
+        b.setRotation(180);
+        b.setImageTintList(ColorStateList.valueOf(TEXT));
+        b.setScaleType(ImageView.ScaleType.CENTER);
+        b.setContentDescription(c.getString(R.string.jump_to_end));
+        b.setBackground(outlined(c, CARD2, 20, OUTLINE, 1));
+        b.setElevation(dp(c, 6));
+        b.setVisibility(android.view.View.GONE);
+        android.widget.FrameLayout.LayoutParams p = new android.widget.FrameLayout.LayoutParams(dp(c, 40), dp(c, 40),
+                android.view.Gravity.BOTTOM | android.view.Gravity.CENTER_HORIZONTAL);
+        p.bottomMargin = dp(c, 12);
+        f.addView(b, p);
+        final Runnable sync = () -> {
+            int left = sv.getChildCount() == 0 ? 0 : sv.getChildAt(0).getHeight() - sv.getScrollY() - sv.getHeight();
+            b.setVisibility(sv.getHeight() > 0 && left > sv.getHeight() * 3 / 4 ? android.view.View.VISIBLE : android.view.View.GONE);
+        };
+        final android.view.ViewTreeObserver.OnScrollChangedListener scrolled = sync::run;
+        sv.addOnAttachStateChangeListener(new android.view.View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(android.view.View v) {
+                v.getViewTreeObserver().addOnScrollChangedListener(scrolled);
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(android.view.View v) {
+                v.getViewTreeObserver().removeOnScrollChangedListener(scrolled);
+            }
+        });
+        if (sv.isAttachedToWindow()) sv.getViewTreeObserver().addOnScrollChangedListener(scrolled);
+        sv.addOnLayoutChangeListener((v, l, t, r, bo, ol, ot, or, ob) -> sync.run()); // (what it holds grew or shrank)
+        b.setOnClickListener(v -> {
+            if (toEnd != null) toEnd.run();
+            else sv.post(() -> sv.smoothScrollTo(0, sv.getChildCount() == 0 ? 0 : sv.getChildAt(0).getHeight()));
+        });
+        return f;
+    }
+
     static Button button(Context c, String label, boolean primary) {
         Button b = new Button(c);
         b.setText(label);
@@ -293,19 +340,25 @@ final class Ui {
         return p;
     }
 
-    /** Each agent's own color (as text on BG/CARD): Claude Code clay, Codex blue, OpenCode green, Antigravity violet. */
+    /** Each agent's own color (as text on BG/CARD): Claude Code clay, Codex blue, OpenCode green, Antigravity violet,
+     *  Grok grey, Copilot teal, Pi amber. */
     static int agentColor(String backend) {
         if ("codex".equals(backend)) return DARK ? 0xFF9DB3FF : 0xFF3C5FCC;
         if ("opencode".equals(backend)) return DARK ? 0xFF7FD6A7 : 0xFF23855A;
         if ("agy".equals(backend)) return DARK ? 0xFFBFA9FF : 0xFF6A4FD0;
         if ("grok".equals(backend)) return DARK ? 0xFFD7D3CC : 0xFF5A554E;
+        if ("copilot".equals(backend)) return DARK ? 0xFF6FD3D9 : 0xFF0F7C84;
+        if ("pi".equals(backend)) return DARK ? 0xFFE8C46A : 0xFF8A6A12;
         return DARK ? 0xFFE89A7C : 0xFFB4532F;
     }
 
-    /** 40×40 tile with "CC" (Claude Code), "CX" (Codex), "OC" (OpenCode), "AG" (Antigravity) or "GK" (Grok), in the agent's color. */
+    /** 40×40 tile with "CC" (Claude Code), "CX" (Codex), "OC" (OpenCode), "AG" (Antigravity), "GK" (Grok), "CP"
+     *  (Copilot) or "PI" (Pi), in the agent's color. */
     static TextView agentTile(Context c, String backend) {
         TextView t = text(c, "codex".equals(backend) ? "CX" : "opencode".equals(backend) ? "OC"
-                : "agy".equals(backend) ? "AG" : "grok".equals(backend) ? "GK" : "CC", 13, agentColor(backend));
+                : "agy".equals(backend) ? "AG" : "grok".equals(backend) ? "GK" : "copilot".equals(backend) ? "CP"
+                : "pi".equals(backend) ? "PI" : "CC",
+                13, agentColor(backend));
         t.setTypeface(sans(c, 700));
         t.setGravity(Gravity.CENTER);
         t.setBackground(rounded(c, Theme.withAlpha(agentColor(backend), 0x29), 14));
@@ -406,6 +459,56 @@ final class Ui {
         t.setPaddingRelative(dp(c, 10), 0, 0, 0);
         w.addView(t, weight1());
         return w;
+    }
+
+    /** Lays its children out in rows, left to right (right to left in RTL), wrapping when one doesn't fit: chips. */
+    static final class Flow extends ViewGroup {
+        private final int gap;
+
+        Flow(Context c, int gapDp) {
+            super(c);
+            gap = dp(c, gapDp);
+        }
+
+        @Override
+        protected void onMeasure(int widthSpec, int heightSpec) {
+            int max = MeasureSpec.getSize(widthSpec) - getPaddingLeft() - getPaddingRight();
+            int x = 0, y = 0, rowH = 0;
+            for (int i = 0; i < getChildCount(); i++) {
+                View v = getChildAt(i);
+                if (v.getVisibility() == GONE) continue;
+                measureChild(v, MeasureSpec.makeMeasureSpec(max, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+                if (x > 0 && x + v.getMeasuredWidth() > max) {
+                    x = 0;
+                    y += rowH + gap;
+                    rowH = 0;
+                }
+                x += v.getMeasuredWidth() + gap;
+                rowH = Math.max(rowH, v.getMeasuredHeight());
+            }
+            setMeasuredDimension(MeasureSpec.getSize(widthSpec), y + rowH + getPaddingTop() + getPaddingBottom());
+        }
+
+        @Override
+        protected void onLayout(boolean changed, int l, int t, int r, int b) {
+            int max = r - l - getPaddingLeft() - getPaddingRight();
+            boolean rtl = getLayoutDirection() == LAYOUT_DIRECTION_RTL;
+            int x = 0, y = getPaddingTop(), rowH = 0;
+            for (int i = 0; i < getChildCount(); i++) {
+                View v = getChildAt(i);
+                if (v.getVisibility() == GONE) continue;
+                int w = v.getMeasuredWidth(), h = v.getMeasuredHeight();
+                if (x > 0 && x + w > max) {
+                    x = 0;
+                    y += rowH + gap;
+                    rowH = 0;
+                }
+                int left = rtl ? r - l - getPaddingRight() - x - w : getPaddingLeft() + x;
+                v.layout(left, y, left + w, y + h);
+                x += w + gap;
+                rowH = Math.max(rowH, h);
+            }
+        }
     }
 
     /** A plain flat row with a ripple (for list rows). */
@@ -538,6 +641,70 @@ final class Ui {
         return box;
     }
 
+    /**
+     * Tabs across the top of a screen: an icon over its label, and a line under the one that's open. options are
+     * {value, label, icon (R.drawable)}. Five fit a narrow phone: a label stays on one line and shrinks before it
+     * would wrap. A screen reader hears the label, the tab's place and whether it's the open one.
+     */
+    static LinearLayout tabs(Context c, Object[][] options, String selected, Pick l) {
+        LinearLayout bar = row(c);
+        for (int i = 0; i < options.length; i++) {
+            Object[] o = options[i];
+            String label = (String) o[1];
+            boolean on = o[0].equals(selected);
+            LinearLayout t = column(c);
+            t.setGravity(Gravity.CENTER_HORIZONTAL);
+            t.setPaddingRelative(dp(c, 2), dp(c, 8), dp(c, 2), 0);
+            t.setBackgroundResource(ripple(c, false));
+            t.addView(icon(c, (Integer) o[2], on ? ACCENT_TEXT : MUTED, 22));
+            TextView name = text(c, label, 12, on ? TEXT : MUTED);
+            name.setTypeface(sans(c, on ? 600 : 500));
+            name.setGravity(Gravity.CENTER);
+            name.setMaxLines(1);
+            // (a height of its own: the shrinking needs both sides fixed)
+            name.setAutoSizeTextTypeUniformWithConfiguration(8, 12, 1, TypedValue.COMPLEX_UNIT_SP);
+            LinearLayout.LayoutParams np = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(c, 20));
+            np.topMargin = dp(c, 2);
+            t.addView(name, np);
+            View line = new View(c);
+            line.setBackground(corners(c, on ? ACCENT : 0x00000000, 2, 2, 0, 0));
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(c, 3));
+            lp.topMargin = dp(c, 5);
+            lp.setMarginStart(dp(c, 8));
+            lp.setMarginEnd(dp(c, 8));
+            t.addView(line, lp);
+            t.setContentDescription(c.getString(R.string.ui_tab, label, i + 1, options.length));
+            t.setSelected(on);
+            t.setOnClickListener(v -> {
+                if (!on) l.onPick((String) o[0]);
+            });
+            bar.addView(t, weight1());
+        }
+        return bar;
+    }
+
+    /** A fact with a small icon before it (what a connection gives, costs, keeps): the text wraps beside the icon. */
+    static LinearLayout fact(Context c, int icon, String s) {
+        LinearLayout r = row(c);
+        r.setGravity(Gravity.TOP);
+        ImageView i = icon(c, icon, MUTED, 18);
+        ((LinearLayout.LayoutParams) i.getLayoutParams()).topMargin = dp(c, 1); // level with the first line of text
+        r.addView(i);
+        TextView t = text(c, s, 14, TEXT2);
+        t.setPaddingRelative(dp(c, 10), 0, 0, 0);
+        r.addView(t, weight1());
+        return r;
+    }
+
+    /** A 40×40 tile with an icon, for something that isn't an agent (see agentTile). */
+    static View iconTile(Context c, int res) {
+        FrameLayout ic = new FrameLayout(c);
+        ic.setBackground(rounded(c, CARD2, 11));
+        ic.addView(icon(c, res, TEXT, 20), new FrameLayout.LayoutParams(dp(c, 20), dp(c, 20), Gravity.CENTER));
+        ic.setLayoutParams(new LinearLayout.LayoutParams(dp(c, 40), dp(c, 40)));
+        return ic;
+    }
+
     /** A radio button's look (for lists of choices in sheets). */
     static View radio(Context c, boolean on) {
         FrameLayout f = new FrameLayout(c);
@@ -553,7 +720,7 @@ final class Ui {
 
     /**
      * Settings → Chats on Default (issue #20): for each agent that's signed in, what a chat uses while its model is
-     * "Default": the agent's own default, one of its models, or an API key service's.
+     * "Default": the agent's own default, one of its models, or a service's.
      */
     static void defaultsSheet(Activity a) {
         LinearLayout c = column(a);
@@ -650,7 +817,7 @@ final class Ui {
         modelSheet(a, backend, current, defaultHint, true, l);
     }
 
-    /** services: also the API key services' models (not for runs outside a chat, like the reviewer's). */
+    /** services: also the models of the services saved in Buddy (not for runs outside a chat, like the reviewer's). */
     static void modelSheet(Activity a, String backend, String current, String defaultHint, boolean services, Pick l) {
         final Dialog[] d = new Dialog[1];
         Models.refresh(a, () -> { // a service's list changed meanwhile: the sheet again, with it
@@ -668,7 +835,7 @@ final class Ui {
         if (options.size() > SEARCH_FROM) c.addView(listFilter(a, a.getString(R.string.chat_model_search), found), full());
         View heading = null;
         for (final String[] o : options) {
-            if (o[0] == null) { // an API key service's models
+            if (o[0] == null) { // a service's models
                 TextView sl = sectionLabel(a, o[1]);
                 sl.setPaddingRelative(0, dp(a, 14), 0, dp(a, 2));
                 c.addView(sl);
@@ -1178,6 +1345,11 @@ final class Ui {
      * (Google Play's prominent disclosure: shown in the app, before the permission, with an explicit choice).
      */
     static void openAccessibilitySettings(Activity a) {
+        openAccessibilitySettings(a, null);
+    }
+
+    /** declined: run when the user says no to the disclosure (or closes it), so a setup walk can go on; may be null. */
+    static void openAccessibilitySettings(Activity a, Runnable declined) {
         Runnable open = () -> a.startActivity(new android.content.Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS));
         if (Prefs.a11yConsent(a)) {
             open.run();
@@ -1211,7 +1383,11 @@ final class Ui {
         btns.addView(yes, yp);
         c.addView(btns, full());
         Dialog d = bottomSheet(a, c);
-        no.setOnClickListener(v -> d.dismiss());
+        no.setOnClickListener(v -> {
+            d.dismiss();
+            if (declined != null) declined.run();
+        });
+        if (declined != null) d.setOnCancelListener(x -> declined.run());
         yes.setOnClickListener(v -> {
             Prefs.setA11yConsent(a);
             d.dismiss();

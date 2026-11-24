@@ -84,6 +84,10 @@ public final class HiddenNotice extends BroadcastReceiver {
             if (s != null && named != null) for (String k : named) Background.stopOutside(s, k);
             return;
         }
+        if (LinuxFiles.ACTION_CANCEL.equals(intent.getAction())) { // Cancel on "Sending … to Linux tools"
+            LinuxFiles.cancel(null);
+            return;
+        }
         if (CodexLive.ACTION_END.equals(intent.getAction())) { // the live voice notification's End
             CodexLive.end(null);
             return;

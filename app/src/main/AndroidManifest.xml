@@ -28,6 +28,11 @@
     <!-- the location tool, asked for the first time it's used (not in the Play build) -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- a scheduled task that starts when a Bluetooth device connects: asked when the user picks that event -->
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <!-- the Wi-Fi network the phone is on, to pick it for a scheduled task that starts there (no prompt) -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <!-- Needed on Android 11+ to see launchable apps for open_app / list_apps -->
     <queries>
@@ -125,11 +130,15 @@
             android:exported="false" />
 
         <activity
-            android:name=".ApiKeysActivity"
+            android:name=".OnPhoneActivity"
             android:exported="false" />
 
         <activity
-            android:name=".OnPhoneActivity"
+            android:name=".AddConnectionActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ConnectionActivity"
             android:exported="false" />
 
         <activity
@@ -146,6 +155,20 @@
 
         <activity
             android:name=".SchedulesActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".RoutinesActivity"
+            android:exported="false" />
+
+        <!-- Files: what is in Buddy's Linux (the agents' workspace, a chat's own folders), uploads, open and share -->
+        <activity
+            android:name=".FilesActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".OtherDevicesActivity"
             android:exported="false" />
 
         <activity

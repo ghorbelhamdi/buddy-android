@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A round arrow around a play sign (do it again), drawn to match the Material Symbols icons. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="960" android:viewportHeight="960">
+    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="70" android:fillColor="#00000000"
+        android:pathData="M470,160A320,320 0 1 1 203,320" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M380,160L520,70L520,250Z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M420,360L420,600L610,480Z" />
+</vector>

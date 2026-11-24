@@ -113,6 +113,24 @@ final class Prefs {
         sp(c).edit().putInt("bg_adb_port", port).apply();
     }
 
+    /** Background mode: Wireless debugging goes back on when the phone switches it off (see DebugLock). */
+    static boolean debugLock(Context c) {
+        return sp(c).getBoolean("debug_lock", true);
+    }
+
+    static void setDebugLock(Context c, boolean on) {
+        sp(c).edit().putBoolean("debug_lock", on).apply();
+    }
+
+    /** Apps in front on a hidden screen are silenced while they're there (see HiddenMute). On unless switched off. */
+    static boolean muteHidden(Context c) {
+        return sp(c).getBoolean("bg_mute", true);
+    }
+
+    static void setMuteHidden(Context c, boolean on) {
+        sp(c).edit().putBoolean("bg_mute", on).apply();
+    }
+
     /** Background mode's helper is started again by Buddy itself after a restart of the phone (see Background.afterRestart). */
     static boolean backgroundRestart(Context c) {
         return sp(c).getBoolean("bg_restart", false);
@@ -174,7 +192,7 @@ final class Prefs {
         sp(c).edit().putString("helper", status).putLong("helper_at", System.currentTimeMillis()).apply();
     }
 
-    /** Which agent answers the bubble: "claude" (default), "codex", "opencode", "agy" or "grok". */
+    /** Which agent answers the bubble: "claude" (default), "codex", "opencode", "agy", "grok", "copilot" or "pi". */
     static String backend(Context c) {
         return sp(c).getString("backend", "claude");
     }
@@ -193,6 +211,42 @@ final class Prefs {
 
     static void setAgentsTapBuddy(Context c, boolean on) {
         sp(c).edit().putBoolean("agents_tap_buddy", on).apply();
+    }
+
+    /** Settings → Routines: routines started there run on a hidden screen of their own (background mode set up). */
+    /** Other devices: paired devices may look at the phone's screen and the hidden screens (Settings → Other devices). */
+    static boolean webScreens(Context c) {
+        return sp(c).getBoolean("web_screens", true);
+    }
+
+    static void setWebScreens(Context c, boolean on) {
+        sp(c).edit().putBoolean("web_screens", on).apply();
+    }
+
+    static boolean routinesHidden(Context c) {
+        return sp(c).getBoolean("routines_hidden", true);
+    }
+
+    static void setRoutinesHidden(Context c, boolean on) {
+        sp(c).edit().putBoolean("routines_hidden", on).apply();
+    }
+
+    /** Files: dot-files are listed too. */
+    static boolean filesHidden(Context c) {
+        return sp(c).getBoolean("files_hidden", false);
+    }
+
+    static void setFilesHidden(Context c, boolean on) {
+        sp(c).edit().putBoolean("files_hidden", on).apply();
+    }
+
+    /** The part of a file LinuxFiles is copying into Buddy's Linux now ("": none), to remove if Buddy is closed meanwhile. */
+    static String linuxPart(Context c) {
+        return sp(c).getString("linux_part", "");
+    }
+
+    static void setLinuxPart(Context c, String path) {
+        sp(c).edit().putString("linux_part", path).commit(); // (written before the copy starts: it may be cut short)
     }
 
     /** Sessions outside Buddy (Claude Code in Termux, a PC over Tailscale) work on a hidden screen (see Background). */
@@ -431,6 +485,15 @@ final class Prefs {
         sp(c).edit().putBoolean("voice_cards", on).apply();
     }
 
+    /** The tab of Add a connection that was open last ("": never opened, so the first one). */
+    static String connectionTab(Context c) {
+        return sp(c).getString("connection_tab", "");
+    }
+
+    static void setConnectionTab(Context c, String tab) {
+        sp(c).edit().putString("connection_tab", tab).apply();
+    }
+
     /**
      * The first-run guide's "Local model" choice: OpenCode with a model server of the user's own. The guide then asks
      * for the server too, and the server becomes what OpenCode's chats use by default.
@@ -630,6 +693,24 @@ final class Prefs {
         sp(c).edit().putString("grok_models", json).apply();
     }
 
+    /** Copilot's model list (the ids `copilot help config` lists), as JSON [[id, name], …]. */
+    static String copilotModels(Context c) {
+        return sp(c).getString("copilot_models", "[]");
+    }
+
+    static void setCopilotModels(Context c, String json) {
+        sp(c).edit().putString("copilot_models", json).apply();
+    }
+
+    /** Pi's model list (`pi --list-models`: the connected providers' models), as JSON [["provider/model", name], …]. */
+    static String piModels(Context c) {
+        return sp(c).getString("pi_models", "[]");
+    }
+
+    static void setPiModels(Context c, String json) {
+        sp(c).edit().putString("pi_models", json).apply();
+    }
+
     /** First-run guide finished (or skipped). */
     static boolean onboarded(Context c) {
         return sp(c).getBoolean("onboarded", false);
@@ -658,7 +739,8 @@ final class Prefs {
         sp(c).edit().putInt("onboard_step", step).apply();
     }
 
-    /** Which agents the user wants: "claude", "codex", "opencode", "agy", "grok" or "both" (Claude Code and Codex). */
+    /** Which agents the user wants: "claude", "codex", "opencode", "agy", "grok", "copilot", "pi" or "both" (Claude Code and
+     *  Codex). */
     static String agents(Context c) {
         return sp(c).getString("agents", "claude");
     }
@@ -695,7 +777,7 @@ final class Prefs {
         if (busy ? s.add(chat) : s.remove(chat)) sp(c).edit().putStringSet("busy_chats", s).commit();
     }
 
-    /** The API key services (see Providers), as JSON, without their keys. */
+    /** The services saved in Buddy (see Providers), as JSON, without their keys. */
     static String providers(Context c) {
         return sp(c).getString("providers", "[]");
     }

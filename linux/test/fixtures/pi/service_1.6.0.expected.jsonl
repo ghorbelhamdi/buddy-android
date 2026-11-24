@@ -1,0 +1,6 @@
+{"buddy_session":"fixture","session_id":"buddy-c1-1795474253","subtype":"init","type":"system"}
+{"buddy_session":"fixture","model":"buddy-test/m1","subtype":"model","type":"system"}
+{"buddy_session":"fixture","message":{"content":[{"input":{},"name":"mcp__phone__get_time","type":"tool_use"}]},"type":"assistant"}
+{"buddy_session":"fixture","message":{"content":[{"text":"The time is 12:34.","type":"text"}]},"type":"assistant"}
+{"buddy_session":"fixture","model":"buddy-test/m1","subtype":"model","type":"system"}
+{"buddy_session":"fixture","result":"","subtype":"success","type":"result"}

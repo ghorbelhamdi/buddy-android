@@ -2,7 +2,7 @@
 <!-- Every text Buddy shows, in Vietnamese (bạn). English source: res/values/strings.xml. -->
 <resources>
     <string name="service_label">Trợ lý Buddy</string>
-    <string name="service_description">Hiển thị bong bóng trò chuyện của Buddy và cho phép agent bạn chọn (Claude Code, Codex, OpenCode, Antigravity hoặc Grok), chạy bên trong Buddy trên điện thoại này, đọc màn hình, nhấn, gõ và cuộn thay bạn. Không có gì rời khỏi điện thoại, ngoại trừ những gì chính agent gửi tới dịch vụ AI của nó (Anthropic, OpenAI, Google, xAI hoặc nhà cung cấp mô hình OpenCode của bạn).</string>
+    <string name="service_description">Hiển thị bong bóng trò chuyện của Buddy và cho phép agent bạn chọn (Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot hoặc Pi), chạy bên trong Buddy trên điện thoại này, đọc màn hình, nhấn, gõ và cuộn thay bạn. Không có gì rời khỏi điện thoại, ngoại trừ những gì chính agent gửi tới dịch vụ AI của nó (Anthropic, OpenAI, Google, xAI, GitHub hoặc nhà cung cấp mô hình OpenCode hay Pi của bạn).</string>
 
     <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
 
@@ -28,7 +28,7 @@
     <!-- Two example requests a user could type. Translate them naturally and use your language's quotation marks. -->
     <string name="onboarding_welcome_ask_text">“Nhắn Sam là mình đến muộn”, “thêm sữa vào giỏ hàng”.</string>
     <string name="onboarding_welcome_plan_title">Dùng gói của bạn, không cần khóa API</string>
-    <string name="onboarding_welcome_plan_text">Chạy Claude Code bằng gói Claude của bạn. Codex với gói ChatGPT, Antigravity với tài khoản Google, Grok với tài khoản Google hoặc X, và các mô hình miễn phí của OpenCode cũng dùng được.</string>
+    <string name="onboarding_welcome_plan_text">Chạy Claude Code bằng gói Claude của bạn. Codex với gói ChatGPT, Antigravity với tài khoản Google, Grok với tài khoản Google hoặc X, Copilot với tài khoản GitHub, Pi với gói hoặc khóa API bạn kết nối, và các mô hình miễn phí của OpenCode cũng dùng được.</string>
     <string name="onboarding_welcome_control_title">Bạn luôn nắm quyền</string>
     <string name="onboarding_welcome_control_text">Gửi, đăng, mua và xóa luôn hỏi bạn trước.</string>
     <!-- Small lowercase mono line under the list. -->
@@ -181,7 +181,7 @@
     <string name="main_section_recent">Gần đây</string>
     <string name="main_empty_title">Chưa có cuộc trò chuyện nào</string>
     <!-- "New chat" = the button (main_new_chat). -->
-    <string name="main_empty_text">Nhấn Trò chuyện mới để bắt đầu với Claude Code, Codex, OpenCode, Antigravity hoặc Grok. Nhấn giữ một cuộc trò chuyện để xóa.</string>
+    <string name="main_empty_text">Nhấn Trò chuyện mới để bắt đầu với Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot hoặc Pi. Nhấn giữ một cuộc trò chuyện để xóa.</string>
     <!-- Status of a chat with a running task, until the agent reports what it's doing. Small lowercase mono text. -->
     <string name="main_chat_working">đang làm…</string>
     <string name="main_chat_waiting">đang chờ bạn…</string>
@@ -726,7 +726,7 @@
     <!-- After "Continue in Buddy" on an earlier session. %1$s = agent name. -->
     <string name="hub_continuing">Đang tiếp tục một phiên %1$s trước đó. Nếu phiên đó vẫn mở trong terminal, hãy đóng nó ở đó trước.</string>
     <string name="hub_still_working_attachments">Cuộc trò chuyện này vẫn đang làm việc. Hãy gửi tệp đính kèm khi nó xong.</string>
-    <string name="hub_service_off">%1$s đang tắt (Cài đặt → Tác nhân và mô hình → Khóa API). Hãy bật lại, hoặc chọn mô hình khác cho cuộc trò chuyện này.</string>
+    <string name="hub_service_off">%1$s đang tắt (Cài đặt → Tác nhân và mô hình). Hãy bật lại, hoặc chọn mô hình khác cho cuộc trò chuyện này.</string>
     <string name="hub_accessibility_dead">Dịch vụ hỗ trợ tiếp cận của Buddy không chạy dù đang bật: Android đã dừng Buddy và không khởi động lại dịch vụ, nên các tác nhân không dùng được điện thoại. Hãy tắt rồi bật lại Buddy trong Cài đặt Android → Hỗ trợ tiếp cận. Để không lặp lại: cho phép Buddy tự khởi động trong cài đặt ứng dụng của điện thoại nếu có, và cấp micrô “Trong khi dùng ứng dụng”, không phải “Chỉ lần này”.</string>
     <string name="hub_accessibility_off">Dịch vụ hỗ trợ tiếp cận của Buddy đang tắt, nên các tác nhân không dùng được điện thoại. Hãy bật Buddy trong Cài đặt Android → Hỗ trợ tiếp cận.</string>
     <string name="voice_mic_while_using">Hãy chọn “Trong khi dùng ứng dụng”: với “Chỉ lần này”, Android dừng Buddy một phút sau khi bạn rời khỏi nó, kể cả giữa chừng một tác vụ.</string>
@@ -899,7 +899,7 @@
     <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
     <string name="ui_a11y_title">Cách Buddy dùng hỗ trợ tiếp cận</string>
     <string name="ui_a11y_what">Buddy dùng dịch vụ hỗ trợ tiếp cận của Android để làm điều bạn nhờ trong các ứng dụng khác: nó đọc nội dung trên màn hình rồi nhấn, gõ và cuộn thay bạn. Nó cũng hiển thị bong bóng nổi.</string>
-    <string name="ui_a11y_data">Trong lúc một việc đang chạy, nội dung màn hình, có thể gồm thông tin cá nhân như tin nhắn, tên hay địa chỉ, được gửi tới dịch vụ AI của agent bạn chọn (Anthropic cho Claude Code, OpenAI cho Codex, Google cho Antigravity, xAI cho Grok, hoặc nhà cung cấp mô hình OpenCode của bạn), chỉ để thực hiện yêu cầu của bạn.</string>
+    <string name="ui_a11y_data">Trong lúc một việc đang chạy, nội dung màn hình, có thể gồm thông tin cá nhân như tin nhắn, tên hay địa chỉ, được gửi tới dịch vụ AI của agent bạn chọn (Anthropic cho Claude Code, OpenAI cho Codex, Google cho Antigravity, xAI cho Grok, GitHub cho Copilot, hoặc nhà cung cấp mô hình OpenCode hay Pi của bạn), chỉ để thực hiện yêu cầu của bạn.</string>
     <string name="ui_a11y_no_servers">Buddy không có máy chủ riêng. Buddy không thu thập, bán hay chia sẻ dữ liệu này, và không dùng nó cho quảng cáo.</string>
     <string name="ui_a11y_asks">Trước mọi việc gửi, đăng, mua hoặc xóa, Buddy đều hỏi bạn đồng ý. Bạn có thể tắt dịch vụ này bất cứ lúc nào trong cài đặt hỗ trợ tiếp cận của Android.</string>
     <string name="ui_privacy_policy">Chính sách quyền riêng tư</string>
@@ -994,7 +994,7 @@
     <string name="signin_token">Dùng token</string>
     <string name="signin_token_title">Token Claude Code</string>
     <string name="signin_token_info">Dán token mà lệnh “claude setup-token” in ra trên máy tính; token bắt đầu bằng sk-ant-oat. Token này đủ cho các cuộc trò chuyện. Nhập bằng giọng nói và Remote Control cần đăng nhập đầy đủ.</string>
-    <string name="signin_token_wrong">Đây không phải token Claude Code. Khóa API (sk-ant-api…) thì nhập trong Cài đặt → Tác nhân và mô hình → Khóa API.</string>
+    <string name="signin_token_wrong">Đây không phải token Claude Code. Khóa API (sk-ant-api…) thì nhập trong Cài đặt → Tác nhân và mô hình → Thêm kết nối.</string>
     <string name="signin_token_on">Đã đăng nhập bằng token: đủ cho các cuộc trò chuyện. Nhập bằng giọng nói và Remote Control cần đăng nhập đầy đủ.</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <string name="signin_other_device">Đăng nhập trên thiết bị khác</string>
@@ -1193,9 +1193,9 @@
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">Cài đặt</string>
-    <string name="setup_settings_subtitle">Buddy chạy Claude Code, Codex, OpenCode, Antigravity hoặc Grok ngay trong ứng dụng, bằng gói của chính bạn (hoặc các mô hình miễn phí của OpenCode và gói miễn phí của Antigravity).</string>
+    <string name="setup_settings_subtitle">Buddy chạy Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot hoặc Pi ngay trong ứng dụng, bằng gói của chính bạn (hoặc các mô hình miễn phí của OpenCode và gói miễn phí của Antigravity).</string>
     <string name="settings_agents">Tác nhân và mô hình</string>
-    <string name="settings_agents_sub">Tác nhân mặc định, đăng nhập, khóa API, mô hình mặc định, GitHub, máy chủ tải xuống</string>
+    <string name="settings_agents_sub">Cuộc trò chuyện mới dùng gì, những gì đã kết nối, thêm gói, khóa hoặc mô hình, GitHub, máy chủ tải xuống</string>
     <string name="settings_bubble">Bong bóng và trò chuyện</string>
     <string name="settings_bubble_sub">Hiện bong bóng, chạm vào sẽ làm gì, kích thước bảng</string>
     <string name="settings_voice_sub">Nhập và xuất giọng nói, ngôn ngữ, giọng nói trực tiếp, đọc to câu trả lời</string>
@@ -1309,7 +1309,7 @@
     <!-- Which AI agent answers new chats. -->
     <string name="setup_default_brain">Agent mặc định</string>
     <!-- "New chat" is the name of a button in Buddy. -->
-    <string name="setup_default_brain_info">Agent trả lời các cuộc trò chuyện mới từ bong bóng hoặc nút Trò chuyện mới. Claude Code dùng gói Claude của bạn, Codex dùng gói ChatGPT, Antigravity dùng tài khoản Google, Grok dùng tài khoản Grok, OpenCode dùng mô hình miễn phí hoặc nhà cung cấp riêng của bạn. Chỉ chọn được những agent đã thiết lập.</string>
+    <string name="setup_default_brain_info">Agent trả lời các cuộc trò chuyện mới từ bong bóng hoặc nút Trò chuyện mới. Claude Code dùng gói Claude của bạn, Codex dùng gói ChatGPT, Antigravity dùng tài khoản Google, Grok dùng tài khoản Grok, Copilot dùng gói GitHub Copilot, Pi dùng gói hoặc khóa API bạn kết nối với nó, OpenCode dùng mô hình miễn phí hoặc nhà cung cấp riêng của bạn. Chỉ chọn được những agent đã thiết lập.</string>
     <!-- Toast. %1$s = agent name. "New chat" is the name of a button in Buddy. -->
     <string name="setup_default_brain_set">Các cuộc trò chuyện mới sẽ dùng %1$s. Bạn có thể chọn cho từng cuộc trò chuyện bằng nút Trò chuyện mới.</string>
     <!-- Toast. %1$s = agent name. -->
@@ -1324,8 +1324,7 @@
     <!-- %1$s = the account's email address. -->
     <string name="setup_agent_signed_in_email">đã đăng nhập · %1$s</string>
     <string name="setup_agent_not_signed_in">chưa đăng nhập</string>
-    <string name="setup_agent_api_key">chưa đăng nhập · khóa API</string>
-    <string name="signin_key_only">Đang dùng khóa API</string>
+    <string name="signin_key_only">Đang chạy bằng một dịch vụ</string>
 
     <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
     <string name="setup_phone_tools">Công cụ điện thoại trong phiên của riêng bạn</string>
@@ -1524,7 +1523,7 @@
     <string name="terminal_close">Đóng</string>
     <!-- Button (verb): starts a new shell. -->
     <string name="terminal_restart">Khởi động lại</string>
-    <string name="terminal_needs_linux">Hãy cài Claude Code, Codex, OpenCode, Antigravity hoặc Grok trong Cài đặt trước: việc đó sẽ thiết lập Linux của Buddy.</string>
+    <string name="terminal_needs_linux">Hãy cài Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot hoặc Pi trong Cài đặt trước: việc đó sẽ thiết lập Linux của Buddy.</string>
     <!-- %1$s = error message. -->
     <string name="terminal_start_failed">Không khởi động được terminal: %1$s</string>
     <!-- Sheet title. %1$s = the tab's name, e.g. "shell 1". -->
@@ -1552,7 +1551,7 @@
 
     <!-- Sessions screen: every agent session running on the phone, and recent history. -->
     <string name="monitor_title">Phiên</string>
-    <string name="monitor_subtitle">Mọi phiên Claude Code, Codex, OpenCode, Antigravity và Grok trên điện thoại này.</string>
+    <string name="monitor_subtitle">Mọi phiên Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot và Pi trên điện thoại này.</string>
     <string name="monitor_terminal_running">Một shell đang chạy · nhấn để quay lại</string>
     <string name="monitor_terminal_idle">Một shell trong Linux của Buddy</string>
     <string name="monitor_running_now">Đang chạy</string>
@@ -1613,7 +1612,7 @@
     <!-- Toast when the user picks a reviewer that isn't signed in. %1$s = Claude Code or Codex. -->
     <string name="perms_reviewer_sign_in">Hãy đăng nhập %1$s trước (Cài đặt).</string>
     <!-- Under the reviewer choice. “allow”, “ask you” and “advise against” are the reviewer's three possible answers. -->
-    <string name="perms_reviewer_about">Một phiên tạm thời cho mỗi lần nhấn, không có công cụ: nó xem yêu cầu của bạn, ghi chú của agent và màn hình, rồi trả lời cho phép, hỏi bạn, hoặc khuyên không nên. Khoảng 3 giây mỗi lần nhấn. Các cuộc trò chuyện OpenCode, Antigravity và Grok được Claude Code (hoặc Codex) kiểm duyệt.</string>
+    <string name="perms_reviewer_about">Một phiên tạm thời cho mỗi lần nhấn, không có công cụ: nó xem yêu cầu của bạn, ghi chú của agent và màn hình, rồi trả lời cho phép, hỏi bạn, hoặc khuyên không nên. Khoảng 3 giây mỗi lần nhấn. Các cuộc trò chuyện OpenCode, Antigravity, Grok, Copilot và Pi được Claude Code (hoặc Codex) kiểm duyệt.</string>
     <!-- Under the reviewer's description: it also does the check before a notification rule's countdown. -->
     <string name="perms_reviewer_rules">Nó cũng kiểm tra câu trả lời trước khi bộ đếm ngược của quy tắc thông báo gửi đi.</string>
     <!-- In the reviewer's model picker, the first choice ("Default") described: for Claude Code it is Haiku. -->
@@ -2119,16 +2118,10 @@
     <string name="setup_help_info">Hướng dẫn sử dụng Buddy, trên GitHub. Bạn cũng có thể hỏi bất kỳ agent nào về cách Buddy hoạt động.</string>
     <string name="signin_api_key">Dùng khóa API thay vào đó</string>
     <string name="signin_api_base_bad">Nhập địa chỉ bắt đầu bằng https:// (hoặc http:// trên điện thoại này hay mạng riêng của bạn)</string>
-    <string name="account_plan_api_key_at">Khóa API · %1$s</string>
+    <string name="account_plan_api_key_at">Chạy bằng %1$s</string>
     <string name="models_via">%1$s qua %2$s</string>
-    <string name="signin_api_keys">Khóa API</string>
-    <string name="api_keys_title">Khóa API</string>
-    <string name="api_keys_row_none">Mô hình của dịch vụ khác, bằng khóa của bạn</string>
-    <string name="api_keys_intro">Dùng mô hình của dịch vụ khác với Claude Code, Codex và OpenCode, bên cạnh gói của bạn hoặc thay cho chúng. Mỗi cuộc trò chuyện chọn mô hình trong bảng mô hình của nó. Chi phí khi dùng khóa được tính vào tài khoản của khóa đó. Khóa được lưu mã hóa trên điện thoại này và không bao giờ tới tay agent: Buddy tự thêm khóa vào từng yêu cầu.</string>
-    <string name="api_keys_none">Chưa có khóa API nào.</string>
-    <string name="api_keys_add">Thêm khóa API</string>
-    <string name="api_keys_models">%1$s · %2$d mô hình</string>
-    <string name="api_keys_for">Cho %1$s</string>
+    <string name="signin_api_keys">Dịch vụ đã lưu trong Buddy</string>
+    <string name="api_keys_add">Thêm dịch vụ</string>
     <string name="api_keys_use">Dùng dịch vụ này</string>
     <string name="api_keys_use_info">Tắt: khóa vẫn được lưu, nhưng không cuộc trò chuyện hay tác nhân nào dùng nó.</string>
     <string name="api_keys_off">Tắt</string>
@@ -2172,16 +2165,15 @@
     <string name="api_keys_key_keep_hint">Khóa API (để trống để giữ nguyên)</string>
     <string name="api_keys_anthropic_hint">Địa chỉ kiểu Anthropic</string>
     <string name="api_keys_openai_hint">Địa chỉ kiểu OpenAI</string>
-    <string name="api_keys_addresses_info">Claude Code dùng địa chỉ kiểu Anthropic. Codex dùng địa chỉ kiểu OpenAI, khi dịch vụ có Responses API của OpenAI. OpenCode dùng loại nào cũng được. Để trống địa chỉ nếu dịch vụ không có.</string>
+    <string name="api_keys_addresses_info">Claude Code dùng địa chỉ kiểu Anthropic. Codex dùng địa chỉ kiểu OpenAI, khi dịch vụ có Responses API của OpenAI. OpenCode và Pi dùng loại nào cũng được. Để trống địa chỉ nếu dịch vụ không có.</string>
     <string name="api_keys_check">Kiểm tra ngay</string>
     <string name="api_keys_check_info">Không bắt buộc: gửi một yêu cầu kiểm tra rất nhỏ, có thể tốn một chút rất nhỏ tín dụng API.</string>
     <string name="api_keys_check_ok">%1$s: hoạt động.</string>
-    <string name="api_keys_check_chat">%1$s: dùng được với OpenCode, nhưng không có Responses API nên không dùng được với Codex.</string>
+    <string name="api_keys_check_chat">%1$s: dùng được với OpenCode và Pi, nhưng không có Responses API nên không dùng được với Codex.</string>
     <string name="api_keys_check_none">%1$s: không có phản hồi ở địa chỉ này. %2$s</string>
     <string name="api_keys_check_unsure">%1$s: không có câu trả lời rõ ràng. %2$s</string>
     <string name="api_keys_service">Dịch vụ</string>
-    <string name="api_keys_custom">Tùy chỉnh</string>
-    <string name="setup_step_signin_key_mismatch">Khóa API của bạn (%2$s) không dùng được với %1$s. Khóa dùng được với %3$s.</string>
+    <string name="setup_step_signin_key_mismatch">Các dịch vụ của bạn (%2$s) không dùng được với %1$s. Chúng dùng được với %3$s.</string>
     <string name="setup_step_signin_free">Không có tài khoản? OpenCode có các mô hình miễn phí và không cần đăng nhập.</string>
     <string name="setup_use_agent">Dùng %1$s</string>
     <string name="api_keys_save">Lưu</string>
@@ -2192,7 +2184,6 @@
     <string name="api_keys_remove">Gỡ</string>
     <string name="api_keys_remove_title">Gỡ %1$s?</string>
     <string name="api_keys_remove_text">Khóa của dịch vụ này sẽ bị xóa khỏi điện thoại. Các cuộc trò chuyện dùng mô hình của nó sẽ quay về Mặc định.</string>
-    <string name="api_keys_choose">Mô hình trong danh sách chọn: %1$d/%2$d</string>
     <string name="api_keys_choose_title">Mô hình %1$s</string>
     <string name="api_keys_choose_info">Chọn những mô hình mà cuộc trò chuyện sẽ đưa ra. Nếu không chọn mô hình nào thì dùng tất cả.</string>
     <string name="api_keys_choose_search">Tìm kiếm</string>
@@ -2259,12 +2250,12 @@
     <string name="hub_compacting">Đang thu gọn cuộc trò chuyện…</string>
     <string name="hub_compacted">Đã thu gọn cuộc trò chuyện: %1$s → %2$s token</string>
     <string name="signin_api_models_none">Dịch vụ không liệt kê mô hình nào.</string>
-    <string name="setup_step_signin_api_key">Hoặc dùng khóa API: Cài đặt → Tác nhân và mô hình → Khóa API.</string>
+    <string name="setup_step_signin_api_key">Hoặc dùng khóa API hay máy chủ mô hình của riêng bạn: Cài đặt → Tác nhân và mô hình → Thêm kết nối.</string>
     <string name="setup_step_signin_others">%1$s là agent mặc định của bạn, nhưng các agent này đã sẵn sàng: %2$s. Đặt một trong số đó làm mặc định là Buddy chạy được ngay.</string>
     <string name="setup_switch_default">Đổi mặc định</string>
     <string name="setup_switch_default_title">Agent mặc định</string>
-    <string name="signin_api_key_on">%1$s chạy bằng khóa API của bạn: chọn mô hình trong bảng mô hình của cuộc trò chuyện, hoặc mặc định của nó trong mục Khóa API.</string>
-    <string name="signin_api_key_on_plan">Các cuộc trò chuyện cũng có thể dùng mô hình từ khóa API của bạn (chọn trong bảng mô hình của cuộc trò chuyện). Giọng nói và các tính năng khác của gói vẫn dùng gói của bạn.</string>
+    <string name="signin_api_key_on">%1$s chạy bằng các dịch vụ đã lưu trong Buddy: chọn mô hình trong bảng mô hình của cuộc trò chuyện, hoặc mặc định của nó trong Cài đặt → Tác nhân và mô hình.</string>
+    <string name="signin_api_key_on_plan">Các cuộc trò chuyện cũng có thể dùng mô hình của các dịch vụ đã lưu trong Buddy (chọn trong bảng mô hình của cuộc trò chuyện). Giọng nói và các tính năng khác của gói vẫn dùng gói của bạn.</string>
     <string name="fdroid_download_note">Các tệp này tải trực tiếp từ nhà phát triển, không phải từ F-Droid, nên F-Droid chưa kiểm tra chúng.</string>
     <string name="api_keys_local_info">Với máy chủ của riêng bạn (Ollama, LM Studio, llama.cpp): để trống khóa API. Nếu chạy trên PC, hãy thay localhost bằng địa chỉ của PC trong Wi-Fi, ví dụ http://192.168.1.20:11434/v1.</string>
     <string name="main_section_pinned">Đã ghim</string>
@@ -2455,4 +2446,494 @@
     <string name="hub_tool_sms_list">Đang đọc SMS</string>
     <string name="setup_face_too_big">Ảnh động này lớn hơn 16 MB nên bong bóng hiển thị nó như ảnh tĩnh.</string>
     <string name="background_older">Trình trợ giúp từ trước khi cập nhật vẫn đang chạy, nên các cuộc trò chuyện nền có thể vẫn hoạt động. Để khởi động cái mới, Buddy cần Gỡ lỗi không dây một lần: nhấn Khởi động ngay.</string>
+
+    <!-- Routines: tasks saved as their steps, done again without the agent (RoutinesActivity, the routine tool). -->
+    <string name="routines_title">Quy trình</string>
+    <string name="routines_row">Tác vụ đã lưu để làm lại trong vài giây</string>
+    <string name="routines_intro">Tác nhân có thể lưu một tác vụ đã làm thành quy trình: khi xong suôn sẻ, hãy bảo nó “lưu cái đó thành quy trình”. Quy trình làm lại đúng các bước đó trong vài giây, không cần tác nhân, và thẻ phê duyệt vẫn hiện ra. Chữ nó gõ là một ô trống bạn điền mỗi lần.</string>
+    <string name="routines_none">Chưa có quy trình nào.</string>
+    <string name="routines_blanks">Ô trống: %1$s</string>
+    <string name="routines_last_run">Đã chạy %1$s</string>
+    <string name="routines_stopped_at">dừng ở bước %1$d</string>
+    <string name="routines_card_waiting">Có một thẻ đang chờ bạn trả lời: quy trình sẽ bắt đầu khi bạn trả lời xong.</string>
+    <string name="routines_hidden">Chạy trên màn hình ẩn</string>
+    <string name="routines_hidden_info">Quy trình bắt đầu từ đây chạy trên màn hình riêng, nên bạn vẫn dùng điện thoại được. Thẻ và câu hỏi vẫn hiện cho bạn.</string>
+    <string name="routines_run">Chạy</string>
+    <string name="routines_running">Đang chạy…</string>
+    <string name="routines_delete">Xóa</string>
+    <string name="routines_delete_title">Xóa “%1$s”?</string>
+    <string name="routines_delete_text">Các bước của nó sẽ mất hẳn. Tác nhân có thể lưu lại vào lần khác.</string>
+    <string name="routines_step_open">Mở %1$s</string>
+    <string name="routines_step_tap">Chạm %1$s</string>
+    <string name="routines_step_hold">Nhấn giữ %1$s</string>
+    <string name="routines_step_type">Gõ %1$s%2$s</string>
+    <string name="routines_step_scroll">Cuộn</string>
+    <string name="routines_step_swipe">Vuốt</string>
+    <string name="routines_step_back">Nhấn Quay lại</string>
+    <string name="routines_step_press">Nhấn một nút</string>
+    <string name="routines_step_find">Cuộn tới “%1$s”</string>
+    <string name="routines_step_wait">Chờ</string>
+    <string name="routines_blanks_info">Lần này nó nên gõ gì?</string>
+    <string name="routines_blanks_need">Hãy điền mọi ô trống.</string>
+    <string name="routines_need_access">Dịch vụ hỗ trợ tiếp cận của Buddy đang tắt nên nó không dùng được màn hình.</string>
+    <string name="routines_done_title">“%1$s” đã xong</string>
+    <string name="routines_done_text">Mọi bước đều thành công.</string>
+    <string name="routines_stopped_title">“%1$s” đã dừng</string>
+    <string name="routines_finish">Nhờ tác nhân làm nốt</string>
+    <string name="routine_saved_note">Đã lưu quy trình “%1$s” (Cài đặt → Quy trình)</string>
+    <string name="activity_routine">Đang làm “%1$s”</string>
+    <string name="hub_tool_routine">Đang xem quy trình</string>
+    <string name="hub_tool_routine_run">Đang chạy “%1$s”</string>
+    <string name="hub_tool_routine_save">Đang lưu quy trình “%1$s”</string>
+    <string name="tool_routine">Quy trình</string>
+    <string name="tool_routine_info">Lưu các bước của một tác vụ và làm lại mà không cần nghĩ lại</string>
+    <plurals name="routines_steps">
+        <item quantity="other">%d bước</item>
+    </plurals>
+    <plurals name="routines_row_saved">
+        <item quantity="other">%d quy trình</item>
+    </plurals>
+
+    <!-- Files for Linux tools (#76): any size, straight into the chat's folder in Buddy's Linux. -->
+    <string name="linux_file_sending">Đang gửi %1$s tới công cụ Linux</string>
+    <string name="linux_file_progress">%1$s / %2$s</string>
+    <string name="linux_file_done">%1$s, %2$s → %3$s</string>
+    <string name="linux_file_not_sent">%1$s chưa được gửi tới công cụ Linux.</string>
+    <string name="linux_file_cancelled">Đã dừng gửi %1$s tới công cụ Linux. Phần đã chép đã bị xóa.</string>
+    <string name="linux_file_no_room">%1$s chưa được gửi tới công cụ Linux: cần %2$s, điện thoại còn trống %3$s.</string>
+    <string name="linux_file_full">%1$s chưa được gửi tới công cụ Linux: điện thoại hết dung lượng. Phần đã chép đã bị xóa.</string>
+    <string name="linux_file_write_failed">%1$s chưa được gửi tới công cụ Linux: %2$s. Phần đã chép đã bị xóa.</string>
+    <string name="linux_file_gone">%1$s chưa được gửi tới công cụ Linux: tệp biến mất khi đang đọc (ứng dụng nguồn đã đóng hoặc tệp bị chuyển đi). Phần đã chép đã bị xóa.</string>
+    <string name="share_linux_title">Quá lớn để đính kèm</string>
+    <string name="share_linux_text">%1$s: lớn hơn giới hạn 25 MB của tệp đính kèm. Gửi thẳng vào thư mục của cuộc trò chuyện này trong Linux của Buddy thay vào đó? Tác nhân nhận đường dẫn, cho các công cụ như unzip.</string>
+    <string name="share_linux_send">Gửi tới Linux</string>
+    <string name="chat_linux_files_keep">Giữ tệp đã gửi tới công cụ Linux sau cuộc trò chuyện</string>
+    <string name="chat_linux_files_keep_info">Khi xóa cuộc trò chuyện, chúng chuyển sang ~/.buddy/work/incoming thay vì bị xóa theo</string>
+    <plurals name="linux_file_more">
+        <item quantity="other">còn %1$d đang chờ</item>
+    </plurals>
+
+    <!-- 2.4.0: Other devices, Computers over SSH, the running command sheet, set up what's missing, scheduled tasks on events, mute apps on hidden screens. -->
+    <string name="web_title">Thiết bị khác</string>
+    <string name="web_row">Cuộc trò chuyện và thẻ của bạn trong trình duyệt trên máy tính</string>
+    <string name="web_intro">Cuộc trò chuyện và thẻ duyệt của bạn trong trình duyệt trên máy tính hoặc một điện thoại khác. Không cần tài khoản, không cần máy chủ: kết nối đi thẳng đến điện thoại này qua Tailscale. Thiết bị đã ghép nối có thể đọc cuộc trò chuyện, gửi tin nhắn và trả lời thẻ, nhưng không trả lời được thẻ về tiền (thanh toán, mua hàng, ứng dụng tài chính) hay thẻ cho phép thiết bị vào: những thẻ đó vẫn ở trên điện thoại. Thiết bị đó không dùng được màn hình điện thoại.</string>
+    <string name="web_switch">Cho thiết bị đã ghép nối vào</string>
+    <string name="web_switch_info">Tắt: không thiết bị nào mở được trang, dù đã ghép nối hay chưa.</string>
+    <string name="web_screens_switch">Màn hình trên thiết bị đã ghép nối</string>
+    <string name="web_screens_info">Thiết bị đã ghép nối có thể xem màn hình điện thoại và các màn hình ẩn nơi agent làm việc. Chỉ để xem, và không bao giờ khi một ứng dụng tiền ở phía trước.</string>
+    <string name="web_address_label">Mở địa chỉ này trên thiết bị kia</string>
+    <string name="web_no_tailscale">Tailscale chưa kết nối trên điện thoại này. Hãy bật lên, đăng nhập cùng tài khoản với thiết bị kia.</string>
+    <string name="web_copy">Sao chép địa chỉ</string>
+    <string name="web_copied">Đã sao chép địa chỉ</string>
+    <string name="web_devices_title">Thiết bị đã ghép nối</string>
+    <string name="web_none">Chưa có.</string>
+    <string name="web_device_seen">Lần cuối thấy %1$s</string>
+    <string name="web_remove">Gỡ</string>
+    <string name="web_remove_title">Gỡ “%1$s”?</string>
+    <string name="web_remove_text">Thiết bị này không mở được cuộc trò chuyện của bạn nữa. Nó chỉ ghép nối lại được khi bạn đồng ý trên điện thoại.</string>
+    <string name="web_pair_how">Để thêm thiết bị, mở địa chỉ trên thiết bị đó và nhấn “Pair”. Bạn duyệt nó ở đây, trên một thẻ hiện cùng mã.</string>
+    <string name="web_card_pair">“%1$s” muốn xem cuộc trò chuyện của bạn và trả lời thẻ duyệt. Cùng mã trên màn hình đó: %2$s (từ %3$s)</string>
+    <string name="web_card_computer">Thêm máy tính “%1$s” (%2$s)? Agent sẽ có thể chạy lệnh trên đó; mỗi lệnh vẫn hiện trên một thẻ trước.</string>
+    <string name="web_device_unnamed">Một trình duyệt</string>
+    <plurals name="web_row_paired">
+        <item quantity="other">Đã ghép nối %d thiết bị</item>
+    </plurals>
+    <string name="computers_title">Máy tính mà tác nhân có thể làm việc</string>
+    <string name="computers_intro">Tác nhân chạy lệnh trên máy tính của chính bạn qua SSH, như bạn làm trong terminal. Lệnh hiện trên một thẻ trước.</string>
+    <string name="computers_mode_each">Hỏi trước mỗi lệnh</string>
+    <string name="computers_remove_text">Tác nhân không truy cập được máy đó nữa. Khóa của Buddy vẫn ở trong authorized_keys của máy cho đến khi bạn tự xóa ở đó.</string>
+    <string name="computers_add">Thêm máy tính</string>
+    <string name="computers_need_linux">Để thêm máy tính cần Công cụ Linux của Buddy: hãy cài trong Cài đặt trước.</string>
+    <string name="computers_name">Tên</string>
+    <string name="computers_name_default">Máy tính của tôi</string>
+    <string name="computers_host">Địa chỉ (tên Tailscale hoặc IP)</string>
+    <string name="computers_user">Người dùng trên máy đó</string>
+    <string name="computers_port">Cổng SSH</string>
+    <string name="computers_key_info">Thêm dòng này vào ~/.ssh/authorized_keys của máy tính (trên Windows: bật OpenSSH Server, rồi dùng cùng tệp trong thư mục người dùng, hoặc administrators_authorized_keys cho tài khoản quản trị):</string>
+    <string name="computers_key_making">Đang tạo khóa của Buddy…</string>
+    <string name="computers_key_failed">Buddy không tạo được khóa: %1$s</string>
+    <string name="computers_copy_key">Sao chép khóa</string>
+    <string name="computers_key_copied">Đã sao chép khóa</string>
+    <string name="computers_check_add">Kiểm tra và thêm</string>
+    <string name="computers_fill_in">Điền tên, địa chỉ và người dùng.</string>
+    <string name="computers_checking">Đang kiểm tra xem máy tính có cho Buddy vào không…</string>
+    <string name="computers_check_failed">Máy không cho Buddy vào:\n%1$s</string>
+    <string name="computers_added">Đã thêm %1$s</string>
+    <string name="tools_card_computer">Chạy trên %1$s:\n%2$s</string>
+    <string name="activity_computer">Trên %1$s</string>
+    <string name="hub_tool_computer">Trên %1$s: %2$s</string>
+    <string name="tool_run_on_computer">Lệnh trên máy tính của bạn</string>
+    <string name="tool_run_on_computer_info">Chạy lệnh trên các máy tính bạn thêm trong Thiết bị khác, qua SSH</string>
+    <string name="cmd_sheet_title">Đang chạy</string>
+    <string name="cmd_sheet_command">Lệnh</string>
+    <string name="cmd_sheet_running_for">Thời gian chạy %1$s</string>
+    <string name="cmd_sheet_started">Bắt đầu %1$s trước. Tiến trình của nó không có trong danh sách bên dưới: có thể nó đã kết thúc.</string>
+    <string name="cmd_sheet_no_command">%1$s hiện không chạy lệnh nào.</string>
+    <string name="cmd_sheet_ended">Cuộc trò chuyện này hiện không làm việc.</string>
+    <string name="cmd_sheet_processes">Đang chạy dưới %1$s</string>
+    <string name="cmd_sheet_loading">Đang tìm…</string>
+    <string name="cmd_sheet_no_agent">%1$s hiện không chạy trong Linux của Buddy.</string>
+    <string name="cmd_sheet_none">Hiện không có gì chạy dưới %1$s.</string>
+    <string name="cmd_sheet_proc_line">pid %1$d · thời gian chạy %2$s · CPU %3$s</string>
+    <string name="cmd_sheet_proc_line_idle">pid %1$d · thời gian chạy %2$s</string>
+    <string name="cmd_sheet_output_note">Kết quả của lệnh không hiện ở đây: %1$s nhận được khi lệnh kết thúc.</string>
+    <string name="cmd_sheet_stop">Dừng lệnh này</string>
+    <string name="cmd_sheet_stop_one">Dừng</string>
+    <string name="cmd_sheet_stop_title">Dừng tiến trình này?</string>
+    <string name="cmd_sheet_stop_text">Nó dừng cùng những gì nó đã khởi chạy. %1$s vẫn tiếp tục làm việc và thấy lệnh bị lỗi.</string>
+    <string name="cmd_sheet_done">Lệnh này đã kết thúc.</string>
+    <string name="walk_button">Thiết lập phần còn thiếu (%1$d)</string>
+    <string name="walk_step">%1$s (%2$d/%3$d): cho phép, rồi quay lại Buddy</string>
+    <string name="walk_all_set">Đã xong hết</string>
+    <string name="walk_left_title">Vẫn còn thiếu</string>
+    <string name="walk_left_text">Những quyền này vẫn tắt: %1$s. Buddy vẫn chạy được khi thiếu chúng, nhưng làm được ít hơn.</string>
+    <string name="walk_again">Làm lại từng bước</string>
+    <string name="walk_notify">Thông báo</string>
+    <string name="walk_exact">Chuông báo và lời nhắc</string>
+    <string name="event_charger_on">Đã cắm sạc</string>
+    <string name="event_charger_off">Đã rút sạc</string>
+    <string name="event_wifi_on">Đã kết nối Wi-Fi</string>
+    <string name="event_wifi_on_named">Đã kết nối Wi-Fi “%1$s”</string>
+    <string name="event_wifi_off">Đã ngắt Wi-Fi</string>
+    <string name="event_bt_on">Đã kết nối thiết bị Bluetooth</string>
+    <string name="event_bt_on_named">Đã kết nối “%1$s”</string>
+    <string name="event_unlock">Lần mở khóa đầu tiên trong ngày</string>
+    <string name="schedule_at_times">Vào giờ đã đặt</string>
+    <string name="schedule_events">Khi có sự kiện</string>
+    <string name="schedule_events_info">Tin nhắn cũng được gửi khi một trong các sự kiện này xảy ra, cách nhau ít nhất 10 phút.</string>
+    <string name="schedule_wifi_any">Mạng bất kỳ</string>
+    <string name="schedule_wifi_location">Cho phép vị trí để chọn mạng: Android chỉ cho các ứng dụng có quyền vị trí thấy tên Wi-Fi.</string>
+    <string name="schedule_wifi_named_note">Khi Buddy không đọc được tên mạng (vị trí đang tắt), mục này không chạy.</string>
+    <string name="schedule_bt_any">Thiết bị bất kỳ</string>
+    <string name="schedule_bt_allow">Cho phép Thiết bị ở gần: Android chỉ báo cho Buddy về thiết bị Bluetooth khi có quyền này.</string>
+    <string name="schedule_bt_none">Không có thiết bị đã ghép nối.</string>
+    <string name="schedule_cap">Số lần chạy từ sự kiện mỗi ngày</string>
+    <string name="schedule_cap_info">Tối đa chừng này lần, để Wi-Fi chập chờn không dùng hết hạn mức gói của bạn.</string>
+    <string name="schedule_cap_less">Ít hơn</string>
+    <string name="schedule_cap_more">Nhiều hơn</string>
+    <string name="schedule_need_start">Chọn một giờ hoặc một sự kiện.</string>
+    <string name="schedule_on_events">Chạy khi: %1$s</string>
+    <string name="schedule_events_today">Từ sự kiện hôm nay: %1$d/%2$d</string>
+    <string name="walk_bluetooth">Thiết bị ở gần</string>
+    <string name="walk_location">Vị trí</string>
+    <string name="background_mute">Tắt tiếng ứng dụng trên màn hình ẩn</string>
+    <string name="background_mute_info">Ứng dụng ở phía trước trên màn hình ẩn sẽ không phát ra âm thanh (ví dụ video tự phát), trừ khi nó cũng ở trên màn hình của bạn. Buddy trả lại âm thanh khi ứng dụng rời màn hình ẩn, và không bao giờ đụng đến ứng dụng mà bạn tự tắt tiếng. Cần trình trợ giúp đang chạy.</string>
+
+    <!-- Keep Wireless debugging on (DebugLock). -->
+    <string name="debug_lock">Giữ gỡ lỗi không dây luôn bật</string>
+    <string name="debug_lock_info">Khi điện thoại tắt nó, Buddy bật lại (khi có Wi-Fi), để trình trợ giúp luôn khởi động lại được.</string>
+    <string name="debug_lock_channel">Gỡ lỗi không dây</string>
+    <string name="debug_lock_off_title">Gỡ lỗi không dây đang tắt</string>
+    <string name="debug_lock_off_text">Điện thoại đã tắt nó và Buddy không bật lại được. Chế độ nền tạm dừng cho đến khi nó bật lại: chạm để khởi động.</string>
+
+    <!-- Copilot and Pi as agents: setup, sign-in, account and model strings. -->
+    <string name="onboarding_brain_copilot">Dùng gói GitHub Copilot của bạn (Copilot Free cũng được).</string>
+    <string name="onboarding_agent_sign_in_copilot">Đăng nhập bằng tài khoản GitHub: Buddy hiện một mã, bạn nhập mã đó trên trang của GitHub, và Buddy sẽ tự hoàn tất.</string>
+    <string name="onboarding_agent_download_copilot">Tải về khoảng 190 MB một lần (Linux của Buddy, Node.js và GitHub Copilot CLI).</string>
+    <string name="signin_install_sub_copilot">Chạy GitHub Copilot CLI bên trong Buddy bằng gói GitHub Copilot của bạn (Copilot Free cũng được).</string>
+    <string name="signin_install_size_copilot">Tải về khoảng 190 MB một lần: Linux của Buddy, Node.js và GitHub Copilot CLI. Sau khi cài đặt sẽ chiếm khoảng 300 MB. Hãy dùng Wi-Fi nếu được.</string>
+    <string name="signin_title_github">Đăng nhập GitHub</string>
+    <string name="signin_sub_copilot">Dùng tài khoản GitHub có Copilot của bạn. Buddy hiện một mã; nhập mã đó trên trang của GitHub và Buddy sẽ tự hoàn tất.</string>
+    <string name="signin_with_github">Đăng nhập bằng GitHub</string>
+    <string name="signin_remote_copilot">Mở liên kết tại đây hoặc trên bất kỳ thiết bị nào, đăng nhập GitHub và nhập mã. “Mở tại đây” sẽ sao chép mã giúp bạn. Buddy sẽ tự hoàn tất.</string>
+    <string name="signin_copilot_via_gh">Copilot dùng thông tin đăng nhập GitHub trong Cài đặt → Tác nhân và mô hình → GitHub. Để đăng xuất Copilot, hãy đăng xuất GitHub ở đó.</string>
+    <string name="account_tagline_copilot">Dùng gói GitHub Copilot của bạn</string>
+    <string name="models_default_copilot">Mô hình mặc định của Copilot</string>
+    <string name="setup_step_install_copilot">Buddy tải về Linux nhỏ của riêng nó và %1$s từ GitHub (khoảng 190 MB kèm Node.js).</string>
+    <string name="setup_step_signin_copilot">Bằng tài khoản GitHub của bạn. Buddy hiện một mã để nhập trên trang của GitHub, rồi tự hoàn tất.</string>
+    <string name="onboarding_brain_pi">Dùng gói Claude, ChatGPT hoặc GitHub Copilot của bạn, hoặc một khóa API, mà bạn kết nối trong màn hình riêng của Pi.</string>
+    <string name="onboarding_pi_provider">nhà cung cấp bạn kết nối với nó</string>
+    <string name="onboarding_agent_sign_in_pi">Kết nối một nhà cung cấp trong màn hình riêng của Pi: gõ /login ở đó rồi chọn gói của bạn hoặc một khóa API.</string>
+    <string name="onboarding_agent_download_pi">Tải về khoảng 220 MB một lần (Linux của Buddy, Node.js và Pi).</string>
+    <string name="signin_install_sub_pi">Chạy Pi bên trong Buddy bằng nhà cung cấp bạn kết nối: gói Claude, ChatGPT hoặc GitHub Copilot của bạn, hoặc một khóa API.</string>
+    <string name="signin_install_size_pi">Tải về khoảng 220 MB một lần: Linux của Buddy, Node.js và Pi. Hãy dùng Wi-Fi nếu được.</string>
+    <string name="signin_pi_ready">Pi đã sẵn sàng</string>
+    <string name="signin_pi_connected">Đã kết nối: %1$s. Chọn một mô hình cho từng cuộc trò chuyện bằng nút mô hình.</string>
+    <string name="signin_pi_connect_title">Kết nối nhà cung cấp</string>
+    <string name="signin_pi_connect_text">Pi không có mô hình riêng. Hãy kết nối gói Claude, ChatGPT hoặc GitHub Copilot của bạn, hoặc một khóa API, và Pi sẽ dùng nó.</string>
+    <string name="signin_pi_connect_note">Đăng nhập tại đây bằng gói Claude, ChatGPT hoặc GitHub Copilot. Với nhà cung cấp khác hoặc khóa API, màn hình của Pi sẽ mở: gõ %1$s ở đó. %2$s ở đó xóa một nhà cung cấp.</string>
+    <string name="account_tagline_pi">Dùng gói hoặc khóa API bạn kết nối</string>
+    <string name="models_default_pi">Mô hình mặc định của Pi</string>
+    <string name="setup_step_install_pi">Buddy tải về Linux nhỏ của riêng nó và %1$s (khoảng 220 MB kèm Node.js).</string>
+    <string name="setup_step_signin_pi">Kết nối một nhà cung cấp trong màn hình riêng của Pi (/login ở đó): gói Claude, ChatGPT hoặc GitHub Copilot của bạn, hoặc một khóa API.</string>
+
+    <!-- Agents and models (2.4.0): what new chats use, what's connected, Add a connection, Sign in with OpenRouter, one API service's screen. -->
+    <string name="agents_lead">Tác nhân nào làm việc cho bạn, và nó chạy trên gì.</string>
+    <string name="agents_new_chats">Cuộc trò chuyện mới dùng</string>
+    <string name="agents_model_default">Mô hình mặc định của nó</string>
+    <string name="agents_not_set_up">Chưa thiết lập</string>
+    <string name="agents_on_claude">Bằng gói Claude của bạn</string>
+    <string name="agents_on_chatgpt">Bằng gói ChatGPT của bạn</string>
+    <string name="agents_on_google">Bằng tài khoản Google của bạn</string>
+    <string name="agents_on_grok">Bằng tài khoản xAI của bạn</string>
+    <string name="agents_on_copilot">Bằng gói GitHub Copilot của bạn</string>
+    <string name="agents_on">Qua %1$s</string>
+    <string name="agents_change">Sửa</string>
+    <string name="agents_small">Kiểm tra an toàn dùng %1$s</string>
+    <string name="agents_small_info_cheap">Một mô hình rẻ hơn, do %1$s chạy.</string>
+    <string name="agents_small_info">Do %1$s chạy.</string>
+    <string name="agents_small_codex">Mô hình nhỏ của Codex</string>
+    <string name="agents_small_none">Kiểm tra an toàn cần Claude Code hoặc Codex</string>
+    <string name="agents_small_none_info">Chúng kiểm tra các ứng dụng đặt ở chế độ Thông minh. Hãy thiết lập một trong hai.</string>
+    <string name="agents_pick_title">Cuộc trò chuyện mới dùng</string>
+    <string name="agents_pick_set_up">Chưa thiết lập: chạm để thiết lập</string>
+    <string name="agents_connected">Đã kết nối</string>
+    <string name="agents_none_connected">Chưa kết nối gì.</string>
+    <string name="agents_claude_plan">Gói Claude</string>
+    <string name="agents_chatgpt_plan">Gói ChatGPT</string>
+    <string name="agents_google">Tài khoản Google</string>
+    <string name="agents_grok">Tài khoản xAI</string>
+    <string name="agents_copilot">GitHub Copilot</string>
+    <string name="agents_runs_in">Chạy trong %1$s</string>
+    <string name="agents_can_run_in">Có thể chạy trong %1$s</string>
+    <string name="agents_runs_in_lite">Chạy trong %1$s, chế độ nhẹ</string>
+    <string name="agents_on_phone">%1$s, trên điện thoại này</string>
+    <string name="agents_engine_missing">Thiếu bộ máy</string>
+    <string name="agents_cost_subscription">Gói đăng ký</string>
+    <string name="agents_cost_pay">Trả theo mức dùng</string>
+    <string name="agents_cost_free">Miễn phí</string>
+    <string name="agents_cost_free_or_plan">Miễn phí hoặc gói</string>
+    <string name="agents_cost_offline">Ngoại tuyến</string>
+    <string name="agents_cost_private">Riêng tư</string>
+    <string name="agents_see_what">Xem cần đổi gì</string>
+    <string name="agents_add">Thêm kết nối</string>
+    <string name="agents_installed">Tác nhân đã cài</string>
+    <string name="agents_not_installed">%1$s, chưa cài</string>
+    <string name="agents_installed_info">Đây là chương trình riêng của các tác nhân, chạy bên trong Buddy. Vì vậy gói Claude và ChatGPT của bạn dùng được ở đây.</string>
+    <string name="agents_more">Thêm</string>
+    <string name="agents_github_none">Chưa kết nối</string>
+    <plurals name="agents_defaults_set">
+        <item quantity="other">Đã đặt %1$d tác nhân</item>
+    </plurals>
+    <string name="conn_add_title">Thêm kết nối</string>
+    <string name="conn_free">Miễn phí</string>
+    <string name="conn_opencode_free">Mô hình miễn phí của OpenCode</string>
+    <string name="conn_google_sub">Đăng nhập bằng Google</string>
+    <string name="conn_or_free">Mô hình miễn phí của OpenRouter</string>
+    <string name="conn_claude_plan">Claude Pro hoặc Max</string>
+    <string name="conn_claude_plan_sub">Đăng nhập bằng Claude</string>
+    <string name="conn_chatgpt_plan">ChatGPT Plus hoặc Pro</string>
+    <string name="conn_chatgpt_plan_sub">Đăng nhập bằng ChatGPT</string>
+    <string name="conn_google_plan">Gói Google AI</string>
+    <string name="conn_supergrok">SuperGrok</string>
+    <string name="conn_supergrok_sub">Đăng nhập bằng tài khoản xAI của bạn</string>
+    <string name="conn_copilot">GitHub Copilot</string>
+    <string name="conn_copilot_sub">Đăng nhập bằng GitHub</string>
+    <string name="conn_pi">Gói của bạn, trong Pi</string>
+    <string name="conn_pi_sub">Claude, ChatGPT hoặc Copilot: đăng nhập từ màn hình riêng của Pi</string>
+    <string name="conn_pi_connected">Đã kết nối: %1$s</string>
+    <string name="conn_paste_key">Dán khóa</string>
+    <string name="conn_custom">Dịch vụ khác</string>
+    <string name="conn_custom_sub">Bất kỳ địa chỉ nào dùng định dạng của OpenAI hoặc Anthropic</string>
+    <string name="conn_custom_agents">Tùy địa chỉ của nó</string>
+    <string name="conn_signed_in">Đã đăng nhập</string>
+    <string name="conn_ready">Sẵn sàng</string>
+    <string name="conn_add_foot">Đăng nhập một gói sẽ cài tác nhân của gói đó trước nếu chưa có.</string>
+    <string name="conn_or_choice_info">Đăng nhập và OpenRouter tạo cho Buddy một khóa riêng: không cần sao chép gì. Hoặc dán khóa bạn đã tạo trên OpenRouter.</string>
+    <string name="conn_or_sign_in">Đăng nhập bằng OpenRouter</string>
+    <string name="conn_or_paste">Dán khóa</string>
+    <string name="conn_or_needs_service_title">Dịch vụ của Buddy đang tắt</string>
+    <string name="conn_or_needs_service">OpenRouter đưa bạn trở lại Buddy qua một địa chỉ trên điện thoại này, địa chỉ đó chỉ phản hồi khi dịch vụ hỗ trợ tiếp cận của Buddy đang bật. Hãy bật nó rồi thử lại, hoặc dán khóa thay thế.</string>
+    <string name="conn_or_busy">Đang lấy khóa từ OpenRouter…</string>
+    <string name="conn_or_page_done">Bạn có thể quay lại Buddy.</string>
+    <string name="conn_or_page_expired">Lần đăng nhập này đã hết hạn hoặc đã được dùng. Hãy bắt đầu lại trong Buddy.</string>
+    <string name="conn_or_failed">Đăng nhập OpenRouter thất bại: %1$s</string>
+    <string name="conn_or_no_free">OpenRouter vừa rồi không liệt kê mô hình miễn phí nào, nên bộ chọn hiện tất cả mô hình của nó. Mô hình miễn phí có đuôi “:free”.</string>
+    <string name="conn_status_signed_in">Đã đăng nhập</string>
+    <string name="conn_status_key">Đã lưu khóa</string>
+    <string name="conn_status_ready">Sẵn sàng</string>
+    <string name="conn_status_off">Đã tắt</string>
+    <string name="conn_status_checking">Đang kiểm tra…</string>
+    <string name="conn_status_failed">Không phản hồi</string>
+    <string name="conn_status_no_tools">Không dùng được công cụ</string>
+    <string name="conn_balance_left">Còn %1$s</string>
+    <string name="conn_free_left">Hôm nay còn %1$d yêu cầu tới mô hình miễn phí.</string>
+    <string name="conn_or_own_key">OpenRouter đã tạo cho Buddy một khóa riêng. Xóa nó trên trang Keys của OpenRouter để chặn Buddy.</string>
+    <string name="conn_checked">Đã kiểm tra khi bạn kết nối</string>
+    <string name="conn_checking">Đang kiểm tra…</string>
+    <string name="conn_not_checked">Chưa kiểm tra.</string>
+    <string name="conn_check_answers">Mô hình trả lời</string>
+    <string name="conn_check_tools">Nó gọi được công cụ, nên dùng được điện thoại</string>
+    <string name="conn_check_tools_failed">Nó không gọi công cụ khi được yêu cầu</string>
+    <string name="conn_no_tools_warning">%1$s đã trả lời, nhưng không gọi được công cụ khi Buddy thử. Như vậy nó không dùng được điện thoại.</string>
+    <string name="conn_check_fits">Công cụ và hướng dẫn của Buddy (khoảng %1$s token) vừa với bộ nhớ %2$s của nó. Prompt riêng của tác nhân còn cộng thêm vào.</string>
+    <string name="conn_check_fits_not">Chỉ riêng công cụ và hướng dẫn của Buddy (khoảng %1$s token) đã không vừa bộ nhớ %2$s của nó.</string>
+    <string name="conn_check_no_model">Nó không liệt kê mô hình nào để kiểm tra.</string>
+    <string name="conn_check_no_call">Nó trả lời bằng lời thay vì gọi công cụ.</string>
+    <string name="conn_checked_how">%1$s, hỏi theo cách của %2$s, %3$s</string>
+    <string name="conn_check_stale">Tác nhân hoặc mô hình đã thay đổi từ đó: hãy kiểm tra lại.</string>
+    <string name="conn_check_now">Kiểm tra ngay</string>
+    <string name="conn_check_again">Kiểm tra lại</string>
+    <string name="conn_check_cost">Hai yêu cầu rất nhỏ: tốn nhiều nhất một chút xíu tín dụng API.</string>
+    <string name="conn_runs_in">Chạy trong</string>
+    <string name="conn_runs_in_info">Các tác nhân được đánh dấu dùng dịch vụ này cho các cuộc trò chuyện ở Mặc định.</string>
+    <string name="conn_runs_in_keep">%1$s không có gói, nên các cuộc trò chuyện của nó cần một dịch vụ. Hãy chọn dịch vụ khác cho nó trong Mô hình mặc định.</string>
+    <string name="conn_models">Mô hình</string>
+    <string name="conn_for_chats">Cho cuộc trò chuyện</string>
+    <string name="conn_for_chats_title">Mô hình %1$s cho cuộc trò chuyện</string>
+    <string name="conn_edit">Địa chỉ và khóa</string>
+    <string name="conn_use_for_new">Dùng cho cuộc trò chuyện mới, trong %1$s</string>
+    <string name="conn_used_now">Cuộc trò chuyện mới đang dùng cái này, trong %1$s.</string>
+    <string name="conn_sign_out">Đăng xuất khỏi %1$s</string>
+    <string name="conn_sign_out_text">Khóa của nó bị xóa khỏi điện thoại này, và các cuộc trò chuyện dùng mô hình của nó quay về Mặc định. Khóa vẫn còn trên OpenRouter cho đến khi bạn xóa nó ở đó.</string>
+    <string name="conn_remove">Gỡ %1$s</string>
+
+    <!-- Pi's sign-in to a plan, without its own screen (PiSignIn). -->
+    <string name="signin_pi_with">Đăng nhập bằng %1$s</string>
+    <string name="signin_pi_other">Nhà cung cấp khác hoặc khóa API</string>
+    <string name="signin_pi_starting">Đang bắt đầu đăng nhập Pi…</string>
+    <string name="signin_pi_open_page">Mở trang đăng nhập</string>
+    <string name="signin_pi_paste_hint">Mã trang hiển thị</string>
+    <string name="signin_pi_send_code">Gửi mã</string>
+    <string name="signin_pi_enter_code">Nhập mã này trên trang (mã được sao chép khi bạn mở trang):</string>
+    <string name="signin_pi_copy_code">Đăng nhập trên trang, sao chép mã hiển thị rồi quay lại: Buddy sẽ lo phần còn lại.</string>
+    <string name="signin_pi_checking">Đang kiểm tra…</string>
+    <string name="signin_pi_signed_in">Pi đã đăng nhập bằng %1$s</string>
+    <string name="signin_pi_failed">Chưa đăng nhập:\n%1$s</string>
+    <string name="debug_lock_ask_title">Cho phép gỡ lỗi không dây trên Wi-Fi này</string>
+    <string name="debug_lock_ask_text">Điện thoại hỏi một lần cho mỗi điểm truy cập Wi-Fi (mạng mesh có nhiều điểm). Chạm vào đây, chọn “Luôn cho phép trên mạng này” rồi chạm Cho phép.</string>
+
+    <!-- Services (2.4.0): a service's optional key, its models shown in pickers, Pi and the services saved in Buddy. -->
+    <string name="api_keys_key_optional_hint">Khóa API (không bắt buộc)</string>
+    <string name="conn_shown">Hiện trong bộ chọn</string>
+    <string name="conn_shown_count">%1$d/%2$d</string>
+    <string name="signin_services_also">Các cuộc trò chuyện với %1$s cũng có thể dùng mô hình của các dịch vụ đã lưu trong Buddy: chọn một mô hình trong bảng mô hình của cuộc trò chuyện.</string>
+    <string name="chat_attach_files_linux_sub">PDF, tài liệu, bất cứ gì. Trên 25 MB, tệp đi thẳng vào công cụ Linux của cuộc trò chuyện này, mọi kích thước.</string>
+    <string name="chat_attach_big_to_linux">Quá lớn để đính kèm: đang gửi tới công cụ Linux của cuộc trò chuyện này. Khi tệp đã ở đó, hãy xem trong Tệp (tùy chọn trò chuyện).</string>
+    <string name="chat_attach_in_linux">Trong công cụ Linux</string>
+    <!-- Add a connection in tabs (2.4.0): Free, Plans, API keys, This phone, Servers. -->
+    <string name="ui_tab">%1$s, thẻ %2$d trên %3$d</string>
+    <string name="conn_tab_plans">Gói</string>
+    <string name="conn_tab_keys">Khóa API</string>
+    <string name="conn_tab_phone">Điện thoại</string>
+    <string name="conn_tab_servers">Máy chủ</string>
+    <string name="conn_free_lead">Các cách bắt đầu mà không phải trả tiền. Mỗi nhà cung cấp tự đặt giới hạn của mình và có thể thay đổi.</string>
+    <string name="conn_free_checked">Các dòng về giới hạn, thanh toán và quyền riêng tư lấy từ trang của chính từng nhà cung cấp, đọc vào tháng 11 năm 2026. Những điều đó do nhà cung cấp quyết định và có thể thay đổi.</string>
+    <string name="conn_open">Mở</string>
+    <string name="conn_fact_opencode_get">Một danh sách mô hình thay đổi theo thời gian, mỗi mô hình miễn phí trong thời gian giới hạn.</string>
+    <string name="conn_fact_opencode_account">Không cần tài khoản, không cần đăng nhập: dùng được ngay khi OpenCode được cài.</string>
+    <string name="conn_fact_opencode_privacy">Một số mô hình miễn phí lưu lại những gì bạn gửi và dùng để cải thiện mô hình. Trang Zen của OpenCode cho biết mô hình nào.</string>
+    <string name="conn_agy_free">Gói miễn phí của Antigravity</string>
+    <string name="conn_fact_agy_get">Gói $0 của Google, với hạn mức được nạp lại mỗi tuần. Khi chính Buddy dùng, nó dừng sau khoảng 300 yêu cầu và hoạt động lại sau khoảng một tuần. Google đặt hạn mức và có thể thay đổi.</string>
+    <string name="conn_fact_agy_account">Bạn đăng nhập bằng tài khoản Google.</string>
+    <string name="conn_fact_agy_privacy">Google dùng những gì bạn gửi để cải thiện sản phẩm của họ, và người ở Google có thể đọc. Đừng gửi bất cứ điều gì bí mật.</string>
+    <string name="conn_fact_or_get">Các mô hình có tên kết thúc bằng “:free”: 50 yêu cầu mỗi ngày, 20 mỗi phút. 1000 mỗi ngày khi tài khoản đã mua 10 tín dụng.</string>
+    <string name="conn_fact_or_account">Bạn đăng nhập từ trình duyệt: không có khóa nào phải sao chép.</string>
+    <string name="conn_fact_or_privacy">OpenRouter không lưu prompt của bạn trừ khi bạn tự bật tùy chọn đó. Nhà cung cấp mô hình miễn phí có thể dùng chúng để huấn luyện: cài đặt quyền riêng tư của bạn trên OpenRouter quyết định có dùng các nhà cung cấp đó hay không.</string>
+    <string name="conn_copilot_free">GitHub Copilot Free</string>
+    <string name="conn_fact_copilot_get">Gói miễn phí của GitHub gồm tác nhân dòng lệnh của Copilot, kèm một lượng tín dụng AI. Mô hình được chọn sẵn cho bạn.</string>
+    <string name="conn_fact_copilot_who">Chỉ dành cho tài khoản cá nhân không được một tổ chức cấp Copilot.</string>
+    <string name="conn_fact_copilot_privacy">GitHub có thể huấn luyện mô hình của họ bằng những gì bạn gửi. Việc đó tắt được bằng “Allow GitHub to use my data for AI model training” trong cài đặt Copilot của bạn trên GitHub.</string>
+    <string name="conn_gemini_free">Bậc miễn phí của Google AI Studio</string>
+    <string name="conn_fact_gemini_get">Một số mô hình Gemini, miễn phí trong giới hạn theo phút và theo ngày. Google AI Studio hiển thị giới hạn của bạn.</string>
+    <string name="conn_fact_gemini_card">Không cần tài khoản thanh toán: cái đó dành cho các bậc trả phí.</string>
+    <string name="conn_fact_gemini_privacy">Google dùng những gì bạn gửi để cải thiện sản phẩm của họ, và người đánh giá có thể đọc: đừng gửi gì mang tính cá nhân hay bí mật. Ở EEA, Thụy Sĩ và Vương quốc Anh, điều khoản trả phí được áp dụng, và dữ liệu không bị dùng theo cách đó.</string>
+    <string name="conn_fact_gemini_region">Chỉ ở những quốc gia Google liệt kê cho Gemini API.</string>
+    <string name="conn_plans_lead">Đăng nhập bằng gói bạn đang trả tiền: không cần khóa API và không thêm hóa đơn thứ hai.</string>
+    <string name="conn_keys_lead">Một khóa từ dịch vụ tính tiền theo mức dùng, vào tài khoản của khóa đó. Buddy lưu khóa được mã hóa trên điện thoại, và các tác nhân không bao giờ thấy chúng.</string>
+    <string name="conn_keys_many">Nhiều mô hình sau một khóa</string>
+    <string name="conn_keys_makers">Từ công ty làm ra mô hình</string>
+    <string name="conn_keys_fast">Nhanh</string>
+    <string name="conn_keys_other">Thứ khác</string>
+    <string name="conn_what_openrouter">Mô hình từ nhiều công ty trên một tài khoản. Đăng nhập hoặc dán khóa.</string>
+    <string name="conn_what_models">Mô hình %1$s</string>
+    <string name="conn_what_gemini">Mô hình Gemini. Có bậc miễn phí: xem Miễn phí.</string>
+    <string name="conn_what_fast">Một số mô hình chọn lọc, phục vụ để chạy nhanh</string>
+    <string name="conn_phone_lead">Mô hình chạy ngay trên điện thoại.</string>
+    <string name="conn_phone_private">Riêng tư: không gì rời khỏi điện thoại và hoạt động không cần internet.</string>
+    <string name="conn_phone_small">Mô hình nhỏ chậm hơn so với mô hình trực tuyến và hay sai ở việc có nhiều bước. Phù hợp nhất với yêu cầu một bước: pin, hẹn giờ, xem nhanh một ứng dụng.</string>
+    <string name="conn_phone_ram">Điện thoại này có %1$s bộ nhớ. Mô hình phải vừa trong đó cùng với mọi thứ khác đang mở.</string>
+    <string name="conn_servers_lead">Máy chủ mô hình bạn chạy trên máy tính hoặc trong mạng của mình.</string>
+    <string name="conn_servers_yours">Máy chủ của bạn</string>
+    <string name="conn_servers_title">Máy chủ mô hình của riêng bạn</string>
+    <string name="conn_servers_what">Bất kỳ máy chủ nào dùng định dạng của OpenAI: %1$s và các máy chủ khác.</string>
+    <string name="conn_servers_address">Nhập địa chỉ của nó và Buddy tải các mô hình nó cung cấp. Với máy chủ trên máy tính, đó là địa chỉ của máy tính trong mạng của bạn, không phải localhost.</string>
+    <string name="conn_servers_private">Riêng tư: những gì bạn gửi đi tới máy chủ của bạn và ở lại trong mạng của bạn.</string>
+    <string name="conn_servers_key">Không cần khóa, trừ khi máy chủ của bạn yêu cầu.</string>
+    <string name="conn_servers_start">Với địa chỉ thông thường đã điền sẵn:</string>
+    <string name="conn_servers_add">Thêm máy chủ</string>
+    <!-- Files (2.4.0): the browser of Buddy's Linux (Projects and a chat's own folders), its rows in Settings and in a chat's options. -->
+    <string name="files_title">Tệp</string>
+    <string name="files_row_info">Những gì có trong Linux của Buddy: tải lên tệp mọi kích thước, mở, chia sẻ hoặc xóa</string>
+    <string name="chat_files_row">Dự án và tệp của cuộc trò chuyện này trong Linux của Buddy</string>
+    <string name="chat_files_row_size">Dự án và tệp của cuộc trò chuyện này · đã gửi %1$s tới cuộc trò chuyện này</string>
+    <string name="files_intro">Những gì có trong Linux của Buddy, nơi các agent có công cụ Linux làm việc. Tải tệp lên một thư mục cho chúng, hoặc lấy ra những gì chúng đã tạo.</string>
+    <string name="files_projects">Không gian làm việc</string>
+    <string name="files_projects_info">Không gian làm việc của các agent, mỗi dự án một thư mục</string>
+    <string name="files_projects_shared_info">Cuộc trò chuyện này làm việc ở đây, như mọi cuộc trò chuyện không có thư mục dự án</string>
+    <string name="files_project_info">Dự án của cuộc trò chuyện này: agent của nó làm việc ở đây</string>
+    <string name="files_all_chats">Mọi cuộc trò chuyện</string>
+    <string name="files_project_here">Dự án của cuộc trò chuyện này: agent của nó bắt đầu trong thư mục này.</string>
+    <string name="files_project_hint">Cuộc trò chuyện này làm việc trong toàn bộ không gian làm việc. Để giữ nó trong một dự án, hãy mở menu của một thư mục và chọn “Đặt làm dự án của cuộc trò chuyện”.</string>
+    <string name="files_project_make">Đặt làm dự án của cuộc trò chuyện</string>
+    <string name="files_project_end">Không còn là dự án của cuộc trò chuyện này</string>
+    <string name="files_project_title">Làm việc trong “%1$s” ở cuộc trò chuyện này?</string>
+    <string name="files_project_none_title">Làm việc lại trong toàn bộ không gian làm việc?</string>
+    <string name="files_project_text">Từ tin nhắn tiếp theo của bạn, agent bắt đầu ở đó. Nó mở một cuộc hội thoại mới của riêng mình và nhận cuộc trò chuyện này đến giờ dưới dạng văn bản.</string>
+    <string name="files_project_yes">Làm việc ở đó</string>
+    <string name="files_project_set">Cuộc trò chuyện này giờ làm việc trong %1$s</string>
+    <string name="files_project_none_set">Cuộc trò chuyện này lại làm việc trong toàn bộ không gian làm việc</string>
+    <string name="chat_project">Thư mục dự án</string>
+    <string name="chat_project_none">Toàn bộ không gian làm việc</string>
+    <string name="chat_project_none_info">Dùng chung cho mọi cuộc trò chuyện không có thư mục dự án</string>
+    <string name="chat_project_info">Nơi agent của cuộc trò chuyện này bắt đầu và lưu công việc. Nhiều cuộc trò chuyện có thể cùng làm một dự án.</string>
+    <string name="chat_folder_busy">Cuộc trò chuyện đang làm việc. Hãy đổi thư mục dự án của nó khi xong.</string>
+    <string name="jump_to_end">Đến cuối</string>
+    <string name="models_pi_group">Qua đăng nhập %1$s của bạn</string>
+    <string name="models_opencode_free">Mô hình miễn phí của OpenCode</string>
+    <string name="files_this_chat">Cuộc trò chuyện này</string>
+    <string name="files_incoming">Đã gửi tới công cụ Linux</string>
+    <string name="files_incoming_info">Tệp cho công cụ của agent, mọi kích thước</string>
+    <string name="files_attachments">Tệp đính kèm</string>
+    <string name="files_attachments_info">Bản sao những gì bạn đã đính kèm, đúng như agent nhận được</string>
+    <string name="files_upload">Tải tệp lên</string>
+    <string name="files_new_folder">Thư mục mới</string>
+    <string name="files_create">Tạo</string>
+    <string name="files_name_hint">Tên</string>
+    <string name="files_bad_name">Tên không được để trống, không được là “.” hay “..”, và không được chứa dấu gạch chéo.</string>
+    <string name="files_menu">Thêm</string>
+    <string name="files_show_hidden">Hiện tệp ẩn</string>
+    <string name="files_show_hidden_info">Tệp và thư mục có tên bắt đầu bằng dấu chấm</string>
+    <string name="files_empty">Chưa có gì ở đây.</string>
+    <plurals name="files_hidden_count">
+        <item quantity="other">%1$d mục ẩn không được hiển thị.</item>
+    </plurals>
+    <string name="files_show_more">Hiện thêm (còn %1$d)</string>
+    <string name="files_list_failed">Không thể hiển thị thư mục này: %1$s</string>
+    <string name="files_link">Liên kết tới %1$s</string>
+    <string name="files_link_info">Một liên kết được tạo bên trong Linux của Buddy. Buddy không bao giờ mở hay đi theo liên kết ở đây: nơi nó trỏ tới có thể nằm ngoài các thư mục này.</string>
+    <string name="files_open">Mở</string>
+    <string name="files_share">Chia sẻ</string>
+    <string name="files_save">Lưu vào Tải xuống</string>
+    <string name="files_rename">Đổi tên</string>
+    <string name="files_delete">Xóa</string>
+    <string name="files_copy_path">Sao chép đường dẫn</string>
+    <string name="files_mention">Nhắc đến trong cuộc trò chuyện</string>
+    <plurals name="files_selected">
+        <item quantity="other">Đã chọn %1$d</item>
+    </plurals>
+    <string name="files_delete_title">Xóa %1$s?</string>
+    <plurals name="files_delete_many">
+        <item quantity="other">Xóa %1$d mục?</item>
+    </plurals>
+    <string name="files_delete_counting">Đang đếm những gì sẽ bị xóa…</string>
+    <plurals name="files_delete_info">
+        <item quantity="other">%1$d mục (%2$s) sẽ bị xóa vĩnh viễn.</item>
+    </plurals>
+    <string name="files_deleting">Đang xóa… đã xong %1$d</string>
+    <string name="files_delete_failed">Không xóa được hết. %1$s</string>
+    <string name="files_saving">Đang lưu %1$s vào Tải xuống… %2$s</string>
+    <plurals name="files_saved_many">
+        <item quantity="other">Đã lưu %1$d tệp vào Downloads/Buddy.</item>
+    </plurals>
+    <string name="files_save_failed">Không lưu được %1$s: %2$s</string>
+    <string name="files_rename_failed">Không đổi tên được %1$s: %2$s</string>
+    <string name="files_folder_failed">Không tạo được thư mục %1$s: %2$s</string>
+    <string name="files_copying_into">vẫn còn một tệp đang được sao chép vào đó</string>
+    <string name="files_busy">Hãy chờ thao tác xóa hoặc lưu đang chạy hoàn tất.</string>
+    <string name="files_outside">nó không nằm trong các thư mục mà Tệp hiển thị</string>
+    <string name="files_uploaded">Đã thêm %1$s</string>
+    <string name="files_attachments_hint">Đây là bản sao của những gì bạn đã đính kèm trong cuộc trò chuyện này. Để đưa tệp khác cho tác nhân, hãy tải tệp lên không gian làm việc hoặc mục đã gửi tới công cụ Linux.</string>
+    <string name="debug_lock_settings_text">Chế độ nền không thể khởi động lại cho đến khi nó được bật. Nếu điện thoại hỏi, chọn “Luôn cho phép trên mạng này” rồi chạm Cho phép.</string>
+    <string name="debug_lock_turn_on">Bật</string>
 </resources>

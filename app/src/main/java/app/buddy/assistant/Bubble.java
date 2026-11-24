@@ -78,6 +78,8 @@ final class Bubble implements ChatHub.Listener {
     // expanded
     private LinearLayout panel, messages, confirmCard;
     private ScrollView scroll;
+    /** The messages' scroll view with its "to the end" arrow over it (Ui.withJumpToEnd): what the panel shows or hides. */
+    private View scrollFrame;
     /** The card's scrolling part (text and answers), and the most it may take so the panel fits (see buildPanel). */
     private ScrollView cardScroll;
     private int cardRoom = Integer.MAX_VALUE;
@@ -456,7 +458,8 @@ final class Bubble implements ChatHub.Listener {
         LinearLayout.LayoutParams hlp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         hlp.topMargin = dp(8);
         panel.addView(helpersList, hlp);
-        panel.addView(scroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
+        scrollFrame = Ui.withJumpToEnd(svc, scroll, this::scrollToEnd);
+        panel.addView(scrollFrame, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
         listScroll = new ScrollView(svc);
         sessionList = new LinearLayout(svc);
         sessionList.setOrientation(LinearLayout.VERTICAL);
@@ -1131,7 +1134,11 @@ final class Bubble implements ChatHub.Listener {
         // during a live voice call, which only its own chat's screen can end otherwise.
         liveUp = CodexLive.on();
         boolean inBuddy = Screen.anyOpen() && Prefs.bubbleHideInApp(svc) && Prefs.hadReply(svc) && !noteListening && !liveUp;
-        boolean show = !locked && (((Prefs.bubbleEnabled(svc) || controlling) && !inBuddy) || expanded || pendingConfirm != null
+        // a chat's card while Buddy lists it (the chat list's Waiting rows, or its own chat's inline card): it's there,
+        // so no bubble over it (issue #73). A card from outside Buddy has no chat to show it in: the bubble does
+        boolean cardListed = pendingConfirm != null && cardChat != null && inBuddy && (MainActivity.shown || hub.onScreen(cardChat));
+        boolean show = !locked && (((Prefs.bubbleEnabled(svc) || controlling) && !inBuddy) || expanded
+                || (pendingConfirm != null && !cardListed)
                 || (svc.paused() && !hiddenInPause) || talkListening); // (it listens: it stays till that's done)
         boolean wasHidden = root.getVisibility() != View.VISIBLE;
         root.setVisibility(show ? View.VISIBLE : View.GONE);
@@ -1896,7 +1903,7 @@ final class Bubble implements ChatHub.Listener {
     /** The chats list or the new-chat picker is showing: no composer, like the app's Chats tab. */
     private void showListMode() {
         listScroll.setVisibility(showingList ? View.VISIBLE : View.GONE);
-        scroll.setVisibility(showingList ? View.GONE : View.VISIBLE);
+        scrollFrame.setVisibility(showingList ? View.GONE : View.VISIBLE);
         if (composer != null && voiceBar != null && voiceBar.getVisibility() != View.VISIBLE) {
             composer.setVisibility(showingList ? View.GONE : View.VISIBLE);
         }
@@ -1968,7 +1975,7 @@ final class Bubble implements ChatHub.Listener {
         }
         View heading = null;
         for (final String[] o : options) {
-            if (o[0] == null) { // an API key service's models
+            if (o[0] == null) { // a service's models
                 TextView sl = Ui.sectionLabel(svc, o[1]);
                 sl.setPaddingRelative(dp(8), dp(14), 0, dp(2));
                 sessionList.addView(sl);
@@ -2588,7 +2595,8 @@ final class Bubble implements ChatHub.Listener {
         vibrate(60);
         if (!open) collapse(); // the screen stays free for the step; the pill asks
         // in the chat's own screen the card shows there, with the same buttons: no panel popping up over it (#41)
-        else if (!hub.onScreen(cardChat)) expand();
+        else if (!hub.onScreen(cardChat) && !(MainActivity.shown && cardChat != null && Prefs.bubbleHideInApp(svc)
+                && Prefs.hadReply(svc))) expand(); // (the chat list shows it too: issue #73)
         // on the lock screen the card waits out of sight (a notification says so): approving needs the phone unlocked
         applyEnabled();
         if (card.countdown > 0) startCountdown(card.countdown);
@@ -2917,9 +2925,10 @@ final class Bubble implements ChatHub.Listener {
         if (paused && pendingConfirm == null) {
             text = svc.getString(R.string.bubble_pill_paused);
         } else if (controlling && pendingConfirm == null) {
-            String step = fresh && !activityBrowser ? activity : text; // the tool's own step is the most precise
-            text = step == null || step.isEmpty() ? svc.getString(R.string.bubble_using_phone)
-                    : svc.getString(R.string.bubble_using_phone_status, step);
+            // each step shows for a few seconds, then the pill goes until the next one (issue #73: a long phone command
+            // kept it on the screen the whole time); the working ring and the screen's edge still say it's at work
+            String step = fresh && !activityBrowser ? activity : null;
+            text = step == null || step.isEmpty() ? null : svc.getString(R.string.bubble_using_phone_status, step);
         } else if (browsing && pendingConfirm == null) {
             text = activity;
         }

@@ -2,7 +2,7 @@
 <!-- Every text Buddy shows, in Indonesian (Bahasa Indonesia). English source: res/values/strings.xml. -->
 <resources>
     <string name="service_label">Asisten Buddy</string>
-    <string name="service_description">Menampilkan balon chat Buddy dan memungkinkan agen yang Anda pilih (Claude Code, Codex, OpenCode, Antigravity, atau Grok), yang berjalan di dalam Buddy di ponsel ini, membaca layar serta mengetuk, mengetik, dan menggulir untuk Anda. Tidak ada data yang keluar dari ponsel kecuali yang dikirim agen itu sendiri ke layanan AI-nya (Anthropic, OpenAI, Google, xAI, atau penyedia model OpenCode Anda).</string>
+    <string name="service_description">Menampilkan balon chat Buddy dan memungkinkan agen yang Anda pilih (Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot, atau Pi), yang berjalan di dalam Buddy di ponsel ini, membaca layar serta mengetuk, mengetik, dan menggulir untuk Anda. Tidak ada data yang keluar dari ponsel kecuali yang dikirim agen itu sendiri ke layanan AI-nya (Anthropic, OpenAI, Google, xAI, GitHub, atau penyedia model OpenCode atau Pi Anda).</string>
 
     <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
 
@@ -28,7 +28,7 @@
     <!-- Two example requests a user could type. Translate them naturally and use your language's quotation marks. -->
     <string name="onboarding_welcome_ask_text">“Balas Sari, bilang saya terlambat”, “tambahkan susu ke keranjang saya”.</string>
     <string name="onboarding_welcome_plan_title">Paket Anda sendiri, tanpa kunci API</string>
-    <string name="onboarding_welcome_plan_text">Menjalankan Claude Code dengan langganan Claude Anda. Codex dengan paket ChatGPT, Antigravity dengan akun Google, Grok dengan akun Google atau X, dan model gratis OpenCode juga bisa.</string>
+    <string name="onboarding_welcome_plan_text">Menjalankan Claude Code dengan langganan Claude Anda. Codex dengan paket ChatGPT, Antigravity dengan akun Google, Grok dengan akun Google atau X, Copilot dengan akun GitHub, Pi dengan paket atau kunci API yang Anda hubungkan, dan model gratis OpenCode juga bisa.</string>
     <string name="onboarding_welcome_control_title">Anda tetap memegang kendali</string>
     <string name="onboarding_welcome_control_text">Mengirim, memposting, membeli, dan menghapus selalu meminta izin Anda dulu.</string>
     <!-- Small lowercase mono line under the list. -->
@@ -177,7 +177,7 @@
     <string name="main_section_recent">Terbaru</string>
     <string name="main_empty_title">Belum ada chat</string>
     <!-- "New chat" = the button (main_new_chat). -->
-    <string name="main_empty_text">Ketuk Chat baru untuk memulai chat dengan Claude Code, Codex, OpenCode, Antigravity, atau Grok. Tekan lama chat untuk menghapusnya.</string>
+    <string name="main_empty_text">Ketuk Chat baru untuk memulai chat dengan Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot, atau Pi. Tekan lama chat untuk menghapusnya.</string>
     <!-- Status of a chat with a running task, until the agent reports what it's doing. Small lowercase mono text. -->
     <string name="main_chat_working">bekerja…</string>
     <string name="main_chat_waiting">menunggumu…</string>
@@ -675,7 +675,7 @@
     <!-- After "Continue in Buddy" on an earlier session. %1$s = agent name. -->
     <string name="hub_continuing">Melanjutkan sesi %1$s sebelumnya. Jika masih terbuka di terminal, tutup dulu di sana.</string>
     <string name="hub_still_working_attachments">Chat ini masih berjalan. Kirim lampiran setelah selesai.</string>
-    <string name="hub_service_off">%1$s dinonaktifkan (Setelan → Agen dan model → Kunci API). Aktifkan, atau pilih model lain untuk chat ini.</string>
+    <string name="hub_service_off">%1$s dinonaktifkan (Setelan → Agen dan model). Aktifkan, atau pilih model lain untuk chat ini.</string>
     <string name="hub_accessibility_dead">Layanan aksesibilitas Buddy tidak berjalan, padahal aktif: Android menghentikan Buddy dan tidak memulai layanannya lagi, jadi agen tidak bisa menjangkau ponsel. Nonaktifkan lalu aktifkan lagi Buddy di Setelan Android → Aksesibilitas. Agar tidak terulang: izinkan Buddy mulai otomatis di setelan aplikasi ponsel, jika ada, dan beri mikrofon “Saat aplikasi digunakan”, bukan “Hanya kali ini”.</string>
     <string name="hub_accessibility_off">Layanan aksesibilitas Buddy nonaktif, jadi agen tidak bisa menjangkau ponsel. Aktifkan Buddy di Setelan Android → Aksesibilitas.</string>
     <string name="voice_mic_while_using">Pilih “Saat aplikasi digunakan”: dengan “Hanya kali ini”, Android menghentikan Buddy semenit setelah Anda meninggalkannya, bahkan di tengah tugas.</string>
@@ -846,7 +846,7 @@
     <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
     <string name="ui_a11y_title">Cara Buddy menggunakan aksesibilitas</string>
     <string name="ui_a11y_what">Buddy menggunakan layanan aksesibilitas Android untuk melakukan apa yang Anda minta di aplikasi lain: Buddy membaca isi layar serta mengetuk, mengetik, dan menggulir untuk Anda. Buddy juga menampilkan balon mengambang.</string>
-    <string name="ui_a11y_data">Selama tugas berjalan, konten layar, yang dapat berisi informasi pribadi seperti pesan, nama, atau alamat, dikirim ke layanan AI dari agen yang Anda pilih (Anthropic untuk Claude Code, OpenAI untuk Codex, Google untuk Antigravity, xAI untuk Grok, atau penyedia model OpenCode Anda), hanya untuk menjalankan permintaan Anda.</string>
+    <string name="ui_a11y_data">Selama tugas berjalan, konten layar, yang dapat berisi informasi pribadi seperti pesan, nama, atau alamat, dikirim ke layanan AI dari agen yang Anda pilih (Anthropic untuk Claude Code, OpenAI untuk Codex, Google untuk Antigravity, xAI untuk Grok, GitHub untuk Copilot, atau penyedia model OpenCode atau Pi Anda), hanya untuk menjalankan permintaan Anda.</string>
     <string name="ui_a11y_no_servers">Buddy tidak memiliki server sendiri. Buddy tidak mengumpulkan, menjual, atau membagikan data ini, dan tidak menggunakannya untuk iklan.</string>
     <string name="ui_a11y_asks">Sebelum melakukan apa pun yang mengirim, memposting, membeli, atau menghapus, Buddy meminta persetujuan Anda. Anda dapat menonaktifkan layanan ini kapan saja di setelan aksesibilitas Android.</string>
     <string name="ui_privacy_policy">Kebijakan privasi</string>
@@ -941,7 +941,7 @@
     <string name="signin_token">Gunakan token</string>
     <string name="signin_token_title">Token Claude Code</string>
     <string name="signin_token_info">Tempel token yang ditampilkan “claude setup-token” di komputer; awalannya sk-ant-oat. Token ini cukup untuk chat. Input suara dan Remote Control memerlukan login penuh.</string>
-    <string name="signin_token_wrong">Itu bukan token Claude Code. Kunci API (sk-ant-api…) dimasukkan di Setelan → Agen dan model → Kunci API.</string>
+    <string name="signin_token_wrong">Itu bukan token Claude Code. Kunci API (sk-ant-api…) dimasukkan di Setelan → Agen dan model → Tambah koneksi.</string>
     <string name="signin_token_on">Sudah login dengan token: cukup untuk chat. Input suara dan Remote Control memerlukan login penuh.</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <string name="signin_other_device">Login di perangkat lain</string>
@@ -1132,9 +1132,9 @@
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">Setelan</string>
-    <string name="setup_settings_subtitle">Buddy menjalankan Claude Code, Codex, OpenCode, Antigravity, atau Grok di dalam aplikasi, dengan langganan Anda sendiri (atau model gratis OpenCode dan paket gratis Antigravity).</string>
+    <string name="setup_settings_subtitle">Buddy menjalankan Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot, atau Pi di dalam aplikasi, dengan langganan Anda sendiri (atau model gratis OpenCode dan paket gratis Antigravity).</string>
     <string name="settings_agents">Agen dan model</string>
-    <string name="settings_agents_sub">Agen default, masuk, kunci API, model default, GitHub, server unduhan</string>
+    <string name="settings_agents_sub">Yang dipakai chat baru, yang terhubung, menambah paket, kunci, atau model, GitHub, server unduhan</string>
     <string name="settings_bubble">Gelembung dan chat</string>
     <string name="settings_bubble_sub">Tampilkan gelembung, fungsi ketukan, ukuran panel</string>
     <string name="settings_voice_sub">Input dan output suara, bahasa, suara langsung, membacakan balasan</string>
@@ -1245,7 +1245,7 @@
     <!-- Which AI agent answers new chats. -->
     <string name="setup_default_brain">Agen default</string>
     <!-- "New chat" is the name of a button in Buddy. -->
-    <string name="setup_default_brain_info">Agen yang menjawab chat baru dari balon atau tombol Chat baru. Claude Code memakai paket Claude Anda, Codex memakai paket ChatGPT Anda, Antigravity memakai akun Google Anda, Grok memakai akun Grok Anda, OpenCode memakai model gratisnya atau penyedia Anda sendiri. Hanya agen yang sudah disiapkan yang bisa dipilih.</string>
+    <string name="setup_default_brain_info">Agen yang menjawab chat baru dari balon atau tombol Chat baru. Claude Code memakai paket Claude Anda, Codex memakai paket ChatGPT Anda, Antigravity memakai akun Google Anda, Grok memakai akun Grok Anda, Copilot memakai paket GitHub Copilot Anda, Pi memakai paket atau kunci API yang Anda hubungkan ke sana, OpenCode memakai model gratisnya atau penyedia Anda sendiri. Hanya agen yang sudah disiapkan yang bisa dipilih.</string>
     <!-- Toast. %1$s = agent name. "New chat" is the name of a button in Buddy. -->
     <string name="setup_default_brain_set">Chat baru akan menggunakan %1$s. Anda dapat memilih per chat dengan tombol Chat baru.</string>
     <!-- Toast. %1$s = agent name. -->
@@ -1260,8 +1260,7 @@
     <!-- %1$s = the account's email address. -->
     <string name="setup_agent_signed_in_email">sudah login · %1$s</string>
     <string name="setup_agent_not_signed_in">belum login</string>
-    <string name="setup_agent_api_key">belum masuk · kunci API</string>
-    <string name="signin_key_only">Memakai kunci API</string>
+    <string name="signin_key_only">Berjalan dengan layanan</string>
 
     <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
     <string name="setup_phone_tools">Alat ponsel di sesi Anda sendiri</string>
@@ -1452,7 +1451,7 @@
     <string name="terminal_close">Tutup</string>
     <!-- Button (verb): starts a new shell. -->
     <string name="terminal_restart">Mulai ulang</string>
-    <string name="terminal_needs_linux">Instal Claude Code, Codex, OpenCode, Antigravity, atau Grok di Setelan terlebih dahulu: langkah itu akan menyiapkan Linux Buddy.</string>
+    <string name="terminal_needs_linux">Instal Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot, atau Pi di Setelan terlebih dahulu: langkah itu akan menyiapkan Linux Buddy.</string>
     <!-- %1$s = error message. -->
     <string name="terminal_start_failed">Tidak dapat memulai terminal: %1$s</string>
     <!-- Sheet title. %1$s = the tab's name, e.g. "shell 1". -->
@@ -1480,7 +1479,7 @@
 
     <!-- Sessions screen: every agent session running on the phone, and recent history. -->
     <string name="monitor_title">Sesi</string>
-    <string name="monitor_subtitle">Semua sesi Claude Code, Codex, OpenCode, Antigravity, dan Grok di ponsel ini.</string>
+    <string name="monitor_subtitle">Semua sesi Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot, dan Pi di ponsel ini.</string>
     <string name="monitor_terminal_running">Shell sedang berjalan · ketuk untuk kembali</string>
     <string name="monitor_terminal_idle">Shell di Linux Buddy</string>
     <string name="monitor_running_now">Sedang berjalan</string>
@@ -1541,7 +1540,7 @@
     <!-- Toast when the user picks a reviewer that isn't signed in. %1$s = Claude Code or Codex. -->
     <string name="perms_reviewer_sign_in">Login ke %1$s terlebih dahulu (Setelan).</string>
     <!-- Under the reviewer choice. “allow”, “ask you” and “advise against” are the reviewer's three possible answers. -->
-    <string name="perms_reviewer_about">Sesi sementara untuk setiap ketukan, tanpa alat: peninjau melihat permintaan Anda, catatan agen, dan layar, lalu menjawab “izinkan”, “tanya Anda”, atau “tidak disarankan”. Sekitar 3 detik per ketukan. Chat OpenCode, Antigravity, dan Grok ditinjau oleh Claude Code (atau Codex).</string>
+    <string name="perms_reviewer_about">Sesi sementara untuk setiap ketukan, tanpa alat: peninjau melihat permintaan Anda, catatan agen, dan layar, lalu menjawab “izinkan”, “tanya Anda”, atau “tidak disarankan”. Sekitar 3 detik per ketukan. Chat OpenCode, Antigravity, Grok, Copilot, dan Pi ditinjau oleh Claude Code (atau Codex).</string>
     <!-- Under the reviewer's description: it also does the check before a notification rule's countdown. -->
     <string name="perms_reviewer_rules">Peninjau juga memeriksa balasan sebelum hitung mundur aturan notifikasi mengirimnya.</string>
     <!-- In the reviewer's model picker, the first choice ("Default") described: for Claude Code it is Haiku. -->
@@ -1979,10 +1978,9 @@
     <string name="setup_help_info">Panduan Buddy di GitHub. Kamu juga bisa bertanya ke agen mana pun cara kerja Buddy.</string>
     <string name="signin_api_key">Gunakan kunci API saja</string>
     <string name="signin_api_base_bad">Masukkan alamat yang diawali https:// (atau http:// di ponsel ini atau jaringan Anda sendiri)</string>
-    <string name="account_plan_api_key_at">Kunci API · %1$s</string>
+    <string name="account_plan_api_key_at">Berjalan dengan %1$s</string>
     <string name="models_via">%1$s melalui %2$s</string>
     <string name="api_keys_remove_text">Kuncinya dihapus dari ponsel ini. Chat yang memakai modelnya kembali ke Default.</string>
-    <string name="api_keys_choose">Model di menu: %1$d dari %2$d</string>
     <string name="api_keys_choose_title">Model %1$s</string>
     <string name="api_keys_choose_info">Pilih yang ditawarkan chat. Jika tidak ada yang dipilih, semuanya.</string>
     <string name="api_keys_choose_search">Cari</string>
@@ -2047,16 +2045,15 @@
     <string name="api_keys_need_key">Masukkan kunci API.</string>
     <string name="api_keys_saving">Memeriksa kunci…</string>
     <string name="api_keys_save">Simpan</string>
-    <string name="api_keys_addresses_info">Claude Code memakai alamat gaya Anthropic. Codex memakai alamat gaya OpenAI, jika layanan punya Responses API OpenAI. OpenCode memakai salah satunya. Kosongkan alamat jika layanan tidak memilikinya.</string>
+    <string name="api_keys_addresses_info">Claude Code memakai alamat gaya Anthropic. Codex memakai alamat gaya OpenAI, jika layanan punya Responses API OpenAI. OpenCode dan Pi memakai salah satunya. Kosongkan alamat jika layanan tidak memilikinya.</string>
     <string name="api_keys_check">Periksa sekarang</string>
     <string name="api_keys_check_info">Opsional: mengirim permintaan tes sangat kecil, yang mungkin memakai sedikit sekali kredit API.</string>
     <string name="api_keys_check_ok">%1$s: berfungsi.</string>
-    <string name="api_keys_check_chat">%1$s: berfungsi dengan OpenCode, tetapi tidak punya Responses API, jadi tidak dengan Codex.</string>
+    <string name="api_keys_check_chat">%1$s: berfungsi dengan OpenCode dan Pi, tetapi tidak punya Responses API, jadi tidak dengan Codex.</string>
     <string name="api_keys_check_none">%1$s: tidak ada jawaban di alamat ini. %2$s</string>
     <string name="api_keys_check_unsure">%1$s: tidak ada jawaban jelas. %2$s</string>
     <string name="api_keys_service">Layanan</string>
-    <string name="api_keys_custom">Khusus</string>
-    <string name="setup_step_signin_key_mismatch">Kunci API Anda (%2$s) tidak berfungsi dengan %1$s. Kunci itu berfungsi dengan %3$s.</string>
+    <string name="setup_step_signin_key_mismatch">Layanan Anda (%2$s) tidak berfungsi dengan %1$s. Layanan itu berfungsi dengan %3$s.</string>
     <string name="setup_step_signin_free">Tidak punya akun? OpenCode punya model gratis dan tidak perlu masuk.</string>
     <string name="setup_use_agent">Pakai %1$s</string>
     <string name="api_keys_openai_hint">Alamat gaya OpenAI</string>
@@ -2067,7 +2064,6 @@
     <string name="api_keys_own_default">Default-nya sendiri</string>
     <string name="api_keys_defaults_info">Yang dipakai chat saat modelnya Default. Default-nya sendiri berjalan dengan paket agen.</string>
     <string name="api_keys_defaults">Model default</string>
-    <string name="api_keys_for">Untuk %1$s</string>
     <string name="api_keys_use">Gunakan layanan ini</string>
     <string name="api_keys_use_info">Nonaktif: kunci tetap tersimpan, tetapi tidak ada chat atau agen yang memakainya.</string>
     <string name="api_keys_off">Nonaktif</string>
@@ -2103,13 +2099,8 @@
     <string name="mcp_name_taken">Nama itu sudah dipakai.</string>
     <string name="mcp_import_info">Tempel daftar seperti yang disimpan aplikasi lain (“mcpServers”). Server yang punya alamat ditambahkan; yang berjalan sebagai perintah di komputer dilewati.</string>
     <string name="mcp_imported">Ditambahkan: %1$d · dilewati: %2$d</string>
-    <string name="api_keys_models">%1$s · %2$d model</string>
-    <string name="api_keys_add">Tambah kunci API</string>
-    <string name="api_keys_none">Belum ada kunci API.</string>
-    <string name="api_keys_intro">Gunakan model layanan lain dengan Claude Code, Codex, dan OpenCode, di samping paketmu atau sebagai gantinya. Setiap chat memilih modelnya di menu model. Pemakaian dengan kunci ditagihkan ke akun kunci itu. Kunci disimpan terenkripsi di ponsel ini dan tidak pernah sampai ke agen: Buddy menambahkannya ke setiap permintaan.</string>
-    <string name="api_keys_row_none">Model layanan lain, dengan kuncimu</string>
-    <string name="api_keys_title">Kunci API</string>
-    <string name="signin_api_keys">Kunci API</string>
+    <string name="api_keys_add">Tambah layanan</string>
+    <string name="signin_api_keys">Layanan yang tersimpan di Buddy</string>
     <string name="models_context">konteks %1$s</string>
     <string name="models_chip_context">%1$d%% konteks</string>
     <string name="chat_context">Konteks</string>
@@ -2119,12 +2110,12 @@
     <string name="hub_compacting">Meringkas percakapan…</string>
     <string name="hub_compacted">Percakapan diringkas: %1$s → %2$s token</string>
     <string name="signin_api_models_none">Layanan tidak menampilkan model apa pun.</string>
-    <string name="setup_step_signin_api_key">Atau gunakan kunci API: Setelan → Agen dan model → Kunci API.</string>
+    <string name="setup_step_signin_api_key">Atau gunakan kunci API atau server model milikmu sendiri: Setelan → Agen dan model → Tambah koneksi.</string>
     <string name="setup_step_signin_others">%1$s adalah otak default-mu, tapi yang ini sudah siap: %2$s. Jadikan salah satunya default dan Buddy langsung bisa dipakai.</string>
     <string name="setup_switch_default">Ganti default</string>
     <string name="setup_switch_default_title">Otak default</string>
-    <string name="signin_api_key_on">%1$s berjalan dengan kunci API-mu: pilih model di menu model chat, atau default-nya di Kunci API.</string>
-    <string name="signin_api_key_on_plan">Chat juga bisa memakai model kunci API-mu (pilih di menu model chat). Suara dan fitur paket lainnya memakai paketmu.</string>
+    <string name="signin_api_key_on">%1$s berjalan dengan layanan yang tersimpan di Buddy: pilih model di menu model chat, atau default-nya di Setelan → Agen dan model.</string>
+    <string name="signin_api_key_on_plan">Chat juga bisa memakai model dari layanan yang tersimpan di Buddy (pilih di menu model chat). Suara dan fitur paket lainnya memakai paketmu.</string>
     <string name="fdroid_download_note">Unduhan ini berasal dari pembuatnya, bukan dari F-Droid, jadi F-Droid belum memeriksanya.</string>
     <string name="api_keys_local_info">Untuk server Anda sendiri (Ollama, LM Studio, llama.cpp): kosongkan kunci API. Di PC, ganti localhost dengan alamatnya di Wi-Fi Anda, misalnya http://192.168.1.20:11434/v1.</string>
     <string name="main_section_pinned">Disematkan</string>
@@ -2315,4 +2306,494 @@
     <string name="hub_tool_sms_list">Membaca SMS</string>
     <string name="setup_face_too_big">Animasi itu lebih dari 16 MB, jadi balon menampilkannya sebagai gambar diam.</string>
     <string name="background_older">Pembantu dari sebelum pembaruan masih berjalan, jadi chat latar belakang mungkin masih berfungsi. Untuk memulai yang baru, Buddy perlu Debugging nirkabel sekali: ketuk Mulai sekarang.</string>
+
+    <!-- Routines: tasks saved as their steps, done again without the agent (RoutinesActivity, the routine tool). -->
+    <string name="routines_title">Rutinitas</string>
+    <string name="routines_row">Tugas yang disimpan untuk diulang dalam hitungan detik</string>
+    <string name="routines_intro">Agen bisa menyimpan tugas yang sudah dikerjakan sebagai rutinitas: kalau berhasil, minta ia “menyimpannya sebagai rutinitas”. Rutinitas mengulang langkah yang sama dalam hitungan detik tanpa agen, dan kartu persetujuan tetap muncul. Teks yang diketiknya adalah isian kosong yang Anda isi setiap kali.</string>
+    <string name="routines_none">Belum ada rutinitas.</string>
+    <string name="routines_blanks">Isian: %1$s</string>
+    <string name="routines_last_run">Dijalankan %1$s</string>
+    <string name="routines_stopped_at">berhenti di langkah %1$d</string>
+    <string name="routines_card_waiting">Ada kartu yang menunggu jawaban Anda: rutinitas mulai setelah Anda menjawabnya.</string>
+    <string name="routines_hidden">Jalankan di layar tersembunyi</string>
+    <string name="routines_hidden_info">Rutinitas yang dimulai di sini berjalan di layarnya sendiri, jadi Anda tetap bisa memakai ponsel. Kartu dan pertanyaan tetap muncul untuk Anda.</string>
+    <string name="routines_run">Jalankan</string>
+    <string name="routines_running">Berjalan…</string>
+    <string name="routines_delete">Hapus</string>
+    <string name="routines_delete_title">Hapus “%1$s”?</string>
+    <string name="routines_delete_text">Langkah-langkahnya hilang selamanya. Agen bisa menyimpannya lagi lain kali.</string>
+    <string name="routines_step_open">Buka %1$s</string>
+    <string name="routines_step_tap">Ketuk %1$s</string>
+    <string name="routines_step_hold">Tekan lama %1$s</string>
+    <string name="routines_step_type">Ketik %1$s%2$s</string>
+    <string name="routines_step_scroll">Gulir</string>
+    <string name="routines_step_swipe">Geser</string>
+    <string name="routines_step_back">Tekan Kembali</string>
+    <string name="routines_step_press">Tekan tombol</string>
+    <string name="routines_step_find">Gulir ke “%1$s”</string>
+    <string name="routines_step_wait">Tunggu</string>
+    <string name="routines_blanks_info">Apa yang harus diketik kali ini?</string>
+    <string name="routines_blanks_need">Isi setiap isian.</string>
+    <string name="routines_need_access">Layanan aksesibilitas Buddy mati, jadi ia tidak bisa memakai layar.</string>
+    <string name="routines_done_title">“%1$s” selesai</string>
+    <string name="routines_done_text">Semua langkah berhasil.</string>
+    <string name="routines_stopped_title">“%1$s” berhenti</string>
+    <string name="routines_finish">Minta agen menyelesaikannya</string>
+    <string name="routine_saved_note">Rutinitas “%1$s” disimpan (Setelan → Rutinitas)</string>
+    <string name="activity_routine">Menjalankan “%1$s”</string>
+    <string name="hub_tool_routine">Melihat rutinitas</string>
+    <string name="hub_tool_routine_run">Memulai “%1$s”</string>
+    <string name="hub_tool_routine_save">Menyimpan rutinitas “%1$s”</string>
+    <string name="tool_routine">Rutinitas</string>
+    <string name="tool_routine_info">Menyimpan langkah-langkah tugas dan mengulanginya tanpa memikirkannya lagi</string>
+    <plurals name="routines_steps">
+        <item quantity="other">%d langkah</item>
+    </plurals>
+    <plurals name="routines_row_saved">
+        <item quantity="other">%d rutinitas</item>
+    </plurals>
+
+    <!-- Files for Linux tools (#76): any size, straight into the chat's folder in Buddy's Linux. -->
+    <string name="linux_file_sending">Mengirim %1$s ke alat Linux</string>
+    <string name="linux_file_progress">%1$s dari %2$s</string>
+    <string name="linux_file_done">%1$s, %2$s → %3$s</string>
+    <string name="linux_file_not_sent">%1$s tidak terkirim ke alat Linux.</string>
+    <string name="linux_file_cancelled">Pengiriman %1$s ke alat Linux dihentikan. Bagian yang tersalin dihapus.</string>
+    <string name="linux_file_no_room">%1$s tidak terkirim ke alat Linux: perlu %2$s dan ruang kosong ponsel %3$s.</string>
+    <string name="linux_file_full">%1$s tidak terkirim ke alat Linux: ruang ponsel habis. Bagian yang tersalin dihapus.</string>
+    <string name="linux_file_write_failed">%1$s tidak terkirim ke alat Linux: %2$s. Bagian yang tersalin dihapus.</string>
+    <string name="linux_file_gone">%1$s tidak terkirim ke alat Linux: file hilang saat dibaca (aplikasi asalnya menutupnya, atau dipindahkan). Bagian yang tersalin dihapus.</string>
+    <string name="share_linux_title">Terlalu besar untuk dilampirkan</string>
+    <string name="share_linux_text">%1$s: lebih dari 25 MB batas lampiran. Kirim langsung ke folder chat ini di Linux Buddy saja? Agen mendapat jalurnya, untuk alat seperti unzip.</string>
+    <string name="share_linux_send">Kirim ke Linux</string>
+    <string name="chat_linux_files_keep">Simpan file yang dikirim ke alat Linux setelah chat</string>
+    <string name="chat_linux_files_keep_info">Saat chat dihapus, file pindah ke ~/.buddy/work/incoming alih-alih ikut terhapus</string>
+    <plurals name="linux_file_more">
+        <item quantity="other">%1$d lagi menunggu</item>
+    </plurals>
+
+    <!-- 2.4.0: Other devices, Computers over SSH, the running command sheet, set up what's missing, scheduled tasks on events, mute apps on hidden screens. -->
+    <string name="web_title">Perangkat lain</string>
+    <string name="web_row">Chat dan kartu Anda di browser komputer Anda</string>
+    <string name="web_intro">Chat dan kartu persetujuan Anda di browser komputer Anda atau ponsel lain. Tanpa akun dan tanpa server: langsung ke ponsel ini lewat Tailscale. Perangkat yang dipasangkan bisa membaca chat Anda, mengirim pesan, dan menjawab kartu, tapi tidak kartu tentang uang (membayar, membeli, aplikasi keuangan) atau tentang mengizinkan perangkat masuk: kartu itu tetap di ponsel. Perangkat itu tidak bisa memakai layar ponsel.</string>
+    <string name="web_switch">Izinkan perangkat yang dipasangkan masuk</string>
+    <string name="web_switch_info">Nonaktif: tidak ada perangkat yang bisa membuka halaman, dipasangkan atau tidak.</string>
+    <string name="web_screens_switch">Layar di perangkat tersambung</string>
+    <string name="web_screens_info">Perangkat tersambung dapat melihat layar ponsel dan layar tersembunyi tempat agen bekerja. Hanya untuk dilihat, dan tidak pernah saat aplikasi keuangan ada di depan.</string>
+    <string name="web_address_label">Buka ini di perangkat lain</string>
+    <string name="web_no_tailscale">Tailscale tidak terhubung di ponsel ini. Aktifkan, masuk dengan akun yang sama seperti perangkat lain itu.</string>
+    <string name="web_copy">Salin alamat</string>
+    <string name="web_copied">Alamat disalin</string>
+    <string name="web_devices_title">Perangkat yang dipasangkan</string>
+    <string name="web_none">Belum ada.</string>
+    <string name="web_device_seen">Terakhir terlihat %1$s</string>
+    <string name="web_remove">Hapus</string>
+    <string name="web_remove_title">Hapus “%1$s”?</string>
+    <string name="web_remove_text">Perangkat ini tidak bisa lagi membuka chat Anda. Perangkat ini hanya bisa dipasangkan lagi dengan persetujuan Anda di ponsel.</string>
+    <string name="web_pair_how">Untuk menambah perangkat, buka alamat itu di perangkat tersebut lalu ketuk “Pair”. Anda menyetujuinya di sini, di kartu yang menampilkan kode yang sama.</string>
+    <string name="web_card_pair">“%1$s” ingin melihat chat Anda dan menjawab kartu persetujuan. Kode yang sama di layar itu: %2$s (dari %3$s)</string>
+    <string name="web_card_computer">Tambahkan komputer “%1$s” (%2$s)? Agen lalu dapat menjalankan perintah di sana; setiap perintah tetap muncul di kartu dulu.</string>
+    <string name="web_device_unnamed">Sebuah browser</string>
+    <plurals name="web_row_paired">
+        <item quantity="other">%d perangkat dipasangkan</item>
+    </plurals>
+    <string name="computers_title">Komputer tempat agen bisa bekerja</string>
+    <string name="computers_intro">Agen menjalankan perintah di komputer Anda sendiri lewat SSH, seperti yang Anda lakukan di terminal. Perintahnya tampil di kartu lebih dulu.</string>
+    <string name="computers_mode_each">Bertanya sebelum setiap perintah</string>
+    <string name="computers_remove_text">Agen tidak bisa lagi menjangkaunya. Kunci Buddy tetap ada di authorized_keys komputer itu sampai Anda menghapusnya di sana.</string>
+    <string name="computers_add">Tambah komputer</string>
+    <string name="computers_need_linux">Menambah komputer memerlukan Alat Linux Buddy: pasang dulu di Setelan.</string>
+    <string name="computers_name">Nama</string>
+    <string name="computers_name_default">PC saya</string>
+    <string name="computers_host">Alamat (nama Tailscale atau IP)</string>
+    <string name="computers_user">Pengguna di komputer itu</string>
+    <string name="computers_port">Port SSH</string>
+    <string name="computers_key_info">Tambahkan baris ini ke ~/.ssh/authorized_keys di komputer (di Windows: aktifkan OpenSSH Server, lalu file yang sama di folder pengguna Anda, atau administrators_authorized_keys untuk akun admin):</string>
+    <string name="computers_key_making">Membuat kunci Buddy…</string>
+    <string name="computers_key_failed">Buddy tidak bisa membuat kuncinya: %1$s</string>
+    <string name="computers_copy_key">Salin kunci</string>
+    <string name="computers_key_copied">Kunci disalin</string>
+    <string name="computers_check_add">Periksa dan tambahkan</string>
+    <string name="computers_fill_in">Isi nama, alamat, dan pengguna.</string>
+    <string name="computers_checking">Memeriksa apakah komputer mengizinkan Buddy masuk…</string>
+    <string name="computers_check_failed">Komputer tidak mengizinkan Buddy masuk:\n%1$s</string>
+    <string name="computers_added">%1$s ditambahkan</string>
+    <string name="tools_card_computer">Jalankan di %1$s:\n%2$s</string>
+    <string name="activity_computer">Di %1$s</string>
+    <string name="hub_tool_computer">Di %1$s: %2$s</string>
+    <string name="tool_run_on_computer">Perintah di komputer Anda</string>
+    <string name="tool_run_on_computer_info">Menjalankan perintah di komputer yang Anda tambahkan di Perangkat lain, lewat SSH</string>
+    <string name="cmd_sheet_title">Sedang berjalan</string>
+    <string name="cmd_sheet_command">Perintah</string>
+    <string name="cmd_sheet_running_for">Berjalan selama %1$s</string>
+    <string name="cmd_sheet_started">Dimulai %1$s lalu. Prosesnya tidak ada di daftar di bawah: mungkin sudah selesai.</string>
+    <string name="cmd_sheet_no_command">%1$s tidak sedang menjalankan perintah saat ini.</string>
+    <string name="cmd_sheet_ended">Chat ini sedang tidak bekerja.</string>
+    <string name="cmd_sheet_processes">Berjalan di bawah %1$s</string>
+    <string name="cmd_sheet_loading">Mencari…</string>
+    <string name="cmd_sheet_no_agent">%1$s tidak sedang berjalan di Linux Buddy saat ini.</string>
+    <string name="cmd_sheet_none">Tidak ada yang berjalan di bawah %1$s saat ini.</string>
+    <string name="cmd_sheet_proc_line">pid %1$d · berjalan selama %2$s · CPU %3$s</string>
+    <string name="cmd_sheet_proc_line_idle">pid %1$d · berjalan selama %2$s</string>
+    <string name="cmd_sheet_output_note">Output perintah tidak ditampilkan di sini: %1$s menerimanya saat perintah selesai.</string>
+    <string name="cmd_sheet_stop">Hentikan perintah ini</string>
+    <string name="cmd_sheet_stop_one">Hentikan</string>
+    <string name="cmd_sheet_stop_title">Hentikan proses ini?</string>
+    <string name="cmd_sheet_stop_text">Proses ini berhenti bersama semua yang dimulainya. %1$s tetap bekerja dan melihatnya gagal.</string>
+    <string name="cmd_sheet_done">Perintah ini sudah selesai.</string>
+    <string name="walk_button">Siapkan yang belum ada (%1$d)</string>
+    <string name="walk_step">%1$s (%2$d dari %3$d): izinkan, lalu kembali ke Buddy</string>
+    <string name="walk_all_set">Semua siap</string>
+    <string name="walk_left_title">Masih belum ada</string>
+    <string name="walk_left_text">Ini masih nonaktif: %1$s. Buddy tetap berfungsi tanpanya, dengan kemampuan lebih sedikit.</string>
+    <string name="walk_again">Telusuri lagi</string>
+    <string name="walk_notify">Notifikasi</string>
+    <string name="walk_exact">Alarm &amp; pengingat</string>
+    <string name="event_charger_on">Pengisi daya terhubung</string>
+    <string name="event_charger_off">Pengisi daya dilepas</string>
+    <string name="event_wifi_on">Wi-Fi terhubung</string>
+    <string name="event_wifi_on_named">Wi-Fi “%1$s” terhubung</string>
+    <string name="event_wifi_off">Wi-Fi terputus</string>
+    <string name="event_bt_on">Perangkat Bluetooth terhubung</string>
+    <string name="event_bt_on_named">“%1$s” terhubung</string>
+    <string name="event_unlock">Buka kunci pertama hari ini</string>
+    <string name="schedule_at_times">Pada waktu tertentu</string>
+    <string name="schedule_events">Saat ada peristiwa</string>
+    <string name="schedule_events_info">Pesan juga dikirim saat salah satu ini terjadi, dengan jarak minimal 10 menit.</string>
+    <string name="schedule_wifi_any">Jaringan apa saja</string>
+    <string name="schedule_wifi_location">Izinkan lokasi untuk memilih jaringan: Android hanya menampilkan nama Wi-Fi ke aplikasi yang punya akses lokasi.</string>
+    <string name="schedule_wifi_named_note">Jika Buddy tidak bisa membaca nama jaringan (lokasi nonaktif), ini tidak berjalan.</string>
+    <string name="schedule_bt_any">Perangkat apa saja</string>
+    <string name="schedule_bt_allow">Izinkan perangkat di sekitar: Android hanya memberi tahu Buddy tentang perangkat Bluetooth dengan izin ini.</string>
+    <string name="schedule_bt_none">Tidak ada perangkat yang disambungkan.</string>
+    <string name="schedule_cap">Jumlah eksekusi dari peristiwa per hari</string>
+    <string name="schedule_cap_info">Paling banyak sejumlah ini, agar Wi-Fi yang putus-sambung tidak menghabiskan kuota paket Anda.</string>
+    <string name="schedule_cap_less">Lebih sedikit</string>
+    <string name="schedule_cap_more">Lebih banyak</string>
+    <string name="schedule_need_start">Pilih waktu atau peristiwa.</string>
+    <string name="schedule_on_events">Berjalan saat: %1$s</string>
+    <string name="schedule_events_today">Dari peristiwa hari ini: %1$d dari %2$d</string>
+    <string name="walk_bluetooth">Perangkat di sekitar</string>
+    <string name="walk_location">Lokasi</string>
+    <string name="background_mute">Bisukan aplikasi di layar tersembunyi</string>
+    <string name="background_mute_info">Aplikasi yang tampil di depan pada layar tersembunyi tidak mengeluarkan suara (misalnya video yang mulai sendiri), kecuali juga ada di layar Anda. Buddy mengembalikan suaranya saat aplikasi itu meninggalkan layar tersembunyi, dan tidak pernah menyentuh aplikasi yang Anda bisukan sendiri. Pembantu harus berjalan.</string>
+
+    <!-- Keep Wireless debugging on (DebugLock). -->
+    <string name="debug_lock">Biarkan debugging nirkabel tetap aktif</string>
+    <string name="debug_lock_info">Saat ponsel mematikannya, Buddy menyalakannya lagi (di Wi-Fi), agar helper selalu bisa dimulai lagi.</string>
+    <string name="debug_lock_channel">Debugging nirkabel</string>
+    <string name="debug_lock_off_title">Debugging nirkabel mati</string>
+    <string name="debug_lock_off_text">Ponsel mematikannya dan Buddy tidak bisa menyalakannya lagi. Mode latar belakang berhenti sampai aktif lagi: ketuk untuk memulainya.</string>
+
+    <!-- Copilot and Pi as agents: setup, sign-in, account and model strings. -->
+    <string name="onboarding_brain_copilot">Menggunakan paket GitHub Copilot Anda (Copilot Free juga bisa).</string>
+    <string name="onboarding_agent_sign_in_copilot">Login dengan akun GitHub Anda: Buddy menampilkan kode, Anda memasukkannya di halaman GitHub, dan Buddy akan menyelesaikannya dengan sendirinya.</string>
+    <string name="onboarding_agent_download_copilot">Mendownload sekitar 190 MB, cukup sekali (Linux Buddy, Node.js, dan GitHub Copilot CLI).</string>
+    <string name="signin_install_sub_copilot">Menjalankan GitHub Copilot CLI di dalam Buddy dengan paket GitHub Copilot Anda (Copilot Free juga bisa).</string>
+    <string name="signin_install_size_copilot">Mendownload sekitar 190 MB, cukup sekali: Linux Buddy, Node.js, dan GitHub Copilot CLI. Setelah diinstal, ukurannya sekitar 300 MB. Gunakan Wi-Fi jika bisa.</string>
+    <string name="signin_title_github">Login ke GitHub</string>
+    <string name="signin_sub_copilot">Gunakan akun GitHub yang memiliki Copilot. Buddy menampilkan kode; masukkan di halaman GitHub dan Buddy akan menyelesaikannya dengan sendirinya.</string>
+    <string name="signin_with_github">Login dengan GitHub</string>
+    <string name="signin_remote_copilot">Buka link di sini atau di perangkat mana pun, login ke GitHub, dan masukkan kodenya. “Buka di sini” menyalin kode untuk Anda. Buddy akan menyelesaikannya dengan sendirinya.</string>
+    <string name="signin_copilot_via_gh">Copilot memakai login GitHub dari Setelan → Agen dan model → GitHub. Untuk logout Copilot, logout dari GitHub di sana.</string>
+    <string name="account_tagline_copilot">Menggunakan paket GitHub Copilot Anda</string>
+    <string name="models_default_copilot">Model default Copilot</string>
+    <string name="setup_step_install_copilot">Buddy mendownload Linux kecil miliknya sendiri dan %1$s dari GitHub (sekitar 190 MB dengan Node.js).</string>
+    <string name="setup_step_signin_copilot">Dengan akun GitHub Anda. Buddy menampilkan kode untuk dimasukkan di halaman GitHub, lalu menyelesaikannya dengan sendirinya.</string>
+    <string name="onboarding_brain_pi">Menggunakan paket Claude, ChatGPT, atau GitHub Copilot Anda, atau kunci API, yang Anda hubungkan di layar Pi sendiri.</string>
+    <string name="onboarding_pi_provider">penyedia yang Anda hubungkan ke sana</string>
+    <string name="onboarding_agent_sign_in_pi">Hubungkan penyedia di layar Pi sendiri: ketik /login di sana dan pilih paket Anda atau kunci API.</string>
+    <string name="onboarding_agent_download_pi">Mendownload sekitar 220 MB, cukup sekali (Linux Buddy, Node.js, dan Pi).</string>
+    <string name="signin_install_sub_pi">Menjalankan Pi di dalam Buddy dengan penyedia yang Anda hubungkan: paket Claude, ChatGPT, atau GitHub Copilot Anda, atau kunci API.</string>
+    <string name="signin_install_size_pi">Mendownload sekitar 220 MB, cukup sekali: Linux Buddy, Node.js, dan Pi. Gunakan Wi-Fi jika bisa.</string>
+    <string name="signin_pi_ready">Pi siap</string>
+    <string name="signin_pi_connected">Terhubung: %1$s. Pilih model per chat lewat tombol model di bagian atas chat.</string>
+    <string name="signin_pi_connect_title">Hubungkan penyedia</string>
+    <string name="signin_pi_connect_text">Pi tidak punya model sendiri. Hubungkan paket Claude, ChatGPT, atau GitHub Copilot Anda, atau kunci API, dan Pi akan memakainya.</string>
+    <string name="signin_pi_connect_note">Masuk di sini dengan paket Claude, ChatGPT, atau GitHub Copilot Anda. Untuk penyedia lain atau kunci API, layar Pi terbuka: ketik %1$s di sana. %2$s di sana menghapus satu.</string>
+    <string name="account_tagline_pi">Menggunakan paket atau kunci API yang Anda hubungkan</string>
+    <string name="models_default_pi">Model default Pi</string>
+    <string name="setup_step_install_pi">Buddy mendownload Linux kecil miliknya sendiri dan %1$s (sekitar 220 MB dengan Node.js).</string>
+    <string name="setup_step_signin_pi">Hubungkan penyedia di layar Pi sendiri (/login di sana): paket Claude, ChatGPT, atau GitHub Copilot Anda, atau kunci API.</string>
+
+    <!-- Agents and models (2.4.0): what new chats use, what's connected, Add a connection, Sign in with OpenRouter, one API service's screen. -->
+    <string name="agents_lead">Agen mana yang bekerja untuk Anda, dan berjalan di atas apa.</string>
+    <string name="agents_new_chats">Chat baru memakai</string>
+    <string name="agents_model_default">Model default-nya</string>
+    <string name="agents_not_set_up">Belum disiapkan</string>
+    <string name="agents_on_claude">Dengan paket Claude Anda</string>
+    <string name="agents_on_chatgpt">Dengan paket ChatGPT Anda</string>
+    <string name="agents_on_google">Dengan akun Google Anda</string>
+    <string name="agents_on_grok">Dengan akun xAI Anda</string>
+    <string name="agents_on_copilot">Dengan paket GitHub Copilot Anda</string>
+    <string name="agents_on">Lewat %1$s</string>
+    <string name="agents_change">Ubah</string>
+    <string name="agents_small">Pemeriksaan keamanan memakai %1$s</string>
+    <string name="agents_small_info_cheap">Model yang lebih murah, dijalankan oleh %1$s.</string>
+    <string name="agents_small_info">Dijalankan oleh %1$s.</string>
+    <string name="agents_small_codex">Model kecil Codex</string>
+    <string name="agents_small_none">Pemeriksaan keamanan butuh Claude Code atau Codex</string>
+    <string name="agents_small_none_info">Merekalah yang memeriksa aplikasi yang disetel ke Pintar. Siapkan salah satunya.</string>
+    <string name="agents_pick_title">Chat baru memakai</string>
+    <string name="agents_pick_set_up">Belum disiapkan: ketuk untuk menyiapkan</string>
+    <string name="agents_connected">Terhubung</string>
+    <string name="agents_none_connected">Belum ada yang terhubung.</string>
+    <string name="agents_claude_plan">Paket Claude</string>
+    <string name="agents_chatgpt_plan">Paket ChatGPT</string>
+    <string name="agents_google">Akun Google</string>
+    <string name="agents_grok">Akun xAI</string>
+    <string name="agents_copilot">GitHub Copilot</string>
+    <string name="agents_runs_in">Berjalan di %1$s</string>
+    <string name="agents_can_run_in">Bisa berjalan di %1$s</string>
+    <string name="agents_runs_in_lite">Berjalan di %1$s, ringan</string>
+    <string name="agents_on_phone">%1$s, di ponsel ini</string>
+    <string name="agents_engine_missing">Mesin tidak ada</string>
+    <string name="agents_cost_subscription">Langganan</string>
+    <string name="agents_cost_pay">Bayar sesuai pemakaian</string>
+    <string name="agents_cost_free">Gratis</string>
+    <string name="agents_cost_free_or_plan">Gratis atau paket</string>
+    <string name="agents_cost_offline">Offline</string>
+    <string name="agents_cost_private">Pribadi</string>
+    <string name="agents_see_what">Lihat yang perlu diubah</string>
+    <string name="agents_add">Tambah koneksi</string>
+    <string name="agents_installed">Agen terpasang</string>
+    <string name="agents_not_installed">%1$s, belum terpasang</string>
+    <string name="agents_installed_info">Ini program milik agen itu sendiri, yang berjalan di dalam Buddy. Itulah sebabnya paket Claude dan ChatGPT Anda bisa dipakai di sini.</string>
+    <string name="agents_more">Lainnya</string>
+    <string name="agents_github_none">Tidak terhubung</string>
+    <plurals name="agents_defaults_set">
+        <item quantity="other">%1$d agen disetel</item>
+    </plurals>
+    <string name="conn_add_title">Tambah koneksi</string>
+    <string name="conn_free">Gratis</string>
+    <string name="conn_opencode_free">Model gratis OpenCode</string>
+    <string name="conn_google_sub">Masuk dengan Google</string>
+    <string name="conn_or_free">Model gratis OpenRouter</string>
+    <string name="conn_claude_plan">Claude Pro atau Max</string>
+    <string name="conn_claude_plan_sub">Masuk dengan Claude</string>
+    <string name="conn_chatgpt_plan">ChatGPT Plus atau Pro</string>
+    <string name="conn_chatgpt_plan_sub">Masuk dengan ChatGPT</string>
+    <string name="conn_google_plan">Paket Google AI</string>
+    <string name="conn_supergrok">SuperGrok</string>
+    <string name="conn_supergrok_sub">Masuk dengan akun xAI Anda</string>
+    <string name="conn_copilot">GitHub Copilot</string>
+    <string name="conn_copilot_sub">Masuk dengan GitHub</string>
+    <string name="conn_pi">Paket Anda, di Pi</string>
+    <string name="conn_pi_sub">Claude, ChatGPT, atau Copilot: masuk dari layar Pi sendiri</string>
+    <string name="conn_pi_connected">Terhubung: %1$s</string>
+    <string name="conn_paste_key">Tempel kunci</string>
+    <string name="conn_custom">Layanan lain</string>
+    <string name="conn_custom_sub">Alamat apa pun yang memakai format OpenAI atau Anthropic</string>
+    <string name="conn_custom_agents">Tergantung alamatnya</string>
+    <string name="conn_signed_in">Sudah masuk</string>
+    <string name="conn_ready">Siap</string>
+    <string name="conn_add_foot">Masuk ke sebuah paket akan memasang agennya dulu jika belum ada.</string>
+    <string name="conn_or_choice_info">Masuk, dan OpenRouter membuatkan kunci khusus untuk Buddy: tidak ada yang perlu disalin. Atau tempel kunci yang Anda buat di OpenRouter.</string>
+    <string name="conn_or_sign_in">Masuk dengan OpenRouter</string>
+    <string name="conn_or_paste">Tempel kunci</string>
+    <string name="conn_or_needs_service_title">Layanan Buddy nonaktif</string>
+    <string name="conn_or_needs_service">OpenRouter mengirim Anda kembali ke Buddy di sebuah alamat di ponsel ini, yang hanya menjawab saat layanan aksesibilitas Buddy aktif. Aktifkan lalu coba lagi, atau tempel kunci saja.</string>
+    <string name="conn_or_busy">Mengambil kunci dari OpenRouter…</string>
+    <string name="conn_or_page_done">Anda bisa kembali ke Buddy.</string>
+    <string name="conn_or_page_expired">Proses masuk ini sudah kedaluwarsa atau sudah dipakai. Mulai lagi di Buddy.</string>
+    <string name="conn_or_failed">Gagal masuk ke OpenRouter: %1$s</string>
+    <string name="conn_or_no_free">OpenRouter tidak mencantumkan model gratis saat ini, jadi pemilihnya menampilkan semua modelnya. Yang gratis berakhiran “:free”.</string>
+    <string name="conn_status_signed_in">Sudah masuk</string>
+    <string name="conn_status_key">Kunci tersimpan</string>
+    <string name="conn_status_ready">Siap</string>
+    <string name="conn_status_off">Dimatikan</string>
+    <string name="conn_status_checking">Memeriksa…</string>
+    <string name="conn_status_failed">Tidak menjawab</string>
+    <string name="conn_status_no_tools">Tidak bisa memakai alat</string>
+    <string name="conn_balance_left">Sisa %1$s</string>
+    <string name="conn_free_left">Sisa %1$d permintaan model gratis hari ini.</string>
+    <string name="conn_or_own_key">OpenRouter membuatkan kunci khusus untuk Buddy. Hapus di halaman Keys OpenRouter untuk memutus akses Buddy.</string>
+    <string name="conn_checked">Diperiksa saat Anda menghubungkan</string>
+    <string name="conn_checking">Memeriksa…</string>
+    <string name="conn_not_checked">Belum diperiksa.</string>
+    <string name="conn_check_answers">Model menjawab</string>
+    <string name="conn_check_tools">Bisa memanggil alat, jadi bisa memakai ponsel</string>
+    <string name="conn_check_tools_failed">Tidak memanggil alat saat diminta</string>
+    <string name="conn_no_tools_warning">%1$s menjawab, tetapi tidak bisa memanggil alat saat diuji Buddy. Dengan begini ia tidak bisa memakai ponsel.</string>
+    <string name="conn_check_fits">Alat dan instruksi Buddy (sekitar %1$s token) muat di memorinya yang %2$s. Prompt milik agen sendiri ditambahkan di atasnya.</string>
+    <string name="conn_check_fits_not">Alat dan instruksi Buddy saja (sekitar %1$s token) sudah tidak muat di memorinya yang %2$s.</string>
+    <string name="conn_check_no_model">Tidak ada model yang tercantum untuk diperiksa.</string>
+    <string name="conn_check_no_call">Menjawab dengan kata-kata alih-alih memanggil alat.</string>
+    <string name="conn_checked_how">%1$s, ditanya seperti cara %2$s, %3$s</string>
+    <string name="conn_check_stale">Agen atau modelnya sudah berubah sejak itu: periksa lagi.</string>
+    <string name="conn_check_now">Periksa sekarang</string>
+    <string name="conn_check_again">Periksa lagi</string>
+    <string name="conn_check_cost">Dua permintaan sangat kecil: paling banyak sedikit sekali kredit API.</string>
+    <string name="conn_runs_in">Berjalan di</string>
+    <string name="conn_runs_in_info">Agen yang dicentang memakai layanan ini untuk chat mereka di Default.</string>
+    <string name="conn_runs_in_keep">%1$s tidak punya paket, jadi chat-nya butuh layanan. Pilih layanan lain untuknya di Model default.</string>
+    <string name="conn_models">Model</string>
+    <string name="conn_for_chats">Untuk chat</string>
+    <string name="conn_for_chats_title">Model %1$s untuk chat</string>
+    <string name="conn_edit">Alamat dan kunci</string>
+    <string name="conn_use_for_new">Pakai untuk chat baru, di %1$s</string>
+    <string name="conn_used_now">Chat baru memakai ini, di %1$s.</string>
+    <string name="conn_sign_out">Logout dari %1$s</string>
+    <string name="conn_sign_out_text">Kuncinya dihapus dari ponsel ini, dan chat yang memakai modelnya kembali ke Default. Kunci tetap ada di OpenRouter sampai Anda menghapusnya di sana.</string>
+    <string name="conn_remove">Hapus %1$s</string>
+
+    <!-- Pi's sign-in to a plan, without its own screen (PiSignIn). -->
+    <string name="signin_pi_with">Masuk dengan %1$s</string>
+    <string name="signin_pi_other">Penyedia lain atau kunci API</string>
+    <string name="signin_pi_starting">Memulai proses masuk Pi…</string>
+    <string name="signin_pi_open_page">Buka halaman masuk</string>
+    <string name="signin_pi_paste_hint">Kode yang ditampilkan halaman</string>
+    <string name="signin_pi_send_code">Kirim kode</string>
+    <string name="signin_pi_enter_code">Masukkan kode ini di halaman (tersalin saat Anda membukanya):</string>
+    <string name="signin_pi_copy_code">Masuk di halaman, salin kode yang ditampilkan, lalu kembali: Buddy akan melanjutkannya.</string>
+    <string name="signin_pi_checking">Memeriksa…</string>
+    <string name="signin_pi_signed_in">Pi sudah masuk dengan %1$s</string>
+    <string name="signin_pi_failed">Belum masuk:\n%1$s</string>
+    <string name="debug_lock_ask_title">Izinkan debugging nirkabel di Wi-Fi ini</string>
+    <string name="debug_lock_ask_text">Ponsel bertanya sekali untuk setiap titik akses Wi-Fi (jaringan mesh punya beberapa). Ketuk di sini, centang “Selalu izinkan di jaringan ini”, lalu ketuk Izinkan.</string>
+
+    <!-- Services (2.4.0): a service's optional key, its models shown in pickers, Pi and the services saved in Buddy. -->
+    <string name="api_keys_key_optional_hint">Kunci API (opsional)</string>
+    <string name="conn_shown">Ditampilkan di pemilih</string>
+    <string name="conn_shown_count">%1$d dari %2$d</string>
+    <string name="signin_services_also">Chat %1$s juga bisa memakai model dari layanan yang tersimpan di Buddy: pilih salah satu di menu model chat.</string>
+    <string name="chat_attach_files_linux_sub">PDF, dokumen, apa saja. Di atas 25 MB, file langsung masuk ke alat Linux chat ini, berapa pun ukurannya.</string>
+    <string name="chat_attach_big_to_linux">Terlalu besar untuk dilampirkan: dikirim ke alat Linux chat ini. Setelah sampai, lihat di File (opsi chat).</string>
+    <string name="chat_attach_in_linux">Di alat Linux</string>
+    <!-- Add a connection in tabs (2.4.0): Free, Plans, API keys, This phone, Servers. -->
+    <string name="ui_tab">%1$s, tab %2$d dari %3$d</string>
+    <string name="conn_tab_plans">Paket</string>
+    <string name="conn_tab_keys">Kunci API</string>
+    <string name="conn_tab_phone">Ponsel ini</string>
+    <string name="conn_tab_servers">Server</string>
+    <string name="conn_free_lead">Cara memulai tanpa membayar. Setiap penyedia menetapkan batasnya sendiri dan dapat mengubahnya.</string>
+    <string name="conn_free_checked">Baris tentang batas, pembayaran, dan privasi berasal dari halaman masing-masing penyedia, dibaca pada November 2026. Semua itu ditetapkan penyedia dan dapat berubah.</string>
+    <string name="conn_open">Buka</string>
+    <string name="conn_fact_opencode_get">Daftar model yang berganti-ganti, masing-masing gratis untuk waktu terbatas.</string>
+    <string name="conn_fact_opencode_account">Tanpa akun dan tanpa masuk: langsung berfungsi begitu OpenCode terpasang.</string>
+    <string name="conn_fact_opencode_privacy">Beberapa model gratis menyimpan apa yang Anda kirim dan memakainya untuk menyempurnakan model. Halaman Zen OpenCode menyebutkan yang mana.</string>
+    <string name="conn_agy_free">Paket gratis Antigravity</string>
+    <string name="conn_fact_agy_get">Paket $0 dari Google, dengan kuota yang terisi lagi setiap minggu. Dalam pemakaian Buddy sendiri, paket ini berhenti setelah sekitar 300 permintaan dan kembali sekitar seminggu kemudian. Google menetapkan kuotanya dan dapat mengubahnya.</string>
+    <string name="conn_fact_agy_account">Anda masuk dengan akun Google.</string>
+    <string name="conn_fact_agy_privacy">Google memakai apa yang Anda kirim untuk menyempurnakan produknya, dan orang di Google dapat membacanya. Jangan kirim apa pun yang rahasia.</string>
+    <string name="conn_fact_or_get">Model yang namanya berakhiran “:free”: 50 permintaan sehari, 20 semenit. 1000 sehari setelah akun membeli 10 kredit.</string>
+    <string name="conn_fact_or_account">Anda masuk dari browser: tidak ada kunci yang perlu disalin.</string>
+    <string name="conn_fact_or_privacy">OpenRouter tidak menyimpan prompt Anda kecuali Anda sendiri mengaktifkannya. Penyedia model gratis dapat melatih model dengan prompt itu: setelan privasi Anda di OpenRouter menentukan apakah penyedia tersebut dipakai.</string>
+    <string name="conn_copilot_free">GitHub Copilot Free</string>
+    <string name="conn_fact_copilot_get">Paket gratis GitHub mencakup agen baris perintah Copilot, dengan jatah kredit AI. Modelnya dipilihkan untuk Anda.</string>
+    <string name="conn_fact_copilot_who">Hanya untuk akun pribadi yang tidak mendapat Copilot dari organisasi.</string>
+    <string name="conn_fact_copilot_privacy">GitHub dapat melatih modelnya dengan apa yang Anda kirim. Hal itu dimatikan lewat “Allow GitHub to use my data for AI model training” di setelan Copilot Anda di GitHub.</string>
+    <string name="conn_gemini_free">Tingkat gratis Google AI Studio</string>
+    <string name="conn_fact_gemini_get">Beberapa model Gemini, gratis dalam batas per menit dan per hari. Google AI Studio menampilkan batas Anda.</string>
+    <string name="conn_fact_gemini_card">Tidak perlu akun penagihan: itu untuk tingkat berbayar.</string>
+    <string name="conn_fact_gemini_privacy">Google memakai apa yang Anda kirim untuk menyempurnakan produknya, dan peninjau dapat membacanya: jangan kirim hal pribadi atau rahasia. Di EEA, Swiss, dan Inggris Raya, ketentuan berbayar yang berlaku, dan data tidak dipakai seperti itu.</string>
+    <string name="conn_fact_gemini_region">Hanya di negara yang dicantumkan Google untuk Gemini API.</string>
+    <string name="conn_plans_lead">Masuk dengan paket yang sudah Anda bayar: tanpa kunci API dan tanpa tagihan kedua.</string>
+    <string name="conn_keys_lead">Kunci dari layanan yang menagih sesuai pemakaian, ke akun pemilik kunci itu. Buddy menyimpan kunci secara terenkripsi di ponsel, dan agen tidak pernah melihatnya.</string>
+    <string name="conn_keys_many">Banyak model di balik satu kunci</string>
+    <string name="conn_keys_makers">Dari perusahaan pembuat modelnya</string>
+    <string name="conn_keys_fast">Cepat</string>
+    <string name="conn_keys_other">Yang lain</string>
+    <string name="conn_what_openrouter">Model dari banyak perusahaan dalam satu akun. Masuk, atau tempel kunci.</string>
+    <string name="conn_what_models">Model %1$s</string>
+    <string name="conn_what_gemini">Model Gemini. Punya tingkat gratis: lihat Gratis.</string>
+    <string name="conn_what_fast">Pilihan model, disajikan untuk kecepatan</string>
+    <string name="conn_phone_lead">Model yang berjalan di ponsel itu sendiri.</string>
+    <string name="conn_phone_private">Privat: tidak ada yang keluar dari ponsel, dan berfungsi tanpa internet.</string>
+    <string name="conn_phone_small">Model kecil lambat dibanding yang online, dan keliru pada tugas dengan beberapa langkah. Paling cocok untuk permintaan satu langkah: baterai, timer, melihat sekilas sebuah aplikasi.</string>
+    <string name="conn_phone_ram">Ponsel ini punya memori %1$s. Sebuah model harus muat di dalamnya bersama semua hal lain yang sedang terbuka.</string>
+    <string name="conn_servers_lead">Server model yang Anda jalankan di komputer atau jaringan Anda.</string>
+    <string name="conn_servers_yours">Server Anda</string>
+    <string name="conn_servers_title">Server model Anda sendiri</string>
+    <string name="conn_servers_what">Server apa pun yang memakai format OpenAI: %1$s dan lainnya.</string>
+    <string name="conn_servers_address">Masukkan alamatnya dan Buddy memuat model yang disajikannya. Untuk server di komputer, itu adalah alamat komputer di jaringan Anda, bukan localhost.</string>
+    <string name="conn_servers_private">Privat: apa yang Anda kirim menuju server Anda dan tetap di jaringan Anda.</string>
+    <string name="conn_servers_key">Tidak perlu kunci, kecuali server Anda memintanya.</string>
+    <string name="conn_servers_start">Dengan alamat biasanya sudah terisi:</string>
+    <string name="conn_servers_add">Tambah server</string>
+    <!-- Files (2.4.0): the browser of Buddy's Linux (Projects and a chat's own folders), its rows in Settings and in a chat's options. -->
+    <string name="files_title">File</string>
+    <string name="files_row_info">Isi Linux Buddy: upload file berukuran berapa pun, buka, bagikan, atau hapus</string>
+    <string name="chat_files_row">Proyek dan file chat ini di Linux Buddy</string>
+    <string name="chat_files_row_size">Proyek dan file chat ini · %1$s dikirim ke chat ini</string>
+    <string name="files_intro">Isi Linux Buddy, tempat agen dengan alat Linux bekerja. Upload file ke sebuah folder untuk mereka, atau ambil hasil buatan mereka.</string>
+    <string name="files_projects">Ruang kerja</string>
+    <string name="files_projects_info">Ruang kerja para agen, satu folder per proyek</string>
+    <string name="files_projects_shared_info">Chat ini bekerja di sini, seperti semua chat tanpa folder proyek</string>
+    <string name="files_project_info">Proyek chat ini: agennya bekerja di sini</string>
+    <string name="files_all_chats">Semua chat</string>
+    <string name="files_project_here">Proyek chat ini: agennya mulai di folder ini.</string>
+    <string name="files_project_hint">Chat ini bekerja di seluruh ruang kerja. Agar tetap di satu proyek, buka menu sebuah folder lalu pilih “Jadikan proyek chat ini”.</string>
+    <string name="files_project_make">Jadikan proyek chat ini</string>
+    <string name="files_project_end">Bukan lagi proyek chat ini</string>
+    <string name="files_project_title">Bekerja di “%1$s” dalam chat ini?</string>
+    <string name="files_project_none_title">Bekerja di seluruh ruang kerja lagi?</string>
+    <string name="files_project_text">Mulai pesan Anda berikutnya, agen mulai di sana. Agen memulai percakapan baru sendiri dan menerima isi chat ini sejauh ini sebagai teks.</string>
+    <string name="files_project_yes">Bekerja di sana</string>
+    <string name="files_project_set">Chat ini sekarang bekerja di %1$s</string>
+    <string name="files_project_none_set">Chat ini kembali bekerja di seluruh ruang kerja</string>
+    <string name="chat_project">Folder proyek</string>
+    <string name="chat_project_none">Seluruh ruang kerja</string>
+    <string name="chat_project_none_info">Dipakai bersama oleh semua chat tanpa folder proyek</string>
+    <string name="chat_project_info">Tempat agen chat ini mulai dan menyimpan pekerjaannya. Beberapa chat bisa mengerjakan proyek yang sama.</string>
+    <string name="chat_folder_busy">Chat sedang bekerja. Ubah folder proyeknya setelah selesai.</string>
+    <string name="jump_to_end">Ke bagian akhir</string>
+    <string name="models_pi_group">Melalui login %1$s Anda</string>
+    <string name="models_opencode_free">Model gratis OpenCode</string>
+    <string name="files_this_chat">Chat ini</string>
+    <string name="files_incoming">Dikirim ke alat Linux</string>
+    <string name="files_incoming_info">File untuk alat agen, berapa pun ukurannya</string>
+    <string name="files_attachments">Lampiran</string>
+    <string name="files_attachments_info">Salinan dari yang Anda lampirkan, seperti yang diterima agen</string>
+    <string name="files_upload">Upload file</string>
+    <string name="files_new_folder">Folder baru</string>
+    <string name="files_create">Buat</string>
+    <string name="files_name_hint">Nama</string>
+    <string name="files_bad_name">Nama tidak boleh kosong, “.” atau “..”, atau mengandung garis miring.</string>
+    <string name="files_menu">Lainnya</string>
+    <string name="files_show_hidden">Tampilkan file tersembunyi</string>
+    <string name="files_show_hidden_info">File dan folder yang namanya diawali titik</string>
+    <string name="files_empty">Belum ada apa-apa di sini.</string>
+    <plurals name="files_hidden_count">
+        <item quantity="other">%1$d item tersembunyi tidak ditampilkan.</item>
+    </plurals>
+    <string name="files_show_more">Tampilkan lagi (tersisa %1$d)</string>
+    <string name="files_list_failed">Tidak dapat menampilkan folder ini: %1$s</string>
+    <string name="files_link">Link ke %1$s</string>
+    <string name="files_link_info">Link yang dibuat di dalam Linux Buddy. Buddy tidak pernah membuka atau mengikuti link di sini: tujuannya bisa berada di luar folder-folder ini.</string>
+    <string name="files_open">Buka</string>
+    <string name="files_share">Bagikan</string>
+    <string name="files_save">Simpan ke Downloads</string>
+    <string name="files_rename">Ganti nama</string>
+    <string name="files_delete">Hapus</string>
+    <string name="files_copy_path">Salin jalur</string>
+    <string name="files_mention">Sebut di chat</string>
+    <plurals name="files_selected">
+        <item quantity="other">%1$d dipilih</item>
+    </plurals>
+    <string name="files_delete_title">Hapus %1$s?</string>
+    <plurals name="files_delete_many">
+        <item quantity="other">Hapus %1$d item?</item>
+    </plurals>
+    <string name="files_delete_counting">Menghitung yang akan dihapus…</string>
+    <plurals name="files_delete_info">
+        <item quantity="other">%1$d item (%2$s) dihapus untuk selamanya.</item>
+    </plurals>
+    <string name="files_deleting">Menghapus… %1$d selesai</string>
+    <string name="files_delete_failed">Tidak semuanya dapat dihapus. %1$s</string>
+    <string name="files_saving">Menyimpan %1$s ke Downloads… %2$s</string>
+    <plurals name="files_saved_many">
+        <item quantity="other">%1$d file disimpan ke Downloads/Buddy.</item>
+    </plurals>
+    <string name="files_save_failed">Tidak dapat menyimpan %1$s: %2$s</string>
+    <string name="files_rename_failed">Tidak dapat mengganti nama %1$s: %2$s</string>
+    <string name="files_folder_failed">Tidak dapat membuat folder %1$s: %2$s</string>
+    <string name="files_copying_into">masih ada file yang sedang disalin ke dalamnya</string>
+    <string name="files_busy">Tunggu sampai penghapusan atau penyimpanan yang sedang berjalan selesai.</string>
+    <string name="files_outside">tidak berada di dalam folder yang ditampilkan File</string>
+    <string name="files_uploaded">%1$s ditambahkan</string>
+    <string name="files_attachments_hint">Ini salinan dari yang Anda lampirkan di chat ini. Untuk memberi agen file lain, upload ke ruang kerja atau ke file yang dikirim ke alat Linux.</string>
+    <string name="debug_lock_settings_text">Mode latar belakang tidak bisa dimulai lagi sampai ini aktif. Jika ponsel bertanya, centang “Selalu izinkan di jaringan ini”, lalu ketuk Izinkan.</string>
+    <string name="debug_lock_turn_on">Aktifkan</string>
 </resources>

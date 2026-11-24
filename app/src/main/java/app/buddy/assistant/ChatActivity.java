@@ -59,9 +59,18 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     private int maxBubble;
     private ToolLog log; // the tool-call group being appended to, if the last message was a step
     private final java.util.List<String> pending = new java.util.ArrayList<>(); // attachments for the next message
+    /** Files sent to the chat's Linux tools, for the next message: their paths there (shown as chips, like attachments). */
+    private java.util.List<String> pendingLinux = new java.util.ArrayList<>();
+    /** Those chips per chat, kept while Buddy runs: leaving the chat or turning the phone doesn't lose them. */
+    private static final java.util.Map<String, java.util.List<String>> LINUX_CHIPS = new java.util.HashMap<>();
     private android.widget.HorizontalScrollView trayScroll;
     private LinearLayout tray;
-    private static final int REQ_CAMERA = 21, REQ_PHOTOS = 22, REQ_FILES = 23;
+    private static final int REQ_CAMERA = 21, REQ_PHOTOS = 22, REQ_FILES = 23, REQ_BROWSE = 24;
+    /** A file being sent to Linux tools (LinuxFiles): how far, with Cancel. */
+    private LinearLayout sending;
+    private TextView sendingText;
+    private ProgressBar sendingBar;
+    private final Runnable sendingTick = this::paintSending;
     /** The background browser's live card, while this chat has a tab there. */
     private BrowserPanel browser;
     private BackgroundPanel backgroundPanel;
@@ -78,6 +87,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             finish();
             return;
         }
+        pendingLinux = LINUX_CHIPS.computeIfAbsent(ses.id, k -> new java.util.ArrayList<>());
         maxBubble = (int) (getResources().getDisplayMetrics().widthPixels * 0.82f);
 
         LinearLayout root = column(this);
@@ -171,6 +181,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         stripText = single(monoText(this, "", 12, ACCENT_TEXT));
         stripText.setPaddingRelative(dp(this, 10), 0, dp(this, 8), 0);
         strip.addView(stripText, weight1());
+        // (says the line opens something: a tap on it shows what runs now, which nothing else on it gave away)
+        ImageView more = icon(this, R.drawable.ms_expand_more, MUTED, 22);
+        LinearLayout.LayoutParams mp = new LinearLayout.LayoutParams(dp(this, 22), dp(this, 22));
+        mp.setMarginEnd(dp(this, 8));
+        strip.addView(more, mp);
         Button stop = button(this, getString(R.string.chat_stop), false);
         stop.setTextColor(ERR);
         stop.setBackground(rounded(this, ERR_SOFT, 10));
@@ -179,6 +194,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         stop.setPaddingRelative(dp(this, 14), 0, dp(this, 14), 0);
         stop.setOnClickListener(v -> hub.stop(ses));
         strip.addView(stop, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 34)));
+        // a tap on the line itself: what the agent is doing now, the command it runs and its processes (issue #81)
+        strip.setForeground(getDrawable(ripple(this, false)));
+        strip.setOnClickListener(v -> commandSheet());
+        strip.setContentDescription(getString(R.string.cmd_sheet_title));
         LinearLayout.LayoutParams stp = full();
         stp.leftMargin = stp.rightMargin = dp(this, 12);
         stp.topMargin = dp(this, 8);
@@ -218,7 +237,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         messages.setPaddingRelative(dp(this, 16), dp(this, 8), dp(this, 16), dp(this, 12));
         scroll.addView(messages);
         watchEnd();
-        root.addView(scroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
+        root.addView(withJumpToEnd(this, scroll, this::scrollToEnd), new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
 
         // a notification rule's chat: "Check again" has the agent look at the conversation now (see Triggers.recheck)
         recheck = button(this, getString(R.string.rules_recheck), false);
@@ -261,6 +280,38 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         slp.leftMargin = slp.rightMargin = dp(this, 12);
         slp.bottomMargin = dp(this, 6);
         root.addView(slashList, slp);
+
+        // a file on its way to Linux tools: how far, and Cancel
+        sending = row(this);
+        sending.setGravity(Gravity.CENTER_VERTICAL);
+        sending.setPaddingRelative(dp(this, 12), dp(this, 6), dp(this, 4), dp(this, 6));
+        sending.setBackground(rounded(this, CARD, 14));
+        LinearLayout sc = column(this);
+        sendingText = single(text(this, "", 13, TEXT));
+        sc.addView(sendingText);
+        sendingBar = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
+        sendingBar.setMax(1000);
+        sendingBar.setProgressTintList(ColorStateList.valueOf(ACCENT));
+        sendingBar.setProgressBackgroundTintList(ColorStateList.valueOf(CARD2));
+        sendingBar.setIndeterminateTintList(ColorStateList.valueOf(ACCENT));
+        LinearLayout.LayoutParams sbp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(this, 4));
+        sbp.topMargin = dp(this, 6);
+        sc.addView(sendingBar, sbp);
+        sending.addView(sc, weight1());
+        TextView cancelSend = text(this, getString(android.R.string.cancel), 14, ACCENT_TEXT);
+        cancelSend.setTypeface(sans(this, 600));
+        cancelSend.setPaddingRelative(dp(this, 12), dp(this, 8), dp(this, 12), dp(this, 8));
+        cancelSend.setBackgroundResource(ripple(this, false));
+        cancelSend.setOnClickListener(v -> {
+            LinuxFiles.cancel(ses.id);
+            paintSending();
+        });
+        sending.addView(cancelSend);
+        sending.setVisibility(View.GONE);
+        LinearLayout.LayoutParams sdp = full();
+        sdp.leftMargin = sdp.rightMargin = dp(this, 12);
+        sdp.bottomMargin = dp(this, 6);
+        root.addView(sending, sdp);
 
         // composer
         trayScroll = new android.widget.HorizontalScrollView(this);
@@ -431,6 +482,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             pending.addAll(files);
             renderTray();
         }
+        // from the Files screen, when it was opened by an upload's notification rather than from this chat
+        if (state == null) mention(getIntent().getStringArrayListExtra(FilesActivity.EXTRA_MENTION));
     }
 
     /** The chat's messages from scratch. */
@@ -563,6 +616,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         }
         if (lastMsg() != lastShown) showAll(); // messages came in while this screen was hidden
         refresh();
+        paintSending();
+        if (!pendingLinux.isEmpty()) renderTray(); // (chips kept from before the chat was left)
         if (found != null && foundView != null) showFound(); // opened from Search: at the message, not the end
         else scrollToEnd();
     }
@@ -570,11 +625,16 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     @Override
     protected void onPause() {
         if (helpersBox != null) helpersBox.removeCallbacks(helperTick);
+        if (sending != null) sending.removeCallbacks(sendingTick);
         for (HelperCard c : helperCards.values()) if (c.watching != null) {
             Browser.unwatch(c.watching, c);
             c.watching = null;
         }
         if (Voice.listening()) Voice.stopListening();
+        if (commandSheet != null) { // it asks Linux every 2 s: not while nobody looks
+            commandSheet.dismiss();
+            commandSheet = null;
+        }
         // a live call goes on (the agent works in other apps): it ends with End, the screen off or a pause
         CodexLive.removeUi(liveUi);
         if (ses != null) {
@@ -593,6 +653,26 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         super.onPause();
     }
 
+    /** How many lines of a long step the chat shows until it's tapped. */
+    private static final int STEP_LINES = 4;
+
+    /** The open "what is it doing" sheet (see CommandSheet), or null. */
+    private Dialog commandSheet;
+
+    private void commandSheet() {
+        if (commandSheet != null && commandSheet.isShowing()) return;
+        commandSheet = CommandSheet.show(this, ses);
+    }
+
+    /** The chat's step line for that command, as ChatHub adds it. */
+    private static String commandStep(String cmd) {
+        try {
+            return ChatHub.describeTool("Bash", new org.json.JSONObject().put("command", cmd), true);
+        } catch (org.json.JSONException e) {
+            return null;
+        }
+    }
+
     private View divider() {
         View v = new View(this);
         v.setBackgroundColor(LINE);
@@ -600,7 +680,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     }
 
     private void paintSend() {
-        boolean has = input.getText().toString().trim().length() > 0 || !pending.isEmpty();
+        boolean has = input.getText().toString().trim().length() > 0 || !pending.isEmpty() || !pendingLinux.isEmpty();
         send.setBackground(oval(has ? ACCENT : CARD2));
         send.setImageTintList(ColorStateList.valueOf(has ? ON_ACCENT : MUTED));
     }
@@ -643,14 +723,15 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
 
     private void send() {
         String text = input.getText().toString().trim();
-        if (text.isEmpty() && pending.isEmpty()) return;
+        if (text.isEmpty() && pending.isEmpty() && pendingLinux.isEmpty()) return;
         if (quoted != null) { // as Markdown, so the agent can tell what's quoted from what's asked
             StringBuilder b = new StringBuilder();
             for (String line : quoted.split("\n")) b.append("> ").append(line).append('\n');
             text = b.append('\n').append(text).toString();
         }
         sentAt = android.os.SystemClock.uptimeMillis(); // (its message shows, wherever the user was reading)
-        String err = hub.send(ses, text, pending);
+        // (files in Linux tools stay chips on the message; the agent gets their paths with it)
+        String err = hub.send(ses, text, pending, new java.util.ArrayList<>(pendingLinux));
         if (err != null) {
             Toast.makeText(this, err, Toast.LENGTH_LONG).show();
             return;
@@ -658,6 +739,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         input.setText("");
         setQuote(null);
         pending.clear();
+        pendingLinux.clear();
         renderTray();
     }
 
@@ -815,7 +897,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         if (options.size() > SEARCH_FROM) c.addView(listFilter(this, getString(R.string.chat_model_search), found), full());
         View heading = null;
         for (final String[] o : options) {
-            if (o[0] == null) { // an API key service's models
+            if (o[0] == null) { // a service's models
                 TextView sl = sectionLabel(this, o[1]);
                 sl.setPaddingRelative(0, dp(this, 14), 0, dp(this, 2));
                 c.addView(sl);
@@ -1569,6 +1651,9 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 ses.incognito, on -> hub.setIncognito(ses, on));
         inc.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
         c.addView(inc, full());
+        if (ses.parent.isEmpty() && Linux.installed(this) && (linuxFiles() || LinuxFiles.dir(this, ses.id).isDirectory())) {
+            linuxFilesRows(c, sheet);
+        }
         TextView sl = sectionLabel(this, getString(R.string.schedule_title));
         sl.setPaddingRelative(0, dp(this, 12), 0, dp(this, 4));
         c.addView(sl);
@@ -1584,8 +1669,9 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             st.addView(text(this, getString(R.string.schedule_set_info), 13, MUTED));
         } else {
             st.addView(title(this, ses.schedule.summary(this), 15));
-            st.addView(text(this, getString(R.string.schedule_next,
-                    Schedules.when(this, ses.schedule.next(System.currentTimeMillis()))), 13, MUTED));
+            st.addView(text(this, ses.schedule.timed ? getString(R.string.schedule_next,
+                    Schedules.when(this, ses.schedule.next(System.currentTimeMillis())))
+                    : getString(R.string.schedule_events_today, Events.runsToday(this, ses.id), ses.schedule.cap), 13, MUTED));
         }
         sr.addView(st, weight1());
         sr.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
@@ -1652,6 +1738,189 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     }
 
     /**
+     * Chat options: Files (the browser of Buddy's Linux, opened at this chat's place; the row says how much was sent to
+     * this chat's Linux tools, which can be a lot), and whether those files stay when the chat is deleted.
+     */
+    private void linuxFilesRows(LinearLayout c, Dialog[] sheet) {
+        LinearLayout pr = row(this);
+        pr.setGravity(Gravity.CENTER_VERTICAL);
+        pr.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
+        pr.setBackgroundResource(ripple(this, false));
+        LinearLayout pt = column(this);
+        pt.addView(title(this, getString(R.string.chat_project), 15));
+        TextView where = text(this, ses.folder.isEmpty() ? getString(R.string.chat_project_none) : ses.folder, 13, MUTED);
+        where.setPaddingRelative(0, dp(this, 2), 0, 0);
+        pt.addView(where);
+        pr.addView(pt, weight1());
+        pr.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
+        pr.setOnClickListener(v -> {
+            if (sheet[0] != null) sheet[0].dismiss();
+            projectSheet();
+        });
+        c.addView(pr, full());
+        LinearLayout r = row(this);
+        r.setGravity(Gravity.CENTER_VERTICAL);
+        r.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
+        r.setBackgroundResource(ripple(this, false));
+        LinearLayout t = column(this);
+        t.addView(title(this, getString(R.string.files_title), 15));
+        TextView size = text(this, getString(R.string.chat_files_row), 13, MUTED);
+        size.setPaddingRelative(0, dp(this, 2), 0, 0);
+        t.addView(size);
+        r.addView(t, weight1());
+        r.addView(icon(this, R.drawable.ms_chevron_right, MUTED, 22));
+        r.setOnClickListener(v -> {
+            if (sheet[0] != null) sheet[0].dismiss();
+            openFiles(null);
+        });
+        c.addView(r, full());
+        new Thread(() -> { // (walking a folder the agent unpacked into can take a moment)
+            long n = LinuxFiles.kept(this, ses.id);
+            if (n > 0) runOnUiThread(() -> size.setText(getString(R.string.chat_files_row_size,
+                    android.text.format.Formatter.formatShortFileSize(this, n))));
+        }, "linux-files-size").start();
+        LinearLayout keep = switchRow(this, getString(R.string.chat_linux_files_keep), getString(R.string.chat_linux_files_keep_info),
+                ses.keepFiles, on -> hub.setKeepFiles(ses, on));
+        keep.setPaddingRelative(dp(this, 4), dp(this, 8), dp(this, 4), dp(this, 12));
+        c.addView(keep, full());
+    }
+
+    /**
+     * The chat's project folder: the workspace itself (shared by the chats without one), one of the workspace's
+     * folders, or a new one. Folders deeper down are chosen on the Files screen ("Make this the chat's project").
+     */
+    private void projectSheet() {
+        final LinearLayout c = column(this);
+        c.addView(title(this, getString(R.string.chat_project), 18));
+        TextView info = text(this, getString(R.string.chat_project_info), 13, MUTED);
+        info.setPaddingRelative(0, dp(this, 4), 0, dp(this, 10));
+        c.addView(info);
+        final LinearLayout rows = column(this);
+        c.addView(rows, full());
+        ScrollView sv = new ScrollView(this);
+        sv.addView(c);
+        final Dialog d = bottomSheet(this, sv);
+        final java.util.function.Consumer<String> pick = rel -> {
+            final Runnable set = () -> {
+                String err = hub.setFolder(ses, rel);
+                if (err != null) Toast.makeText(this, err, Toast.LENGTH_LONG).show();
+                d.dismiss();
+            };
+            if (rel.equals(ses.folder)) d.dismiss();
+            else if (ses.messages.isEmpty()) set.run();
+            else confirmSheet(this, rel.isEmpty() ? getString(R.string.files_project_none_title) : getString(R.string.files_project_title, rel),
+                    getString(R.string.files_project_text), getString(R.string.files_project_yes), false, set);
+        };
+        new Thread(() -> {
+            final java.util.List<String> names = new java.util.ArrayList<>();
+            try {
+                String[] kids = FilePlaces.folder(this, null, FilePlaces.work(this)).list();
+                if (kids != null) for (String k : kids) {
+                    FilePlaces.Entry e = FilePlaces.stat(new java.io.File(FilePlaces.work(this), k));
+                    if (e != null && e.dir && !e.hidden() && FilePlaces.validProject(k)) names.add(k);
+                }
+            } catch (Exception ignored) {
+            }
+            java.util.Collections.sort(names, String.CASE_INSENSITIVE_ORDER);
+            // (a project deeper down, chosen on the Files screen: listed too, as what the chat has)
+            if (!ses.folder.isEmpty() && !names.contains(ses.folder)) names.add(0, ses.folder);
+            runOnUiThread(() -> {
+                rows.addView(projectRow(getString(R.string.chat_project_none), getString(R.string.chat_project_none_info),
+                        ses.folder.isEmpty(), () -> pick.accept("")), full());
+                for (String n : names) rows.addView(projectRow(n, null, n.equals(ses.folder), () -> pick.accept(n)), full());
+                LinearLayout add = row(this);
+                add.setGravity(Gravity.CENTER_VERTICAL);
+                add.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
+                add.setBackgroundResource(ripple(this, false));
+                add.addView(icon(this, R.drawable.ms_create_new_folder, ACCENT_TEXT, 22));
+                TextView at = text(this, getString(R.string.files_new_folder), 15, ACCENT_TEXT);
+                at.setPaddingRelative(dp(this, 14), 0, 0, 0);
+                add.addView(at, weight1());
+                add.setOnClickListener(v -> newProject(pick));
+                rows.addView(add, full());
+            });
+        }, "chat-projects").start();
+        d.show();
+    }
+
+    private View projectRow(String name, String sub, boolean on, Runnable tap) {
+        LinearLayout r = row(this);
+        r.setGravity(Gravity.CENTER_VERTICAL);
+        r.setPaddingRelative(dp(this, 4), dp(this, 10), dp(this, 4), dp(this, 10));
+        r.setBackgroundResource(ripple(this, false));
+        r.addView(icon(this, R.drawable.ms_folder, on ? ACCENT_TEXT : MUTED, 22));
+        LinearLayout t = column(this);
+        t.setPaddingRelative(dp(this, 14), 0, dp(this, 8), 0);
+        TextView nm = single(text(this, name, 15, TEXT));
+        nm.setEllipsize(android.text.TextUtils.TruncateAt.MIDDLE);
+        t.addView(nm);
+        if (sub != null) t.addView(text(this, sub, 13, MUTED));
+        r.addView(t, weight1());
+        if (on) r.addView(icon(this, R.drawable.ms_check, ACCENT_TEXT, 22));
+        r.setOnClickListener(v -> tap.run());
+        return r;
+    }
+
+    /** A new folder in the workspace, as the chat's project. */
+    private void newProject(final java.util.function.Consumer<String> pick) {
+        LinearLayout c = column(this);
+        c.addView(title(this, getString(R.string.files_new_folder), 18));
+        final EditText field = new EditText(this);
+        field.setHint(R.string.files_name_hint);
+        field.setHintTextColor(MUTED);
+        field.setTextColor(TEXT);
+        field.setTextSize(15);
+        field.setSingleLine(true);
+        field.setPaddingRelative(dp(this, 12), dp(this, 12), dp(this, 12), dp(this, 12));
+        field.setBackground(outlined(this, BG, 12, OUTLINE, 1));
+        LinearLayout.LayoutParams fp = full();
+        fp.topMargin = dp(this, 12);
+        c.addView(field, fp);
+        Button ok = button(this, getString(R.string.files_create), true);
+        LinearLayout.LayoutParams op = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(this, 48));
+        op.topMargin = dp(this, 14);
+        c.addView(ok, op);
+        final Dialog d = bottomSheet(this, c);
+        ok.setOnClickListener(v -> {
+            String n = field.getText().toString().trim();
+            if (!FilePlaces.validProject(n) || n.startsWith(".")) {
+                Toast.makeText(this, R.string.files_bad_name, Toast.LENGTH_LONG).show();
+                return;
+            }
+            try {
+                java.io.File w = FilePlaces.folder(this, null, FilePlaces.work(this));
+                java.io.File f = new java.io.File(w, n);
+                FilePlaces.Entry e = FilePlaces.stat(f);
+                if (e == null) android.system.Os.mkdir(f.getPath(), 0700);
+                else if (!e.dir) throw new java.io.IOException(android.system.Os.strerror(android.system.OsConstants.EEXIST));
+            } catch (Exception x) {
+                Toast.makeText(this, getString(R.string.files_folder_failed, n, FilePlaces.why(x)), Toast.LENGTH_LONG).show();
+                return;
+            }
+            d.dismiss();
+            pick.accept(n);
+        });
+        d.show();
+    }
+
+    /**
+     * Files, for this chat: at its own place, or at the folder given (as the agent sees it). "Mention in chat" there
+     * comes back as a result (see onActivityResult).
+     */
+    private void openFiles(String path) {
+        android.content.Intent i = new android.content.Intent(this, FilesActivity.class).putExtra(FilesActivity.EXTRA_CHAT, ses.id);
+        if (path != null) i.putExtra(FilesActivity.EXTRA_PATH, path);
+        startActivityForResult(i, REQ_BROWSE);
+    }
+
+    /** Files named on the Files screen ("Mention in chat"): a chip each above the message box, once. */
+    private void mention(java.util.List<String> paths) {
+        if (paths == null) return;
+        for (String p : paths) if (!pendingLinux.contains(p)) pendingLinux.add(p);
+        renderTray();
+    }
+
+    /**
      * The chat's schedule: a time of day, the days (every day, weekdays or picked ones), the message Buddy sends then as
      * if the user typed it (at first the chat's first message), and whether to wake the phone for it. Nothing changes
      * until Save.
@@ -1665,13 +1934,23 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         info.setPaddingRelative(0, dp(this, 4), 0, dp(this, 8));
         c.addView(info);
 
+        // at set times (the times and days below), on events (further down), or both
+        LinearLayout timedBox = column(this);
+        LinearLayout timed = switchRow(this, getString(R.string.schedule_at_times), null, p.timed, on -> {
+            p.timed = on;
+            timedBox.setVisibility(on ? View.VISIBLE : View.GONE);
+        });
+        timed.setPaddingRelative(dp(this, 4), dp(this, 8), dp(this, 4), dp(this, 4));
+        c.addView(timed, full());
+        timedBox.setVisibility(p.timed ? View.VISIBLE : View.GONE);
+        c.addView(timedBox, full());
         TextView tl = sectionLabel(this, getString(R.string.schedule_time));
         tl.setPaddingRelative(0, dp(this, 8), 0, dp(this, 4));
-        c.addView(tl);
+        timedBox.addView(tl);
         // one box per time: a tap changes it, its ✕ takes it away, + adds another. One time alone shows large;
         // several share each line's width evenly, three to a line (two with a 12-hour clock, whose times are longer)
         LinearLayout times = column(this);
-        c.addView(times, full());
+        timedBox.addView(times, full());
         final boolean h24 = android.text.format.DateFormat.is24HourFormat(this);
         final Runnable[] paintTimes = new Runnable[1];
         paintTimes[0] = () -> {
@@ -1756,13 +2035,13 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
 
         TextView dl = sectionLabel(this, getString(R.string.schedule_days));
         dl.setPaddingRelative(0, dp(this, 14), 0, dp(this, 4));
-        c.addView(dl);
+        timedBox.addView(dl);
         FrameLayout modes = new FrameLayout(this);
-        c.addView(modes, full());
+        timedBox.addView(modes, full());
         LinearLayout picks = row(this);
         LinearLayout.LayoutParams pp = full();
         pp.topMargin = dp(this, 8);
-        c.addView(picks, pp);
+        timedBox.addView(picks, pp);
         String[] names = new java.text.DateFormatSymbols(Ui.locale(this)).getShortWeekdays();
         final Runnable[] paint = new Runnable[1];
         final String[] mode = {p.days == Schedules.Plan.EVERY_DAY ? "daily" : p.days == Schedules.Plan.WEEKDAYS ? "weekdays" : "pick"};
@@ -1795,6 +2074,36 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             }
         };
         paint[0].run();
+
+        TextView el = sectionLabel(this, getString(R.string.schedule_events));
+        el.setPaddingRelative(0, dp(this, 18), 0, 0);
+        c.addView(el);
+        TextView ei = text(this, getString(R.string.schedule_events_info), 13, MUTED);
+        ei.setPaddingRelative(0, dp(this, 2), 0, dp(this, 4));
+        c.addView(ei);
+        LinearLayout eventsBox = column(this);
+        c.addView(eventsBox, full());
+        final Runnable[] paintEvents = new Runnable[1];
+        paintEvents[0] = () -> {
+            eventsBox.removeAllViews();
+            for (String k : Events.ALL) {
+                boolean on = p.events.contains(k);
+                LinearLayout r = switchRow(this, Events.label(this, p, k), null, on, v -> {
+                    if (v) p.events.add(k);
+                    else p.events.remove(k);
+                    // Android 12+ tells Buddy about Bluetooth devices only with Nearby devices allowed
+                    if (v && Events.BT_ON.equals(k) && !Events.bluetoothAllowed(this)) askEventPermission(true);
+                    eventsBox.post(paintEvents[0]);
+                });
+                r.setPaddingRelative(dp(this, 4), dp(this, 6), dp(this, 4), dp(this, 6));
+                eventsBox.addView(r, full());
+                if (on && Events.WIFI_ON.equals(k)) eventsBox.addView(wifiChoice(p, paintEvents[0]), full());
+                if (on && Events.BT_ON.equals(k)) eventsBox.addView(bluetoothChoice(p, paintEvents[0]), full());
+            }
+            if (!p.events.isEmpty()) eventsBox.addView(capRow(p), full());
+        };
+        eventsPaint = paintEvents[0];
+        paintEvents[0].run();
 
         TextView ml = sectionLabel(this, getString(R.string.schedule_message));
         ml.setPaddingRelative(0, dp(this, 14), 0, dp(this, 4));
@@ -1862,7 +2171,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         c.addView(btns, full());
         save.setOnClickListener(v -> {
             p.text = msg.getText().toString().trim();
-            if ((p.days & Schedules.Plan.EVERY_DAY) == 0) {
+            if (!p.timed && p.events.isEmpty()) {
+                Toast.makeText(this, R.string.schedule_need_start, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (p.timed && (p.days & Schedules.Plan.EVERY_DAY) == 0) {
                 Toast.makeText(this, R.string.schedule_no_days, Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -1873,11 +2186,133 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             }
             d[0].dismiss();
             hub.setSchedule(ses, p);
-            Toast.makeText(this, getString(R.string.schedule_next, Schedules.when(this, p.next(System.currentTimeMillis()))),
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, p.timed ? getString(R.string.schedule_next, Schedules.when(this, p.next(System.currentTimeMillis())))
+                    : getString(R.string.schedule_on_events, Events.summary(this, p)), Toast.LENGTH_SHORT).show();
         });
         d[0] = bottomSheet(this, c);
         d[0].show();
+    }
+
+    /** The open schedule sheet's events, painted again when a permission they need comes back. */
+    private Runnable eventsPaint;
+    private static final int ASK_EVENTS = 5;
+
+    private void askEventPermission(boolean bluetooth) {
+        if (bluetooth) {
+            if (android.os.Build.VERSION.SDK_INT >= 31) requestPermissions(new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, ASK_EVENTS);
+        } else {
+            requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION}, ASK_EVENTS);
+        }
+    }
+
+    /** One choice of a list under an event: a radio and its words. */
+    private LinearLayout choice(String label, boolean on, Runnable pick) {
+        LinearLayout r = row(this);
+        r.setGravity(Gravity.CENTER_VERTICAL);
+        r.setPaddingRelative(dp(this, 20), dp(this, 6), dp(this, 4), dp(this, 6));
+        r.setBackgroundResource(ripple(this, false));
+        r.addView(Ui.radio(this, on));
+        TextView t = text(this, label, 14, TEXT);
+        t.setPaddingRelative(dp(this, 10), 0, 0, 0);
+        r.addView(t, weight1());
+        r.setOnClickListener(v -> pick.run());
+        return r;
+    }
+
+    private TextView eventNote(String s, Runnable tap) {
+        TextView t = text(this, s, 13, tap != null ? ACCENT_TEXT : MUTED);
+        t.setPaddingRelative(dp(this, 20), dp(this, 4), dp(this, 4), dp(this, 6));
+        if (tap != null) t.setOnClickListener(v -> tap.run());
+        return t;
+    }
+
+    /** Wi-Fi connected: any network, or one by its name (the one the phone is on now, or the one picked before). */
+    private LinearLayout wifiChoice(Schedules.Plan p, Runnable repaint) {
+        LinearLayout box = column(this);
+        box.addView(choice(getString(R.string.schedule_wifi_any), p.wifi.isEmpty(), () -> {
+            p.wifi = "";
+            repaint.run();
+        }), full());
+        java.util.LinkedHashSet<String> names = new java.util.LinkedHashSet<>();
+        if (!p.wifi.isEmpty()) names.add(p.wifi);
+        String now = Events.locationAllowed(this) ? Events.currentWifi(this) : null;
+        if (now != null) names.add(now);
+        for (String n : names) {
+            box.addView(choice(n, n.equals(p.wifi), () -> {
+                p.wifi = n;
+                repaint.run();
+            }), full());
+        }
+        // Android tells apps a network's name only with location allowed
+        if (!Events.locationAllowed(this)) {
+            box.addView(eventNote(getString(R.string.schedule_wifi_location), () -> askEventPermission(false)), full());
+        } else if (!p.wifi.isEmpty()) {
+            box.addView(eventNote(getString(R.string.schedule_wifi_named_note), null), full());
+        }
+        return box;
+    }
+
+    /** Bluetooth device connected: any, or one of the phone's paired devices. */
+    @android.annotation.SuppressLint("MissingPermission")
+    private LinearLayout bluetoothChoice(Schedules.Plan p, Runnable repaint) {
+        LinearLayout box = column(this);
+        if (!Events.bluetoothAllowed(this)) {
+            box.addView(eventNote(getString(R.string.schedule_bt_allow), () -> askEventPermission(true)), full());
+            return box;
+        }
+        box.addView(choice(getString(R.string.schedule_bt_any), p.bt.isEmpty(), () -> {
+            p.bt = "";
+            p.btName = "";
+            repaint.run();
+        }), full());
+        java.util.LinkedHashMap<String, String> devices = new java.util.LinkedHashMap<>();
+        if (!p.bt.isEmpty()) devices.put(p.bt, p.btName);
+        try {
+            android.bluetooth.BluetoothManager bm = getSystemService(android.bluetooth.BluetoothManager.class);
+            android.bluetooth.BluetoothAdapter ad = bm == null ? null : bm.getAdapter();
+            if (ad != null) for (android.bluetooth.BluetoothDevice d : ad.getBondedDevices()) {
+                String n = d.getName();
+                devices.put(d.getAddress(), n == null || n.isEmpty() ? d.getAddress() : n);
+            }
+        } catch (Exception ignored) { // Bluetooth off or not allowed: the choices so far
+        }
+        for (java.util.Map.Entry<String, String> e : devices.entrySet()) {
+            box.addView(choice(e.getValue(), e.getKey().equalsIgnoreCase(p.bt), () -> {
+                p.bt = e.getKey();
+                p.btName = e.getValue();
+                repaint.run();
+            }), full());
+        }
+        if (devices.isEmpty()) box.addView(eventNote(getString(R.string.schedule_bt_none), null), full());
+        return box;
+    }
+
+    /** Runs from events a day: − n + (1 to 20). */
+    private LinearLayout capRow(Schedules.Plan p) {
+        LinearLayout r = row(this);
+        r.setGravity(Gravity.CENTER_VERTICAL);
+        r.setPaddingRelative(dp(this, 4), dp(this, 10), dp(this, 4), dp(this, 4));
+        LinearLayout t = column(this);
+        t.addView(title(this, getString(R.string.schedule_cap), 15));
+        t.addView(text(this, getString(R.string.schedule_cap_info), 13, MUTED));
+        r.addView(t, weight1());
+        TextView n = monoText(this, String.valueOf(p.cap), 16, TEXT);
+        n.setGravity(Gravity.CENTER);
+        ImageButton less = iconButton(this, R.drawable.ms_remove, getString(R.string.schedule_cap_less), ACCENT_TEXT);
+        ImageButton more = iconButton(this, R.drawable.ms_add, getString(R.string.schedule_cap_more), ACCENT_TEXT);
+        less.setOnClickListener(v -> {
+            p.cap = Math.max(Events.CAP_MIN, p.cap - 1);
+            n.setText(String.valueOf(p.cap));
+        });
+        more.setOnClickListener(v -> {
+            p.cap = Math.min(Events.CAP_MAX, p.cap + 1);
+            n.setText(String.valueOf(p.cap));
+        });
+        r.addView(less, new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
+        r.addView(n, new LinearLayout.LayoutParams(dp(this, 32), LinearLayout.LayoutParams.WRAP_CONTENT));
+        r.addView(more, new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
+        return r;
     }
 
     /** Pick an app for "Allowed without asking": launchable apps, without those it never covers (Guard.allowable). */
@@ -2171,6 +2606,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         super.onRequestPermissionsResult(code, perms, res);
         if (code == 3 && Voice.micAllowed(this)) toggleMic();
         if (code == 4 && Voice.micAllowed(this)) startLive();
+        if (code == ASK_EVENTS && eventsPaint != null) eventsPaint.run(); // the network's name, the paired devices
     }
 
     /** One line per scheduled message: when, what, and Cancel. */
@@ -2523,7 +2959,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             tp.bottomMargin = -dp(this, 8); // close to its message
             messages.addView(tag, tp);
         }
-        if (m.kind == Bubble.Kind.USER && !m.files.isEmpty()) {
+        if (m.kind == Bubble.Kind.USER && (!m.files.isEmpty() || !m.linux.isEmpty())) {
             if (log != null) {
                 log.finish();
                 log = null;
@@ -2537,6 +2973,14 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 View av = attachmentView(id, true);
                 if (m.text.isEmpty()) messageMenuOnLongPress(av, m); // only files: copy, quote, edit, fork from them
                 col.addView(av, fp);
+            }
+            for (String path : m.linux) { // a file in the chat's Linux tools: a chip that opens Files where it is
+                LinearLayout.LayoutParams fp = wrap();
+                fp.gravity = Gravity.END;
+                fp.bottomMargin = dp(this, 4);
+                View lv = linuxFileChip(path);
+                if (m.text.isEmpty() && m.files.isEmpty()) messageMenuOnLongPress(lv, m);
+                col.addView(lv, fp);
             }
             if (!m.text.isEmpty()) {
                 View tv = userBubble(m.text);
@@ -2567,6 +3011,24 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         }
     }
 
+    /** A sent message's file in Linux tools: its name and where it is, as an attachment's chip looks. */
+    private View linuxFileChip(final String path) {
+        LinearLayout chip = row(this);
+        chip.setGravity(Gravity.CENTER_VERTICAL);
+        chip.setPaddingRelative(dp(this, 10), dp(this, 8), dp(this, 12), dp(this, 8));
+        chip.setBackground(corners(this, USER, 16, 16, 6, 16));
+        chip.addView(icon(this, R.drawable.ms_terminal, TEXT, 20));
+        LinearLayout tx = column(this);
+        tx.setPaddingRelative(dp(this, 8), 0, 0, 0);
+        TextView name = single(text(this, path.substring(path.lastIndexOf('/') + 1), 14, TEXT));
+        name.setMaxWidth(dp(this, 220));
+        tx.addView(name);
+        tx.addView(single(text(this, getString(R.string.chat_attach_in_linux), 12, TEXT2)));
+        chip.addView(tx);
+        chip.setOnClickListener(v -> openFiles(path.substring(0, Math.max(1, path.lastIndexOf('/'))))); // its folder
+        return chip;
+    }
+
     // --------------------------------------------------------- attachments
 
     private void attachSheet() {
@@ -2578,7 +3040,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         Object[][] opts = {
                 {R.drawable.ms_photo_camera, getString(R.string.chat_attach_camera), getString(R.string.chat_attach_camera_sub)},
                 {R.drawable.ms_image, getString(R.string.chat_attach_photos), getString(R.string.chat_attach_photos_sub)},
-                {R.drawable.ms_description, getString(R.string.chat_attach_files), getString(R.string.chat_attach_files_sub)},
+                // with Linux tools on, a file too big to attach goes straight to the chat's Linux folder (issue #76):
+                // one way to add a file, whatever its size
+                {R.drawable.ms_description, getString(R.string.chat_attach_files), getString(linuxFiles()
+                        ? R.string.chat_attach_files_linux_sub : R.string.chat_attach_files_sub)},
         };
         for (int i = 0; i < opts.length; i++) {
             final int which = i;
@@ -2639,6 +3104,18 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     @Override
     protected void onActivityResult(int code, int result, android.content.Intent data) {
         super.onActivityResult(code, result, data);
+        if (code == REQ_BROWSE) { // back from Files
+            // (a file deleted there can't stay named in the next message)
+            for (String p : new java.util.ArrayList<>(pendingLinux)) {
+                try {
+                    if (FilePlaces.stat(FilePlaces.fromLinux(this, p)) == null) pendingLinux.remove(p);
+                } catch (java.io.IOException ignored) {
+                }
+            }
+            renderTray();
+            if (result == RESULT_OK && data != null) mention(data.getStringArrayListExtra(FilesActivity.EXTRA_MENTION));
+            return;
+        }
         if (result != RESULT_OK) return;
         final java.util.List<android.net.Uri> uris = new java.util.ArrayList<>();
         if (code == REQ_CAMERA) {
@@ -2650,7 +3127,37 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 uris.add(data.getData());
             }
         }
-        if (!uris.isEmpty()) addFiles(uris, null);
+        if (uris.isEmpty()) return;
+        addFiles(uris, null);
+    }
+
+    /** Whether this chat can take files for Linux tools: its own chat (not a sub-agent's) with them on, not lite. */
+    private boolean linuxFiles() {
+        return ses.dev && !Lite.on(ses) && ses.parent.isEmpty() && Linux.installed(this);
+    }
+
+    /**
+     * The row of a file on its way to Linux tools, every half second while there is one; when one is done, its path
+     * goes into the message box ("unpack it" is then all there is to type).
+     */
+    private void paintSending() {
+        sending.removeCallbacks(sendingTick);
+        // (the job first: a file's path is ready before its job ends, so none is missed between the two)
+        LinuxFiles.Job j = LinuxFiles.current(ses.id);
+        java.util.List<String> paths = LinuxFiles.takeReady(ses.id);
+        if (!paths.isEmpty()) { // a chip each, like an attachment; the path goes to the agent with the message
+            pendingLinux.addAll(paths);
+            renderTray();
+        }
+        sending.setVisibility(j == null ? View.GONE : View.VISIBLE);
+        if (j == null) return;
+        int more = LinuxFiles.count(ses.id) - 1;
+        String line = getString(R.string.linux_file_sending, j.name) + " · " + LinuxFiles.progress(this, j);
+        if (more > 0) line += " · " + getResources().getQuantityString(R.plurals.linux_file_more, more, more);
+        sendingText.setText(line);
+        sendingBar.setIndeterminate(j.size <= 0);
+        if (j.size > 0) sendingBar.setProgress((int) Math.min(1000, j.done * 1000 / j.size));
+        if (resumed) sending.postDelayed(sendingTick, 500);
     }
 
     /** Copies picked or pasted files into Buddy's storage and adds them to the next message; then done, if any. */
@@ -2659,13 +3166,22 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 : getResources().getQuantityString(R.plurals.chat_adding_files, uris.size(), uris.size()), Toast.LENGTH_SHORT).show();
         new Thread(() -> {
             java.util.List<String> ids = new java.util.ArrayList<>();
+            final java.util.List<android.net.Uri> big = new java.util.ArrayList<>();
             String err = null;
             for (android.net.Uri u : uris) {
                 try {
                     ids.add(Attachments.importUri(this, u));
+                } catch (Attachments.TooLarge e) {
+                    if (linuxFiles()) big.add(u); // too big for the model to read: for the chat's Linux tools instead
+                    else err = e.getMessage();
                 } catch (Exception e) {
                     err = e.getMessage();
                 }
+            }
+            // (opened at once, while the picker's grant holds; the copy itself goes on when this screen is left)
+            if (!big.isEmpty()) {
+                String e2 = LinuxFiles.send(this, ses.id, big);
+                if (e2 != null) err = e2;
             }
             final String error = err;
             runOnUiThread(() -> {
@@ -2673,6 +3189,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 if (isFinishing()) return;
                 pending.addAll(ids);
                 renderTray();
+                if (!big.isEmpty()) {
+                    Toast.makeText(this, R.string.chat_attach_big_to_linux, Toast.LENGTH_LONG).show();
+                    paintSending();
+                }
                 if (error != null) Toast.makeText(this, error, Toast.LENGTH_LONG).show();
             });
         }).start();
@@ -2680,7 +3200,43 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
 
     private void renderTray() {
         tray.removeAllViews();
-        trayScroll.setVisibility(pending.isEmpty() ? View.GONE : View.VISIBLE);
+        trayScroll.setVisibility(pending.isEmpty() && pendingLinux.isEmpty() ? View.GONE : View.VISIBLE);
+        for (final String path : new java.util.ArrayList<>(pendingLinux)) {
+            FrameLayout f = new FrameLayout(this);
+            LinearLayout chip = row(this);
+            chip.setGravity(Gravity.CENTER_VERTICAL);
+            chip.setPaddingRelative(dp(this, 10), dp(this, 8), dp(this, 12), dp(this, 8));
+            chip.setBackground(outlined(this, CARD, 14, OUTLINE, 1));
+            chip.addView(icon(this, R.drawable.ms_terminal, ACCENT_TEXT, 20));
+            LinearLayout tx = column(this);
+            tx.setPaddingRelative(dp(this, 8), 0, dp(this, 18), 0);
+            TextView name = single(text(this, path.substring(path.lastIndexOf('/') + 1), 14, TEXT));
+            name.setMaxWidth(dp(this, 200));
+            tx.addView(name);
+            tx.addView(single(text(this, getString(R.string.chat_attach_in_linux), 12, MUTED)));
+            chip.addView(tx);
+            chip.setMinimumHeight(dp(this, 64));
+            // a tap shows it where it is, on the Files screen
+            chip.setOnClickListener(v -> openFiles(path.substring(0, Math.max(1, path.lastIndexOf('/')))));
+            f.addView(chip);
+            ImageButton x = new ImageButton(this);
+            x.setImageResource(R.drawable.ms_close);
+            x.setImageTintList(ColorStateList.valueOf(0xFFFFFFFF));
+            x.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            x.setPaddingRelative(dp(this, 3), dp(this, 3), dp(this, 3), dp(this, 3));
+            x.setBackground(oval(0xB3000000));
+            x.setContentDescription(getString(R.string.chat_attachment_remove));
+            x.setOnClickListener(v -> { // (the file stays in the chat's Linux folder; only this message leaves it out)
+                pendingLinux.remove(path);
+                renderTray();
+            });
+            FrameLayout.LayoutParams xp = new FrameLayout.LayoutParams(dp(this, 22), dp(this, 22), Gravity.TOP | Gravity.END);
+            xp.setMargins(0, dp(this, 4), dp(this, 4), 0);
+            f.addView(x, xp);
+            LinearLayout.LayoutParams p = wrap();
+            p.setMarginEnd(dp(this, 8));
+            tray.addView(f, p);
+        }
         for (final String id : new java.util.ArrayList<>(pending)) {
             FrameLayout f = new FrameLayout(this);
             f.addView(attachmentView(id, false));
@@ -3222,8 +3778,26 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             sb.append(arg);
             t.setText(sb); // whole: what was typed, sent or run is read here
             t.setPaddingRelative(dp(ChatActivity.this, 8), 0, 0, 0);
+            // a long one (a script, a file written in a command) would fill the screen: its first lines, and all of
+            // it on a tap (a long press copies it whole either way)
+            final boolean longStep = step.length() > 280 || step.split("\n", STEP_LINES + 2).length > STEP_LINES;
+            if (longStep) {
+                t.setMaxLines(STEP_LINES);
+                t.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            }
             r.addView(t, weight1());
             copyOnLongPress(r, step);
+            // the command the agent is running now: a tap shows what it's doing (issue #81)
+            final String cmd = ses.running ? ses.cmd : null;
+            final boolean isCommand = cmd != null && step.equals(commandStep(cmd));
+            if (isCommand || longStep) {
+                r.setBackgroundResource(ripple(ChatActivity.this, false));
+                r.setOnClickListener(v -> {
+                    if (isCommand && ses.running && cmd.equals(ses.cmd)) commandSheet();
+                    else if (longStep) t.setMaxLines(t.getMaxLines() == STEP_LINES ? Integer.MAX_VALUE : STEP_LINES);
+                    else Toast.makeText(ChatActivity.this, R.string.cmd_sheet_done, Toast.LENGTH_SHORT).show();
+                });
+            }
             rows.addView(r, full());
             lastMark = mark;
             paintLast();

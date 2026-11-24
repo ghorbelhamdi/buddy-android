@@ -28,6 +28,13 @@ final class Attachments {
     private Attachments() {
     }
 
+    /** Past MAX_BYTES: a share to a chat with Linux tools can still send it there (LinuxFiles). */
+    static final class TooLarge extends IOException {
+        TooLarge(String message) {
+            super(message);
+        }
+    }
+
     static File dir(Context c) {
         File d = new File(c.getFilesDir(), "attachments");
         if (!d.isDirectory()) d.mkdirs();
@@ -75,7 +82,7 @@ final class Attachments {
             int n;
             while ((n = in.read(buf)) > 0) {
                 total += n;
-                if (total > MAX_BYTES) throw new IOException(c.getString(R.string.attach_too_large, name));
+                if (total > MAX_BYTES) throw new TooLarge(c.getString(R.string.attach_too_large, name));
                 o.write(buf, 0, n);
             }
         } catch (IOException e) {

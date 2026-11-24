@@ -18,12 +18,12 @@ final class Models {
     private static long refreshedAt;
 
     /** Re-reads the agents' model lists (new free OpenCode models appear often) when the picker opens, at most every
-     *  10 minutes; the helper's answer updates the lists. The API key services' lists too. */
+     *  10 minutes; the helper's answer updates the lists. The services' lists too. */
     static void refresh(android.content.Context c) {
         refresh(c, null);
     }
 
-    /** changed: an API key service's list came back different (see Providers.refresh). */
+    /** changed: a service's list came back different (see Providers.refresh). */
     static void refresh(android.content.Context c, Runnable changed) {
         Providers.refresh(c, changed);
         long now = System.currentTimeMillis();
@@ -37,7 +37,7 @@ final class Models {
 
     private static String key(String backend) {
         return "codex".equals(backend) || "opencode".equals(backend) || "agy".equals(backend) || "grok".equals(backend)
-                ? backend : "claude";
+                || "copilot".equals(backend) || "pi".equals(backend) ? backend : "claude";
     }
 
     /** The agent's own models (its plan's, or OpenCode's), "" (its default) first; only that until it has reported. */
@@ -70,16 +70,55 @@ final class Models {
 
     /**
      * Everything a model picker offers for this agent: Default, its plan's models (when it's signed in to a plan, or
-     * OpenCode's own), then each API key service it can use, under the service's name: rows {id, name}, a heading
+     * OpenCode's own), then each service saved in Buddy that it can use, under the service's name: rows {id, name}, a heading
      * {null, service name}. Service models are "@service/model".
      */
     static java.util.List<String[]> options(String backend, boolean services) {
         java.util.List<String[]> out = new java.util.ArrayList<>();
         String[][] own = forBackend(backend);
-        boolean plan = !("claude".equals(backend) || "codex".equals(backend)) || SetupState.ownModels(BuddyApp.context(), backend);
-        for (String[] m : own) if (m[0].isEmpty() || plan) out.add(m);
+        // (Claude Code, Codex and Pi can be there for the services alone: then they have no models of their own)
+        boolean plan = !("claude".equals(backend) || "codex".equals(backend) || "pi".equals(backend))
+                || SetupState.ownModels(BuddyApp.context(), backend);
+        boolean byProvider = "pi".equals(backend) || "opencode".equals(backend);
+        java.util.List<Providers.P> svcs = services ? Providers.forAgent(backend) : new java.util.ArrayList<>();
+        // the agent's own models under the sign-in they come from, where services' models follow (Pi's and OpenCode's
+        // under each of theirs, below)
+        String own1 = byProvider || svcs.isEmpty() ? null : signIn(backend);
+        java.util.Set<String> ids = new java.util.HashSet<>();
+        for (String[] m : own) ids.add(m[0]);
+        // Pi's and OpenCode's models are "provider/model": in a group per provider, under its sign-in (Claude, GitHub
+        // Copilot…) or OpenCode's free models
+        java.util.Map<String, java.util.List<String[]>> groups = new java.util.LinkedHashMap<>();
+        for (String[] m : own) {
+            if (!m[0].isEmpty() && !plan) continue;
+            // a dated copy of a model that's there undated ("…-4-5-20251001" next to "…-4-5") says nothing new
+            if (m[0].matches(".*-\\d{8}") && ids.contains(m[0].replaceAll("-\\d{8}$", ""))) continue;
+            int slash = byProvider ? m[0].indexOf('/') : -1;
+            if (slash > 0) {
+                String provider = m[0].substring(0, slash), id = m[0].substring(slash + 1);
+                String name = m[1] == null || m[1].isEmpty() || m[1].equals(m[0]) || m[1].equals(id) ? readable(id)
+                        : m[1].startsWith(provider + "/") ? m[1].substring(slash + 1) : m[1];
+                groups.computeIfAbsent(provider, k -> new java.util.ArrayList<>()).add(new String[]{m[0], name, m.length > 2 ? m[2] : ""});
+                continue;
+            }
+            if (!m[0].isEmpty() && own1 != null) {
+                out.add(new String[]{null, BuddyApp.str(R.string.models_pi_group, own1)});
+                own1 = null;
+            }
+            // (an agent that names its models by their ids: a name people read)
+            out.add(!m[0].isEmpty() && m[0].equals(m[1]) && m[0].matches("[a-z][a-z0-9.-]+")
+                    ? new String[]{m[0], readable(m[0]), m.length > 2 ? m[2] : ""} : m);
+        }
+        for (java.util.Map.Entry<String, java.util.List<String[]>> g : groups.entrySet()) {
+            String provider = g.getKey();
+            out.add(new String[]{null, "opencode".equals(provider) ? BuddyApp.str(R.string.models_opencode_free)
+                    : BuddyApp.str(R.string.models_pi_group, Account.piName(provider))});
+            java.util.List<String[]> l = g.getValue();
+            l.sort(Models::newestFirst);
+            out.addAll(l);
+        }
         if (!services) return out;
-        for (Providers.P p : Providers.forAgent(backend)) {
+        for (Providers.P p : svcs) {
             org.json.JSONArray models = p.offered();
             if (models.length() == 0) continue;
             out.add(new String[]{null, p.name});
@@ -92,17 +131,81 @@ final class Models {
     }
 
     /**
+     * A model id as people write it: Claude's as the app names them ("Opus 4.5", see pretty), others word by word
+     * ("gpt-5.6-luna" → "GPT-5.6 Luna", "claude-haiku-4.5" → "Haiku 4.5").
+     */
+    static String readable(String id) {
+        String p = pretty(id.replaceAll("^(claude-[a-z]+-\\d{1,2})\\.(\\d{1,2})", "$1-$2"));
+        if (!p.equals(id.replaceAll("^(claude-[a-z]+-\\d{1,2})\\.(\\d{1,2})", "$1-$2"))) return p;
+        String[] t = id.split("-");
+        StringBuilder b = new StringBuilder();
+        String prev = "";
+        for (String w : t) {
+            if (w.isEmpty() || w.matches("\\d{8}")) continue; // (a date)
+            boolean num = w.matches("\\d+(\\.\\d+)*");
+            if (num && prev.matches("\\d+")) b.append('.').append(w);
+            else {
+                if (b.length() > 0) b.append(num && prev.equalsIgnoreCase("gpt") ? "-" : " ");
+                b.append(w.equalsIgnoreCase("gpt") ? "GPT" : w.matches("[a-z]\\d.*") ? w // (o3, o4-mini…)
+                        : Character.toUpperCase(w.charAt(0)) + w.substring(1));
+            }
+            prev = w;
+        }
+        return b.length() == 0 ? id : b.toString();
+    }
+
+    /** Within a family the newest first ("Opus 5.5" before "Opus 4.8"), families by name. */
+    private static int newestFirst(String[] a, String[] b) {
+        String fa = a[1].replaceAll("[\\s-]*\\d.*$", ""), fb = b[1].replaceAll("[\\s-]*\\d.*$", "");
+        int c = fa.compareToIgnoreCase(fb);
+        if (c != 0) return c;
+        double va = version(a[1]), vb = version(b[1]);
+        return va != vb ? Double.compare(vb, va) : a[1].compareToIgnoreCase(b[1]);
+    }
+
+    private static double version(String name) {
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d+)(?:\\.(\\d+))?").matcher(name);
+        if (!m.find()) return -1;
+        return Integer.parseInt(m.group(1)) * 1000 + (m.group(2) == null ? 0 : Integer.parseInt(m.group(2)));
+    }
+
+    /** The account an agent's own models come with, as people know it. */
+    private static String signIn(String backend) {
+        switch (backend) {
+            case "codex": return "ChatGPT";
+            case "copilot": return "GitHub Copilot";
+            case "grok": return "Grok";
+            case "agy": return "Google";
+            default: return "Claude";
+        }
+    }
+
+    /**
      * What a chat on Default uses with this agent, as the user set it (Settings → Chats on Default): "" (the agent's
      * own default), one of the agent's own models, or "@service/model".
      */
     static String agentDefault(String backend) {
         String d = Prefs.agentDefault(BuddyApp.context(), backend);
-        if (d.isEmpty()) return "";
+        if (d.isEmpty()) return serviceOnly(backend);
         if (!d.startsWith("@")) return d; // one of the agent's own models (issue #20)
         Providers.P p = Providers.of(d);
-        if (p == null || p.off || !p.fits(backend)) return ""; // gone, or switched off for now
+        if (p == null || p.off || !p.fits(backend)) return serviceOnly(backend); // gone, or switched off for now
         String m = Providers.model(d);
         return Providers.ref(p, m.isEmpty() ? p.defaultModel() : m);
+    }
+
+    /**
+     * Pi with no provider of its own is there for the services alone and has no default to fall back on: its chats on
+     * Default use the first service it can, rather than start with no model at all. "" for Pi with a provider, and
+     * for the other agents: Claude Code and Codex without a plan can still have a key of their own, which their own
+     * default runs on.
+     */
+    private static String serviceOnly(String backend) {
+        if (!"pi".equals(backend)) return "";
+        android.content.Context c = BuddyApp.context();
+        if (!SetupState.signedIn(c, backend) || SetupState.ownModels(c, backend)) return "";
+        java.util.List<Providers.P> can = Providers.forAgent(backend);
+        return can.isEmpty() ? "" : Providers.ref(can.get(0), can.get(0).defaultModel());
     }
 
     /** The chat's model as it will run: the one picked, or the agent's default. */
@@ -250,7 +353,7 @@ final class Models {
                 + (ctx >= 50 ? " · " + BuddyApp.str(R.string.models_chip_context, ctx) : "");
     }
 
-    /** The API key service the chat's model comes from (its name), or null for the agent's own. */
+    /** The service the chat's model comes from (its name), or null for the agent's own. */
     static String via(Sessions.Session s) {
         Providers.P p = Providers.of(effective(s));
         return p == null ? null : p.name;
@@ -289,6 +392,8 @@ final class Models {
         if ("codex".equals(backend)) return BuddyApp.str(R.string.models_default_codex);
         if ("agy".equals(backend)) return BuddyApp.str(R.string.models_default_agy);
         if ("grok".equals(backend)) return BuddyApp.str(R.string.models_default_grok);
+        if ("copilot".equals(backend)) return BuddyApp.str(R.string.models_default_copilot);
+        if ("pi".equals(backend)) return BuddyApp.str(R.string.models_default_pi);
         return BuddyApp.str(R.string.models_default_opencode);
     }
 

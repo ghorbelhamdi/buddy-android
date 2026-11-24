@@ -99,6 +99,10 @@ public class SchedulesActivity extends Screen implements ChatHub.Listener {
             TextView when = text(this, p.summary(this) + (p.paused ? " · " + getString(R.string.schedules_paused) : "")
                     + (p.quiet ? " · " + getString(R.string.schedules_quiet_tag) : ""), 14, p.paused ? MUTED : ACCENT_TEXT);
             card.addView(when, gap(10));
+            if (!p.events.isEmpty()) { // how many of today's runs from events are used
+                card.addView(text(this, getString(R.string.schedule_events_today, Events.runsToday(this, s.id), p.cap),
+                        12, MUTED), gap(2));
+            }
             TextView msg = text(this, p.text, 13, MUTED);
             msg.setMaxLines(3);
             msg.setEllipsize(android.text.TextUtils.TruncateAt.END);

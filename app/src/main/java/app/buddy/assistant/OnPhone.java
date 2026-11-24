@@ -101,6 +101,24 @@ final class OnPhone {
         return new File(Linux.root(c), "root/.buddy/onphone");
     }
 
+    /** The phone's memory as Android reports it (0 if it doesn't say). */
+    static long ram(Context c) {
+        android.app.ActivityManager am = c.getSystemService(android.app.ActivityManager.class);
+        if (am == null) return 0;
+        android.app.ActivityManager.MemoryInfo mi = new android.app.ActivityManager.MemoryInfo();
+        am.getMemoryInfo(mi);
+        return mi.totalMem;
+    }
+
+    /**
+     * The model's file is more than half the phone's memory: its weights have to sit there next to Android and the
+     * apps that are open, so it may not start. A rule of thumb for the lists, not a measurement: nothing is refused.
+     */
+    static boolean tight(Context c, Model m) {
+        long ram = ram(c);
+        return ram > 0 && m.size > ram / 2;
+    }
+
     /** A Snapdragon phone: the build with the Adreno GPU and Hexagon NPU. Others get the plain build (CPU). */
     static boolean snapdragon() {
         String soc = Build.VERSION.SDK_INT >= 31 ? Build.SOC_MANUFACTURER : "";

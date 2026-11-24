@@ -40,7 +40,7 @@ public class StepsActivity extends Screen {
         LinearLayout body = column(this);
         body.setPaddingRelative(dp(this, 16), dp(this, 4), dp(this, 16), dp(this, 32));
         sv.addView(body);
-        root.addView(sv, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
+        root.addView(withJumpToEnd(this, sv, null), new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
         FrameLayout frame = new FrameLayout(this);
         frame.setBackgroundColor(BG);
         frame.setFitsSystemWindows(true);

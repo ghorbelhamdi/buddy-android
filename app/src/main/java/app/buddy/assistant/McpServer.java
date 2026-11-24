@@ -269,6 +269,47 @@ final class McpServer {
                     headers.put(line.substring(0, c).trim().toLowerCase(Locale.ROOT), line.substring(c + 1).trim());
                 }
             }
+            if (remote && ("/".equals(path) || path.startsWith("/web/"))) { // Other devices: the page and its calls
+                // never from the phone itself: an agent in Buddy's Linux or the background browser shares its network
+                if (WebDevices.fromPhone(s.getInetAddress(), s.getLocalAddress())) {
+                    send(out, 403, "text/plain", "not from this phone\n");
+                    return;
+                }
+                String auth = headers.get("authorization");
+                // a file from the page comes as it is, at any size: WebDevices streams it to its place once it knows who
+                boolean upload = "/web/upload".equals(path) && "POST".equals(method);
+                long rawLength = -1;
+                if (upload) {
+                    String cl = headers.get("content-length");
+                    try {
+                        rawLength = cl == null ? -1 : Long.parseLong(cl.trim());
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+                byte[] body;
+                try {
+                    body = "POST".equals(method) && !upload ? readBody(in, headers, 64 * 1024) : new byte[0];
+                } catch (TooLarge e) {
+                    send(out, 413, null, null);
+                    return;
+                }
+                CALLER_CHAT.set(null);
+                CALLER_KEY.set(null);
+                CALLER_REMOTE.set(null);
+                CALLER_GONE.set(() -> gone(s, in));
+                WebDevices.Reply r;
+                try {
+                    r = WebDevices.handle(BuddyApp.context(), method, path, q >= 0 ? rawPath.substring(q + 1) : null, auth,
+                            body, s.getInetAddress(), headers.get("host"), () -> known(s), // (a long poll isn't a stranger)
+                            upload ? in : null, rawLength);
+                } catch (Exception e) {
+                    send(out, 400, "application/json", "{\"error\":\"bad request\"}");
+                    return;
+                }
+                if (r.stream != null || r.data != null) sendWeb(out, r);
+                else send(out, r.code, r.type, r.body);
+                return;
+            }
             if (remote && "/pair".equals(path) && "POST".equals(method)) { // a computer asks to be paired (Tailnet.pair)
                 String name = null;
                 int nq = rawPath.indexOf("name=");
@@ -300,6 +341,12 @@ final class McpServer {
                 }
                 CALLER_GONE.set(() -> gone(s, in));
                 serveMcp(method, body, out, headers.get("accept"));
+                return;
+            }
+            // the browser coming back from Sign in with OpenRouter: no token (it's the browser), so OpenRouterAuth takes
+            // only the state of the sign-in it is waiting for, once, and the page it gets says nothing of what came in
+            if (OpenRouterAuth.PATH.equals(path) && "GET".equals(method)) {
+                send(out, 200, "text/html", OpenRouterAuth.callback(BuddyApp.context(), q >= 0 ? rawPath.substring(q + 1) : ""));
                 return;
             }
             // Anthropic-style clients (OpenCode's) send the token they were given as x-api-key: the relay takes that too
@@ -481,6 +528,31 @@ final class McpServer {
         h.append("Connection: close\r\n\r\n");
         out.write(h.toString().getBytes(StandardCharsets.US_ASCII));
         out.write(b);
+        out.flush();
+    }
+
+    /**
+     * The page's bytes: a picture, or a download saved under its name. Never shown as a page of the site (a file an
+     * agent made could be HTML): a download is always "attachment", and nothing is read as another type than it says.
+     */
+    private static void sendWeb(OutputStream out, WebDevices.Reply r) throws IOException {
+        StringBuilder h = new StringBuilder("HTTP/1.1 ").append(r.code).append(' ').append(reason(r.code)).append("\r\n");
+        h.append("Content-Type: ").append(r.type).append("\r\nX-Content-Type-Options: nosniff\r\nCache-Control: no-store\r\n");
+        long len = r.data != null ? r.data.length : r.length;
+        if (len >= 0) h.append("Content-Length: ").append(len).append("\r\n");
+        if (r.filename != null) {
+            String ascii = r.filename.replaceAll("[^A-Za-z0-9._ ()-]", "_");
+            h.append("Content-Disposition: attachment; filename=\"").append(ascii).append("\"; filename*=UTF-8''")
+                    .append(java.net.URLEncoder.encode(r.filename, "UTF-8").replace("+", "%20")).append("\r\n");
+        }
+        h.append("Connection: close\r\n\r\n");
+        out.write(h.toString().getBytes(StandardCharsets.UTF_8));
+        if (r.data != null) out.write(r.data);
+        else try (java.io.InputStream in = r.stream) {
+            byte[] buf = new byte[256 * 1024];
+            int n;
+            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+        }
         out.flush();
     }
 

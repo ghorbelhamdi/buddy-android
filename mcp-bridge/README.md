@@ -36,7 +36,7 @@ The first time the agent uses a phone tool, the phone asks you to pair this comp
 BUDDY_TOKEN=<token from Buddy's Settings> npx -y buddy-phone-bridge
 ```
 
-Most agents on the phone connect to `http://127.0.0.1:8765/mcp` directly instead: Buddy's Settings give the command for Claude Code, Codex, OpenCode, Antigravity and Grok.
+Most agents on the phone connect to `http://127.0.0.1:8765/mcp` directly instead: Buddy's Settings give the command for Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot and Pi.
 
 ## Settings
 

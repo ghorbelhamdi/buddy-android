@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="service_label">Assistente Buddy</string>
-    <string name="service_description">Mostra o balão de chat do Buddy e permite que o agente que você escolher (Claude Code, Codex, OpenCode, Antigravity ou Grok), executado dentro do Buddy neste telefone, leia a tela, toque, digite e role por você. Nada sai do telefone, exceto o que o próprio agente envia para o serviço de IA dele (Anthropic, OpenAI, Google, xAI ou o provedor do seu modelo do OpenCode).</string>
+    <string name="service_description">Mostra o balão de chat do Buddy e permite que o agente que você escolher (Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot ou Pi), executado dentro do Buddy neste telefone, leia a tela, toque, digite e role por você. Nada sai do telefone, exceto o que o próprio agente envia para o serviço de IA dele (Anthropic, OpenAI, Google, xAI, GitHub ou o provedor do seu modelo do OpenCode ou do Pi).</string>
 
     <!-- ===== First run (OnboardingActivity), the Chats home screen (MainActivity), updates, appearance ===== -->
 
@@ -27,7 +27,7 @@
     <!-- Two example requests a user could type. Translate them naturally and use your language's quotation marks. -->
     <string name="onboarding_welcome_ask_text">“Responda ao Sam que vou chegar tarde”, “adicione leite ao meu carrinho”.</string>
     <string name="onboarding_welcome_plan_title">Seu próprio plano, sem chave de API</string>
-    <string name="onboarding_welcome_plan_text">Executa o Claude Code com a sua assinatura do Claude. O Codex com um plano do ChatGPT, o Antigravity com uma conta do Google, o Grok com uma conta do Google ou do X e os modelos gratuitos do OpenCode também funcionam.</string>
+    <string name="onboarding_welcome_plan_text">Executa o Claude Code com a sua assinatura do Claude. O Codex com um plano do ChatGPT, o Antigravity com uma conta do Google, o Grok com uma conta do Google ou do X, o Copilot com uma conta do GitHub, o Pi com um plano ou uma chave de API que você conectar e os modelos gratuitos do OpenCode também funcionam.</string>
     <string name="onboarding_welcome_control_title">Você continua no controle</string>
     <string name="onboarding_welcome_control_text">O Buddy sempre pede seu OK antes de enviar, publicar, comprar ou excluir algo.</string>
     <!-- Small lowercase mono line under the list. -->
@@ -176,7 +176,7 @@
     <string name="main_section_recent">Recentes</string>
     <string name="main_empty_title">Nenhum chat ainda</string>
     <!-- "New chat" = the button (main_new_chat). -->
-    <string name="main_empty_text">Toque em Novo chat para começar um com o Claude Code, o Codex, o OpenCode, o Antigravity ou o Grok. Toque e segure um chat para excluí-lo.</string>
+    <string name="main_empty_text">Toque em Novo chat para começar um com o Claude Code, o Codex, o OpenCode, o Antigravity, o Grok, o Copilot ou o Pi. Toque e segure um chat para excluí-lo.</string>
     <!-- Status of a chat with a running task, until the agent reports what it's doing. Small lowercase mono text. -->
     <string name="main_chat_working">trabalhando…</string>
     <string name="main_chat_waiting">esperando por você…</string>
@@ -680,7 +680,7 @@
     <!-- After "Continue in Buddy" on an earlier session. %1$s = agent name. -->
     <string name="hub_continuing">Continuando uma sessão anterior do %1$s. Se ela ainda estiver aberta em um terminal, feche-a lá primeiro.</string>
     <string name="hub_still_working_attachments">Este chat ainda está trabalhando. Envie os anexos quando ele terminar.</string>
-    <string name="hub_service_off">%1$s está desativado (Configurações → Agentes e modelos → Chaves de API). Ative-o ou escolha outro modelo para esta conversa.</string>
+    <string name="hub_service_off">%1$s está desativado (Ajustes → Agentes e modelos). Ative-o ou escolha outro modelo para esta conversa.</string>
     <string name="hub_accessibility_dead">O serviço de acessibilidade do Buddy não está em execução, embora esteja ativado: o Android fechou o Buddy e não reiniciou o serviço, então os agentes não conseguem usar o telefone. Desative e ative o Buddy em Configurações do Android → Acessibilidade. Para não acontecer de novo: permita a inicialização automática do Buddy nas configurações de apps do telefone, se houver, e dê ao microfone “Durante o uso do app”, não “Apenas esta vez”.</string>
     <string name="hub_accessibility_off">O serviço de acessibilidade do Buddy está desativado, então os agentes não conseguem usar o telefone. Ative o Buddy em Configurações do Android → Acessibilidade.</string>
     <string name="voice_mic_while_using">Escolha “Durante o uso do app”: com “Apenas esta vez”, o Android fecha o Buddy um minuto depois que você sai dele, mesmo no meio de uma tarefa.</string>
@@ -853,7 +853,7 @@
     <!-- Accessibility disclosure, shown before Android's accessibility settings open (required by Google Play) -->
     <string name="ui_a11y_title">Como o Buddy usa a acessibilidade</string>
     <string name="ui_a11y_what">O Buddy usa o serviço de acessibilidade do Android para fazer o que você pede em outros apps: ele lê o que está na tela e toca, digita e rola por você. Ele também mostra o balão flutuante.</string>
-    <string name="ui_a11y_data">Enquanto uma tarefa está em andamento, o conteúdo da tela, que pode incluir informações pessoais como mensagens, nomes ou endereços, é enviado ao serviço de IA do agente que você escolher (Anthropic para o Claude Code, OpenAI para o Codex, Google para o Antigravity, xAI para o Grok ou o provedor do seu modelo do OpenCode), apenas para realizar o seu pedido.</string>
+    <string name="ui_a11y_data">Enquanto uma tarefa está em andamento, o conteúdo da tela, que pode incluir informações pessoais como mensagens, nomes ou endereços, é enviado ao serviço de IA do agente que você escolher (Anthropic para o Claude Code, OpenAI para o Codex, Google para o Antigravity, xAI para o Grok, GitHub para o Copilot ou o provedor do seu modelo do OpenCode ou do Pi), apenas para realizar o seu pedido.</string>
     <string name="ui_a11y_no_servers">O Buddy não tem servidores próprios. Ele não coleta, vende nem compartilha esses dados, e não os usa para anúncios.</string>
     <string name="ui_a11y_asks">O Buddy pede seu OK antes de qualquer coisa que envie, publique, compre ou exclua. Você pode desativar o serviço quando quiser nas configurações de acessibilidade do Android.</string>
     <string name="ui_privacy_policy">Política de privacidade</string>
@@ -948,7 +948,7 @@
     <string name="signin_token">Usar um token</string>
     <string name="signin_token_title">Token do Claude Code</string>
     <string name="signin_token_info">Cole o token que “claude setup-token” mostra em um computador; ele começa com sk-ant-oat. Ele vale para os chats. A entrada de voz e o Controle remoto precisam do login completo.</string>
-    <string name="signin_token_wrong">Isso não é um token do Claude Code. Uma chave de API (sk-ant-api…) vai em Ajustes → Agentes e modelos → Chaves de API.</string>
+    <string name="signin_token_wrong">Isso não é um token do Claude Code. Uma chave de API (sk-ant-api…) vai em Ajustes → Agentes e modelos → Adicionar uma conexão.</string>
     <string name="signin_token_on">Conectado com um token: ele vale para os chats. A entrada de voz e o Controle remoto precisam do login completo.</string>
     <!-- Button (Claude) and the title of the screen it opens: get a link to sign in from another phone or computer. -->
     <string name="signin_other_device">Fazer login em outro dispositivo</string>
@@ -1140,9 +1140,9 @@
 
     <!-- Settings screen: header. -->
     <string name="setup_settings_title">Ajustes</string>
-    <string name="setup_settings_subtitle">O Buddy executa o Claude Code, o Codex, o OpenCode, o Antigravity ou o Grok dentro do app, com a sua própria assinatura (ou com os modelos gratuitos do OpenCode e o plano gratuito do Antigravity).</string>
+    <string name="setup_settings_subtitle">O Buddy executa o Claude Code, o Codex, o OpenCode, o Antigravity, o Grok, o Copilot ou o Pi dentro do app, com a sua própria assinatura (ou com os modelos gratuitos do OpenCode e o plano gratuito do Antigravity).</string>
     <string name="settings_agents">Agentes e modelos</string>
-    <string name="settings_agents_sub">Agente padrão, login, chaves de API, modelos padrão, GitHub, servidor de download</string>
+    <string name="settings_agents_sub">O que os chats novos usam, o que está conectado, adicionar um plano, uma chave ou um modelo, GitHub, servidor de download</string>
     <string name="settings_bubble">Bolha e chat</string>
     <string name="settings_bubble_sub">Mostrar a bolha, o que um toque faz, tamanho do painel</string>
     <string name="settings_voice_sub">Entrada e saída de voz, idiomas, voz ao vivo, ler respostas em voz alta</string>
@@ -1253,7 +1253,7 @@
     <!-- Which AI agent answers new chats. -->
     <string name="setup_default_brain">Cérebro padrão</string>
     <!-- "New chat" is the name of a button in Buddy. -->
-    <string name="setup_default_brain_info">Quem responde aos novos chats abertos pelo balão ou pelo botão Novo chat. O Claude Code usa seu plano do Claude; o Codex, seu plano do ChatGPT; o Antigravity, sua conta do Google; o Grok, sua conta do Grok; e o OpenCode, os modelos gratuitos dele ou seus próprios provedores. Só é possível escolher agentes já configurados.</string>
+    <string name="setup_default_brain_info">Quem responde aos novos chats abertos pelo balão ou pelo botão Novo chat. O Claude Code usa seu plano do Claude; o Codex, seu plano do ChatGPT; o Antigravity, sua conta do Google; o Grok, sua conta do Grok; o Copilot, seu plano do GitHub Copilot; o Pi, o plano ou a chave de API que você conectar a ele; e o OpenCode, os modelos gratuitos dele ou seus próprios provedores. Só é possível escolher agentes já configurados.</string>
     <!-- Toast. %1$s = agent name. "New chat" is the name of a button in Buddy. -->
     <string name="setup_default_brain_set">Os novos chats vão usar o %1$s. Você pode escolher em cada chat pelo botão Novo chat.</string>
     <!-- Toast. %1$s = agent name. -->
@@ -1268,8 +1268,7 @@
     <!-- %1$s = the account's email address. -->
     <string name="setup_agent_signed_in_email">conectado · %1$s</string>
     <string name="setup_agent_not_signed_in">não conectado</string>
-    <string name="setup_agent_api_key">não conectado · chave de API</string>
-    <string name="signin_key_only">Usando uma chave de API</string>
+    <string name="signin_key_only">Funciona com um serviço</string>
 
     <!-- Settings screen: Phone tools in your own sessions (MCP server). -->
     <string name="setup_phone_tools">Ferramentas do telefone nas suas próprias sessões</string>
@@ -1463,7 +1462,7 @@
     <string name="terminal_close">Fechar</string>
     <!-- Button (verb): starts a new shell. -->
     <string name="terminal_restart">Reiniciar</string>
-    <string name="terminal_needs_linux">Primeiro instale o Claude Code, o Codex, o OpenCode, o Antigravity ou o Grok em Ajustes: isso configura o Linux do Buddy.</string>
+    <string name="terminal_needs_linux">Primeiro instale o Claude Code, o Codex, o OpenCode, o Antigravity, o Grok, o Copilot ou o Pi em Ajustes: isso configura o Linux do Buddy.</string>
     <!-- %1$s = error message. -->
     <string name="terminal_start_failed">Não foi possível iniciar o terminal: %1$s</string>
     <!-- Sheet title. %1$s = the tab's name, e.g. "shell 1". -->
@@ -1491,7 +1490,7 @@
 
     <!-- Sessions screen: every agent session running on the phone, and recent history. -->
     <string name="monitor_title">Sessões</string>
-    <string name="monitor_subtitle">Todas as sessões do Claude Code, do Codex, do OpenCode, do Antigravity e do Grok neste telefone.</string>
+    <string name="monitor_subtitle">Todas as sessões do Claude Code, do Codex, do OpenCode, do Antigravity, do Grok, do Copilot e do Pi neste telefone.</string>
     <string name="monitor_terminal_running">Um shell está em execução · toque para voltar</string>
     <string name="monitor_terminal_idle">Um shell no Linux do Buddy</string>
     <string name="monitor_running_now">Em execução</string>
@@ -1552,7 +1551,7 @@
     <!-- Toast when the user picks a reviewer that isn't signed in. %1$s = Claude Code or Codex. -->
     <string name="perms_reviewer_sign_in">Faça login no %1$s primeiro (Ajustes).</string>
     <!-- Under the reviewer choice. “allow”, “ask you” and “advise against” are the reviewer's three possible answers. -->
-    <string name="perms_reviewer_about">Uma sessão temporária por toque, sem ferramentas: ela vê seu pedido, a nota do agente e a tela, e decide se permite, se pergunta a você ou se desaconselha. Cerca de 3 segundos por toque. Os chats do OpenCode, do Antigravity e do Grok são revisados pelo Claude Code (ou pelo Codex).</string>
+    <string name="perms_reviewer_about">Uma sessão temporária por toque, sem ferramentas: ela vê seu pedido, a nota do agente e a tela, e decide se permite, se pergunta a você ou se desaconselha. Cerca de 3 segundos por toque. Os chats do OpenCode, do Antigravity, do Grok, do Copilot e do Pi são revisados pelo Claude Code (ou pelo Codex).</string>
     <!-- Under the reviewer's description: it also does the check before a notification rule's countdown. -->
     <string name="perms_reviewer_rules">Também confere as respostas antes que a contagem regressiva de uma regra de notificação as envie.</string>
     <!-- In the reviewer's model picker, the first choice ("Default") described: for Claude Code it is Haiku. -->
@@ -1990,10 +1989,9 @@
     <string name="setup_help_info">O guia do Buddy, no GitHub. Você também pode perguntar a qualquer agente como o Buddy funciona.</string>
     <string name="signin_api_key">Usar uma chave de API</string>
     <string name="signin_api_base_bad">Digite um endereço que comece com https:// (ou http:// neste telefone ou na sua própria rede)</string>
-    <string name="account_plan_api_key_at">Chave de API · %1$s</string>
+    <string name="account_plan_api_key_at">Funciona com %1$s</string>
     <string name="models_via">%1$s via %2$s</string>
     <string name="api_keys_remove_text">A chave é apagada deste telefone. Os chats que usam seus modelos voltam ao Padrão.</string>
-    <string name="api_keys_choose">Modelos nos menus: %1$d de %2$d</string>
     <string name="api_keys_choose_title">Modelos de %1$s</string>
     <string name="api_keys_choose_info">Escolha os que os chats oferecem. Sem escolha, todos.</string>
     <string name="api_keys_choose_search">Pesquisar</string>
@@ -2058,16 +2056,15 @@
     <string name="api_keys_need_key">Digite a chave de API.</string>
     <string name="api_keys_saving">Verificando a chave…</string>
     <string name="api_keys_save">Salvar</string>
-    <string name="api_keys_addresses_info">O Claude Code usa o endereço estilo Anthropic. O Codex usa o estilo OpenAI, se o serviço tiver a Responses API da OpenAI. O OpenCode usa qualquer um. Deixe um endereço vazio se o serviço não o tiver.</string>
+    <string name="api_keys_addresses_info">O Claude Code usa o endereço estilo Anthropic. O Codex usa o estilo OpenAI, se o serviço tiver a Responses API da OpenAI. O OpenCode e o Pi usam qualquer um. Deixe um endereço vazio se o serviço não o tiver.</string>
     <string name="api_keys_check">Verificar agora</string>
     <string name="api_keys_check_info">Opcional: envia uma solicitação de teste muito pequena, que pode gastar uma parte mínima do crédito de API.</string>
     <string name="api_keys_check_ok">%1$s: funciona.</string>
-    <string name="api_keys_check_chat">%1$s: funciona com o OpenCode, mas não tem a Responses API, então não com o Codex.</string>
+    <string name="api_keys_check_chat">%1$s: funciona com o OpenCode e o Pi, mas não tem a Responses API, então não com o Codex.</string>
     <string name="api_keys_check_none">%1$s: nada respondeu neste endereço. %2$s</string>
     <string name="api_keys_check_unsure">%1$s: sem resposta clara. %2$s</string>
     <string name="api_keys_service">Serviço</string>
-    <string name="api_keys_custom">Personalizado</string>
-    <string name="setup_step_signin_key_mismatch">Suas chaves de API (%2$s) não funcionam com %1$s. Elas funcionam com %3$s.</string>
+    <string name="setup_step_signin_key_mismatch">Seus serviços (%2$s) não funcionam com %1$s. Eles funcionam com %3$s.</string>
     <string name="setup_step_signin_free">Sem conta? O OpenCode tem modelos gratuitos e não precisa de login.</string>
     <string name="setup_use_agent">Usar %1$s</string>
     <string name="api_keys_openai_hint">Endereço estilo OpenAI</string>
@@ -2078,7 +2075,6 @@
     <string name="api_keys_own_default">Padrão próprio</string>
     <string name="api_keys_defaults_info">O que um chat usa quando o modelo é Padrão. O padrão próprio usa o plano do agente.</string>
     <string name="api_keys_defaults">Modelo padrão</string>
-    <string name="api_keys_for">Para %1$s</string>
     <string name="api_keys_use">Usar este serviço</string>
     <string name="api_keys_use_info">Desativado: a chave continua salva, mas nenhuma conversa nem agente a usa.</string>
     <string name="api_keys_off">Desativado</string>
@@ -2114,13 +2110,8 @@
     <string name="mcp_name_taken">Esse nome já está em uso.</string>
     <string name="mcp_import_info">Cole uma lista como outros apps a guardam (“mcpServers”). Servidores com endereço são adicionados; os que rodam como um comando em um computador são ignorados.</string>
     <string name="mcp_imported">Adicionados: %1$d · ignorados: %2$d</string>
-    <string name="api_keys_models">%1$s · %2$d modelos</string>
-    <string name="api_keys_add">Adicionar chave de API</string>
-    <string name="api_keys_none">Nenhuma chave de API ainda.</string>
-    <string name="api_keys_intro">Use modelos de outros serviços com Claude Code, Codex e OpenCode, junto com seus planos ou no lugar deles. Cada chat escolhe o modelo no seu menu de modelos. O uso com uma chave é cobrado na conta dessa chave. As chaves ficam criptografadas neste telefone e nunca chegam aos agentes: o Buddy as adiciona a cada pedido.</string>
-    <string name="api_keys_row_none">Modelos de outros serviços, com sua chave</string>
-    <string name="api_keys_title">Chaves de API</string>
-    <string name="signin_api_keys">Chaves de API</string>
+    <string name="api_keys_add">Adicionar um serviço</string>
+    <string name="signin_api_keys">Serviços salvos no Buddy</string>
     <string name="models_context">contexto de %1$s</string>
     <string name="models_chip_context">%1$d%% do contexto</string>
     <string name="chat_context">Contexto</string>
@@ -2130,12 +2121,12 @@
     <string name="hub_compacting">Compactando a conversa…</string>
     <string name="hub_compacted">Conversa compactada: %1$s → %2$s tokens</string>
     <string name="signin_api_models_none">O serviço não listou nenhum modelo.</string>
-    <string name="setup_step_signin_api_key">Ou use uma chave de API: Ajustes → Agentes e modelos → Chaves de API.</string>
+    <string name="setup_step_signin_api_key">Ou use uma chave de API ou um servidor de modelos seu: Ajustes → Agentes e modelos → Adicionar uma conexão.</string>
     <string name="setup_step_signin_others">%1$s é o seu cérebro padrão, mas estes estão prontos: %2$s. Escolha um deles como padrão e o Buddy funciona na hora.</string>
     <string name="setup_switch_default">Trocar padrão</string>
     <string name="setup_switch_default_title">Cérebro padrão</string>
-    <string name="signin_api_key_on">%1$s funciona com suas chaves de API: escolha um modelo no menu de modelos de um chat, ou o padrão em Chaves de API.</string>
-    <string name="signin_api_key_on_plan">Os chats também podem usar os modelos das suas chaves de API (escolha um no menu de modelos de um chat). Voz e os outros recursos do plano usam seu plano.</string>
+    <string name="signin_api_key_on">%1$s funciona com os serviços salvos no Buddy: escolha um modelo no menu de modelos de um chat, ou o padrão em Ajustes → Agentes e modelos.</string>
+    <string name="signin_api_key_on_plan">Os chats também podem usar os modelos dos serviços salvos no Buddy (escolha um no menu de modelos de um chat). Voz e os outros recursos do plano usam seu plano.</string>
     <string name="fdroid_download_note">Estes downloads vêm de quem os criou, não do F-Droid, por isso o F-Droid não os verificou.</string>
     <string name="api_keys_local_info">Para um servidor seu (Ollama, LM Studio, llama.cpp): deixe a chave de API vazia. Num PC, coloque o endereço dele no seu Wi-Fi no lugar de localhost, por exemplo http://192.168.1.20:11434/v1.</string>
     <string name="main_section_pinned">Fixadas</string>
@@ -2326,4 +2317,504 @@
     <string name="hub_tool_sms_list">Lendo SMS</string>
     <string name="setup_face_too_big">Essa animação tem mais de 16 MB, então o balão a mostra como imagem parada.</string>
     <string name="background_older">O auxiliar de antes da atualização ainda está rodando, então os chats em segundo plano podem funcionar. Para iniciar o novo, o Buddy precisa uma vez da depuração por Wi-Fi: toque em Iniciar agora.</string>
+
+    <!-- Routines: tasks saved as their steps, done again without the agent (RoutinesActivity, the routine tool). -->
+    <string name="routines_title">Rotinas</string>
+    <string name="routines_row">Tarefas guardadas para repetir em segundos</string>
+    <string name="routines_intro">Um agente pode guardar uma tarefa que fez como rotina: quando correr bem, peça-lhe para “guardar isso como rotina”. Uma rotina repete os mesmos passos em segundos, sem o agente, e os cartões de aprovação continuam a aparecer. O texto que escreve é um espaço que preenche de cada vez.</string>
+    <string name="routines_none">Ainda não há rotinas.</string>
+    <string name="routines_blanks">Espaços: %1$s</string>
+    <string name="routines_last_run">Executada %1$s</string>
+    <string name="routines_stopped_at">parou no passo %1$d</string>
+    <string name="routines_card_waiting">Há um cartão à espera da sua resposta: a rotina começa assim que responder.</string>
+    <string name="routines_hidden">Executar no ecrã oculto</string>
+    <string name="routines_hidden_info">As rotinas iniciadas aqui correm num ecrã próprio, para poder continuar a usar o telemóvel. Cartões e perguntas continuam a aparecer-lhe.</string>
+    <string name="routines_run">Executar</string>
+    <string name="routines_running">A executar…</string>
+    <string name="routines_delete">Apagar</string>
+    <string name="routines_delete_title">Apagar “%1$s”?</string>
+    <string name="routines_delete_text">Os passos desaparecem de vez. Um agente pode voltar a guardá-la noutra altura.</string>
+    <string name="routines_step_open">Abrir %1$s</string>
+    <string name="routines_step_tap">Tocar em %1$s</string>
+    <string name="routines_step_hold">Manter premido %1$s</string>
+    <string name="routines_step_type">Escrever %1$s%2$s</string>
+    <string name="routines_step_scroll">Deslocar</string>
+    <string name="routines_step_swipe">Deslizar</string>
+    <string name="routines_step_back">Premir Voltar</string>
+    <string name="routines_step_press">Premir um botão</string>
+    <string name="routines_step_find">Deslocar até “%1$s”</string>
+    <string name="routines_step_wait">Esperar</string>
+    <string name="routines_blanks_info">O que deve escrever desta vez?</string>
+    <string name="routines_blanks_need">Preencha todos os espaços.</string>
+    <string name="routines_need_access">O serviço de acessibilidade do Buddy está desligado, por isso não pode usar o ecrã.</string>
+    <string name="routines_done_title">“%1$s” terminou</string>
+    <string name="routines_done_text">Todos os passos correram bem.</string>
+    <string name="routines_stopped_title">“%1$s” parou</string>
+    <string name="routines_finish">Pedir a um agente para terminar</string>
+    <string name="routine_saved_note">Rotina “%1$s” guardada (Definições → Rotinas)</string>
+    <string name="activity_routine">A fazer “%1$s”</string>
+    <string name="hub_tool_routine">A ver as rotinas</string>
+    <string name="hub_tool_routine_run">A executar “%1$s”</string>
+    <string name="hub_tool_routine_save">A guardar a rotina “%1$s”</string>
+    <string name="tool_routine">Rotinas</string>
+    <string name="tool_routine_info">Guarda os passos de uma tarefa e repete-os sem os voltar a descobrir</string>
+    <plurals name="routines_steps">
+        <item quantity="one">%d passo</item>
+        <item quantity="other">%d passos</item>
+    </plurals>
+    <plurals name="routines_row_saved">
+        <item quantity="one">%d rotina</item>
+        <item quantity="other">%d rotinas</item>
+    </plurals>
+
+    <!-- Files for Linux tools (#76): any size, straight into the chat's folder in Buddy's Linux. -->
+    <string name="linux_file_sending">A enviar %1$s para as ferramentas Linux</string>
+    <string name="linux_file_progress">%1$s de %2$s</string>
+    <string name="linux_file_done">%1$s, %2$s → %3$s</string>
+    <string name="linux_file_not_sent">%1$s não foi enviado para as ferramentas Linux.</string>
+    <string name="linux_file_cancelled">Parou o envio de %1$s para as ferramentas Linux. A parte copiada foi removida.</string>
+    <string name="linux_file_no_room">%1$s não foi enviado para as ferramentas Linux: precisa de %2$s e o telemóvel tem %3$s livres.</string>
+    <string name="linux_file_full">%1$s não foi enviado para as ferramentas Linux: o telemóvel ficou sem espaço. A parte copiada foi removida.</string>
+    <string name="linux_file_write_failed">%1$s não foi enviado para as ferramentas Linux: %2$s. A parte copiada foi removida.</string>
+    <string name="linux_file_gone">%1$s não foi enviado para as ferramentas Linux: o ficheiro desapareceu durante a leitura (a app de onde veio fechou-o, ou foi movido). A parte copiada foi removida.</string>
+    <string name="share_linux_title">Demasiado grande para anexar</string>
+    <string name="share_linux_text">%1$s: mais do que os 25 MB de um anexo. Enviar antes diretamente para a pasta deste chat no Linux do Buddy? O agente recebe o caminho, para ferramentas como o unzip.</string>
+    <string name="share_linux_send">Enviar para o Linux</string>
+    <string name="chat_linux_files_keep">Manter os ficheiros enviados para o Linux depois do chat</string>
+    <string name="chat_linux_files_keep_info">Quando o chat é apagado, passam para ~/.buddy/work/incoming em vez de irem com ele</string>
+    <plurals name="linux_file_more">
+        <item quantity="one">mais %1$d à espera</item>
+        <item quantity="other">mais %1$d à espera</item>
+    </plurals>
+
+    <!-- 2.4.0: Other devices, Computers over SSH, the running command sheet, set up what's missing, scheduled tasks on events, mute apps on hidden screens. -->
+    <string name="web_title">Outros dispositivos</string>
+    <string name="web_row">Seus chats e cartões em um navegador no seu computador</string>
+    <string name="web_intro">Seus chats e cartões de aprovação em um navegador no seu computador ou em outro telefone. Sem conta e sem servidor: vai direto para este telefone pelo Tailscale. Um dispositivo pareado pode ler seus chats, enviar mensagens e responder cartões, mas não cartões sobre dinheiro (pagar, comprar, apps de dinheiro) nem sobre deixar dispositivos entrarem: esses ficam no telefone. Ele não pode usar a tela do telefone.</string>
+    <string name="web_switch">Deixar dispositivos pareados entrarem</string>
+    <string name="web_switch_info">Desligado: nenhum dispositivo pode abrir a página, pareado ou não.</string>
+    <string name="web_screens_switch">Telas em dispositivos pareados</string>
+    <string name="web_screens_info">Dispositivos pareados podem ver a tela do celular e as telas ocultas em que os agentes trabalham. Só para olhar, e nunca enquanto um app de dinheiro estiver na frente.</string>
+    <string name="web_address_label">Abra isto no outro dispositivo</string>
+    <string name="web_no_tailscale">O Tailscale não está conectado neste telefone. Ative-o, com a mesma conta do outro dispositivo.</string>
+    <string name="web_copy">Copiar endereço</string>
+    <string name="web_copied">Endereço copiado</string>
+    <string name="web_devices_title">Dispositivos pareados</string>
+    <string name="web_none">Nenhum ainda.</string>
+    <string name="web_device_seen">Visto por último %1$s</string>
+    <string name="web_remove">Remover</string>
+    <string name="web_remove_title">Remover “%1$s”?</string>
+    <string name="web_remove_text">Ele não pode mais abrir seus chats. Só pode parear de novo com o seu OK no telefone.</string>
+    <string name="web_pair_how">Para adicionar um dispositivo, abra o endereço nele e toque em “Pair”. Você aprova aqui, em um cartão que mostra o mesmo código.</string>
+    <string name="web_card_pair">“%1$s” quer ver seus chats e responder cartões de aprovação. Mesmo código naquela tela: %2$s (de %3$s)</string>
+    <string name="web_card_computer">Adicionar o computador “%1$s” (%2$s)? Os agentes poderão executar comandos nele; cada comando aparece antes num cartão.</string>
+    <string name="web_device_unnamed">Um navegador</string>
+    <plurals name="web_row_paired">
+        <item quantity="one">%d dispositivo pareado</item>
+        <item quantity="other">%d dispositivos pareados</item>
+    </plurals>
+    <string name="computers_title">Computadores em que os agentes podem trabalhar</string>
+    <string name="computers_intro">Os agentes executam comandos nos seus próprios computadores via SSH, como você faria em um terminal. Os comandos aparecem antes em um cartão.</string>
+    <string name="computers_mode_each">Pergunta antes de cada comando</string>
+    <string name="computers_remove_text">Os agentes não conseguem mais alcançá-lo. A chave do Buddy continua no authorized_keys dele até você tirá-la lá.</string>
+    <string name="computers_add">Adicionar um computador</string>
+    <string name="computers_need_linux">Adicionar um computador precisa das Ferramentas do Linux do Buddy: instale-as antes em Ajustes.</string>
+    <string name="computers_name">Nome</string>
+    <string name="computers_name_default">Meu PC</string>
+    <string name="computers_host">Endereço (nome no Tailscale ou IP)</string>
+    <string name="computers_user">Usuário naquele computador</string>
+    <string name="computers_port">Porta SSH</string>
+    <string name="computers_key_info">Adicione esta linha ao ~/.ssh/authorized_keys do computador (no Windows: ative o OpenSSH Server e depois use o mesmo arquivo na sua pasta de usuário, ou administrators_authorized_keys para uma conta de administrador):</string>
+    <string name="computers_key_making">Criando a chave do Buddy…</string>
+    <string name="computers_key_failed">O Buddy não conseguiu criar a chave dele: %1$s</string>
+    <string name="computers_copy_key">Copiar chave</string>
+    <string name="computers_key_copied">Chave copiada</string>
+    <string name="computers_check_add">Verificar e adicionar</string>
+    <string name="computers_fill_in">Preencha o nome, o endereço e o usuário.</string>
+    <string name="computers_checking">Verificando se o computador deixa o Buddy entrar…</string>
+    <string name="computers_check_failed">Ele não deixou o Buddy entrar:\n%1$s</string>
+    <string name="computers_added">%1$s adicionado</string>
+    <string name="tools_card_computer">Executar em %1$s:\n%2$s</string>
+    <string name="activity_computer">Em %1$s</string>
+    <string name="hub_tool_computer">Em %1$s: %2$s</string>
+    <string name="tool_run_on_computer">Comandos nos seus computadores</string>
+    <string name="tool_run_on_computer_info">Executa comandos via SSH nos computadores que você adiciona em Outros dispositivos</string>
+    <string name="cmd_sheet_title">Em execução agora</string>
+    <string name="cmd_sheet_command">Comando</string>
+    <string name="cmd_sheet_running_for">Tempo rodando: %1$s</string>
+    <string name="cmd_sheet_started">Começou há %1$s. O processo dele não está na lista abaixo: pode ter terminado.</string>
+    <string name="cmd_sheet_no_command">%1$s não está executando nenhum comando agora.</string>
+    <string name="cmd_sheet_ended">Este chat não está trabalhando agora.</string>
+    <string name="cmd_sheet_processes">Rodando sob %1$s</string>
+    <string name="cmd_sheet_loading">Procurando…</string>
+    <string name="cmd_sheet_no_agent">%1$s não está rodando no Linux do Buddy agora.</string>
+    <string name="cmd_sheet_none">Nada está rodando sob %1$s agora.</string>
+    <string name="cmd_sheet_proc_line">pid %1$d · tempo rodando %2$s · CPU %3$s</string>
+    <string name="cmd_sheet_proc_line_idle">pid %1$d · tempo rodando %2$s</string>
+    <string name="cmd_sheet_output_note">A saída de um comando não aparece aqui: %1$s a recebe quando o comando termina.</string>
+    <string name="cmd_sheet_stop">Parar este comando</string>
+    <string name="cmd_sheet_stop_one">Parar</string>
+    <string name="cmd_sheet_stop_title">Parar este processo?</string>
+    <string name="cmd_sheet_stop_text">Ele para junto com o que iniciou. %1$s continua trabalhando e vê que falhou.</string>
+    <string name="cmd_sheet_done">Este comando terminou.</string>
+    <string name="walk_button">Configurar o que falta (%1$d)</string>
+    <string name="walk_step">%1$s (%2$d de %3$d): permita e depois volte ao Buddy</string>
+    <string name="walk_all_set">Tudo pronto</string>
+    <string name="walk_left_title">Ainda falta</string>
+    <string name="walk_left_text">Estes ainda estão desativados: %1$s. O Buddy funciona sem eles, mas com menos.</string>
+    <string name="walk_again">Passar por eles de novo</string>
+    <string name="walk_notify">Notificações</string>
+    <string name="walk_exact">Alarmes e lembretes</string>
+    <string name="event_charger_on">Carregador conectado</string>
+    <string name="event_charger_off">Carregador desconectado</string>
+    <string name="event_wifi_on">Wi-Fi conectado</string>
+    <string name="event_wifi_on_named">Wi-Fi “%1$s” conectado</string>
+    <string name="event_wifi_off">Wi-Fi desconectado</string>
+    <string name="event_bt_on">Dispositivo Bluetooth conectado</string>
+    <string name="event_bt_on_named">“%1$s” conectado</string>
+    <string name="event_unlock">Primeiro desbloqueio do dia</string>
+    <string name="schedule_at_times">Em horários fixos</string>
+    <string name="schedule_events">Em eventos</string>
+    <string name="schedule_events_info">A mensagem também é enviada quando um destes acontece, com pelo menos 10 minutos de intervalo.</string>
+    <string name="schedule_wifi_any">Qualquer rede</string>
+    <string name="schedule_wifi_location">Permita a localização para escolher uma rede: o Android só mostra nomes de Wi-Fi para apps com acesso à localização.</string>
+    <string name="schedule_wifi_named_note">Quando o Buddy não consegue ler o nome da rede (localização desativada), isto não é executado.</string>
+    <string name="schedule_bt_any">Qualquer dispositivo</string>
+    <string name="schedule_bt_allow">Permita Dispositivos por perto: só com isso o Android informa o Buddy sobre dispositivos Bluetooth.</string>
+    <string name="schedule_bt_none">Nenhum dispositivo pareado.</string>
+    <string name="schedule_cap">Execuções por eventos por dia</string>
+    <string name="schedule_cap_info">No máximo estas, para que um Wi-Fi que cai e volta não gaste o seu plano.</string>
+    <string name="schedule_cap_less">Menos</string>
+    <string name="schedule_cap_more">Mais</string>
+    <string name="schedule_need_start">Escolha um horário ou um evento.</string>
+    <string name="schedule_on_events">Executa em: %1$s</string>
+    <string name="schedule_events_today">Por eventos hoje: %1$d de %2$d</string>
+    <string name="walk_bluetooth">Dispositivos por perto</string>
+    <string name="walk_location">Localização</string>
+    <string name="background_mute">Silenciar apps em telas ocultas</string>
+    <string name="background_mute_info">Um app em primeiro plano numa tela oculta não emite som (um vídeo que começa sozinho), a menos que também esteja na sua tela. O Buddy devolve o som quando ele sai da tela oculta, e nunca mexe em um app que você mesmo silenciou. Precisa do auxiliar rodando.</string>
+
+    <!-- Keep Wireless debugging on (DebugLock). -->
+    <string name="debug_lock">Manter a depuração sem fios ativa</string>
+    <string name="debug_lock_info">Quando o telemóvel a desliga, o Buddy volta a ligá-la (com Wi-Fi), para que o ajudante possa sempre voltar a arrancar.</string>
+    <string name="debug_lock_channel">Depuração sem fios</string>
+    <string name="debug_lock_off_title">A depuração sem fios está desligada</string>
+    <string name="debug_lock_off_text">O telemóvel desligou-a e o Buddy não a conseguiu voltar a ligar. O modo em segundo plano para até voltar a estar ligada: toque para o iniciar.</string>
+
+    <!-- Copilot and Pi as agents: setup, sign-in, account and model strings. -->
+    <string name="onboarding_brain_copilot">Usa seu plano do GitHub Copilot (o Copilot Free também funciona).</string>
+    <string name="onboarding_agent_sign_in_copilot">Faça login com sua conta do GitHub: o Buddy mostra um código, você o digita na página do GitHub e o Buddy termina sozinho.</string>
+    <string name="onboarding_agent_download_copilot">Baixa cerca de 190 MB uma única vez (o Linux do Buddy, o Node.js e o GitHub Copilot CLI).</string>
+    <string name="signin_install_sub_copilot">Executa o GitHub Copilot CLI dentro do Buddy com o seu plano do GitHub Copilot (o Copilot Free também funciona).</string>
+    <string name="signin_install_size_copilot">Baixa cerca de 190 MB uma única vez: o Linux do Buddy, o Node.js e o GitHub Copilot CLI. Depois de instalado, ocupa cerca de 300 MB. Use o Wi-Fi se puder.</string>
+    <string name="signin_title_github">Faça login no GitHub</string>
+    <string name="signin_sub_copilot">Use a conta do GitHub com a qual você tem o Copilot. O Buddy mostra um código; digite-o na página do GitHub e o Buddy termina sozinho.</string>
+    <string name="signin_with_github">Fazer login com o GitHub</string>
+    <string name="signin_remote_copilot">Abra o link aqui ou em qualquer dispositivo, faça login no GitHub e digite o código. Abrir aqui copia o código para você. O Buddy termina sozinho.</string>
+    <string name="signin_copilot_via_gh">O Copilot usa o login do GitHub em Ajustes → Agentes e modelos → GitHub. Para desconectar o Copilot, saia do GitHub lá.</string>
+    <string name="account_tagline_copilot">Usa seu plano do GitHub Copilot</string>
+    <string name="models_default_copilot">Modelo padrão do Copilot</string>
+    <string name="setup_step_install_copilot">O Buddy baixa um pequeno Linux próprio e o %1$s do GitHub (cerca de 190 MB com o Node.js).</string>
+    <string name="setup_step_signin_copilot">Com sua conta do GitHub. O Buddy mostra um código para digitar na página do GitHub e depois termina sozinho.</string>
+    <string name="onboarding_brain_pi">Usa seu plano do Claude, do ChatGPT ou do GitHub Copilot, ou uma chave de API, que você conecta na própria tela do Pi.</string>
+    <string name="onboarding_pi_provider">IA que você conectar a ele</string>
+    <string name="onboarding_agent_sign_in_pi">Conecte um provedor na própria tela do Pi: digite /login lá e escolha seu plano ou uma chave de API.</string>
+    <string name="onboarding_agent_download_pi">Baixa cerca de 220 MB uma única vez (o Linux do Buddy, o Node.js e o Pi).</string>
+    <string name="signin_install_sub_pi">Executa o Pi dentro do Buddy com um provedor que você conectar: seu plano do Claude, do ChatGPT ou do GitHub Copilot, ou uma chave de API.</string>
+    <string name="signin_install_size_pi">Baixa cerca de 220 MB uma única vez: o Linux do Buddy, o Node.js e o Pi. Use o Wi-Fi se puder.</string>
+    <string name="signin_pi_ready">O Pi está pronto</string>
+    <string name="signin_pi_connected">Conectados: %1$s. Escolha um modelo por chat no chip do modelo.</string>
+    <string name="signin_pi_connect_title">Conectar um provedor</string>
+    <string name="signin_pi_connect_text">O Pi não tem modelos próprios. Conecte seu plano do Claude, do ChatGPT ou do GitHub Copilot, ou uma chave de API, e o Pi passa a usá-lo.</string>
+    <string name="signin_pi_connect_note">Inicie sessão aqui com o seu plano Claude, ChatGPT ou GitHub Copilot. Para outro fornecedor ou uma chave de API, abre-se o ecrã do Pi: escreva %1$s lá. %2$s lá remove um.</string>
+    <string name="account_tagline_pi">Usa um plano ou uma chave de API que você conectar</string>
+    <string name="models_default_pi">Modelo padrão do Pi</string>
+    <string name="setup_step_install_pi">O Buddy baixa um pequeno Linux próprio e o %1$s (cerca de 220 MB com o Node.js).</string>
+    <string name="setup_step_signin_pi">Conecte um provedor na própria tela do Pi (/login lá): seu plano do Claude, do ChatGPT ou do GitHub Copilot, ou uma chave de API.</string>
+
+    <!-- Agents and models (2.4.0): what new chats use, what's connected, Add a connection, Sign in with OpenRouter, one API service's screen. -->
+    <string name="agents_lead">Qual agente trabalha para você e no que ele roda.</string>
+    <string name="agents_new_chats">Chats novos usam</string>
+    <string name="agents_model_default">O modelo padrão dele</string>
+    <string name="agents_not_set_up">Ainda não configurado</string>
+    <string name="agents_on_claude">No seu plano do Claude</string>
+    <string name="agents_on_chatgpt">No seu plano do ChatGPT</string>
+    <string name="agents_on_google">Na sua conta do Google</string>
+    <string name="agents_on_grok">Na sua conta da xAI</string>
+    <string name="agents_on_copilot">No seu plano do GitHub Copilot</string>
+    <string name="agents_on">Via %1$s</string>
+    <string name="agents_change">Alterar</string>
+    <string name="agents_small">As verificações de segurança usam %1$s</string>
+    <string name="agents_small_info_cheap">Um modelo mais barato, executado por %1$s.</string>
+    <string name="agents_small_info">Executadas por %1$s.</string>
+    <string name="agents_small_codex">O modelo pequeno do Codex</string>
+    <string name="agents_small_none">As verificações de segurança precisam do Claude Code ou do Codex</string>
+    <string name="agents_small_none_info">Eles fazem as verificações dos apps em IA. Configure um dos dois.</string>
+    <string name="agents_pick_title">Chats novos usam</string>
+    <string name="agents_pick_set_up">Ainda não configurado: toque para configurar</string>
+    <string name="agents_connected">Conectados</string>
+    <string name="agents_none_connected">Nada conectado ainda.</string>
+    <string name="agents_claude_plan">Plano do Claude</string>
+    <string name="agents_chatgpt_plan">Plano do ChatGPT</string>
+    <string name="agents_google">Conta do Google</string>
+    <string name="agents_grok">Conta da xAI</string>
+    <string name="agents_copilot">GitHub Copilot</string>
+    <string name="agents_runs_in">Roda no %1$s</string>
+    <string name="agents_can_run_in">Pode rodar em %1$s</string>
+    <string name="agents_runs_in_lite">Roda no %1$s, leve</string>
+    <string name="agents_on_phone">%1$s, neste telefone</string>
+    <string name="agents_engine_missing">Falta o motor</string>
+    <string name="agents_cost_subscription">Assinatura</string>
+    <string name="agents_cost_pay">Pago por uso</string>
+    <string name="agents_cost_free">Grátis</string>
+    <string name="agents_cost_free_or_plan">Grátis ou plano</string>
+    <string name="agents_cost_offline">Offline</string>
+    <string name="agents_cost_private">Privado</string>
+    <string name="agents_see_what">Ver o que mudar</string>
+    <string name="agents_add">Adicionar uma conexão</string>
+    <string name="agents_installed">Agentes instalados</string>
+    <string name="agents_not_installed">%1$s, não instalado</string>
+    <string name="agents_installed_info">Estes são os próprios programas dos agentes, rodando dentro do Buddy. É por isso que seus planos do Claude e do ChatGPT funcionam aqui.</string>
+    <string name="agents_more">Mais</string>
+    <string name="agents_github_none">Não conectado</string>
+    <plurals name="agents_defaults_set">
+        <item quantity="one">%1$d agente definido</item>
+        <item quantity="other">%1$d agentes definidos</item>
+    </plurals>
+    <string name="conn_add_title">Adicionar uma conexão</string>
+    <string name="conn_free">Grátis</string>
+    <string name="conn_opencode_free">Modelos gratuitos do OpenCode</string>
+    <string name="conn_google_sub">Entrar com o Google</string>
+    <string name="conn_or_free">Modelos gratuitos do OpenRouter</string>
+    <string name="conn_claude_plan">Claude Pro ou Max</string>
+    <string name="conn_claude_plan_sub">Entrar com o Claude</string>
+    <string name="conn_chatgpt_plan">ChatGPT Plus ou Pro</string>
+    <string name="conn_chatgpt_plan_sub">Entrar com o ChatGPT</string>
+    <string name="conn_google_plan">Plano Google AI</string>
+    <string name="conn_supergrok">SuperGrok</string>
+    <string name="conn_supergrok_sub">Entre com sua conta da xAI</string>
+    <string name="conn_copilot">GitHub Copilot</string>
+    <string name="conn_copilot_sub">Entrar com o GitHub</string>
+    <string name="conn_pi">Seu plano, no Pi</string>
+    <string name="conn_pi_sub">Claude, ChatGPT ou Copilot: entre pela própria tela do Pi</string>
+    <string name="conn_pi_connected">Conectados: %1$s</string>
+    <string name="conn_paste_key">Colar uma chave</string>
+    <string name="conn_custom">Outro serviço</string>
+    <string name="conn_custom_sub">Qualquer endereço que fale o formato da OpenAI ou da Anthropic</string>
+    <string name="conn_custom_agents">Depende dos endereços</string>
+    <string name="conn_signed_in">Conectado</string>
+    <string name="conn_ready">Pronto</string>
+    <string name="conn_add_foot">Entrar num plano instala o agente dele antes, se ainda não estiver aqui.</string>
+    <string name="conn_or_choice_info">Entre e o OpenRouter cria uma chave só para o Buddy: nada para copiar. Ou cole uma chave que você criou no OpenRouter.</string>
+    <string name="conn_or_sign_in">Entrar com o OpenRouter</string>
+    <string name="conn_or_paste">Colar uma chave</string>
+    <string name="conn_or_needs_service_title">O serviço do Buddy está desativado</string>
+    <string name="conn_or_needs_service">O OpenRouter manda você de volta ao Buddy num endereço deste telefone, que só responde enquanto o serviço de acessibilidade do Buddy está ativado. Ative-o e tente de novo, ou cole uma chave.</string>
+    <string name="conn_or_busy">Pegando a chave do OpenRouter…</string>
+    <string name="conn_or_page_done">Você pode voltar ao Buddy.</string>
+    <string name="conn_or_page_expired">Este login expirou ou já foi usado. Comece de novo no Buddy.</string>
+    <string name="conn_or_failed">O login no OpenRouter falhou: %1$s</string>
+    <string name="conn_or_no_free">O OpenRouter não listou nenhum modelo gratuito agora, então os seletores mostram todos os modelos dele. Os gratuitos terminam em “:free”.</string>
+    <string name="conn_status_signed_in">Conectado</string>
+    <string name="conn_status_key">Chave salva</string>
+    <string name="conn_status_ready">Pronto</string>
+    <string name="conn_status_off">Desativado</string>
+    <string name="conn_status_checking">Verificando…</string>
+    <string name="conn_status_failed">Não respondeu</string>
+    <string name="conn_status_no_tools">Não usa ferramentas</string>
+    <string name="conn_balance_left">Restam %1$s</string>
+    <string name="conn_free_left">Pedidos a modelos gratuitos restantes hoje: %1$d.</string>
+    <string name="conn_or_own_key">O OpenRouter criou uma chave só para o Buddy. Apague-a na página Keys do OpenRouter para cortar o acesso do Buddy.</string>
+    <string name="conn_checked">Verificado ao conectar</string>
+    <string name="conn_checking">Verificando…</string>
+    <string name="conn_not_checked">Ainda não verificado.</string>
+    <string name="conn_check_answers">O modelo responde</string>
+    <string name="conn_check_tools">Ele consegue chamar uma ferramenta, então pode usar o telefone</string>
+    <string name="conn_check_tools_failed">Ele não chamou uma ferramenta quando pedido</string>
+    <string name="conn_no_tools_warning">%1$s respondeu, mas não conseguiu chamar uma ferramenta quando o Buddy testou. Assim ele não consegue usar o telefone.</string>
+    <string name="conn_check_fits">As ferramentas e instruções do Buddy (cerca de %1$s tokens) cabem na memória de %2$s dele. O prompt do próprio agente vem por cima.</string>
+    <string name="conn_check_fits_not">Só as ferramentas e instruções do Buddy (cerca de %1$s tokens) já não cabem na memória de %2$s dele.</string>
+    <string name="conn_check_no_model">Ele não lista nenhum modelo para verificar.</string>
+    <string name="conn_check_no_call">Ele respondeu com palavras em vez de chamar a ferramenta.</string>
+    <string name="conn_checked_how">%1$s, perguntado como o %2$s faz, %3$s</string>
+    <string name="conn_check_stale">O agente ou o modelo mudou desde então: verifique de novo.</string>
+    <string name="conn_check_now">Verificar agora</string>
+    <string name="conn_check_again">Verificar de novo</string>
+    <string name="conn_check_cost">Dois pedidos bem pequenos: no máximo um pouquinho de crédito de API.</string>
+    <string name="conn_runs_in">Roda em</string>
+    <string name="conn_runs_in_info">Os agentes marcados usam este serviço nos chats em Padrão.</string>
+    <string name="conn_runs_in_keep">%1$s não tem plano, então os chats dele precisam de um serviço. Escolha outro para ele em Modelo padrão.</string>
+    <string name="conn_models">Modelos</string>
+    <string name="conn_for_chats">Para chats</string>
+    <string name="conn_for_chats_title">Modelo do %1$s para chats</string>
+    <string name="conn_edit">Endereços e chave</string>
+    <string name="conn_use_for_new">Usar em chats novos, no %1$s</string>
+    <string name="conn_used_now">Chats novos usam isto, no %1$s.</string>
+    <string name="conn_sign_out">Sair do %1$s</string>
+    <string name="conn_sign_out_text">A chave dele é apagada deste telefone, e os chats que usam os modelos dele voltam para Padrão. A chave continua no OpenRouter até você apagá-la lá.</string>
+    <string name="conn_remove">Remover %1$s</string>
+
+    <!-- Pi's sign-in to a plan, without its own screen (PiSignIn). -->
+    <string name="signin_pi_with">Iniciar sessão com %1$s</string>
+    <string name="signin_pi_other">Outro fornecedor ou chave de API</string>
+    <string name="signin_pi_starting">A iniciar a sessão do Pi…</string>
+    <string name="signin_pi_open_page">Abrir a página de início de sessão</string>
+    <string name="signin_pi_paste_hint">O código que a página mostra</string>
+    <string name="signin_pi_send_code">Enviar o código</string>
+    <string name="signin_pi_enter_code">Introduza este código na página (é copiado ao abri-la):</string>
+    <string name="signin_pi_copy_code">Inicie sessão na página, copie o código que ela mostra e volte: o Buddy trata do resto.</string>
+    <string name="signin_pi_checking">A verificar…</string>
+    <string name="signin_pi_signed_in">O Pi tem sessão iniciada com %1$s</string>
+    <string name="signin_pi_failed">Sem sessão iniciada:\n%1$s</string>
+    <string name="debug_lock_ask_title">Permitir a depuração sem fios neste Wi-Fi</string>
+    <string name="debug_lock_ask_text">O telemóvel pergunta uma vez por cada ponto de acesso Wi-Fi (uma rede mesh tem vários). Toque aqui, marque “Permitir sempre nesta rede” e toque em Permitir.</string>
+
+    <!-- Services (2.4.0): a service's optional key, its models shown in pickers, Pi and the services saved in Buddy. -->
+    <string name="api_keys_key_optional_hint">Chave de API (opcional)</string>
+    <string name="conn_shown">Mostrados nos seletores</string>
+    <string name="conn_shown_count">%1$d de %2$d</string>
+    <string name="signin_services_also">Os chats do %1$s também podem usar os modelos dos serviços salvos no Buddy: escolha um no menu de modelos do chat.</string>
+    <string name="chat_attach_files_linux_sub">PDF, documentos, qualquer coisa. Acima de 25 MB, vai direto para as ferramentas Linux deste chat, de qualquer tamanho.</string>
+    <string name="chat_attach_big_to_linux">Demasiado grande para anexar: é enviado para as ferramentas Linux deste chat. Quando estiver lá, veja em Arquivos (opções do chat).</string>
+    <string name="chat_attach_in_linux">Nas ferramentas Linux</string>
+    <!-- Add a connection in tabs (2.4.0): Free, Plans, API keys, This phone, Servers. -->
+    <string name="ui_tab">%1$s, guia %2$d de %3$d</string>
+    <string name="conn_tab_plans">Planos</string>
+    <string name="conn_tab_keys">Chaves API</string>
+    <string name="conn_tab_phone">Telefone</string>
+    <string name="conn_tab_servers">Servidores</string>
+    <string name="conn_free_lead">Formas de começar sem pagar. Cada provedor define seus próprios limites e pode mudá-los.</string>
+    <string name="conn_free_checked">As linhas sobre limites, pagamento e privacidade vêm das páginas de cada provedor, lidas em novembro de 2026. Quem decide isso é o provedor, e pode mudar.</string>
+    <string name="conn_open">Abrir</string>
+    <string name="conn_fact_opencode_get">Uma lista de modelos que vai mudando, cada um gratuito por tempo limitado.</string>
+    <string name="conn_fact_opencode_account">Sem conta e sem login: funcionam assim que o OpenCode é instalado.</string>
+    <string name="conn_fact_opencode_privacy">Alguns dos modelos gratuitos guardam o que você envia e usam isso para melhorar o modelo. A página Zen do OpenCode diz quais.</string>
+    <string name="conn_agy_free">Plano gratuito do Antigravity</string>
+    <string name="conn_fact_agy_get">O plano de $0 do Google, com uma cota que é reposta toda semana. No uso do próprio Buddy, ele parou depois de cerca de 300 pedidos e voltou cerca de uma semana depois. O Google define a cota e pode mudá-la.</string>
+    <string name="conn_fact_agy_account">Você entra com uma conta do Google.</string>
+    <string name="conn_fact_agy_privacy">O Google usa o que você envia para melhorar seus produtos, e pessoas do Google podem ler. Não envie nada confidencial.</string>
+    <string name="conn_fact_or_get">Modelos cujo nome termina em “:free”: 50 pedidos por dia, 20 por minuto. 1000 por dia depois que a conta tiver comprado 10 créditos.</string>
+    <string name="conn_fact_or_account">Você entra pelo navegador: nenhuma chave para copiar.</string>
+    <string name="conn_fact_or_privacy">O OpenRouter não guarda seus prompts, a não ser que você mesmo ative isso. Provedores de modelos gratuitos podem treinar com eles: suas configurações de privacidade no OpenRouter decidem se esses provedores são usados.</string>
+    <string name="conn_copilot_free">GitHub Copilot Free</string>
+    <string name="conn_fact_copilot_get">O plano gratuito do GitHub inclui o agente de linha de comando do Copilot, com uma franquia de créditos de IA. O modelo é escolhido para você.</string>
+    <string name="conn_fact_copilot_who">Só para contas pessoais que não recebem o Copilot de uma organização.</string>
+    <string name="conn_fact_copilot_privacy">O GitHub pode treinar seus modelos com o que você envia. Isso se desativa em “Allow GitHub to use my data for AI model training”, nas suas configurações do Copilot no GitHub.</string>
+    <string name="conn_gemini_free">Nível gratuito do Google AI Studio</string>
+    <string name="conn_fact_gemini_get">Alguns modelos Gemini, gratuitos dentro de limites por minuto e por dia. O Google AI Studio mostra os seus.</string>
+    <string name="conn_fact_gemini_card">Não precisa de conta de faturamento: isso é para os níveis pagos.</string>
+    <string name="conn_fact_gemini_privacy">O Google usa o que você envia para melhorar seus produtos, e revisores podem ler: nada pessoal nem confidencial. No EEE, na Suíça e no Reino Unido valem os termos pagos, e não é usado dessa forma.</string>
+    <string name="conn_fact_gemini_region">Só nos países que o Google lista para a API Gemini.</string>
+    <string name="conn_plans_lead">Entre com o plano que você já paga: sem chave de API e sem uma segunda fatura.</string>
+    <string name="conn_keys_lead">Uma chave de um serviço que cobra por uso, na conta da chave. O Buddy guarda as chaves criptografadas no telefone, e os agentes nunca as veem.</string>
+    <string name="conn_keys_many">Muitos modelos atrás de uma só chave</string>
+    <string name="conn_keys_makers">Da empresa que faz os modelos</string>
+    <string name="conn_keys_fast">Rápidos</string>
+    <string name="conn_keys_other">Outra coisa</string>
+    <string name="conn_what_openrouter">Modelos de muitas empresas em uma só conta. Entre ou cole uma chave.</string>
+    <string name="conn_what_models">Modelos %1$s</string>
+    <string name="conn_what_gemini">Modelos Gemini. Tem um nível gratuito: veja Grátis.</string>
+    <string name="conn_what_fast">Uma seleção de modelos, servidos com foco em velocidade</string>
+    <string name="conn_phone_lead">Modelos que rodam no próprio telefone.</string>
+    <string name="conn_phone_private">Privado: nada sai do telefone e funciona sem internet.</string>
+    <string name="conn_phone_small">Modelos pequenos são lentos perto dos que ficam online e erram em tarefas com vários passos. Melhores para pedidos de um passo só: a bateria, um timer, uma olhada num app.</string>
+    <string name="conn_phone_ram">Este telefone tem %1$s de memória. Um modelo precisa caber nela junto com tudo o mais que estiver aberto.</string>
+    <string name="conn_servers_lead">Um servidor de modelos que você roda no seu computador ou na sua rede.</string>
+    <string name="conn_servers_yours">Seus servidores</string>
+    <string name="conn_servers_title">Seu próprio servidor de modelos</string>
+    <string name="conn_servers_what">Qualquer servidor que fale o formato da OpenAI: %1$s e outros.</string>
+    <string name="conn_servers_address">Digite o endereço dele e o Buddy carrega os modelos que ele serve. Para um servidor em um computador, é o endereço do computador na sua rede, não localhost.</string>
+    <string name="conn_servers_private">Privado: o que você envia vai para o seu servidor e fica na sua rede.</string>
+    <string name="conn_servers_key">Não precisa de chave, a não ser que seu servidor peça uma.</string>
+    <string name="conn_servers_start">Com o endereço de costume já preenchido:</string>
+    <string name="conn_servers_add">Adicionar um servidor</string>
+    <!-- Files (2.4.0): the browser of Buddy's Linux (Projects and a chat's own folders), its rows in Settings and in a chat's options. -->
+    <string name="files_title">Arquivos</string>
+    <string name="files_row_info">O que há no Linux do Buddy: faça upload de arquivos de qualquer tamanho, abra, compartilhe ou exclua</string>
+    <string name="chat_files_row">Projetos e os arquivos deste chat no Linux do Buddy</string>
+    <string name="chat_files_row_size">Projetos e os arquivos deste chat · %1$s enviados a este chat</string>
+    <string name="files_intro">O que há no Linux do Buddy, onde trabalham os agentes com ferramentas Linux. Faça upload de um arquivo em uma pasta para eles ou pegue o que eles fizeram.</string>
+    <string name="files_projects">Área de trabalho</string>
+    <string name="files_projects_info">O espaço de trabalho dos agentes, uma pasta por projeto</string>
+    <string name="files_projects_shared_info">Este chat trabalha aqui, como todo chat sem pasta de projeto</string>
+    <string name="files_project_info">O projeto deste chat: o agente dele trabalha aqui</string>
+    <string name="files_all_chats">Todos os chats</string>
+    <string name="files_project_here">O projeto deste chat: o agente dele começa nesta pasta.</string>
+    <string name="files_project_hint">Este chat trabalha em toda a área de trabalho. Para mantê-lo em um só projeto, abra o menu de uma pasta e escolha “Definir como o projeto do chat”.</string>
+    <string name="files_project_make">Definir como o projeto do chat</string>
+    <string name="files_project_end">Não é mais o projeto deste chat</string>
+    <string name="files_project_title">Trabalhar em “%1$s” neste chat?</string>
+    <string name="files_project_none_title">Voltar a trabalhar em toda a área de trabalho?</string>
+    <string name="files_project_text">A partir da sua próxima mensagem, o agente começa lá. Ele inicia uma conversa nova, só dele, e recebe este chat até aqui como texto.</string>
+    <string name="files_project_yes">Trabalhar lá</string>
+    <string name="files_project_set">Este chat agora trabalha em %1$s</string>
+    <string name="files_project_none_set">Este chat voltou a trabalhar em toda a área de trabalho</string>
+    <string name="chat_project">Pasta de projeto</string>
+    <string name="chat_project_none">Toda a área de trabalho</string>
+    <string name="chat_project_none_info">Compartilhada por todos os chats sem pasta de projeto</string>
+    <string name="chat_project_info">Onde o agente deste chat começa e guarda o trabalho. Vários chats podem trabalhar no mesmo projeto.</string>
+    <string name="chat_folder_busy">O chat está trabalhando. Mude a pasta de projeto dele quando terminar.</string>
+    <string name="jump_to_end">Ir para o fim</string>
+    <string name="models_pi_group">Pelo seu login do %1$s</string>
+    <string name="models_opencode_free">Modelos gratuitos do OpenCode</string>
+    <string name="files_this_chat">Este chat</string>
+    <string name="files_incoming">Enviados às ferramentas Linux</string>
+    <string name="files_incoming_info">Arquivos para as ferramentas do agente, de qualquer tamanho</string>
+    <string name="files_attachments">Anexos</string>
+    <string name="files_attachments_info">Cópias do que você anexou, como o agente as recebeu</string>
+    <string name="files_upload">Fazer upload de arquivos</string>
+    <string name="files_new_folder">Nova pasta</string>
+    <string name="files_create">Criar</string>
+    <string name="files_name_hint">Nome</string>
+    <string name="files_bad_name">Um nome não pode ficar vazio, ser “.” ou “..”, nem ter uma barra.</string>
+    <string name="files_menu">Mais</string>
+    <string name="files_show_hidden">Mostrar arquivos ocultos</string>
+    <string name="files_show_hidden_info">Arquivos e pastas cujo nome começa com um ponto</string>
+    <string name="files_empty">Ainda não há nada aqui.</string>
+    <plurals name="files_hidden_count">
+        <item quantity="one">%1$d item oculto não é mostrado.</item>
+        <item quantity="other">%1$d itens ocultos não são mostrados.</item>
+    </plurals>
+    <string name="files_show_more">Mostrar mais (faltam %1$d)</string>
+    <string name="files_list_failed">Não é possível mostrar esta pasta: %1$s</string>
+    <string name="files_link">Link para %1$s</string>
+    <string name="files_link_info">Um link criado dentro do Linux do Buddy. O Buddy nunca abre nem segue links aqui: o destino pode ficar fora destas pastas.</string>
+    <string name="files_open">Abrir</string>
+    <string name="files_share">Compartilhar</string>
+    <string name="files_save">Salvar em Downloads</string>
+    <string name="files_rename">Renomear</string>
+    <string name="files_delete">Excluir</string>
+    <string name="files_copy_path">Copiar caminho</string>
+    <string name="files_mention">Mencionar no chat</string>
+    <plurals name="files_selected">
+        <item quantity="one">%1$d selecionado</item>
+        <item quantity="other">%1$d selecionados</item>
+    </plurals>
+    <string name="files_delete_title">Excluir %1$s?</string>
+    <plurals name="files_delete_many">
+        <item quantity="one">Excluir %1$d item?</item>
+        <item quantity="other">Excluir %1$d itens?</item>
+    </plurals>
+    <string name="files_delete_counting">Contando o que será excluído…</string>
+    <plurals name="files_delete_info">
+        <item quantity="one">%1$d item (%2$s) é excluído para sempre.</item>
+        <item quantity="other">%1$d arquivos e pastas (%2$s) são excluídos para sempre.</item>
+    </plurals>
+    <string name="files_deleting">Excluindo… %1$d concluídos</string>
+    <string name="files_delete_failed">Nem tudo pôde ser excluído. %1$s</string>
+    <string name="files_saving">Salvando %1$s em Downloads… %2$s</string>
+    <plurals name="files_saved_many">
+        <item quantity="one">%1$d arquivo salvo em Downloads/Buddy.</item>
+        <item quantity="other">%1$d arquivos salvos em Downloads/Buddy.</item>
+    </plurals>
+    <string name="files_save_failed">Não foi possível salvar %1$s: %2$s</string>
+    <string name="files_rename_failed">Não foi possível renomear %1$s: %2$s</string>
+    <string name="files_folder_failed">Não foi possível criar a pasta %1$s: %2$s</string>
+    <string name="files_copying_into">um arquivo ainda está sendo copiado para ela</string>
+    <string name="files_busy">Aguarde o fim da exclusão ou do salvamento em andamento.</string>
+    <string name="files_outside">não está dentro das pastas que Arquivos mostra</string>
+    <string name="files_uploaded">%1$s adicionado</string>
+    <string name="files_attachments_hint">São cópias do que você anexou neste chat. Para dar outro arquivo ao agente, envie-o para a área de trabalho ou para os enviados às ferramentas Linux.</string>
+    <string name="debug_lock_settings_text">O modo em segundo plano não pode voltar a iniciar até estar ligada. Se o telefone perguntar, marque “Permitir sempre nesta rede” e toque em Permitir.</string>
+    <string name="debug_lock_turn_on">Ligar</string>
 </resources>

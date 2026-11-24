@@ -26,7 +26,7 @@ final class ToolSwitch {
     /** {group, its tools}, as the screen shows them; every tool Buddy has is in one. */
     static final String[][] GROUPS = {
             {"screen", "read_screen", "screenshot", "tap", "long_press", "type_text", "scroll", "swipe", "press",
-                    "find", "collect", "do_steps", "wait", "wait_for", "point_out"},
+                    "find", "collect", "do_steps", "routine", "wait", "wait_for", "point_out"},
             {"apps", "open_app", "list_apps", "open_url", "share", "save_to_downloads", "install_apk",
                     "wait_for_install", "update_buddy"},
             {"info", "device_status", "notifications", "reply_notification", "location", "calendar_events",
@@ -36,7 +36,7 @@ final class ToolSwitch {
             {"browser", "browser_open", "browser_read", "browser_click", "browser_type", "browser_scroll",
                     "browser_back", "browser_screenshot", "browser_tabs"},
             {"schedule", "schedule_message", "list_scheduled", "cancel_scheduled", "add_notification_rule"},
-            {"advanced", "delegate", "subagents", "phone_shell"},
+            {"advanced", "delegate", "subagents", "phone_shell", "run_on_computer"},
     };
 
     private ToolSwitch() {

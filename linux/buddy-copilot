@@ -1,0 +1,16 @@
+#!/bin/sh
+# GitHub Copilot CLI in Buddy's Linux: Settings > Copilot links this as ~/.local/bin/copilot.
+# npm's copilot starts a single-file executable that fails under proot ("Node-API symbol ... has not been loaded");
+# the package it unpacks into Copilot's cache is plain JavaScript and runs on Alpine's Node. The newest unpacked
+# version runs. Updates go through Buddy (npm, then unpack): Copilot's own updater would fetch another executable.
+pkg=${COPILOT_CACHE_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/copilot}/pkg/linuxmusl-arm64
+dir=""
+for d in $(ls -d "$pkg"/[0-9]*/ 2>/dev/null | sort -V); do
+  [ -f "$d/index.js" ] && [ -f "$d/.extraction-complete" ] && dir=$d
+done
+if [ -z "$dir" ]; then
+  echo "Copilot isn't unpacked in $pkg. Update or install Copilot again in Buddy's Settings." >&2
+  exit 1
+fi
+export COPILOT_AUTO_UPDATE=false
+exec node "${dir}index.js" "$@"

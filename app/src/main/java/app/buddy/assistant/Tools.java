@@ -32,7 +32,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-/** The phone-control tools exposed to the agents (Claude Code, Codex, OpenCode, Antigravity, Grok) over MCP. */
+/** The phone-control tools exposed to the agents (Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot, Pi) over
+ *  MCP. */
 final class Tools {
     private static final int MAX_NODES = 350;
     /** Screenshots are scaled so their shorter side is at most this, the same in portrait and landscape. */
@@ -45,6 +46,8 @@ final class Tools {
     private int lastNodesDisplay = Display.DEFAULT_DISPLAY;
     /** This call reads the user's real screen for a background chat (read_screen/screenshot with screen "user"). */
     private static final ThreadLocal<Boolean> USER_SCREEN = new ThreadLocal<>();
+    /** What this call's last tap or typing went to: how Buddy notes the step for a routine (see noteStep). */
+    private static final ThreadLocal<AccessibilityNodeInfo> REC_NODE = new ThreadLocal<>();
     private final BrowserTools browser;
     private final PhoneTools phone;
 
@@ -167,6 +170,45 @@ final class Tools {
                                 .put("append", boolProp("type: append")).put("submit", boolProp("type: press enter/send after"))
                                 .put("until", until)).put("required", new JSONArray().put("action")))),
                 "steps"));
+        String pcs = Computers.names(svc);
+        t.put(tool("run_on_computer",
+                "Run a command on one of the user's own computers over SSH (they set these up in Buddy's Settings → "
+                        + "Other devices). It runs in that computer's shell (cmd.exe on Windows unless its SSH server says "
+                        + "otherwise) as the user who added it, with no terminal: nothing interactive. The user approves "
+                        + "commands on a card first. Returns the output and the exit code."
+                        + (pcs.isEmpty() ? " No computer is set up yet: say how to add one if the user asks for this."
+                        : " Computers: " + pcs + "."),
+                props().put("computer", strProp("The computer's name as set up in Buddy"))
+                        .put("command", strProp("The command line to run there"))
+                        .put("timeout_s", intProp("Default 120, max 600")),
+                "command"));
+        String saved = Routines.names(svc);
+        t.put(tool("routine",
+                "Routines: a phone task saved as its steps, done again in seconds without working it out each time. "
+                        + "\"run\" does a saved routine step by step on its own (no read_screen between steps; the same "
+                        + "approvals apply), with \"values\" for its blanks; when a step doesn't fit (a button isn't "
+                        + "there, another app is in front) it stops and returns the steps left, for you to finish from the "
+                        + "screen as it is. \"noted\" gives the phone actions Buddy noted in this chat, in routine form; "
+                        + "\"save\" keeps steps as a routine, when the user asks for one (after a task went well). "
+                        + "\"list\" shows them. When the user asks for something a routine does, run it rather than "
+                        + "doing it by hand." + (saved.isEmpty() ? "" : " Saved: " + saved + "."),
+                props().put("action", enumProp("run", "list", "noted", "save"))
+                        .put("name", strProp("run, save: the routine's name"))
+                        .put("values", new JSONObject().put("type", "object")
+                                .put("additionalProperties", new JSONObject().put("type", "string"))
+                                .put("description", "run: the text for each blank, e.g. {\"message\": \"On my way\"}"))
+                        .put("about", strProp("save: one line on what it does"))
+                        .put("steps", new JSONObject().put("type", "array").put("maxItems", Routines.MAX_STEPS)
+                                .put("items", new JSONObject().put("type", "object"))
+                                .put("description", "save: the steps, as \"noted\" gives them: {\"action\": open_app | "
+                                        + "open_url | tap | long_press | type | scroll | swipe | press | wait | wait_for | "
+                                        + "find, and its arguments}. The first step opens an app (or a link). tap and "
+                                        + "long_press name their target by \"text\" (\"nth\"/\"of\" when several say "
+                                        + "it); type's \"text\" is a blank such as \"{message}\", its \"target\" the "
+                                        + "field's hint; \"app\" is the package that should be in front for the step; "
+                                        + "\"until\" waits for something after it, as in wait_for."))
+                        .put("replace", boolProp("save: replace the routine of that name")),
+                "action"));
         t.put(tool("collect",
                 "Read a long list or conversation in one call: scrolls it and gathers the text that comes into view, "
                         + "without repeats, until nothing new appears (or max_scrolls). Use it to summarize a chat, "
@@ -389,10 +431,11 @@ final class Tools {
     private static final java.util.Set<String> STEPPED = new java.util.HashSet<>(java.util.Arrays.asList(
             "tap", "long_press", "type_text", "scroll", "swipe", "press", "open_app", "open_url", "do_steps", "collect",
             "find", "take_photo", "set_alarm", "set_timer", "share", "save_to_downloads", "add_calendar_event", "media",
-            "reply_notification", "schedule_message", "clipboard_write", "phone_shell", "add_notification_rule"));
+            "reply_notification", "schedule_message", "clipboard_write", "phone_shell", "add_notification_rule", "routine",
+            "run_on_computer"));
     /** Of those, the ones that don't change the screen: listed without a picture. */
     private static final java.util.Set<String> UNSEEN = new java.util.HashSet<>(java.util.Arrays.asList(
-            "reply_notification", "schedule_message", "clipboard_write", "phone_shell", "add_notification_rule"));
+            "reply_notification", "schedule_message", "clipboard_write", "phone_shell", "add_notification_rule", "run_on_computer"));
 
     JSONObject call(String name, JSONObject a) throws Exception {
         // a session from outside Buddy counts as working for as long as its call goes (Sessions tab, Stop)
@@ -406,8 +449,14 @@ final class Tools {
             // the "working" notification names it (once it has used the phone: browser_* calls alone don't count)
             if (!was && Background.outsideLastCall(outside) > 0) svc.runOnMain(svc::outsideChanged);
         }
+        REC_NODE.remove();
         try {
             r = call0(name, a);
+            if (NOTED.contains(name)) {
+                JSONArray content = r.optJSONArray("content");
+                JSONObject first = content == null ? null : content.optJSONObject(0);
+                noteStep(name, a, first == null ? "" : first.optString("text"));
+            }
         } finally {
             if (outside != null) {
                 Background.outsideCall(outside, -1);
@@ -416,7 +465,7 @@ final class Tools {
                     svc.runOnMain(svc::outsideChanged);
             }
         }
-        if (STEPPED.contains(name)) {
+        if (STEPPED.contains(name) && !("routine".equals(name) && !"run".equals(a.optString("action")))) {
             JSONArray content = r.optJSONArray("content");
             JSONObject first = content == null ? null : content.optJSONObject(0);
             String said = first == null ? "" : first.optString("text");
@@ -458,6 +507,13 @@ final class Tools {
         // find and collect scroll: not with scrolling off
         if (("find".equals(name) || "collect".equals(name)) && !ToolSwitch.onForCaller(svc, "scroll"))
             return text(ToolSwitch.refusal("scroll"));
+        // a routine's list, its noted steps and saving one use nothing of the screen: no lock, pause or hidden display
+        // stands in their way. Saving is for the chat the user talks to (a helper's steps aren't the user's routine)
+        if ("routine".equals(name) && !"run".equals(a.optString("action"))) {
+            if ("save".equals(a.optString("action")) && Helpers.is(svc, McpServer.CALLER_CHAT.get()))
+                return text(Helpers.refuse("saving a routine is for the chat the user talks to"));
+            return text(routine(a));
+        }
         String capped = countStep(name, a);
         if (capped != null) return text(capped);
         if (Helpers.is(svc, McpServer.CALLER_CHAT.get())) { // a helper only looks things up, by itself (see Helpers)
@@ -537,17 +593,12 @@ final class Tools {
             case "press": return text(press(a.getString("button")));
             case "open_app": return text(openApp(a.getString("app")));
             case "list_apps": return text(listApps());
-            case "open_url": {
-                // a rule's run works for someone else's message: a link could carry the user's data away
-                if (ruleRun() && !Guard.takeApproval(false, a.getString("url"))) {
-                    String answer = svc.askConfirm(svc.getString(R.string.tools_card_open_url, a.getString("url")), false);
-                    if (!answer.startsWith("APPROVED")) return text("Not opened. " + answer);
-                }
-                return text(openUrl(a.getString("url")));
-            }
+            case "open_url": return text(openUrlChecked(a.getString("url")));
             case "screenshot": return screenshot();
             case "wait_for": return text(waitFor(a));
             case "do_steps": return text(doSteps(a.getJSONArray("steps")));
+            case "routine": return text(routine(a));
+            case "run_on_computer": return text(runOnComputer(a));
             case "collect": return text(collect(a));
             case "find": return text(find(a));
             case "wait": {
@@ -573,7 +624,7 @@ final class Tools {
                             + "passwords, security settings), is in another app or the background browser, or is one "
                             + "they set to always ask.");
                 }
-                String answer = svc.askConfirm(summary, true);
+                String answer = ask(summary, true, summary);
                 // covers the next risky tap (after a rule's countdown or its "Don't ask", only a send)
                 if (answer.startsWith("APPROVED")) Guard.approved(a.getString("summary"), BuddyService.selfApproved(answer));
                 return text(answer);
@@ -841,6 +892,7 @@ final class Tools {
     static void runStarted(String chat) {
         steps.remove(chat);
         lastStep.remove(chat);
+        Routines.runStarted(chat);
     }
 
     /**
@@ -872,18 +924,19 @@ final class Tools {
 
     private static final java.util.Set<String> SCREEN = new java.util.HashSet<>(java.util.Arrays.asList(
             "read_screen", "tap", "long_press", "type_text", "scroll", "swipe", "press", "open_app", "open_url",
-            "screenshot", "point_out", "wait_for", "do_steps", "collect", "find"));
+            "screenshot", "point_out", "wait_for", "do_steps", "collect", "find", "routine"));
 
     /** Not for a helper (see Helpers): what reaches the user, the phone's own settings or a later time. */
     private static final java.util.Set<String> HELPER_NO = new java.util.HashSet<>(java.util.Arrays.asList(
-            "delegate", "subagents", "phone_shell", "install_apk", "update_buddy", "wait_for_install", "schedule_message",
+            "delegate", "subagents", "phone_shell", "run_on_computer", "install_apk", "update_buddy", "wait_for_install", "schedule_message",
             "add_notification_rule",
             "cancel_scheduled", "notify", "share", "reply_notification", "point_out", "add_calendar_event", "set_alarm",
             "set_timer", "take_photo", "clipboard_write", "save_to_downloads"));
 
     /** Tools that act on the screen: the point_out marks go first, as the screen is about to change. */
     private static final java.util.Set<String> ACTIONS = new java.util.HashSet<>(java.util.Arrays.asList(
-            "tap", "long_press", "type_text", "scroll", "swipe", "press", "open_app", "open_url", "do_steps", "collect", "find"));
+            "tap", "long_press", "type_text", "scroll", "swipe", "press", "open_app", "open_url", "do_steps", "collect", "find",
+            "routine"));
 
     /** point_out's marks or ask's highlight: elements from the last read_screen, or points on the screen. */
     private List<Marks.Mark> marks(JSONArray a) throws JSONException {
@@ -1490,106 +1543,8 @@ final class Tools {
         for (int i = 0; i < steps.length() && i < 12; i++) {
             JSONObject st = steps.getJSONObject(i);
             String action = st.optString("action");
-            String tool = "type".equals(action) ? "type_text" : action;
-            // a step is that tool as much as a call of its own would be, and what it does on the way too: a "type" step
-            // with a target taps it first, a target found by its text reads the screen, "until" waits as wait_for does
-            boolean byText = !st.has("element") && !(st.has("x") && st.has("y"))
-                    && !st.optString("tap".equals(action) || "long_press".equals(action) ? "text" : "target").isEmpty();
-            String off = !ToolSwitch.onForCaller(svc, tool) ? tool
-                    : "type".equals(action) && !st.has("element") && (byText || (st.has("x") && st.has("y")))
-                    && !ToolSwitch.onForCaller(svc, "tap") ? "tap"
-                    : byText && !ToolSwitch.onForCaller(svc, "read_screen") ? "read_screen"
-                    : st.has("until") && !ToolSwitch.onForCaller(svc, "wait_for") ? "wait_for" : null;
-            if (off != null) {
-                out.append(i + 1).append(". ").append(ToolSwitch.refusal(off)).append('\n');
-                break;
-            }
             String before = frontPkg();
-            String held = svc.awaitResume(tool);
-            if (held == null) held = stoppedNow();
-            if (held != null) {
-                out.append(i + 1).append(". stopped: ").append(held).append('\n');
-                break;
-            }
-            String r;
-            boolean stop = false;
-            try {
-                JSONObject a;
-                switch (action) {
-                    case "tap":
-                    case "long_press":
-                        a = target(st, "text");
-                        break;
-                    case "type":
-                        a = target(st, "target").put("text", st.optString("text"))
-                                .put("append", st.optBoolean("append")).put("submit", st.optBoolean("submit"));
-                        break;
-                    case "scroll":
-                        a = new JSONObject().put("direction", st.optString("direction", "down"));
-                        if (st.has("element")) a.put("element", st.getInt("element"));
-                        break;
-                    case "press":
-                        a = new JSONObject().put("button", st.optString("button"));
-                        break;
-                    case "open_app":
-                        a = new JSONObject().put("app", st.optString("app"));
-                        break;
-                    case "wait":
-                        a = new JSONObject().put("ms", st.optLong("ms", 1000));
-                        break;
-                    default:
-                        throw new IllegalArgumentException("unknown action \"" + action + "\"");
-                }
-                String capped = "wait".equals(action) ? null : countStep(tool, a);
-                if (capped != null) {
-                    out.append(i + 1).append(". ").append(capped).append('\n');
-                    break;
-                }
-                switch (action) {
-                    case "tap": r = tap(a, false); break;
-                    case "long_press": r = tap(a, true); break;
-                    case "type": {
-                        if (a.has("x")) { // a field found by its text: into it first, then type where the focus is
-                            String t = tap(new JSONObject().put("x", a.getInt("x")).put("y", a.getInt("y")), false);
-                            if (!t.startsWith("Tapped") && !t.startsWith("Clicked")) {
-                                r = t;
-                                break;
-                            }
-                            Thread.sleep(300);
-                            a.remove("x");
-                            a.remove("y");
-                        }
-                        r = typeText(a);
-                        break;
-                    }
-                    case "scroll": r = scroll(a); break;
-                    case "press": r = press(a.getString("button")); break;
-                    case "open_app": r = openApp(a.getString("app")); break;
-                    default: {
-                        long ms = Math.max(0, Math.min(10000, a.optLong("ms", 1000)));
-                        Thread.sleep(ms);
-                        r = "Waited " + ms + " ms.";
-                    }
-                }
-                if (a.has("found")) r = "(\"" + a.getString("found") + "\") " + r;
-            } catch (IllegalArgumentException e) {
-                r = "FAILED: " + e.getMessage();
-                stop = true;
-            }
-            // a refusal, an answer from the user, or anything that didn't happen ends the batch
-            String low = r.toLowerCase(Locale.ROOT);
-            if (low.startsWith("failed") || low.contains("blocked") || low.contains("denied") || low.contains("not done")
-                    || low.contains("could not") || low.contains("couldn't") || low.contains("cancelled")
-                    || low.contains("changes requested") || low.contains("not tapped") || low.contains("stopped")
-                    || (r.contains(NOTHING_CHANGED) && !st.has("until"))) stop = true;
-            out.append(i + 1).append(". ").append(action).append(": ").append(r.replace("Call read_screen to see the new content.", "").trim());
-            if (!stop && st.has("until")) {
-                String w = waitFor(st.getJSONObject("until"));
-                out.append(" · ").append(w);
-                if (w.startsWith("TIMED OUT")) stop = true;
-            }
-            out.append('\n');
-            if (stop) break;
+            if (!step(i, st, false, out)) break;
             done++;
             String after = frontPkg();
             if (!"open_app".equals(action) && !"press".equals(action) && after != null && before != null && !after.equals(before)
@@ -1599,6 +1554,652 @@ final class Tools {
             }
         }
         return out + "Done " + done + " of " + steps.length() + " steps. Call read_screen before going on.";
+    }
+
+    /**
+     * One step of do_steps or of a routine, through the same checks as the tool on its own; its line goes to out.
+     * False: the steps stop here. A routine's step also waits a moment for its target to show up, and finds it
+     * by the same match it had when it was saved (see routineTarget).
+     */
+    private boolean step(int i, JSONObject st, boolean routine, StringBuilder out) throws Exception {
+        String action = st.optString("action");
+        String tool = "type".equals(action) ? "type_text" : action;
+        // a step is that tool as much as a call of its own would be, and what it does on the way too: a "type" step
+        // with a target taps it first, a target found by its text reads the screen, "until" waits as wait_for does
+        boolean byText = !st.has("element") && !(st.has("x") && st.has("y"))
+                && (!st.optString("tap".equals(action) || "long_press".equals(action) ? "text" : "target").isEmpty()
+                || !st.optString("id").isEmpty());
+        if (!routine && ("swipe".equals(action) || "open_url".equals(action) || "wait_for".equals(action) || "find".equals(action))) {
+            out.append(i + 1).append(". FAILED: unknown action \"").append(action).append("\"\n");
+            return false;
+        }
+        String off = !ToolSwitch.onForCaller(svc, tool) ? tool
+                : "find".equals(action) && !ToolSwitch.onForCaller(svc, "scroll") ? "scroll"
+                : "type".equals(action) && !st.has("element") && (byText || (st.has("x") && st.has("y")))
+                && !ToolSwitch.onForCaller(svc, "tap") ? "tap"
+                : byText && !ToolSwitch.onForCaller(svc, "read_screen") ? "read_screen"
+                : st.has("until") && !ToolSwitch.onForCaller(svc, "wait_for") ? "wait_for" : null;
+        if (off != null) {
+            out.append(i + 1).append(". ").append(ToolSwitch.refusal(off)).append('\n');
+            return false;
+        }
+        String held = svc.awaitResume(tool);
+        // a routine finds each target afresh: the user having used the phone doesn't make its steps stale
+        if (routine && held != null && held.startsWith("SCREEN CHANGED")) held = null;
+        if (held == null) held = stoppedNow();
+        if (held != null) {
+            out.append(i + 1).append(". stopped: ").append(held).append('\n');
+            return false;
+        }
+        String r;
+        boolean stop = false;
+        JSONObject a = null;
+        REC_NODE.remove();
+        try {
+            switch (action) {
+                case "tap":
+                case "long_press":
+                    a = routine ? routineTarget(st, "text") : target(st, "text");
+                    break;
+                case "type":
+                    a = (routine ? routineTarget(st, "target") : target(st, "target")).put("text", st.optString("text"))
+                            .put("append", st.optBoolean("append")).put("submit", st.optBoolean("submit"));
+                    break;
+                case "scroll":
+                    a = new JSONObject().put("direction", st.optString("direction", "down"));
+                    if (st.has("element")) a.put("element", st.getInt("element"));
+                    break;
+                case "swipe":
+                    a = new JSONObject().put("x1", st.getInt("x1")).put("y1", st.getInt("y1")).put("x2", st.getInt("x2"))
+                            .put("y2", st.getInt("y2")).put("duration_ms", st.optLong("duration_ms", 300));
+                    break;
+                case "press":
+                    a = new JSONObject().put("button", st.optString("button"));
+                    break;
+                case "open_app":
+                    a = new JSONObject().put("app", st.optString("app"));
+                    break;
+                case "open_url":
+                    a = new JSONObject().put("url", st.optString("url"));
+                    break;
+                case "wait":
+                    a = new JSONObject().put("ms", st.optLong("ms", 1000));
+                    break;
+                case "wait_for":
+                case "find": {
+                    a = new JSONObject(st.toString());
+                    a.remove("action");
+                    a.remove("until");
+                    break;
+                }
+                default:
+                    throw new IllegalArgumentException("unknown action \"" + action + "\"");
+            }
+            String capped = "wait".equals(action) || "wait_for".equals(action) ? null : countStep(tool, a);
+            if (capped != null) {
+                out.append(i + 1).append(". ").append(capped).append('\n');
+                return false;
+            }
+            switch (action) {
+                case "tap": r = tap(a, false); break;
+                case "long_press": r = tap(a, true); break;
+                case "type": {
+                    if (a.has("x")) { // a field found by its text: into it first, then type where the focus is
+                        String t = tap(new JSONObject().put("x", a.getInt("x")).put("y", a.getInt("y")), false);
+                        if (!t.startsWith("Tapped") && !t.startsWith("Clicked")) {
+                            r = t;
+                            break;
+                        }
+                        Thread.sleep(300);
+                        a.remove("x");
+                        a.remove("y");
+                    }
+                    r = typeText(a);
+                    break;
+                }
+                case "scroll": r = scroll(a); break;
+                case "swipe": r = swipe(a); break;
+                case "press": r = press(a.getString("button")); break;
+                case "open_app": r = openApp(a.getString("app")); break;
+                case "open_url": r = openUrlChecked(a.getString("url")); break;
+                case "wait_for": {
+                    r = waitFor(a);
+                    if (r.startsWith("TIMED OUT")) stop = true;
+                    break;
+                }
+                case "find": {
+                    r = find(a);
+                    if (!r.startsWith("FOUND")) stop = true;
+                    break;
+                }
+                default: {
+                    long ms = Math.max(0, Math.min(10000, a.optLong("ms", 1000)));
+                    Thread.sleep(ms);
+                    r = "Waited " + ms + " ms.";
+                }
+            }
+        } catch (IllegalArgumentException | IllegalStateException | JSONException e) {
+            r = "FAILED: " + e.getMessage();
+            stop = true;
+        }
+        // a refusal, an answer from the user, or anything that didn't happen ends the batch. Judged by the tool's own
+        // words: a result that quotes what it touched (the text found, an app's name, a link) is judged by how it
+        // starts, or a button called "Blocked numbers" would read as a refusal
+        String low = r.toLowerCase(Locale.ROOT);
+        boolean quotes = "find".equals(action) || "open_app".equals(action) || "open_url".equals(action)
+                || "wait_for".equals(action) || "wait".equals(action);
+        if (low.startsWith("failed")) stop = true;
+        else if ("open_app".equals(action) || "open_url".equals(action)) stop |= !r.startsWith("Opened");
+        else if (!quotes && (low.contains("blocked") || low.contains("denied") || low.contains("not done")
+                || low.contains("could not") || low.contains("couldn't") || low.contains("cancelled")
+                || low.contains("changes requested") || low.contains("not tapped") || low.contains("not sent")
+                || low.contains("stopped") || (r.contains(NOTHING_CHANGED) && !st.has("until") && !(routine && "scroll".equals(action)))))
+            stop = true;
+        if (!stop && a != null) noteStep(tool, a, r);
+        // (what it found by its text goes on the line only now: its words aren't the tool's)
+        if (a != null && a.has("found") && !r.startsWith("FAILED")) r = "(\"" + a.getString("found") + "\") " + r;
+        out.append(i + 1).append(". ").append(action).append(": ").append(r.replace("Call read_screen to see the new content.", "")
+                .replace("Call read_screen to see the result.", "").replace("Call read_screen to see it.", "").trim());
+        if (!stop && st.optJSONObject("until") != null) {
+            String w = waitFor(st.getJSONObject("until"));
+            out.append(" · ").append(w);
+            if (w.startsWith("TIMED OUT")) stop = true;
+            else Routines.untilLast(noteKey(), st.getJSONObject("until"));
+        }
+        out.append('\n');
+        return !stop;
+    }
+
+    // ------------------------------------------------------------ routines
+
+    /** Settings → Routines' Run: Buddy's own run on the user's screen, outside any chat, through the same call. */
+    String runFromPage(String name, JSONObject values, boolean hidden) {
+        if (hidden) McpServer.CALLER_KEY.set(Background.ROUTINES); // its own hidden screen, as an outside session's
+        try {
+            JSONObject r = call("routine", new JSONObject().put("action", "run").put("name", name)
+                    .put("values", values == null ? new JSONObject() : values));
+            JSONArray content = r.optJSONArray("content");
+            JSONObject first = content == null ? null : content.optJSONObject(0);
+            return first == null ? "" : first.optString("text");
+        } catch (Exception e) {
+            return "FAILED: " + e;
+        } finally {
+            McpServer.CALLER_KEY.remove();
+        }
+    }
+
+    /** open_url as the tool does it, and as a routine's step: in a rule's run, the link asks first. */
+    private String openUrlChecked(String url) throws Exception {
+        // a rule's run works for someone else's message: a link could carry the user's data away
+        if (ruleRun() && !Guard.takeApproval(false, url)) {
+            String answer = svc.askConfirm(svc.getString(R.string.tools_card_open_url, url), false);
+            if (!answer.startsWith("APPROVED")) return "Not opened. " + answer;
+        }
+        return openUrl(url);
+    }
+
+    /** run_on_computer: a command on one of the user's computers, after their OK (see Computers). */
+    private String runOnComputer(JSONObject a) throws Exception {
+        if (ruleRun()) return "Not run: a notification rule's run can't use the user's computers.";
+        Computers.Computer m = Computers.find(svc, a.optString("computer"));
+        if (m == null) {
+            String all = Computers.names(svc);
+            return all.isEmpty() ? "No computer is set up. The user adds one in Buddy's Settings → Other devices → Add a computer."
+                    : "No computer called \"" + a.optString("computer") + "\". There are: " + all + ".";
+        }
+        String command = a.optString("command").trim();
+        if (command.isEmpty()) return "Say which command to run.";
+        String answer = svc.askConfirm(svc.getString(R.string.tools_card_computer, m.name, command), false); // every one
+        if (!answer.startsWith("APPROVED")) return "Not run. " + answer;
+        svc.showActivity(svc.getString(R.string.activity_computer, m.name), pictureKey());
+        int timeout = Math.max(5, Math.min(600, a.optInt("timeout_s", 120)));
+        return Computers.run(svc, m, command, timeout);
+    }
+
+    /** Whose noted steps these are: the chat's, or the session's outside Buddy (each computer and the terminal apart). */
+    private static String noteKey() {
+        String chat = McpServer.CALLER_CHAT.get();
+        return chat != null ? chat : screenKey();
+    }
+
+    /** The routine tool: run, list, noted, save. */
+    private String routine(JSONObject a) throws Exception {
+        String chat = McpServer.CALLER_CHAT.get();
+        switch (a.optString("action")) {
+            case "list": {
+                List<JSONObject> all = Routines.all(svc);
+                if (all.isEmpty()) return "No routines saved yet.";
+                StringBuilder b = new StringBuilder();
+                for (JSONObject r : all) {
+                    List<String> blanks = Routines.blanks(r.optJSONArray("steps"));
+                    b.append("- \"").append(r.optString("name")).append("\": ").append(r.optString("about"))
+                            .append(" (").append(r.optJSONArray("steps") == null ? 0 : r.optJSONArray("steps").length())
+                            .append(" steps").append(blanks.isEmpty() ? "" : "; blanks: " + android.text.TextUtils.join(", ", blanks))
+                            .append(")\n");
+                }
+                return b.toString();
+            }
+            case "noted":
+                return Routines.noted(noteKey());
+            case "save": {
+                if (ruleRun()) return "Not saved: a notification rule's run can't save routines; only the user's own chats can.";
+                JSONArray steps = a.optJSONArray("steps");
+                String wrong = Routines.save(svc, a.optString("name"), a.optString("about"), steps, a.optBoolean("replace"));
+                if (wrong != null) return "Not saved. " + wrong;
+                List<String> blanks = Routines.blanks(steps);
+                noteInChat(chat, svc.getString(R.string.routine_saved_note, a.optString("name").trim()));
+                return "Saved the routine \"" + a.optString("name").trim() + "\" (" + steps.length() + " steps"
+                        + (blanks.isEmpty() ? "" : "; blanks: " + android.text.TextUtils.join(", ", blanks)) + "). The user "
+                        + "finds it in Settings → Routines, and can start it there; you can run it with action \"run\".";
+            }
+            case "run":
+                return runRoutine(a.optString("name"), a.optJSONObject("values"));
+            default:
+                return "Say which action: run, list, noted or save.";
+        }
+    }
+
+    /**
+     * Does a saved routine, step by step, through the same checks as the agent's own steps. Stops at the first step
+     * that doesn't fit and says which steps are left. Called by the agent (routine run) and from Settings → Routines
+     * (no chat: Buddy's own run, see runFromPage).
+     */
+    String runRoutine(String name, JSONObject values) throws Exception {
+        JSONObject r = Routines.find(svc, name);
+        if (r == null) {
+            String all = Routines.names(svc);
+            return "No routine called \"" + name + "\". " + (all.isEmpty() ? "There are none yet." : "There are: " + all + ".");
+        }
+        name = r.optString("name");
+        JSONArray steps = r.getJSONArray("steps");
+        List<String> blanks = Routines.blanks(steps), missing = new ArrayList<>();
+        for (String b : blanks) if (values == null || values.optString(b).isEmpty()) missing.add(b);
+        if (!missing.isEmpty()) return "Not started: this routine types into blanks (" + android.text.TextUtils.join(", ", blanks)
+                + "). Give \"values\" for " + android.text.TextUtils.join(", ", missing) + " (ask the user if you don't know them).";
+        StringBuilder out = new StringBuilder("Routine \"" + name + "\":\n");
+        int n = Math.min(steps.length(), Routines.MAX_STEPS), at = -1;
+        svc.showActivity(svc.getString(R.string.activity_routine, name), pictureKey());
+        for (int i = 0; i < n; i++) {
+            JSONObject st = new JSONObject(steps.getJSONObject(i).toString());
+            String action = st.optString("action"), blank = "type".equals(action) ? Routines.blank(st.optString("text")) : null;
+            if (blank != null) st.put("text", values.optString(blank));
+            String want = st.optString("app");
+            // (a target found by its text is checked by its own app, see routineTarget; a point, by what's under it)
+            boolean byNode = !st.optString("text").isEmpty() && !"type".equals(action) || !st.optString("id").isEmpty()
+                    || "type".equals(action) && !st.optString("target").isEmpty();
+            boolean atPoint = ("tap".equals(action) || "long_press".equals(action)) && !byNode && st.has("x") && st.has("y");
+            if (!want.isEmpty() && !byNode && !"open_app".equals(action) && !"open_url".equals(action) && !"press".equals(action)
+                    && !"wait".equals(action) && !"wait_for".equals(action)) {
+                String other = atPoint ? awaitAt(want, st.getInt("x"), st.getInt("y"), 6000) : awaitFront(want, 6000);
+                if (other != null) {
+                    out.append(i + 1).append(". stopped: ").append(appLabel(want)).append(" should be in front for this ")
+                            .append("step, but ").append(other).append(" is.\n");
+                    at = i;
+                    break;
+                }
+            }
+            // a card from someone else waits (another chat's, a question): the routine waits for the user's answer
+            // rather than stopping at its next touch, as long as a card waits anyway
+            for (long until = android.os.SystemClock.elapsedRealtime() + 5 * 60_000L; svc.bubble() != null
+                    && svc.bubble().confirming() && android.os.SystemClock.elapsedRealtime() < until && stoppedNow() == null; )
+                Thread.sleep(500);
+            if (!step(i, st, true, out)) {
+                at = i;
+                break;
+            }
+        }
+        Routines.ran(svc, name, at + 1); // 0: done
+        if (at < 0) return out + "Done: all " + n + " steps. Call read_screen to check how it ended.";
+        JSONArray left = new JSONArray();
+        for (int i = at; i < n; i++) {
+            JSONObject st = new JSONObject(steps.getJSONObject(i).toString());
+            String blank = "type".equals(st.optString("action")) ? Routines.blank(st.optString("text")) : null;
+            if (blank != null) st.put("text", values.optString(blank));
+            left.put(st);
+        }
+        return out + "Stopped at step " + (at + 1) + " of " + n + ". The steps left, from that one on, for you to do "
+                + "yourself (read_screen first: the screen may need another way than the routine's):\n" + left;
+    }
+
+    /** null once what's at x, y is the app's (waiting up to ms for it), else the name of the app in front. */
+    private String awaitAt(String pkg, int x, int y, long ms) throws InterruptedException {
+        long end = android.os.SystemClock.elapsedRealtime() + ms;
+        while (true) {
+            AccessibilityNodeInfo at = Guard.nodeAt(windows(), x, y);
+            if (at != null && pkg.contentEquals(String.valueOf(at.getPackageName()))) return null;
+            if (android.os.SystemClock.elapsedRealtime() > end || stoppedNow() != null) {
+                String f = frontName();
+                return f == null ? "another app" : f;
+            }
+            Thread.sleep(250);
+        }
+    }
+
+    /** null once the app is in front (waiting up to ms for it), else the name of the app that is. */
+    private String awaitFront(String pkg, long ms) throws InterruptedException {
+        long end = android.os.SystemClock.elapsedRealtime() + ms;
+        while (true) {
+            if (pkg.equals(frontPkg())) return null;
+            if (android.os.SystemClock.elapsedRealtime() > end || stoppedNow() != null) {
+                String f = frontName();
+                return f == null ? "another app" : f;
+            }
+            Thread.sleep(250);
+        }
+    }
+
+    private String appLabel(String pkg) {
+        try {
+            PackageManager pm = svc.getPackageManager();
+            return String.valueOf(pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)));
+        } catch (Exception e) {
+            return pkg;
+        }
+    }
+
+    /**
+     * A routine step's target, as it was when the routine was saved: its text (or view id), the same one of several
+     * when several say it ("nth" of "of"). Waits up to 6 s for it to show up, as the screen may still be on its way;
+     * no match, or more matches than then, is a failure: a routine doesn't guess.
+     */
+    private JSONObject routineTarget(JSONObject st, String key) throws Exception {
+        JSONObject a = new JSONObject();
+        String q = st.optString(key).trim(), id = st.optString("id");
+        if (q.isEmpty() && id.isEmpty()) {
+            if (st.has("x") && st.has("y")) a.put("x", st.getInt("x")).put("y", st.getInt("y"));
+            return a;
+        }
+        int of = Math.max(1, st.optInt("of", 1)), nth = st.optInt("nth", 0);
+        String app = st.optString("app");
+        JSONArray atJ = st.optJSONArray("at");
+        int[] at = atJ != null && atJ.length() == 2 ? new int[]{atJ.optInt(0), atJ.optInt(1)} : null;
+        long end = android.os.SystemClock.elapsedRealtime() + 6000;
+        Rect last = null;
+        while (true) {
+            List<AccessibilityNodeInfo> found = q.isEmpty() ? byId(id) : findAll(q);
+            if (found.isEmpty() && !q.isEmpty()) {
+                AccessibilityNodeInfo near = findText(q); // only a longer text with it in: still the one, when it's alone
+                if (near != null) found = Collections.singletonList(near);
+            }
+            if (!app.isEmpty()) { // in the app it was in when saved (a dialog of the system's is its own app)
+                List<AccessibilityNodeInfo> mine = new ArrayList<>();
+                for (AccessibilityNodeInfo f : found) if (app.contentEquals(String.valueOf(f.getPackageName()))) mine.add(f);
+                found = mine;
+            }
+            AccessibilityNodeInfo pick = found.size() == of && nth < of ? found.get(nth) : null;
+            if (pick == null && !found.isEmpty() && at != null) pick = nearest(found, at); // the one where it was
+            if (pick != null) {
+                Rect r = new Rect();
+                pick.getBoundsInScreen(r);
+                // the same place twice in a row: not the screen on its way out, nor something still sliding in
+                if (r.equals(last)) return a.put("x", r.centerX()).put("y", r.centerY()).put("found", q.isEmpty() ? id : q);
+                last = r;
+            } else last = null;
+            if (android.os.SystemClock.elapsedRealtime() > end || stoppedNow() != null) {
+                String what = q.isEmpty() ? "the element " + id : "\"" + q + "\"";
+                String front = frontPkg();
+                if (found.isEmpty() && !app.isEmpty() && front != null && !app.equals(front))
+                    throw new IllegalArgumentException(appLabel(app) + " should be in front for this step, but " + frontName() + " is");
+                throw new IllegalArgumentException(found.isEmpty() ? "nothing on the screen says " + what
+                        : found.size() + " things on the screen say " + what + " (" + of + " when the routine was saved), "
+                        + "so Buddy can't tell which one to " + ("target".equals(key) ? "type in" : "tap"));
+            }
+            Thread.sleep(300);
+        }
+    }
+
+    /**
+     * Of several that say the same, the one where the routine's was when saved: clearly the nearest (within a tenth
+     * of the screen, and the next one at least twice as far), else null.
+     */
+    private AccessibilityNodeInfo nearest(List<AccessibilityNodeInfo> found, int[] at) {
+        DisplayMetrics dm = svc.getResources().getDisplayMetrics();
+        double near = Math.hypot(dm.widthPixels, dm.heightPixels) / 10, best = Double.MAX_VALUE, second = Double.MAX_VALUE;
+        AccessibilityNodeInfo pick = null;
+        Rect r = new Rect();
+        for (AccessibilityNodeInfo f : found) {
+            f.getBoundsInScreen(r);
+            double d = Math.hypot(r.centerX() - at[0], r.centerY() - at[1]);
+            if (d < best) {
+                second = best;
+                best = d;
+                pick = f;
+            } else if (d < second) second = d;
+        }
+        return best <= near && second >= 2 * Math.max(best, 1) ? pick : null;
+    }
+
+    /** Every visible element whose text, description or hint is exactly q (not Buddy's own), in screen order. */
+    private List<AccessibilityNodeInfo> findAll(String q) {
+        String want = q.trim().toLowerCase(Locale.ROOT);
+        List<AccessibilityNodeInfo> out = new ArrayList<>();
+        if (want.isEmpty()) return out;
+        for (AccessibilityWindowInfo w : windows()) {
+            if (w.getType() != AccessibilityWindowInfo.TYPE_APPLICATION && w.getType() != AccessibilityWindowInfo.TYPE_SYSTEM) continue;
+            AccessibilityNodeInfo root = w.getRoot();
+            if (root == null || svc.getPackageName().contentEquals(String.valueOf(root.getPackageName()))) continue;
+            allIn(root, want, out, 0);
+        }
+        // a button whose label is inside it ("Stopwatch" on the tab and on its text) is one thing, not two
+        List<AccessibilityNodeInfo> outer = new ArrayList<>();
+        for (AccessibilityNodeInfo n : out) {
+            boolean inside = false;
+            AccessibilityNodeInfo p = n.getParent();
+            for (int i = 0; p != null && i < 8 && !inside; i++, p = p.getParent()) inside = out.contains(p);
+            if (!inside) outer.add(n);
+        }
+        return outer;
+    }
+
+    private void allIn(AccessibilityNodeInfo n, String want, List<AccessibilityNodeInfo> out, int depth) {
+        if (n == null || depth > 80 || out.size() > 50 || !n.isVisibleToUser()) return;
+        for (CharSequence c : new CharSequence[]{n.getText(), n.getContentDescription(), n.isEditable() ? n.getHintText() : null}) {
+            if (!empty(c) && c.toString().trim().toLowerCase(Locale.ROOT).equals(want)) {
+                out.add(n);
+                break;
+            }
+        }
+        for (int i = 0; i < n.getChildCount(); i++) allIn(n.getChild(i), want, out, depth + 1);
+    }
+
+    private List<AccessibilityNodeInfo> byId(String id) {
+        List<AccessibilityNodeInfo> out = new ArrayList<>();
+        for (AccessibilityWindowInfo w : windows()) {
+            AccessibilityNodeInfo root = w.getRoot();
+            if (root == null || svc.getPackageName().contentEquals(String.valueOf(root.getPackageName()))) continue;
+            for (AccessibilityNodeInfo n : root.findAccessibilityNodeInfosByViewId(id)) if (n.isVisibleToUser()) out.add(n);
+        }
+        return out;
+    }
+
+    /** The phone actions a routine can repeat: noted as they go through (see noteStep). */
+    private static final java.util.Set<String> NOTED = new java.util.HashSet<>(java.util.Arrays.asList(
+            "tap", "long_press", "type_text", "scroll", "swipe", "press", "open_app", "open_url", "wait_for", "find", "wait"));
+
+    /**
+     * An action that went through, noted for this chat in routine form (Routines.noted): what it touched by its text
+     * and the app it was in, never an element id. In memory only, and never for an incognito chat.
+     */
+    private void noteStep(String tool, JSONObject a, String result) {
+        try {
+            String chat = McpServer.CALLER_CHAT.get();
+            Sessions.Session ses = chat == null ? null : ChatHub.get(svc).sessions.find(chat);
+            if (ses != null && ses.incognito) return;
+            AccessibilityNodeInfo n = REC_NODE.get();
+            REC_NODE.remove();
+            String res = result == null ? "" : result.trim();
+            JSONObject st;
+            switch (tool) {
+                case "tap":
+                case "long_press":
+                    if (!res.startsWith("Tapped") && !res.startsWith("Long-pressed") && !res.startsWith("Clicked")) return;
+                    st = new JSONObject().put("action", tool);
+                    if (n == null || (a.has("x") && a.has("y") && !a.has("found") && !aimedAt(n, a.optInt("x"), a.optInt("y")))) {
+                        // a point on a map, a picture or a game: the point it was, in the app it was in
+                        st.put("x", a.optInt("x")).put("y", a.optInt("y"));
+                        if (n != null && n.getPackageName() != null) st.put("app", n.getPackageName().toString());
+                    } else describe(n, st);
+                    break;
+                case "type_text":
+                    if (!res.startsWith("Typed") || res.contains("Not sent")) return;
+                    st = new JSONObject().put("action", "type").put("text", a.optString("text"));
+                    if (n != null) {
+                        String field = fieldName(n);
+                        if (field != null) st.put("target", field);
+                        if (n.getPackageName() != null) st.put("app", n.getPackageName().toString());
+                    }
+                    if (a.optBoolean("submit") && res.contains("Pressed enter")) st.put("submit", true);
+                    if (a.optBoolean("append")) st.put("append", true);
+                    break;
+                case "scroll":
+                    if (!res.startsWith("Scrolled")) return;
+                    st = new JSONObject().put("action", "scroll").put("direction", a.optString("direction", "down"));
+                    putFront(st);
+                    break;
+                case "swipe":
+                    if (!res.startsWith("Swiped")) return;
+                    st = new JSONObject().put("action", "swipe").put("x1", a.optInt("x1")).put("y1", a.optInt("y1"))
+                            .put("x2", a.optInt("x2")).put("y2", a.optInt("y2"));
+                    if (a.has("duration_ms")) st.put("duration_ms", a.optLong("duration_ms"));
+                    putFront(st);
+                    break;
+                case "press":
+                    if (!res.startsWith("Pressed")) return;
+                    st = new JSONObject().put("action", "press").put("button", a.optString("button"));
+                    break;
+                case "open_app": {
+                    if (!res.startsWith("Opened")) return;
+                    // the package: a dotted name in parentheses, the last one ("Maps (Go) (com.google…)" has two)
+                    java.util.regex.Matcher m = java.util.regex.Pattern.compile("\\(([A-Za-z0-9_]+(?:\\.[A-Za-z0-9_]+)+)\\)").matcher(res);
+                    String pkg = null;
+                    while (m.find()) pkg = m.group(1);
+                    st = new JSONObject().put("action", "open_app").put("app", pkg != null ? pkg : a.optString("app"));
+                    break;
+                }
+                case "open_url":
+                    if (!res.startsWith("Opened")) return;
+                    st = new JSONObject().put("action", "open_url").put("url", a.optString("url"));
+                    break;
+                case "wait_for":
+                case "find":
+                    if (!res.startsWith("OK") && !res.startsWith("FOUND")) return;
+                    st = new JSONObject(a.toString()).put("action", tool);
+                    st.remove("element");
+                    break;
+                case "wait":
+                    st = new JSONObject().put("action", "wait").put("ms", a.optLong("ms", 1000));
+                    break;
+                default:
+                    return;
+            }
+            Routines.note(noteKey(), st);
+        } catch (Exception ignored) {
+        }
+    }
+
+    /** A tap at x, y was meant for this element: near its middle, and it isn't a big area (a map, a page, a game). */
+    private boolean aimedAt(AccessibilityNodeInfo n, int x, int y) {
+        Rect r = new Rect();
+        n.getBoundsInScreen(r);
+        DisplayMetrics dm = svc.getResources().getDisplayMetrics();
+        if ((long) r.width() * r.height() > (long) dm.widthPixels * dm.heightPixels / 6) return false;
+        int slackX = Math.max(dp(24), r.width() / 4), slackY = Math.max(dp(24), r.height() / 4);
+        return Math.abs(x - r.centerX()) <= slackX && Math.abs(y - r.centerY()) <= slackY;
+    }
+
+    private int dp(int v) {
+        return Math.round(v * svc.getResources().getDisplayMetrics().density);
+    }
+
+    private void putFront(JSONObject st) throws JSONException {
+        String pkg = frontPkg();
+        if (pkg != null) st.put("app", pkg);
+    }
+
+    /**
+     * How a routine finds this element again: its own text or description, else the first text inside it, with
+     * which of several it is when several say the same; else its view id; else its place on the screen.
+     */
+    private void describe(AccessibilityNodeInfo n, JSONObject st) throws JSONException {
+        if (n.getPackageName() != null) st.put("app", n.getPackageName().toString());
+        AccessibilityNodeInfo named = n;
+        String text = ownText(n);
+        // no text of its own (an icon): the button it's part of ("Timer" on the tab), else a text inside
+        for (AccessibilityNodeInfo p = n.getParent(); text == null && p != null && named == n; p = p.getParent()) {
+            if (ownText(p) != null && (p.isClickable() || p.isLongClickable())) {
+                named = p;
+                text = ownText(p);
+            }
+            if (p.isClickable()) break; // (not past the button itself)
+        }
+        if (text == null) {
+            named = textBelow(n, 0);
+            text = named == null ? null : ownText(named);
+        }
+        if (text != null) {
+            st.put("text", text);
+            Rect at = new Rect();
+            n.getBoundsInScreen(at);
+            st.put("at", new JSONArray().put(at.centerX()).put(at.centerY())); // to tell look-alikes apart
+            List<AccessibilityNodeInfo> all = findAll(text);
+            int nth = all.indexOf(named);
+            if (nth < 0) { // the label was inside a match (deduped): the match it's in
+                for (int i = 0; i < all.size() && nth < 0; i++) {
+                    AccessibilityNodeInfo p = named.getParent();
+                    for (int k = 0; p != null && k < 8; k++, p = p.getParent()) if (p.equals(all.get(i))) { nth = i; break; }
+                }
+            }
+            if (all.size() > 1 && nth >= 0) st.put("nth", nth).put("of", all.size());
+            return;
+        }
+        String id = n.getViewIdResourceName();
+        if (id != null && !id.isEmpty()) {
+            st.put("id", id);
+            Rect at = new Rect();
+            n.getBoundsInScreen(at);
+            st.put("at", new JSONArray().put(at.centerX()).put(at.centerY()));
+            List<AccessibilityNodeInfo> all = byId(id);
+            int nth = all.indexOf(n);
+            if (all.size() > 1 && nth >= 0) st.put("nth", nth).put("of", all.size());
+            return;
+        }
+        Rect r = new Rect();
+        n.getBoundsInScreen(r);
+        st.put("x", r.centerX()).put("y", r.centerY());
+    }
+
+    /** A short text of the element's own, or null. */
+    private static String ownText(AccessibilityNodeInfo n) {
+        // a text field by its hint or description, never by what's typed in it
+        for (CharSequence c : n.isEditable() ? new CharSequence[]{n.getHintText(), n.getContentDescription()}
+                : new CharSequence[]{n.getText(), n.getContentDescription()}) {
+            if (empty(c)) continue;
+            String t = c.toString().trim();
+            if (!t.isEmpty() && t.length() <= 80 && t.indexOf('\n') < 0) return t;
+        }
+        return null;
+    }
+
+    private static AccessibilityNodeInfo textBelow(AccessibilityNodeInfo n, int depth) {
+        if (n == null || depth > 4) return null;
+        for (int i = 0; i < n.getChildCount(); i++) {
+            AccessibilityNodeInfo ch = n.getChild(i);
+            if (ch == null || !ch.isVisibleToUser()) continue;
+            if (ownText(ch) != null) return ch;
+            AccessibilityNodeInfo deeper = textBelow(ch, depth + 1);
+            if (deeper != null) return deeper;
+        }
+        return null;
+    }
+
+    /** A text field's name for a routine: its hint, else its description (never what's typed in it). */
+    private static String fieldName(AccessibilityNodeInfo n) {
+        for (CharSequence c : new CharSequence[]{n.getHintText(), n.getContentDescription()}) {
+            if (empty(c)) continue;
+            String t = c.toString().trim();
+            if (!t.isEmpty() && t.length() <= 80 && t.indexOf('\n') < 0) return t;
+        }
+        return null;
     }
 
     /** collect: scrolls and gathers the text that comes into view, until nothing new does. */
@@ -1768,6 +2369,7 @@ final class Tools {
         String label = Guard.buttonLabel(n != null ? n : hit);
         svc.showActivity(label == null ? svc.getString(R.string.activity_tapping_plain)
                 : svc.getString(R.string.activity_tapping, label), pictureKey());
+        REC_NODE.set(n != null ? n : hit);
         Stroke p = new Stroke();
         p.moveTo(x, y);
         String note = otherButtonNote(n, hit);
@@ -1946,6 +2548,16 @@ final class Tools {
         return guardAction(what, card, detail, send, byRule, false);
     }
 
+    /**
+     * An approval card. One about money (a money app in front, or paying, buying, ordering in what it's for) is
+     * answered on the phone only, never from a paired browser (see WebDevices).
+     */
+    private String ask(String summary, boolean canAuto, String what) throws InterruptedException {
+        String pkg = frontPkg();
+        boolean money = (pkg != null && Guard.moneyApp(svc, pkg)) || WebDevices.money(what) || WebDevices.money(summary);
+        return money ? WebDevices.askOnPhone(svc, summary, canAuto) : svc.askConfirm(summary, canAuto);
+    }
+
     /** otherRisk: a risky button that doesn't send, which an approval given only for sending doesn't cover. */
     private String guardAction(String what, java.util.function.Function<String, String> card, String detail, boolean send,
                                boolean byRule, boolean otherRisk) throws InterruptedException {
@@ -1960,7 +2572,7 @@ final class Tools {
                 : svc.getString(R.string.tools_card_detail, card.apply(app), detail.contains("\n") || detail.startsWith("“")
                 ? detail.trim() : svc.getString(R.string.tools_card_quote, detail.trim()));
         CARD_SHOWN.set(true);
-        String answer = svc.askConfirm(summary, send);
+        String answer = ask(summary, send, what);
         if (answer.startsWith("APPROVED")) return null;
         if (answer.startsWith("CHANGES")) return "Not tapped: the user wants changes first. " + answer;
         return "BLOCKED by Buddy's safety rule: the user did not approve “" + what + "”. Don't retry it; "
@@ -2036,6 +2648,7 @@ final class Tools {
                     + "with this field in highlight so they enter it themselves, then go on.";
         }
         firstUse(str(target.getPackageName()));
+        REC_NODE.set(target);
         if (!target.isFocused()) target.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
         String value = text;
         CharSequence cur = target.isShowingHintText() ? null : target.getText();

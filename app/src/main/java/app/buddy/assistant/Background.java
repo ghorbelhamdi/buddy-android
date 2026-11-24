@@ -79,6 +79,8 @@ final class Background {
      * there until it has been idle that long.
      */
     static final String OUTSIDE = "outside";
+    /** The hidden screen of routines started from Settings → Routines (an outside screen: no chat of their own). */
+    static final String ROUTINES = OUTSIDE + "-routines";
     private static final long OUTSIDE_IDLE_MS = 10 * 60_000L;
     /** When each outside screen's session last made a call, and which of them work on the real screen for now. */
     private static final java.util.Map<String, Long> outsideUsed = new java.util.concurrent.ConcurrentHashMap<>();
@@ -114,7 +116,7 @@ final class Background {
         if (!outside(key)) return on(c, key);
         // (asked from within the session's call, which counts as one going)
         if (outsideOnScreen.contains(key) && idle(key, 1)) outsideOnScreen.remove(key);
-        return !outsideOnScreen.contains(key) && setUp(c) && Prefs.outsideBackground(c);
+        return !outsideOnScreen.contains(key) && setUp(c) && (ROUTINES.equals(key) || Prefs.outsideBackground(c));
     }
 
     /** An outside session made a call: its hidden screen (or its turn on the real one) lasts a while longer. */
@@ -203,6 +205,7 @@ final class Background {
     /** Who an outside session is: the paired computer's name, or this phone's own terminal. */
     static String outsideName(Context c, String key) {
         if (OUTSIDE.equals(key)) return c.getString(R.string.outside_terminal);
+        if (ROUTINES.equals(key)) return c.getString(R.string.routines_title);
         String id = key == null ? "" : key.substring(OUTSIDE.length() + 1);
         String known = names.get(id); // asked on every repaint: the paired list is read once per computer
         if (known != null) return known;
@@ -289,6 +292,7 @@ final class Background {
         int d = Integer.parseInt(id.trim());
         displays.put(chat, d);
         keepAlive(c.getApplicationContext());
+        HiddenMute.check(c); // an app that starts playing there stays quiet
         return d;
     }
 
@@ -298,9 +302,15 @@ final class Background {
         return d == null ? Display.DEFAULT_DISPLAY : d;
     }
 
+    /** The chats (and outside sessions) that have a hidden screen now. */
+    static List<String> hiddenChats() {
+        return new ArrayList<>(displays.keySet());
+    }
+
     /** The chat's display goes, with what's on it. */
     static void close(Context c, String chat) {
         if (displays.remove(chat) == null) return;
+        HiddenMute.check(c); // its apps are heard again
         new Thread(() -> {
             try {
                 call(c, "close\t" + chat);
@@ -381,6 +391,7 @@ final class Background {
             } catch (IOException ignored) {
             }
         }
+        HiddenMute.check(svc); // on the user's screen, the app is heard again
         svc.runOnMain(() -> ChatHub.get(svc).setBackground(ses, false));
         return launch == null ? null : pkg;
     }
@@ -1129,6 +1140,7 @@ final class Background {
         displays.clear();
         set(Step.IDLE, "");
         new Thread(() -> {
+            HiddenMute.restoreAllNow(c); // while the helper still runs: what Buddy silenced is heard again
             try {
                 call(c, "quit");
             } catch (IOException ignored) {

@@ -1,0 +1,4 @@
+{"buddy_session":"fixture","session_id":"buddy-pitest00test-1795464890","subtype":"init","type":"system"}
+{"buddy_session":"fixture","message":{"content":[{"text":"ok","type":"text"}]},"type":"assistant"}
+{"buddy_session":"fixture","model":"stub/stub","subtype":"model","type":"system"}
+{"buddy_session":"fixture","result":"","subtype":"success","type":"result"}

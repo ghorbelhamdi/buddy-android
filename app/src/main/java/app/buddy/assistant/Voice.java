@@ -344,6 +344,22 @@ final class Voice {
         }
     }
 
+    /** The user's region for a language ("BR" for pt), or "": from the TTS engine's own voice, then the phone's languages. */
+    private static String region(String language) {
+        try {
+            android.speech.tts.Voice def = tts.getDefaultVoice();
+            if (def != null && language.equals(def.getLocale().getLanguage()) && !def.getLocale().getCountry().isEmpty())
+                return def.getLocale().getCountry();
+        } catch (Exception ignored) { // (some engines throw before a voice is loaded)
+        }
+        android.os.LocaleList phone = android.os.LocaleList.getDefault();
+        for (int i = 0; i < phone.size(); i++) {
+            java.util.Locale l = phone.get(i);
+            if (language.equals(l.getLanguage()) && !l.getCountry().isEmpty()) return l.getCountry();
+        }
+        return "";
+    }
+
     /** Speak in the reply's own language: detect it (on a worker thread), then pick a matching voice. */
     private static void say(String text) {
         final Context c = appCtx;
@@ -352,13 +368,19 @@ final class Voice {
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
                 if (tts == null || !ttsReady) return;
                 if (loc != null && tts.isLanguageAvailable(loc) >= TextToSpeech.LANG_AVAILABLE) {
-                    tts.setLanguage(loc);
+                    // the language comes from the text, the region from the user: the voice set in the phone's
+                    // text-to-speech settings, else the phone's own languages (pt-BR, not pt-PT, for a Brazilian user:
+                    // issue #84). Same region first, then quality
+                    String region = region(loc.getLanguage());
+                    tts.setLanguage(region.isEmpty() ? loc : new java.util.Locale(loc.getLanguage(), region));
                     android.speech.tts.Voice best = null;
                     for (android.speech.tts.Voice v : tts.getVoices()) {
                         if (!v.getLocale().getLanguage().equals(loc.getLanguage())) continue;
                         if (v.getFeatures().contains(TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED)) continue;
-                        if (best == null || v.getQuality() > best.getQuality()
-                                || (v.getQuality() == best.getQuality() && v.getLocale().equals(loc))) best = v;
+                        boolean mine = !region.isEmpty() && region.equalsIgnoreCase(v.getLocale().getCountry());
+                        boolean bestMine = best != null && !region.isEmpty() && region.equalsIgnoreCase(best.getLocale().getCountry());
+                        if (best == null || (mine && !bestMine) || (mine == bestMine && (v.getQuality() > best.getQuality()
+                                || (v.getQuality() == best.getQuality() && v.getLocale().equals(loc))))) best = v;
                     }
                     if (best != null) tts.setVoice(best);
                 }
