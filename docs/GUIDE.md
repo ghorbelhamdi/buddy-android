@@ -161,6 +161,17 @@ For a task that splits into independent parts in different apps or sites ("compa
 - **An app can only be open in one place,** so the agent gives each sub-agent a different app or site.
 - **Each sub-agent uses your plan** like a chat of its own, at the same time, so limits are reached sooner, and each is a whole agent running on the phone. Not available in a notification rule's run.
 
+### Teams
+
+A team is a set of agents, each with a role, that a chat hands its tasks to (Settings → Background and automation → **Teams**; a chat picks its team in chat options → **Team**, and on the page for other devices in the chat's ⋯ menu).
+
+- **Members:** each has a name, a role (a few sentences: what it does), an agent and a model. Members can run on different agents: a Claude Code chat can have a Codex or Pi member, or one on a service you connected. A member whose agent isn't signed in is shown in red, and the team says so instead of starting.
+- **Fixed stages:** every message of the chat goes through the members stage by stage. Members of one stage work at the same time; each stage gets the task and the reports of the stages before it. Then the chat's own agent answers from the last reports. The **Coding team** you start with works this way: Planner, Developer, Auditor, Finalizer.
+- **The chat's agent leads:** the members are there for the chat's agent to call when it wants (it names one when it starts sub-agents), in any order, as often as it needs.
+- **Members work like the chat,** unlike sub-agents, which only look things up: with Linux tools they work in the chat's project folder, and what they send, post, buy or delete comes to you on a card first. They don't ask you questions (they decide and say what they assumed), don't start members of their own, and use the phone only on a hidden screen (background mode). They show above the chat as sub-agents do, each with its own chat to open.
+- **Cost:** each member uses its agent's plan or service, so a team uses more of it than one agent.
+- **Sub-agents on other agents:** without a team too, an agent can start a sub-agent on another signed-in agent and model ("ask Codex to check this").
+
 ### Background browser
 
 Turn on **Settings → Background and automation → Background browser**: the first time, Buddy downloads Chromium into its Linux (about 300 MB). Agents then use this browser for web pages (looking things up, comparing prices, checking a page) without taking over your screen, also while the phone is locked; for your own accounts and apps they still use the phone. It starts when an agent needs it and stops after 3 minutes unused.

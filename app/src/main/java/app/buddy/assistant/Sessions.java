@@ -107,6 +107,10 @@ final class Sessions {
          * ("flappy"; see FilePlaces.validProject). "" is the workspace itself, which chats without one share.
          */
         String folder = "";
+        /** The team the chat works with (Teams), or "": none. */
+        String team = "";
+        /** A helper that is a team's member: it works like its chat (cards, Linux tools in the chat's folder), see Helpers. */
+        boolean member;
         /** Files sent to Linux tools (LinuxFiles) stay, in ~/.buddy/work/incoming, when the chat is deleted. */
         boolean keepFiles = true;
         /** Background mode: the agent works on a display of its own, the user keeps the screen (see Background). */
@@ -451,7 +455,7 @@ final class Sessions {
         }
         JSONObject o = new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model)
                 .put("effort", s.effort).put("actual_model", s.actualModel).put("ctx_used", s.ctxUsed).put("ctx_window", s.ctxWindow)
-                .put("interrupted", s.interrupted).put("incognito", s.incognito).put("dev", s.dev).put("awake", s.awake).put("keep_files", s.keepFiles).put("folder", s.folder).put("background", s.background).put("approvals", s.approvals).put("handover", s.handover == null ? "" : s.handover).put("reseed", s.reseed)
+                .put("interrupted", s.interrupted).put("incognito", s.incognito).put("dev", s.dev).put("awake", s.awake).put("keep_files", s.keepFiles).put("folder", s.folder).put("team", s.team).put("member", s.member).put("background", s.background).put("approvals", s.approvals).put("handover", s.handover == null ? "" : s.handover).put("reseed", s.reseed)
                 .put("handover_model", s.handoverModel).put("handover_effort", s.handoverEffort)
                 .put("pinned", s.pinned).put("archived", s.archived).put("updated", s.updated).put("cut", s.cut).put("parent", s.parent).put("slot", s.slot).put("messages", msgs);
         synchronized (s.apps) {
@@ -494,6 +498,8 @@ final class Sessions {
         s.awake = o.optBoolean("awake");
         s.keepFiles = o.optBoolean("keep_files", true);
         s.folder = FilePlaces.validProject(o.optString("folder")) ? o.optString("folder") : "";
+        s.team = o.optString("team");
+        s.member = o.optBoolean("member");
         s.background = o.optBoolean("background");
         if (o.has("lite")) s.lite = o.optBoolean("lite");
         JSONObject tl = o.optJSONObject("tools");

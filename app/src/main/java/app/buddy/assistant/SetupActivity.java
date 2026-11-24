@@ -1438,6 +1438,12 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
                 : getResources().getQuantityString(R.plurals.routines_row_saved, saved, saved), saved > 0, RoutinesActivity.class);
         rt.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
         ex.addView(rt, full());
+        ex.addView(divider(), lineParams());
+        int teams = Teams.all(this).size();
+        View tm = navRow(R.drawable.ms_groups, getString(R.string.teams_title), getResources().getQuantityString(R.plurals.teams_row, teams, teams),
+                false, TeamsActivity.class);
+        tm.setPaddingRelative(dp(this, 16), dp(this, 10), dp(this, 16), dp(this, 10));
+        ex.addView(tm, full());
         addCard(ex);
     }
 

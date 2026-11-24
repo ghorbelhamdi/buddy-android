@@ -161,6 +161,11 @@
             android:name=".RoutinesActivity"
             android:exported="false" />
 
+        <!-- Teams: agents with roles a chat hands its tasks to (#81) -->
+        <activity
+            android:name=".TeamsActivity"
+            android:exported="false" />
+
         <!-- Files: what is in Buddy's Linux (the agents' workspace, a chat's own folders), uploads, open and share -->
         <activity
             android:name=".FilesActivity"
