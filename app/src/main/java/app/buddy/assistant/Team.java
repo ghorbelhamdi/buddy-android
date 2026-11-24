@@ -135,6 +135,14 @@ final class Team {
         return p[Math.floorMod(index, p.length)];
     }
 
+    /**
+     * The leader's colour: its own, as a member's is, not the app's accent (which the user picks, and which can be
+     * a member's blue or green).
+     */
+    static int leaderColor(Context c) {
+        return Theme.isDark(c) ? 0xFFE89B7F : 0xFFB4502E;
+    }
+
     /** The same as "#RRGGBB" pairs for the page: {dark, light}. */
     static String[] hex(int index) {
         int i = Math.floorMod(index, DARK.length);

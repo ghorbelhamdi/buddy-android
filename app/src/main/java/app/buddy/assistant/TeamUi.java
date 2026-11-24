@@ -11,7 +11,6 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -40,9 +39,7 @@ final class TeamUi {
         final String[] leader = {ses.backend, ses.model == null ? "" : ses.model};
         final int[] step = {0};
         final LinearLayout box = protect(column(a)); // only the user sets a team up
-        ScrollView sv = new ScrollView(a);
-        sv.addView(box);
-        final Dialog d = bottomSheet(a, sv);
+        final Dialog d = bottomSheet(a, box); // (which scrolls what is longer than the screen)
         final Runnable[] render = new Runnable[1];
         render[0] = () -> {
             box.removeAllViews();
@@ -178,7 +175,7 @@ final class TeamUi {
     /** The members in the structure's shape: the leader on top, then the others, each with its agent and model to pick. */
     private static void diagram(final Activity a, LinearLayout box, final Team t, final String[] leader, final Runnable render) {
         // the leader: this chat's own agent (changing it here changes the chat's)
-        View lead = node(a, a.getString(R.string.team_leader), ACCENT, a.getString(R.string.team_this_chat), true,
+        View lead = node(a, a.getString(R.string.team_leader), Team.leaderColor(a), a.getString(R.string.team_this_chat), true,
                 leader[0], leader[1], agent -> {
                     leader[0] = agent;
                     leader[1] = "";
@@ -250,10 +247,12 @@ final class TeamUi {
                 both.setGravity(Gravity.CENTER);
                 line.addView(both, new LinearLayout.LayoutParams(dp(c, 24), LinearLayout.LayoutParams.MATCH_PARENT));
             } else {
-                line.addView(new View(c), new LinearLayout.LayoutParams(dp(c, 8), 1));
+                // (every child fills the line's height: with one that doesn't, a line of cards that do is only as
+                // tall as that one, and the cards were cut off at 1 px)
+                line.addView(new View(c), new LinearLayout.LayoutParams(dp(c, 8), LinearLayout.LayoutParams.MATCH_PARENT));
             }
             if (i + 1 < cards.size()) line.addView(cards.get(i + 1), new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1));
-            else line.addView(new View(c), new LinearLayout.LayoutParams(0, 1, 1));
+            else line.addView(new View(c), new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1));
             LinearLayout.LayoutParams lp = full();
             if (i > 0) lp.topMargin = dp(c, 8);
             box.addView(line, lp);
@@ -280,9 +279,7 @@ final class TeamUi {
     static Shown view(final Activity a, final ChatHub hub, final Sessions.Session ses) {
         final Shown shown = new Shown();
         final LinearLayout box = column(a);
-        ScrollView sv = new ScrollView(a);
-        sv.addView(box);
-        shown.dialog = bottomSheet(a, sv);
+        shown.dialog = bottomSheet(a, box);
         shown.refresh = () -> {
             final Team t = ses.team;
             if (t == null) {
@@ -296,7 +293,7 @@ final class TeamUi {
             how.setPaddingRelative(0, dp(a, 6), 0, 0);
             box.addView(how);
             String on = Account.nameOf(ses.backend) + (ses.model == null || ses.model.isEmpty() ? "" : " · " + Models.label(ses.backend, ses.model));
-            View lead = info(a, a.getString(R.string.team_leader), ACCENT, on, a.getString(R.string.team_this_chat),
+            View lead = info(a, a.getString(R.string.team_leader), Team.leaderColor(a), on, a.getString(R.string.team_this_chat),
                     ses.running ? (ses.status.isEmpty() ? a.getString(R.string.helper_working) : ses.status) : a.getString(R.string.team_ready),
                     ses.running, true, null);
             List<View> cards = new ArrayList<>();
@@ -348,7 +345,7 @@ final class TeamUi {
     private static View info(Context c, String name, int color, String on, String goal, String state, boolean working,
                              boolean leader, final Runnable open) {
         LinearLayout card = column(c);
-        card.setBackground(outlined(c, CARD2, 16, leader ? ACCENT : CARD2, 2));
+        card.setBackground(outlined(c, CARD2, 16, leader ? Team.leaderColor(c) : CARD2, 2));
         card.setPaddingRelative(dp(c, 12), dp(c, 10), dp(c, 12), dp(c, 10));
         LinearLayout nm = row(c);
         nm.setGravity(Gravity.CENTER_VERTICAL);
@@ -514,7 +511,7 @@ final class TeamUi {
     private static View node(final Activity a, String name, int color, String sub, boolean leader, final String agent, final String model,
                              final Pick onAgent, final Pick onModel, final Runnable rename, final Runnable remove) {
         LinearLayout card = column(a);
-        card.setBackground(outlined(a, CARD2, 16, leader ? ACCENT : CARD2, 2));
+        card.setBackground(outlined(a, CARD2, 16, leader ? Team.leaderColor(a) : CARD2, 2));
         card.setPaddingRelative(dp(a, 10), dp(a, 8), dp(a, 10), dp(a, 10));
         LinearLayout nm = row(a);
         nm.setGravity(Gravity.CENTER_VERTICAL);
@@ -613,7 +610,7 @@ final class TeamUi {
     static View chip(Context c, String name, int color, String state, boolean leader, boolean working) {
         LinearLayout r = row(c);
         r.setGravity(Gravity.CENTER_VERTICAL);
-        r.setBackground(outlined(c, CARD, 12, leader ? Theme.withAlpha(ACCENT, 0x80) : LINE, 1));
+        r.setBackground(outlined(c, CARD, 12, leader ? Theme.withAlpha(Team.leaderColor(c), 0x80) : LINE, 1));
         r.setPaddingRelative(dp(c, 8), dp(c, 6), dp(c, 10), dp(c, 6));
         r.addView(dot(c, color, 8));
         TextView n = single(text(c, name, 12, TEXT));

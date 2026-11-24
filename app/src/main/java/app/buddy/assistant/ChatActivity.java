@@ -1047,7 +1047,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             // first: the structure's picture and name, which opens the team drawn in its shape
             teamChips.addView(TeamUi.shapeButton(this, t.structure, () -> teamSheet = TeamUi.view(this, hub, ses)));
             teamChips.addView(TeamUi.between(this, ""));
-            teamChips.addView(TeamUi.chip(this, getString(R.string.team_leader), ACCENT, ses.running
+            teamChips.addView(TeamUi.chip(this, getString(R.string.team_leader), Team.leaderColor(this), ses.running
                     ? (ses.status.isEmpty() ? getString(R.string.helper_working) : ses.status) : getString(R.string.team_ready), true, ses.running));
             for (int i = 0; i < t.members.size(); i++) {
                 Team.Member m = t.members.get(i);
@@ -1080,7 +1080,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         for (Team.Member m : t.members) who.add(new String[]{m.id, m.name});
         for (int i = 0; i < who.size(); i++) {
             final String id = who.get(i)[0];
-            int color = i == 0 ? ACCENT : Team.color(this, t.members.get(i - 1).color);
+            int color = i == 0 ? Team.leaderColor(this) : Team.color(this, t.members.get(i - 1).color);
             LinearLayout.LayoutParams p = wrap();
             p.setMarginEnd(dp(this, 6));
             sendToChips.addView(TeamUi.sendTo(this, who.get(i)[1], color, sendTo.contains(id), () -> {
@@ -3134,7 +3134,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         if (!framed || messages.getChildCount() <= before) return;
         java.util.List<View> made = new java.util.ArrayList<>();
         for (int i = before; i < messages.getChildCount(); i++) made.add(messages.getChildAt(i));
-        int color = m.from.isEmpty() ? ACCENT_TEXT : Team.color(this, m.color);
+        int color = m.from.isEmpty() ? Team.leaderColor(this) : Team.color(this, m.color);
         LinearLayout f = TeamUi.frame(this, m.fromName, m.fromOn, color,
                 m.quoteFrom.isEmpty() ? getString(R.string.team_you) : m.quoteFrom, m.quote);
         for (View v : made) {
