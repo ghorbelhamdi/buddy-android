@@ -319,6 +319,46 @@ final class Tools {
                                 .put("required", new JSONArray().put("task"))))
                         .put("wait", boolProp("Default true: wait here for the reports. False: return at once, so you "
                                 + "can work on your own part at the same time; call subagents afterwards.")), "tasks"));
+        t.put(tool("team",
+                "Only in a chat with a team that you lead (its messages say so): tells one or more of the team's members "
+                        + "something and waits for what they answer (up to 8 minutes). A member is an agent of its own, "
+                        + "on the agent and model the user picked for it, that remembers what it did in this chat before. "
+                        + "Members named in one call work at the same time. Without a message it waits for the members "
+                        + "still working and returns what they answered; with stop it ends them. What a member answers "
+                        + "shows in the chat under its name, so don't repeat it to the user.",
+                props().put("to", new JSONObject().put("type", "array").put("items", new JSONObject().put("type", "string"))
+                                .put("description", "The members' names, as the chat's messages list them"))
+                        .put("message", strProp("What they should do or answer, with everything they need that they "
+                                + "don't know yet (another member's report, the user's wish)"))
+                        .put("wait", boolProp("Default true: wait here for the answers. False: return at once, so you "
+                                + "can work on your own part at the same time; call team without a message afterwards."))
+                        .put("stop", boolProp("End the members that still work"))));
+        t.put(tool("team_change",
+                "Only in a chat with a team that you lead, and only when the user asks for it: changes the team. Adding, "
+                        + "removing or renaming a member, another agent or model for one, and how the team works come to "
+                        + "the user on a card first; goals, the hand-off and the rules are saved as they are.",
+                props().put("add", new JSONObject().put("type", "array").put("description", "New members")
+                                .put("items", new JSONObject().put("type", "object").put("properties", new JSONObject()
+                                        .put("name", strProp("Its name in the team, e.g. Tester"))
+                                        .put("agent", strProp("A signed-in agent: claude, codex, opencode, agy, grok, copilot or pi. Default: yours"))
+                                        .put("model", strProp("Optional: one of that agent's model ids. Default: its own"))
+                                        .put("goal", strProp("What it is for, in a line")))
+                                        .put("required", new JSONArray().put("name"))))
+                        .put("remove", new JSONObject().put("type", "array").put("items", new JSONObject().put("type", "string"))
+                                .put("description", "Names of members to remove"))
+                        .put("update", new JSONObject().put("type", "array").put("description", "Changes to members")
+                                .put("items", new JSONObject().put("type", "object").put("properties", new JSONObject()
+                                        .put("member", strProp("Its name now"))
+                                        .put("name", strProp("A new name"))
+                                        .put("agent", strProp("Another signed-in agent"))
+                                        .put("model", strProp("Another model of its agent"))
+                                        .put("goal", strProp("What it is for, in a line")))
+                                        .put("required", new JSONArray().put("member"))))
+                        .put("handoff", strProp("How work is handed on between you and the members, in a sentence"))
+                        .put("rules", strProp("The whole team's rules, in a few short sentences; \"\" for none"))
+                        .put("structure", strProp("lead (leader + workers), pipe (pipeline), check (doer + checker) or doers (doers with their own goals)"))
+                        .put("workspace", strProp("sep (each member in its own folder), same (all in this chat's folder) or look (members only look things up)"))
+                        .put("apps", strProp("diff (each member in a different app), turn (one app at a time) or none (no phone apps)"))));
         t.put(tool("subagents",
                 "Your sub-agents from delegate: waits for the ones still working (up to 8 minutes) and returns every "
                         + "report. With stop, ends the ones still working first.",
@@ -545,6 +585,8 @@ final class Tools {
         // starting helpers or waiting for them isn't using the phone: no "Using your phone", no wait for a pause to end
         if ("delegate".equals(name)) return text(Helpers.delegate(svc, McpServer.CALLER_CHAT.get(), a));
         if ("subagents".equals(name)) return text(Helpers.status(svc, McpServer.CALLER_CHAT.get(), a));
+        if ("team".equals(name)) return text(Team.tool(svc, McpServer.CALLER_CHAT.get(), a));
+        if ("team_change".equals(name)) return text(Team.change(svc, McpServer.CALLER_CHAT.get(), a));
         if (name.startsWith("browser_")) { // the background browser: it doesn't need the phone's screen
             svc.onToolActivity(name, false);
             return browser.call(name, a);
@@ -946,11 +988,11 @@ final class Tools {
 
     /** What a working helper (which works like its chat, see Helpers) still may not: what belongs to the chat itself. */
     private static final java.util.Set<String> WORKER_NO = new java.util.HashSet<>(java.util.Arrays.asList(
-            "delegate", "subagents", "schedule_message", "add_notification_rule", "cancel_scheduled", "update_buddy"));
+            "delegate", "subagents", "team", "team_change", "schedule_message", "add_notification_rule", "cancel_scheduled", "update_buddy"));
 
     /** Not for a helper (see Helpers): what reaches the user, the phone's own settings or a later time. */
     private static final java.util.Set<String> HELPER_NO = new java.util.HashSet<>(java.util.Arrays.asList(
-            "delegate", "subagents", "phone_shell", "run_on_computer", "install_apk", "update_buddy", "wait_for_install", "schedule_message",
+            "delegate", "subagents", "team", "team_change", "phone_shell", "run_on_computer", "install_apk", "update_buddy", "wait_for_install", "schedule_message",
             "add_notification_rule",
             "cancel_scheduled", "notify", "share", "reply_notification", "point_out", "add_calendar_event", "set_alarm",
             "set_timer", "take_photo", "clipboard_write", "save_to_downloads"));
@@ -3030,6 +3072,9 @@ final class Tools {
             return "BLOCKED: agents can't open Buddy itself. Only the user uses Buddy's screens.";
         Intent launch = pm.getLaunchIntentForPackage(best);
         if (launch == null) return "App " + bestLabel + " cannot be launched.";
+        // a team whose members take turns in an app: this one waits while another member has it
+        String taken = Team.takeApp(svc, McpServer.CALLER_CHAT.get(), best);
+        if (taken != null) return taken;
         if (background()) {
             if (launch.getComponent() == null) return "App " + bestLabel + " cannot be launched.";
             try {

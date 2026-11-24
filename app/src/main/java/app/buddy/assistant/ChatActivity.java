@@ -202,6 +202,15 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         stp.leftMargin = stp.rightMargin = dp(this, 12);
         stp.topMargin = dp(this, 8);
         root.addView(strip, stp);
+        // the chat's team (see Team): its members side by side, each with its state; a tap opens a member's own chat
+        teamChips = row(this);
+        teamChips.setGravity(Gravity.CENTER_VERTICAL);
+        teamChips.setPaddingRelative(dp(this, 12), 0, dp(this, 12), 0);
+        teamStrip = TeamUi.across(this, teamChips);
+        teamStrip.setVisibility(View.GONE);
+        LinearLayout.LayoutParams tsp = full();
+        tsp.topMargin = dp(this, 8);
+        root.addView(teamStrip, tsp);
         // the chat's helpers (see Helpers), each a row that opens its own chat; in a helper's chat, the way back
         helpersBox = column(this);
         helpersBox.setBackground(rounded(this, CARD, 12));
@@ -312,6 +321,16 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         sdp.leftMargin = sdp.rightMargin = dp(this, 12);
         sdp.bottomMargin = dp(this, 6);
         root.addView(sending, sdp);
+
+        // a chat with a team: who the message goes to (the leader alone unless more are ticked)
+        sendToChips = row(this);
+        sendToChips.setGravity(Gravity.CENTER_VERTICAL);
+        sendToChips.setPaddingRelative(dp(this, 12), 0, dp(this, 12), 0);
+        sendToRow = TeamUi.across(this, sendToChips);
+        sendToRow.setVisibility(View.GONE);
+        LinearLayout.LayoutParams s2p = full();
+        s2p.bottomMargin = dp(this, 6);
+        root.addView(sendToRow, s2p);
 
         // composer
         trayScroll = new android.widget.HorizontalScrollView(this);
@@ -731,7 +750,17 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         }
         sentAt = android.os.SystemClock.uptimeMillis(); // (its message shows, wherever the user was reading)
         // (files in Linux tools stay chips on the message; the agent gets their paths with it)
-        String err = hub.send(ses, text, pending, new java.util.ArrayList<>(pendingLinux));
+        String err;
+        Sessions.Session lead = ses.member.isEmpty() ? null : hub.sessions.find(ses.parent);
+        Team.Member me = lead == null || lead.team == null ? null : lead.team.member(ses.member);
+        if (me != null) { // a member's own chat: as a message ticked for it in the team's chat
+            err = pendingLinux.isEmpty() ? Team.tell(hub, lead, me, null, text, new java.util.ArrayList<>(pending))
+                    : getString(R.string.hub_still_working_attachments);
+        } else if (ses.team != null && ses.parent.isEmpty()) {
+            err = hub.sendTeam(ses, text, pending, new java.util.ArrayList<>(pendingLinux), new java.util.ArrayList<>(sendTo));
+        } else {
+            err = hub.send(ses, text, pending, new java.util.ArrayList<>(pendingLinux));
+        }
         if (err != null) {
             Toast.makeText(this, err, Toast.LENGTH_LONG).show();
             return;
@@ -946,6 +975,115 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         c.addView(other, full());
         d[0] = bottomSheet(this, c);
         d[0].show();
+    }
+
+    // ------------------------------------------------------ the chat's team
+
+    private android.widget.HorizontalScrollView teamStrip, sendToRow;
+    private LinearLayout teamChips, sendToChips;
+    private String teamShown = "", sendToShown = "";
+    /** Who the next message goes to in a chat with a team: Team.LEADER and members' ids. */
+    private final java.util.Set<String> sendTo = new java.util.LinkedHashSet<>(java.util.Collections.singleton(Team.LEADER));
+
+    /** The first of the team's members that works now, or null. */
+    private Sessions.Session workingMember() {
+        for (Sessions.Session h : Team.all(hub, ses.id)) if (h.running) return h;
+        return null;
+    }
+
+    /** Chat options → Team, turned on: Buddy asks how the team works, then the chat's agent asks the rest. */
+    private void teamSetup() {
+        TeamUi.setup(this, ses, (team, agent, model) -> {
+            if (Team.working(hub, ses)) return;
+            if (!agent.equals(ses.backend)) hub.switchAgent(ses, agent); // the leader is this chat's agent
+            if (!model.equals(ses.model == null ? "" : ses.model)) hub.setModel(ses, model);
+            sendTo.clear();
+            sendTo.add(Team.LEADER);
+            sentAt = android.os.SystemClock.uptimeMillis();
+            String err = hub.startTeam(ses, team);
+            if (err != null) Toast.makeText(this, err, Toast.LENGTH_LONG).show();
+        });
+    }
+
+    private void teamOff() {
+        LinearLayout c = column(this);
+        c.addView(title(this, getString(R.string.team_off_title), 18));
+        TextView info = text(this, getString(R.string.team_off_info), 14, TEXT2);
+        info.setPaddingRelative(0, dp(this, 8), 0, dp(this, 16));
+        c.addView(info);
+        Button yes = button(this, getString(R.string.team_off_yes), true);
+        c.addView(yes, full());
+        final Dialog d = bottomSheet(this, protect(c));
+        yes.setOnClickListener(v -> {
+            d.dismiss();
+            if (!Team.working(hub, ses)) hub.setTeam(ses, null, null);
+        });
+        d.show();
+    }
+
+    /** The team's strip over the chat and the boxes over the message box, as the team is now. */
+    private void renderTeam() {
+        if (teamStrip == null) return;
+        final Team t = ses.parent.isEmpty() ? ses.team : null;
+        teamStrip.setVisibility(t == null ? View.GONE : View.VISIBLE);
+        sendToRow.setVisibility(t == null ? View.GONE : View.VISIBLE);
+        if (t == null) {
+            teamShown = sendToShown = "";
+            return;
+        }
+        StringBuilder sig = new StringBuilder(t.structure).append(ses.running).append(ses.status).append(Theme.isDark(this));
+        java.util.List<Sessions.Session> of = new java.util.ArrayList<>();
+        for (Team.Member m : t.members) {
+            Sessions.Session h = Team.session(hub, ses.id, m.id);
+            of.add(h);
+            sig.append('|').append(m.id).append(m.name).append(m.color).append(h == null ? "" : h.running + h.status + h.outcome + h.messages.size());
+        }
+        if (!sig.toString().equals(teamShown)) {
+            teamShown = sig.toString();
+            teamChips.removeAllViews();
+            teamChips.addView(TeamUi.chip(this, getString(R.string.team_leader), ACCENT, ses.running
+                    ? (ses.status.isEmpty() ? getString(R.string.helper_working) : ses.status) : getString(R.string.team_ready), true, ses.running));
+            for (int i = 0; i < t.members.size(); i++) {
+                Team.Member m = t.members.get(i);
+                final Sessions.Session h = of.get(i);
+                teamChips.addView(TeamUi.between(this, i == 0 || Team.PIPE.equals(t.structure) ? "→" : Team.CHECK.equals(t.structure) ? "⇄" : "·"));
+                boolean failed = h != null && "failed".equals(h.outcome), stopped = h != null && "stopped".equals(h.outcome);
+                String state = h == null || h.messages.isEmpty() ? getString(R.string.team_ready)
+                        : h.running ? (h.status.isEmpty() ? getString(R.string.helper_working) : h.status)
+                        : getString(failed ? R.string.helper_failed : stopped ? R.string.helper_stopped : R.string.helper_done);
+                View chip = TeamUi.chip(this, m.name, Team.color(this, m.color), state, false, h != null && h.running);
+                if (h != null) { // its own chat: its steps, its screen
+                    chip.setOnClickListener(v -> startActivity(new android.content.Intent(this, ChatActivity.class).putExtra("id", h.id)));
+                }
+                teamChips.addView(chip);
+            }
+        }
+        java.util.Set<String> ids = new java.util.HashSet<>();
+        ids.add(Team.LEADER);
+        for (Team.Member m : t.members) ids.add(m.id);
+        sendTo.retainAll(ids);
+        if (sendTo.isEmpty()) sendTo.add(Team.LEADER);
+        StringBuilder sig2 = new StringBuilder(sendTo.toString()).append(Theme.isDark(this));
+        for (Team.Member m : t.members) sig2.append('|').append(m.id).append(m.name).append(m.color);
+        if (sig2.toString().equals(sendToShown)) return;
+        sendToShown = sig2.toString();
+        sendToChips.removeAllViews();
+        TextView label = text(this, getString(R.string.team_send_to), 12, MUTED);
+        label.setPaddingRelative(0, 0, dp(this, 8), 0);
+        sendToChips.addView(label);
+        java.util.List<String[]> who = new java.util.ArrayList<>();
+        who.add(new String[]{Team.LEADER, getString(R.string.team_leader)});
+        for (Team.Member m : t.members) who.add(new String[]{m.id, m.name});
+        for (int i = 0; i < who.size(); i++) {
+            final String id = who.get(i)[0];
+            int color = i == 0 ? ACCENT : Team.color(this, t.members.get(i - 1).color);
+            LinearLayout.LayoutParams p = wrap();
+            p.setMarginEnd(dp(this, 6));
+            sendToChips.addView(TeamUi.sendTo(this, who.get(i)[1], color, sendTo.contains(id), () -> {
+                if (!sendTo.remove(id)) sendTo.add(id);
+                renderTeam();
+            }), p);
+        }
     }
 
     // ------------------------------------------------------ helpers
@@ -1653,6 +1791,23 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 startActivity(new android.content.Intent(this, ToolsActivity.class).putExtra(ToolsActivity.EXTRA_CHAT, ses.id));
             });
             c.addView(tr, full());
+        }
+        if (ses.parent.isEmpty()) { // a team: this chat's agent leads other agents (see Team); turning it on asks how
+            final Team team = ses.team;
+            String about = team == null ? getString(R.string.chat_team_info) : getString(Team.structureName(team.structure)) + " · "
+                    + getResources().getQuantityString(R.plurals.team_members, team.members.size() + 1, team.members.size() + 1);
+            LinearLayout tm = switchRow(this, getString(R.string.chat_team), about, team != null, on -> {
+                if (on == (ses.team != null)) return;
+                if (sheet[0] != null) sheet[0].dismiss();
+                if (Team.working(hub, ses)) {
+                    Toast.makeText(this, R.string.team_busy, Toast.LENGTH_LONG).show();
+                    return;
+                }
+                if (on) teamSetup();
+                else teamOff();
+            });
+            tm.setPaddingRelative(dp(this, 4), dp(this, 12), dp(this, 4), dp(this, 12));
+            c.addView(tm, full());
         }
         LinearLayout inc = switchRow(this, getString(R.string.chat_incognito), getString(R.string.chat_incognito_info),
                 ses.incognito, on -> hub.setIncognito(ses, on));
@@ -2700,11 +2855,15 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         paintBackgroundChip();
         checkBackground(false);
         renderHelpers();
+        renderTeam();
         options.setImageTintList(ColorStateList.valueOf(ses.awake || ses.schedule != null || !ses.allowed.isEmpty() ? ACCENT : MUTED));
         if (hint != null) hint.setText(hintText());
-        strip.setVisibility(ses.running ? View.VISIBLE : View.GONE);
+        // (a team's members can work while the chat's own agent doesn't: the line and its Stop are theirs then)
+        Sessions.Session busy = ses.running || ses.team == null || !ses.parent.isEmpty() ? null : workingMember();
+        strip.setVisibility(ses.running || busy != null ? View.VISIBLE : View.GONE);
         input.setHint(ses.running ? getString(R.string.chat_input_hint_running) : getString(R.string.chat_input_hint, ses.brainName()));
-        stripText.setText(ses.status.isEmpty() ? getString(R.string.chat_working) : ses.status);
+        stripText.setText(busy != null ? getString(R.string.team_member_working, busy.title, busy.status.isEmpty() ? getString(R.string.chat_working) : busy.status)
+                : ses.status.isEmpty() ? getString(R.string.chat_working) : ses.status);
         if (log != null) {
             if (ses.running) log.setLive(true);
             else log.finish();
@@ -2948,7 +3107,44 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         renderApproval();
     }
 
+    /**
+     * A message; in a chat with a team, the user's with who it went to over it, and what the leader or a member said
+     * in a frame of its colour, under its name, with the message it answers.
+     */
     private void show(Sessions.Msg m) {
+        boolean framed = !m.fromName.isEmpty() && (m.kind == Bubble.Kind.BUDDY || m.kind == Bubble.Kind.ERROR);
+        if ((framed || (m.kind == Bubble.Kind.USER && !m.to.isEmpty())) && log != null) {
+            log.finish();
+            log = null;
+        }
+        if (m.kind == Bubble.Kind.USER && !m.to.isEmpty()) {
+            TextView to = monoText(this, "→ " + m.to, 11, MUTED);
+            LinearLayout.LayoutParams tp = wrap();
+            tp.gravity = Gravity.END;
+            tp.topMargin = dp(this, 12);
+            tp.bottomMargin = -dp(this, 8); // close to its message
+            messages.addView(to, tp);
+        }
+        int before = messages.getChildCount();
+        showPlain(m);
+        if (!framed || messages.getChildCount() <= before) return;
+        java.util.List<View> made = new java.util.ArrayList<>();
+        for (int i = before; i < messages.getChildCount(); i++) made.add(messages.getChildAt(i));
+        int color = m.from.isEmpty() ? ACCENT_TEXT : Team.color(this, m.color);
+        LinearLayout f = TeamUi.frame(this, m.fromName, m.fromOn, color,
+                m.quoteFrom.isEmpty() ? getString(R.string.team_you) : m.quoteFrom, m.quote);
+        for (View v : made) {
+            messages.removeView(v);
+            LinearLayout.LayoutParams p = full();
+            p.topMargin = dp(this, 6);
+            f.addView(v, p);
+        }
+        LinearLayout.LayoutParams fp = full();
+        fp.topMargin = dp(this, 12);
+        messages.addView(f, fp);
+    }
+
+    private void showPlain(Sessions.Msg m) {
         if (m.scheduled) { // sent by Buddy at the chat's scheduled time: a small "Scheduled" over it
             if (log != null) {
                 log.finish();

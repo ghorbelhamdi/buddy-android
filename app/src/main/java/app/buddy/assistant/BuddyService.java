@@ -1191,7 +1191,9 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             return RULE_APPROVED;
         }
         if (rule && cd == 0 && Triggers.locked(this)) return NOT_NOW;
-        String answer = card(shown, chat, cd, rule ? (cd + 60) * 1000L : Math.max(5 * 60_000L, (cd + 60) * 1000L), null);
+        // (a team member's or a working sub-agent's: in the chat the user talks to, saying who wants it)
+        String answer = card(Helpers.cardText(this, chat, shown), Helpers.cardChat(this, chat), cd,
+                rule ? (cd + 60) * 1000L : Math.max(5 * 60_000L, (cd + 60) * 1000L), null);
         if (!TIMED_OUT.equals(answer)) return answer;
         return rule ? NOT_NOW : "DENIED: the user did not answer within 5 minutes. Do not do it.";
     }

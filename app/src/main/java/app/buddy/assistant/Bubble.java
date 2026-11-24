@@ -3265,6 +3265,7 @@ final class Bubble implements ChatHub.Listener {
     private void renderHelpers(Sessions.Session ses) {
         if (helpersList == null) return;
         java.util.List<Sessions.Session> l = ses == null || !ses.parent.isEmpty() ? new java.util.ArrayList<>() : Helpers.of(hub, ses.id);
+        if (ses != null && ses.team != null) l.addAll(Team.sessions(hub, ses)); // its team's members, the same way
         StringBuilder sig = new StringBuilder();
         for (Sessions.Session h : l) sig.append(h.id).append(h.running).append(h.outcome).append(h.status).append('|');
         if (sig.toString().equals(helpersShown)) return;

@@ -47,6 +47,20 @@ final class Helpers {
         return s != null && !s.parent.isEmpty() && s.works;
     }
 
+    /**
+     * Whose card a chat's question for the user's OK is: a working helper's or a team member's comes up in the chat
+     * the user talks to (its own chat is out of sight), saying who wants it.
+     */
+    static String cardChat(Context c, String chat) {
+        Sessions.Session s = chat == null ? null : ChatHub.get(c).sessions.find(chat);
+        return s != null && !s.parent.isEmpty() ? s.parent : chat;
+    }
+
+    static String cardText(Context c, String chat, String summary) {
+        Sessions.Session s = chat == null ? null : ChatHub.get(c).sessions.find(chat);
+        return s == null || s.parent.isEmpty() ? summary : c.getString(R.string.team_card_from, s.title, summary);
+    }
+
     /** A helper that only looks things up: no card, no trust, nothing it does is waved through. */
     static boolean lookOnly(Context c, String chat) {
         return is(c, chat) && !works(c, chat);
@@ -103,7 +117,8 @@ final class Helpers {
     /** The chat's helpers, oldest first. */
     static List<Sessions.Session> of(ChatHub hub, String parent) {
         List<Sessions.Session> l = new ArrayList<>();
-        for (Sessions.Session s : new ArrayList<>(hub.sessions.all)) if (parent.equals(s.parent)) l.add(s);
+        // (a team's members are no sub-agents: they last, and the chat shows them its own way, see Team)
+        for (Sessions.Session s : new ArrayList<>(hub.sessions.all)) if (parent.equals(s.parent) && s.member.isEmpty()) l.add(s);
         // in the order they were started (the chat list's own order changes with every message)
         java.util.Collections.sort(l, (x, y) -> Integer.compare(x.slot, y.slot));
         return l;

@@ -36,6 +36,17 @@ final class Sessions {
         boolean scheduled;
         /** A user message the user edited (issue #44): the chat marks it so. */
         boolean edited;
+        /** In a chat with a team (see Team): who a user's message went to, as names ("Leader, Builder"); "" elsewhere. */
+        String to = "";
+        /** A user's message in a team chat that went to the leader too (or to it alone). */
+        boolean toLeader = true;
+        /** What a team's member said: its id (""= the chat's own agent or the user), its name, agent and colour then. */
+        String from = "", fromName = "", fromOn = "";
+        int color;
+        /** The message this one answers, in a team chat: who wrote it ("" = the user) and its words (clipped). */
+        String quoteFrom = "", quote = "";
+        /** A member's answer to the user's own message (the leader wasn't in it, and hears of it with its next turn). */
+        boolean direct;
 
         Msg(Bubble.Kind kind, String text) {
             this(kind, text, null);
@@ -139,6 +150,14 @@ final class Sessions {
         int round;
         /** A helper's turn: how many messages the user had sent in the parent chat when it started (a new one clears them). */
         int turn;
+        /** The chat's team (see Team), or null: none. Replaced whole when it changes (main thread). */
+        volatile Team team;
+        /** A team's member's chat: the member's id in its parent's team; "" for every other chat. */
+        String member = "";
+        /** In a team chat: how many of its messages the leader has had word of (see Team.digest). */
+        int teamAt;
+        /** A member's chat, not saved: who told it what it works on now ("" = the user), and the words. */
+        volatile String toldBy = "", told = "";
         /** The chat's scheduled task (see Schedules), or null. */
         Schedules.Plan schedule;
         /** Messages the agent scheduled for itself in this chat (schedule_message), soonest first. Main thread. */
@@ -456,13 +475,17 @@ final class Sessions {
             if (!m.linux.isEmpty()) mo.put("lx", new JSONArray(m.linux));
             if (m.scheduled) mo.put("s", true);
             if (m.edited) mo.put("e", true);
+            if (!m.to.isEmpty()) mo.put("to", m.to).put("tl", m.toLeader);
+            if (!m.fromName.isEmpty()) mo.put("from", m.from).put("fn", m.fromName).put("fo", m.fromOn).put("col", m.color).put("dir", m.direct);
+            if (!m.quote.isEmpty()) mo.put("q", m.quote).put("qf", m.quoteFrom);
             msgs.put(mo);
         }
         JSONObject o = new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model)
                 .put("effort", s.effort).put("actual_model", s.actualModel).put("ctx_used", s.ctxUsed).put("ctx_window", s.ctxWindow)
                 .put("interrupted", s.interrupted).put("incognito", s.incognito).put("dev", s.dev).put("awake", s.awake).put("keep_files", s.keepFiles).put("folder", s.folder).put("background", s.background).put("approvals", s.approvals).put("handover", s.handover == null ? "" : s.handover).put("reseed", s.reseed)
                 .put("handover_model", s.handoverModel).put("handover_effort", s.handoverEffort)
-                .put("pinned", s.pinned).put("archived", s.archived).put("updated", s.updated).put("cut", s.cut).put("parent", s.parent).put("slot", s.slot).put("works", s.works).put("round", s.round).put("turn", s.turn).put("messages", msgs);
+                .put("pinned", s.pinned).put("archived", s.archived).put("updated", s.updated).put("cut", s.cut).put("parent", s.parent).put("slot", s.slot).put("works", s.works).put("round", s.round).put("turn", s.turn).put("member", s.member).put("team_at", s.teamAt).put("messages", msgs);
+        if (s.team != null) o.put("team", s.team.json());
         synchronized (s.apps) {
             if (!s.apps.isEmpty()) o.put("apps", new JSONArray(s.apps));
         }
@@ -526,6 +549,9 @@ final class Sessions {
         s.works = o.optBoolean("works");
         s.round = o.optInt("round");
         s.turn = o.optInt("turn");
+        s.member = o.optString("member");
+        s.teamAt = o.optInt("team_at");
+        s.team = Team.of(o.optJSONObject("team"));
         s.schedule = Schedules.Plan.of(o.optJSONObject("schedule"));
         JSONArray ok = s.schedule == null ? null : o.optJSONArray("allowed"); // kept for its scheduled runs
         if (ok != null) for (int j = 0; j < ok.length(); j++) s.allowed.add(ok.getString(j));
@@ -548,6 +574,15 @@ final class Sessions {
             if (lx != null) for (int k = 0; k < lx.length(); k++) msg.linux.add(lx.getString(k));
             msg.scheduled = m.optBoolean("s");
             msg.edited = m.optBoolean("e");
+            msg.to = m.optString("to");
+            msg.toLeader = m.optBoolean("tl", true);
+            msg.from = m.optString("from");
+            msg.fromName = m.optString("fn");
+            msg.fromOn = m.optString("fo");
+            msg.color = m.optInt("col");
+            msg.direct = m.optBoolean("dir");
+            msg.quote = m.optString("q");
+            msg.quoteFrom = m.optString("qf");
             s.messages.add(msg);
         }
         return s;
