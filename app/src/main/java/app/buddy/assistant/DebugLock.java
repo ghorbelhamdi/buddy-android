@@ -38,6 +38,8 @@ final class DebugLock {
     private static boolean tried;
     private static ContentObserver observer;
     private static ConnectivityManager.NetworkCallback wifiBack;
+    /** USB plugged in or out: on some phones (a OnePlus 12, measured) that restarts adbd, and the helper ends with it. */
+    private static android.content.BroadcastReceiver usb;
     private static Network lastWifi;
 
     private DebugLock() {
@@ -70,6 +72,18 @@ final class DebugLock {
                     wifiBack);
         } catch (Exception ignored) {
         }
+        try {
+            usb = new android.content.BroadcastReceiver() {
+                @Override
+                public void onReceive(Context c, Intent i) {
+                    later(svc);
+                    main.postDelayed(() -> later(svc), 15000); // (and again once adbd is surely back)
+                }
+            };
+            svc.registerReceiver(usb, new android.content.IntentFilter("android.hardware.usb.action.USB_STATE"),
+                    Context.RECEIVER_EXPORTED);
+        } catch (Exception ignored) {
+        }
         later(svc);
     }
 
@@ -100,6 +114,10 @@ final class DebugLock {
             told = false;
             tried = false;
             clearNote(svc);
+            // on, but the helper may be gone (adbd restarted, as a USB change does on some phones): started again now,
+            // which needs no screen while Wireless debugging is on. Else the next time it goes off nothing could put
+            // it back, and it would wait for the user's Start now
+            if (Prefs.debugLock(svc) && Background.setUp(svc) && !Background.alive(svc)) Background.start(svc, false);
             return;
         }
         if (!Prefs.debugLock(svc) || !Background.setUp(svc) || !wifi(svc) || tried) return;
@@ -177,9 +195,11 @@ final class DebugLock {
         try {
             if (observer != null) svc.getContentResolver().unregisterContentObserver(observer);
             if (wifiBack != null) svc.getSystemService(ConnectivityManager.class).unregisterNetworkCallback(wifiBack);
+            if (usb != null) svc.unregisterReceiver(usb);
         } catch (Exception ignored) {
         }
         observer = null;
         wifiBack = null;
+        usb = null;
     }
 }
