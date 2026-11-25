@@ -84,13 +84,13 @@ public class SetupActivity extends Screen implements Account.Listener, RemoteSes
         CodexRemote.addListener(this);
         Browser.addListener(this);
         Connections.addListener(this);
-        Account.CLAUDE.refresh(this);
-        Account.CODEX.refresh(this);
-        Account.OPENCODE.refresh(this);
-        Account.AGY.refresh(this);
-        Account.GROK.refresh(this);
-        Account.COPILOT.refresh(this);
-        Account.PI.refresh(this);
+        Account.CLAUDE.refreshIfStale(this);
+        Account.CODEX.refreshIfStale(this);
+        Account.OPENCODE.refreshIfStale(this);
+        Account.AGY.refreshIfStale(this);
+        Account.GROK.refreshIfStale(this);
+        Account.COPILOT.refreshIfStale(this);
+        Account.PI.refreshIfStale(this);
         render();
     }
 

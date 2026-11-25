@@ -212,9 +212,27 @@ final class Account {
                 Prefs.setAgentToken(a, agent, token);
             }
         }
-        main.post(() -> {
-            for (Listener l : new ArrayList<>(listeners)) l.onAccountChanged();
-        });
+        // one word to the screens for a burst of changes: seven agents checked at once each changed twice, and every
+        // screen drew itself again each time (taps went missing while a team worked)
+        main.removeCallbacks(tell);
+        main.postDelayed(tell, 250);
+    }
+
+    private static final Runnable tell = () -> {
+        for (Listener l : new ArrayList<>(listeners)) l.onAccountChanged();
+    };
+
+    /** When this agent was last looked at (refresh), for refreshIfStale. */
+    private long refreshedAt;
+
+    /**
+     * refresh, unless it was looked at in the last minute and nothing is under way: what a screen does each time it
+     * comes back (each look starts the agent's own program in Buddy's Linux).
+     */
+    void refreshIfStale(Context c) {
+        boolean settled = step == Step.SIGNED_IN || step == Step.SIGNED_OUT || step == Step.NEED_INSTALL;
+        if (settled && refreshedAt != 0 && android.os.SystemClock.elapsedRealtime() - refreshedAt < 60_000) return;
+        refresh(c);
     }
 
     boolean busy() {
@@ -229,6 +247,7 @@ final class Account {
     void refresh(Context c) {
         app = c.getApplicationContext();
         if (busy()) return;
+        refreshedAt = android.os.SystemClock.elapsedRealtime();
         final Context app = c.getApplicationContext();
         new Thread(() -> {
             try {
