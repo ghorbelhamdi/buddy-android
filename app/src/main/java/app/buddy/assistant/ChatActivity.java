@@ -1133,7 +1133,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                     teamStrip.post(() -> teamStrip.scrollTo(Math.max(0, item.getLeft() - (teamStrip.getWidth() - item.getWidth()) / 2), 0));
                 said.append(", ").append(m.name).append(' ').append(st);
             }
-            teamChips.addView(new View(this), weight1());
+            // (a plain view sized to wrap takes all the height it is offered: the bar filled the chat; 1 px tall)
+            teamChips.addView(new View(this), new LinearLayout.LayoutParams(0, 1, 1));
             teamChips.addView(icon(this, R.drawable.ms_expand_more, MUTED, 18));
             teamChips.setContentDescription(getString(R.string.team_bar_desc, getString(Team.structureName(t.structure)), said));
         }
