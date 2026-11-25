@@ -287,17 +287,18 @@ final class Tools {
                         + "agent and model it was given, with a hidden phone screen of its own (background mode), that "
                         + "remembers what it did in this chat before. Members named in one call work at the same time. "
                         + "For work that splits into independent parts (compare a price in three shops, gather facts from "
-                        + "several places, write it and review it) add helpers for it with add: in a chat without a team "
-                        + "that starts one (the user sees it, and can keep it or turn it off). A helper knows nothing of this "
+                        + "several places, write it and review it) add members for it with add: in a chat without a team "
+                        + "that starts one (the user sees it, and can keep it or turn it off). A team the user asks for "
+                        + "goes through team_start instead: add is for the parts of a task. A new member knows nothing of this "
                         + "conversation: give it everything it needs. On another agent or model (agent, model) when the user "
                         + "names one, or one better at that part. Each member uses its agent's plan, so don't add one for "
                         + "what you can do quickly yourself. Give members different apps or sites (an app can only be open "
                         + "in one place). Without a message it waits for the members still working; with stop it ends "
                         + "them. What a member answers shows in the chat under its name, so don't repeat it to the user. "
-                        + "Remove helpers you no longer need with team_change (remove).",
+                        + "Remove members you added and no longer need with team_change (remove).",
                 props().put("to", new JSONObject().put("type", "array").put("items", new JSONObject().put("type", "string"))
-                                .put("description", "The members' names, as the chat's messages list them (helpers added in this call are told too)"))
-                        .put("add", new JSONObject().put("type", "array").put("description", "Helpers to add for this task, told the message at once")
+                                .put("description", "The members' names, as the chat's messages list them (members added in this call are told too)"))
+                        .put("add", new JSONObject().put("type", "array").put("description", "Members to add for this task, told the message at once")
                                 .put("items", new JSONObject().put("type", "object").put("properties", new JSONObject()
                                         .put("name", strProp("A few words the user sees, e.g. Amazon"))
                                         .put("agent", strProp("Optional: a signed-in agent: claude, codex, opencode, agy, grok, copilot or pi. Default: yours"))

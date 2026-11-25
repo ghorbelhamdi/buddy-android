@@ -96,6 +96,11 @@ final class ChatHub {
             }
         }
         pruneLinux(forgetting);
+        // sub-agents from before 2.5.0, when the team took over from them: nothing ends them any more, so they go
+        // now (their reports went back long ago; Buddy starts with none running)
+        main.post(() -> {
+            for (Sessions.Session s : new ArrayList<>(sessions.all)) if (!s.parent.isEmpty() && s.member.isEmpty()) delete(s);
+        });
     }
 
     /**
@@ -457,6 +462,7 @@ final class ChatHub {
         if (!ses.parent.isEmpty()) return;
         Team before = ses.team;
         ses.team = team;
+        if (team != null) ses.teamDraft = null; // (a setup that waited for it is done)
         if (team == null && before != null) ses.lastTeam = before; // (turned off: kept, to start from when it is turned on again)
         if (team != null) ses.lastTeam = null;
         for (Sessions.Session h : Team.all(this, ses.id)) {

@@ -1078,17 +1078,20 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     /** The team's strip over the chat and the boxes over the message box, as the team is now. */
     private void renderTeam() {
         if (teamStrip == null) return;
-        final Team t = ses.parent.isEmpty() ? ses.team : null;
+        // (a member's own chat shows its team's strip too, itself marked; a message there goes to it alone)
+        final Sessions.Session owner = ses.parent.isEmpty() ? ses : ses.member.isEmpty() ? null : hub.sessions.find(ses.parent);
+        final Team t = owner == null ? null : owner.team;
+        final boolean memberChat = owner != null && owner != ses;
         teamStrip.setVisibility(t == null ? View.GONE : View.VISIBLE);
-        sendToRow.setVisibility(t == null ? View.GONE : View.VISIBLE);
+        sendToRow.setVisibility(t == null || memberChat ? View.GONE : View.VISIBLE);
         if (t == null) {
             teamShown = sendToShown = "";
             return;
         }
-        StringBuilder sig = new StringBuilder(t.structure).append(ses.running).append(ses.status).append(Theme.isDark(this));
+        StringBuilder sig = new StringBuilder(t.structure).append(owner.running).append(Theme.isDark(this));
         java.util.List<Sessions.Session> of = new java.util.ArrayList<>();
         for (Team.Member m : t.members) {
-            Sessions.Session h = Team.session(hub, ses.id, m.id);
+            Sessions.Session h = Team.session(hub, owner.id, m.id);
             of.add(h);
             sig.append('|').append(m.id).append(m.name).append(m.color).append(h == null ? "" : h.running + h.status + h.outcome + h.messages.size());
         }
@@ -1097,19 +1100,31 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             if (teamSheet != null && teamSheet.showing()) teamSheet.refresh.run(); // (the team in its shape, while it is open)
             teamChips.removeAllViews();
             // first: the structure's picture and name, which opens the team drawn in its shape
-            teamChips.addView(TeamUi.shapeButton(this, t.structure, () -> teamSheet = TeamUi.view(this, hub, ses)));
+            teamChips.addView(TeamUi.shapeButton(this, t.structure, () -> teamSheet = TeamUi.view(this, hub, owner)));
             teamChips.addView(TeamUi.between(this, ""));
-            teamChips.addView(TeamUi.chip(this, getString(R.string.team_leader), Team.leaderColor(this), ses.running
-                    ? (ses.status.isEmpty() ? getString(R.string.helper_working) : ses.status) : getString(R.string.team_ready), true, ses.running));
+            // (its state in a word: a command is too long for the strip; the line under the header has it whole)
+            View lead = TeamUi.chip(this, getString(R.string.team_leader), Team.leaderColor(this),
+                    getString(owner.running ? R.string.helper_working : R.string.team_ready), true, owner.running);
+            if (memberChat) lead.setOnClickListener(v -> { // back to the team's chat
+                startActivity(new android.content.Intent(this, ChatActivity.class).putExtra("id", owner.id));
+                finish();
+            });
+            teamChips.addView(lead);
             for (int i = 0; i < t.members.size(); i++) {
                 Team.Member m = t.members.get(i);
                 final Sessions.Session h = of.get(i);
                 // (a pipeline's steps follow each other; a doer and its checker go back and forth, pair by pair)
                 teamChips.addView(TeamUi.between(this, i == 0 || Team.PIPE.equals(t.structure) ? "→"
                         : Team.CHECK.equals(t.structure) && i % 2 == 1 ? "⇄" : "·"));
-                View chip = TeamUi.chip(this, m.name, Team.color(this, m.color), TeamUi.state(this, h), false, h != null && h.running);
-                if (h != null) { // its own chat: its steps, its screen
-                    chip.setOnClickListener(v -> startActivity(new android.content.Intent(this, ChatActivity.class).putExtra("id", h.id)));
+                int color = Team.color(this, m.color);
+                View chip = TeamUi.chip(this, m.name, color, TeamUi.state(this, h), false, h != null && h.running);
+                if (h == ses) { // this chat: marked
+                    chip.setBackground(outlined(this, Theme.blend(color, CARD, 0.14f), 12, color, 2));
+                } else if (h != null) { // its own chat: its steps, its screen
+                    chip.setOnClickListener(v -> {
+                        startActivity(new android.content.Intent(this, ChatActivity.class).putExtra("id", h.id));
+                        if (memberChat) finish(); // (from one member's chat to another's: not a stack of them)
+                    });
                 }
                 teamChips.addView(chip);
             }

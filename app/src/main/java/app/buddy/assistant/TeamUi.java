@@ -352,7 +352,7 @@ final class TeamUi {
     /** What a member does now, as its chip and its card say it. */
     static String state(Context c, Sessions.Session h) {
         if (h == null || h.messages.isEmpty()) return c.getString(R.string.team_ready);
-        if (h.running) return h.status.isEmpty() ? c.getString(R.string.helper_working) : h.status;
+        if (h.running) return c.getString(R.string.helper_working); // (not its command: the strip has no room for it)
         return c.getString("failed".equals(h.outcome) ? R.string.helper_failed : "stopped".equals(h.outcome) ? R.string.helper_stopped
                 : R.string.helper_done);
     }

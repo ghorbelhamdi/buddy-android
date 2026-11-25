@@ -44,6 +44,8 @@ final class ToolSwitch {
 
     /** In Settings: what every chat follows unless it has its own choice. */
     static boolean on(Context c, String tool) {
+        // (the team took over from sub-agents in 2.5.0: switched off before, it stays off until switched on again)
+        if ("team".equals(tool)) return Prefs.toolOn(c, tool, Prefs.toolOn(c, "delegate", true));
         return LOCKED.contains(tool) || Prefs.toolOn(c, tool, !DEFAULT_OFF.contains(tool));
     }
 
@@ -56,6 +58,7 @@ final class ToolSwitch {
             if (p != null) chat = p;
         }
         Boolean own = chat == null ? null : chat.tools.get(tool);
+        if (own == null && chat != null && "team".equals(tool)) own = chat.tools.get("delegate"); // (as above, for one chat)
         return own != null ? own : on(c, tool);
     }
 

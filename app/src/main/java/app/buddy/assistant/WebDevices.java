@@ -814,29 +814,33 @@ final class WebDevices {
             }
             JSONObject team = null;
             String busy = "";
-            if (s.team != null) { // its members as the app's strip shows them
+            // (a member's own chat shows its team's strip too: the team's chat's, with the leader's state)
+            final Sessions.Session owner = lead != null ? lead : s;
+            if (owner.team != null) { // its members as the app's strip shows them
                 ChatHub hub = ChatHub.get(c);
                 JSONArray members = new JSONArray();
-                for (Team.Member m : s.team.members) {
-                    Sessions.Session h = Team.session(hub, s.id, m.id);
+                for (Team.Member m : owner.team.members) {
+                    Sessions.Session h = Team.session(hub, owner.id, m.id);
                     boolean on = h != null && h.running;
                     String state = TeamUi.state(c, h);
-                    if (on && busy.isEmpty()) busy = c.getString(R.string.team_member_working, m.name, state);
+                    if (on && busy.isEmpty() && lead == null) busy = c.getString(R.string.team_member_working, m.name, state);
                     members.put(new JSONObject().put("id", m.id).put("chat", h == null ? "" : h.id).put("name", m.name).put("on", m.on()).put("goal", m.goal).put("state", state)
                             .put("running", on).put("c", new JSONArray(java.util.Arrays.asList(Team.hex(m.color)))));
                 }
-                team = new JSONObject().put("structure", s.team.structure).put("name", c.getString(Team.structureName(s.team.structure)))
+                team = new JSONObject().put("leader", new JSONObject().put("agent", Account.cliOf(owner.backend)).put("model", Models.chip(owner))
+                                .put("running", owner.running).put("chat", owner.id))
+                        .put("structure", owner.team.structure).put("name", c.getString(Team.structureName(owner.team.structure)))
                         .put("members", members)
                         // the team in its shape (the page's own view of it): how it works, and what was set
-                        .put("how", c.getString(Team.LEAD.equals(s.team.structure) ? R.string.team_lead_info : Team.CHECK.equals(s.team.structure)
-                                ? R.string.team_check_info : Team.DOERS.equals(s.team.structure) ? R.string.team_doers_info : R.string.team_pipe_info))
-                        .put("workspace", c.getString(Team.SEP.equals(s.team.workspace) ? R.string.team_ws_sep
-                                : Team.LOOK.equals(s.team.workspace) ? R.string.team_ws_look : R.string.team_ws_same))
-                        .put("apps", c.getString(Team.TURN.equals(s.team.apps) ? R.string.team_apps_turn
-                                : Team.NONE.equals(s.team.apps) ? R.string.team_apps_none : R.string.team_apps_diff))
-                        .put("handoff", s.team.handoff).put("rules", s.team.rules);
+                        .put("how", c.getString(Team.LEAD.equals(owner.team.structure) ? R.string.team_lead_info : Team.CHECK.equals(owner.team.structure)
+                                ? R.string.team_check_info : Team.DOERS.equals(owner.team.structure) ? R.string.team_doers_info : R.string.team_pipe_info))
+                        .put("workspace", c.getString(Team.SEP.equals(owner.team.workspace) ? R.string.team_ws_sep
+                                : Team.LOOK.equals(owner.team.workspace) ? R.string.team_ws_look : R.string.team_ws_same))
+                        .put("apps", c.getString(Team.TURN.equals(owner.team.apps) ? R.string.team_apps_turn
+                                : Team.NONE.equals(owner.team.apps) ? R.string.team_apps_none : R.string.team_apps_diff))
+                        .put("handoff", owner.team.handoff).put("rules", owner.team.rules);
             }
-            if (s.team == null) { // none: the setup the user asked for in the chat, waiting, and the last team, to start from
+            if (owner.team == null) { // none: the setup the user asked for in the chat, waiting, and the last team, to start from
                 if (s.teamDraft != null) team = new JSONObject().put("draft", s.teamDraft.json());
                 else if (s.lastTeam != null) team = new JSONObject().put("last", s.lastTeam.json());
                 if (team != null) team.put("off", true);

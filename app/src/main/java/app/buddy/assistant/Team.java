@@ -40,10 +40,12 @@ final class Team {
         String id, name, agent, model, goal;
         /** Its colour's place in the palette: its own for good, so removing another doesn't recolour what it said. */
         int color;
+        /** Added by the leader for a task (the team tool's add): it ends it again without asking the user. */
+        boolean helper;
 
         JSONObject json() throws Exception {
             return new JSONObject().put("id", id).put("name", name).put("agent", agent).put("model", model)
-                    .put("goal", goal).put("color", color);
+                    .put("goal", goal).put("color", color).put("helper", helper);
         }
 
         static Member of(JSONObject o) {
@@ -54,6 +56,7 @@ final class Team {
             m.model = o.optString("model");
             m.goal = o.optString("goal").trim();
             m.color = o.optInt("color");
+            m.helper = o.optBoolean("helper");
             return m;
         }
 
@@ -231,8 +234,8 @@ final class Team {
         if (!t.handoff.isEmpty()) b.append("Hand-off: ").append(ChatHub.clip(t.handoff, 400)).append(". ");
         if (!t.rules.isEmpty()) b.append("The team's rules (pass them on where they matter): ").append(ChatHub.clip(t.rules, 800)).append(". ");
         b.append("A quick question you can answer yourself needs no member. The user can also write to members directly. "
-                + "For a part no member suits, add a helper with the team tool (add); remove helpers you no longer need "
-                + "with team_change (remove). Other changes to the team (team_change) only when the user asks for them. "
+                + "For a part no member suits, add a member with the team tool (add); remove the ones you added and no "
+                + "longer need with team_change (remove). Other changes to the team (team_change) only when the user asks for them. "
                 + "These are phone tools: where your tools "
                 + "carry their server's name, they are mcp__phone__team, mcp__phone__team_change and mcp__phone__ask.]\n\n");
         return b.toString();
@@ -477,39 +480,53 @@ final class Team {
         final Sessions.Session parent = hub.sessions.find(chat);
         if (parent == null || !parent.parent.isEmpty()) return "Only the chat's own agent leads a team.";
         if (Triggers.ruleRun(chat)) return "Not available in a notification rule's run.";
-        JSONArray adding = a.optJSONArray("add");
-        if (adding != null && adding.length() > 0) { // helpers for this task: added (a team starts with them), then told
-            Team n = parent.team == null ? new Team() : parent.team.copy();
-            if (parent.team == null) {
-                n.structure = LEAD;
-                String ws = a.optString("workspace", LOOK);
-                n.workspace = SEP.equals(ws) || SAME.equals(ws) ? ws : LOOK;
-                n.apps = Background.setUp(svc) ? DIFF : NONE;
-                n.handoff = handoffs(LEAD)[0];
-            }
-            JSONArray to = a.optJSONArray("to") == null ? new JSONArray() : a.optJSONArray("to");
+        final JSONArray adding = a.optJSONArray("add");
+        if (adding != null && adding.length() > 0) { // members for this task: added (a team starts with them), then told
+            final JSONArray to = a.optJSONArray("to") == null ? new JSONArray() : a.optJSONArray("to");
             if (a.optJSONArray("to") == null && !a.optString("to").trim().isEmpty()) to.put(a.optString("to"));
-            for (int i = 0; i < adding.length(); i++) {
-                JSONObject o = adding.optJSONObject(i);
-                String name = o == null ? "" : clipName(o.optString("name"));
-                if (name.isEmpty()) return "Each helper needs a name.";
-                if (n.member(name) != null) return "The team has a member \"" + name + "\" already: tell it with to, or give the helper another name.";
-                Member m = n.add(name, parent.backend, "", o.optString("goal").trim());
-                String err = agentAndModel(svc, m, o, parent.backend);
-                if (err != null) return err;
-                to.put(name);
-            }
-            a.put("to", to);
-            final Team made = n;
+            final String[] err = {null};
             final CountDownLatch set = new CountDownLatch(1);
+            // (on the main thread, from the team as it is there and then: two calls at once each add theirs)
             svc.runOnMain(() -> {
                 try {
-                    hub.setTeam(parent, made, null);
+                    Team n = parent.team == null ? new Team() : parent.team.copy();
+                    if (parent.team == null) {
+                        n.structure = LEAD;
+                        String ws = a.optString("workspace", LOOK);
+                        n.workspace = SEP.equals(ws) || SAME.equals(ws) ? ws : LOOK;
+                        n.apps = Background.setUp(svc) ? DIFF : NONE;
+                        n.handoff = handoffs(LEAD)[0];
+                    }
+                    for (int i = 0; i < adding.length(); i++) {
+                        JSONObject o = adding.optJSONObject(i);
+                        String name = o == null ? "" : clipName(o.optString("name"));
+                        if (name.isEmpty()) {
+                            err[0] = "Each member you add needs a name.";
+                            return;
+                        }
+                        if (n.member(name) != null) {
+                            err[0] = "The team has a member \"" + name + "\" already: tell it with to, or give the new one another name.";
+                            return;
+                        }
+                        Member m = n.add(name, parent.backend, "", o.optString("goal").trim());
+                        m.helper = true;
+                        String e = agentAndModel(svc, m, o, parent.backend);
+                        if (e != null) {
+                            err[0] = e;
+                            return;
+                        }
+                        to.put(name);
+                    }
+                    hub.setTeam(parent, n, null);
+                } catch (Exception e) {
+                    err[0] = String.valueOf(e.getMessage());
                 } finally {
                     set.countDown();
                 }
             });
             set.await(30, TimeUnit.SECONDS);
+            if (err[0] != null) return err[0];
+            a.put("to", to);
             if (a.optString("message").trim().isEmpty()) return "Added " + names(adding) + ". Tell them what to do (to, message).";
         }
         final Team t = parent.team;
@@ -635,21 +652,58 @@ final class Team {
      * changes how the team works, comes to the user on a card first; goals, the hand-off and rules are theirs already
      * (they just said them).
      */
-    static String change(final BuddyService svc, String chat, JSONObject a) throws Exception {
+    static String change(final BuddyService svc, String chat, final JSONObject a) throws Exception {
         final ChatHub hub = ChatHub.get(svc);
         final Sessions.Session parent = hub.sessions.find(chat);
         if (parent == null || !parent.parent.isEmpty()) return "Only the chat's own agent leads a team.";
         if (Triggers.ruleRun(chat)) return "Not available in a notification rule's run.";
         if (parent.team == null) return "This chat has no team: the user turns one on in Chat options → Team.";
-        final Team t = parent.team.copy();
-        List<String> card = new ArrayList<>(); // what the user is asked, a line each
-        List<String> gone = new ArrayList<>();
+        // what the user is asked, a line each (from the team as it is now)
+        List<String> card = new ArrayList<>();
+        String err = apply(svc, parent, parent.team.copy(), a, card, new ArrayList<>());
+        if (err != null) return err;
+        if (!card.isEmpty()) {
+            String answer = svc.askConfirm(svc.getString(R.string.team_card_change) + "\n\n" + android.text.TextUtils.join("\n", card), false);
+            if (!answer.startsWith("APPROVED")) return answer;
+        }
+        // the change itself on the team as it is after the card (it may have changed while the card waited)
+        final String[] out = {null};
+        final CountDownLatch done = new CountDownLatch(1);
+        svc.runOnMain(() -> {
+            try {
+                if (parent.team == null) {
+                    out[0] = "The team was turned off meanwhile.";
+                    return;
+                }
+                Team t = parent.team.copy();
+                List<String> gone = new ArrayList<>();
+                String e = apply(svc, parent, t, a, new ArrayList<>(), gone);
+                if (e != null) {
+                    out[0] = e;
+                    return;
+                }
+                hub.setTeam(parent, t, gone);
+                out[0] = "The team is now: " + brief(t, parent).trim();
+            } catch (Exception e) {
+                out[0] = String.valueOf(e.getMessage());
+            } finally {
+                done.countDown();
+            }
+        });
+        done.await(30, TimeUnit.SECONDS);
+        return out[0] == null ? "Buddy didn't answer." : out[0];
+    }
+
+    /** team_change's changes on t; card gets a line for each the user is asked about, gone the members that go. */
+    private static String apply(BuddyService svc, Sessions.Session parent, Team t, JSONObject a, List<String> card, List<String> gone) {
         JSONArray remove = a.optJSONArray("remove");
         for (int i = 0; remove != null && i < remove.length(); i++) {
             Member m = t.member(remove.optString(i));
             if (m == null) return "The team has no member \"" + remove.optString(i) + "\". Its members: " + t.names() + ".";
             t.members.remove(m);
-            gone.add(m.id); // (no card for it: ending a member spends nothing)
+            gone.add(m.id);
+            // (one the leader added for a task, it ends without asking; one the user set up, only with their OK)
+            if (!m.helper) card.add(svc.getString(R.string.team_card_remove, m.name));
         }
         JSONArray update = a.optJSONArray("update");
         for (int i = 0; update != null && i < update.length(); i++) {
@@ -703,20 +757,7 @@ final class Team {
         }
         if (a.has("handoff")) t.handoff = a.optString("handoff").trim();
         if (a.has("rules")) t.rules = a.optString("rules").trim();
-        if (!card.isEmpty()) {
-            String answer = svc.askConfirm(svc.getString(R.string.team_card_change) + "\n\n" + android.text.TextUtils.join("\n", card), false);
-            if (!answer.startsWith("APPROVED")) return answer;
-        }
-        final CountDownLatch done = new CountDownLatch(1);
-        svc.runOnMain(() -> {
-            try {
-                hub.setTeam(parent, t, gone);
-            } finally {
-                done.countDown();
-            }
-        });
-        done.await(30, TimeUnit.SECONDS);
-        return "The team is now: " + brief(t, parent).trim();
+        return null;
     }
 
     /**
