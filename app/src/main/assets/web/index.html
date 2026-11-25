@@ -77,6 +77,10 @@ nav a.wait .s{color:var(--accent-text)}
 
 /* ---------- messages */
 .mine .user{align-self:flex-end}
+.mine.editing .user{width:min(78%,620px);box-sizing:border-box;outline:2px solid var(--accent);outline-offset:2px}
+.mine.editing textarea{display:block;width:100%;box-sizing:border-box;border:0;background:transparent;color:inherit;font:inherit;line-height:inherit;resize:none;padding:0;outline:none;overflow-y:auto}
+.mine.editing .edhint{align-self:flex-end;font-size:12px;color:var(--muted);max-width:min(78%,620px);text-align:end}
+.mine.editing .edbtns{display:flex;align-self:flex-end;gap:8px}
 .user{align-self:flex-end;max-width:min(78%,620px);background:var(--bubble);color:var(--bubble-text);border-radius:20px 20px 6px 20px;padding:10px 16px;white-space:pre-wrap}
 .user .lab{display:block;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;opacity:.7;margin-bottom:2px}
 .user.fold .tx{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
@@ -706,7 +710,7 @@ function drawChat() {
   $('runbtn').hidden = !(d && d.running);
   $('worktext').textContent = working ? (d.running ? d.status || 'Working' : d.busy) : '';
   drawTeam(d);
-  const now = JSON.stringify([open, chatData, shown, [...unfolded], open ? null : draft]);
+  const now = JSON.stringify([open, chatData, shown, [...unfolded], open ? null : draft, editing && [editing.chat, editing.at]]);
   if (now === drawn) return; // nothing new: what is unfolded or selected stays as it is
   drawn = now;
   const stick = toBottom || atEnd(), top = pane.scrollTop;
@@ -1003,9 +1007,10 @@ function row(r, live) {
         el('span', {class: 'n'}, live ? r.steps[n - 1] : n + (n === 1 ? ' tool call' : ' tool calls')), el('span', {class: 'v'})),
       el('ol', {}, ...r.steps.map(step)));
     // (the phone's next update draws the chat again: it must find this row as the user left it)
-    dt.addEventListener('toggle', () => { if (dt.open) unfolded.add(r.at); else unfolded.delete(r.at); drawn = JSON.stringify([open, chatData, shown, [...unfolded], open ? null : draft]); });
+    dt.addEventListener('toggle', () => { if (dt.open) unfolded.add(r.at); else unfolded.delete(r.at); drawn = JSON.stringify([open, chatData, shown, [...unfolded], open ? null : draft, editing && [editing.chat, editing.at]]); });
     return dt;
   }
+  if (r.k === 'user' && editing && editing.chat === open && editing.at === r.at) return editor(r);
   if (r.k === 'user') {
     // a schedule's message is its whole instruction: three lines of it, the rest on a tap
     const long = r.s && r.t.length > 220, key = 'u' + r.at, fold = long && !unfolded.has(key);
@@ -1154,25 +1159,42 @@ function setQuote(text) {
 }
 
 /** Your own message, changed: the chat goes on from there with the new words (the phone keeps the old chat, archived). */
+/** The message being edited in place: its chat, where it is, and what is typed so far (kept over the chat's redraws). */
+let editing = null;
+
 function edit(index, text) {
   if (chatData && chatData.running) { say('The chat is working: edit the message when it’s done.'); return; }
-  sheet((box, close) => {
-    const ta = el('textarea', {'aria-label': 'Your message'});
-    ta.value = text;
-    box.append(el('h2', {}, 'Edit your message'),
-      el('p', {}, 'It’s asked again from here: what came after it goes. The chat as it was is kept in Archived.'), ta,
-      el('div', {class: 'line', style: 'justify-content:flex-end;margin-top:8px'}, el('button', {class: 'btn', onclick: close}, 'Cancel'),
-        el('button', {class: 'btn primary', onclick: async () => {
-          const t = ta.value.trim(), id = open;
-          if (!t) return;
-          close();
-          try {
-            const r = await api('/web/edit', {chat: id, index, text: t});
-            say(r.error || '');
-            if (open === id) { toBottom = true; drawn = ''; chatData = await api('/web/chat?id=' + encodeURIComponent(id)); render(); }
-          } catch (e) { say(e.message); }
-        }}, 'Ask again')));
+  editing = {chat: open, at: index, text};
+  drawn = '';
+  drawChat();
+}
+
+/** Your message, editable where it is: its own bubble becomes the field, with Cancel and Ask again under it. */
+function editor(r) {
+  const ta = el('textarea', {class: 'tx', 'aria-label': 'Edit your message', rows: '1'});
+  ta.value = editing.text;
+  const fit = () => { ta.style.height = 'auto'; ta.style.height = Math.min(360, ta.scrollHeight) + 'px'; };
+  const cancel = () => { editing = null; drawn = ''; drawChat(); };
+  const go = async () => {
+    const t = ta.value.trim(), id = editing.chat, index = editing.at;
+    if (!t) return;
+    editing = null;
+    try {
+      const res = await api('/web/edit', {chat: id, index, text: t});
+      say(res.error || '');
+      if (open === id) { toBottom = true; drawn = ''; chatData = await api('/web/chat?id=' + encodeURIComponent(id)); render(); }
+    } catch (e) { say(e.message); drawn = ''; drawChat(); }
+  };
+  ta.addEventListener('input', () => { editing.text = ta.value; fit(); });
+  ta.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { e.preventDefault(); cancel(); }
+    else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); go(); }
   });
+  setTimeout(() => { fit(); ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }, 0);
+  return el('div', {class: 'mine editing'}, el('div', {class: 'user'}, ta),
+    el('div', {class: 'edhint'}, 'Asked again from here: what came after it goes, and the chat as it was is kept in Archived.'),
+    el('div', {class: 'line edbtns'}, el('button', {class: 'btn', onclick: cancel}, 'Cancel'),
+      el('button', {class: 'btn primary', onclick: go}, 'Ask again')));
 }
 
 async function fork(index) {
