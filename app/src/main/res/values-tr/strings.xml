@@ -1514,7 +1514,7 @@
     <string name="chat_bg_setup_info">Siz telefonunuzu kullanırken ajanın uygulamalarınızda kendi ekranında çalışmasını sağlar. Kurulum yaklaşık bir dakika sürer ve Wi-Fi gerekir.</string>
     <string name="hub_tool_delegate">Alt ajanlar başlatılıyor: %1$s</string>
     <string name="hub_tool_helpers">Alt ajanlar bekleniyor</string>
-    <string name="helpers_title">Alt ajanlar</string>
+    <string name="helpers_title">Ekranlar</string>
     <string name="helper_working">Çalışıyor</string>
     <string name="helper_done">Bitti</string>
     <string name="helper_failed">Başarısız</string>

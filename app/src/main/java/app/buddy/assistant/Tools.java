@@ -281,53 +281,32 @@ final class Tools {
                         + "field. Buddy shows the user an approval card with the text first, unless you called confirm "
                         + "with it just before.",
                 props().put("text", strProp("The reply, exactly as it should be sent")), "text"));
-        t.put(tool("delegate",
-                "Hand parts of a task to sub-agents that work at the same time, and get their reports back: for "
-                        + "work that splits into independent parts in different apps or sites (compare a price in three "
-                        + "shops, gather facts from several places). Each sub-agent is an agent like you with the phone "
-                        + "tools, on a hidden screen of its own, so the user keeps their screen and you keep yours. "
-                        + "Sub-agents only look things up: they can't send, post, buy, delete, change settings or ask the "
-                        + "user, so do those steps yourself afterwards. Give each a different app or site (an app can "
-                        + "only be open in one place) and a task that stands on its own: a sub-agent knows nothing of "
-                        + "this conversation. The call waits for the reports (up to 8 minutes; then subagents gives the "
-                        + "rest). When you have a part of your own to do meanwhile (in another app), pass wait false: "
-                        + "the sub-agents start, you work at the same time, and subagents collects their reports when you "
-                        + "are done. Give as many tasks as the work has parts: they all start at once. Each sub-agent uses the user's plan as you do, so don't delegate what you can do "
-                        + "quickly yourself, and never a step whose result you need before you can go on: a lone "
-                        + "sub-agent you only wait for is slower than doing it yourself. A sub-agent can run on another "
-                        + "agent and model than you (agent, model): when the user names one (\"have Codex write it and "
-                        + "Claude review it\"), or one better at that part. By default a sub-agent only looks things up; "
-                        + "with work it works like you, in this chat's folder (its sends and deletes come to the user on a "
-                        + "card): for writing or changing things. For steps one after another (write, then review), call "
-                        + "delegate once per step: the reports of the step before go in the next one's task.",
-                props().put("tasks", new JSONObject().put("type", "array").put("minItems", 1)
-                        .put("description", "One per sub-agent")
-                        .put("items", new JSONObject().put("type", "object")
-                                .put("properties", props()
-                                        .put("name", strProp("A few words the user sees, e.g. \"Amazon\""))
-                                        .put("task", strProp("Everything the sub-agent needs: what to find, where, and "
-                                                + "what to report back"))
-                                        .put("phone", boolProp("Default true. False for a part that needs no app "
-                                                + "(the web, files, thinking): that sub-agent takes no phone screen"))
-                                        .put("agent", strProp("Optional: another signed-in agent for this sub-agent: claude, "
-                                                + "codex, opencode, agy, grok, copilot or pi (if it isn't signed in, the "
-                                                + "answer lists the ones that are). Default: yours"))
-                                        .put("model", strProp("Optional: one of that agent's model ids. Default: its own"))
-                                        .put("work", boolProp("Default false: it only looks things up. True: it works "
-                                                + "like you, in this chat's folder, and can make, change and send things "
-                                                + "(the user approves sends and deletes on a card)")))
-                                .put("required", new JSONArray().put("task"))))
-                        .put("wait", boolProp("Default true: wait here for the reports. False: return at once, so you "
-                                + "can work on your own part at the same time; call subagents afterwards.")), "tasks"));
         t.put(tool("team",
-                "Only in a chat with a team that you lead (its messages say so): tells one or more of the team's members "
-                        + "something and waits for what they answer (up to 8 minutes). A member is an agent of its own, "
-                        + "on the agent and model the user picked for it, that remembers what it did in this chat before. "
-                        + "Members named in one call work at the same time. Without a message it waits for the members "
-                        + "still working and returns what they answered; with stop it ends them. What a member answers "
-                        + "shows in the chat under its name, so don't repeat it to the user.",
+                "Other agents that work with you in this chat, the chat's team, which you lead: tells members something "
+                        + "and waits for what they answer (up to 8 minutes). Each member is an agent of its own, on the "
+                        + "agent and model it was given, with a hidden phone screen of its own (background mode), that "
+                        + "remembers what it did in this chat before. Members named in one call work at the same time. "
+                        + "For work that splits into independent parts (compare a price in three shops, gather facts from "
+                        + "several places, write it and review it) add helpers for it with add: in a chat without a team "
+                        + "that starts one (the user sees it, and can keep it or turn it off). A helper knows nothing of this "
+                        + "conversation: give it everything it needs. On another agent or model (agent, model) when the user "
+                        + "names one, or one better at that part. Each member uses its agent's plan, so don't add one for "
+                        + "what you can do quickly yourself. Give members different apps or sites (an app can only be open "
+                        + "in one place). Without a message it waits for the members still working; with stop it ends "
+                        + "them. What a member answers shows in the chat under its name, so don't repeat it to the user. "
+                        + "Remove helpers you no longer need with team_change (remove).",
                 props().put("to", new JSONObject().put("type", "array").put("items", new JSONObject().put("type", "string"))
-                                .put("description", "The members' names, as the chat's messages list them"))
+                                .put("description", "The members' names, as the chat's messages list them (helpers added in this call are told too)"))
+                        .put("add", new JSONObject().put("type", "array").put("description", "Helpers to add for this task, told the message at once")
+                                .put("items", new JSONObject().put("type", "object").put("properties", new JSONObject()
+                                        .put("name", strProp("A few words the user sees, e.g. Amazon"))
+                                        .put("agent", strProp("Optional: a signed-in agent: claude, codex, opencode, agy, grok, copilot or pi. Default: yours"))
+                                        .put("model", strProp("Optional: one of that agent's model ids. Default: its own"))
+                                        .put("goal", strProp("What it is for, in a line")))
+                                        .put("required", new JSONArray().put("name"))))
+                        .put("workspace", strProp("Only when add starts a team: look (members only look things up, the "
+                                + "default), same (they work in this chat's folder, their sends and deletes on a card) or sep "
+                                + "(each in a folder of its own)"))
                         .put("message", strProp("What they should do or answer, with everything they need that they "
                                 + "don't know yet (another member's report, the user's wish)"))
                         .put("wait", boolProp("Default true: wait here for the answers. False: return at once, so you "
@@ -380,10 +359,6 @@ final class Tools {
                         .put("structure", strProp("lead (leader + workers), pipe (pipeline), check (doer + checker) or doers (doers with their own goals)"))
                         .put("workspace", strProp("sep (each member in its own folder), same (all in this chat's folder) or look (members only look things up)"))
                         .put("apps", strProp("diff (each member in a different app), turn (one app at a time) or none (no phone apps)"))));
-        t.put(tool("subagents",
-                "Your sub-agents from delegate: waits for the ones still working (up to 8 minutes) and returns every "
-                        + "report. With stop, ends the ones still working first.",
-                props().put("stop", boolProp("End the sub-agents that still work"))));
         t.put(tool("schedule_message",
                 "Schedule a message to yourself in this chat, sent once at a later time: to check something again, "
                         + "remind the user, or go on with a task later (\"check the price again tomorrow at 9\"). At its time "
@@ -604,8 +579,6 @@ final class Tools {
         }
         if (Lite.MORE.equals(name)) return text(Lite.more(svc, a)); // lite mode loads a group of tools
         // starting helpers or waiting for them isn't using the phone: no "Using your phone", no wait for a pause to end
-        if ("delegate".equals(name)) return text(Helpers.delegate(svc, McpServer.CALLER_CHAT.get(), a));
-        if ("subagents".equals(name)) return text(Helpers.status(svc, McpServer.CALLER_CHAT.get(), a));
         if ("team".equals(name)) return text(Team.tool(svc, McpServer.CALLER_CHAT.get(), a));
         if ("team_change".equals(name)) return text(Team.change(svc, McpServer.CALLER_CHAT.get(), a));
         if ("team_start".equals(name)) return text(Team.start(svc, McpServer.CALLER_CHAT.get(), a));
@@ -1010,11 +983,11 @@ final class Tools {
 
     /** What a working helper (which works like its chat, see Helpers) still may not: what belongs to the chat itself. */
     private static final java.util.Set<String> WORKER_NO = new java.util.HashSet<>(java.util.Arrays.asList(
-            "delegate", "subagents", "team", "team_change", "team_start", "schedule_message", "add_notification_rule", "cancel_scheduled", "update_buddy"));
+            "team", "team_change", "team_start", "schedule_message", "add_notification_rule", "cancel_scheduled", "update_buddy"));
 
     /** Not for a helper (see Helpers): what reaches the user, the phone's own settings or a later time. */
     private static final java.util.Set<String> HELPER_NO = new java.util.HashSet<>(java.util.Arrays.asList(
-            "delegate", "subagents", "team", "team_change", "team_start", "phone_shell", "run_on_computer", "install_apk", "update_buddy", "wait_for_install", "schedule_message",
+            "team", "team_change", "team_start", "phone_shell", "run_on_computer", "install_apk", "update_buddy", "wait_for_install", "schedule_message",
             "add_notification_rule",
             "cancel_scheduled", "notify", "share", "reply_notification", "point_out", "add_calendar_event", "set_alarm",
             "set_timer", "take_photo", "clipboard_write", "save_to_downloads"));

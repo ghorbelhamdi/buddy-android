@@ -1540,7 +1540,7 @@
     <string name="chat_bg_setup_info">Pozwala agentowi pracować w Twoich aplikacjach na własnym ekranie, gdy korzystasz z telefonu. Konfiguracja trwa około minuty i wymaga Wi-Fi.</string>
     <string name="hub_tool_delegate">Uruchamianie podagentów: %1$s</string>
     <string name="hub_tool_helpers">Czekanie na podagentów</string>
-    <string name="helpers_title">Podagenci</string>
+    <string name="helpers_title">Ekrany</string>
     <string name="helper_working">Pracuje</string>
     <string name="helper_done">Gotowe</string>
     <string name="helper_failed">Nie udało się</string>

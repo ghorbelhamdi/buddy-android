@@ -1946,7 +1946,7 @@
     <string name="chat_bg_setup_info">Permet à un agent de travailler dans vos applis sur son propre écran pendant que vous utilisez votre téléphone. La configuration prend environ une minute et nécessite le Wi-Fi.</string>
     <string name="hub_tool_delegate">Démarrage des sous-agents : %1$s</string>
     <string name="hub_tool_helpers">En attente des sous-agents</string>
-    <string name="helpers_title">Sous-agents</string>
+    <string name="helpers_title">Écrans</string>
     <string name="helper_working">En cours</string>
     <string name="helper_done">Terminé</string>
     <string name="helper_failed">Échec</string>

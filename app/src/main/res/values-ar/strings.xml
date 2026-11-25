@@ -1558,7 +1558,7 @@
     <string name="chat_bg_setup_info">يتيح للوكيل العمل في تطبيقاتك على شاشة خاصة به بينما تستخدم هاتفك. يستغرق الإعداد نحو دقيقة ويحتاج إلى Wi-Fi.</string>
     <string name="hub_tool_delegate">بدء الوكلاء الفرعيين: %1$s</string>
     <string name="hub_tool_helpers">في انتظار الوكلاء الفرعيين</string>
-    <string name="helpers_title">الوكلاء الفرعيون</string>
+    <string name="helpers_title">الشاشات</string>
     <string name="helper_working">يعمل</string>
     <string name="helper_done">تم</string>
     <string name="helper_failed">فشل</string>

@@ -231,7 +231,9 @@ final class Team {
         if (!t.handoff.isEmpty()) b.append("Hand-off: ").append(ChatHub.clip(t.handoff, 400)).append(". ");
         if (!t.rules.isEmpty()) b.append("The team's rules (pass them on where they matter): ").append(ChatHub.clip(t.rules, 800)).append(". ");
         b.append("A quick question you can answer yourself needs no member. The user can also write to members directly. "
-                + "Change the team (team_change) only when the user asks for it. These are phone tools: where your tools "
+                + "For a part no member suits, add a helper with the team tool (add); remove helpers you no longer need "
+                + "with team_change (remove). Other changes to the team (team_change) only when the user asks for them. "
+                + "These are phone tools: where your tools "
                 + "carry their server's name, they are mcp__phone__team, mcp__phone__team_change and mcp__phone__ask.]\n\n");
         return b.toString();
     }
@@ -475,8 +477,43 @@ final class Team {
         final Sessions.Session parent = hub.sessions.find(chat);
         if (parent == null || !parent.parent.isEmpty()) return "Only the chat's own agent leads a team.";
         if (Triggers.ruleRun(chat)) return "Not available in a notification rule's run.";
+        JSONArray adding = a.optJSONArray("add");
+        if (adding != null && adding.length() > 0) { // helpers for this task: added (a team starts with them), then told
+            Team n = parent.team == null ? new Team() : parent.team.copy();
+            if (parent.team == null) {
+                n.structure = LEAD;
+                String ws = a.optString("workspace", LOOK);
+                n.workspace = SEP.equals(ws) || SAME.equals(ws) ? ws : LOOK;
+                n.apps = Background.setUp(svc) ? DIFF : NONE;
+                n.handoff = handoffs(LEAD)[0];
+            }
+            JSONArray to = a.optJSONArray("to") == null ? new JSONArray() : a.optJSONArray("to");
+            if (a.optJSONArray("to") == null && !a.optString("to").trim().isEmpty()) to.put(a.optString("to"));
+            for (int i = 0; i < adding.length(); i++) {
+                JSONObject o = adding.optJSONObject(i);
+                String name = o == null ? "" : clipName(o.optString("name"));
+                if (name.isEmpty()) return "Each helper needs a name.";
+                if (n.member(name) != null) return "The team has a member \"" + name + "\" already: tell it with to, or give the helper another name.";
+                Member m = n.add(name, parent.backend, "", o.optString("goal").trim());
+                String err = agentAndModel(svc, m, o, parent.backend);
+                if (err != null) return err;
+                to.put(name);
+            }
+            a.put("to", to);
+            final Team made = n;
+            final CountDownLatch set = new CountDownLatch(1);
+            svc.runOnMain(() -> {
+                try {
+                    hub.setTeam(parent, made, null);
+                } finally {
+                    set.countDown();
+                }
+            });
+            set.await(30, TimeUnit.SECONDS);
+            if (a.optString("message").trim().isEmpty()) return "Added " + names(adding) + ". Tell them what to do (to, message).";
+        }
         final Team t = parent.team;
-        if (t == null) return "This chat has no team: the user turns one on in Chat options → Team. Do the task yourself.";
+        if (t == null) return "This chat has no team yet: add helpers for the task with add (and a message for them).";
         if (a.optBoolean("stop")) {
             svc.runOnMain(() -> stop(hub, parent.id));
             for (int i = 0; i < 40 && anyRunning(sessions(hub, parent)); i++) Thread.sleep(250);
@@ -612,8 +649,7 @@ final class Team {
             Member m = t.member(remove.optString(i));
             if (m == null) return "The team has no member \"" + remove.optString(i) + "\". Its members: " + t.names() + ".";
             t.members.remove(m);
-            gone.add(m.id);
-            card.add(svc.getString(R.string.team_card_remove, m.name));
+            gone.add(m.id); // (no card for it: ending a member spends nothing)
         }
         JSONArray update = a.optJSONArray("update");
         for (int i = 0; update != null && i < update.length(); i++) {
@@ -816,6 +852,15 @@ final class Team {
             return null;
         }
         return t;
+    }
+
+    private static String names(JSONArray adding) {
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < adding.length(); i++) {
+            JSONObject o = adding.optJSONObject(i);
+            if (o != null) b.append(b.length() > 0 ? ", " : "").append(clipName(o.optString("name")));
+        }
+        return b.toString();
     }
 
     /** A member's name as it is kept: 40 characters at most, cut before it is compared with the others'. */

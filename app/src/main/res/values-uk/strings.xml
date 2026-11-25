@@ -1985,7 +1985,7 @@
     <string name="chat_bg_setup_info">Дає агентові змогу працювати у ваших застосунках на власному екрані, поки ви користуєтеся телефоном. Налаштування триває близько хвилини й потребує Wi-Fi.</string>
     <string name="hub_tool_delegate">Запуск субагентів: %1$s</string>
     <string name="hub_tool_helpers">Очікування субагентів</string>
-    <string name="helpers_title">Субагенти</string>
+    <string name="helpers_title">Екрани</string>
     <string name="helper_working">Працює</string>
     <string name="helper_done">Готово</string>
     <string name="helper_failed">Не вдалося</string>

@@ -2190,7 +2190,7 @@
     <string name="chat_bg_setup_info">Lets an agent work in your apps on a screen of its own while you use your phone. Set-up takes about a minute and needs Wi-Fi.</string>
     <string name="hub_tool_delegate">Starting sub-agents: %1$s</string>
     <string name="hub_tool_helpers">Waiting for the sub-agents</string>
-    <string name="helpers_title">Sub-agents</string>
+    <string name="helpers_title">Screens</string>
     <string name="helper_working">Working</string>
     <string name="helper_done">Done</string>
     <string name="helper_failed">Failed</string>

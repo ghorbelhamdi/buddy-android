@@ -1947,7 +1947,7 @@
     <string name="chat_bg_setup_info">Memungkinkan agen bekerja di aplikasi Anda pada layarnya sendiri saat Anda memakai ponsel. Penyiapan butuh sekitar satu menit dan memerlukan Wi-Fi.</string>
     <string name="hub_tool_delegate">Memulai sub-agen: %1$s</string>
     <string name="hub_tool_helpers">Menunggu sub-agen</string>
-    <string name="helpers_title">Sub-agen</string>
+    <string name="helpers_title">Layar</string>
     <string name="helper_working">Bekerja</string>
     <string name="helper_done">Selesai</string>
     <string name="helper_failed">Gagal</string>

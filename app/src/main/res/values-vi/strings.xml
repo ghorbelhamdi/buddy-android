@@ -2087,7 +2087,7 @@
     <string name="chat_bg_setup_info">Cho phép tác nhân làm việc trong ứng dụng của bạn trên màn hình riêng trong khi bạn dùng điện thoại. Thiết lập mất khoảng một phút và cần Wi-Fi.</string>
     <string name="hub_tool_delegate">Đang khởi động tác nhân phụ: %1$s</string>
     <string name="hub_tool_helpers">Đang chờ các tác nhân phụ</string>
-    <string name="helpers_title">Tác nhân phụ</string>
+    <string name="helpers_title">Màn hình</string>
     <string name="helper_working">Đang làm</string>
     <string name="helper_done">Xong</string>
     <string name="helper_failed">Thất bại</string>

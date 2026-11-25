@@ -1498,7 +1498,7 @@
     <string name="chat_bg_setup_info">スマホを使っている間、エージェントが専用の画面でアプリを操作します。セットアップは約1分で、Wi-Fi が必要です。</string>
     <string name="hub_tool_delegate">サブエージェントを開始: %1$s</string>
     <string name="hub_tool_helpers">サブエージェントを待っています</string>
-    <string name="helpers_title">サブエージェント</string>
+    <string name="helpers_title">画面</string>
     <string name="helper_working">作業中</string>
     <string name="helper_done">完了</string>
     <string name="helper_failed">失敗</string>

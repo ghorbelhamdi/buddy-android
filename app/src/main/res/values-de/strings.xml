@@ -1513,7 +1513,7 @@
     <string name="chat_bg_setup_info">Lässt einen Agenten auf einem eigenen Bildschirm in deinen Apps arbeiten, während du dein Handy benutzt. Die Einrichtung dauert etwa eine Minute und braucht WLAN.</string>
     <string name="hub_tool_delegate">Sub-Agenten werden gestartet: %1$s</string>
     <string name="hub_tool_helpers">Warten auf die Sub-Agenten</string>
-    <string name="helpers_title">Sub-Agenten</string>
+    <string name="helpers_title">Bildschirme</string>
     <string name="helper_working">Arbeitet</string>
     <string name="helper_done">Fertig</string>
     <string name="helper_failed">Fehlgeschlagen</string>

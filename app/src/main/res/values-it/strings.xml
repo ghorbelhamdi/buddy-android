@@ -1946,7 +1946,7 @@
     <string name="chat_bg_setup_info">Permette a un agente di lavorare nelle tue app su uno schermo proprio mentre usi il telefono. La configurazione richiede circa un minuto e il Wi-Fi.</string>
     <string name="hub_tool_delegate">Avvio dei sub-agenti: %1$s</string>
     <string name="hub_tool_helpers">In attesa dei sub-agenti</string>
-    <string name="helpers_title">Sub-agenti</string>
+    <string name="helpers_title">Schermi</string>
     <string name="helper_working">Al lavoro</string>
     <string name="helper_done">Fatto</string>
     <string name="helper_failed">Non riuscito</string>

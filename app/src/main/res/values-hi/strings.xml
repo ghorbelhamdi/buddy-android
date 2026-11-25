@@ -1506,7 +1506,7 @@
     <string name="chat_bg_setup_info">जब आप फ़ोन इस्तेमाल करते हैं, तब एजेंट अपनी अलग स्क्रीन पर आपके ऐप्स में काम करता है। सेट-अप में लगभग एक मिनट लगता है और Wi-Fi चाहिए।</string>
     <string name="hub_tool_delegate">सब-एजेंट शुरू हो रहे हैं: %1$s</string>
     <string name="hub_tool_helpers">सब-एजेंट का इंतज़ार</string>
-    <string name="helpers_title">सब-एजेंट</string>
+    <string name="helpers_title">स्क्रीन</string>
     <string name="helper_working">काम जारी है</string>
     <string name="helper_done">पूरा हुआ</string>
     <string name="helper_failed">विफल</string>

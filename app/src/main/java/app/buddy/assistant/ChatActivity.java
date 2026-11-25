@@ -1229,6 +1229,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     private void renderHelpers() {
         if (helpersBox == null) return;
         java.util.List<Sessions.Session> l = ses.parent.isEmpty() ? Helpers.of(hub, ses.id) : new java.util.ArrayList<>();
+        if (ses.parent.isEmpty() && ses.team != null) { // the team's members that have a hidden screen: their live pictures
+            for (Sessions.Session h : Team.sessions(hub, ses)) {
+                if (h.background && Background.displayOf(h.id) != android.view.Display.DEFAULT_DISPLAY) l.add(h);
+            }
+        }
         final Sessions.Session parent = ses.parent.isEmpty() ? null : hub.sessions.find(ses.parent);
         boolean ownScreen = !l.isEmpty() && ses.background && Background.displayOf(ses.id) != android.view.Display.DEFAULT_DISPLAY;
         if (!ownScreen) ownApp = null;

@@ -604,7 +604,7 @@ run_claude() {
   [ "$DEV" = rule ] && tools=("mcp__phone")
   for n in $(jq -r '.[].name' <<<"$EXTRA"); do tools+=("mcp__$n"); done
   # Claude Code's own sub-agents (Agent, once Task) are off: Buddy can't show them, give each a screen or keep them to
-  # looking things up. The phone server's delegate tool starts sub-agents the user sees and can open.
+  # looking things up. The phone server's team tool adds helpers the user sees and can open.
   local deny=(--disallowedTools "Agent" "Task")
   [ "$DEV" = rule ] && deny=(--disallowedTools "Agent" "Task" "Bash" "WebFetch" "WebSearch" "Write" "Edit" "NotebookEdit" "Skill")
   [ "$DEV" = 1 ] && tools+=("Bash" "Read" "Write" "Edit" "Glob" "Grep" "Skill")

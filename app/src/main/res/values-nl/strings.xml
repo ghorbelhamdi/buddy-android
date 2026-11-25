@@ -1512,7 +1512,7 @@
     <string name="chat_bg_setup_info">Laat een agent op een eigen scherm in je apps werken terwijl jij je telefoon gebruikt. Instellen duurt ongeveer een minuut en vereist wifi.</string>
     <string name="hub_tool_delegate">Subagents starten: %1$s</string>
     <string name="hub_tool_helpers">Wachten op de subagents</string>
-    <string name="helpers_title">Subagents</string>
+    <string name="helpers_title">Schermen</string>
     <string name="helper_working">Bezig</string>
     <string name="helper_done">Klaar</string>
     <string name="helper_failed">Mislukt</string>
