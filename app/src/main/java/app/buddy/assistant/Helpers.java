@@ -38,14 +38,14 @@ final class Helpers {
     static String cardText(Context c, String chat, String summary) {
         Sessions.Session s = chat == null ? null : ChatHub.get(c).sessions.find(chat);
         if (s == null || s.parent.isEmpty()) return summary;
-        // through the leader (the user picked that): for whom, the task that member was given (the leader's own words,
-        // or the user's), then what it wants to do, word for word
+        // through the leader (the user picked that): for whom, then what it wants to do, word for word (first, so a
+        // card cut short still shows it), then the task that member was given (the leader's words, or the user's)
         String task = s.told == null ? "" : Ui.linkText(s.told).replace('\n', ' ').trim();
         if (task.length() > 200) task = task.substring(0, 200) + "…";
-        String head = c.getString(R.string.team_card_for, s.title);
-        if (!task.isEmpty()) head += "\n" + c.getString(s.toldBy == null || s.toldBy.isEmpty() ? R.string.team_card_task_you
+        String out = c.getString(R.string.team_card_for, s.title) + "\n\n" + summary;
+        if (!task.isEmpty()) out += "\n\n" + c.getString(s.toldBy == null || s.toldBy.isEmpty() ? R.string.team_card_task_you
                 : R.string.team_card_task, task);
-        return head + "\n\n" + summary;
+        return out;
     }
 
     /** A helper that only looks things up: no card, no trust, nothing it does is waved through. */

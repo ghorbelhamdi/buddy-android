@@ -304,6 +304,10 @@ final class TeamUi {
 
     /** Members' last pictures of their hidden screens, shown at once when the panel is drawn again. */
     private static final java.util.Map<String, android.graphics.Bitmap> PICTURES = new java.util.concurrent.ConcurrentHashMap<>();
+    /** Where each member's picture shows now (the panel is drawn anew), when its last one was asked for, and which load. */
+    private static final java.util.Map<String, ImageView> PICTURE_VIEWS = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Map<String, Long> PICTURE_AT = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Set<String> LOADING = java.util.concurrent.ConcurrentHashMap.newKeySet();
 
     /**
      * The team panel (the team bar opens it): the team drawn in its shape, each one with its agent and model, what
@@ -397,7 +401,12 @@ final class TeamUi {
         again[0] = () -> {
             if (shown.showing()) shown.refresh.run();
         };
-        shown.dialog.setOnDismissListener(x -> tick.removeCallbacksAndMessages(null));
+        shown.dialog.setOnDismissListener(x -> {
+            tick.removeCallbacksAndMessages(null);
+            PICTURES.clear();
+            PICTURE_VIEWS.clear();
+            PICTURE_AT.clear();
+        });
         shown.refresh.run();
         shown.dialog.show();
         return shown;
@@ -470,13 +479,26 @@ final class TeamUi {
             pp.gravity = Gravity.CENTER_HORIZONTAL;
             card.addView(pic, pp);
             final android.content.Context app = c.getApplicationContext();
-            new Thread(() -> {
-                byte[] jpg = Background.frame(app, screen.id, w * 2, 70);
-                final android.graphics.Bitmap b = jpg == null ? null : android.graphics.BitmapFactory.decodeByteArray(jpg, 0, jpg.length);
-                if (b == null) return;
-                PICTURES.put(screen.id, b);
-                pic.post(() -> pic.setImageBitmap(b));
-            }, "team-screen").start();
+            final String id = screen.id;
+            PICTURE_VIEWS.put(id, pic);
+            Long at = PICTURE_AT.get(id);
+            long now = android.os.SystemClock.elapsedRealtime();
+            // one load at a time per member, and not more often than every two seconds; it lands in the panel as it is then
+            if ((at == null || now - at > 2000) && LOADING.add(id)) {
+                PICTURE_AT.put(id, now);
+                new Thread(() -> {
+                    try {
+                        byte[] jpg = Background.frame(app, id, w * 2, 70);
+                        final android.graphics.Bitmap b = jpg == null ? null : android.graphics.BitmapFactory.decodeByteArray(jpg, 0, jpg.length);
+                        if (b == null) return;
+                        PICTURES.put(id, b);
+                        ImageView into = PICTURE_VIEWS.get(id);
+                        if (into != null) into.post(() -> into.setImageBitmap(b));
+                    } finally {
+                        LOADING.remove(id);
+                    }
+                }, "team-screen").start();
+            }
             Button bring = button(c, c.getString(R.string.background_show), false);
             bring.setMinHeight(dp(c, 36));
             bring.setMinimumHeight(dp(c, 36));

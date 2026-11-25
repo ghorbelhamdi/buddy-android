@@ -1108,7 +1108,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         for (Team.Member m : t.members) {
             Sessions.Session h = Team.session(hub, owner.id, m.id);
             of.add(h);
-            sig.append('|').append(m.id).append(m.name).append(m.color).append(h == null ? "" : h.running + h.status + h.outcome + h.messages.size());
+            // (what the bar shows: its word, not each step; the panel's own tick keeps its screens live)
+            sig.append('|').append(m.id).append(m.name).append(m.color).append(h == null ? "" : TeamUi.state(this, h) + h.lastReply.length());
         }
         if (!sig.toString().equals(teamShown)) {
             teamShown = sig.toString();
