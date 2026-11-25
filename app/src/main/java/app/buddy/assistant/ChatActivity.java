@@ -3769,7 +3769,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 items.add(new Object[]{R.drawable.ms_format_quote, R.string.chat_quote, (Runnable) () -> quote(m.text)});
             }
             boolean own = ses.parent.isEmpty() && ses.messages.contains(m);
-            if (own && !ses.running) items.add(new Object[]{R.drawable.ms_edit, R.string.chat_edit, (Runnable) () -> editMessage(m)});
+            if (own && !ses.running) items.add(new Object[]{R.drawable.ms_edit, R.string.chat_edit, (Runnable) () -> editMessage(m, v)});
             if (own) items.add(new Object[]{R.drawable.ms_call_split, R.string.chat_fork, (Runnable) () -> fork(m)});
             for (Object[] it : items) {
                 LinearLayout r = row(this);
@@ -3916,48 +3916,76 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     }
 
     /** Edit: the user changes their message, and the agent answers again from there. */
-    private void editMessage(final Sessions.Msg m) {
-        LinearLayout c = protect(column(this));
-        c.addView(title(this, getString(R.string.chat_edit_title), 18));
-        TextView info = text(this, getString(R.string.chat_edit_info), 13, MUTED);
-        info.setPaddingRelative(0, dp(this, 6), 0, dp(this, 10));
-        c.addView(info);
+    /**
+     * Edit your own message where it is (issue #44): its bubble becomes the text field, with Cancel and Ask again under
+     * it, as chat apps do. Asked again from there; the chat as it was is kept, archived.
+     */
+    private void editMessage(final Sessions.Msg m, final View bubble) {
+        final ViewGroup parent = bubble.getParent() instanceof ViewGroup ? (ViewGroup) bubble.getParent() : null;
+        if (parent == null) return;
+        final int at = parent.indexOfChild(bubble);
+        final ViewGroup.LayoutParams was = bubble.getLayoutParams();
+        LinearLayout box = protect(column(this));
+        box.setGravity(Gravity.END);
         final EditText et = new EditText(this);
         et.setText(m.text);
         et.setTextColor(TEXT);
         et.setTextSize(15);
-        et.setMaxLines(8);
-        et.setPaddingRelative(dp(this, 12), dp(this, 10), dp(this, 12), dp(this, 10));
-        et.setBackground(outlined(this, BG, 12, OUTLINE, 1));
-        c.addView(et, full());
+        et.setMaxLines(10);
+        et.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        et.setPaddingRelative(dp(this, 14), dp(this, 10), dp(this, 14), dp(this, 10));
+        et.setBackground(outlined(this, USER, 18, ACCENT, 2)); // (your bubble, marked as being edited)
+        et.setContentDescription(getString(R.string.chat_edit_title));
+        box.addView(et, full());
+        TextView info = text(this, getString(R.string.chat_edit_info), 12, MUTED);
+        info.setGravity(Gravity.END);
+        info.setPaddingRelative(dp(this, 8), dp(this, 6), dp(this, 4), 0);
+        box.addView(info, full());
         LinearLayout btns = row(this);
-        btns.setPaddingRelative(0, dp(this, 14), 0, 0);
+        btns.setPaddingRelative(0, dp(this, 8), 0, 0);
         Button no = button(this, getString(android.R.string.cancel), false);
         Button yes = button(this, getString(R.string.chat_edit_send), true);
-        btns.addView(no, new LinearLayout.LayoutParams(0, dp(this, 48), 1));
-        LinearLayout.LayoutParams yp = new LinearLayout.LayoutParams(0, dp(this, 48), 1);
-        yp.setMarginStart(dp(this, 10));
+        btns.addView(no, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 44)));
+        LinearLayout.LayoutParams yp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 44));
+        yp.setMarginStart(dp(this, 8));
         btns.addView(yes, yp);
-        c.addView(btns, full());
-        Dialog d = bottomSheet(this, c);
-        no.setOnClickListener(v -> d.dismiss());
+        box.addView(btns, wrap());
+        parent.removeViewAt(at);
+        LinearLayout.LayoutParams bp = full();
+        if (was instanceof ViewGroup.MarginLayoutParams) bp.topMargin = ((ViewGroup.MarginLayoutParams) was).topMargin;
+        parent.addView(box, at, bp);
+        final android.view.inputmethod.InputMethodManager ime = getSystemService(android.view.inputmethod.InputMethodManager.class);
+        final Runnable back = () -> { // as it was
+            ime.hideSoftInputFromWindow(et.getWindowToken(), 0);
+            int i = parent.indexOfChild(box);
+            if (i < 0) return;
+            parent.removeViewAt(i);
+            parent.addView(bubble, i, was);
+        };
+        no.setOnClickListener(v -> back.run());
         yes.setOnClickListener(v -> {
             String t = et.getText().toString().trim();
             if (t.isEmpty()) return;
+            if (ses.running) { // (it started working meanwhile: a message can't be asked again now)
+                Toast.makeText(this, R.string.chat_edit_running, Toast.LENGTH_LONG).show();
+                return;
+            }
             String err = hub.edit(ses, ses.messages.indexOf(m), t);
             if (err != null) Toast.makeText(this, err, Toast.LENGTH_LONG).show();
             if (err != null && !ses.running) { // it didn't go and the chat is as it was: the edited text stays here
                 refresh();
                 return;
             }
-            d.dismiss();
+            ime.hideSoftInputFromWindow(et.getWindowToken(), 0);
             showAll(); // the messages after it are gone
             refresh();
             scrollToEnd();
         });
-        d.show();
         et.requestFocus();
         et.setSelection(et.getText().length());
+        et.postDelayed(() -> ime.showSoftInput(et, 0), 150);
+        // its place in view, above the keyboard
+        box.postDelayed(() -> scroll.smoothScrollTo(0, Math.max(0, box.getTop() + ((View) box.getParent()).getTop() - dp(this, 80))), 400);
     }
 
     private void copyOnLongPress(View v, String text) {
