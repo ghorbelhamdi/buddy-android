@@ -754,8 +754,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         Sessions.Session lead = ses.member.isEmpty() ? null : hub.sessions.find(ses.parent);
         Team.Member me = lead == null || lead.team == null ? null : lead.team.member(ses.member);
         if (me != null) { // a member's own chat: as a message ticked for it in the team's chat
-            err = pendingLinux.isEmpty() ? Team.tell(hub, lead, me, null, text, new java.util.ArrayList<>(pending))
-                    : getString(R.string.hub_still_working_attachments);
+            // (files in Linux tools: their paths with the message, as sendTeam gives them)
+            String told = pendingLinux.isEmpty() ? text : (text.isEmpty() ? "Have a look at these files." : text)
+                    + "\n\nFiles in Linux tools:\n" + android.text.TextUtils.join("\n", pendingLinux);
+            err = Team.tell(hub, lead, me, null, told, new java.util.ArrayList<>(pending));
         } else if (ses.team != null && ses.parent.isEmpty()) {
             err = hub.sendTeam(ses, text, pending, new java.util.ArrayList<>(pendingLinux), new java.util.ArrayList<>(sendTo));
         } else {

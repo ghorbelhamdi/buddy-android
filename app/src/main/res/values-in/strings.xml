@@ -2879,6 +2879,7 @@
     <string name="team_fact_rules">Aturan: %1$s</string>
     <string name="team_change_hint">Untuk mengubah tim, beri tahu pemimpin.</string>
     <string name="team_show_shape">%1$s: tampilkan tim dalam bentuknya</string>
+    <string name="team_member_of">Anggota tim di “%1$s”</string>
     <string name="team_note_on">Tim aktif: %1$s dengan %2$s</string>
     <string name="team_note_off">Tim nonaktif</string>
     <string name="hub_tool_team">Memberi arahan ke %1$s</string>

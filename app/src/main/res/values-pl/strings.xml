@@ -2505,6 +2505,7 @@
     <string name="team_fact_rules">Zasady: %1$s</string>
     <string name="team_change_hint">Aby zmienić zespół, powiedz o tym liderowi.</string>
     <string name="team_show_shape">%1$s: pokaż zespół w jego układzie</string>
+    <string name="team_member_of">Członek zespołu w „%1$s”</string>
     <string name="team_note_on">Zespół włączony: %1$s, członkowie: %2$s</string>
     <string name="team_note_off">Zespół wyłączony</string>
     <string name="hub_tool_team">Polecenie dla: %1$s</string>

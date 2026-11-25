@@ -2449,6 +2449,7 @@
     <string name="team_fact_rules">नियम: %1$s</string>
     <string name="team_change_hint">टीम बदलने के लिए लीडर से कहें।</string>
     <string name="team_show_shape">%1$s: टीम को उसके ढाँचे में दिखाएँ</string>
+    <string name="team_member_of">“%1$s” में टीम सदस्य</string>
     <string name="team_note_on">टीम चालू: %1$s, सदस्य: %2$s</string>
     <string name="team_note_off">टीम बंद</string>
     <string name="hub_tool_team">%1$s को बता रहा है</string>

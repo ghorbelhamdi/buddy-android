@@ -2950,6 +2950,7 @@
     <string name="team_fact_rules">Правила: %1$s</string>
     <string name="team_change_hint">Щоб змінити команду, скажіть лідеру.</string>
     <string name="team_show_shape">%1$s: показати команду у вигляді схеми</string>
+    <string name="team_member_of">Учасник команди в «%1$s»</string>
     <string name="team_note_on">Команду ввімкнено: %1$s, учасники: %2$s</string>
     <string name="team_note_off">Команду вимкнено</string>
     <string name="hub_tool_team">Доручення для: %1$s</string>

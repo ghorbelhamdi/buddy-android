@@ -240,13 +240,15 @@ final class Team {
         StringBuilder b = new StringBuilder();
         synchronized (parent.messages) {
             int from = Math.max(0, Math.min(parent.teamAt, parent.messages.size()));
-            for (int i = from; i < parent.messages.size(); i++) {
+            for (int i = 0; i < parent.messages.size(); i++) {
                 Sessions.Msg m = parent.messages.get(i);
-                if (m.kind == Bubble.Kind.USER && !m.to.isEmpty() && !m.toLeader) {
+                if (i >= from && m.kind == Bubble.Kind.USER && !m.to.isEmpty() && !m.toLeader) {
                     b.append("- The user to ").append(m.to).append(": ").append(ChatHub.clip(m.text, 1500)).append('\n');
-                } else if (!m.from.isEmpty() && m.direct) {
-                    b.append("- ").append(m.fromName).append(m.kind == Bubble.Kind.ERROR ? " failed: " : " answered: ")
-                            .append(ChatHub.clip(m.text, 3000)).append('\n');
+                } else if (!m.from.isEmpty() && !m.heard) {
+                    // a member's answer the leader hasn't had: to the user, or to the leader after its turn had ended
+                    b.append("- ").append(m.fromName).append(m.kind == Bubble.Kind.ERROR ? " failed" : " answered")
+                            .append(m.direct ? " (to the user): " : " (to you): ").append(ChatHub.clip(m.text, 3000)).append('\n');
+                    m.heard = true;
                 }
             }
         }
@@ -369,8 +371,13 @@ final class Team {
             h.incognito = parent.incognito;
             h.archived = true; // out of the chat list and the bubble: the parent's chat shows it
         }
+        if (h.running && files != null && !files.isEmpty()) return hub.app.getString(R.string.hub_still_working_attachments);
         h.title = m.name;
         h.dev = parent.dev;
+        if (!h.running) { // moved to another agent or model while it worked: now it takes effect
+            if (!m.agent.equals(h.backend)) hub.switchAgent(h, m.agent);
+            h.model = m.model;
+        }
         h.works = !LOOK.equals(t.workspace);
         String folder = LOOK.equals(t.workspace) ? "" : SEP.equals(t.workspace) ? folder(hub, parent, m, h) : parent.folder;
         if (!folder.equals(h.folder) && !h.running) { // (another folder: its agent starts anew there, with the chat so far, as a chat's does)
@@ -384,10 +391,16 @@ final class Team {
             BuddyService svc = BuddyService.get();
             if (svc != null) svc.allowControl();
         }
+        String who = from == null ? "[From the user, directly]\n" : "[From the leader]\n";
+        if (h.running) return hub.sendMember(h, (from == null ? "" : who) + text, null, null); // (a note for its next step)
         h.toldBy = from == null ? "" : from;
         h.told = text;
-        String who = from == null ? "[From the user, directly]\n" : "[From the leader]\n";
-        String prompt = (first || h.messages.isEmpty() ? memberPrompt(t, m, parent, h, screen) : "") + who + text;
+        // its instructions: the first time, and again when they changed (goal, rules, folder, another agent that
+        // starts anew with the chat so far, which never held them)
+        String brief = memberPrompt(t, m, parent, h, screen);
+        boolean again = first || h.messages.isEmpty() || h.handover != null || h.reseed || brief.hashCode() != h.briefed;
+        h.briefed = brief.hashCode();
+        String prompt = (again ? brief : "") + who + text;
         String err = hub.sendMember(h, text, files, prompt);
         if (err != null && first) hub.delete(h);
         return err;
@@ -402,20 +415,22 @@ final class Team {
         if (parent == null || parent.team == null) return;
         Member m = parent.team.member(h.member);
         if (m == null || "stopped".equals(h.outcome)) return;
-        Sessions.Msg last = null;
         boolean failed = h.outcome != null;
+        Bubble.Kind kind = failed ? Bubble.Kind.ERROR : Bubble.Kind.BUDDY;
+        // its last words, and every file it gave since it was told (a saved file or a picture comes as a message of its own)
+        String text = null;
+        List<String> files = new ArrayList<>();
         synchronized (h.messages) {
             for (int i = h.messages.size() - 1; i >= 0; i--) {
                 Sessions.Msg x = h.messages.get(i);
                 if (x.kind == Bubble.Kind.USER) break;
-                if (x.kind == (failed ? Bubble.Kind.ERROR : Bubble.Kind.BUDDY) && !(x.text.isEmpty() && x.files.isEmpty())) {
-                    last = x;
-                    break;
-                }
+                if (x.kind != kind) continue;
+                if (text == null && !x.text.isEmpty()) text = x.text;
+                files.addAll(0, x.files);
             }
         }
-        if (last == null) return;
-        hub.addFrom(parent, last.kind, last.text, new ArrayList<>(last.files), m, h.toldBy, h.told);
+        if (text == null && files.isEmpty()) return;
+        hub.addFrom(parent, kind, text == null ? "" : text, files, m, h.toldBy, h.told);
     }
 
     // ------------------------------------------------------------------ the leader's tools
@@ -484,7 +499,7 @@ final class Team {
                 started.countDown();
             }
         });
-        started.await(60, TimeUnit.SECONDS);
+        if (!started.await(60, TimeUnit.SECONDS)) return "Buddy is still starting them. Call team without a message in a moment to wait for them.";
         told.removeIf(x -> x == null);
         if (told.isEmpty()) return errors.toString().trim();
         if (!a.optBoolean("wait", true)) {
@@ -572,11 +587,11 @@ final class Team {
             Member m = o == null ? null : t.member(o.optString("member"));
             if (m == null) return "The team has no member \"" + (o == null ? "" : o.optString("member")) + "\". Its members: " + t.names() + ".";
             if (o.has("goal")) m.goal = o.optString("goal").trim();
-            String name = o.optString("name").trim();
+            String name = clipName(o.optString("name"));
             if (!name.isEmpty() && !name.equals(m.name)) {
                 if (t.member(name) != null) return "The team has a member \"" + name + "\" already.";
                 card.add(svc.getString(R.string.team_card_rename, m.name, name));
-                m.name = ChatHub.clip(name, 40);
+                m.name = name;
             }
             String agentWas = m.agent, modelWas = m.model;
             String err = agentAndModel(svc, m, o, m.agent);
@@ -587,10 +602,10 @@ final class Team {
         JSONArray add = a.optJSONArray("add");
         for (int i = 0; add != null && i < add.length(); i++) {
             JSONObject o = add.optJSONObject(i);
-            String name = o == null ? "" : o.optString("name").trim();
+            String name = o == null ? "" : clipName(o.optString("name"));
             if (name.isEmpty()) return "A new member needs a name.";
             if (t.member(name) != null) return "The team has a member \"" + name + "\" already.";
-            Member m = t.add(ChatHub.clip(name, 40), parent.backend, "", o.optString("goal").trim());
+            Member m = t.add(name, parent.backend, "", o.optString("goal").trim());
             String err = agentAndModel(svc, m, o, parent.backend);
             if (err != null) return err;
             card.add(svc.getString(R.string.team_card_add, m.name, m.on()));
@@ -631,6 +646,12 @@ final class Team {
         });
         done.await(30, TimeUnit.SECONDS);
         return "The team is now: " + brief(t, parent).trim();
+    }
+
+    /** A member's name as it is kept: 40 characters at most, cut before it is compared with the others'. */
+    private static String clipName(String said) {
+        String s = said == null ? "" : said.trim();
+        return s.length() <= 40 ? s : s.substring(0, 40).trim();
     }
 
     /** A member's agent and model as the leader said them (agent, model), checked against what is signed in here. */
@@ -674,6 +695,8 @@ final class Team {
         Sessions.Session parent = hub.sessions.find(h.parent);
         if (parent == null || parent.team == null || !TURN.equals(parent.team.apps)) return null;
         String key = parent.id + "|" + pkg;
+        // (one app at a time for a member too: the one it had before is free for the others once it opens another)
+        held.entrySet().removeIf(e -> e.getValue().equals(h.id) && !e.getKey().equals(key));
         long end = SystemClock.elapsedRealtime() + 4 * 60_000;
         while (true) {
             String by = held.putIfAbsent(key, h.id);

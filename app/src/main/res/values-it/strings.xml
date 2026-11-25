@@ -2889,6 +2889,7 @@
     <string name="team_fact_rules">Regole: %1$s</string>
     <string name="team_change_hint">Per modificare il team, dillo al leader.</string>
     <string name="team_show_shape">%1$s: mostra il team nella sua forma</string>
+    <string name="team_member_of">Membro del team in «%1$s»</string>
     <string name="team_note_on">Team attivo: %1$s con %2$s</string>
     <string name="team_note_off">Team disattivato</string>
     <string name="hub_tool_team">Istruzioni a %1$s</string>

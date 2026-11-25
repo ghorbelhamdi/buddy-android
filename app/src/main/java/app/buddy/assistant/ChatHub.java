@@ -415,6 +415,8 @@ final class ChatHub {
         msg.quoteFrom = quoteFrom == null ? "" : quoteFrom;
         msg.quote = clip(quote == null ? "" : quote, 300);
         msg.direct = msg.quoteFrom.isEmpty();
+        // an answer to the leader while it works: its team call gets it; after its turn, its next turn's digest does
+        msg.heard = !msg.direct && parent.running;
         sessions.save(parent);
         if (!viewing.contains(parent)) parent.unread = true;
         for (Listener l : new ArrayList<>(listeners)) l.onMessage(parent, msg);
@@ -446,7 +448,7 @@ final class ChatHub {
         }
         if (before == null && team != null) add(ses, Bubble.Kind.NOTE, app.getString(R.string.team_note_on, app.getString(Team.structureName(team.structure)), team.names()));
         if (before != null && team == null) add(ses, Bubble.Kind.NOTE, app.getString(R.string.team_note_off));
-        ses.teamAt = ses.messages.size();
+        if (before == null && team != null) ses.teamAt = ses.messages.size(); // (a change keeps what the leader hasn't heard yet)
         sessions.save(ses);
         changed();
     }
@@ -998,7 +1000,11 @@ final class ChatHub {
      */
     String approvalsFor(String chat) {
         Sessions.Session s = byId(chat);
-        return s != null && s.parent.isEmpty() ? s.approvals : "";
+        if (s != null && !s.parent.isEmpty()) { // a working member or sub-agent: its chat's "Always ask" holds for it too
+            Sessions.Session p = s.works ? byId(s.parent) : null;
+            return p != null && "strict".equals(p.approvals) ? "strict" : "";
+        }
+        return s != null ? s.approvals : "";
     }
 
     /** The chat with this id, for a tool's thread (a copy of the list: it changes on the main thread); or null. */
@@ -1369,7 +1375,8 @@ final class ChatHub {
         try {
             Helper.runFor(app, ses.id, code -> main.postDelayed(() -> helperGone(ses, run[0], code), HELPER_GONE_MS),
                     "ask", ses.id, ses.backend, devArg(ses),
-                    "(Added while you were working; if it asks something, answer it:) " + text, model(ses), "", ses.effort,
+                    (ses.team != null && ses.parent.isEmpty() ? Team.brief(ses.team, ses) + Team.digest(ses) : "")
+                            + "(Added while you were working; if it asks something, answer it:) " + text, model(ses), "", ses.effort,
                     "", Lite.on(ses) ? "lite" : "", ses.folder); // (in its project folder, as its other runs)
         } catch (Exception e) {
             add(ses, Bubble.Kind.ERROR, e.getMessage());

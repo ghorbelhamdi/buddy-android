@@ -3019,6 +3019,7 @@
     <string name="team_fact_rules">Quy tắc: %1$s</string>
     <string name="team_change_hint">Để thay đổi nhóm, hãy nói với trưởng nhóm.</string>
     <string name="team_show_shape">%1$s: hiện nhóm theo sơ đồ</string>
+    <string name="team_member_of">Thành viên nhóm trong “%1$s”</string>
     <string name="team_note_on">Đã bật nhóm: %1$s với %2$s</string>
     <string name="team_note_off">Đã tắt nhóm</string>
     <string name="hub_tool_team">Đang giao việc cho %1$s</string>

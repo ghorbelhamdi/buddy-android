@@ -2878,6 +2878,7 @@
     <string name="team_fact_rules">规则：%1$s</string>
     <string name="team_change_hint">要更改团队，请告诉负责人。</string>
     <string name="team_show_shape">%1$s：以结构图显示团队</string>
+    <string name="team_member_of">“%1$s”中的团队成员</string>
     <string name="team_note_on">团队已开启：%1$s，成员：%2$s</string>
     <string name="team_note_off">团队已关闭</string>
     <string name="hub_tool_team">正在指示 %1$s</string>

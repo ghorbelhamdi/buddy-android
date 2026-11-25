@@ -97,11 +97,7 @@ final class Helpers {
 
     /** How many messages the user has sent in this chat: a helper's turn (see Session.turn). */
     private static int turn(Sessions.Session parent) {
-        int n = 0;
-        synchronized (parent.messages) {
-            for (Sessions.Msg m : parent.messages) if (m.kind == Bubble.Kind.USER) n++;
-        }
-        return n;
+        return parent.said; // (counted as they come: the chat's oldest messages go once it is long)
     }
 
     /** The helpers of the chat's latest round (see Session.round). */
@@ -169,6 +165,7 @@ final class Helpers {
             if (!modelSaid.isEmpty()) {
                 String found = null;
                 for (String[] m : Models.options(w.agent, true)) {
+                    if (m[0] == null) continue; // (a heading)
                     if (modelSaid.equals(m[0])) found = m[0];
                     else if (found == null && m.length > 1 && modelSaid.equalsIgnoreCase(m[1])) found = m[0];
                 }

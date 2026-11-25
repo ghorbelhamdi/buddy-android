@@ -1884,7 +1884,8 @@ final class Bubble implements ChatHub.Listener {
     }
 
     private void stop() {
-        if (!sessions.current.running) toast(svc.getString(R.string.bubble_nothing_running_chat));
+        // (a chat with a team: its members may work while its own agent doesn't; Stop stops them too)
+        if (!Team.working(hub, sessions.current)) toast(svc.getString(R.string.bubble_nothing_running_chat));
         else hub.stop(sessions.current);
     }
 
@@ -3458,7 +3459,7 @@ final class Bubble implements ChatHub.Listener {
         boolean sent = m.kind == Kind.USER && SystemClock.uptimeMillis() - sentAt < 3000; // (not a rule's or a schedule's)
         if (m.files.isEmpty()) {
             // (in a chat with a team: which member said it; the chat screen shows it in the member's colour)
-            showMessage(m.kind, m.from.isEmpty() ? m.text : "**" + m.fromName + ":** " + m.text);
+            showMessage(m.kind, m.from.isEmpty() ? m.text : m.kind == Kind.BUDDY ? "**" + m.fromName + ":** " + m.text : m.fromName + ": " + m.text);
             if (sent) scrollToEnd();
             else followEnd();
             return;

@@ -2457,6 +2457,7 @@
     <string name="team_fact_rules">Kurallar: %1$s</string>
     <string name="team_change_hint">Takımı değiştirmek için lidere söyleyin.</string>
     <string name="team_show_shape">%1$s: takımı yapısıyla göster</string>
+    <string name="team_member_of">“%1$s” sohbetinde takım üyesi</string>
     <string name="team_note_on">Takım açık: %1$s, üyeler: %2$s</string>
     <string name="team_note_off">Takım kapalı</string>
     <string name="hub_tool_team">Görev veriliyor: %1$s</string>

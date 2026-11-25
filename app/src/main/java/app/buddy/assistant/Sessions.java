@@ -47,6 +47,8 @@ final class Sessions {
         String quoteFrom = "", quote = "";
         /** A member's answer to the user's own message (the leader wasn't in it, and hears of it with its next turn). */
         boolean direct;
+        /** A member's answer the leader has had: from the team tool while it waited, or in its next turn's digest. */
+        boolean heard;
 
         Msg(Bubble.Kind kind, String text) {
             this(kind, text, null);
@@ -156,6 +158,10 @@ final class Sessions {
         String member = "";
         /** In a team chat: how many of its messages the leader has had word of (see Team.digest). */
         int teamAt;
+        /** How many messages the user has sent in this chat, ever (a helper's turn: see Helpers). */
+        int said;
+        /** A member's chat: its instructions as it last got them (a hash), to send them again when they change. */
+        int briefed;
         /** A member's chat, not saved: who told it what it works on now ("" = the user), and the words. */
         volatile String toldBy = "", told = "";
         /** The chat's scheduled task (see Schedules), or null. */
@@ -363,8 +369,10 @@ final class Sessions {
 
     void add(Session s, Bubble.Kind kind, String text, List<String> files) {
         s.messages.add(new Msg(kind, text, files));
+        if (kind == Bubble.Kind.USER) s.said++;
         while (s.messages.size() > MAX_MESSAGES) {
             s.messages.remove(0);
+            if (s.teamAt > 0) s.teamAt--; // (it counts messages from the start, which just lost one)
             s.cut = true; // the chat says so, and offers the agent's own record of the start where there is one
         }
         s.updated = System.currentTimeMillis();
@@ -478,13 +486,14 @@ final class Sessions {
             if (!m.to.isEmpty()) mo.put("to", m.to).put("tl", m.toLeader);
             if (!m.fromName.isEmpty()) mo.put("from", m.from).put("fn", m.fromName).put("fo", m.fromOn).put("col", m.color).put("dir", m.direct);
             if (!m.quote.isEmpty()) mo.put("q", m.quote).put("qf", m.quoteFrom);
+            if (m.heard) mo.put("hd", true);
             msgs.put(mo);
         }
         JSONObject o = new JSONObject().put("id", s.id).put("backend", s.backend).put("title", s.title).put("model", s.model)
                 .put("effort", s.effort).put("actual_model", s.actualModel).put("ctx_used", s.ctxUsed).put("ctx_window", s.ctxWindow)
                 .put("interrupted", s.interrupted).put("incognito", s.incognito).put("dev", s.dev).put("awake", s.awake).put("keep_files", s.keepFiles).put("folder", s.folder).put("background", s.background).put("approvals", s.approvals).put("handover", s.handover == null ? "" : s.handover).put("reseed", s.reseed)
                 .put("handover_model", s.handoverModel).put("handover_effort", s.handoverEffort)
-                .put("pinned", s.pinned).put("archived", s.archived).put("updated", s.updated).put("cut", s.cut).put("parent", s.parent).put("slot", s.slot).put("works", s.works).put("round", s.round).put("turn", s.turn).put("member", s.member).put("team_at", s.teamAt).put("messages", msgs);
+                .put("pinned", s.pinned).put("archived", s.archived).put("updated", s.updated).put("cut", s.cut).put("parent", s.parent).put("slot", s.slot).put("works", s.works).put("round", s.round).put("turn", s.turn).put("member", s.member).put("team_at", s.teamAt).put("said", s.said).put("briefed", s.briefed).put("messages", msgs);
         if (s.team != null) o.put("team", s.team.json());
         synchronized (s.apps) {
             if (!s.apps.isEmpty()) o.put("apps", new JSONArray(s.apps));
@@ -551,6 +560,8 @@ final class Sessions {
         s.turn = o.optInt("turn");
         s.member = o.optString("member");
         s.teamAt = o.optInt("team_at");
+        s.said = o.optInt("said");
+        s.briefed = o.optInt("briefed");
         s.team = Team.of(o.optJSONObject("team"));
         s.schedule = Schedules.Plan.of(o.optJSONObject("schedule"));
         JSONArray ok = s.schedule == null ? null : o.optJSONArray("allowed"); // kept for its scheduled runs
@@ -583,6 +594,7 @@ final class Sessions {
             msg.direct = m.optBoolean("dir");
             msg.quote = m.optString("q");
             msg.quoteFrom = m.optString("qf");
+            msg.heard = m.optBoolean("hd");
             s.messages.add(msg);
         }
         return s;

@@ -2456,6 +2456,7 @@
     <string name="team_fact_rules">Regeln: %1$s</string>
     <string name="team_change_hint">Um das Team zu ändern, sag es dem Leiter.</string>
     <string name="team_show_shape">%1$s: Team in seiner Form anzeigen</string>
+    <string name="team_member_of">Teammitglied in „%1$s“</string>
     <string name="team_note_on">Team an: %1$s mit %2$s</string>
     <string name="team_note_off">Team aus</string>
     <string name="hub_tool_team">Beauftragt %1$s</string>
