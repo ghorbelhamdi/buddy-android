@@ -1,0 +1,7 @@
+• Agent teams: several agents in one chat, each on its own agent and model
+• Set a team up in the chat's options, or just ask for one in the chat
+• One team bar and panel; write to the leader or any member
+• Sub-agents are now team members, their hidden screens live in the chat
+• Edit a message in its own bubble
+• A smaller, brief pill while agents work off the screen
+• Fixes for tablets with a keyboard (#88) and a lost Wireless debugging pairing (#89)
