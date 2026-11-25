@@ -154,6 +154,10 @@ final class Sessions {
         int turn;
         /** The chat's team (see Team), or null: none. Replaced whole when it changes (main thread). */
         volatile Team team;
+        /** The team the chat had last, kept when it is turned off: turning it on again starts from it. */
+        volatile Team lastTeam;
+        /** Not saved: a team the leader proposed that the user wants to adjust first (the chat opens the setup with it). */
+        volatile Team teamDraft;
         /** A team's member's chat: the member's id in its parent's team; "" for every other chat. */
         String member = "";
         /** In a team chat: how many of its messages the leader has had word of (see Team.digest). */
@@ -495,6 +499,7 @@ final class Sessions {
                 .put("handover_model", s.handoverModel).put("handover_effort", s.handoverEffort)
                 .put("pinned", s.pinned).put("archived", s.archived).put("updated", s.updated).put("cut", s.cut).put("parent", s.parent).put("slot", s.slot).put("works", s.works).put("round", s.round).put("turn", s.turn).put("member", s.member).put("team_at", s.teamAt).put("said", s.said).put("briefed", s.briefed).put("messages", msgs);
         if (s.team != null) o.put("team", s.team.json());
+        if (s.lastTeam != null) o.put("last_team", s.lastTeam.json());
         synchronized (s.apps) {
             if (!s.apps.isEmpty()) o.put("apps", new JSONArray(s.apps));
         }
@@ -563,6 +568,7 @@ final class Sessions {
         s.said = o.optInt("said");
         s.briefed = o.optInt("briefed");
         s.team = Team.of(o.optJSONObject("team"));
+        s.lastTeam = Team.of(o.optJSONObject("last_team"));
         s.schedule = Schedules.Plan.of(o.optJSONObject("schedule"));
         JSONArray ok = s.schedule == null ? null : o.optJSONArray("allowed"); // kept for its scheduled runs
         if (ok != null) for (int j = 0; j < ok.length(); j++) s.allowed.add(ok.getString(j));

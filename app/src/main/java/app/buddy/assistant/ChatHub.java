@@ -432,6 +432,8 @@ final class ChatHub {
         if (!ses.parent.isEmpty()) return;
         Team before = ses.team;
         ses.team = team;
+        if (team == null && before != null) ses.lastTeam = before; // (turned off: kept, to start from when it is turned on again)
+        if (team != null) ses.lastTeam = null;
         for (Sessions.Session h : Team.all(this, ses.id)) {
             Team.Member m = team == null ? null : team.member(h.member);
             if (m == null || (gone != null && gone.contains(h.member))) {
@@ -1786,6 +1788,7 @@ final class ChatHub {
                         : BuddyApp.str(R.string.hub_tool_team, names);
             }
             case "team_change": return BuddyApp.str(R.string.hub_tool_team_change);
+            case "team_start": return BuddyApp.str(R.string.hub_tool_team_start);
             case "schedule_message": return BuddyApp.str(R.string.hub_tool_schedule_message, said(full, in.optString("message"), 40));
             case "add_notification_rule": return BuddyApp.str(R.string.hub_tool_add_rule, in.optString("app"));
             case "list_scheduled": return BuddyApp.str(R.string.hub_tool_list_scheduled);

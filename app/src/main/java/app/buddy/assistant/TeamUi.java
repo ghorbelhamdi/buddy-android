@@ -34,10 +34,14 @@ final class TeamUi {
 
     // ------------------------------------------------------------------ setting one up
 
-    static void setup(final Activity a, final Sessions.Session ses, final Done done) {
-        final Team[] team = {Team.preset(a, Team.PIPE, ses.backend)};
+    /**
+     * from: a team to start from (one the leader proposed, or the chat's last one), or null for a new one; with one
+     * the sheet opens on its members, the questions a step back.
+     */
+    static void setup(final Activity a, final Sessions.Session ses, Team from, final Done done) {
+        final Team[] team = {from != null ? from.copy() : Team.preset(a, Team.PIPE, ses.backend)};
         final String[] leader = {ses.backend, ses.model == null ? "" : ses.model};
-        final int[] step = {0};
+        final int[] step = {from != null ? 3 : 0};
         final LinearLayout box = protect(column(a)); // only the user sets a team up
         final Dialog d = bottomSheet(a, box); // (which scrolls what is longer than the screen)
         final Runnable[] render = new Runnable[1];

@@ -333,6 +333,24 @@ final class Tools {
                         .put("wait", boolProp("Default true: wait here for the answers. False: return at once, so you "
                                 + "can work on your own part at the same time; call team without a message afterwards."))
                         .put("stop", boolProp("End the members that still work"))));
+        t.put(tool("team_start",
+                "Only when the user asks for a team in a chat without one (\"set up a team: Codex builds, Claude reviews\", "
+                        + "\"turn the team back on\"): proposes it, and the user decides on a card (start it, adjust it in "
+                        + "Buddy's setup first, or not). You lead it as this chat's agent. With restore, the team this chat "
+                        + "had last, as it was.",
+                props().put("restore", boolProp("The chat's last team again, as it was (then leave the rest out)"))
+                        .put("structure", strProp("lead (leader + workers), pipe (pipeline), check (doer + checker) or doers (doers with their own goals)"))
+                        .put("members", new JSONObject().put("type", "array").put("description", "The members, in order (a pipeline's steps; a doer then its checker)")
+                                .put("items", new JSONObject().put("type", "object").put("properties", new JSONObject()
+                                        .put("name", strProp("Its name in the team, e.g. Builder"))
+                                        .put("agent", strProp("A signed-in agent: claude, codex, opencode, agy, grok, copilot or pi. Default: yours"))
+                                        .put("model", strProp("Optional: one of that agent's model ids. Default: its own"))
+                                        .put("goal", strProp("What it is for, in a line")))
+                                        .put("required", new JSONArray().put("name"))))
+                        .put("workspace", strProp("sep (each member in its own folder), same (all in this chat's folder, the default) or look (members only look things up)"))
+                        .put("apps", strProp("diff (each member in a different app, the default), turn (one app at a time) or none (no phone apps)"))
+                        .put("handoff", strProp("How work is handed on, in a sentence"))
+                        .put("rules", strProp("The whole team's rules, in a few short sentences"))));
         t.put(tool("team_change",
                 "Only in a chat with a team that you lead, and only when the user asks for it: changes the team. Adding, "
                         + "removing or renaming a member, another agent or model for one, and how the team works come to "
@@ -587,6 +605,7 @@ final class Tools {
         if ("subagents".equals(name)) return text(Helpers.status(svc, McpServer.CALLER_CHAT.get(), a));
         if ("team".equals(name)) return text(Team.tool(svc, McpServer.CALLER_CHAT.get(), a));
         if ("team_change".equals(name)) return text(Team.change(svc, McpServer.CALLER_CHAT.get(), a));
+        if ("team_start".equals(name)) return text(Team.start(svc, McpServer.CALLER_CHAT.get(), a));
         if (name.startsWith("browser_")) { // the background browser: it doesn't need the phone's screen
             svc.onToolActivity(name, false);
             return browser.call(name, a);
@@ -988,11 +1007,11 @@ final class Tools {
 
     /** What a working helper (which works like its chat, see Helpers) still may not: what belongs to the chat itself. */
     private static final java.util.Set<String> WORKER_NO = new java.util.HashSet<>(java.util.Arrays.asList(
-            "delegate", "subagents", "team", "team_change", "schedule_message", "add_notification_rule", "cancel_scheduled", "update_buddy"));
+            "delegate", "subagents", "team", "team_change", "team_start", "schedule_message", "add_notification_rule", "cancel_scheduled", "update_buddy"));
 
     /** Not for a helper (see Helpers): what reaches the user, the phone's own settings or a later time. */
     private static final java.util.Set<String> HELPER_NO = new java.util.HashSet<>(java.util.Arrays.asList(
-            "delegate", "subagents", "team", "team_change", "phone_shell", "run_on_computer", "install_apk", "update_buddy", "wait_for_install", "schedule_message",
+            "delegate", "subagents", "team", "team_change", "team_start", "phone_shell", "run_on_computer", "install_apk", "update_buddy", "wait_for_install", "schedule_message",
             "add_notification_rule",
             "cancel_scheduled", "notify", "share", "reply_notification", "point_out", "add_calendar_event", "set_alarm",
             "set_timer", "take_photo", "clipboard_write", "save_to_downloads"));

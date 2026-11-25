@@ -997,12 +997,25 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
 
     /** Chat options → Team, turned on: Buddy asks how the team works, then the chat's agent asks the rest. */
     private void teamSetup() {
-        TeamUi.setup(this, ses, (team, agent, model) -> {
-            if (Team.working(hub, ses)) return;
-            if (!agent.equals(ses.backend)) hub.switchAgent(ses, agent); // the leader is this chat's agent
-            if (!model.equals(ses.model == null ? "" : ses.model)) hub.setModel(ses, model);
+        teamSetup(ses.lastTeam, true); // (turned on again: the team it had last, to start from)
+    }
+
+    /**
+     * The team setup, from a team (or none). ask: then the chat's agent asks the user the rest; not for a team the
+     * leader proposed, which it set up with the user already.
+     */
+    private void teamSetup(Team from, final boolean ask) {
+        TeamUi.setup(this, ses, from, (team, agent, model) -> {
+            if (ses.team != null) return; // (turned on meanwhile, by the leader)
+            boolean busy = Team.working(hub, ses);
+            if (!busy && !agent.equals(ses.backend)) hub.switchAgent(ses, agent); // the leader is this chat's agent
+            if (!busy && !model.equals(ses.model == null ? "" : ses.model)) hub.setModel(ses, model);
             sendTo.clear();
             sendTo.add(Team.LEADER);
+            if (!ask || busy) { // (the leader hears of it with its next turn: its brief says who is in it)
+                hub.setTeam(ses, team, null);
+                return;
+            }
             sentAt = android.os.SystemClock.uptimeMillis();
             String err = hub.startTeam(ses, team);
             if (err != null) Toast.makeText(this, err, Toast.LENGTH_LONG).show();
@@ -2862,6 +2875,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         checkBackground(false);
         renderHelpers();
         renderTeam();
+        if (resumed && ses.teamDraft != null) { // the leader's proposal, which the user wants to adjust first
+            Team draft = ses.teamDraft;
+            ses.teamDraft = null;
+            if (ses.team == null) teamSetup(draft, false);
+        }
         options.setImageTintList(ColorStateList.valueOf(ses.awake || ses.schedule != null || !ses.allowed.isEmpty() ? ACCENT : MUTED));
         if (hint != null) hint.setText(hintText());
         // (a team's members can work while the chat's own agent doesn't: the line and its Stop are theirs then)

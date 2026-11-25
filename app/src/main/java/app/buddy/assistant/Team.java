@@ -648,6 +648,83 @@ final class Team {
         return "The team is now: " + brief(t, parent).trim();
     }
 
+    /**
+     * The team_start tool: the leader proposes a team (or the chat's last one again, restore) and the user decides on a
+     * card: start it, adjust it first in Buddy's setup, or not. Nothing starts without the user's tap: a team brings in
+     * other agents, on their plans.
+     */
+    static String start(final BuddyService svc, String chat, JSONObject a) throws Exception {
+        final ChatHub hub = ChatHub.get(svc);
+        final Sessions.Session parent = hub.sessions.find(chat);
+        if (parent == null || !parent.parent.isEmpty()) return "Only the chat's own agent leads a team.";
+        if (Triggers.ruleRun(chat)) return "Not available in a notification rule's run.";
+        if (parent.team != null) return "This chat has a team already. Change it with team_change.";
+        final Team t;
+        if (a.optBoolean("restore")) {
+            if (parent.lastTeam == null) return "This chat had no team before. Propose one: structure and members.";
+            t = parent.lastTeam.copy();
+        } else {
+            t = new Team();
+            String s = a.optString("structure", PIPE);
+            if (!(LEAD.equals(s) || PIPE.equals(s) || CHECK.equals(s) || DOERS.equals(s))) return "structure is lead, pipe, check or doers.";
+            t.structure = s;
+            s = a.optString("workspace", SAME);
+            if (!(SEP.equals(s) || SAME.equals(s) || LOOK.equals(s))) return "workspace is sep, same or look.";
+            t.workspace = s;
+            s = a.optString("apps", Background.setUp(svc) ? DIFF : NONE);
+            if (!(DIFF.equals(s) || TURN.equals(s) || NONE.equals(s))) return "apps is diff, turn or none.";
+            t.apps = Background.setUp(svc) ? s : NONE; // (no hidden screens on this phone: none to share)
+            JSONArray members = a.optJSONArray("members");
+            if (members == null || members.length() == 0) return "Give the members: [{\"name\": \"Builder\", \"agent\": \"codex\", \"goal\": \"…\"}].";
+            for (int i = 0; i < members.length(); i++) {
+                JSONObject o = members.optJSONObject(i);
+                String name = o == null ? "" : clipName(o.optString("name"));
+                if (name.isEmpty()) return "Each member needs a name.";
+                if (t.member(name) != null) return "Two members are called \"" + name + "\": give each its own name.";
+                Member m = t.add(name, parent.backend, "", o.optString("goal").trim());
+                String err = agentAndModel(svc, m, o, parent.backend);
+                if (err != null) return err;
+            }
+            t.handoff = a.optString("handoff").trim();
+            if (t.handoff.isEmpty()) t.handoff = handoffs(t.structure)[0];
+            t.rules = a.optString("rules").trim();
+        }
+        // the card: the team as it would be, line by line
+        StringBuilder card = new StringBuilder(svc.getString(R.string.team_card_start)).append("\n\n")
+                .append(svc.getString(structureName(t.structure))).append('\n')
+                .append(svc.getString(R.string.team_card_on, svc.getString(R.string.team_leader),
+                        Account.nameOf(parent.backend) + (parent.model == null || parent.model.isEmpty() ? "" : " · " + Models.label(parent.backend, parent.model))));
+        for (Member m : t.members) card.append('\n').append(svc.getString(R.string.team_card_on, m.name, m.on()));
+        card.append("\n\n").append(svc.getString(R.string.team_card_workspace, svc.getString(SEP.equals(t.workspace) ? R.string.team_ws_sep
+                : LOOK.equals(t.workspace) ? R.string.team_ws_look : R.string.team_ws_same)))
+                .append('\n').append(svc.getString(R.string.team_card_apps, svc.getString(TURN.equals(t.apps) ? R.string.team_apps_turn
+                        : NONE.equals(t.apps) ? R.string.team_apps_none : R.string.team_apps_diff)));
+        String yes = svc.getString(R.string.team_start), adjust = svc.getString(R.string.team_start_adjust), no = svc.getString(R.string.team_start_no);
+        String answer = svc.askQuestion(card.toString(), java.util.Arrays.asList(yes, adjust, no), false, null);
+        final CountDownLatch done = new CountDownLatch(1);
+        if (answer.startsWith("ANSWER: \u201c" + yes + "\u201d")) {
+            svc.runOnMain(() -> {
+                try {
+                    if (parent.team == null) hub.setTeam(parent, t, null);
+                } finally {
+                    done.countDown();
+                }
+            });
+            done.await(30, TimeUnit.SECONDS);
+            if (parent.team != t) return "The team couldn't start: the chat has another one now.";
+            return "The user started the team. " + brief(t, parent).trim() + " If you didn't ask the user what each member "
+                    + "is for, the hand-off and rules, and they matter for the task, ask now (ask tool) and save it with team_change.";
+        }
+        if (answer.startsWith("ANSWER: \u201c" + adjust + "\u201d")) {
+            parent.teamDraft = t; // the chat opens the setup with it (main thread: refresh)
+            svc.runOnMain(hub::changed);
+            return "The user is adjusting the team in Buddy's setup, which opened on the chat screen with your proposal. "
+                    + "It starts when they finish there; your next turn's messages will say who is in it. End your turn now.";
+        }
+        if (answer.startsWith("ANSWER (typed")) return "The user didn't start the team; they wrote: " + answer.substring(answer.indexOf(':') + 1).trim();
+        return "The user didn't start the team (" + answer + "). Don't propose it again unless they ask.";
+    }
+
     /** A member's name as it is kept: 40 characters at most, cut before it is compared with the others'. */
     private static String clipName(String said) {
         String s = said == null ? "" : said.trim();
@@ -655,7 +732,7 @@ final class Team {
     }
 
     /** A member's agent and model as the leader said them (agent, model), checked against what is signed in here. */
-    private static String agentAndModel(BuddyService svc, Member m, JSONObject o, String fallback) {
+    static String agentAndModel(BuddyService svc, Member m, JSONObject o, String fallback) {
         String agentSaid = o.optString("agent").trim();
         if (!agentSaid.isEmpty()) {
             String agent = Helpers.agentOf(svc, agentSaid);
