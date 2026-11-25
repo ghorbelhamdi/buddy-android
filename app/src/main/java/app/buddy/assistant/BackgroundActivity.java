@@ -26,7 +26,17 @@ public class BackgroundActivity extends Screen {
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         // from the lock's "allow it on this Wi-Fi" notification: once more, so Android's question shows now
-        if (getIntent().getBooleanExtra("debug_lock_again", false)) DebugLock.changed(BuddyService.get());
+        // (when Buddy can't switch it on, the helper being gone too: Settings opens on the switch, where Android asks)
+        if (getIntent().getBooleanExtra("debug_lock_again", false)) {
+            new Thread(() -> {
+                boolean can = Background.canSwitchWireless(this) || Background.alive(this);
+                runOnUiThread(() -> {
+                    if (isFinishing()) return;
+                    if (can) DebugLock.changed(BuddyService.get());
+                    else openWirelessDebugging();
+                });
+            }, "debug-lock-again").start();
+        }
         LinearLayout root = column(this);
         root.setBackgroundColor(BG);
         LinearLayout top = row(this);
