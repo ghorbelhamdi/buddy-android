@@ -1467,7 +1467,14 @@ function cardView(card, from) {
   const row = el('div', {class: 'row'});
   if (card.options) {
     for (const o of card.options) row.append(el('button', {class: 'btn', onclick: () => answer({option: o})}, o));
-    box.append(row);
+    // as on the phone: Skip, or an answer of your own instead of the buttons
+    const own = el('input', {placeholder: 'Your answer', 'aria-label': 'Your answer'});
+    const typed = el('div', {class: 'change', hidden: true}, own, el('button', {class: 'btn primary', onclick: () => { if (own.value.trim()) answer({change: own.value.trim()}); }}, 'Send'));
+    own.addEventListener('keydown', e => { if (e.key === 'Enter' && own.value.trim()) answer({change: own.value.trim()}); });
+    const more = el('div', {class: 'row'},
+      el('button', {class: 'btn', onclick: () => answer({approve: false})}, 'Skip'),
+      el('button', {class: 'btn', onclick: () => { typed.hidden = !typed.hidden; if (!typed.hidden) own.focus(); }}, 'Type my own answer'));
+    box.append(row, more, typed);
   } else {
     const what = el('input', {placeholder: 'What should it change?', 'aria-label': 'What should it change?'});
     const tell = el('div', {class: 'change', hidden: true}, what, el('button', {class: 'btn primary', onclick: () => { if (what.value.trim()) answer({change: what.value.trim()}); }}, 'Send'));
