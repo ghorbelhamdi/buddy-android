@@ -2493,4 +2493,6 @@
         <item quantity="other">Teamronde · %d antwoorden</item>
     </plurals>
     <string name="team_show_all">Alles tonen</string>
+    <string name="team_started_busy">Het team staat aan. De leider werkte nog en krijgt zijn vragen bij de volgende stap.</string>
+    <string name="team_started_busy_agent">Het team staat aan. De leider werkte nog en krijgt zijn vragen bij de volgende stap; de agent en het model die je koos zijn niet gewijzigd (wijzig ze bovenaan als hij klaar is).</string>
 </resources>

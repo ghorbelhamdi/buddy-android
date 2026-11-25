@@ -891,7 +891,8 @@ final class WebDevices {
             Team t = Team.fromPage(c, s, in.optJSONObject("team") == null ? new JSONObject() : in.optJSONObject("team"), why);
             if (t == null) return why[0];
             Team.Draft d = in.optBoolean("draft") ? s.teamDraft : null;
-            s.teamDraft = null;
+            // (kept until the team is on, as on the phone, so a start that fails gives it back; not opened on the phone)
+            if (d != null) d.shown = true;
             String ask = d != null ? Team.interview(t, !d.goals, !d.handoff, !d.rules) : Team.interview(t);
             // (once the leader is free, as on the phone: it may still be ending the turn that asked for this setup)
             hub.startTeamWhenFree(s, t, ask, s.backend, s.model == null ? "" : s.model);
@@ -931,6 +932,13 @@ final class WebDevices {
             } else s = hub.sessions.find(id);
             Sessions.Session lead = s == null || s.parent.isEmpty() ? null : memberParent(c, s);
             if (lead != null) { // a team's member's own chat: as a message ticked for it in the team's chat
+                if (!linux.isEmpty() && Lite.on(s)) return "this chat runs on a model on the phone, which has no Linux tools for files";
+                for (String p : linux) { // only what is in its own or its team's places, as for any chat
+                    java.io.File real = FilePlaces.fromLinux(c, p).getCanonicalFile();
+                    if (!FilePlaces.inside(real, FilePlaces.incoming(c, s.id).getCanonicalFile())
+                            && !FilePlaces.inside(real, FilePlaces.incoming(c, lead.id).getCanonicalFile())
+                            && !FilePlaces.inside(real, FilePlaces.work(c).getCanonicalFile())) return "that file isn't in this chat's places";
+                }
                 chat[0] = s.id;
                 String e = Team.tell(hub, lead, lead.team.byId(s.member), null, said, files, linux.isEmpty() ? null : linux);
                 return e == null ? "" : e;

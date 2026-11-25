@@ -726,7 +726,7 @@ function rows(d) {
   d.messages.forEach((m, i) => {
     const at = (d.first || 0) + i, last = out[out.length - 1];
     if (m.k === 'step') { if (last && last.k === 'steps') last.steps.push(m.t); else out.push({k: 'steps', at, steps: [m.t]}); }
-    else out.push({k: m.k, at, t: m.t, s: m.s, f: m.f, lx: m.lx, to: m.to, ne: m.ne, fn: m.fn, fo: m.fo, c: m.c, q: m.q, qf: m.qf});
+    else out.push({k: m.k, at, t: m.t, s: m.s, f: m.f, lx: m.lx, to: m.to, ne: m.ne, fn: m.fn, fo: m.fo, c: m.c, q: m.q, qf: m.qf, dr: m.dr});
   });
   return out;
 }
@@ -1064,7 +1064,10 @@ async function teamSetup(from, draft) {
       box.append(sec('Shape', known[0]), el('div', {class: 'ttiles', role: 'radiogroup', 'aria-label': 'Shape'}, ...STRUCTS.map(o =>
         el('button', {class: 'ttile' + (o[0] === t.structure ? ' on' : ''), role: 'radio', 'aria-checked': o[0] === t.structure ? 'true' : 'false', onclick: async () => {
           if (o[0] === t.structure) return;
-          if (draft && draft.members) { t.structure = o[0]; draw(); return; } // (the members the user named stay)
+          if (draft && draft.members) { // (the members the user named stay; a hand-off the user didn't say follows the shape)
+            if (!draft.handoff) { try { const p = await api('/web/team-preset?chat=' + encodeURIComponent(chat) + '&structure=' + o[0]); t.handoff = p.team.handoff; } catch (e) {} }
+            t.structure = o[0]; draw(); return;
+          }
           try { const p = await api('/web/team-preset?chat=' + encodeURIComponent(chat) + '&structure=' + o[0]);
             // (rules and a hand-off the user said stay)
             Object.assign(t, {structure: o[0], members: p.team.members, handoff: draft && draft.handoff ? t.handoff : p.team.handoff}); draw(); } catch (e) { say(e.message); }

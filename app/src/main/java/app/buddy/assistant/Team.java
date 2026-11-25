@@ -670,8 +670,15 @@ final class Team {
         // (what this returns, the leader has: its next turn's digest doesn't tell it again)
         java.util.Set<String> done = new java.util.HashSet<>();
         for (Sessions.Session h : l) if (!h.running) done.add(h.member);
-        synchronized (parent.messages) { // (its answers to the leader; one to the user directly is for its digest still)
-            for (Sessions.Msg m : parent.messages) if (!m.from.isEmpty() && !m.direct && done.contains(m.from)) m.heard = true;
+        // every answer of theirs the leader hasn't had (one to the user directly is for its digest still): all of it in
+        // what this returns, so none is marked heard unseen (an earlier one, when it was given more work without waiting)
+        java.util.Map<String, List<String>> unheard = new java.util.HashMap<>();
+        synchronized (parent.messages) {
+            for (Sessions.Msg m : parent.messages) {
+                if (m.from.isEmpty() || m.direct || m.heard || !done.contains(m.from)) continue;
+                if (m.kind == Bubble.Kind.BUDDY && !m.text.isEmpty()) unheard.computeIfAbsent(m.from, k -> new ArrayList<>()).add(m.text);
+                m.heard = true;
+            }
         }
         for (Sessions.Session h : l) {
             b.append(h.title);
@@ -682,7 +689,10 @@ final class Team {
                 b.append(" ").append(h.outcome).append(lastError(h)).append(h.lastReply.isEmpty() ? "" : "\nIt said: " + h.lastReply)
                         .append("\n\n");
             } else {
-                b.append(" answers:\n").append(h.lastReply.isEmpty() ? "(nothing)" : h.lastReply).append("\n\n");
+                List<String> all = unheard.get(h.member);
+                String said = all == null || all.isEmpty() ? h.lastReply : android.text.TextUtils.join("\n\n---\n\n", all);
+                b.append(all != null && all.size() > 1 ? " answers (each answer you hadn't had yet, oldest first):\n" : " answers:\n")
+                        .append(said.isEmpty() ? "(nothing)" : said).append("\n\n");
             }
         }
         if (waiting) b.append("Call team without a message to wait for the ones still working (or with stop to end them).\n");
@@ -852,6 +862,7 @@ final class Team {
         if (a.optBoolean("restore")) {
             if (parent.lastTeam == null) return "This chat had no team before. Pass what the user said about the team instead.";
             d.team = parent.lastTeam.copy();
+            for (Member m : d.team.members) m.helper = false; // (set up again by the user: theirs)
             d.structure = d.workspace = d.apps = d.members = d.goals = d.handoff = d.rules = true;
         } else {
             String s = a.optString("structure").trim();

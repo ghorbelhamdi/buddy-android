@@ -83,7 +83,10 @@ final class TeamUi {
                 tile.setSelected(on);
                 tile.setContentDescription(x[1]);
                 tile.setOnClickListener(v -> {
-                    if (keepMembers) t.structure = x[0]; // (the members the user named stay)
+                    if (keepMembers) { // (the members the user named stay; a hand-off that was only the old shape's own follows the new one)
+                        if (t.handoff.isEmpty() || t.handoff.equals(Team.handoffs(t.structure)[0])) t.handoff = Team.handoffs(x[0])[0];
+                        t.structure = x[0];
+                    }
                     else if (!x[0].equals(t.structure)) { // another shape: its own members to start from
                         Team n2 = Team.preset(a, x[0], leader[0]);
                         n2.workspace = t.workspace;
@@ -142,6 +145,7 @@ final class TeamUi {
             go.setAlpha(go.isEnabled() ? 1f : 0.5f);
             go.setOnClickListener(v -> {
                 d.dismiss();
+                for (Team.Member m : t.members) m.helper = false; // (the user's team now: none is the leader's to drop unasked)
                 done.done(t, leader[0], leader[1]);
             });
             LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(0, dp(a, 48), 1);

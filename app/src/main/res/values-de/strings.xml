@@ -2494,4 +2494,6 @@
         <item quantity="other">Teamrunde · %d Antworten</item>
     </plurals>
     <string name="team_show_all">Alle zeigen</string>
+    <string name="team_started_busy">Das Team ist an. Der Leiter arbeitete noch und bekommt seine Rückfragen mit dem nächsten Schritt.</string>
+    <string name="team_started_busy_agent">Das Team ist an. Der Leiter arbeitete noch und bekommt seine Rückfragen mit dem nächsten Schritt; Agent und Modell, die du für ihn gewählt hast, wurden nicht geändert (ändere sie oben, wenn er fertig ist).</string>
 </resources>

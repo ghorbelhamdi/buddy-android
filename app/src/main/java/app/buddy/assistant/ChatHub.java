@@ -373,7 +373,7 @@ final class ChatHub {
         for (Team.Member m : members) { // checked before anything is sent: all of them get it, or none
             if (!SetupState.signedIn(app, m.agent)) return app.getString(R.string.team_not_signed_in, m.name, Account.nameOf(m.agent));
             Sessions.Session h = Team.session(this, ses.id, m.id);
-            if (h != null && h.running && hasFiles) return app.getString(R.string.hub_still_working_attachments);
+            if (h != null && h.running && (hasFiles || hasLinux)) return app.getString(R.string.hub_still_working_attachments);
         }
         sendingTo = names.toString();
         sendingToLeader = leader;
@@ -466,6 +466,10 @@ final class ChatHub {
                 }
                 if (Team.working(ChatHub.this, ses)) {
                     setTeam(ses, team, null); // still working: on all the same, its next turn's brief says so
+                    // (its questions go to it as a note; another agent or model for it can't while it works: said so)
+                    if (ask != null && ses.running) addNote(ses, ask);
+                    boolean other = !agent.equals(ses.backend) || !model.equals(ses.model == null ? "" : ses.model);
+                    note(ses, Bubble.Kind.NOTE, app.getString(other ? R.string.team_started_busy_agent : R.string.team_started_busy));
                     return;
                 }
                 if (!agent.equals(ses.backend)) switchAgent(ses, agent);
@@ -1475,7 +1479,10 @@ final class ChatHub {
         }
         for (Sessions.Msg m : heardNow) m.heard = true;
         heardNow.clear();
-        if (team) ses.teamAt = ses.messages.size(); // (the leader has had word of everything up to here)
+        if (team) {
+            ses.teamAt = ses.messages.size(); // (the leader has had word of everything up to here)
+            sessions.save(ses); // (so a restart doesn't tell it again)
+        }
         if (!ses.member.isEmpty()) { // a member's late note is what this run answers
             int at = ses.messages.size() - 1;
             while (at > 0 && ses.messages.get(at).kind != Bubble.Kind.USER) at--; // (the note's own message)

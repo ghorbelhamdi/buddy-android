@@ -3056,4 +3056,6 @@
         <item quantity="other">Lượt của nhóm · %d câu trả lời</item>
     </plurals>
     <string name="team_show_all">Hiện tất cả</string>
+    <string name="team_started_busy">Nhóm đã bật. Trưởng nhóm vẫn đang làm, nên sẽ nhận câu hỏi ở bước tiếp theo.</string>
+    <string name="team_started_busy_agent">Nhóm đã bật. Trưởng nhóm vẫn đang làm, nên sẽ nhận câu hỏi ở bước tiếp theo; tác tử và mô hình bạn chọn chưa được đổi (đổi ở phía trên khi xong).</string>
 </resources>

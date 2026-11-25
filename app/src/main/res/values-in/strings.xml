@@ -2916,4 +2916,6 @@
         <item quantity="other">Putaran tim · %d jawaban</item>
     </plurals>
     <string name="team_show_all">Tampilkan semua</string>
+    <string name="team_started_busy">Tim aktif. Pemimpin masih bekerja, jadi ia mendapat pertanyaan lanjutannya pada langkah berikutnya.</string>
+    <string name="team_started_busy_agent">Tim aktif. Pemimpin masih bekerja, jadi ia mendapat pertanyaan lanjutannya pada langkah berikutnya; agen dan model yang Anda pilih untuknya tidak diubah (ubah di atas setelah selesai).</string>
 </resources>

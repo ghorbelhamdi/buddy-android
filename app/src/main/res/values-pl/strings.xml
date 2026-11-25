@@ -2545,4 +2545,6 @@
         <item quantity="other">Runda zespołu · %d odpowiedzi</item>
     </plurals>
     <string name="team_show_all">Pokaż wszystko</string>
+    <string name="team_started_busy">Zespół działa. Lider jeszcze pracował, więc dostanie pytania przy następnym kroku.</string>
+    <string name="team_started_busy_agent">Zespół działa. Lider jeszcze pracował, więc dostanie pytania przy następnym kroku; wybrany dla niego agent i model się nie zmieniły (zmień je u góry, gdy skończy).</string>
 </resources>

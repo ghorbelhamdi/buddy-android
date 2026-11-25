@@ -2990,4 +2990,6 @@
         <item quantity="other">Раунд команди · %d відповіді</item>
     </plurals>
     <string name="team_show_all">Показати все</string>
+    <string name="team_started_busy">Команду ввімкнено. Лідер ще працював, тож отримає запитання з наступним кроком.</string>
+    <string name="team_started_busy_agent">Команду ввімкнено. Лідер ще працював, тож отримає запитання з наступним кроком; обрані для нього агент і модель не змінено (змініть їх угорі, коли він закінчить).</string>
 </resources>

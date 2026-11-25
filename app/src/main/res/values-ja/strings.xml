@@ -2467,4 +2467,6 @@
         <item quantity="other">チームのラウンド · 回答 %d 件</item>
     </plurals>
     <string name="team_show_all">すべて表示</string>
+    <string name="team_started_busy">チームを開始しました。リーダーはまだ作業中だったため、次のステップで質問を受け取ります。</string>
+    <string name="team_started_busy_agent">チームを開始しました。リーダーはまだ作業中だったため、次のステップで質問を受け取ります。選んだエージェントとモデルは変更されていません（完了後に上部で変更してください）。</string>
 </resources>
