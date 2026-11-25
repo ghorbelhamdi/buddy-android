@@ -2525,4 +2525,9 @@
     <string name="team_to_desc">Wyślij do: %1$s. Dotknij, by zmienić odbiorców</string>
     <string name="team_everyone">Wszyscy</string>
     <string name="team_done">Gotowe</string>
+    <string name="team_waiting">Czeka</string>
+    <string name="team_last">Ostatnio: %1$s</string>
+    <string name="team_bar_desc">Zespół %1$s: %2$s. Otwiera zespół</string>
+    <string name="team_back_to_team">Wróć do czatu zespołu</string>
+    <string name="team_open_chat_of">Otwórz czat: %1$s</string>
 </resources>

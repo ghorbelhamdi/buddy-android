@@ -2899,4 +2899,9 @@
     <string name="team_to_desc">Kirim ke: %1$s. Ketuk untuk mengubah penerima</string>
     <string name="team_everyone">Semua</string>
     <string name="team_done">Selesai</string>
+    <string name="team_waiting">Menunggu</string>
+    <string name="team_last">Terakhir: %1$s</string>
+    <string name="team_bar_desc">Tim %1$s: %2$s. Membuka tim</string>
+    <string name="team_back_to_team">Kembali ke chat tim</string>
+    <string name="team_open_chat_of">Buka chat %1$s</string>
 </resources>

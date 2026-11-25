@@ -3039,4 +3039,9 @@
     <string name="team_to_desc">Gửi đến: %1$s. Chạm để đổi người nhận</string>
     <string name="team_everyone">Mọi người</string>
     <string name="team_done">Xong</string>
+    <string name="team_waiting">Đang chờ</string>
+    <string name="team_last">Mới nhất: %1$s</string>
+    <string name="team_bar_desc">Nhóm %1$s: %2$s. Mở nhóm</string>
+    <string name="team_back_to_team">Quay lại cuộc trò chuyện của nhóm</string>
+    <string name="team_open_chat_of">Mở cuộc trò chuyện của %1$s</string>
 </resources>

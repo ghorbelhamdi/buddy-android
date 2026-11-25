@@ -203,12 +203,19 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         stp.topMargin = dp(this, 8);
         root.addView(strip, stp);
         // the chat's team (see Team): its members side by side, each with its state; a tap opens a member's own chat
+        // one bar: the shape, then each one's mark and state in a word; a tap opens the team panel (TeamUi.view)
         teamChips = row(this);
         teamChips.setGravity(Gravity.CENTER_VERTICAL);
-        teamChips.setPaddingRelative(dp(this, 12), 0, dp(this, 12), 0);
+        teamChips.setMinimumHeight(dp(this, 44));
+        teamChips.setBackground(outlined(this, CARD, 22, LINE, 1));
+        teamChips.setForeground(getDrawable(ripple(this, false)));
+        teamChips.setPaddingRelative(dp(this, 6), 0, dp(this, 10), 0);
+        teamChips.setOnClickListener(v -> openTeamPanel());
         teamStrip = TeamUi.across(this, teamChips);
+        teamStrip.setFillViewport(true);
         teamStrip.setVisibility(View.GONE);
         LinearLayout.LayoutParams tsp = full();
+        tsp.leftMargin = tsp.rightMargin = dp(this, 12);
         tsp.topMargin = dp(this, 8);
         root.addView(teamStrip, tsp);
         // the chat's helpers (see Helpers), each a row that opens its own chat; in a helper's chat, the way back
@@ -1057,6 +1064,13 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         });
     }
 
+    /** The team panel: the team in its shape, live; from a member's own chat too (its team's). */
+    private void openTeamPanel() {
+        Sessions.Session owner = ses.parent.isEmpty() ? ses : ses.member.isEmpty() ? null : hub.sessions.find(ses.parent);
+        if (owner == null || owner.team == null) return;
+        teamSheet = TeamUi.view(this, hub, owner, ses, owner == ses ? this::teamOff : null);
+    }
+
     private void teamOff() {
         LinearLayout c = column(this);
         c.addView(title(this, getString(R.string.team_off_title), 18));
@@ -1087,7 +1101,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             if (teamSheet != null && teamSheet.showing()) teamSheet.refresh.run(); // (it closes: no team to show)
             return;
         }
-        StringBuilder sig = new StringBuilder(t.structure).append(owner.running).append(Theme.isDark(this));
+        boolean waits = Team.waits(hub, owner);
+        StringBuilder sig = new StringBuilder(t.structure).append(owner.running).append(waits).append(Theme.isDark(this));
         java.util.List<Sessions.Session> of = new java.util.ArrayList<>();
         for (Team.Member m : t.members) {
             Sessions.Session h = Team.session(hub, owner.id, m.id);
@@ -1096,39 +1111,29 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         }
         if (!sig.toString().equals(teamShown)) {
             teamShown = sig.toString();
-            if (teamSheet != null && teamSheet.showing()) teamSheet.refresh.run(); // (the team in its shape, while it is open)
+            if (teamSheet != null && teamSheet.showing()) teamSheet.refresh.run(); // (the panel, while it is open)
             teamChips.removeAllViews();
-            // first: the structure's picture and name, which opens the team drawn in its shape
-            teamChips.addView(TeamUi.shapeButton(this, t.structure, () -> teamSheet = TeamUi.view(this, hub, owner)));
-            teamChips.addView(TeamUi.between(this, ""));
-            // (its state in a word: a command is too long for the strip; the line under the header has it whole)
-            View lead = TeamUi.chip(this, getString(R.string.team_leader), Team.leaderColor(this),
-                    getString(owner.running ? R.string.helper_working : R.string.team_ready), true, owner.running);
-            if (memberChat) lead.setOnClickListener(v -> { // back to the team's chat
-                startActivity(new android.content.Intent(this, ChatActivity.class).putExtra("id", owner.id));
-                finish();
-            });
-            teamChips.addView(lead);
+            teamChips.addView(TeamUi.shape(this, t.structure, 30, 24));
+            View gap = new View(this);
+            teamChips.addView(gap, new LinearLayout.LayoutParams(dp(this, 6), 1));
+            StringBuilder said = new StringBuilder();
+            String word = getString(owner.running ? (waits ? R.string.team_waiting : R.string.helper_working) : R.string.team_ready);
+            teamChips.addView(TeamUi.barItem(this, getString(R.string.team_leader), Team.leaderColor(this), word, owner.running, owner == ses));
+            said.append(getString(R.string.team_leader)).append(' ').append(word);
             for (int i = 0; i < t.members.size(); i++) {
                 Team.Member m = t.members.get(i);
-                final Sessions.Session h = of.get(i);
-                // (a pipeline's steps follow each other; a doer and its checker go back and forth, pair by pair)
-                teamChips.addView(TeamUi.between(this, i == 0 || Team.PIPE.equals(t.structure) ? "→"
-                        : Team.CHECK.equals(t.structure) && i % 2 == 1 ? "⇄" : "·"));
-                int color = Team.color(this, m.color);
-                View chip = TeamUi.chip(this, m.name, color, TeamUi.state(this, h), false, h != null && h.running);
-                if (h == ses) { // this chat: marked, and in view (the strip scrolls to it, centred where it can be)
-                    chip.setBackground(outlined(this, Theme.blend(color, CARD, 0.14f), 12, color, 2));
-                    final View me = chip;
-                    teamStrip.post(() -> teamStrip.scrollTo(Math.max(0, me.getLeft() - (teamStrip.getWidth() - me.getWidth()) / 2), 0));
-                } else if (h != null) { // its own chat: its steps, its screen
-                    chip.setOnClickListener(v -> {
-                        startActivity(new android.content.Intent(this, ChatActivity.class).putExtra("id", h.id));
-                        if (memberChat) finish(); // (from one member's chat to another's: not a stack of them)
-                    });
-                }
-                teamChips.addView(chip);
+                Sessions.Session h = of.get(i);
+                String st = TeamUi.state(this, h);
+                // (its state in a word: a command is too long for the bar; the line under the header has it whole)
+                View item = TeamUi.barItem(this, m.name, Team.color(this, m.color), st, h != null && h.running, h == ses);
+                teamChips.addView(item);
+                if (h == ses) // (a member's own chat: the bar scrolls to it, centred where it can be)
+                    teamStrip.post(() -> teamStrip.scrollTo(Math.max(0, item.getLeft() - (teamStrip.getWidth() - item.getWidth()) / 2), 0));
+                said.append(", ").append(m.name).append(' ').append(st);
             }
+            teamChips.addView(new View(this), weight1());
+            teamChips.addView(icon(this, R.drawable.ms_expand_more, MUTED, 18));
+            teamChips.setContentDescription(getString(R.string.team_bar_desc, getString(Team.structureName(t.structure)), said));
         }
         java.util.Set<String> ids = new java.util.HashSet<>();
         ids.add(Team.LEADER);
@@ -1238,14 +1243,9 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
 
     private void renderHelpers() {
         if (helpersBox == null) return;
+        // (a team's members and their screens are in the team bar's panel; a member's chat has the bar back to its team)
         java.util.List<Sessions.Session> l = ses.parent.isEmpty() ? Helpers.of(hub, ses.id) : new java.util.ArrayList<>();
-        if (ses.parent.isEmpty() && ses.team != null) { // the team's members that have a hidden screen: their live pictures
-            for (Sessions.Session h : Team.sessions(hub, ses)) {
-                // (only once an app is on it: a screen it opened and left empty is a blank card, while it runs commands)
-                if (h.background && Background.hasApp(h.id)) l.add(h);
-            }
-        }
-        final Sessions.Session parent = ses.parent.isEmpty() ? null : hub.sessions.find(ses.parent);
+        final Sessions.Session parent = ses.parent.isEmpty() || !ses.member.isEmpty() ? null : hub.sessions.find(ses.parent);
         boolean ownScreen = !l.isEmpty() && ses.background && Background.displayOf(ses.id) != android.view.Display.DEFAULT_DISPLAY;
         if (!ownScreen) ownApp = null;
         // this chat's own card only once an app is on its screen: a screen it opened and left empty is a black picture

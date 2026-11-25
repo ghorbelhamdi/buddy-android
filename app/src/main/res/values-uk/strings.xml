@@ -2970,4 +2970,9 @@
     <string name="team_to_desc">Надіслати: %1$s. Торкніться, щоб змінити отримувачів</string>
     <string name="team_everyone">Усім</string>
     <string name="team_done">Готово</string>
+    <string name="team_waiting">Чекає</string>
+    <string name="team_last">Останнє: %1$s</string>
+    <string name="team_bar_desc">Команда «%1$s»: %2$s. Відкриває команду</string>
+    <string name="team_back_to_team">Назад до чату команди</string>
+    <string name="team_open_chat_of">Відкрити чат: %1$s</string>
 </resources>

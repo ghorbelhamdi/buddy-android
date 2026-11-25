@@ -3201,4 +3201,9 @@
     <string name="team_to_desc">Send to: %1$s. Tap to change who gets it</string>
     <string name="team_everyone">Everyone</string>
     <string name="team_done">Done</string>
+    <string name="team_waiting">Waiting</string>
+    <string name="team_last">Last: %1$s</string>
+    <string name="team_bar_desc">%1$s team: %2$s. Opens the team</string>
+    <string name="team_back_to_team">Back to the team’s chat</string>
+    <string name="team_open_chat_of">Open %1$s’s chat</string>
 </resources>

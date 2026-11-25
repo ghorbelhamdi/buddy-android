@@ -2476,4 +2476,9 @@
     <string name="team_to_desc">Senden an: %1$s. Tippen, um die Empfänger zu ändern</string>
     <string name="team_everyone">Alle</string>
     <string name="team_done">Fertig</string>
+    <string name="team_waiting">Wartet</string>
+    <string name="team_last">Zuletzt: %1$s</string>
+    <string name="team_bar_desc">Team %1$s: %2$s. Öffnet das Team</string>
+    <string name="team_back_to_team">Zurück zum Chat des Teams</string>
+    <string name="team_open_chat_of">Chat von %1$s öffnen</string>
 </resources>

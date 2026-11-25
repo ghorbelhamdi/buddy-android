@@ -2450,4 +2450,9 @@
     <string name="team_to_desc">送信先: %1$s。タップして変更</string>
     <string name="team_everyone">全員</string>
     <string name="team_done">完了</string>
+    <string name="team_waiting">待機中</string>
+    <string name="team_last">最新: %1$s</string>
+    <string name="team_bar_desc">%1$sチーム: %2$s。チームを開く</string>
+    <string name="team_back_to_team">チームのチャットに戻る</string>
+    <string name="team_open_chat_of">%1$sのチャットを開く</string>
 </resources>

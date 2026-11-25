@@ -2908,4 +2908,9 @@
     <string name="team_to_desc">Enviar a: %1$s. Toca para cambiar quién lo recibe</string>
     <string name="team_everyone">Todos</string>
     <string name="team_done">Listo</string>
+    <string name="team_waiting">Esperando</string>
+    <string name="team_last">Último: %1$s</string>
+    <string name="team_bar_desc">Equipo %1$s: %2$s. Abre el equipo</string>
+    <string name="team_back_to_team">Volver al chat del equipo</string>
+    <string name="team_open_chat_of">Abrir el chat de %1$s</string>
 </resources>

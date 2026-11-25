@@ -825,11 +825,15 @@ final class WebDevices {
                     boolean on = h != null && h.running;
                     String state = TeamUi.state(c, h);
                     if (on && busy.isEmpty() && lead == null) busy = c.getString(R.string.team_member_working, m.name, state);
+                    String last = h == null ? "" : Ui.linkText(h.lastReply).replace('\n', ' ').trim();
                     members.put(new JSONObject().put("id", m.id).put("chat", h == null ? "" : h.id).put("name", m.name).put("on", m.on()).put("goal", m.goal).put("state", state)
-                            .put("running", on).put("c", new JSONArray(java.util.Arrays.asList(Team.hex(m.color)))));
+                            .put("running", on).put("c", new JSONArray(java.util.Arrays.asList(Team.hex(m.color))))
+                            .put("last", last.length() > 200 ? last.substring(0, 200) + "…" : last)
+                            // (an app on its hidden screen: the panel shows it through /web/shot, with its rules)
+                            .put("screen", h != null && h.background && !h.incognito && Background.hasApp(h.id)));
                 }
                 team = new JSONObject().put("leader", new JSONObject().put("agent", Account.cliOf(owner.backend)).put("model", Models.chip(owner))
-                                .put("running", owner.running).put("chat", owner.id))
+                                .put("running", owner.running).put("waiting", Team.waits(hub, owner)).put("chat", owner.id))
                         .put("structure", owner.team.structure).put("name", c.getString(Team.structureName(owner.team.structure)))
                         .put("members", members)
                         // the team in its shape (the page's own view of it): how it works, and what was set

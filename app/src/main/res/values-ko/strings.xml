@@ -2449,4 +2449,9 @@
     <string name="team_to_desc">보낼 대상: %1$s. 탭하여 변경</string>
     <string name="team_everyone">모두</string>
     <string name="team_done">완료</string>
+    <string name="team_waiting">기다리는 중</string>
+    <string name="team_last">최근: %1$s</string>
+    <string name="team_bar_desc">%1$s 팀: %2$s. 팀 열기</string>
+    <string name="team_back_to_team">팀 채팅으로 돌아가기</string>
+    <string name="team_open_chat_of">%1$s 채팅 열기</string>
 </resources>

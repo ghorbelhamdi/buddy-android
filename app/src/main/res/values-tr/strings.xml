@@ -2477,4 +2477,9 @@
     <string name="team_to_desc">Gönderilecek: %1$s. Alıcıları değiştirmek için dokunun</string>
     <string name="team_everyone">Herkes</string>
     <string name="team_done">Tamam</string>
+    <string name="team_waiting">Bekliyor</string>
+    <string name="team_last">Son: %1$s</string>
+    <string name="team_bar_desc">%1$s ekibi: %2$s. Ekibi açar</string>
+    <string name="team_back_to_team">Ekibin sohbetine dön</string>
+    <string name="team_open_chat_of">%1$s sohbetini aç</string>
 </resources>

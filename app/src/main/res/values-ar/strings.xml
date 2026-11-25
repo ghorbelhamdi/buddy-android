@@ -2565,4 +2565,9 @@
     <string name="team_to_desc">إرسال إلى: %1$s. انقر لتغيير المستلمين</string>
     <string name="team_everyone">الجميع</string>
     <string name="team_done">تم</string>
+    <string name="team_waiting">ينتظر</string>
+    <string name="team_last">الأخير: %1$s</string>
+    <string name="team_bar_desc">فريق %1$s: %2$s. يفتح الفريق</string>
+    <string name="team_back_to_team">العودة إلى محادثة الفريق</string>
+    <string name="team_open_chat_of">فتح محادثة %1$s</string>
 </resources>

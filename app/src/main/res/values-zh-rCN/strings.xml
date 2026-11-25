@@ -2898,4 +2898,9 @@
     <string name="team_to_desc">发送给：%1$s。点按更改接收者</string>
     <string name="team_everyone">所有人</string>
     <string name="team_done">完成</string>
+    <string name="team_waiting">等待中</string>
+    <string name="team_last">最近：%1$s</string>
+    <string name="team_bar_desc">%1$s团队：%2$s。打开团队</string>
+    <string name="team_back_to_team">返回团队的聊天</string>
+    <string name="team_open_chat_of">打开 %1$s 的聊天</string>
 </resources>

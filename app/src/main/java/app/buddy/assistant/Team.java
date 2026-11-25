@@ -617,6 +617,13 @@ final class Team {
         return false;
     }
 
+    /** Whether the chat's leader waits in a team call for one of its members now (its state: Waiting). */
+    static boolean waits(ChatHub hub, Sessions.Session parent) {
+        if (!parent.running || AWAITED.isEmpty()) return false;
+        for (Sessions.Session h : all(hub, parent.id)) if (h.running && AWAITED.contains(h.id)) return true;
+        return false;
+    }
+
     /** The members' chats a team call waits for now: what they answer meanwhile, the leader gets from that call. */
     private static final java.util.Set<String> AWAITED = java.util.concurrent.ConcurrentHashMap.newKeySet();
 

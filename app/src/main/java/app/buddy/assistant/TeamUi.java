@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -296,15 +297,23 @@ final class TeamUi {
         }
     }
 
+    /** Members' last pictures of their hidden screens, shown at once when the panel is drawn again. */
+    private static final java.util.Map<String, android.graphics.Bitmap> PICTURES = new java.util.concurrent.ConcurrentHashMap<>();
+
     /**
-     * The chat's team drawn in its shape: the leader, the members where the structure puts them, each with its agent
-     * and model, what it is for and what it does now (a tap opens its own chat), then where they work, how they
-     * share apps, the hand-off and the rules. To look at: the team is changed by telling the leader.
+     * The team panel (the team bar opens it): the team drawn in its shape, each one with its agent and model, what
+     * it is for, what it does now and its last answer; a member with an app on its hidden screen shows that screen
+     * live, with Show on my screen. A card opens that one's own chat (the leader's: back to the team's chat). Then
+     * where they work, how they share apps, the hand-off and the rules, and Turn off. To look at: the team is changed
+     * by telling the leader. here: the chat this was opened from (the team's or a member's own).
      */
-    static Shown view(final Activity a, final ChatHub hub, final Sessions.Session ses) {
+    static Shown view(final Activity a, final ChatHub hub, final Sessions.Session ses, final Sessions.Session here,
+                      final Runnable off) {
         final Shown shown = new Shown();
         final LinearLayout box = column(a);
         shown.dialog = bottomSheet(a, box);
+        final android.os.Handler tick = new android.os.Handler(android.os.Looper.getMainLooper());
+        final Runnable[] again = new Runnable[1];
         shown.refresh = () -> {
             final Team t = ses.team;
             if (t == null) {
@@ -312,41 +321,78 @@ final class TeamUi {
                 return;
             }
             box.removeAllViews();
-            box.addView(title(a, a.getString(Team.structureName(t.structure)), 20));
-            TextView how = text(a, a.getString(Team.LEAD.equals(t.structure) ? R.string.team_lead_info : Team.CHECK.equals(t.structure)
-                    ? R.string.team_check_info : Team.DOERS.equals(t.structure) ? R.string.team_doers_info : R.string.team_pipe_info), 14, TEXT2);
-            how.setPaddingRelative(0, dp(a, 6), 0, 0);
-            box.addView(how);
+            LinearLayout head = row(a);
+            head.setGravity(Gravity.CENTER_VERTICAL);
+            head.addView(shape(a, t.structure, 40, 32));
+            TextView name = title(a, a.getString(Team.structureName(t.structure)), 20);
+            name.setPaddingRelative(dp(a, 12), 0, 0, 0);
+            head.addView(name, weight1());
+            box.addView(head, full());
+            StringBuilder how = new StringBuilder(a.getString(Team.SEP.equals(t.workspace) ? R.string.team_ws_sep
+                    : Team.LOOK.equals(t.workspace) ? R.string.team_ws_look : R.string.team_ws_same))
+                    .append(" · ").append(a.getString(Team.TURN.equals(t.apps) ? R.string.team_apps_turn
+                            : Team.NONE.equals(t.apps) ? R.string.team_apps_none : R.string.team_apps_diff));
+            TextView hw = text(a, how.toString(), 13, MUTED);
+            hw.setPaddingRelative(0, dp(a, 6), 0, 0);
+            box.addView(hw);
+            boolean screens = false;
             String on = Account.nameOf(ses.backend) + (ses.model == null || ses.model.isEmpty() ? "" : " · " + Models.label(ses.backend, ses.model));
+            String leadState = ses.running ? a.getString(Team.waits(hub, ses) ? R.string.team_waiting : R.string.helper_working)
+                    : a.getString(R.string.team_ready);
             View lead = info(a, a.getString(R.string.team_leader), Team.leaderColor(a), on, a.getString(R.string.team_this_chat),
-                    ses.running ? (ses.status.isEmpty() ? a.getString(R.string.helper_working) : ses.status) : a.getString(R.string.team_ready),
-                    ses.running, true, null);
+                    null, leadState, ses.running, true, here == ses, null, here == ses ? null : () -> {
+                        shown.dialog.dismiss();
+                        a.startActivity(new android.content.Intent(a, ChatActivity.class).putExtra("id", ses.id));
+                        a.finish(); // (from a member's chat back to the team's: not a stack of them)
+                    });
             List<View> cards = new ArrayList<>();
             for (Team.Member m : t.members) {
                 final Sessions.Session h = Team.session(hub, ses.id, m.id);
-                cards.add(info(a, m.name, Team.color(a, m.color), m.on(), m.goal, state(a, h), h != null && h.running, false,
-                        h == null ? null : () -> {
+                boolean screen = h != null && h.background && Background.hasApp(h.id);
+                screens |= screen;
+                cards.add(info(a, m.name, Team.color(a, m.color), m.on(), m.goal, h == null ? null : h.lastReply, state(a, h),
+                        h != null && h.running, false, h == here, screen ? h : null, h == null || h == here ? null : () -> {
                             shown.dialog.dismiss();
                             a.startActivity(new android.content.Intent(a, ChatActivity.class).putExtra("id", h.id));
+                            if (here != ses) a.finish(); // (from one member's chat to another's)
                         }));
             }
             place(a, box, t.structure, lead, cards, cards.size());
-            LinearLayout facts = column(a);
-            facts.setBackground(rounded(a, CARD2, 14));
-            facts.setPaddingRelative(dp(a, 12), dp(a, 10), dp(a, 12), dp(a, 10));
-            fact(a, facts, a.getString(R.string.team_card_workspace, a.getString(Team.SEP.equals(t.workspace) ? R.string.team_ws_sep
-                    : Team.LOOK.equals(t.workspace) ? R.string.team_ws_look : R.string.team_ws_same)));
-            fact(a, facts, a.getString(R.string.team_card_apps, a.getString(Team.TURN.equals(t.apps) ? R.string.team_apps_turn
-                    : Team.NONE.equals(t.apps) ? R.string.team_apps_none : R.string.team_apps_diff)));
-            if (!t.handoff.isEmpty()) fact(a, facts, a.getString(R.string.team_fact_handoff, t.handoff));
-            if (!t.rules.isEmpty()) fact(a, facts, a.getString(R.string.team_fact_rules, t.rules));
-            LinearLayout.LayoutParams fp = full();
-            fp.topMargin = dp(a, 14);
-            box.addView(facts, fp);
+            if (!t.handoff.isEmpty() || !t.rules.isEmpty()) {
+                LinearLayout facts = column(a);
+                facts.setBackground(rounded(a, CARD2, 14));
+                facts.setPaddingRelative(dp(a, 12), dp(a, 10), dp(a, 12), dp(a, 10));
+                if (!t.handoff.isEmpty()) fact(a, facts, a.getString(R.string.team_fact_handoff, t.handoff));
+                if (!t.rules.isEmpty()) fact(a, facts, a.getString(R.string.team_fact_rules, t.rules));
+                LinearLayout.LayoutParams fp = full();
+                fp.topMargin = dp(a, 14);
+                box.addView(facts, fp);
+            }
+            LinearLayout foot = row(a);
+            foot.setGravity(Gravity.CENTER_VERTICAL);
             TextView change = text(a, a.getString(R.string.team_change_hint), 13, MUTED);
-            change.setPaddingRelative(dp(a, 2), dp(a, 10), 0, 0);
-            box.addView(change);
+            foot.addView(change, weight1());
+            if (off != null) {
+                Button o = button(a, a.getString(R.string.team_off_yes), false);
+                o.setOnClickListener(v -> {
+                    shown.dialog.dismiss();
+                    off.run();
+                });
+                LinearLayout.LayoutParams op = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(a, 44));
+                op.setMarginStart(dp(a, 12));
+                foot.addView(o, op);
+            }
+            LinearLayout.LayoutParams ftp = full();
+            ftp.topMargin = dp(a, 14);
+            box.addView(foot, ftp);
+            // the screens live while it is open: drawn again every few seconds
+            tick.removeCallbacksAndMessages(null);
+            if (screens) tick.postDelayed(again[0], 3000);
         };
+        again[0] = () -> {
+            if (shown.showing()) shown.refresh.run();
+        };
+        shown.dialog.setOnDismissListener(x -> tick.removeCallbacksAndMessages(null));
         shown.refresh.run();
         shown.dialog.show();
         return shown;
@@ -366,34 +412,86 @@ final class TeamUi {
         box.addView(t);
     }
 
-    /** A member's card to look at: its name in its colour, its agent, what it is for, what it does now. */
-    private static View info(Context c, String name, int color, String on, String goal, String state, boolean working,
-                             boolean leader, final Runnable open) {
+    /**
+     * One's card in the panel: its mark and name in its colour, its agent, what it is for, its last answer and what it
+     * does now; here: the chat it was opened from (outlined); screen: a member with an app on its hidden screen (the
+     * screen live, and Show on my screen); open: its own chat, or null.
+     */
+    private static View info(final Activity c, String name, int color, String on, String goal, String last, String state,
+                             boolean working, boolean leader, boolean here, final Sessions.Session screen, final Runnable open) {
         LinearLayout card = column(c);
-        card.setBackground(outlined(c, CARD2, 16, leader ? Team.leaderColor(c) : CARD2, 2));
+        card.setBackground(outlined(c, CARD2, 16, here ? color : leader ? Theme.withAlpha(color, 0x80) : CARD2, 2));
         card.setPaddingRelative(dp(c, 12), dp(c, 10), dp(c, 12), dp(c, 10));
         LinearLayout nm = row(c);
         nm.setGravity(Gravity.CENTER_VERTICAL);
-        nm.addView(dot(c, color, 10));
-        TextView n = single(text(c, name, 14, TEXT));
+        nm.addView(avatar(c, name, color, 24));
+        TextView n = single(text(c, name, 14, color));
         n.setTypeface(sans(c, 600));
-        n.setPaddingRelative(dp(c, 6), 0, 0, 0);
+        n.setPaddingRelative(dp(c, 8), 0, dp(c, 6), 0);
         nm.addView(n, weight1());
+        TextView st = single(text(c, state, 12, working ? TEXT : MUTED));
+        if (working) st.setTypeface(sans(c, 600));
+        nm.addView(st);
         card.addView(nm, full());
-        TextView o = text(c, on, 12, TEXT2);
-        o.setPaddingRelative(0, dp(c, 2), 0, 0);
+        TextView o = single(text(c, on, 12, TEXT2));
+        o.setPaddingRelative(0, dp(c, 4), 0, 0);
         card.addView(o);
         if (goal != null && !goal.isEmpty()) {
             TextView g = text(c, goal, 12, MUTED);
+            g.setMaxLines(2);
+            g.setEllipsize(android.text.TextUtils.TruncateAt.END);
             g.setPaddingRelative(0, dp(c, 4), 0, 0);
             card.addView(g);
         }
-        TextView st = single(monoText(c, state, 11, working ? ACCENT_TEXT : MUTED));
-        st.setPaddingRelative(0, dp(c, 6), 0, 0);
-        card.addView(st);
+        if (last != null && !last.trim().isEmpty()) {
+            TextView l = text(c, c.getString(R.string.team_last, Ui.linkText(last.trim()).replace('\n', ' ')), 12, TEXT2);
+            l.setMaxLines(2);
+            l.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            l.setPaddingRelative(0, dp(c, 4), 0, 0);
+            card.addView(l);
+        }
+        if (screen != null) { // its hidden screen, live, and the way to bring the app to the user's own
+            final ImageView pic = new ImageView(c);
+            pic.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            pic.setBackground(rounded(c, BG, 10));
+            pic.setClipToOutline(true);
+            pic.setContentDescription(c.getString(R.string.background_preview));
+            android.graphics.Bitmap had = PICTURES.get(screen.id);
+            if (had != null) pic.setImageBitmap(had);
+            android.util.DisplayMetrics dm = c.getResources().getDisplayMetrics();
+            int w = dp(c, 72);
+            LinearLayout.LayoutParams pp = new LinearLayout.LayoutParams(w, Math.round(w * (dm.heightPixels / (float) dm.widthPixels)));
+            pp.topMargin = dp(c, 8);
+            pp.gravity = Gravity.CENTER_HORIZONTAL;
+            card.addView(pic, pp);
+            final android.content.Context app = c.getApplicationContext();
+            new Thread(() -> {
+                byte[] jpg = Background.frame(app, screen.id, w * 2, 70);
+                final android.graphics.Bitmap b = jpg == null ? null : android.graphics.BitmapFactory.decodeByteArray(jpg, 0, jpg.length);
+                if (b == null) return;
+                PICTURES.put(screen.id, b);
+                pic.post(() -> pic.setImageBitmap(b));
+            }, "team-screen").start();
+            Button bring = button(c, c.getString(R.string.background_show), false);
+            bring.setMinHeight(dp(c, 36));
+            bring.setMinimumHeight(dp(c, 36));
+            bring.setOnClickListener(v -> {
+                BuddyService svc = BuddyService.get();
+                if (svc == null) return;
+                bring.setEnabled(false);
+                new Thread(() -> {
+                    Background.bringToScreen(svc, screen);
+                    bring.post(() -> bring.setEnabled(true));
+                }).start();
+            });
+            LinearLayout.LayoutParams bp = full();
+            bp.topMargin = dp(c, 8);
+            card.addView(bring, bp);
+        }
         if (open != null) {
             card.setForeground(c.getDrawable(ripple(c, false)));
             card.setOnClickListener(v -> open.run());
+            card.setContentDescription(c.getString(leader ? R.string.team_back_to_team : R.string.team_open_chat_of, name) + ", " + state);
         }
         return card;
     }
@@ -472,23 +570,6 @@ final class TeamUi {
         tile.addView(new Shape(c, structure), new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         tile.setLayoutParams(new LinearLayout.LayoutParams(dp(c, w), dp(c, h)));
         return tile;
-    }
-
-    /** The strip's first button: the structure's picture and name; a tap shows the team in its shape. */
-    static View shapeButton(Context c, String structure, final Runnable open) {
-        LinearLayout r = row(c);
-        r.setGravity(Gravity.CENTER_VERTICAL);
-        r.setBackground(outlined(c, CARD2, 12, LINE, 1));
-        r.setPaddingRelative(dp(c, 4), dp(c, 3), dp(c, 6), dp(c, 3));
-        r.addView(shape(c, structure, 30, 24));
-        TextView n = single(text(c, c.getString(Team.structureName(structure)), 12, TEXT));
-        n.setTypeface(sans(c, 600));
-        n.setPaddingRelative(dp(c, 6), 0, dp(c, 2), 0);
-        r.addView(n);
-        r.addView(icon(c, R.drawable.ms_expand_more, MUTED, 18));
-        r.setContentDescription(c.getString(R.string.team_show_shape, c.getString(Team.structureName(structure))));
-        r.setOnClickListener(v -> open.run());
-        return r;
     }
 
     /** From the leader down to the two columns of members: drawn, as arrows that point sideways come out as emoji. */
@@ -773,25 +854,20 @@ final class TeamUi {
         return d;
     }
 
-    /** One of the strip's members: its colour, name and state. */
-    static View chip(Context c, String name, int color, String state, boolean leader, boolean working) {
+    /** One in the team bar: its mark (ringed in the chat it is), and what it does now in a word. */
+    static View barItem(Context c, String name, int color, String word, boolean working, boolean here) {
         LinearLayout r = row(c);
         r.setGravity(Gravity.CENTER_VERTICAL);
-        r.setBackground(outlined(c, CARD, 12, leader ? Theme.withAlpha(Team.leaderColor(c), 0x80) : LINE, 1));
-        r.setPaddingRelative(dp(c, 8), dp(c, 6), dp(c, 10), dp(c, 6));
-        r.addView(dot(c, color, 8));
-        TextView n = single(text(c, name, 12, TEXT));
-        n.setTypeface(sans(c, 600));
-        n.setPaddingRelative(dp(c, 6), 0, dp(c, 6), 0);
-        r.addView(n);
-        r.addView(single(monoText(c, state, 11, working ? ACCENT_TEXT : MUTED)));
+        FrameLayout ring = new FrameLayout(c);
+        if (here) ring.setBackground(outlinedOval(c, 0x00000000, color, 2));
+        ring.addView(avatar(c, name, color, 20), new FrameLayout.LayoutParams(dp(c, 20), dp(c, 20), Gravity.CENTER));
+        r.addView(ring, new LinearLayout.LayoutParams(dp(c, 28), dp(c, 28)));
+        TextView w = single(text(c, word, 12, working || here ? TEXT : MUTED));
+        if (working) w.setTypeface(sans(c, 600));
+        w.setPaddingRelative(dp(c, 4), 0, dp(c, 10), 0);
+        r.addView(w);
+        r.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
         return r;
-    }
-
-    static View between(Context c, String s) {
-        TextView t = text(c, s, 13, MUTED);
-        t.setPaddingRelative(dp(c, 6), 0, dp(c, 6), 0);
-        return t;
     }
 
     /**

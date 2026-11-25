@@ -2475,4 +2475,9 @@
     <string name="team_to_desc">Sturen naar: %1$s. Tik om te wijzigen wie het krijgt</string>
     <string name="team_everyone">Iedereen</string>
     <string name="team_done">Klaar</string>
+    <string name="team_waiting">Wacht</string>
+    <string name="team_last">Laatst: %1$s</string>
+    <string name="team_bar_desc">Team %1$s: %2$s. Opent het team</string>
+    <string name="team_back_to_team">Terug naar de chat van het team</string>
+    <string name="team_open_chat_of">Chat van %1$s openen</string>
 </resources>

@@ -2469,4 +2469,9 @@
     <string name="team_to_desc">भेजें: %1$s. किसे मिले, बदलने के लिए टैप करें</string>
     <string name="team_everyone">सभी</string>
     <string name="team_done">हो गया</string>
+    <string name="team_waiting">इंतज़ार में</string>
+    <string name="team_last">पिछला: %1$s</string>
+    <string name="team_bar_desc">%1$s टीम: %2$s. टीम खोलता है</string>
+    <string name="team_back_to_team">टीम की चैट पर वापस</string>
+    <string name="team_open_chat_of">%1$s की चैट खोलें</string>
 </resources>
