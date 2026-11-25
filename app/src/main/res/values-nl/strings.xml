@@ -2488,4 +2488,9 @@
     <string name="team_card_for">De leider vraagt je OK, voor %1$s.</string>
     <string name="team_card_task">Zijn taak van de leider: %1$s</string>
     <string name="team_card_task_you">Zijn taak van jou: %1$s</string>
+    <plurals name="team_round">
+        <item quantity="one">Teamronde · %d antwoord</item>
+        <item quantity="other">Teamronde · %d antwoorden</item>
+    </plurals>
+    <string name="team_show_all">Alles tonen</string>
 </resources>

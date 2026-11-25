@@ -2489,4 +2489,9 @@
     <string name="team_card_for">Der Leiter bittet um dein OK, für %1$s.</string>
     <string name="team_card_task">Seine Aufgabe vom Leiter: %1$s</string>
     <string name="team_card_task_you">Seine Aufgabe von dir: %1$s</string>
+    <plurals name="team_round">
+        <item quantity="one">Teamrunde · %d Antwort</item>
+        <item quantity="other">Teamrunde · %d Antworten</item>
+    </plurals>
+    <string name="team_show_all">Alle zeigen</string>
 </resources>

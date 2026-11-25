@@ -2983,4 +2983,11 @@
     <string name="team_card_for">Лидер просит вашего согласия для: %1$s.</string>
     <string name="team_card_task">Задача от лидера: %1$s</string>
     <string name="team_card_task_you">Задача от вас: %1$s</string>
+    <plurals name="team_round">
+        <item quantity="one">Раунд команды · %d ответ</item>
+        <item quantity="few">Раунд команды · %d ответа</item>
+        <item quantity="many">Раунд команды · %d ответов</item>
+        <item quantity="other">Раунд команды · %d ответа</item>
+    </plurals>
+    <string name="team_show_all">Показать всё</string>
 </resources>

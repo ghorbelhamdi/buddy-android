@@ -3052,4 +3052,8 @@
     <string name="team_card_for">Trưởng nhóm xin bạn đồng ý, cho %1$s.</string>
     <string name="team_card_task">Nhiệm vụ từ trưởng nhóm: %1$s</string>
     <string name="team_card_task_you">Nhiệm vụ từ bạn: %1$s</string>
+    <plurals name="team_round">
+        <item quantity="other">Lượt của nhóm · %d câu trả lời</item>
+    </plurals>
+    <string name="team_show_all">Hiện tất cả</string>
 </resources>

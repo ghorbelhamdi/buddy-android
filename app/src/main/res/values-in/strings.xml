@@ -2912,4 +2912,8 @@
     <string name="team_card_for">Pemimpin meminta persetujuan Anda, untuk %1$s.</string>
     <string name="team_card_task">Tugasnya dari pemimpin: %1$s</string>
     <string name="team_card_task_you">Tugasnya dari Anda: %1$s</string>
+    <plurals name="team_round">
+        <item quantity="other">Putaran tim · %d jawaban</item>
+    </plurals>
+    <string name="team_show_all">Tampilkan semua</string>
 </resources>

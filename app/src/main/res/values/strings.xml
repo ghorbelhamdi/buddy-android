@@ -3214,4 +3214,9 @@
     <string name="team_card_for">The leader asks for your OK, for %1$s.</string>
     <string name="team_card_task">Its task from the leader: %1$s</string>
     <string name="team_card_task_you">Its task from you: %1$s</string>
+    <plurals name="team_round">
+        <item quantity="one">Team round · %d answer</item>
+        <item quantity="other">Team round · %d answers</item>
+    </plurals>
+    <string name="team_show_all">Show all</string>
 </resources>

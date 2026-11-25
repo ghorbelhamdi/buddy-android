@@ -2490,4 +2490,9 @@
     <string name="team_card_for">Lider, %1$s için onayınızı istiyor.</string>
     <string name="team_card_task">Liderden aldığı görev: %1$s</string>
     <string name="team_card_task_you">Sizden aldığı görev: %1$s</string>
+    <plurals name="team_round">
+        <item quantity="one">Ekip turu · %d yanıt</item>
+        <item quantity="other">Ekip turu · %d yanıt</item>
+    </plurals>
+    <string name="team_show_all">Tümünü göster</string>
 </resources>

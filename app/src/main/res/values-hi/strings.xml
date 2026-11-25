@@ -2482,4 +2482,9 @@
     <string name="team_card_for">लीडर %1$s के लिए आपकी मंज़ूरी माँग रहा है।</string>
     <string name="team_card_task">लीडर से मिला काम: %1$s</string>
     <string name="team_card_task_you">आपसे मिला काम: %1$s</string>
+    <plurals name="team_round">
+        <item quantity="one">टीम राउंड · %d जवाब</item>
+        <item quantity="other">टीम राउंड · %d जवाब</item>
+    </plurals>
+    <string name="team_show_all">सब दिखाएँ</string>
 </resources>

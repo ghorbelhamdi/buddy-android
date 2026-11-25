@@ -2538,4 +2538,11 @@
     <string name="team_card_for">Lider prosi o twoją zgodę dla: %1$s.</string>
     <string name="team_card_task">Zadanie od lidera: %1$s</string>
     <string name="team_card_task_you">Zadanie od ciebie: %1$s</string>
+    <plurals name="team_round">
+        <item quantity="one">Runda zespołu · %d odpowiedź</item>
+        <item quantity="few">Runda zespołu · %d odpowiedzi</item>
+        <item quantity="many">Runda zespołu · %d odpowiedzi</item>
+        <item quantity="other">Runda zespołu · %d odpowiedzi</item>
+    </plurals>
+    <string name="team_show_all">Pokaż wszystko</string>
 </resources>

@@ -810,6 +810,7 @@ final class WebDevices {
                 if (!m.fromName.isEmpty()) {
                     o.put("fn", m.fromName).put("fo", m.fromOn).put("q", m.quote).put("qf", m.quoteFrom);
                     if (!m.from.isEmpty()) o.put("c", new JSONArray(java.util.Arrays.asList(Team.hex(m.color))));
+                    if (m.direct) o.put("dr", true); // (an answer to the user directly: never folded into a round)
                 }
                 msgs.put(o);
             }

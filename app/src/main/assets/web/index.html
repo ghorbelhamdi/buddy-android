@@ -251,6 +251,14 @@ h2.sec{margin:8px 0 0;font-size:13px;letter-spacing:.5px;text-transform:uppercas
 .tbar .sp{flex:1}
 .tbar>svg:last-child{flex:none;color:var(--muted)}
 .tcard .nm .av{width:24px;height:24px;font-size:12px}
+.round{align-self:flex-start;width:min(92%,760px);box-sizing:border-box;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.round .rh{display:flex;align-items:center;gap:8px}
+.round .rh b{flex:1;font-size:13px}
+.round .avs{display:flex}
+.round .av{width:22px;height:22px;font-size:11px;box-shadow:0 0 0 2px var(--card)}
+.round .av+.av{margin-inline-start:-6px}
+.round p{margin:0;font-size:13px;color:var(--soft);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.round p b{color:var(--mc)}
 .tcard .nm b{color:var(--mc);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tcard .nm .sw{font-size:12px;font-weight:400;color:var(--muted)}
 .tcard .nm .sw.on2{color:var(--text);font-weight:600}
@@ -774,12 +782,29 @@ function drawChat() {
   const all = rows(d), from = Math.max(0, all.length - shown);
   if (from > 0) col.append(el('button', {class: 'btn earlier', onclick: () => { keep = pane.scrollHeight - pane.scrollTop; shown += PAGE; drawChat(); }}, 'Show earlier messages'));
   else if (d.first > 0) col.append(el('div', {class: 'note', style: 'align-self:center'}, 'Earlier messages are on the phone.'));
-  for (let i = from; i < all.length; i++) col.append(row(all[i], d.running && i === all.length - 1));
+  // member answers that came one after another fold into one card (not errors, files or answers to you directly)
+  const foldable = r => r && r.k === 'buddy' && r.fn && r.c && !r.dr && !r.f && !r.lx && !d.memberOf;
+  for (let i = from; i < all.length; i++) {
+    let j = i;
+    while (j < all.length && foldable(all[j])) j++;
+    if (j - i >= 2 && !unfolded.has('r' + all[i].at)) { col.append(roundCard(all.slice(i, j), 'r' + all[i].at)); i = j - 1; continue; }
+    col.append(row(all[i], d.running && i === all.length - 1));
+  }
   if (d.running && (!all.length || all[all.length - 1].k !== 'steps')) col.append(el('div', {class: 'working'}, el('span', {class: 'spin'}), 'Working…'));
   if (keep != null) { pane.scrollTop = pane.scrollHeight - keep; keep = null; } // (earlier messages came in above: the view stays where it was)
   else if (stick) { end(); toBottom = false; }
   else pane.scrollTop = top;
   jump();
+}
+
+/** A round of member answers as one card: their marks, how many, each one's first lines, and Show all. */
+function roundCard(rs, key) {
+  const names = [...new Set(rs.map(r => r.fn))].slice(0, 4);
+  return el('div', {class: 'round'},
+    el('div', {class: 'rh'}, el('span', {class: 'avs'}, ...names.map(n => avatar(n, rs.find(r => r.fn === n).c))),
+      el('b', {}, 'Team round · ' + rs.length + ' answers'),
+      el('button', {class: 'btn small', onclick: () => { unfolded.add(key); drawChat(); }}, 'Show all')),
+    ...rs.map(r => tint(el('p', {}, el('b', {}, r.fn), ' ', plain(r.t)), r.c)));
 }
 
 /** The open chat is a team's member's own (its settings, edit and fork are the team's chat's business). */

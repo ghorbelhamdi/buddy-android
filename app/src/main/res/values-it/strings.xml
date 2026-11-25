@@ -2922,4 +2922,9 @@
     <string name="team_card_for">Il leader chiede il tuo OK, per %1$s.</string>
     <string name="team_card_task">Il suo compito dal leader: %1$s</string>
     <string name="team_card_task_you">Il suo compito da te: %1$s</string>
+    <plurals name="team_round">
+        <item quantity="one">Giro del team · %d risposta</item>
+        <item quantity="other">Giro del team · %d risposte</item>
+    </plurals>
+    <string name="team_show_all">Mostra tutto</string>
 </resources>

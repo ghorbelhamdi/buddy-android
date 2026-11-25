@@ -2911,4 +2911,8 @@
     <string name="team_card_for">负责人代 %1$s 请求你的同意。</string>
     <string name="team_card_task">负责人交给它的任务：%1$s</string>
     <string name="team_card_task_you">你交给它的任务：%1$s</string>
+    <plurals name="team_round">
+        <item quantity="other">团队一轮 · %d 条回答</item>
+    </plurals>
+    <string name="team_show_all">全部显示</string>
 </resources>

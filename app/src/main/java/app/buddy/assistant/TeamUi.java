@@ -859,6 +859,49 @@ final class TeamUi {
         return d;
     }
 
+    /**
+     * A round of member answers that came one after another, as one card ({name, colour, text} each): their marks,
+     * how many, each one's first line, and Show all.
+     */
+    static View round(Context c, List<Object[]> who, final Runnable showAll) {
+        LinearLayout card = column(c);
+        card.setBackground(outlined(c, CARD, 16, LINE, 1));
+        card.setPaddingRelative(dp(c, 14), dp(c, 12), dp(c, 14), dp(c, 12));
+        LinearLayout head = row(c);
+        head.setGravity(Gravity.CENTER_VERTICAL);
+        java.util.Set<String> seen = new java.util.HashSet<>();
+        for (Object[] w : who) {
+            if (!seen.add((String) w[0]) || seen.size() > 4) continue;
+            TextView av = avatar(c, (String) w[0], (Integer) w[1], 22);
+            av.setBackground(outlinedOval(c, (Integer) w[1], CARD, 2));
+            LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) av.getLayoutParams();
+            if (seen.size() > 1) p.setMarginStart(-dp(c, 6));
+            head.addView(av, p);
+        }
+        TextView n = single(text(c, c.getResources().getQuantityString(R.plurals.team_round, who.size(), who.size()), 13, TEXT));
+        n.setTypeface(sans(c, 600));
+        n.setPaddingRelative(dp(c, 8), 0, dp(c, 8), 0);
+        head.addView(n, weight1());
+        Button all = button(c, c.getString(R.string.team_show_all), false);
+        all.setMinHeight(dp(c, 36));
+        all.setMinimumHeight(dp(c, 36));
+        all.setOnClickListener(v -> showAll.run());
+        head.addView(all, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(c, 36)));
+        card.addView(head, full());
+        for (Object[] w : who) {
+            TextView l = text(c, "", 13, TEXT2);
+            android.text.SpannableString s = new android.text.SpannableString(w[0] + "  " + w[2]);
+            s.setSpan(new android.text.style.ForegroundColorSpan((Integer) w[1]), 0, ((String) w[0]).length(), 0);
+            s.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD), 0, ((String) w[0]).length(), 0);
+            l.setText(s);
+            l.setMaxLines(2);
+            l.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            l.setPaddingRelative(0, dp(c, 8), 0, 0);
+            card.addView(l, full());
+        }
+        return card;
+    }
+
     /** One in the team bar: its mark (ringed in the chat it is), and what it does now in a word. */
     static View barItem(Context c, String name, int color, String word, boolean working, boolean here) {
         LinearLayout r = row(c);

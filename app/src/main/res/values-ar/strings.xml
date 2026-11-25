@@ -2578,4 +2578,13 @@
     <string name="team_card_for">يطلب القائد موافقتك، من أجل %1$s.</string>
     <string name="team_card_task">مهمته من القائد: %1$s</string>
     <string name="team_card_task_you">مهمته منك: %1$s</string>
+    <plurals name="team_round">
+        <item quantity="zero">جولة الفريق · %d إجابة</item>
+        <item quantity="one">جولة الفريق · إجابة واحدة</item>
+        <item quantity="two">جولة الفريق · إجابتان</item>
+        <item quantity="few">جولة الفريق · %d إجابات</item>
+        <item quantity="many">جولة الفريق · %d إجابة</item>
+        <item quantity="other">جولة الفريق · %d إجابة</item>
+    </plurals>
+    <string name="team_show_all">عرض الكل</string>
 </resources>

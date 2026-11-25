@@ -2921,4 +2921,9 @@
     <string name="team_card_for">El líder pide tu OK, para %1$s.</string>
     <string name="team_card_task">Su tarea del líder: %1$s</string>
     <string name="team_card_task_you">Su tarea tuya: %1$s</string>
+    <plurals name="team_round">
+        <item quantity="one">Ronda del equipo · %d respuesta</item>
+        <item quantity="other">Ronda del equipo · %d respuestas</item>
+    </plurals>
+    <string name="team_show_all">Mostrar todo</string>
 </resources>

@@ -2462,4 +2462,8 @@
     <string name="team_card_for">리더가 %1$s을(를) 위해 승인을 요청합니다.</string>
     <string name="team_card_task">리더가 준 작업: %1$s</string>
     <string name="team_card_task_you">내가 준 작업: %1$s</string>
+    <plurals name="team_round">
+        <item quantity="other">팀 라운드 · 답변 %d개</item>
+    </plurals>
+    <string name="team_show_all">모두 보기</string>
 </resources>

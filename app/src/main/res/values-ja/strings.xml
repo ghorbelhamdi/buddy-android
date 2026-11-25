@@ -2463,4 +2463,8 @@
     <string name="team_card_for">リーダーが%1$sのためにあなたの許可を求めています。</string>
     <string name="team_card_task">リーダーからの作業: %1$s</string>
     <string name="team_card_task_you">あなたからの作業: %1$s</string>
+    <plurals name="team_round">
+        <item quantity="other">チームのラウンド · 回答 %d 件</item>
+    </plurals>
+    <string name="team_show_all">すべて表示</string>
 </resources>

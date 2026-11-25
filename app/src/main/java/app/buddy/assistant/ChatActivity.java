@@ -524,6 +524,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     private void showAll() {
         messages.removeAllViews();
         log = null;
+        round = null;
         hint = null;
         if (ses.messages.isEmpty()) {
             hint = text(this, hintText(), 14, MUTED);
@@ -3192,6 +3193,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
      */
     private void show(Sessions.Msg m) {
         boolean framed = !m.fromName.isEmpty() && (m.kind == Bubble.Kind.BUDDY || m.kind == Bubble.Kind.ERROR);
+        // a member's plain answer may join a round (see fold); anything else ends the round
+        boolean foldable = framed && m.kind == Bubble.Kind.BUDDY && !m.from.isEmpty() && !m.direct && m.files.isEmpty()
+                && m.linux.isEmpty() && ses.member.isEmpty();
+        if (!foldable) round = null;
         if ((framed || (m.kind == Bubble.Kind.USER && !m.to.isEmpty())) && log != null) {
             log.finish();
             log = null;
@@ -3221,6 +3226,40 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         LinearLayout.LayoutParams fp = full();
         fp.topMargin = dp(this, 12);
         messages.addView(f, fp);
+        if (foldable) fold(m, f);
+    }
+
+    /** Member answers that came one after another: folded into one card until Show all (see TeamUi.round). */
+    private static final class Round {
+        final java.util.List<Sessions.Msg> msgs = new java.util.ArrayList<>();
+        final java.util.List<View> frames = new java.util.ArrayList<>();
+        View card;
+    }
+
+    private Round round;
+    /** Rounds the user unfolded (by their first answer): they stay open when the chat is drawn again. */
+    private final java.util.Set<Sessions.Msg> roundsOpen = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+
+    private void fold(Sessions.Msg m, View frame) {
+        if (round == null) round = new Round();
+        final Round rd = round;
+        rd.msgs.add(m);
+        rd.frames.add(frame);
+        if (rd.msgs.size() < 2 || roundsOpen.contains(rd.msgs.get(0))) return;
+        int at = rd.card != null ? messages.indexOfChild(rd.card) : messages.indexOfChild(rd.frames.get(0));
+        if (rd.card != null) messages.removeView(rd.card);
+        java.util.List<Object[]> who = new java.util.ArrayList<>();
+        for (Sessions.Msg x : rd.msgs) who.add(new Object[]{x.fromName, Team.color(this, x.color), Ui.linkText(x.text).replace('\n', ' ').trim()});
+        rd.card = TeamUi.round(this, who, () -> { // Show all: the answers as they came
+            roundsOpen.add(rd.msgs.get(0));
+            messages.removeView(rd.card);
+            rd.card = null;
+            for (View v : rd.frames) v.setVisibility(View.VISIBLE);
+        });
+        for (View v : rd.frames) v.setVisibility(View.GONE);
+        LinearLayout.LayoutParams cp = full();
+        cp.topMargin = dp(this, 12);
+        messages.addView(rd.card, Math.max(0, at), cp);
     }
 
     private void showPlain(Sessions.Msg m) {
