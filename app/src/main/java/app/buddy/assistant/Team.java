@@ -231,7 +231,8 @@ final class Team {
         if (!t.handoff.isEmpty()) b.append("Hand-off: ").append(ChatHub.clip(t.handoff, 400)).append(". ");
         if (!t.rules.isEmpty()) b.append("The team's rules (pass them on where they matter): ").append(ChatHub.clip(t.rules, 800)).append(". ");
         b.append("A quick question you can answer yourself needs no member. The user can also write to members directly. "
-                + "Change the team (team_change) only when the user asks for it.]\n\n");
+                + "Change the team (team_change) only when the user asks for it. These are phone tools: where your tools "
+                + "carry their server's name, they are mcp__phone__team, mcp__phone__team_change and mcp__phone__ask.]\n\n");
         return b.toString();
     }
 
@@ -268,6 +269,7 @@ final class Team {
                 + "2. How work is handed on, with the options: \"" + h[0] + "\", \"" + h[1] + "\", \"" + h[2] + "\".\n"
                 + "3. Rules for the whole team, with options that fit this chat (such as \"Tests must pass\", \"Keep the "
                 + "existing style\", \"Explain every change\") and \"No rules\".\n"
+                + "(These are phone tools: where your tools carry their server's name, mcp__phone__ask and mcp__phone__team_change.)\n"
                 + "Then save what they chose with team_change (update for each member's goal, handoff, rules), and tell "
                 + "them in two or three lines that the team is ready and that the boxes over the message box say who a "
                 + "message goes to. If they skip a question, keep what is set.";
