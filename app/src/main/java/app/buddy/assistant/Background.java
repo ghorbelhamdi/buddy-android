@@ -296,20 +296,34 @@ final class Background {
         return d;
     }
 
-    /** hasApp's last answers, per chat {when, yes}: the chat screen asks on each redraw, on the main thread. */
+    /** hasApp's last answers, per chat {when, yes}, and the chats being looked at now. */
     private static final Map<String, long[]> hasAppSeen = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Set<String> hasAppLooking = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    private static final ExecutorService hasAppPool = Executors.newSingleThreadExecutor();
 
-    /** An app is on the chat's hidden screen now (one it opened and left, or none yet: no). Looked at once a second. */
+    /**
+     * An app is on the chat's hidden screen now (one it opened and left, or none yet: no). Never blocks: the answer
+     * looked at last (within a second or so), and a fresh look in the background when it's older. Looking means asking
+     * the app on that screen for its window, which waits as long as that app is busy, and its callers (the chat screen,
+     * the team panel, the page's chat) run on the main thread: there it held the whole app up.
+     */
     static boolean hasApp(String chat) {
-        int d = displayOf(chat);
-        BuddyService svc = BuddyService.get();
+        final int d = displayOf(chat);
+        final BuddyService svc = BuddyService.get();
         if (d == Display.DEFAULT_DISPLAY || svc == null) return false;
         long now = android.os.SystemClock.elapsedRealtime();
         long[] seen = hasAppSeen.get(chat);
-        if (seen != null && now - seen[0] < 1000) return seen[1] == 1;
-        boolean yes = hasAppNow(svc, d);
-        hasAppSeen.put(chat, new long[]{now, yes ? 1 : 0});
-        return yes;
+        if ((seen == null || now - seen[0] >= 1000) && hasAppLooking.add(chat)) {
+            hasAppPool.execute(() -> {
+                try {
+                    boolean yes = hasAppNow(svc, d);
+                    hasAppSeen.put(chat, new long[]{android.os.SystemClock.elapsedRealtime(), yes ? 1 : 0});
+                } finally {
+                    hasAppLooking.remove(chat);
+                }
+            });
+        }
+        return seen != null && seen[1] == 1;
     }
 
     private static boolean hasAppNow(BuddyService svc, int d) {

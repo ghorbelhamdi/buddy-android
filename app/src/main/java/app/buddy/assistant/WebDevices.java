@@ -826,7 +826,7 @@ final class WebDevices {
                     boolean on = h != null && h.running;
                     String state = TeamUi.state(c, h);
                     if (on && busy.isEmpty() && lead == null) busy = c.getString(R.string.team_member_working, m.name, state);
-                    String last = h == null ? "" : Ui.linkText(h.lastReply).replace('\n', ' ').trim();
+                    String last = h == null ? "" : Ui.linkText(ChatHub.clip(h.lastReply, 600)).replace('\n', ' ').trim();
                     members.put(new JSONObject().put("id", m.id).put("chat", h == null ? "" : h.id).put("name", m.name).put("on", m.on()).put("goal", m.goal).put("state", state)
                             .put("running", on).put("c", new JSONArray(java.util.Arrays.asList(Team.hex(m.color))))
                             .put("last", last.length() > 200 ? last.substring(0, 200) + "…" : last)

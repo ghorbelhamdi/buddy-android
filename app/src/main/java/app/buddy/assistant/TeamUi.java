@@ -458,7 +458,7 @@ final class TeamUi {
             card.addView(g);
         }
         if (last != null && !last.trim().isEmpty()) {
-            TextView l = text(c, c.getString(R.string.team_last, Ui.linkText(last.trim()).replace('\n', ' ')), 12, TEXT2);
+            TextView l = text(c, c.getString(R.string.team_last, Ui.linkText(ChatHub.clip(last.trim(), 600)).replace('\n', ' ')), 12, TEXT2);
             l.setMaxLines(2);
             l.setEllipsize(android.text.TextUtils.TruncateAt.END);
             l.setPaddingRelative(0, dp(c, 4), 0, 0);
