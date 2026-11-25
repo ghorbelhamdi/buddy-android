@@ -2444,6 +2444,12 @@
     <string name="team_not_signed_in">%1$s werkt op %2$s, en die is niet ingelogd op deze telefoon.</string>
     <string name="team_card_from">%1$s vraagt om je akkoord:\n\n%2$s</string>
     <string name="team_card_change">Team wijzigen?</string>
+    <string name="team_card_start">Dit team starten?</string>
+    <string name="team_start_adjust">Eerst aanpassen</string>
+    <string name="team_start_no">Nu niet</string>
+    <string name="hub_tool_team_start">Team voorstellen</string>
+    <string name="tool_team_start">Een team starten</string>
+    <string name="tool_team_start_info">De agent van de chat stelt een team voor als je erom vraagt; het start pas als je op de kaart op ‘Team starten’ tikt</string>
     <string name="team_card_add">%1$s toevoegen op %2$s</string>
     <string name="team_card_remove">%1$s verwijderen</string>
     <string name="team_card_rename">%1$s hernoemen naar %2$s</string>

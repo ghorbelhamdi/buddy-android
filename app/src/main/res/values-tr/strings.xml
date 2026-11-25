@@ -2446,6 +2446,12 @@
     <string name="team_not_signed_in">%1$s, %2$s üzerinde çalışıyor; bu ajana bu telefonda giriş yapılmadı.</string>
     <string name="team_card_from">%1$s onayınızı istiyor:\n\n%2$s</string>
     <string name="team_card_change">Takım değiştirilsin mi?</string>
+    <string name="team_card_start">Bu takım başlatılsın mı?</string>
+    <string name="team_start_adjust">Önce düzenle</string>
+    <string name="team_start_no">Şimdi değil</string>
+    <string name="hub_tool_team_start">Takım öneriliyor</string>
+    <string name="tool_team_start">Takım başlatma</string>
+    <string name="tool_team_start_info">Sohbetin ajanı, siz isteyince bir takım önerir; takım yalnızca kartındaki “Takımı başlat”a dokunduğunuzda başlar</string>
     <string name="team_card_add">Ekle: %1$s, %2$s üzerinde</string>
     <string name="team_card_remove">Kaldır: %1$s</string>
     <string name="team_card_rename">“%1$s” adını “%2$s” yap</string>

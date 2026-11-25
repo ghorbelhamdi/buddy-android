@@ -3008,6 +3008,12 @@
     <string name="team_not_signed_in">%1$s chạy trên %2$s, nhưng agent này chưa đăng nhập trên điện thoại này.</string>
     <string name="team_card_from">%1$s xin bạn đồng ý:\n\n%2$s</string>
     <string name="team_card_change">Thay đổi nhóm?</string>
+    <string name="team_card_start">Bắt đầu nhóm này?</string>
+    <string name="team_start_adjust">Điều chỉnh trước</string>
+    <string name="team_start_no">Để sau</string>
+    <string name="hub_tool_team_start">Đang đề xuất một nhóm</string>
+    <string name="tool_team_start">Bắt đầu một nhóm</string>
+    <string name="tool_team_start_info">Agent của cuộc trò chuyện đề xuất một nhóm khi bạn yêu cầu; nhóm chỉ bắt đầu khi bạn chạm “Bắt đầu nhóm” trên thẻ</string>
     <string name="team_card_add">Thêm %1$s trên %2$s</string>
     <string name="team_card_remove">Gỡ %1$s</string>
     <string name="team_card_rename">Đổi tên %1$s thành %2$s</string>

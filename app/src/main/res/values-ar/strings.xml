@@ -2534,6 +2534,12 @@
     <string name="team_not_signed_in">يعمل %1$s على %2$s، ولم يتم تسجيل الدخول إليه على هذا الهاتف.</string>
     <string name="team_card_from">%1$s يطلب موافقتك:\n\n%2$s</string>
     <string name="team_card_change">تغيير الفريق؟</string>
+    <string name="team_card_start">بدء هذا الفريق؟</string>
+    <string name="team_start_adjust">عدّله أولًا</string>
+    <string name="team_start_no">ليس الآن</string>
+    <string name="hub_tool_team_start">جارٍ اقتراح فريق</string>
+    <string name="tool_team_start">بدء فريق</string>
+    <string name="tool_team_start_info">وكيل المحادثة يقترح فريقًا عندما تطلب ذلك؛ ولا يبدأ إلا عندما تضغط «بدء الفريق» على بطاقته</string>
     <string name="team_card_add">إضافة %1$s على %2$s</string>
     <string name="team_card_remove">إزالة %1$s</string>
     <string name="team_card_rename">إعادة تسمية %1$s إلى %2$s</string>

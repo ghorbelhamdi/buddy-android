@@ -2418,6 +2418,12 @@
     <string name="team_not_signed_in">%1$s 멤버는 %2$s에서 동작하는데, 이 휴대전화에서는 로그인되어 있지 않아요.</string>
     <string name="team_card_from">%1$s 승인 요청:\n\n%2$s</string>
     <string name="team_card_change">팀을 변경할까요?</string>
+    <string name="team_card_start">이 팀을 시작할까요?</string>
+    <string name="team_start_adjust">먼저 조정하기</string>
+    <string name="team_start_no">나중에</string>
+    <string name="hub_tool_team_start">팀 제안 중</string>
+    <string name="tool_team_start">팀 시작</string>
+    <string name="tool_team_start_info">요청하면 채팅의 에이전트가 팀을 제안해요. 카드에서 “팀 시작”을 탭해야 시작돼요</string>
     <string name="team_card_add">%1$s 추가 (%2$s)</string>
     <string name="team_card_remove">%1$s 삭제</string>
     <string name="team_card_rename">“%1$s” 이름을 “%2$s”(으)로 변경</string>

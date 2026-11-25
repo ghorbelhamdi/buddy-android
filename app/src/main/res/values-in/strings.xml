@@ -2868,6 +2868,12 @@
     <string name="team_not_signed_in">%1$s bekerja di %2$s, yang belum login di ponsel ini.</string>
     <string name="team_card_from">%1$s meminta persetujuan Anda:\n\n%2$s</string>
     <string name="team_card_change">Ubah tim?</string>
+    <string name="team_card_start">Mulai tim ini?</string>
+    <string name="team_start_adjust">Sesuaikan dulu</string>
+    <string name="team_start_no">Jangan sekarang</string>
+    <string name="hub_tool_team_start">Mengusulkan tim</string>
+    <string name="tool_team_start">Mulai tim</string>
+    <string name="tool_team_start_info">Agen chat mengusulkan tim saat Anda minta; tim baru dimulai saat Anda mengetuk “Mulai tim” di kartunya</string>
     <string name="team_card_add">Tambahkan %1$s di %2$s</string>
     <string name="team_card_remove">Hapus %1$s</string>
     <string name="team_card_rename">Ganti nama %1$s menjadi %2$s</string>

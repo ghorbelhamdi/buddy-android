@@ -2877,6 +2877,12 @@
     <string name="team_not_signed_in">%1$s trabaja en %2$s, que no tiene la sesión iniciada en este teléfono.</string>
     <string name="team_card_from">%1$s pide tu aprobación:\n\n%2$s</string>
     <string name="team_card_change">¿Cambiar el equipo?</string>
+    <string name="team_card_start">¿Iniciar este equipo?</string>
+    <string name="team_start_adjust">Ajustarlo antes</string>
+    <string name="team_start_no">Ahora no</string>
+    <string name="hub_tool_team_start">Proponiendo un equipo</string>
+    <string name="tool_team_start">Iniciar un equipo</string>
+    <string name="tool_team_start_info">El agente del chat propone un equipo cuando se lo pides; solo empieza cuando tocas «Iniciar el equipo» en su tarjeta</string>
     <string name="team_card_add">Añadir a %1$s en %2$s</string>
     <string name="team_card_remove">Quitar a %1$s</string>
     <string name="team_card_rename">Cambiar el nombre de %1$s a %2$s</string>

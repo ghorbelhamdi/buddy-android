@@ -2419,6 +2419,12 @@
     <string name="team_not_signed_in">%1$s は %2$s で動きますが、このスマートフォンではログインしていません。</string>
     <string name="team_card_from">%1$s が承認を求めています:\n\n%2$s</string>
     <string name="team_card_change">チームを変更しますか？</string>
+    <string name="team_card_start">このチームを開始しますか？</string>
+    <string name="team_start_adjust">先に調整する</string>
+    <string name="team_start_no">今はしない</string>
+    <string name="hub_tool_team_start">チームを提案中</string>
+    <string name="tool_team_start">チームを開始</string>
+    <string name="tool_team_start_info">頼むとチャットのエージェントがチームを提案します。カードの「チームを開始」をタップするまで開始しません</string>
     <string name="team_card_add">%1$s を追加（%2$s）</string>
     <string name="team_card_remove">%1$s を削除</string>
     <string name="team_card_rename">%1$s の名前を %2$s に変更</string>

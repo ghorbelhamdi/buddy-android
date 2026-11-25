@@ -2890,6 +2890,12 @@
     <string name="team_not_signed_in">%1$s trabalha no %2$s, que não está conectado neste telefone.</string>
     <string name="team_card_from">%1$s pede seu OK:\n\n%2$s</string>
     <string name="team_card_change">Alterar a equipe?</string>
+    <string name="team_card_start">Iniciar esta equipe?</string>
+    <string name="team_start_adjust">Ajustar antes</string>
+    <string name="team_start_no">Agora não</string>
+    <string name="hub_tool_team_start">Propondo uma equipe</string>
+    <string name="tool_team_start">Iniciar uma equipe</string>
+    <string name="tool_team_start_info">O agente do chat propõe uma equipe quando você pede; ela só começa quando você toca em “Iniciar a equipe” no cartão</string>
     <string name="team_card_add">Adicionar %1$s no %2$s</string>
     <string name="team_card_remove">Remover %1$s</string>
     <string name="team_card_rename">Renomear %1$s para %2$s</string>
