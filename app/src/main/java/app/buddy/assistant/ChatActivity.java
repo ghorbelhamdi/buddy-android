@@ -1192,7 +1192,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             helpersChevron = null;
             helpersBox.setVisibility(l.isEmpty() && parent == null ? View.GONE : View.VISIBLE);
             if (parent != null) {
-                helpersBox.addView(helperRow(MUTED, getString(R.string.helper_of, parent.label()), "", parent.id), full());
+                helpersBox.addView(helperRow(MUTED, getString(ses.member.isEmpty() ? R.string.helper_of : R.string.team_member_of, parent.label()), "", parent.id), full());
                 return;
             }
             if (l.isEmpty()) return;

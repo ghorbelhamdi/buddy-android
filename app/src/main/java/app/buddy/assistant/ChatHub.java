@@ -385,7 +385,15 @@ final class ChatHub {
     /** Turns a chat's team on, and has its agent ask the user the rest (what each member is for, the hand-off, rules). */
     String startTeam(Sessions.Session ses, Team team) {
         setTeam(ses, team, null);
-        return send(ses, app.getString(R.string.team_setup_sent), null, Team.interview(team), false, false);
+        boolean untitled = ses.title.isEmpty();
+        String err = send(ses, app.getString(R.string.team_setup_sent), null, Team.interview(team), false, false);
+        // (the chat isn't named after this line: its first own message names it, as in any chat)
+        if (untitled && !ses.title.isEmpty()) {
+            ses.title = "";
+            sessions.save(ses);
+            changed();
+        }
+        return err;
     }
 
     /** While sendTeam sends (main thread): who the message goes to, for the message made in there. */
