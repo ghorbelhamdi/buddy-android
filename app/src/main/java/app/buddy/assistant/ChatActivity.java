@@ -1226,7 +1226,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         java.util.List<Sessions.Session> l = ses.parent.isEmpty() ? Helpers.of(hub, ses.id) : new java.util.ArrayList<>();
         if (ses.parent.isEmpty() && ses.team != null) { // the team's members that have a hidden screen: their live pictures
             for (Sessions.Session h : Team.sessions(hub, ses)) {
-                if (h.background && Background.displayOf(h.id) != android.view.Display.DEFAULT_DISPLAY) l.add(h);
+                // (only once an app is on it: a screen it opened and left empty is a blank card, while it runs commands)
+                if (h.background && Background.hasApp(h.id)) l.add(h);
             }
         }
         final Sessions.Session parent = ses.parent.isEmpty() ? null : hub.sessions.find(ses.parent);
@@ -1284,7 +1285,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             if (c == null) continue;
             boolean failed = "failed".equals(h.outcome), stopped = "stopped".equals(h.outcome);
             c.dot.setBackground(oval(h.running ? ACCENT : failed ? ERR : stopped ? MUTED : OK));
-            c.state.setText(h.running ? (h.status.isEmpty() ? getString(R.string.helper_working) : h.status)
+            // (a word, as the strip has: a command is too long for a card)
+            c.state.setText(h.running ? getString(R.string.helper_working)
                     : getString(failed ? R.string.helper_failed : stopped ? R.string.helper_stopped : R.string.helper_done));
         }
         HelperCard mine = helperCards.get(ses.id);

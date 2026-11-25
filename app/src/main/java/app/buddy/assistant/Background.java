@@ -297,6 +297,23 @@ final class Background {
     }
 
     /** The chat's display if it has one right now, else the real screen's id. Doesn't make one. */
+    /** An app is on the chat's hidden screen now (one it opened and left, or none yet: no). */
+    static boolean hasApp(String chat) {
+        int d = displayOf(chat);
+        BuddyService svc = BuddyService.get();
+        if (d == Display.DEFAULT_DISPLAY || svc == null) return false;
+        try {
+            java.util.List<android.view.accessibility.AccessibilityWindowInfo> l = svc.getWindowsOnAllDisplays().get(d);
+            if (l != null) for (android.view.accessibility.AccessibilityWindowInfo w : l) {
+                android.view.accessibility.AccessibilityNodeInfo r = w.getRoot();
+                if (w.getType() == android.view.accessibility.AccessibilityWindowInfo.TYPE_APPLICATION && r != null
+                        && r.getPackageName() != null) return true;
+            }
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
+
     static int displayOf(String chat) {
         Integer d = chat == null ? null : displays.get(chat);
         return d == null ? Display.DEFAULT_DISPLAY : d;
