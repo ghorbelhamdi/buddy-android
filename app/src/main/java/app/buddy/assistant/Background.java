@@ -581,9 +581,41 @@ final class Background {
      * Settings (a phone that lets Buddy's adb grant it the right needs no walk).
      */
     static String start(Context c, boolean asked) {
-        String why = startNow(c, asked);
+        if (asked) startBusy = true;
+        String why;
+        try {
+            why = startNow(c, asked);
+        } finally {
+            if (asked) startBusy = false;
+        }
         if (why == null) restartNote = null; // (it runs: why it didn't after the restart is history)
+        if (asked) { // the user's Start now: why it didn't work, kept for the screen that asked (issue #89)
+            lastStartWhy = why;
+            lastStartAt = android.os.SystemClock.elapsedRealtime();
+            Runnable l = listener; // (the screen, as it is now, shows it)
+            if (l != null) l.run();
+        }
         return why;
+    }
+
+    private static volatile boolean startBusy;
+
+    /** The user's Start now is still at it (the screen may have been drawn anew meanwhile). */
+    static boolean startBusy() {
+        return startBusy;
+    }
+
+    private static volatile String lastStartWhy;
+    private static volatile long lastStartAt;
+
+    /**
+     * Why the user's last Start now didn't work, in the last half hour, or null. Start now may walk Settings for
+     * Wireless debugging, and the Background mode screen is drawn anew when the user comes back: the answer came to the
+     * screen as it was before, and was never seen (issue #89).
+     */
+    static String lastStartWhy() {
+        String w = lastStartWhy;
+        return w == null || android.os.SystemClock.elapsedRealtime() - lastStartAt > 30 * 60_000 ? null : w;
     }
 
     private static String startNow(Context c, boolean asked) {

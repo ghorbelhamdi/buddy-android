@@ -185,6 +185,7 @@ public class BackgroundActivity extends Screen {
         final TextView status = title(this, getString(R.string.background_ready), 16);
         body.addView(status, gap(20));
         final TextView info = text(this, getString(R.string.background_ready_info), 13, MUTED);
+        info.setTextIsSelectable(true); // (what adb said, to copy into a report)
         body.addView(info, gap(4));
         final Button start = button(this, getString(R.string.background_start_now), true);
         start.setVisibility(View.GONE);
@@ -207,10 +208,20 @@ public class BackgroundActivity extends Screen {
             String problem = alive ? Background.problem(this) : null;
             // (not started again after a restart although that's switched on: why, where it would say it isn't running)
             String restart = alive || older || !Prefs.backgroundRestart(this) ? null : Background.restartNote();
+            String last = alive || older ? null : Background.lastStartWhy(); // (the last Start now, also from before this screen was drawn)
             runOnUiThread(() -> {
                 status.setText(alive ? R.string.background_ready : R.string.background_paired);
+                if (!alive && Background.startBusy()) { // (a Start now from before this screen was drawn: still at it)
+                    info.setText(R.string.background_starting);
+                    start.setVisibility(View.VISIBLE);
+                    start.setEnabled(false);
+                    return;
+                }
                 if (problem != null) info.setText(getString(R.string.background_failed, problem));
-                else if (restart != null) info.setText(getString(R.string.background_failed, restart));
+                else if (last != null) {
+                    info.setText(getString(R.string.background_failed, last));
+                    if (last.contains("paired")) pair.setVisibility(View.VISIBLE); // Wireless debugging forgot Buddy
+                } else if (restart != null) info.setText(getString(R.string.background_failed, restart));
                 else info.setText(alive ? R.string.background_ready_info
                         : older ? R.string.background_older : R.string.background_asleep);
                 start.setVisibility(alive ? View.GONE : View.VISIBLE);
