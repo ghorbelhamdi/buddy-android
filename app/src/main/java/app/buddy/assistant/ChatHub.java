@@ -64,7 +64,10 @@ final class ChatHub {
     static final String QUIET = "[QUIET]";
 
     static synchronized ChatHub get(Context c) {
-        if (instance == null) instance = new ChatHub(c.getApplicationContext());
+        if (instance == null) {
+            instance = new ChatHub(c.getApplicationContext());
+            Watchdog.start(c); // TEMPORARY (2.5.0 tests)
+        }
         return instance;
     }
 
