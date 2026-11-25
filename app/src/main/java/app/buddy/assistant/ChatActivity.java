@@ -322,16 +322,6 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         sdp.bottomMargin = dp(this, 6);
         root.addView(sending, sdp);
 
-        // a chat with a team: who the message goes to (the leader alone unless more are ticked)
-        sendToChips = row(this);
-        sendToChips.setGravity(Gravity.CENTER_VERTICAL);
-        sendToChips.setPaddingRelative(dp(this, 12), 0, dp(this, 12), 0);
-        sendToRow = TeamUi.across(this, sendToChips);
-        sendToRow.setVisibility(View.GONE);
-        LinearLayout.LayoutParams s2p = full();
-        s2p.bottomMargin = dp(this, 6);
-        root.addView(sendToRow, s2p);
-
         // composer
         trayScroll = new android.widget.HorizontalScrollView(this);
         trayScroll.setHorizontalScrollBarEnabled(false);
@@ -350,6 +340,24 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         attach.setLayoutParams(new LinearLayout.LayoutParams(dp(this, 40), dp(this, 40)));
         attach.setOnClickListener(v -> attachSheet());
         bar.addView(attach);
+        // a chat with a team: who the message goes to (the leader alone unless more are ticked), a tap to pick
+        toChip = row(this);
+        toChip.setGravity(Gravity.CENTER_VERTICAL);
+        toChip.setBackground(rounded(this, CARD2, 18));
+        toChip.setForeground(getDrawable(ripple(this, false)));
+        toChip.setPaddingRelative(dp(this, 6), 0, dp(this, 8), 0);
+        toChip.setVisibility(View.GONE);
+        toChip.setOnClickListener(v -> {
+            Sessions.Session owner = ses.parent.isEmpty() ? ses : null;
+            if (owner == null || owner.team == null) return;
+            TeamUi.sendToSheet(this, hub, owner, sendTo, () -> {
+                sendToShown = "";
+                renderTeam();
+            });
+        });
+        LinearLayout.LayoutParams tcp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 36));
+        tcp.setMarginStart(dp(this, 2));
+        bar.addView(toChip, tcp);
         // agent · model · effort: tap to change (it shortens its text when the bar has little room)
         LinearLayout chip = chip(this, "");
         chipText = (TextView) chip.getChildAt(0);
@@ -980,8 +988,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
 
     // ------------------------------------------------------ the chat's team
 
-    private android.widget.HorizontalScrollView teamStrip, sendToRow;
-    private LinearLayout teamChips, sendToChips;
+    private android.widget.HorizontalScrollView teamStrip;
+    private LinearLayout teamChips, toChip;
     private String teamShown = "", sendToShown = "";
     /** The team the Send to boxes were set for (its identity, and its members' ids then). */
     private int teamFor;
@@ -1073,7 +1081,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         final Team t = owner == null ? null : owner.team;
         final boolean memberChat = owner != null && owner != ses;
         teamStrip.setVisibility(t == null ? View.GONE : View.VISIBLE);
-        sendToRow.setVisibility(t == null || memberChat ? View.GONE : View.VISIBLE);
+        toChip.setVisibility(t == null || memberChat ? View.GONE : View.VISIBLE);
         if (t == null) {
             teamShown = sendToShown = "";
             if (teamSheet != null && teamSheet.showing()) teamSheet.refresh.run(); // (it closes: no team to show)
@@ -1141,23 +1149,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         for (Team.Member m : t.members) sig2.append('|').append(m.id).append(m.name).append(m.color);
         if (sig2.toString().equals(sendToShown)) return;
         sendToShown = sig2.toString();
-        sendToChips.removeAllViews();
-        TextView label = text(this, getString(R.string.team_send_to), 12, MUTED);
-        label.setPaddingRelative(0, 0, dp(this, 8), 0);
-        sendToChips.addView(label);
-        java.util.List<String[]> who = new java.util.ArrayList<>();
-        who.add(new String[]{Team.LEADER, getString(R.string.team_leader)});
-        for (Team.Member m : t.members) who.add(new String[]{m.id, m.name});
-        for (int i = 0; i < who.size(); i++) {
-            final String id = who.get(i)[0];
-            int color = i == 0 ? Team.leaderColor(this) : Team.color(this, t.members.get(i - 1).color);
-            LinearLayout.LayoutParams p = wrap();
-            p.setMarginEnd(dp(this, 6));
-            sendToChips.addView(TeamUi.sendTo(this, who.get(i)[1], color, sendTo.contains(id), () -> {
-                if (!sendTo.remove(id)) sendTo.add(id);
-                renderTeam();
-            }), p);
-        }
+        TeamUi.paintTo(this, toChip, t, sendTo);
     }
 
     // ------------------------------------------------------ helpers

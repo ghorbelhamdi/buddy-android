@@ -3196,4 +3196,9 @@
     <string name="tool_team_info">The chat\'s agent tells its team\'s members what to do and gets their answers</string>
     <string name="tool_team_change">Change the team</string>
     <string name="tool_team_change_info">The chat\'s agent changes its team when you ask; new members and agents come to you on a card</string>
+    <string name="team_to">To %1$s</string>
+    <string name="team_to_n">To %1$d</string>
+    <string name="team_to_desc">Send to: %1$s. Tap to change who gets it</string>
+    <string name="team_everyone">Everyone</string>
+    <string name="team_done">Done</string>
 </resources>

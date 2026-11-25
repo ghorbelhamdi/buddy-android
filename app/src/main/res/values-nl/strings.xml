@@ -2470,4 +2470,9 @@
     <string name="tool_team_info">De agent van de chat vertelt de leden van zijn team wat ze moeten doen en krijgt hun antwoorden</string>
     <string name="tool_team_change">Team wijzigen</string>
     <string name="tool_team_change_info">De agent van de chat wijzigt zijn team als je erom vraagt; nieuwe leden en agents komen op een kaart bij jou</string>
+    <string name="team_to">Aan %1$s</string>
+    <string name="team_to_n">Aan %1$d</string>
+    <string name="team_to_desc">Sturen naar: %1$s. Tik om te wijzigen wie het krijgt</string>
+    <string name="team_everyone">Iedereen</string>
+    <string name="team_done">Klaar</string>
 </resources>

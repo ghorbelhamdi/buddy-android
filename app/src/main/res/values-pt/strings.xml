@@ -2916,4 +2916,9 @@
     <string name="tool_team_info">O agente do chat diz aos membros da equipe o que fazer e recebe as respostas deles</string>
     <string name="tool_team_change">Alterar a equipe</string>
     <string name="tool_team_change_info">O agente do chat altera a equipe quando você pede; novos membros e agentes chegam para você em um cartão</string>
+    <string name="team_to">Para %1$s</string>
+    <string name="team_to_n">Para %1$d</string>
+    <string name="team_to_desc">Enviar para: %1$s. Toque para mudar quem recebe</string>
+    <string name="team_everyone">Todos</string>
+    <string name="team_done">Concluído</string>
 </resources>

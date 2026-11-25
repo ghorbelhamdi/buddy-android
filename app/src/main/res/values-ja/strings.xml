@@ -2445,4 +2445,9 @@
     <string name="tool_team_info">チャットのエージェントがチームのメンバーに作業を指示し、その回答を受け取ります</string>
     <string name="tool_team_change">チームを変更</string>
     <string name="tool_team_change_info">あなたが頼むと、チャットのエージェントがチームを変更します。新しいメンバーやエージェントはカードで確認されます</string>
+    <string name="team_to">宛先: %1$s</string>
+    <string name="team_to_n">宛先: %1$d</string>
+    <string name="team_to_desc">送信先: %1$s。タップして変更</string>
+    <string name="team_everyone">全員</string>
+    <string name="team_done">完了</string>
 </resources>

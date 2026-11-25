@@ -2965,4 +2965,9 @@
     <string name="tool_team_info">Агент чату каже учасникам своєї команди, що робити, і отримує їхні відповіді</string>
     <string name="tool_team_change">Змінити команду</string>
     <string name="tool_team_change_info">Агент чату змінює свою команду на ваше прохання; нові учасники й агенти приходять вам на картці</string>
+    <string name="team_to">Кому: %1$s</string>
+    <string name="team_to_n">Кому: %1$d</string>
+    <string name="team_to_desc">Надіслати: %1$s. Торкніться, щоб змінити отримувачів</string>
+    <string name="team_everyone">Усім</string>
+    <string name="team_done">Готово</string>
 </resources>

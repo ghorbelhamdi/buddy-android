@@ -2904,4 +2904,9 @@
     <string name="tool_team_info">L\'agente della chat dice ai membri del suo team cosa fare e riceve le loro risposte</string>
     <string name="tool_team_change">Modifica il team</string>
     <string name="tool_team_change_info">L\'agente della chat modifica il suo team quando glielo chiedi; nuovi membri e agenti ti arrivano su una scheda</string>
+    <string name="team_to">A %1$s</string>
+    <string name="team_to_n">A %1$d</string>
+    <string name="team_to_desc">Invia a: %1$s. Tocca per cambiare i destinatari</string>
+    <string name="team_everyone">Tutti</string>
+    <string name="team_done">Fatto</string>
 </resources>

@@ -2965,4 +2965,9 @@
     <string name="tool_team_info">Агент чата говорит участникам своей команды, что делать, и получает их ответы</string>
     <string name="tool_team_change">Изменить команду</string>
     <string name="tool_team_change_info">Агент чата меняет свою команду по вашей просьбе; новые участники и агенты приходят вам на карточке</string>
+    <string name="team_to">Кому: %1$s</string>
+    <string name="team_to_n">Кому: %1$d</string>
+    <string name="team_to_desc">Отправить: %1$s. Нажмите, чтобы изменить получателей</string>
+    <string name="team_everyone">Всем</string>
+    <string name="team_done">Готово</string>
 </resources>

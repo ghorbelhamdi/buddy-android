@@ -2893,4 +2893,9 @@
     <string name="tool_team_info">对话的智能体告诉团队成员要做什么，并收取它们的回答</string>
     <string name="tool_team_change">更改团队</string>
     <string name="tool_team_change_info">你提出要求时，对话的智能体会更改它的团队；新成员和新智能体会以卡片形式交给你确认</string>
+    <string name="team_to">发给 %1$s</string>
+    <string name="team_to_n">发给 %1$d 人</string>
+    <string name="team_to_desc">发送给：%1$s。点按更改接收者</string>
+    <string name="team_everyone">所有人</string>
+    <string name="team_done">完成</string>
 </resources>

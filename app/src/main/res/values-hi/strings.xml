@@ -2464,4 +2464,9 @@
     <string name="tool_team_info">चैट का एजेंट अपनी टीम के सदस्यों को बताता है कि क्या करना है और उनके जवाब लेता है</string>
     <string name="tool_team_change">टीम बदलें</string>
     <string name="tool_team_change_info">आपके कहने पर चैट का एजेंट अपनी टीम बदलता है; नए सदस्य और एजेंट एक कार्ड पर आपके पास आते हैं</string>
+    <string name="team_to">%1$s को</string>
+    <string name="team_to_n">%1$d को</string>
+    <string name="team_to_desc">भेजें: %1$s. किसे मिले, बदलने के लिए टैप करें</string>
+    <string name="team_everyone">सभी</string>
+    <string name="team_done">हो गया</string>
 </resources>

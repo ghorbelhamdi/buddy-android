@@ -2904,4 +2904,9 @@
     <string name="tool_team_info">L\'agent de la discussion dit aux membres de son équipe quoi faire et reçoit leurs réponses</string>
     <string name="tool_team_change">Modifier l\'équipe</string>
     <string name="tool_team_change_info">L\'agent de la discussion modifie son équipe quand vous le demandez ; les nouveaux membres et agents vous arrivent sur une carte</string>
+    <string name="team_to">À %1$s</string>
+    <string name="team_to_n">À %1$d</string>
+    <string name="team_to_desc">Envoyer à : %1$s. Touchez pour changer les destinataires</string>
+    <string name="team_everyone">Tout le monde</string>
+    <string name="team_done">OK</string>
 </resources>

@@ -2444,4 +2444,9 @@
     <string name="tool_team_info">채팅의 에이전트가 팀 멤버에게 할 일을 알려 주고 답을 받아요</string>
     <string name="tool_team_change">팀 변경</string>
     <string name="tool_team_change_info">요청하면 채팅의 에이전트가 팀을 변경해요. 새 멤버와 에이전트는 카드로 확인해요</string>
+    <string name="team_to">받는 사람: %1$s</string>
+    <string name="team_to_n">받는 사람: %1$d</string>
+    <string name="team_to_desc">보낼 대상: %1$s. 탭하여 변경</string>
+    <string name="team_everyone">모두</string>
+    <string name="team_done">완료</string>
 </resources>

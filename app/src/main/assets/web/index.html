@@ -287,10 +287,22 @@ h2.sec{margin:8px 0 0;font-size:13px;letter-spacing:.5px;text-transform:uppercas
 .tcard.addm{border:2px dashed var(--line);align-items:center;justify-content:center;min-height:90px;color:var(--soft);cursor:pointer;font:inherit}
 .tfacts{display:flex;flex-direction:column;gap:6px;background:var(--card2);border-radius:14px;padding:10px 12px;margin:14px 6px 0;font-size:13px;color:var(--soft)}
 dialog:has(.sheet.wide){width:min(720px,calc(100vw - 32px))}
-.sendto{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
-.sendto label{display:flex;align-items:center;gap:6px;min-height:34px;border-radius:17px;padding:0 12px 0 8px;border:1px solid var(--line);color:var(--text);cursor:pointer}
-.sendto label.on{background:var(--card2)}
-.sendto input{accent-color:var(--mc);width:16px;height:16px;margin:0}
+.av{flex:none;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;background:var(--mc);color:#1A1714;font-weight:700;line-height:1}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .av{color:#fff}}
+:root[data-theme="light"] .av{color:#fff}
+.tochip{flex:none;align-self:center;display:flex;align-items:center;gap:6px;height:36px;border-radius:18px;background:var(--card2);border:0;color:var(--text);font:inherit;font-size:13px;padding:0 8px 0 6px;cursor:pointer;white-space:nowrap}
+.tochip .avs{display:flex}
+.tochip .av{width:20px;height:20px;font-size:10px;box-shadow:0 0 0 2px var(--card2)}
+.tochip .av+.av{margin-inline-start:-6px}
+.tochip svg{color:var(--muted)}
+.composer:has(.tochip:not([hidden])){padding-inline-start:6px}
+.torow{display:flex;align-items:center;gap:12px;min-height:56px;border-radius:14px;padding:6px 10px;cursor:pointer}
+.torow.on{background:var(--card2)}
+.torow input{accent-color:var(--mc);width:18px;height:18px;margin:0;flex:none}
+.torow .av{width:28px;height:28px;font-size:13px}
+.torow span.t{display:flex;flex-direction:column;min-width:0}
+.torow b{font-weight:600}
+.torow small{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .from{align-self:flex-start;max-width:min(92%,760px);background:color-mix(in srgb,var(--mc) 14%,transparent);border-radius:18px 18px 18px 6px;padding:10px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
 .from .who{display:flex;align-items:center;gap:6px;font-size:13px}
 .from .who b{color:var(--mc)}
@@ -298,7 +310,6 @@ dialog:has(.sheet.wide){width:min(720px,calc(100vw - 32px))}
 .from .qt{background:color-mix(in srgb,var(--bg) 55%,transparent);border-radius:10px;padding:6px 10px;font-size:12px;color:var(--soft);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap}
 .from .error{background:none;padding:0}
 .to{align-self:flex-end;font-size:11px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-.shell.view #sendto{display:none}
 .buddy>*:first-child{margin-top:0}
 .buddy>*:last-child{margin-bottom:0}
 .buddy p{margin:0 0 10px;white-space:pre-wrap}
@@ -529,11 +540,11 @@ function start() {
       el('div', {class: 'col dock'}, el('div', {id: 'run'}), el('div', {id: 'cards'}),
         el('div', {id: 'quote'}), el('div', {class: 'atts', id: 'atts'}),
         el('div', {id: 'teamwait'}),
-        el('div', {class: 'sendto', id: 'sendto', hidden: true, role: 'group', 'aria-label': 'Who the message goes to'}),
         el('div', {class: 'composer'},
           el('button', {class: 'clip', 'aria-label': 'Attach files', title: 'Attach files (pictures, documents; over 25 MB they go to the chat’s Linux tools)',
             onclick: () => $('pick').click()}, icon(I.attach, 20)),
           el('input', {type: 'file', id: 'pick', multiple: true, hidden: true, onchange: e => { attach([...e.target.files]); e.target.value = ''; }}),
+          el('button', {class: 'tochip', id: 'tochip', hidden: true, 'aria-haspopup': 'dialog', onclick: () => pickTo()}),
           el('label', {for: 'msg', class: 'sr'}, 'Message'), ta,
           el('button', {class: 'model', id: 'model', hidden: true, title: 'Model and effort', onclick: () => pickModel()}), send),
         el('div', {class: 'said', id: 'said', role: 'alert', hidden: true})))));
@@ -760,7 +771,7 @@ let sendTo = new Set(['leader']), sendToChat = null, teamDrawn = '';
 /** A chat with a team: its members over the chat, each with its state, and the boxes over the message box. */
 function drawTeam(d) {
   drawTeamWait(d);
-  const t = d && d.team && !d.team.off ? d.team : null, strip = $('team'), boxes = $('sendto');
+  const t = d && d.team && !d.team.off ? d.team : null, strip = $('team'), boxes = $('tochip');
   strip.hidden = !t;
   boxes.hidden = !t || !!d.memberOf; // (in a member's own chat, a message goes to that member)
   if (!t) { teamDrawn = ''; return; }
@@ -790,13 +801,56 @@ function drawTeam(d) {
         el('span', {class: 'dotc'}), el('b', {}, m.name), el('small', {}, m.on),
         el('span', {class: 'st' + (m.running ? ' on' : '')}, m.state)), m.c));
   });
-  boxes.textContent = '';
-  boxes.append(el('span', {}, 'Send to'));
-  for (const m of [{id: 'leader', name: 'Leader', c: null}, ...t.members]) {
-    const box = el('input', {type: 'checkbox', onchange: () => { if (!sendTo.delete(m.id)) sendTo.add(m.id); teamDrawn = ''; drawTeam(chatData); }});
-    box.checked = sendTo.has(m.id);
-    boxes.append(tint(el('label', {class: sendTo.has(m.id) ? 'on' : ''}, box, m.name), m.c));
-  }
+  paintTo(t);
+}
+
+/** A member's mark: its initial on its colour. */
+function avatar(name, c) {
+  return tint(el('span', {class: 'av', 'aria-hidden': 'true'}, ([...(name || '?').trim()][0] || '?').toUpperCase()), c);
+}
+
+/** Who a team chat's message can go to: the leader first, then the members. */
+function recipients(t) {
+  return [{id: 'leader', name: 'Leader', c: null}, ...t.members];
+}
+
+/** The message box's To chip: the marks of whom the message goes to, a name or how many, and an arrow to pick. */
+function paintTo(t) {
+  const chip = $('tochip'), who = recipients(t).filter(m => sendTo.has(m.id));
+  chip.textContent = '';
+  chip.append(el('span', {class: 'avs'}, ...who.slice(0, 3).map(m => avatar(m.name, m.c))),
+    who.length === 1 ? 'To ' + who[0].name : 'To ' + who.length, icon(I.chev, 14));
+  chip.setAttribute('aria-label', 'Send to: ' + who.map(m => m.name).join(', ') + '. Change who gets it');
+  chip.title = 'Who the message goes to';
+}
+
+/** The To chip's picker: the leader and each member with its agent and what it does now; a tick counts at once. */
+function pickTo() {
+  const d = chatData, t = d && d.team && !d.team.off ? d.team : null;
+  if (!t) return;
+  sheet((box, close) => {
+    const draw = () => {
+      box.textContent = '';
+      box.append(el('h2', {}, 'Send to'));
+      const L = t.leader || {agent: d.agent, running: d.running};
+      for (const m of recipients(t)) {
+        const lead = m.id === 'leader';
+        const on = lead ? AGENTS[L.agent] || L.agent : m.on, state = lead ? (L.running ? 'Working' : 'Ready') : m.state;
+        const cb = el('input', {type: 'checkbox', onchange: () => {
+          if (!sendTo.delete(m.id)) sendTo.add(m.id);
+          if (!sendTo.size) sendTo.add('leader');
+          paintTo(t); draw();
+        }});
+        cb.checked = sendTo.has(m.id);
+        box.append(tint(el('label', {class: 'torow' + (sendTo.has(m.id) ? ' on' : '')}, cb, avatar(m.name, m.c),
+          el('span', {class: 't'}, el('b', {}, m.name), el('small', {}, on ? on + ' · ' + state : state))), m.c));
+      }
+      box.append(el('div', {class: 'line', style: 'margin-top:14px'},
+        el('button', {class: 'btn', onclick: () => { recipients(t).forEach(m => sendTo.add(m.id)); paintTo(t); draw(); }}, 'Everyone'),
+        el('button', {class: 'btn primary', onclick: close}, 'Done')));
+    };
+    draw();
+  });
 }
 
 /** A structure's shape as a small picture: the leader and what links it in its colour, the members plain. */

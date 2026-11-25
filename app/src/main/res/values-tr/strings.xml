@@ -2472,4 +2472,9 @@
     <string name="tool_team_info">Sohbetin ajanı takımındaki üyelere ne yapacaklarını söyler ve yanıtlarını alır</string>
     <string name="tool_team_change">Takımı değiştir</string>
     <string name="tool_team_change_info">Sohbetin ajanı, siz isteyince takımını değiştirir; yeni üyeler ve ajanlar size bir kartta gelir</string>
+    <string name="team_to">Kime: %1$s</string>
+    <string name="team_to_n">Kime: %1$d</string>
+    <string name="team_to_desc">Gönderilecek: %1$s. Alıcıları değiştirmek için dokunun</string>
+    <string name="team_everyone">Herkes</string>
+    <string name="team_done">Tamam</string>
 </resources>

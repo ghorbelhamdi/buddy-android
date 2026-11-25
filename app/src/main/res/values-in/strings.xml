@@ -2894,4 +2894,9 @@
     <string name="tool_team_info">Agen chat memberi tahu anggota timnya apa yang harus dikerjakan dan menerima jawaban mereka</string>
     <string name="tool_team_change">Ubah tim</string>
     <string name="tool_team_change_info">Agen chat mengubah timnya saat Anda minta; anggota dan agen baru datang kepada Anda di kartu</string>
+    <string name="team_to">Ke %1$s</string>
+    <string name="team_to_n">Ke %1$d</string>
+    <string name="team_to_desc">Kirim ke: %1$s. Ketuk untuk mengubah penerima</string>
+    <string name="team_everyone">Semua</string>
+    <string name="team_done">Selesai</string>
 </resources>

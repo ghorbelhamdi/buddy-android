@@ -2520,4 +2520,9 @@
     <string name="tool_team_info">Agent czatu mówi członkom swojego zespołu, co mają zrobić, i dostaje ich odpowiedzi</string>
     <string name="tool_team_change">Zmień zespół</string>
     <string name="tool_team_change_info">Agent czatu zmienia swój zespół, gdy o to poprosisz; nowi członkowie i agenci trafiają do ciebie na karcie</string>
+    <string name="team_to">Do: %1$s</string>
+    <string name="team_to_n">Do: %1$d</string>
+    <string name="team_to_desc">Wyślij do: %1$s. Dotknij, by zmienić odbiorców</string>
+    <string name="team_everyone">Wszyscy</string>
+    <string name="team_done">Gotowe</string>
 </resources>

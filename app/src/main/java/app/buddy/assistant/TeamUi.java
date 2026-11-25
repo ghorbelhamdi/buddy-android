@@ -631,6 +631,148 @@ final class TeamUi {
 
     // ------------------------------------------------------------------ in the chat
 
+    /** A member's mark: its initial on its colour, in the ink (dark or light) that reads on it. */
+    static TextView avatar(Context c, String name, int color, int sizeDp) {
+        TextView t = new TextView(c);
+        String n = name == null ? "" : name.trim();
+        t.setText(n.isEmpty() ? "?" : n.substring(0, n.offsetByCodePoints(0, 1)).toUpperCase(java.util.Locale.getDefault()));
+        t.setGravity(Gravity.CENTER);
+        t.setIncludeFontPadding(false);
+        t.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, sizeDp * 0.5f);
+        t.setTypeface(sans(c, 700));
+        t.setTextColor(Theme.luminance(color) > 0.5 ? 0xFF1A1714 : 0xFFFFFFFF);
+        t.setBackground(oval(color));
+        t.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(dp(c, sizeDp), dp(c, sizeDp));
+        p.gravity = Gravity.CENTER_VERTICAL;
+        t.setLayoutParams(p);
+        return t;
+    }
+
+    /** Who a team chat's message can go to: the leader first, then the members ({id, name, colour}). */
+    static List<Object[]> recipients(Context c, Team t) {
+        List<Object[]> l = new ArrayList<>();
+        l.add(new Object[]{Team.LEADER, c.getString(R.string.team_leader), Team.leaderColor(c)});
+        for (Team.Member m : t.members) l.add(new Object[]{m.id, m.name, Team.color(c, m.color)});
+        return l;
+    }
+
+    /**
+     * The message box's "To" chip: the ones a message goes to now (their marks, a name or how many), and an arrow
+     * that opens the picker (see sendToSheet).
+     */
+    static void paintTo(Context c, LinearLayout chip, Team t, java.util.Set<String> to) {
+        chip.removeAllViews();
+        List<String> names = new ArrayList<>();
+        int shown = 0;
+        for (Object[] r : recipients(c, t)) {
+            if (!to.contains((String) r[0])) continue;
+            names.add((String) r[1]);
+            if (shown++ >= 3) continue; // (three marks at most, the others in the count)
+            TextView av = avatar(c, (String) r[1], (Integer) r[2], 18);
+            av.setBackground(outlinedOval(c, (Integer) r[2], CARD2, 2));
+            LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) av.getLayoutParams();
+            if (shown > 1) p.setMarginStart(-dp(c, 6));
+            chip.addView(av, p);
+        }
+        String label = names.size() == 1 ? c.getString(R.string.team_to, names.get(0)) : c.getString(R.string.team_to_n, names.size());
+        TextView n = single(text(c, label, 13, TEXT));
+        n.setPaddingRelative(dp(c, 6), 0, dp(c, 2), 0);
+        chip.addView(n);
+        chip.addView(icon(c, R.drawable.ms_expand_less, MUTED, 16));
+        chip.setContentDescription(c.getString(R.string.team_to_desc, android.text.TextUtils.join(", ", names)));
+    }
+
+    private static android.graphics.drawable.Drawable outlinedOval(Context c, int fill, int ring, int ringDp) {
+        android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable();
+        g.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+        g.setColor(fill);
+        g.setStroke(dp(c, ringDp), ring);
+        return g;
+    }
+
+    /**
+     * The picker the "To" chip opens: the leader and each member, its agent and what it does now, ticked or not
+     * (a tick takes effect at once); Everyone ticks them all. The leader alone when nothing is left ticked.
+     */
+    static Dialog sendToSheet(final Activity a, final ChatHub hub, final Sessions.Session owner, final java.util.Set<String> to,
+                              final Runnable changed) {
+        final LinearLayout box = column(a);
+        final Dialog d = bottomSheet(a, box);
+        final Runnable[] render = new Runnable[1];
+        render[0] = () -> {
+            box.removeAllViews();
+            Team t = owner.team;
+            if (t == null) {
+                d.dismiss();
+                return;
+            }
+            box.addView(title(a, a.getString(R.string.team_send_to), 20));
+            for (final Object[] r : recipients(a, t)) {
+                final String id = (String) r[0];
+                boolean leader = Team.LEADER.equals(id);
+                Team.Member m = leader ? null : t.byId(id);
+                Sessions.Session h = leader ? owner : Team.session(hub, owner.id, id);
+                String on = leader ? Account.nameOf(owner.backend) : m == null ? "" : m.on();
+                String state = leader ? a.getString(owner.running ? R.string.helper_working : R.string.team_ready) : state(a, h);
+                boolean ticked = to.contains(id);
+                LinearLayout row = row(a);
+                row.setGravity(Gravity.CENTER_VERTICAL);
+                row.setMinimumHeight(dp(a, 56));
+                row.setPaddingRelative(dp(a, 10), dp(a, 6), dp(a, 10), dp(a, 6));
+                row.setBackground(rounded(a, ticked ? CARD2 : 0x00000000, 14));
+                row.setForeground(a.getDrawable(ripple(a, false)));
+                FrameLayout tick = new FrameLayout(a);
+                int color = (Integer) r[2];
+                tick.setBackground(outlined(a, ticked ? color : 0x00000000, 5, color, 2));
+                if (ticked) tick.addView(icon(a, R.drawable.ms_check, Theme.luminance(color) > 0.5 ? 0xFF1A1714 : 0xFFFFFFFF, 14),
+                        new FrameLayout.LayoutParams(dp(a, 14), dp(a, 14), Gravity.CENTER));
+                row.addView(tick, new LinearLayout.LayoutParams(dp(a, 20), dp(a, 20)));
+                TextView av = avatar(a, (String) r[1], color, 28);
+                LinearLayout.LayoutParams ap = (LinearLayout.LayoutParams) av.getLayoutParams();
+                ap.setMarginStart(dp(a, 12));
+                row.addView(av, ap);
+                LinearLayout col = column(a);
+                col.setPaddingRelative(dp(a, 12), 0, 0, 0);
+                TextView n = single(text(a, (String) r[1], 15, TEXT));
+                n.setTypeface(sans(a, 600));
+                col.addView(n);
+                col.addView(single(text(a, on.isEmpty() ? state : on + " · " + state, 12, MUTED)));
+                row.addView(col, weight1());
+                row.setContentDescription(r[1] + ", " + state);
+                row.setSelected(ticked);
+                row.setOnClickListener(v -> {
+                    if (!to.remove(id)) to.add(id);
+                    if (to.isEmpty()) to.add(Team.LEADER);
+                    changed.run();
+                    render[0].run();
+                });
+                LinearLayout.LayoutParams rp = full();
+                rp.topMargin = dp(a, 6);
+                box.addView(row, rp);
+            }
+            LinearLayout buttons = row(a);
+            Button all = button(a, a.getString(R.string.team_everyone), false);
+            all.setOnClickListener(v -> {
+                for (Object[] r : recipients(a, owner.team == null ? new Team() : owner.team)) to.add((String) r[0]);
+                changed.run();
+                render[0].run();
+            });
+            Button done = button(a, a.getString(R.string.team_done), true);
+            done.setOnClickListener(v -> d.dismiss());
+            LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(0, dp(a, 48), 1);
+            bp.setMarginEnd(dp(a, 8));
+            buttons.addView(all, bp);
+            buttons.addView(done, new LinearLayout.LayoutParams(0, dp(a, 48), 1));
+            LinearLayout.LayoutParams bsp = full();
+            bsp.topMargin = dp(a, 16);
+            box.addView(buttons, bsp);
+        };
+        render[0].run();
+        d.show();
+        return d;
+    }
+
     /** One of the strip's members: its colour, name and state. */
     static View chip(Context c, String name, int color, String state, boolean leader, boolean working) {
         LinearLayout r = row(c);
@@ -650,26 +792,6 @@ final class TeamUi {
         TextView t = text(c, s, 13, MUTED);
         t.setPaddingRelative(dp(c, 6), 0, dp(c, 6), 0);
         return t;
-    }
-
-    /** A box that says a message goes to this one: ticked or not. */
-    static View sendTo(Context c, String name, int color, boolean on, final Runnable toggle) {
-        LinearLayout r = row(c);
-        r.setGravity(Gravity.CENTER_VERTICAL);
-        r.setBackground(outlined(c, on ? CARD2 : 0x00000000, 18, on ? OUTLINE : LINE, 1));
-        r.setPaddingRelative(dp(c, 8), 0, dp(c, 12), 0);
-        r.setMinimumHeight(dp(c, 36));
-        FrameLayout box = new FrameLayout(c);
-        box.setBackground(outlined(c, on ? color : 0x00000000, 5, color, 2));
-        if (on) box.addView(icon(c, R.drawable.ms_check, BG, 14), new FrameLayout.LayoutParams(dp(c, 14), dp(c, 14), Gravity.CENTER));
-        r.addView(box, new LinearLayout.LayoutParams(dp(c, 18), dp(c, 18)));
-        TextView n = single(text(c, name, 13, TEXT));
-        n.setPaddingRelative(dp(c, 6), 0, 0, 0);
-        r.addView(n);
-        r.setOnClickListener(v -> toggle.run());
-        r.setContentDescription(name);
-        r.setSelected(on);
-        return r;
     }
 
     /**

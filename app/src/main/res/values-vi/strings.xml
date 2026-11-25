@@ -3034,4 +3034,9 @@
     <string name="tool_team_info">Agent của cuộc trò chuyện bảo các thành viên trong nhóm việc cần làm và nhận câu trả lời của họ</string>
     <string name="tool_team_change">Thay đổi nhóm</string>
     <string name="tool_team_change_info">Agent của cuộc trò chuyện thay đổi nhóm khi bạn yêu cầu; thành viên và agent mới sẽ đến với bạn trên một thẻ</string>
+    <string name="team_to">Gửi %1$s</string>
+    <string name="team_to_n">Gửi %1$d</string>
+    <string name="team_to_desc">Gửi đến: %1$s. Chạm để đổi người nhận</string>
+    <string name="team_everyone">Mọi người</string>
+    <string name="team_done">Xong</string>
 </resources>

@@ -2560,4 +2560,9 @@
     <string name="tool_team_info">وكيل المحادثة يخبر أعضاء فريقه بما عليهم فعله ويتلقى إجاباتهم</string>
     <string name="tool_team_change">تغيير الفريق</string>
     <string name="tool_team_change_info">وكيل المحادثة يغيّر فريقه عندما تطلب ذلك؛ والأعضاء والوكلاء الجدد يصلونك على بطاقة</string>
+    <string name="team_to">إلى %1$s</string>
+    <string name="team_to_n">إلى %1$d</string>
+    <string name="team_to_desc">إرسال إلى: %1$s. انقر لتغيير المستلمين</string>
+    <string name="team_everyone">الجميع</string>
+    <string name="team_done">تم</string>
 </resources>
