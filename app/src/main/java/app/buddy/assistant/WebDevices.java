@@ -705,7 +705,7 @@ final class WebDevices {
     private static Sessions.Session memberParent(Context c, Sessions.Session s) {
         if (s.member.isEmpty()) return null;
         Sessions.Session p = ChatHub.get(c).sessions.find(s.parent);
-        return p == null || p.incognito || p.team == null || p.team.member(s.member) == null ? null : p;
+        return p == null || p.incognito || p.team == null || p.team.byId(s.member) == null ? null : p;
     }
 
     /** As shownChat, or a team's member's chat (to look at, write to and stop, as on the phone). */
@@ -806,6 +806,7 @@ final class WebDevices {
                 if (!m.linux.isEmpty()) o.put("lx", new JSONArray(m.linux));
                 // a chat with a team: who a message went to; who said this one (its colours: on dark, on light), and what it answers
                 if (!m.to.isEmpty()) o.put("to", m.to);
+                if (m.kind == Bubble.Kind.USER && !m.editable()) o.put("ne", true); // (went to members: not asked again)
                 if (!m.fromName.isEmpty()) {
                     o.put("fn", m.fromName).put("fo", m.fromOn).put("q", m.quote).put("qf", m.quoteFrom);
                     if (!m.from.isEmpty()) o.put("c", new JSONArray(java.util.Arrays.asList(Team.hex(m.color))));
@@ -926,12 +927,13 @@ final class WebDevices {
             if (lead != null) { // a team's member's own chat: as a message ticked for it in the team's chat
                 if (!linux.isEmpty()) return "send files in Linux tools from the team's chat";
                 chat[0] = s.id;
-                String e = Team.tell(hub, lead, lead.team.member(s.member), null, said, files);
+                String e = Team.tell(hub, lead, lead.team.byId(s.member), null, said, files);
                 return e == null ? "" : e;
             }
             if (s == null || s.incognito || !s.parent.isEmpty()) return "no such chat";
             if (!linux.isEmpty() && Lite.on(s)) return "this chat runs on a model on the phone, which has no Linux tools for files";
-            if (s.running) return "the chat is still working: wait for it, or stop it on the phone";
+            // (a team chat takes a message while its leader works: as a note to it, and to the members ticked)
+            if (s.running && s.team == null) return "the chat is still working: wait for it, or stop it on the phone";
             chat[0] = s.id;
             for (String p : linux) { // only what is in this chat's own places, as the app's chips are
                 java.io.File real = FilePlaces.fromLinux(c, p).getCanonicalFile();

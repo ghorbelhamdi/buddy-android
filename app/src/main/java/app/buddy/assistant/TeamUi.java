@@ -89,6 +89,9 @@ final class TeamUi {
                             Team n = Team.preset(a, x[0], leader[0]);
                             n.workspace = t.workspace;
                             n.apps = t.apps;
+                            // (rules and a hand-off the user said stay; the hand-off a shape starts with is that shape's own)
+                            n.rules = t.rules;
+                            if (!t.handoff.isEmpty() && !t.handoff.equals(Team.handoffs(t.structure)[0])) n.handoff = t.handoff;
                             team[0] = n;
                         }
                         render[0].run();

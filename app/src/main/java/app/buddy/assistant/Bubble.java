@@ -827,7 +827,7 @@ final class Bubble implements ChatHub.Listener {
      * a floating keyboard, sits elsewhere, and room made for it from its top squeezed the panel to nothing (issue #88).
      */
     void onKeyboardTop(int top, int bottom) {
-        if (top > 0 && bottom < screen().bottom - dp(48)) top = 0;
+        if (top > 0 && bottom < usable().bottom - dp(48)) top = 0; // (above a taskbar or a tall navigation bar: still along the bottom)
         if (top == imeTop) return;
         imeTop = top;
         fitKeyboard();

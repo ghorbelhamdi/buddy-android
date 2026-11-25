@@ -106,6 +106,12 @@ final class Team {
         }
     }
 
+    /** By its id only (a member's chat knows its member so). */
+    Member byId(String id) {
+        for (Member m : members) if (m.id.equals(id)) return m;
+        return null;
+    }
+
     /** By its id, or by its name as the leader says it. */
     Member member(String said) {
         String s = said == null ? "" : said.trim();
@@ -384,7 +390,7 @@ final class Team {
             h.parent = parent.id;
             h.member = m.id;
             h.model = m.model;
-            h.effort = m.agent.equals(parent.backend) && m.model.isEmpty() ? parent.effort : "";
+            h.effort = m.agent.equals(parent.backend) && m.model.equals(parent.model == null ? "" : parent.model) ? parent.effort : "";
             h.incognito = parent.incognito;
             h.archived = true; // out of the chat list and the bubble: the parent's chat shows it
         }
@@ -431,7 +437,7 @@ final class Team {
     static void reported(ChatHub hub, Sessions.Session h) {
         Sessions.Session parent = hub.sessions.find(h.parent);
         if (parent == null || parent.team == null) return;
-        Member m = parent.team.member(h.member);
+        Member m = parent.team.byId(h.member);
         if (m == null || "stopped".equals(h.outcome)) return;
         boolean failed = h.outcome != null;
         Bubble.Kind kind = failed ? Bubble.Kind.ERROR : Bubble.Kind.BUDDY;
@@ -440,7 +446,7 @@ final class Team {
         List<String> files = new ArrayList<>();
         synchronized (h.messages) {
             int from = Math.min(h.toldAt, h.messages.size());
-            if (from <= 0) { // (not known, after Buddy restarted: from its last message in)
+            if (from < 0) { // (not known, after Buddy restarted: from its last message in)
                 from = h.messages.size() - 1;
                 while (from > 0 && h.messages.get(from).kind != Bubble.Kind.USER) from--;
             }
@@ -515,6 +521,8 @@ final class Team {
                             err[0] = e;
                             return;
                         }
+                        // (on the chat's own agent, unless another model was asked for: the chat's model, as sub-agents had)
+                        if (m.agent.equals(parent.backend) && o.optString("model").trim().isEmpty()) m.model = parent.model == null ? "" : parent.model;
                         to.put(name);
                     }
                     hub.setTeam(parent, n, null);
@@ -524,7 +532,7 @@ final class Team {
                     set.countDown();
                 }
             });
-            set.await(30, TimeUnit.SECONDS);
+            if (!set.await(30, TimeUnit.SECONDS)) return "Buddy is still adding them. Call team again in a moment, with to and the message.";
             if (err[0] != null) return err[0];
             a.put("to", to);
             if (a.optString("message").trim().isEmpty()) return "Added " + names(adding) + ". Tell them what to do (to, message).";
@@ -584,7 +592,7 @@ final class Team {
     }
 
     private static boolean anyRunning(List<Sessions.Session> l) {
-        for (Sessions.Session s : l) if (s.running) return true;
+        for (Sessions.Session s : l) if (s.running) return true; // (a deleted one isn't: see ChatHub.delete)
         return false;
     }
 
@@ -618,6 +626,12 @@ final class Team {
     private static String report(ChatHub hub, Sessions.Session parent, List<Sessions.Session> l, String note) {
         StringBuilder b = new StringBuilder(note);
         boolean waiting = false;
+        // (what this returns, the leader has: its next turn's digest doesn't tell it again)
+        java.util.Set<String> done = new java.util.HashSet<>();
+        for (Sessions.Session h : l) if (!h.running) done.add(h.member);
+        synchronized (parent.messages) {
+            for (Sessions.Msg m : parent.messages) if (!m.from.isEmpty() && done.contains(m.from)) m.heard = true;
+        }
         for (Sessions.Session h : l) {
             b.append(h.title);
             if (h.running) {
@@ -690,7 +704,7 @@ final class Team {
                 done.countDown();
             }
         });
-        done.await(30, TimeUnit.SECONDS);
+        if (!done.await(30, TimeUnit.SECONDS)) return "Buddy is still applying the change: it shows in the team in a moment.";
         return out[0] == null ? "Buddy didn't answer." : out[0];
     }
 

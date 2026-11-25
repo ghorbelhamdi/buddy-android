@@ -50,6 +50,14 @@ final class Sessions {
         /** A member's answer the leader has had: from the team tool while it waited, or in its next turn's digest. */
         boolean heard;
 
+        /**
+         * Can be edited and asked again (issue #44): the user's own message, to the chat's agent alone (in a team chat, a
+         * message that went to members too, or only to them, would reach only the leader again).
+         */
+        boolean editable() {
+            return kind == Bubble.Kind.USER && (to.isEmpty() || toLeader && !to.contains(","));
+        }
+
         Msg(Bubble.Kind kind, String text) {
             this(kind, text, null);
         }
@@ -168,8 +176,8 @@ final class Sessions {
         int briefed;
         /** A member's chat, not saved: who told it what it works on now ("" = the user), and the words. */
         volatile String toldBy = "", told = "";
-        /** A member's chat, not saved: where its run's messages start (the message it was told). */
-        volatile int toldAt;
+        /** A member's chat, not saved: where its run's messages start (the message it was told); -1: not known. */
+        volatile int toldAt = -1;
         /** The chat's scheduled task (see Schedules), or null. */
         Schedules.Plan schedule;
         /** Messages the agent scheduled for itself in this chat (schedule_message), soonest first. Main thread. */
@@ -570,6 +578,10 @@ final class Sessions {
         s.briefed = o.optInt("briefed");
         s.team = Team.of(o.optJSONObject("team"));
         s.lastTeam = Team.of(o.optJSONObject("last_team"));
+        // (2.5.0: the team took over from sub-agents; this chat's own switch for them is the team's now)
+        Boolean wasDelegate = s.tools.remove("delegate");
+        s.tools.remove("subagents");
+        if (wasDelegate != null) for (String t : new String[]{"team", "team_change", "team_start"}) if (!s.tools.containsKey(t)) s.tools.put(t, wasDelegate);
         s.schedule = Schedules.Plan.of(o.optJSONObject("schedule"));
         JSONArray ok = s.schedule == null ? null : o.optJSONArray("allowed"); // kept for its scheduled runs
         if (ok != null) for (int j = 0; j < ok.length(); j++) s.allowed.add(ok.getString(j));

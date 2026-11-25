@@ -680,7 +680,7 @@ function rows(d) {
   d.messages.forEach((m, i) => {
     const at = (d.first || 0) + i, last = out[out.length - 1];
     if (m.k === 'step') { if (last && last.k === 'steps') last.steps.push(m.t); else out.push({k: 'steps', at, steps: [m.t]}); }
-    else out.push({k: m.k, at, t: m.t, s: m.s, f: m.f, lx: m.lx, to: m.to, fn: m.fn, fo: m.fo, c: m.c, q: m.q, qf: m.qf});
+    else out.push({k: m.k, at, t: m.t, s: m.s, f: m.f, lx: m.lx, to: m.to, ne: m.ne, fn: m.fn, fo: m.fo, c: m.c, q: m.q, qf: m.qf});
   });
   return out;
 }
@@ -944,7 +944,8 @@ async function teamSetup(from, draft) {
             if (k === t.structure) return;
             if (draft && draft.members) { t.structure = k; return; } // (the members the user named stay)
             try { const p = await api('/web/team-preset?chat=' + encodeURIComponent(chat) + '&structure=' + k);
-              Object.assign(t, {structure: k, members: p.team.members, handoff: p.team.handoff}); draw(); } catch (e) { say(e.message); }
+              // (rules and a hand-off the user said stay)
+              Object.assign(t, {structure: k, members: p.team.members, handoff: draft && draft.handoff ? t.handoff : p.team.handoff}); draw(); } catch (e) { say(e.message); }
           }, true));
       } else if (step === 1) {
         box.append(el('h2', {}, 'Where do the members work?'), el('p', {}, 'For the whole team. You can tell the leader to change it later.'),
@@ -980,7 +981,7 @@ async function teamSetup(from, draft) {
           const n = t.structure === 'pipe' ? 'Step ' : t.structure === 'lead' ? 'Worker ' : 'Doer ';
           let i = t.members.length + 1;
           while (t.members.some(m => m.name.toLowerCase() === (n + i).toLowerCase())) i++;
-          t.members.push({name: n + i, agent: chatData.agent === 'claude-code' ? 'claude' : (agents[0] || {}).id, model: '', goal: ''}); draw();
+          t.members.push({name: n + i, agent: chatData.agent === 'claude-code' ? 'claude' : chatData.agent, model: '', goal: ''}); draw();
         }}, '+ Add a member'));
         shape.append(el('span', {class: 'ar', 'aria-hidden': 'true'}, '↓'));
         if (t.structure === 'pipe') cards.forEach((c, i) => { if (i) shape.append(el('span', {class: 'ar', 'aria-hidden': 'true'}, '↓')); shape.append(c); });
@@ -1047,7 +1048,7 @@ function row(r, live) {
     return el('div', {class: 'mine'}, r.to ? el('span', {class: 'to'}, '→ ' + r.to) : null, b, el('div', {class: 'acts own'},
       el('button', {'aria-label': 'Copy', title: 'Copy', onclick: e => copy(say1, e.currentTarget)}, icon(I.copy, 18)),
       el('button', {'aria-label': 'Quote', title: 'Quote in your next message', onclick: () => setQuote(r.t)}, icon(I.quote, 18)),
-      r.s || inMember() ? null : el('button', {'aria-label': 'Edit', title: 'Edit and ask again from here', onclick: () => edit(r.at, say1)}, icon(I.edit, 18)),
+      r.s || r.ne || inMember() ? null : el('button', {'aria-label': 'Edit', title: 'Edit and ask again from here', onclick: () => edit(r.at, say1)}, icon(I.edit, 18)),
       inMember() ? null : el('button', {'aria-label': 'Fork from here', title: 'Fork: a new chat with the conversation up to here', onclick: () => fork(r.at)}, icon(I.fork, 18))));
   }
   if (r.k === 'buddy') {

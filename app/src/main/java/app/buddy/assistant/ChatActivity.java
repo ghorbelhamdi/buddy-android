@@ -752,7 +752,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         // (files in Linux tools stay chips on the message; the agent gets their paths with it)
         String err;
         Sessions.Session lead = ses.member.isEmpty() ? null : hub.sessions.find(ses.parent);
-        Team.Member me = lead == null || lead.team == null ? null : lead.team.member(ses.member);
+        Team.Member me = lead == null || lead.team == null ? null : lead.team.byId(ses.member);
         if (me != null) { // a member's own chat: as a message ticked for it in the team's chat
             // (files in Linux tools: their paths with the message, as sendTeam gives them)
             String told = pendingLinux.isEmpty() ? text : (text.isEmpty() ? "Have a look at these files." : text)
@@ -1008,32 +1008,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     private void teamSetup(final Team.Draft draft) {
         TeamUi.setup(this, ses, draft.team, draft.known(), draft.members, false, (team, agent, model) -> {
             if (ses.team != null) return;
-            if (ses.teamDraft == draft) ses.teamDraft = null;
             sendTo.clear();
             sendTo.add(Team.LEADER);
-            final String ask = Team.interview(team, !draft.goals, !draft.handoff, !draft.rules);
-            final Runnable go = new Runnable() {
-                int waited;
-
-                @Override
-                public void run() {
-                    if (ses.team != null || isFinishing() && waited > 0) return;
-                    if (Team.working(hub, ses) && waited++ < 120) { // (its turn ends in a moment)
-                        input.postDelayed(this, 1000);
-                        return;
-                    }
-                    if (Team.working(hub, ses)) {
-                        hub.setTeam(ses, team, null); // still working after 2 minutes: on, and its next turn's brief says so
-                        return;
-                    }
-                    if (!agent.equals(ses.backend)) hub.switchAgent(ses, agent);
-                    if (!model.equals(ses.model == null ? "" : ses.model)) hub.setModel(ses, model);
-                    sentAt = android.os.SystemClock.uptimeMillis();
-                    String err = hub.startTeam(ses, team, ask);
-                    if (err != null) Toast.makeText(ChatActivity.this, err, Toast.LENGTH_LONG).show();
-                }
-            };
-            go.run();
+            // (when the leader's turn is over, which it was told to end: done by the hub, so leaving this screen doesn't lose it)
+            hub.startTeamWhenFree(ses, team, Team.interview(team, !draft.goals, !draft.handoff, !draft.rules), agent, model);
         });
     }
 
@@ -3791,7 +3769,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 items.add(new Object[]{R.drawable.ms_format_quote, R.string.chat_quote, (Runnable) () -> quote(m.text)});
             }
             boolean own = ses.parent.isEmpty() && ses.messages.contains(m);
-            if (own && !ses.running) items.add(new Object[]{R.drawable.ms_edit, R.string.chat_edit, (Runnable) () -> editMessage(m, v)});
+            if (own && !ses.running && m.editable()) items.add(new Object[]{R.drawable.ms_edit, R.string.chat_edit, (Runnable) () -> editMessage(m, v)});
             if (own) items.add(new Object[]{R.drawable.ms_call_split, R.string.chat_fork, (Runnable) () -> fork(m)});
             for (Object[] it : items) {
                 LinearLayout r = row(this);

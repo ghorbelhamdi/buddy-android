@@ -70,6 +70,9 @@ final class ChatHub {
 
     private ChatHub(Context app) {
         this.app = app;
+        // (2.5.0: the team took over from sub-agents; switched off in Settings, its tools are off too)
+        Prefs.carryTool(app, "delegate", "team", "team_change", "team_start");
+        Prefs.carryTool(app, "subagents");
         sessions = new Sessions(app);
         // a chat still marked working when Buddy starts was cut off: Android closed Buddy (an update, low memory), and
         // its agent with it
@@ -231,6 +234,11 @@ final class ChatHub {
 
     void delete(Sessions.Session s) {
         savedFiles.remove(s.id);
+        if (s.running) { // (stopped below; its end won't be heard of for a chat that's gone: over now, its screen with it)
+            s.running = false;
+            Prefs.setBusy(app, s.id, false);
+            Background.close(app, s.id);
+        }
         if (CodexLive.on(s)) CodexLive.end(null);
         StepLog.deleteChat(app, s.id);
         Routines.forget(s.id);
@@ -427,6 +435,33 @@ final class ChatHub {
     /** Members' answers a run of the leader is told of (main thread): heard once that run has started. */
     private final List<Sessions.Msg> heardNow = new ArrayList<>();
 
+    /**
+     * A team the user set up from one they asked for in the chat: started once the leader's turn is over (it was told
+     * to end it), up to two minutes; still working then, the team is on all the same and its next turn's brief says so.
+     * Main thread.
+     */
+    void startTeamWhenFree(final Sessions.Session ses, final Team team, final String ask, final String agent, final String model) {
+        final int[] waited = {0};
+        main.post(new Runnable() {
+            @Override
+            public void run() {
+                if (ses.team != null || !sessions.all.contains(ses)) return;
+                if (Team.working(ChatHub.this, ses) && waited[0]++ < 120) {
+                    main.postDelayed(this, 1000);
+                    return;
+                }
+                if (Team.working(ChatHub.this, ses)) {
+                    setTeam(ses, team, null);
+                    return;
+                }
+                if (!agent.equals(ses.backend)) switchAgent(ses, agent);
+                if (!model.equals(ses.model == null ? "" : ses.model)) setModel(ses, model);
+                String err = startTeam(ses, team, ask);
+                if (err != null) note(ses, Bubble.Kind.ERROR, err);
+            }
+        });
+    }
+
     /** While sendTeam sends (main thread): who the message goes to, for the message made in there. */
     private String sendingTo, sendingAlso;
     private boolean sendingToLeader = true;
@@ -466,7 +501,7 @@ final class ChatHub {
         if (team == null && before != null) ses.lastTeam = before; // (turned off: kept, to start from when it is turned on again)
         if (team != null) ses.lastTeam = null;
         for (Sessions.Session h : Team.all(this, ses.id)) {
-            Team.Member m = team == null ? null : team.member(h.member);
+            Team.Member m = team == null ? null : team.byId(h.member);
             if (m == null || (gone != null && gone.contains(h.member))) {
                 if (h.running) stop(h);
                 delete(h);
@@ -777,7 +812,7 @@ final class ChatHub {
     String edit(Sessions.Session ses, int index, String text) {
         if (ses.running) return app.getString(R.string.chat_edit_running);
         if (!ses.parent.isEmpty() || index < 0 || index >= ses.messages.size()
-                || ses.messages.get(index).kind != Bubble.Kind.USER || text.trim().isEmpty()) {
+                || !ses.messages.get(index).editable() || text.trim().isEmpty()) {
             return app.getString(R.string.chat_edit_failed); // (the message isn't there any more): said, not dropped
         }
         Sessions.Session before = sessions.copy(ses, ses.messages.size(),
