@@ -2570,4 +2570,9 @@
     <string name="team_bar_desc">فريق %1$s: %2$s. يفتح الفريق</string>
     <string name="team_back_to_team">العودة إلى محادثة الفريق</string>
     <string name="team_open_chat_of">فتح محادثة %1$s</string>
+    <string name="team_setup_title">إعداد فريق</string>
+    <string name="team_sec_shape">الشكل</string>
+    <string name="team_sec_members">الأعضاء</string>
+    <string name="team_from_message">من رسالتك</string>
+    <string name="team_then_asks">ثم يسألك القائد عن هدف كل عضو وطريقة التسليم وأي قواعد.</string>
 </resources>

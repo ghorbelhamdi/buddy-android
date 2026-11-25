@@ -52,108 +52,102 @@ final class TeamUi {
                       boolean atEnd, final Done done) {
         final Team[] team = {from != null ? from.copy() : Team.preset(a, Team.PIPE, ses.backend)};
         final String[] leader = {ses.backend, ses.model == null ? "" : ses.model};
-        final List<Integer> steps = new ArrayList<>();
-        for (int i = 0; i < 3; i++) if (!known[i]) steps.add(i);
-        steps.add(3); // (the members always: their agents are picked there)
-        final int[] at = {atEnd ? steps.size() - 1 : 0};
-        final int[] step = {steps.get(at[0])};
         final LinearLayout box = protect(column(a)); // only the user sets a team up
         final Dialog d = bottomSheet(a, box); // (which scrolls what is longer than the screen)
         final Runnable[] render = new Runnable[1];
+        // everything on one sheet: the shape, the members in it with their agents, where they work and the apps;
+        // what the user already said in the chat is filled in and marked so
         render[0] = () -> {
             box.removeAllViews();
-            // where we are: a dot per step
-            LinearLayout dots = row(a);
-            dots.setGravity(Gravity.CENTER_VERTICAL);
-            step[0] = steps.get(at[0]);
-            for (int i = 0; i < steps.size(); i++) {
-                View dot = new View(a);
-                dot.setBackground(rounded(a, i <= at[0] ? ACCENT : OUTLINE, 3));
-                LinearLayout.LayoutParams dp = new LinearLayout.LayoutParams(dp(a, i == at[0] ? 22 : 6), dp(a, 6));
-                dp.setMarginEnd(dp(a, 6));
-                dots.addView(dot, dp);
-            }
-            dots.addView(new View(a), weight1());
-            dots.addView(monoText(a, a.getString(R.string.team_step, at[0] + 1, steps.size()), 12, MUTED));
-            box.addView(dots, full());
             final Team t = team[0];
-            if (step[0] == 0) {
-                head(a, box, a.getString(R.string.team_q_structure), a.getString(R.string.team_q_structure_info));
-                String[][] o = {{Team.LEAD, a.getString(R.string.team_lead), a.getString(R.string.team_lead_info)},
-                        {Team.PIPE, a.getString(R.string.team_pipe), a.getString(R.string.team_pipe_info)},
-                        {Team.CHECK, a.getString(R.string.team_check), a.getString(R.string.team_check_info)},
-                        {Team.DOERS, a.getString(R.string.team_doers), a.getString(R.string.team_doers_info)}};
-                for (final String[] x : o) {
-                    choice(a, box, x[1], x[2], x[0].equals(t.structure), x[0], () -> {
-                        if (keepMembers) t.structure = x[0]; // (the members the user named stay)
-                        else if (!x[0].equals(t.structure)) { // another shape: its own members to start from
-                            Team n = Team.preset(a, x[0], leader[0]);
-                            n.workspace = t.workspace;
-                            n.apps = t.apps;
-                            // (rules and a hand-off the user said stay; the hand-off a shape starts with is that shape's own)
-                            n.rules = t.rules;
-                            if (!t.handoff.isEmpty() && !t.handoff.equals(Team.handoffs(t.structure)[0])) n.handoff = t.handoff;
-                            team[0] = n;
-                        }
-                        render[0].run();
-                    });
-                }
-            } else if (step[0] == 1) {
-                head(a, box, a.getString(R.string.team_q_workspace), a.getString(R.string.team_q_workspace_info));
-                String[][] o = {{Team.SEP, a.getString(R.string.team_ws_sep), a.getString(R.string.team_ws_sep_info)},
-                        {Team.SAME, a.getString(R.string.team_ws_same), a.getString(R.string.team_ws_same_info)},
-                        {Team.LOOK, a.getString(R.string.team_ws_look), a.getString(R.string.team_ws_look_info)}};
-                for (final String[] x : o) {
-                    choice(a, box, x[1], x[2], x[0].equals(t.workspace), () -> {
-                        t.workspace = x[0];
-                        render[0].run();
-                    });
-                }
-            } else if (step[0] == 2) {
-                boolean screens = Background.setUp(a);
-                head(a, box, a.getString(R.string.team_q_apps), a.getString(screens ? R.string.team_q_apps_info
-                        : R.string.team_q_apps_no_background));
-                String[][] o = {{Team.DIFF, a.getString(R.string.team_apps_diff), a.getString(R.string.team_apps_diff_info)},
-                        {Team.TURN, a.getString(R.string.team_apps_turn), a.getString(R.string.team_apps_turn_info)},
-                        {Team.NONE, a.getString(R.string.team_apps_none), a.getString(R.string.team_apps_none_info)}};
-                if (!screens) t.apps = Team.NONE; // (said above: without background mode there is no screen to share)
-                for (final String[] x : o) {
-                    if (!screens && !Team.NONE.equals(x[0])) continue;
-                    choice(a, box, x[1], x[2], x[0].equals(t.apps), () -> {
-                        t.apps = x[0];
-                        render[0].run();
-                    });
-                }
-            } else {
-                head(a, box, a.getString(Team.structureName(t.structure)), a.getString(R.string.team_q_members_info));
-                diagram(a, box, t, leader, render[0]);
+            box.addView(title(a, a.getString(R.string.team_setup_title), 20));
+            section(a, box, a.getString(R.string.team_sec_shape), known[0]);
+            LinearLayout tiles = row(a);
+            String[][] shapes = {{Team.LEAD, a.getString(R.string.team_lead)}, {Team.PIPE, a.getString(R.string.team_pipe)},
+                    {Team.CHECK, a.getString(R.string.team_check)}, {Team.DOERS, a.getString(R.string.team_doers)}};
+            for (int i = 0; i < shapes.length; i++) {
+                final String[] x = shapes[i];
+                boolean on = x[0].equals(t.structure);
+                LinearLayout tile = column(a);
+                tile.setGravity(Gravity.CENTER);
+                tile.setBackground(outlined(a, on ? ACCENT_SOFT : CARD2, 14, on ? ACCENT : CARD2, 2));
+                tile.setPaddingRelative(dp(a, 4), dp(a, 8), dp(a, 4), dp(a, 8));
+                View pic = new Shape(a, x[0]);
+                tile.addView(pic, new LinearLayout.LayoutParams(dp(a, 40), dp(a, 32)));
+                TextView n = text(a, x[1], 11, on ? TEXT : TEXT2);
+                n.setGravity(Gravity.CENTER);
+                n.setMaxLines(2);
+                if (on) n.setTypeface(sans(a, 600));
+                n.setPaddingRelative(0, dp(a, 4), 0, 0);
+                tile.addView(n, full());
+                tile.setSelected(on);
+                tile.setContentDescription(x[1]);
+                tile.setOnClickListener(v -> {
+                    if (keepMembers) t.structure = x[0]; // (the members the user named stay)
+                    else if (!x[0].equals(t.structure)) { // another shape: its own members to start from
+                        Team n2 = Team.preset(a, x[0], leader[0]);
+                        n2.workspace = t.workspace;
+                        n2.apps = t.apps;
+                        // (rules and a hand-off the user said stay; the hand-off a shape starts with is that shape's own)
+                        n2.rules = t.rules;
+                        if (!t.handoff.isEmpty() && !t.handoff.equals(Team.handoffs(t.structure)[0])) n2.handoff = t.handoff;
+                        team[0] = n2;
+                    }
+                    render[0].run();
+                });
+                LinearLayout.LayoutParams tp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1);
+                if (i > 0) tp.setMarginStart(dp(a, 6));
+                tiles.addView(tile, tp);
             }
-            LinearLayout buttons = row(a);
-            Button back = button(a, a.getString(at[0] == 0 ? R.string.team_cancel : R.string.chat_back), false);
-            back.setOnClickListener(v -> {
-                if (at[0] == 0) d.dismiss();
-                else {
-                    at[0]--;
-                    render[0].run();
-                }
+            box.addView(tiles, full());
+            TextView how = text(a, a.getString(Team.LEAD.equals(t.structure) ? R.string.team_lead_info : Team.CHECK.equals(t.structure)
+                    ? R.string.team_check_info : Team.DOERS.equals(t.structure) ? R.string.team_doers_info : R.string.team_pipe_info), 13, MUTED);
+            how.setPaddingRelative(dp(a, 2), dp(a, 6), 0, 0);
+            box.addView(how);
+            section(a, box, a.getString(R.string.team_sec_members), keepMembers);
+            TextView mi = text(a, a.getString(R.string.team_q_members_info), 13, MUTED);
+            mi.setPaddingRelative(dp(a, 2), 0, 0, 0);
+            box.addView(mi);
+            diagram(a, box, t, leader, render[0]);
+            section(a, box, a.getString(R.string.team_q_workspace), known[1]);
+            segmented(a, box, new String[][]{{Team.SEP, a.getString(R.string.team_ws_sep), a.getString(R.string.team_ws_sep_info)},
+                    {Team.SAME, a.getString(R.string.team_ws_same), a.getString(R.string.team_ws_same_info)},
+                    {Team.LOOK, a.getString(R.string.team_ws_look), a.getString(R.string.team_ws_look_info)}}, t.workspace, v -> {
+                t.workspace = v;
+                render[0].run();
             });
-            boolean last = at[0] == steps.size() - 1;
-            Button next = button(a, a.getString(last ? R.string.team_start : R.string.team_next), true);
-            next.setEnabled(!last || !t.members.isEmpty());
-            next.setAlpha(next.isEnabled() ? 1f : 0.5f);
-            next.setOnClickListener(v -> {
-                if (!last) {
-                    at[0]++;
+            boolean screens = Background.setUp(a);
+            section(a, box, a.getString(R.string.team_q_apps), known[2]);
+            if (!screens) { // (without background mode there is no screen to share)
+                t.apps = Team.NONE;
+                TextView no = text(a, a.getString(R.string.team_q_apps_no_background), 13, MUTED);
+                no.setPaddingRelative(dp(a, 2), 0, 0, 0);
+                box.addView(no);
+            } else {
+                segmented(a, box, new String[][]{{Team.DIFF, a.getString(R.string.team_apps_diff), a.getString(R.string.team_apps_diff_info)},
+                        {Team.TURN, a.getString(R.string.team_apps_turn), a.getString(R.string.team_apps_turn_info)},
+                        {Team.NONE, a.getString(R.string.team_apps_none), a.getString(R.string.team_apps_none_info)}}, t.apps, v -> {
+                    t.apps = v;
                     render[0].run();
-                    return;
-                }
+                });
+            }
+            TextView then = text(a, a.getString(R.string.team_then_asks), 13, TEXT2);
+            then.setPaddingRelative(dp(a, 2), dp(a, 16), 0, 0);
+            box.addView(then);
+            LinearLayout buttons = row(a);
+            Button back = button(a, a.getString(R.string.team_cancel), false);
+            back.setOnClickListener(v -> d.dismiss());
+            Button go = button(a, a.getString(R.string.team_start), true);
+            go.setEnabled(!t.members.isEmpty());
+            go.setAlpha(go.isEnabled() ? 1f : 0.5f);
+            go.setOnClickListener(v -> {
                 d.dismiss();
                 done.done(t, leader[0], leader[1]);
             });
             LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(0, dp(a, 48), 1);
             bp.setMarginEnd(dp(a, 8));
             buttons.addView(back, bp);
-            buttons.addView(next, new LinearLayout.LayoutParams(0, dp(a, 48), 2));
+            buttons.addView(go, new LinearLayout.LayoutParams(0, dp(a, 48), 2));
             LinearLayout.LayoutParams bsp = full();
             bsp.topMargin = dp(a, 16);
             box.addView(buttons, bsp);
@@ -162,39 +156,50 @@ final class TeamUi {
         d.show();
     }
 
-    private static void head(Context c, LinearLayout box, String title, String info) {
-        TextView h = title(c, title, 20);
-        h.setPaddingRelative(0, dp(c, 14), 0, 0);
-        box.addView(h);
-        TextView i = text(c, info, 14, TEXT2);
-        i.setPaddingRelative(0, dp(c, 6), 0, dp(c, 4));
-        box.addView(i);
-    }
-
-    private static void choice(Context c, LinearLayout box, String name, String info, boolean on, final Runnable tap) {
-        choice(c, box, name, info, on, null, tap);
-    }
-
-    /** picture: a structure whose shape shows on the card in place of the radio mark, or null. */
-    private static void choice(Context c, LinearLayout box, String name, String info, boolean on, String picture, final Runnable tap) {
+    /** A section's name on the setup sheet; from: the user said it in the chat already (marked so). */
+    private static void section(Context c, LinearLayout box, String name, boolean from) {
         LinearLayout r = row(c);
         r.setGravity(Gravity.CENTER_VERTICAL);
-        r.setBackground(outlined(c, on ? ACCENT_SOFT : CARD2, 16, on ? ACCENT : CARD2, 2));
-        r.setPaddingRelative(dp(c, 12), dp(c, 12), dp(c, 12), dp(c, 12));
-        r.setMinimumHeight(dp(c, 64));
-        r.addView(picture != null ? shape(c, picture, 56, 48) : radio(c, on));
-        r.setSelected(on);
-        LinearLayout t = column(c);
-        t.setPaddingRelative(dp(c, 12), 0, 0, 0);
-        t.addView(title(c, name, 15));
-        TextView i = text(c, info, 13, TEXT2);
-        i.setPaddingRelative(0, dp(c, 2), 0, 0);
-        t.addView(i);
-        r.addView(t, weight1());
-        r.setOnClickListener(v -> tap.run());
-        LinearLayout.LayoutParams p = full();
-        p.topMargin = dp(c, 8);
-        box.addView(r, p);
+        r.setPaddingRelative(dp(c, 2), dp(c, 18), 0, dp(c, 8));
+        TextView n = text(c, name, 14, TEXT);
+        n.setTypeface(sans(c, 600));
+        r.addView(n, weight1());
+        if (from) r.addView(single(text(c, c.getString(R.string.team_from_message), 12, ACCENT_TEXT)));
+        box.addView(r, full());
+    }
+
+    interface Pick1 {
+        void pick(String value);
+    }
+
+    /** Three choices side by side ({value, name, what it means}), the one on filled; what it means under them. */
+    private static void segmented(Context c, LinearLayout box, String[][] o, String on, final Pick1 pick) {
+        LinearLayout r = row(c);
+        r.setBackground(rounded(c, CARD2, 22));
+        r.setPadding(dp(c, 4), dp(c, 4), dp(c, 4), dp(c, 4));
+        String info = "";
+        for (final String[] x : o) {
+            boolean sel = x[0].equals(on);
+            if (sel) info = x[2];
+            TextView b = text(c, x[1], 12, sel ? ON_ACCENT : TEXT2);
+            b.setGravity(Gravity.CENTER);
+            b.setMaxLines(2);
+            b.setMinHeight(dp(c, 44));
+            b.setPaddingRelative(dp(c, 6), dp(c, 4), dp(c, 6), dp(c, 4));
+            if (sel) {
+                b.setBackground(rounded(c, ACCENT, 18));
+                b.setTypeface(sans(c, 600));
+            } else b.setBackgroundResource(ripple(c, false));
+            b.setSelected(sel);
+            b.setOnClickListener(v -> pick.pick(x[0]));
+            r.addView(b, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1));
+        }
+        box.addView(r, full());
+        if (!info.isEmpty()) {
+            TextView i = text(c, info, 13, MUTED);
+            i.setPaddingRelative(dp(c, 2), dp(c, 6), 0, 0);
+            box.addView(i);
+        }
     }
 
     /** The members in the structure's shape: the leader on top, then the others, each with its agent and model to pick. */

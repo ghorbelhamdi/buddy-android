@@ -2482,4 +2482,9 @@
     <string name="team_bar_desc">%1$s ekibi: %2$s. Ekibi açar</string>
     <string name="team_back_to_team">Ekibin sohbetine dön</string>
     <string name="team_open_chat_of">%1$s sohbetini aç</string>
+    <string name="team_setup_title">Ekip kur</string>
+    <string name="team_sec_shape">Şekil</string>
+    <string name="team_sec_members">Üyeler</string>
+    <string name="team_from_message">Mesajınızdan</string>
+    <string name="team_then_asks">Sonra lider her üyenin hedefini, işi nasıl devredeceklerini ve kuralları sorar.</string>
 </resources>

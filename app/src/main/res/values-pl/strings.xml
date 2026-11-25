@@ -2530,4 +2530,9 @@
     <string name="team_bar_desc">Zespół %1$s: %2$s. Otwiera zespół</string>
     <string name="team_back_to_team">Wróć do czatu zespołu</string>
     <string name="team_open_chat_of">Otwórz czat: %1$s</string>
+    <string name="team_setup_title">Ustaw zespół</string>
+    <string name="team_sec_shape">Kształt</string>
+    <string name="team_sec_members">Członkowie</string>
+    <string name="team_from_message">Z twojej wiadomości</string>
+    <string name="team_then_asks">Potem lider zapyta o cel każdego członka, sposób przekazywania pracy i zasady.</string>
 </resources>

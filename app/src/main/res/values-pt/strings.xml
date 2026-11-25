@@ -2926,4 +2926,9 @@
     <string name="team_bar_desc">Equipe %1$s: %2$s. Abre a equipe</string>
     <string name="team_back_to_team">Voltar ao chat da equipe</string>
     <string name="team_open_chat_of">Abrir o chat de %1$s</string>
+    <string name="team_setup_title">Configurar uma equipe</string>
+    <string name="team_sec_shape">Forma</string>
+    <string name="team_sec_members">Membros</string>
+    <string name="team_from_message">Da sua mensagem</string>
+    <string name="team_then_asks">Depois o líder pergunta o objetivo de cada membro, como passam o trabalho e as regras.</string>
 </resources>

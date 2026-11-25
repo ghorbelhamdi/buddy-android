@@ -291,6 +291,15 @@ button.tcard:hover{border-color:color-mix(in srgb,var(--mc) 60%,transparent)}
 .tcard .goal{color:var(--muted);font-size:12px}
 .tcard .st{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tcard .st.on2{color:var(--accent-text)}
+.tsec{display:flex;align-items:baseline;gap:8px;margin:18px 6px 8px;font-weight:600;font-size:14px}
+.tsec small{margin-inline-start:auto;font-weight:400;font-size:12px;color:var(--accent-text)}
+.ttiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:0 6px}
+.ttile{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:14px;border:2px solid var(--card2);background:var(--card2);color:var(--soft);font:inherit;font-size:12px;cursor:pointer;text-align:center}
+.ttile.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--text);font-weight:600}
+.tseg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:4px;border-radius:22px;background:var(--card2);margin:0 6px}
+.tseg button{min-height:40px;border:0;border-radius:18px;background:none;color:var(--soft);font:inherit;font-size:12px;cursor:pointer;padding:4px 6px}
+.tseg button.on{background:var(--accent);color:#fff;font-weight:600}
+.tinfo{margin:6px 8px 0;color:var(--muted);font-size:13px}
 .tchoice{border:1.5px solid var(--line);margin:4px 0;padding:10px 12px}
 .tchoice.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
 .tchoice small{color:var(--muted)}
@@ -1013,73 +1022,69 @@ async function teamSetup(from, draft) {
   const agents = (base.agents || []).map(a => ({id: a.id, name: a.name}));
   const t = JSON.parse(JSON.stringify(from || pre.team));
   const known = draft ? [draft.structure, draft.workspace, draft.apps] : [false, false, false];
-  const steps = [0, 1, 2].filter(i => !known[i]).concat([3]);
-  let at = from && !draft ? steps.length - 1 : 0;
   if (!pre.screens) t.apps = 'none';
+  // everything on one sheet: the shape, the members in it with their agents, where they work and the apps; what
+  // the user already said in the chat is filled in and marked so
   sheet((box, close) => {
     box.classList.add('wide');
-    const radio = (list, cur, pick, pics) => list.filter(o => pre.screens || list !== APPS || o[0] === 'none').map(o =>
-      el('button', {class: 'opt tchoice' + (o[0] === cur ? ' on' : ''), onclick: () => { pick(o[0]); draw(); }},
-        pics ? shapePic(o[0], 44) : el('span', {class: 'rad'}), el('span', {class: 'n'}, el('b', {}, o[1]), el('br'), el('small', {}, o[2]))));
+    const sec = (name, from) => el('div', {class: 'tsec'}, name, from ? el('small', {}, 'From your message') : null);
+    const seg = (list, cur, pick) => {
+      const o = list.find(x => x[0] === cur);
+      return [el('div', {class: 'tseg', role: 'radiogroup'}, ...list.map(x => el('button', {class: x[0] === cur ? 'on' : '', role: 'radio',
+        'aria-checked': x[0] === cur ? 'true' : 'false', onclick: () => { pick(x[0]); draw(); }}, x[1]))), o ? el('p', {class: 'tinfo'}, o[2]) : null];
+    };
     const draw = async () => {
       box.textContent = '';
-      const step = steps[at];
-      box.append(el('p', {style: 'margin:0 6px 4px;text-align:end;font-family:ui-monospace,monospace'}, (at + 1) + ' of ' + steps.length));
-      if (step === 0) {
-        box.append(el('h2', {}, 'How should the team work?'), el('p', {}, 'This chat’s agent leads. Pick a shape; you choose the members’ agents next.'),
-          ...radio(STRUCTS, t.structure, async k => {
-            if (k === t.structure) return;
-            if (draft && draft.members) { t.structure = k; return; } // (the members the user named stay)
-            try { const p = await api('/web/team-preset?chat=' + encodeURIComponent(chat) + '&structure=' + k);
-              // (rules and a hand-off the user said stay)
-              Object.assign(t, {structure: k, members: p.team.members, handoff: draft && draft.handoff ? t.handoff : p.team.handoff}); draw(); } catch (e) { say(e.message); }
-          }, true));
-      } else if (step === 1) {
-        box.append(el('h2', {}, 'Where do the members work?'), el('p', {}, 'For the whole team. You can tell the leader to change it later.'),
-          ...radio(WORKSPACES, t.workspace, k => { t.workspace = k; }));
-      } else if (step === 2) {
-        box.append(el('h2', {}, 'How do they share the phone’s apps?'),
-          el('p', {}, pre.screens ? 'Each member gets a hidden screen of its own, but an app can only be open in one place.'
-            : 'Background mode isn’t set up on the phone, so members have no phone screen: only the background browser and Linux tools.'),
-          ...radio(APPS, t.apps, k => { t.apps = k; }));
-      } else {
-        box.append(el('h2', {}, (STRUCTS.find(x => x[0] === t.structure) || STRUCTS[1])[1]),
-          el('p', {}, 'Pick each one’s agent and model. The leader is this chat’s agent (change it with the agent chip at the top).'));
-        const shape = el('div', {class: 'tshape'});
-        shape.append(tint(el('div', {class: 'tcard lead'}, el('span', {class: 'nm'}, el('span', {class: 'dotc'}), 'Leader'),
-          el('span', {class: 'on'}, (AGENTS[chatData.agent] || chatData.agent) + (chatData.model ? ' · ' + chatData.model : '')), el('span', {class: 'goal'}, 'this chat')), null));
-        const cards = [];
-        for (const m of t.members) {
-          const ms = await agentModels(m.agent);
-          const name = el('input', {value: m.name, maxlength: '40', 'aria-label': 'Name', oninput: e => { m.name = e.target.value; }});
-          const ag = el('select', {'aria-label': m.name + '’s agent', onchange: e => { m.agent = e.target.value; m.model = ''; draw(); }},
-            ...agents.map(a => el('option', {value: a.id}, a.name)));
-          ag.value = m.agent;
-          const mo = el('select', {'aria-label': m.name + '’s model', onchange: e => { m.model = e.target.value; }},
-            ...(ms.models || []).map(x => x.heading ? el('option', {disabled: true}, '— ' + x.heading + ' —') : el('option', {value: x.id}, x.name)));
-          mo.value = m.model || '';
-          cards.push(tint(el('div', {class: 'tcard edit'},
-            el('span', {class: 'nm'}, el('span', {class: 'dotc'}), name,
-              el('button', {class: 'x', 'aria-label': 'Remove ' + m.name, title: 'Remove', onclick: () => { t.members.splice(t.members.indexOf(m), 1); draw(); }}, icon(I.x, 14))),
-            el('label', {}, el('small', {}, 'Agent'), ag), el('label', {}, el('small', {}, 'Model'), mo),
-            m.goal ? el('span', {class: 'goal'}, m.goal) : null), memberColor(m, t.members.indexOf(m))));
-        }
-        cards.push(el('button', {class: 'tcard addm', onclick: () => {
-          const n = t.structure === 'pipe' ? 'Step ' : t.structure === 'lead' ? 'Worker ' : 'Doer ';
-          let i = t.members.length + 1;
-          while (t.members.some(m => m.name.toLowerCase() === (n + i).toLowerCase())) i++;
-          t.members.push({name: n + i, agent: chatData.agent === 'claude-code' ? 'claude' : chatData.agent, model: '', goal: ''}); draw();
-        }}, '+ Add a member'));
-        shape.append(el('span', {class: 'ar', 'aria-hidden': 'true'}, '↓'));
-        if (t.structure === 'pipe') cards.forEach((c, i) => { if (i) shape.append(el('span', {class: 'ar', 'aria-hidden': 'true'}, '↓')); shape.append(c); });
-        else shape.append(el('div', {class: 'rowm'}, ...cards));
-        box.append(shape);
+      box.append(el('h2', {}, 'Set up a team'));
+      box.append(sec('Shape', known[0]), el('div', {class: 'ttiles', role: 'radiogroup', 'aria-label': 'Shape'}, ...STRUCTS.map(o =>
+        el('button', {class: 'ttile' + (o[0] === t.structure ? ' on' : ''), role: 'radio', 'aria-checked': o[0] === t.structure ? 'true' : 'false', onclick: async () => {
+          if (o[0] === t.structure) return;
+          if (draft && draft.members) { t.structure = o[0]; draw(); return; } // (the members the user named stay)
+          try { const p = await api('/web/team-preset?chat=' + encodeURIComponent(chat) + '&structure=' + o[0]);
+            // (rules and a hand-off the user said stay)
+            Object.assign(t, {structure: o[0], members: p.team.members, handoff: draft && draft.handoff ? t.handoff : p.team.handoff}); draw(); } catch (e) { say(e.message); }
+        }}, shapePic(o[0], 40), o[1]))),
+        el('p', {class: 'tinfo'}, (STRUCTS.find(x => x[0] === t.structure) || STRUCTS[1])[2]));
+      box.append(sec('Members', draft && draft.members), el('p', {class: 'tinfo', style: 'margin-top:0'},
+        'Pick each one’s agent and model. The leader is this chat’s agent (change it with the agent chip at the top).'));
+      const shape = el('div', {class: 'tshape'});
+      shape.append(tint(el('div', {class: 'tcard lead'}, el('span', {class: 'nm'}, avatar('Leader', null), el('b', {}, 'Leader')),
+        el('span', {class: 'on'}, (AGENTS[chatData.agent] || chatData.agent) + (chatData.model ? ' · ' + chatData.model : '')), el('span', {class: 'goal'}, 'this chat')), null));
+      const cards = [];
+      for (const m of t.members) {
+        const ms = await agentModels(m.agent);
+        const name = el('input', {value: m.name, maxlength: '40', 'aria-label': 'Name', oninput: e => { m.name = e.target.value; }});
+        const ag = el('select', {'aria-label': m.name + '’s agent', onchange: e => { m.agent = e.target.value; m.model = ''; draw(); }},
+          ...agents.map(a => el('option', {value: a.id}, a.name)));
+        ag.value = m.agent;
+        const mo = el('select', {'aria-label': m.name + '’s model', onchange: e => { m.model = e.target.value; }},
+          ...(ms.models || []).map(x => x.heading ? el('option', {disabled: true}, '— ' + x.heading + ' —') : el('option', {value: x.id}, x.name)));
+        mo.value = m.model || '';
+        const c = memberColor(m, t.members.indexOf(m));
+        cards.push(tint(el('div', {class: 'tcard edit'},
+          el('span', {class: 'nm'}, avatar(m.name, c), name,
+            el('button', {class: 'x', 'aria-label': 'Remove ' + m.name, title: 'Remove', onclick: () => { t.members.splice(t.members.indexOf(m), 1); draw(); }}, icon(I.x, 14))),
+          el('label', {}, el('small', {}, 'Agent'), ag), el('label', {}, el('small', {}, 'Model'), mo),
+          m.goal ? el('span', {class: 'goal'}, m.goal) : null), c));
       }
-      const last = at === steps.length - 1;
+      cards.push(el('button', {class: 'tcard addm', onclick: () => {
+        const n = t.structure === 'pipe' ? 'Step ' : t.structure === 'lead' ? 'Worker ' : 'Doer ';
+        let i = t.members.length + 1;
+        while (t.members.some(m => m.name.toLowerCase() === (n + i).toLowerCase())) i++;
+        t.members.push({name: n + i, agent: chatData.agent === 'claude-code' ? 'claude' : chatData.agent, model: '', goal: ''}); draw();
+      }}, '+ Add a member'));
+      shape.append(el('span', {class: 'ar', 'aria-hidden': 'true'}, '↓'));
+      if (t.structure === 'pipe') cards.forEach((c, i) => { if (i) shape.append(el('span', {class: 'ar', 'aria-hidden': 'true'}, '↓')); shape.append(c); });
+      else shape.append(el('div', {class: 'rowm'}, ...cards));
+      box.append(shape);
+      box.append(sec('Where do the members work?', known[1]), ...seg(WORKSPACES, t.workspace, k => { t.workspace = k; }));
+      box.append(sec('How do they share the phone’s apps?', known[2]));
+      if (pre.screens) box.append(...seg(APPS, t.apps, k => { t.apps = k; }));
+      else box.append(el('p', {class: 'tinfo', style: 'margin-top:0'}, 'Background mode isn’t set up on the phone, so members have no phone screen: only the background browser and Linux tools.'));
+      box.append(el('p', {style: 'margin:16px 6px 0'}, 'Then the leader asks you each member’s goal, how they hand off, and any rules.'));
       box.append(el('div', {class: 'line', style: 'justify-content:flex-end;margin-top:14px'},
-        el('button', {class: 'btn', onclick: () => { if (at === 0) close(); else { at--; draw(); } }}, at === 0 ? 'Cancel' : 'Back'),
-        el('button', {class: 'btn primary', disabled: last && !t.members.length, onclick: async () => {
-          if (!last) { at++; draw(); return; }
+        el('button', {class: 'btn', onclick: close}, 'Cancel'),
+        el('button', {class: 'btn primary', disabled: !t.members.length, onclick: async () => {
           try {
             const r = await api('/web/team', {action: 'start', chat, draft: !!draft,
               team: {structure: t.structure, workspace: t.workspace, apps: t.apps, handoff: t.handoff, rules: t.rules,
@@ -1087,7 +1092,7 @@ async function teamSetup(from, draft) {
             if (r.error) { say(r.error); return; }
             close(); refreshChat();
           } catch (e) { say(e.message); }
-        }}, last ? 'Start the team' : 'Next')));
+        }}, 'Start the team')));
     };
     draw();
   });

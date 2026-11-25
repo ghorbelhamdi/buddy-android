@@ -2455,4 +2455,9 @@
     <string name="team_bar_desc">%1$sチーム: %2$s。チームを開く</string>
     <string name="team_back_to_team">チームのチャットに戻る</string>
     <string name="team_open_chat_of">%1$sのチャットを開く</string>
+    <string name="team_setup_title">チームを設定</string>
+    <string name="team_sec_shape">形</string>
+    <string name="team_sec_members">メンバー</string>
+    <string name="team_from_message">メッセージから</string>
+    <string name="team_then_asks">その後、リーダーが各メンバーの目標、引き継ぎ方法、ルールを尋ねます。</string>
 </resources>

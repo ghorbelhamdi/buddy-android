@@ -2454,4 +2454,9 @@
     <string name="team_bar_desc">%1$s 팀: %2$s. 팀 열기</string>
     <string name="team_back_to_team">팀 채팅으로 돌아가기</string>
     <string name="team_open_chat_of">%1$s 채팅 열기</string>
+    <string name="team_setup_title">팀 설정</string>
+    <string name="team_sec_shape">형태</string>
+    <string name="team_sec_members">멤버</string>
+    <string name="team_from_message">메시지에서</string>
+    <string name="team_then_asks">그다음 리더가 각 멤버의 목표, 인계 방식, 규칙을 묻습니다.</string>
 </resources>

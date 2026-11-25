@@ -2904,4 +2904,9 @@
     <string name="team_bar_desc">Tim %1$s: %2$s. Membuka tim</string>
     <string name="team_back_to_team">Kembali ke chat tim</string>
     <string name="team_open_chat_of">Buka chat %1$s</string>
+    <string name="team_setup_title">Siapkan tim</string>
+    <string name="team_sec_shape">Bentuk</string>
+    <string name="team_sec_members">Anggota</string>
+    <string name="team_from_message">Dari pesan Anda</string>
+    <string name="team_then_asks">Lalu pemimpin menanyakan tujuan tiap anggota, cara serah terima, dan aturannya.</string>
 </resources>

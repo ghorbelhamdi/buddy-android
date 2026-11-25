@@ -2975,4 +2975,9 @@
     <string name="team_bar_desc">Команда «%1$s»: %2$s. Відкриває команду</string>
     <string name="team_back_to_team">Назад до чату команди</string>
     <string name="team_open_chat_of">Відкрити чат: %1$s</string>
+    <string name="team_setup_title">Зібрати команду</string>
+    <string name="team_sec_shape">Форма</string>
+    <string name="team_sec_members">Учасники</string>
+    <string name="team_from_message">З вашого повідомлення</string>
+    <string name="team_then_asks">Потім лідер запитає мету кожного учасника, як передавати роботу та правила.</string>
 </resources>

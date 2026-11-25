@@ -2474,4 +2474,9 @@
     <string name="team_bar_desc">%1$s टीम: %2$s. टीम खोलता है</string>
     <string name="team_back_to_team">टीम की चैट पर वापस</string>
     <string name="team_open_chat_of">%1$s की चैट खोलें</string>
+    <string name="team_setup_title">टीम बनाएँ</string>
+    <string name="team_sec_shape">आकार</string>
+    <string name="team_sec_members">सदस्य</string>
+    <string name="team_from_message">आपके संदेश से</string>
+    <string name="team_then_asks">फिर लीडर आपसे हर सदस्य का लक्ष्य, काम आगे देने का तरीका और नियम पूछेगा।</string>
 </resources>

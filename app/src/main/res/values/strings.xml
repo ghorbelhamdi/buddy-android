@@ -3206,4 +3206,9 @@
     <string name="team_bar_desc">%1$s team: %2$s. Opens the team</string>
     <string name="team_back_to_team">Back to the team’s chat</string>
     <string name="team_open_chat_of">Open %1$s’s chat</string>
+    <string name="team_setup_title">Set up a team</string>
+    <string name="team_sec_shape">Shape</string>
+    <string name="team_sec_members">Members</string>
+    <string name="team_from_message">From your message</string>
+    <string name="team_then_asks">Then the leader asks you each member’s goal, how they hand off, and any rules.</string>
 </resources>

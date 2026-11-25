@@ -2480,4 +2480,9 @@
     <string name="team_bar_desc">Team %1$s: %2$s. Opent het team</string>
     <string name="team_back_to_team">Terug naar de chat van het team</string>
     <string name="team_open_chat_of">Chat van %1$s openen</string>
+    <string name="team_setup_title">Team instellen</string>
+    <string name="team_sec_shape">Vorm</string>
+    <string name="team_sec_members">Leden</string>
+    <string name="team_from_message">Uit je bericht</string>
+    <string name="team_then_asks">Daarna vraagt de leider je naar het doel van elk lid, de overdracht en regels.</string>
 </resources>

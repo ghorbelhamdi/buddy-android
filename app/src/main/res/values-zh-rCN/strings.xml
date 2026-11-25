@@ -2903,4 +2903,9 @@
     <string name="team_bar_desc">%1$s团队：%2$s。打开团队</string>
     <string name="team_back_to_team">返回团队的聊天</string>
     <string name="team_open_chat_of">打开 %1$s 的聊天</string>
+    <string name="team_setup_title">设置团队</string>
+    <string name="team_sec_shape">形式</string>
+    <string name="team_sec_members">成员</string>
+    <string name="team_from_message">来自你的消息</string>
+    <string name="team_then_asks">然后负责人会问你每个成员的目标、如何交接以及规则。</string>
 </resources>
