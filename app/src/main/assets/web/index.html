@@ -1076,12 +1076,18 @@ function row(r, live) {
 // ------------------------------------------------------------ a reply's formatting (built as elements: never as HTML text)
 
 function inline(into, s) {
-  const re = /(`[^`\n]+`)|(\*\*[^\n]+?\*\*)|(\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\))|(https?:\/\/[^\s<>()]*[^\s<>().,;:!?'"*])|(\*[^*\s](?:[^*\n]*[^*\s])?\*)/g;
+  // (a link to a file in Buddy's Linux, [answers](/root/.buddy/work/…/answers.md): its text, opening Files where it is)
+  const re = /(`[^`\n]+`)|(\*\*[^\n]+?\*\*)|(\[([^\]\n]+)\]\((https?:\/\/[^\s)]+|~?\/[^\s)]+)\))|(https?:\/\/[^\s<>()]*[^\s<>().,;:!?'"*])|(\*[^*\s](?:[^*\n]*[^*\s])?\*)/g;
   let at = 0, m;
   while ((m = re.exec(s))) {
     if (m.index > at) into.append(s.slice(at, m.index));
     if (m[1]) into.append(el('code', {}, m[1].slice(1, -1)));
     else if (m[2]) { const b = el('strong'); inline(b, m[2].slice(2, -2)); into.append(b); }
+    else if (m[3] && !/^https?:/.test(m[5])) { // a file: Files at its folder
+      const p = m[5].startsWith('~/') ? '/root' + m[5].slice(1) : m[5], last = p.slice(p.lastIndexOf('/') + 1);
+      const dir = last.includes('.') ? p.slice(0, Math.max(1, p.lastIndexOf('/'))) : p;
+      into.append(el('a', {href: '#', title: p, onclick: e => { e.preventDefault(); openView('files'); setTimeout(() => goFiles(dir), 300); }}, m[4]));
+    }
     else if (m[3]) into.append(el('a', {href: m[5], target: '_blank', rel: 'noopener noreferrer'}, m[4]));
     else if (m[6]) into.append(el('a', {href: m[6], target: '_blank', rel: 'noopener noreferrer'}, m[6]));
     else { const i = el('em'); inline(i, m[7].slice(1, -1)); into.append(i); }

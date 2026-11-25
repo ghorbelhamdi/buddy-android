@@ -3767,6 +3767,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         tv.setAutoLinkMask(android.text.util.Linkify.WEB_URLS | android.text.util.Linkify.EMAIL_ADDRESSES);
         tv.setLinkTextColor(ACCENT_TEXT);
         tv.setText(tv.getText()); // the mask applies on setText
+        // (a file's name isn't a web address, though its ending may be a country's: answers.md)
+        if (tv.getText() instanceof android.text.Spannable) Ui.dropFileLinks((android.text.Spannable) tv.getText());
     }
 
     private android.widget.ImageButton replyAction(int icon, int label, View.OnClickListener onClick) {
