@@ -247,19 +247,22 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         if (type != AccessibilityEvent.TYPE_WINDOWS_CHANGED && type != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return;
         if (!Background.hiddenChats().isEmpty()) HiddenMute.check(this); // another app in front on a hidden screen?
         recheckLock();
-        int top = 0;
+        int top = 0, bottom = 0;
         AccessibilityWindowInfo app = null;
         for (AccessibilityWindowInfo w : getWindows()) {
             if (w.getType() == AccessibilityWindowInfo.TYPE_INPUT_METHOD) {
                 Rect r = new Rect();
                 w.getBoundsInScreen(r);
-                if (!r.isEmpty()) top = r.top;
+                if (!r.isEmpty()) {
+                    top = r.top;
+                    bottom = r.bottom;
+                }
             } else if (w.getType() == AccessibilityWindowInfo.TYPE_APPLICATION
                     && (app == null || w.getLayer() > app.getLayer())) {
                 app = w;
             }
         }
-        if (type == AccessibilityEvent.TYPE_WINDOWS_CHANGED) bubble.onKeyboardTop(top);
+        if (type == AccessibilityEvent.TYPE_WINDOWS_CHANGED) bubble.onKeyboardTop(top, bottom);
         // Opening Home or Recents folds the panel. Decided by the app actually in front changing: the home
         // screen also reports changes while it's already there (e.g. the keyboard opening or closing over it).
         android.view.accessibility.AccessibilityNodeInfo root = app == null ? null : app.getRoot();

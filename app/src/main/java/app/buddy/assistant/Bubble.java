@@ -597,7 +597,8 @@ final class Bubble implements ChatHub.Listener {
         input.setMaxLines(4);
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE
                 | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
-        input.setImeOptions(EditorInfo.IME_ACTION_SEND);
+        // (never the keyboard's own full-screen text box, which some keyboards open in landscape over the whole panel)
+        input.setImeOptions(EditorInfo.IME_ACTION_SEND | EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_FLAG_NO_FULLSCREEN);
         input.setPaddingRelative(dp(12), dp(10), dp(12), dp(4));
         input.setBackground(null);
         input.setOnFocusChangeListener((v, has) -> {
@@ -820,8 +821,13 @@ final class Bubble implements ChatHub.Listener {
         fitKeyboard();
     }
 
-    /** Where the accessibility service sees the keyboard's top (0: no keyboard). */
-    void onKeyboardTop(int top) {
+    /**
+     * Where the accessibility service sees the keyboard's top (0: no keyboard), and its bottom. Only a keyboard along
+     * the bottom of the screen covers the panel: the floating bar a keyboard app shows beside a physical keyboard, or
+     * a floating keyboard, sits elsewhere, and room made for it from its top squeezed the panel to nothing (issue #88).
+     */
+    void onKeyboardTop(int top, int bottom) {
+        if (top > 0 && bottom < screen().bottom - dp(48)) top = 0;
         if (top == imeTop) return;
         imeTop = top;
         fitKeyboard();
@@ -850,6 +856,10 @@ final class Bubble implements ChatHub.Listener {
         else if (kb > 0) lastKeyboard[slot] = kb;
         // (a card on its own already sits above the navigation bar: only the rest of the keyboard needs room)
         int pad = kb > 0 ? Math.max(0, kb - (cardOnly ? lp.y : 0)) + dp(8) : 0;
+        // and never so much that the panel has no room left for the message box and a few lines of the chat: a
+        // keyboard that reports more than it covers (a landscape tablet, issue #88) can't hide the panel then
+        int keep = Math.min(root.getHeight(), dp(120)); // (the message box and a line or two above it)
+        if (root.getHeight() > 0 && pad > root.getHeight() - keep) pad = Math.max(0, root.getHeight() - keep);
         if (headButtons != null) headButtons.setVisibility(pad > 0 ? View.GONE : View.VISIBLE); // room for the chat
         if (root.getPaddingBottom() != pad) {
             root.setPaddingRelative(0, 0, 0, pad);
