@@ -2365,6 +2365,7 @@
     <string name="files_attachments_hint">ये इस चैट में अटैच की गई चीज़ों की कॉपी हैं। एजेंट को कोई और फ़ाइल देने के लिए उसे वर्कस्पेस में या Linux टूल्स को भेजी गई फ़ाइलों में अपलोड करें।</string>
     <string name="debug_lock_settings_text">जब तक यह चालू नहीं होता, बैकग्राउंड मोड फिर शुरू नहीं हो सकता। फ़ोन पूछे तो “इस नेटवर्क पर हमेशा अनुमति दें” चुनकर अनुमति दें पर टैप करें।</string>
     <string name="debug_lock_turn_on">चालू करें</string>
+    <string name="debug_lock_by_hand">यहाँ वायरलेस डीबगिंग चालू करें, फिर Buddy पर लौटें।</string>
 
     <!-- A chat's team (Team): Chat options, the setup sheet, the chat -->
     <string name="chat_team">टीम</string>

@@ -2372,6 +2372,7 @@
     <string name="files_attachments_hint">Das sind Kopien dessen, was du in diesem Chat angehängt hast. Um dem Agenten eine weitere Datei zu geben, lade sie in den Arbeitsbereich oder nach „An Linux-Tools gesendet“ hoch.</string>
     <string name="debug_lock_settings_text">Der Hintergrundmodus kann erst wieder starten, wenn es an ist. Fragt das Handy, setze den Haken bei „In diesem Netzwerk immer zulassen“ und tippe auf Zulassen.</string>
     <string name="debug_lock_turn_on">Einschalten</string>
+    <string name="debug_lock_by_hand">Schalte hier „Debugging über WLAN“ ein und kehre dann zu Buddy zurück.</string>
 
     <!-- A chat's team (Team): Chat options, the setup sheet, the chat -->
     <string name="chat_team">Team</string>

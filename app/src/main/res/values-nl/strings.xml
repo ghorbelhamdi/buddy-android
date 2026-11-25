@@ -2371,6 +2371,7 @@
     <string name="files_attachments_hint">Dit zijn kopieën van wat je in deze chat hebt bijgevoegd. Wil je de agent nog een bestand geven, upload het dan naar de werkruimte of naar Naar Linux-tools gestuurd.</string>
     <string name="debug_lock_settings_text">De achtergrondmodus kan pas weer starten als het aan staat. Vraagt de telefoon het, vink dan “Altijd toestaan op dit netwerk” aan en tik op Toestaan.</string>
     <string name="debug_lock_turn_on">Aanzetten</string>
+    <string name="debug_lock_by_hand">Zet hier Draadloze foutopsporing aan en ga dan terug naar Buddy.</string>
 
     <!-- A chat's team (Team): Chat options, the setup sheet, the chat -->
     <string name="chat_team">Team</string>

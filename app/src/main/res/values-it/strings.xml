@@ -2805,6 +2805,7 @@
     <string name="files_attachments_hint">Sono copie di ciò che hai allegato in questa chat. Per dare un altro file all’agente, caricalo nell’area di lavoro o tra quelli inviati agli strumenti Linux.</string>
     <string name="debug_lock_settings_text">La modalità in background non può ripartire finché non è attivo. Se il telefono chiede, spunta “Consenti sempre su questa rete” e tocca Consenti.</string>
     <string name="debug_lock_turn_on">Attiva</string>
+    <string name="debug_lock_by_hand">Attiva qui il debug wireless, poi torna su Buddy.</string>
 
     <!-- A chat's team (Team): Chat options, the setup sheet, the chat -->
     <string name="chat_team">Team</string>

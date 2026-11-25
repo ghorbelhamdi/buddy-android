@@ -2805,6 +2805,7 @@
     <string name="files_attachments_hint">Ce sont des copies de ce que vous avez joint dans cette discussion. Pour donner un autre fichier à l’agent, importez-le dans l’espace de travail ou dans les fichiers envoyés aux outils Linux.</string>
     <string name="debug_lock_settings_text">Le mode arrière-plan ne peut pas redémarrer tant qu’il n’est pas activé. Si le téléphone demande, cochez « Toujours autoriser sur ce réseau », puis Autoriser.</string>
     <string name="debug_lock_turn_on">Activer</string>
+    <string name="debug_lock_by_hand">Activez ici le débogage sans fil, puis revenez dans Buddy.</string>
 
     <!-- A chat's team (Team): Chat options, the setup sheet, the chat -->
     <string name="chat_team">Équipe</string>

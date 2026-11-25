@@ -75,6 +75,23 @@ public class BackgroundActivity extends Screen {
         });
     }
 
+    /**
+     * Developer options, scrolled to the Wireless debugging switch where the phone's Settings knows how (Android's own
+     * does since Android 11), for the user to turn it on; this screen shows how it stands when they come back.
+     */
+    private void openWirelessDebugging() {
+        try {
+            Bundle row = new Bundle();
+            row.putString(":settings:fragment_args_key", "toggle_adb_wireless");
+            startActivity(new Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS)
+                    .putExtra(":settings:fragment_args_key", "toggle_adb_wireless")
+                    .putExtra(":settings:show_fragment_args", row));
+            android.widget.Toast.makeText(this, R.string.debug_lock_by_hand, android.widget.Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            startActivity(new Intent(Settings.ACTION_SETTINGS));
+        }
+    }
+
     private void openDeveloperOptions() {
         if (opened) return;
         opened = true;
@@ -239,8 +256,22 @@ public class BackgroundActivity extends Screen {
             warn.addView(wt);
             android.widget.Button on = button(this, getString(R.string.debug_lock_turn_on), true);
             on.setOnClickListener(v -> {
-                DebugLock.changed(BuddyService.get()); // one more try: Android's question comes up if it has one
-                v.postDelayed(this::recreate, 6000); // (it tries after a moment, and the phone answers after another)
+                v.setEnabled(false);
+                new Thread(() -> {
+                    // Buddy switches it on itself where the phone gave it the right, or through the helper while that
+                    // runs; else (the helper went with it) only the user can: Settings opens on the switch
+                    boolean can = Background.canSwitchWireless(this) || Background.alive(this);
+                    runOnUiThread(() -> {
+                        if (isFinishing()) return;
+                        v.setEnabled(true);
+                        if (can) {
+                            DebugLock.changed(BuddyService.get()); // one more try: Android's question comes up if it has one
+                            v.postDelayed(this::recreate, 6000); // (it tries after a moment, and the phone answers after another)
+                            return;
+                        }
+                        openWirelessDebugging();
+                    });
+                }, "debug-lock-on").start();
             });
             warn.addView(on, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(this, 40)));
             LinearLayout.LayoutParams wp = full();

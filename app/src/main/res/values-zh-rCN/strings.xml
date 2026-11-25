@@ -2795,6 +2795,7 @@
     <string name="files_attachments_hint">这些是你在此对话中附加内容的副本。要给智能体另一个文件，请上传到工作区或“发送到 Linux 工具的文件”。</string>
     <string name="debug_lock_settings_text">在它开启之前，后台模式无法再次启动。如果手机询问，请勾选“始终允许在此网络上”，然后点按允许。</string>
     <string name="debug_lock_turn_on">开启</string>
+    <string name="debug_lock_by_hand">请在这里开启无线调试，然后回到 Buddy。</string>
 
     <!-- A chat's team (Team): Chat options, the setup sheet, the chat -->
     <string name="chat_team">团队</string>

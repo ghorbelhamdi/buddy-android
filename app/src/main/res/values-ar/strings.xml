@@ -2457,6 +2457,7 @@
     <string name="files_attachments_hint">هذه نسخ مما أرفقته في هذه المحادثة. لإعطاء الوكيل ملفاً آخر، ارفعه إلى مساحة العمل أو إلى الملفات المرسلة إلى أدوات Linux.</string>
     <string name="debug_lock_settings_text">لا يمكن للوضع في الخلفية أن يبدأ من جديد حتى يُفعَّل. إذا سأل الهاتف، حدّد «السماح دائماً على هذه الشبكة» ثم انقر على سماح.</string>
     <string name="debug_lock_turn_on">تفعيل</string>
+    <string name="debug_lock_by_hand">شغّل «تصحيح الأخطاء اللاسلكي» هنا، ثم ارجع إلى Buddy.</string>
 
     <!-- A chat's team (Team): Chat options, the setup sheet, the chat -->
     <string name="chat_team">الفريق</string>

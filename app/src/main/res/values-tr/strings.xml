@@ -2373,6 +2373,7 @@
     <string name="files_attachments_hint">Bunlar bu sohbette eklediklerinizin kopyalarıdır. Ajana başka bir dosya vermek için dosyayı çalışma alanına veya Linux araçlarına gönderilenlere yükleyin.</string>
     <string name="debug_lock_settings_text">Açık olana kadar arka plan modu yeniden başlayamaz. Telefon sorarsa “Bu ağda her zaman izin ver”i işaretleyip İzin ver’e dokunun.</string>
     <string name="debug_lock_turn_on">Aç</string>
+    <string name="debug_lock_by_hand">Kablosuz hata ayıklamayı burada açın, sonra Buddy\'ye dönün.</string>
 
     <!-- A chat's team (Team): Chat options, the setup sheet, the chat -->
     <string name="chat_team">Takım</string>

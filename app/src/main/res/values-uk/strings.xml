@@ -2864,6 +2864,7 @@
     <string name="files_attachments_hint">Це копії того, що ви прикріпили в цьому чаті. Щоб дати агентові інший файл, завантажте його в робочу папку або в надіслані в інструменти Linux.</string>
     <string name="debug_lock_settings_text">Фоновий режим не зможе запуститися знову, доки його не ввімкнено. Якщо телефон запитає, позначте «Завжди дозволяти в цій мережі» й натисніть «Дозволити».</string>
     <string name="debug_lock_turn_on">Увімкнути</string>
+    <string name="debug_lock_by_hand">Увімкніть тут налагодження через Wi-Fi і поверніться в Buddy.</string>
 
     <!-- A chat's team (Team): Chat options, the setup sheet, the chat -->
     <string name="chat_team">Команда</string>

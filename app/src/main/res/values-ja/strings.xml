@@ -2347,6 +2347,7 @@
     <string name="files_attachments_hint">このチャットで添付したもののコピーです。エージェントに別のファイルを渡すには、ワークスペースか「Linux ツールに送ったファイル」にアップロードしてください。</string>
     <string name="debug_lock_settings_text">オンになるまでバックグラウンド モードは再開できません。スマホに確認されたら「このネットワークで常に許可する」にチェックを入れて「許可」をタップしてください。</string>
     <string name="debug_lock_turn_on">オンにする</string>
+    <string name="debug_lock_by_hand">ここでワイヤレス デバッグをオンにしてから、Buddy に戻ってください。</string>
 
     <!-- A chat's team (Team): Chat options, the setup sheet, the chat -->
     <string name="chat_team">チーム</string>

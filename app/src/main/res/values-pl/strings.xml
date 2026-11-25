@@ -2419,6 +2419,7 @@
     <string name="files_attachments_hint">To kopie tego, co załączono w tym czacie. Aby dać agentowi inny plik, prześlij go do obszaru roboczego lub do plików wysłanych do narzędzi Linux.</string>
     <string name="debug_lock_settings_text">Tryb w tle nie uruchomi się ponownie, dopóki nie będzie włączone. Jeśli telefon zapyta, zaznacz „Zawsze zezwalaj w tej sieci” i dotknij Zezwól.</string>
     <string name="debug_lock_turn_on">Włącz</string>
+    <string name="debug_lock_by_hand">Włącz tutaj debugowanie bezprzewodowe, a potem wróć do Buddy.</string>
 
     <!-- A chat's team (Team): Chat options, the setup sheet, the chat -->
     <string name="chat_team">Zespół</string>

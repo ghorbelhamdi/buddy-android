@@ -2346,6 +2346,7 @@
     <string name="files_attachments_hint">이 채팅에 첨부한 파일의 사본입니다. 에이전트에게 다른 파일을 주려면 작업 공간이나 Linux 도구로 보낸 파일에 업로드하세요.</string>
     <string name="debug_lock_settings_text">켜질 때까지 백그라운드 모드를 다시 시작할 수 없습니다. 휴대폰이 물으면 \"이 네트워크에서 항상 허용\"을 선택하고 허용을 탭하세요.</string>
     <string name="debug_lock_turn_on">켜기</string>
+    <string name="debug_lock_by_hand">여기서 무선 디버깅을 켠 다음 Buddy로 돌아오세요.</string>
 
     <!-- A chat's team (Team): Chat options, the setup sheet, the chat -->
     <string name="chat_team">팀</string>

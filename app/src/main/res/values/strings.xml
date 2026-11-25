@@ -3097,6 +3097,7 @@
     <string name="files_attachments_hint">These are copies of what you attached in this chat. To give the agent another file, upload it to the workspace or to Sent to Linux tools.</string>
     <string name="debug_lock_settings_text">Background mode can’t start again until it’s on. If the phone asks, tick “Always allow on this network”, then Allow.</string>
     <string name="debug_lock_turn_on">Turn it on</string>
+    <string name="debug_lock_by_hand">Turn on Wireless debugging here, then come back to Buddy.</string>
 
     <!-- A chat's team (Team): Chat options, the setup sheet, the chat -->
     <string name="chat_team">Team</string>

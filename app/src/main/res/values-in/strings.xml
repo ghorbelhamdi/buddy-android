@@ -2796,6 +2796,7 @@
     <string name="files_attachments_hint">Ini salinan dari yang Anda lampirkan di chat ini. Untuk memberi agen file lain, upload ke ruang kerja atau ke file yang dikirim ke alat Linux.</string>
     <string name="debug_lock_settings_text">Mode latar belakang tidak bisa dimulai lagi sampai ini aktif. Jika ponsel bertanya, centang “Selalu izinkan di jaringan ini”, lalu ketuk Izinkan.</string>
     <string name="debug_lock_turn_on">Aktifkan</string>
+    <string name="debug_lock_by_hand">Aktifkan Debugging nirkabel di sini, lalu kembali ke Buddy.</string>
 
     <!-- A chat's team (Team): Chat options, the setup sheet, the chat -->
     <string name="chat_team">Tim</string>

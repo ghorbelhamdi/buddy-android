@@ -2817,6 +2817,7 @@
     <string name="files_attachments_hint">São cópias do que você anexou neste chat. Para dar outro arquivo ao agente, envie-o para a área de trabalho ou para os enviados às ferramentas Linux.</string>
     <string name="debug_lock_settings_text">O modo em segundo plano não pode voltar a iniciar até estar ligada. Se o telefone perguntar, marque “Permitir sempre nesta rede” e toque em Permitir.</string>
     <string name="debug_lock_turn_on">Ligar</string>
+    <string name="debug_lock_by_hand">Ative aqui a depuração por Wi-Fi e depois volte ao Buddy.</string>
 
     <!-- A chat's team (Team): Chat options, the setup sheet, the chat -->
     <string name="chat_team">Equipe</string>

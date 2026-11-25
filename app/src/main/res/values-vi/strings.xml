@@ -2936,6 +2936,7 @@
     <string name="files_attachments_hint">Đây là bản sao của những gì bạn đã đính kèm trong cuộc trò chuyện này. Để đưa tệp khác cho tác nhân, hãy tải tệp lên không gian làm việc hoặc mục đã gửi tới công cụ Linux.</string>
     <string name="debug_lock_settings_text">Chế độ nền không thể khởi động lại cho đến khi nó được bật. Nếu điện thoại hỏi, chọn “Luôn cho phép trên mạng này” rồi chạm Cho phép.</string>
     <string name="debug_lock_turn_on">Bật</string>
+    <string name="debug_lock_by_hand">Bật Gỡ lỗi không dây ở đây, rồi quay lại Buddy.</string>
 
     <!-- A chat's team (Team): Chat options, the setup sheet, the chat -->
     <string name="chat_team">Nhóm</string>
