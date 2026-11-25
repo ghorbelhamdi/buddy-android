@@ -2887,6 +2887,7 @@
     <string name="team_note_on">Tim aktif: %1$s dengan %2$s</string>
     <string name="team_note_off">Tim nonaktif</string>
     <string name="hub_tool_team">Memberi arahan ke %1$s</string>
+    <string name="team_waiting_for">Menunggu %1$s</string>
     <string name="hub_tool_team_wait">Menunggu tim</string>
     <string name="hub_tool_team_change">Mengubah tim</string>
     <string name="tool_team">Tim</string>

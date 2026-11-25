@@ -2897,6 +2897,7 @@
     <string name="team_note_on">Team attivo: %1$s con %2$s</string>
     <string name="team_note_off">Team disattivato</string>
     <string name="hub_tool_team">Istruzioni a %1$s</string>
+    <string name="team_waiting_for">In attesa di %1$s</string>
     <string name="hub_tool_team_wait">In attesa del team</string>
     <string name="hub_tool_team_change">Modifica del team</string>
     <string name="tool_team">Team</string>

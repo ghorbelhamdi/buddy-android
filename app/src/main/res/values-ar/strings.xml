@@ -2553,6 +2553,7 @@
     <string name="team_note_on">تم تفعيل الفريق: %1$s مع %2$s</string>
     <string name="team_note_off">تم إيقاف الفريق</string>
     <string name="hub_tool_team">جارٍ توجيه %1$s</string>
+    <string name="team_waiting_for">بانتظار %1$s</string>
     <string name="hub_tool_team_wait">في انتظار الفريق</string>
     <string name="hub_tool_team_change">جارٍ تغيير الفريق</string>
     <string name="tool_team">الفريق</string>

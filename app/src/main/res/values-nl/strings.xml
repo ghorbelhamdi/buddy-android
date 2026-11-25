@@ -2463,6 +2463,7 @@
     <string name="team_note_on">Team aan: %1$s met %2$s</string>
     <string name="team_note_off">Team uit</string>
     <string name="hub_tool_team">Opdracht aan %1$s</string>
+    <string name="team_waiting_for">Wacht op %1$s</string>
     <string name="hub_tool_team_wait">Wachten op het team</string>
     <string name="hub_tool_team_change">Team wijzigen</string>
     <string name="tool_team">Team</string>

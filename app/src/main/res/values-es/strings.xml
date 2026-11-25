@@ -2896,6 +2896,7 @@
     <string name="team_note_on">Equipo activado: %1$s con %2$s</string>
     <string name="team_note_off">Equipo desactivado</string>
     <string name="hub_tool_team">Dando instrucciones a %1$s</string>
+    <string name="team_waiting_for">Esperando a %1$s</string>
     <string name="hub_tool_team_wait">Esperando al equipo</string>
     <string name="hub_tool_team_change">Cambiando el equipo</string>
     <string name="tool_team">Equipo</string>

@@ -2464,6 +2464,7 @@
     <string name="team_note_on">Team an: %1$s mit %2$s</string>
     <string name="team_note_off">Team aus</string>
     <string name="hub_tool_team">Beauftragt %1$s</string>
+    <string name="team_waiting_for">Wartet auf %1$s</string>
     <string name="hub_tool_team_wait">Warten auf das Team</string>
     <string name="hub_tool_team_change">Team wird geändert</string>
     <string name="tool_team">Team</string>

@@ -2958,6 +2958,7 @@
     <string name="team_note_on">Команду ввімкнено: %1$s, учасники: %2$s</string>
     <string name="team_note_off">Команду вимкнено</string>
     <string name="hub_tool_team">Доручення для: %1$s</string>
+    <string name="team_waiting_for">Чекає: %1$s</string>
     <string name="hub_tool_team_wait">Очікування команди</string>
     <string name="hub_tool_team_change">Зміна команди</string>
     <string name="tool_team">Команда</string>

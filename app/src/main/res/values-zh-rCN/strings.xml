@@ -2886,6 +2886,7 @@
     <string name="team_note_on">团队已开启：%1$s，成员：%2$s</string>
     <string name="team_note_off">团队已关闭</string>
     <string name="hub_tool_team">正在指示 %1$s</string>
+    <string name="team_waiting_for">正在等待 %1$s</string>
     <string name="hub_tool_team_wait">正在等待团队</string>
     <string name="hub_tool_team_change">正在更改团队</string>
     <string name="tool_team">团队</string>

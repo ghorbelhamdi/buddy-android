@@ -3189,6 +3189,7 @@
     <string name="team_note_on">Team on: %1$s with %2$s</string>
     <string name="team_note_off">Team off</string>
     <string name="hub_tool_team">Telling %1$s</string>
+    <string name="team_waiting_for">Waiting for %1$s</string>
     <string name="hub_tool_team_wait">Waiting for the team</string>
     <string name="hub_tool_team_change">Changing the team</string>
     <string name="tool_team">Team</string>

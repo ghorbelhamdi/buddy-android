@@ -2465,6 +2465,7 @@
     <string name="team_note_on">Takım açık: %1$s, üyeler: %2$s</string>
     <string name="team_note_off">Takım kapalı</string>
     <string name="hub_tool_team">Görev veriliyor: %1$s</string>
+    <string name="team_waiting_for">Bekleniyor: %1$s</string>
     <string name="hub_tool_team_wait">Takım bekleniyor</string>
     <string name="hub_tool_team_change">Takım değiştiriliyor</string>
     <string name="tool_team">Takım</string>

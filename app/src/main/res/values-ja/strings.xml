@@ -2438,6 +2438,7 @@
     <string name="team_note_on">チームをオンにしました: %1$s、メンバー: %2$s</string>
     <string name="team_note_off">チームをオフにしました</string>
     <string name="hub_tool_team">%1$s に指示中</string>
+    <string name="team_waiting_for">%1$s を待っています</string>
     <string name="hub_tool_team_wait">チームを待っています</string>
     <string name="hub_tool_team_change">チームを変更中</string>
     <string name="tool_team">チーム</string>

@@ -608,10 +608,23 @@ final class Team {
         AWAITED.addAll(ids);
         try {
             long start = SystemClock.elapsedRealtime();
+            String said = null;
             while (anyRunning(l) && SystemClock.elapsedRealtime() - start < WAIT_MS) {
                 if (!parent.running || "stopped".equals(parent.outcome)) { // the user stopped the task: its members too
                     svc.runOnMain(() -> stop(hub, parent.id));
                     break;
+                }
+                // what the leader does meanwhile, said as that: it waits for these (not "Telling …" the whole time)
+                StringBuilder who = new StringBuilder();
+                for (Sessions.Session h : l) if (h.running) who.append(who.length() > 0 ? ", " : "").append(h.title);
+                final String now = svc.getString(R.string.team_waiting_for, who);
+                if (!now.equals(said)) {
+                    said = now;
+                    svc.runOnMain(() -> {
+                        if (!parent.running) return;
+                        parent.status = now;
+                        hub.changed();
+                    });
                 }
                 Thread.sleep(500);
             }

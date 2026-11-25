@@ -2457,6 +2457,7 @@
     <string name="team_note_on">टीम चालू: %1$s, सदस्य: %2$s</string>
     <string name="team_note_off">टीम बंद</string>
     <string name="hub_tool_team">%1$s को बता रहा है</string>
+    <string name="team_waiting_for">%1$s का इंतज़ार</string>
     <string name="hub_tool_team_wait">टीम का इंतज़ार</string>
     <string name="hub_tool_team_change">टीम बदल रहा है</string>
     <string name="tool_team">टीम</string>

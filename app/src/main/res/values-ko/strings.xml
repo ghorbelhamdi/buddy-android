@@ -2437,6 +2437,7 @@
     <string name="team_note_on">팀 켜짐: %1$s, 멤버: %2$s</string>
     <string name="team_note_off">팀 꺼짐</string>
     <string name="hub_tool_team">%1$s에게 지시하는 중</string>
+    <string name="team_waiting_for">%1$s 기다리는 중</string>
     <string name="hub_tool_team_wait">팀을 기다리는 중</string>
     <string name="hub_tool_team_change">팀 변경 중</string>
     <string name="tool_team">팀</string>

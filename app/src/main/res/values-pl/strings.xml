@@ -2513,6 +2513,7 @@
     <string name="team_note_on">Zespół włączony: %1$s, członkowie: %2$s</string>
     <string name="team_note_off">Zespół wyłączony</string>
     <string name="hub_tool_team">Polecenie dla: %1$s</string>
+    <string name="team_waiting_for">Czeka na: %1$s</string>
     <string name="hub_tool_team_wait">Czekanie na zespół</string>
     <string name="hub_tool_team_change">Zmienianie zespołu</string>
     <string name="tool_team">Zespół</string>
