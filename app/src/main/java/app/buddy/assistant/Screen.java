@@ -22,6 +22,15 @@ abstract class Screen extends Activity {
         if (!Theme.key().equals(themeKey)) recreate();
     }
 
+    /** TEMPORARY (2.5.0 tests): each tap that reaches a screen, and what is under it (see Watchdog.touch). */
+    @Override
+    public boolean dispatchTouchEvent(android.view.MotionEvent e) {
+        boolean took = super.dispatchTouchEvent(e);
+        if (e.getActionMasked() == android.view.MotionEvent.ACTION_DOWN || e.getActionMasked() == android.view.MotionEvent.ACTION_UP)
+            Watchdog.touch(this, e, took);
+        return took;
+    }
+
     /** How many of Buddy's screens the user sees right now (started ones; main thread). */
     private static int open;
 

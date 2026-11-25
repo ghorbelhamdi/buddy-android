@@ -97,6 +97,55 @@ final class Watchdog {
         t.start();
     }
 
+    /**
+     * A tap's down and up on one of Buddy's screens: where, whether anything took it, and the views under it from the
+     * window down (their kinds and resource names, never their text).
+     */
+    static void touch(android.app.Activity a, android.view.MotionEvent e, boolean took) {
+        if (app == null) return;
+        StringBuilder b = new StringBuilder();
+        b.append(new java.util.Date()).append("  tap ").append(e.getActionMasked() == android.view.MotionEvent.ACTION_DOWN ? "down" : "up")
+                .append(" on ").append(a.getClass().getSimpleName()).append(" at ").append((int) e.getRawX()).append(',').append((int) e.getRawY())
+                .append(took ? " taken" : " NOT taken").append(" focus=").append(a.hasWindowFocus());
+        if (e.getActionMasked() == android.view.MotionEvent.ACTION_DOWN) {
+            b.append("\n   under it:");
+            under(a.getWindow().getDecorView(), (int) e.getRawX(), (int) e.getRawY(), b, 0);
+        }
+        b.append('\n');
+        synchronized (out) {
+            out.append(b);
+            flushedAt = 0; // (now)
+            flush();
+        }
+    }
+
+    private static void under(android.view.View v, int x, int y, StringBuilder b, int depth) {
+        if (v.getVisibility() != android.view.View.VISIBLE || depth > 40) return;
+        int[] at = new int[2];
+        v.getLocationOnScreen(at);
+        if (x < at[0] || y < at[1] || x >= at[0] + v.getWidth() || y >= at[1] + v.getHeight()) return;
+        String id = "";
+        try {
+            if (v.getId() != android.view.View.NO_ID) id = "#" + v.getResources().getResourceEntryName(v.getId());
+        } catch (Exception ignored) {
+        }
+        b.append(" > ").append(v.getClass().getSimpleName()).append(id).append(v.isClickable() ? "(click)" : "")
+                .append(v.isEnabled() ? "" : "(off)").append(v.getAlpha() < 1f ? "(a" + v.getAlpha() + ")" : "")
+                .append('[').append(v.getWidth()).append('x').append(v.getHeight()).append(']');
+        if (v instanceof android.view.ViewGroup) {
+            android.view.ViewGroup g = (android.view.ViewGroup) v;
+            for (int i = g.getChildCount() - 1; i >= 0; i--) { // (the one drawn on top first: the one a tap goes to)
+                android.view.View c = g.getChildAt(i);
+                int[] ca = new int[2];
+                c.getLocationOnScreen(ca);
+                if (c.getVisibility() == android.view.View.VISIBLE && x >= ca[0] && y >= ca[1] && x < ca[0] + c.getWidth() && y < ca[1] + c.getHeight()) {
+                    under(c, x, y, b, depth + 1);
+                    return;
+                }
+            }
+        }
+    }
+
     /** The handler and callback of a dispatch line, without object ids (they differ each time). */
     private static String kind(String line) {
         String s = line.replaceFirst("^>>>>> Dispatching to ", "").replaceAll("@[0-9a-f]+", "").replaceAll("\\{[0-9a-f]+\\}", "");
