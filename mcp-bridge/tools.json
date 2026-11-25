@@ -4,7 +4,12 @@
     "description": "Read what is on the phone screen as a list of UI elements with ids, text, and tap coordinates. Call this first and after every action to see the result. Element ids are only valid until the next read_screen. Elements can also show a field's error, its hint, a heading, a tooltip or a pane title; \"(covered by ...)\" means a tap there would land on something else. A toast that just showed is listed at the end.",
     "inputSchema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "screen": {
+          "type": "string",
+          "description": "Only in background mode, where you work on a hidden screen of your own: \"own\" (the default) reads that screen; \"user\" reads the user's real screen instead, read only, e.g. when they ask about what they're looking at. Taps and typing always go to your own screen."
+        }
+      }
     }
   },
   {
@@ -204,7 +209,12 @@
     "description": "Take a screenshot (JPEG). Use only when read_screen is not enough (images, games, canvas UIs). The reply says how to convert image coordinates to screen pixels.",
     "inputSchema": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "screen": {
+          "type": "string",
+          "description": "Only in background mode, where you work on a hidden screen of your own: \"own\" (the default) reads that screen; \"user\" reads the user's real screen instead, read only, e.g. when they ask about what they're looking at. Taps and typing always go to your own screen."
+        }
+      }
     }
   },
   {
@@ -367,6 +377,78 @@
       },
       "required": [
         "steps"
+      ]
+    }
+  },
+  {
+    "name": "run_on_computer",
+    "description": "Run a command on one of the user's own computers over SSH (they set these up in Buddy's Settings → Other devices). It runs in that computer's shell (cmd.exe on Windows unless its SSH server says otherwise) as the user who added it, with no terminal: nothing interactive. The user approves commands on a card first. Returns the output and the exit code.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "computer": {
+          "type": "string",
+          "description": "The computer's name as set up in Buddy"
+        },
+        "command": {
+          "type": "string",
+          "description": "The command line to run there"
+        },
+        "timeout_s": {
+          "type": "integer",
+          "description": "Default 120, max 600"
+        }
+      },
+      "required": [
+        "command"
+      ]
+    }
+  },
+  {
+    "name": "routine",
+    "description": "Routines: a phone task saved as its steps, done again in seconds without working it out each time. \"run\" does a saved routine step by step on its own (no read_screen between steps; the same approvals apply), with \"values\" for its blanks; when a step doesn't fit (a button isn't there, another app is in front) it stops and returns the steps left, for you to finish from the screen as it is. \"noted\" gives the phone actions Buddy noted in this chat, in routine form; \"save\" keeps steps as a routine, when the user asks for one (after a task went well). \"list\" shows them. When the user asks for something a routine does, run it rather than doing it by hand.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "run",
+            "list",
+            "noted",
+            "save"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "run, save: the routine's name"
+        },
+        "values": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "run: the text for each blank, e.g. {\"message\": \"On my way\"}"
+        },
+        "about": {
+          "type": "string",
+          "description": "save: one line on what it does"
+        },
+        "steps": {
+          "type": "array",
+          "maxItems": 60,
+          "items": {
+            "type": "object"
+          },
+          "description": "save: the steps, as \"noted\" gives them: {\"action\": open_app | open_url | tap | long_press | type | scroll | swipe | press | wait | wait_for | find, and its arguments}. The first step opens an app (or a link). tap and long_press name their target by \"text\" (\"nth\"/\"of\" when several say it); type's \"text\" is a blank such as \"{message}\", its \"target\" the field's hint; \"app\" is the package that should be in front for the step; \"until\" waits for something after it, as in wait_for."
+        },
+        "replace": {
+          "type": "boolean",
+          "description": "save: replace the routine of that name"
+        }
+      },
+      "required": [
+        "action"
       ]
     }
   },
@@ -601,55 +683,218 @@
     }
   },
   {
-    "name": "delegate",
-    "description": "Hand parts of a task to sub-agents that work at the same time, and get their reports back: for work that splits into independent parts in different apps or sites (compare a price in three shops, gather facts from several places). Each sub-agent is an agent like you with the phone tools, on a hidden screen of its own, so the user keeps their screen and you keep yours. Sub-agents only look things up: they can't send, post, buy, delete, change settings or ask the user, so do those steps yourself afterwards. Give each a different app or site (an app can only be open in one place) and a task that stands on its own: a sub-agent knows nothing of this conversation. The call waits for the reports (up to 8 minutes; then subagents gives the rest). When you have a part of your own to do meanwhile (in another app), pass wait false: the sub-agents start, you work at the same time, and subagents collects their reports when you are done. Give as many tasks as the work has parts: they all start at once. Each sub-agent uses the user's plan as you do, so don't delegate what you can do quickly yourself, and never a step whose result you need before you can go on: a lone sub-agent you only wait for is slower than doing it yourself.",
+    "name": "team",
+    "description": "Work that splits into parts that can run at the same time (compare a price in three shops, gather facts from several sites or apps, write it and review it): add a member per part with add and a message; they all work at once, each on a screen or browser tab of its own, which is much faster than doing the parts one after another yourself. In a chat without a team the first ones start one (the user sees it and can keep it or turn it off). A new member knows nothing of this conversation: give it everything it needs. Members are the chat's team, which you lead; each is an agent of its own, on the agent and model it was given (another one when the user names it, or one better at that part), that remembers what it did in this chat before. Members named in one call work at the same time; the call waits for what they answer (up to 8 minutes). Without a message it waits for the members still working; with stop it ends them. Give members different apps or sites (an app can only be open in one place). A single quick step needs no member. What a member answers shows in the chat under its name, so don't repeat it to the user. A team the user asks for goes through team_start instead: add is for the parts of a task. Remove members you added and no longer need with team_change (remove).",
     "inputSchema": {
       "type": "object",
       "properties": {
-        "tasks": {
+        "to": {
           "type": "array",
-          "minItems": 1,
-          "description": "One per sub-agent",
+          "items": {
+            "type": "string"
+          },
+          "description": "The members' names, as the chat's messages list them (members added in this call are told too)"
+        },
+        "add": {
+          "type": "array",
+          "description": "Members to add for this task, told the message at once",
           "items": {
             "type": "object",
             "properties": {
               "name": {
                 "type": "string",
-                "description": "A few words the user sees, e.g. \"Amazon\""
+                "description": "A few words the user sees, e.g. Amazon"
               },
-              "task": {
+              "agent": {
                 "type": "string",
-                "description": "Everything the sub-agent needs: what to find, where, and what to report back"
+                "description": "Optional: a signed-in agent: claude, codex, opencode, agy, grok, copilot or pi. Default: yours"
               },
-              "phone": {
-                "type": "boolean",
-                "description": "Default true. False for a part that needs no app (the web, files, thinking): that sub-agent takes no phone screen"
+              "model": {
+                "type": "string",
+                "description": "Optional: one of that agent's model ids. Default: its own"
+              },
+              "goal": {
+                "type": "string",
+                "description": "What it is for, in a line"
               }
             },
             "required": [
-              "task"
+              "name"
             ]
           }
         },
+        "workspace": {
+          "type": "string",
+          "description": "Only when add starts a team: look (members only look things up, the default), same (they work in this chat's folder, their sends and deletes on a card) or sep (each in a folder of its own)"
+        },
+        "message": {
+          "type": "string",
+          "description": "What they should do or answer, with everything they need that they don't know yet (another member's report, the user's wish)"
+        },
         "wait": {
           "type": "boolean",
-          "description": "Default true: wait here for the reports. False: return at once, so you can work on your own part at the same time; call subagents afterwards."
+          "description": "Default true: wait here for the answers. False: return at once, so you can work on your own part at the same time; call team without a message afterwards."
+        },
+        "stop": {
+          "type": "boolean",
+          "description": "End the members that still work"
         }
-      },
-      "required": [
-        "tasks"
-      ]
+      }
     }
   },
   {
-    "name": "subagents",
-    "description": "Your sub-agents from delegate: waits for the ones still working (up to 8 minutes) and returns every report. With stop, ends the ones still working first.",
+    "name": "team_start",
+    "description": "Only when the user asks for a team in a chat without one (\"start a team for my job hunt\", \"turn the team back on\"): Buddy's team setup opens on their screen with what they said, asks them what they left open (they pick the agents there), and the team starts when they tap Start the team. Pass ONLY what the user said in so many words: no member, agent, model, goal or setting they didn't name, and nothing you think would suit (Buddy asks them). With restore, the team this chat had last.",
     "inputSchema": {
       "type": "object",
       "properties": {
-        "stop": {
+        "restore": {
           "type": "boolean",
-          "description": "End the sub-agents that still work"
+          "description": "The chat's last team again, as it was (then leave the rest out)"
+        },
+        "structure": {
+          "type": "string",
+          "description": "Only if the user said it: lead (leader + workers), pipe (one after another), check (doer + checker) or doers (doers with their own goals)"
+        },
+        "members": {
+          "type": "array",
+          "description": "Only the members the user named, in order (a pipeline's steps; a doer then its checker); none if they named none",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Its name, as the user said it"
+              },
+              "agent": {
+                "type": "string",
+                "description": "Only if the user named one: claude, codex, opencode, agy, grok, copilot or pi"
+              },
+              "model": {
+                "type": "string",
+                "description": "Only if the user named one"
+              },
+              "goal": {
+                "type": "string",
+                "description": "Only if the user said what it is for"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        },
+        "workspace": {
+          "type": "string",
+          "description": "Only if the user said it: sep (each in its own folder), same (all in this chat's folder) or look (only look things up)"
+        },
+        "apps": {
+          "type": "string",
+          "description": "Only if the user said it: diff (each in a different app), turn (one app at a time) or none (no phone apps)"
+        },
+        "handoff": {
+          "type": "string",
+          "description": "Only if the user said how work is handed on"
+        },
+        "rules": {
+          "type": "string",
+          "description": "Only if the user gave rules for the team"
+        }
+      }
+    }
+  },
+  {
+    "name": "team_change",
+    "description": "Only in a chat with a team that you lead, and only when the user asks for it: changes the team. Adding, removing or renaming a member, another agent or model for one, and how the team works come to the user on a card first; goals, the hand-off and the rules are saved as they are.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "add": {
+          "type": "array",
+          "description": "New members",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Its name in the team, e.g. Tester"
+              },
+              "agent": {
+                "type": "string",
+                "description": "A signed-in agent: claude, codex, opencode, agy, grok, copilot or pi. Default: yours"
+              },
+              "model": {
+                "type": "string",
+                "description": "Optional: one of that agent's model ids. Default: its own"
+              },
+              "goal": {
+                "type": "string",
+                "description": "What it is for, in a line"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        },
+        "remove": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Names of members to remove"
+        },
+        "update": {
+          "type": "array",
+          "description": "Changes to members",
+          "items": {
+            "type": "object",
+            "properties": {
+              "member": {
+                "type": "string",
+                "description": "Its name now"
+              },
+              "name": {
+                "type": "string",
+                "description": "A new name"
+              },
+              "agent": {
+                "type": "string",
+                "description": "Another signed-in agent"
+              },
+              "model": {
+                "type": "string",
+                "description": "Another model of its agent"
+              },
+              "goal": {
+                "type": "string",
+                "description": "What it is for, in a line"
+              }
+            },
+            "required": [
+              "member"
+            ]
+          }
+        },
+        "handoff": {
+          "type": "string",
+          "description": "How work is handed on between you and the members, in a sentence"
+        },
+        "rules": {
+          "type": "string",
+          "description": "The whole team's rules, in a few short sentences; \"\" for none"
+        },
+        "structure": {
+          "type": "string",
+          "description": "lead (leader + workers), pipe (pipeline), check (doer + checker) or doers (doers with their own goals)"
+        },
+        "workspace": {
+          "type": "string",
+          "description": "sep (each member in its own folder), same (all in this chat's folder) or look (members only look things up)"
+        },
+        "apps": {
+          "type": "string",
+          "description": "diff (each member in a different app), turn (one app at a time) or none (no phone apps)"
         }
       }
     }

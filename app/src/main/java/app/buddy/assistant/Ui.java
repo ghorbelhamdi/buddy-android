@@ -913,6 +913,7 @@ final class Ui {
     static void linkifyForService(TextView t, Runnable then) {
         android.text.SpannableString s = new android.text.SpannableString(t.getText());
         boolean found = android.text.util.Linkify.addLinks(s, android.text.util.Linkify.WEB_URLS | android.text.util.Linkify.EMAIL_ADDRESSES);
+        dropFileLinks(s);
         for (android.text.style.URLSpan u : s.getSpans(0, s.length(), android.text.style.URLSpan.class)) {
             int a = s.getSpanStart(u), b = s.getSpanEnd(u);
             s.removeSpan(u);
@@ -925,9 +926,36 @@ final class Ui {
         t.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
     }
 
-    /** A markdown link, [text](https://…); one level of parentheses in the address too (Wikipedia's have them). */
+    /**
+     * A markdown link, [text](https://…); one level of parentheses in the address too (Wikipedia's have them). Or to a
+     * file in Buddy's Linux, [answers](/root/.buddy/work/…/answers.md): its text, which opens Files where it is.
+     */
     private static final java.util.regex.Pattern MD_LINK = java.util.regex.Pattern.compile(
-            "\\[([^\\[\\]\\n]+)\\]\\((https?://[^\\s()]*(?:\\([^\\s()]*\\)[^\\s()]*)*)\\)");
+            "\\[([^\\[\\]\\n]+)\\]\\((https?://[^\\s()]*(?:\\([^\\s()]*\\)[^\\s()]*)*|~?/[^\\s()]+)\\)");
+
+    /**
+     * Endings of file names that are also internet domains (answers.md, setup.py, run.sh, a.zip): Android's link
+     * finder takes a file's name for a web address. Such a "link" without http:// or www. in front isn't one.
+     */
+    private static final java.util.Set<String> FILE_ENDINGS = new java.util.HashSet<>(java.util.Arrays.asList(
+            "md", "py", "sh", "rs", "zip", "mov", // (not .pl or .so: sites, allegro.pl, notion.so) "js", "ts", "kt", "kts", "java", "json", "txt", "csv",
+            "pdf", "apk", "log", "xml", "yml", "yaml", "toml", "ini", "conf", "lock", "sql", "db", "gz", "tar", "png",
+            "jpg", "jpeg", "gif", "webp", "mp3", "mp4", "c", "h", "cpp", "go", "rb", "gradle", "env", "cfg", "dart"));
+
+    /** The web links Android found in s that are files' names (see FILE_ENDINGS), taken out again. */
+    static void dropFileLinks(android.text.Spannable s) {
+        for (android.text.style.URLSpan u : s.getSpans(0, s.length(), android.text.style.URLSpan.class)) {
+            int a = s.getSpanStart(u), b = s.getSpanEnd(u);
+            if (a < 0 || b <= a) continue;
+            String t = s.subSequence(a, b).toString().toLowerCase(java.util.Locale.ROOT);
+            if (t.contains("://") || t.startsWith("www.") || t.contains("@")) continue;
+            String host = t.split("[/?#]", 2)[0];
+            String end = host.substring(host.lastIndexOf('.') + 1);
+            // (in a path, or a file's name alone: answers.md, /root/…/setup.py; with a path after it, as docs.rs/tokio,
+            // it is a site)
+            if ((FILE_ENDINGS.contains(end) && host.equals(t)) || (a > 0 && s.charAt(a - 1) == '/')) s.removeSpan(u);
+        }
+    }
 
     /** The same in plain text, for one-line previews: [text](url) becomes text, **bold** bold, and so on. */
     /**
@@ -1288,6 +1316,12 @@ final class Ui {
         @Override
         public void onClick(android.view.View v) {
             if (then != null) then.run();
+            if (url.startsWith("/") || url.startsWith("~/")) { // in Buddy's Linux: Files, at it (a file: at its folder)
+                String p = url.startsWith("~/") ? "/root" + url.substring(1) : url;
+                v.getContext().startActivity(new android.content.Intent(v.getContext(), FilesActivity.class)
+                        .putExtra(FilesActivity.EXTRA_PATH, p).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK));
+                return;
+            }
             try {
                 v.getContext().startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW,
                         android.net.Uri.parse(url)).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK));

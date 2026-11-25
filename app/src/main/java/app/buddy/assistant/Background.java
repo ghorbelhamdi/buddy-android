@@ -296,6 +296,49 @@ final class Background {
         return d;
     }
 
+    /** hasApp's last answers, per chat {when, yes}, and the chats being looked at now. */
+    private static final Map<String, long[]> hasAppSeen = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Set<String> hasAppLooking = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    private static final ExecutorService hasAppPool = Executors.newSingleThreadExecutor();
+
+    /**
+     * An app is on the chat's hidden screen now (one it opened and left, or none yet: no). Never blocks: the answer
+     * looked at last (within a second or so), and a fresh look in the background when it's older. Looking means asking
+     * the app on that screen for its window, which waits as long as that app is busy, and its callers (the chat screen,
+     * the team panel, the page's chat) run on the main thread: there it held the whole app up.
+     */
+    static boolean hasApp(String chat) {
+        final int d = displayOf(chat);
+        final BuddyService svc = BuddyService.get();
+        if (d == Display.DEFAULT_DISPLAY || svc == null) return false;
+        long now = android.os.SystemClock.elapsedRealtime();
+        long[] seen = hasAppSeen.get(chat);
+        if ((seen == null || now - seen[0] >= 1000) && hasAppLooking.add(chat)) {
+            hasAppPool.execute(() -> {
+                try {
+                    boolean yes = hasAppNow(svc, d);
+                    hasAppSeen.put(chat, new long[]{android.os.SystemClock.elapsedRealtime(), yes ? 1 : 0});
+                } finally {
+                    hasAppLooking.remove(chat);
+                }
+            });
+        }
+        return seen != null && seen[1] == 1;
+    }
+
+    private static boolean hasAppNow(BuddyService svc, int d) {
+        try {
+            java.util.List<android.view.accessibility.AccessibilityWindowInfo> l = svc.getWindowsOnAllDisplays().get(d);
+            if (l != null) for (android.view.accessibility.AccessibilityWindowInfo w : l) {
+                android.view.accessibility.AccessibilityNodeInfo r = w.getRoot();
+                if (w.getType() == android.view.accessibility.AccessibilityWindowInfo.TYPE_APPLICATION && r != null
+                        && r.getPackageName() != null) return true;
+            }
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
+
     /** The chat's display if it has one right now, else the real screen's id. Doesn't make one. */
     static int displayOf(String chat) {
         Integer d = chat == null ? null : displays.get(chat);
@@ -538,9 +581,50 @@ final class Background {
      * Settings (a phone that lets Buddy's adb grant it the right needs no walk).
      */
     static String start(Context c, boolean asked) {
-        String why = startNow(c, asked);
-        if (why == null) restartNote = null; // (it runs: why it didn't after the restart is history)
+        if (asked) startBusy.incrementAndGet();
+        String why;
+        try {
+            why = startNow(c, asked);
+        } finally {
+            if (asked) startBusy.decrementAndGet();
+        }
+        if (why == null) { // (it runs: why it didn't before is history)
+            restartNote = null;
+            lastStartWhy = null;
+        }
+        if (asked) { // the user's Start now: why it didn't work, kept for the screen that asked (issue #89)
+            lastStartWhy = why;
+            lastStartAt = android.os.SystemClock.elapsedRealtime();
+            Runnable l = startShown; // (the Background mode screen, if open, shows it; nothing else is opened)
+            if (l != null) l.run();
+        }
         return why;
+    }
+
+    private static final java.util.concurrent.atomic.AtomicInteger startBusy = new java.util.concurrent.atomic.AtomicInteger();
+    /** The Background mode screen while it is in front: drawn again when a Start now ends. */
+    private static volatile Runnable startShown;
+
+    static void onStartEnded(Runnable r) {
+        startShown = r;
+    }
+
+    /** A user's Start now is still at it (the screen may have been drawn anew meanwhile). */
+    static boolean startBusy() {
+        return startBusy.get() > 0;
+    }
+
+    private static volatile String lastStartWhy;
+    private static volatile long lastStartAt;
+
+    /**
+     * Why the user's last Start now didn't work, in the last half hour, or null. Start now may walk Settings for
+     * Wireless debugging, and the Background mode screen is drawn anew when the user comes back: the answer came to the
+     * screen as it was before, and was never seen (issue #89).
+     */
+    static String lastStartWhy() {
+        String w = lastStartWhy;
+        return w == null || android.os.SystemClock.elapsedRealtime() - lastStartAt > 30 * 60_000 ? null : w;
     }
 
     private static String startNow(Context c, boolean asked) {
@@ -600,7 +684,12 @@ final class Background {
             // only what adb itself says means the pairing is gone; anything else is shown as adb said it
             if (out.contains("unauthorized") || out.contains("failed to authenticate")) {
                 return "Buddy isn't paired with this phone's Wireless debugging any more (Settings → Background mode → "
-                        + "Set up). adb said: " + tried;
+                        + "Pair again). adb said: " + tried;
+            }
+            if (refusedKey(out)) { // issue #89: Settings said paired, Wireless debugging no longer listed Buddy
+                return "Buddy isn't paired with this phone's Wireless debugging any more: it refused Buddy's key, which "
+                        + "it does once it has forgotten the pairing (Buddy is then missing from Wireless debugging → "
+                        + "Paired devices). Tap Pair again (Settings → Background mode). adb said: " + tried;
             }
             return "adb couldn't connect to this phone's Wireless debugging. adb said: " + tried;
         }
@@ -612,6 +701,19 @@ final class Background {
         for (String l : out.split("\n")) if (l.startsWith("TRIED ")) b.append(b.length() == 0 ? "" : "; ").append(l.substring(6).trim());
         String s = b.length() > 0 ? b.toString() : out.trim().isEmpty() ? "nothing" : out.trim();
         return s.length() > 800 ? s.substring(0, 800) + "…" : s;
+    }
+
+    /**
+     * Did Wireless debugging turn Buddy's key away? adb then says just "failed to connect to host:port", with no
+     * reason after it (measured with a key the phone doesn't trust; a closed port adds ": Connection refused", a port
+     * that isn't adb's gives "offline").
+     */
+    private static boolean refusedKey(String out) {
+        for (String l : out.split("\n")) {
+            Matcher m = Pattern.compile("^TRIED (\\S+): failed to connect to (\\S+)\\s*/").matcher(l.trim());
+            if (m.find() && m.group(1).equals(m.group(2))) return true;
+        }
+        return false;
     }
 
     /** What the helper itself printed before it gave up (launch's output after LOG=), as ": …", or "". */
@@ -948,6 +1050,7 @@ final class Background {
         }
         if (!was) wirelessDebugging(svc, false); // not started: as it was
         restartNote = why;
+        lastStartWhy = null; // (newer than the last Start now's: this one shows)
         // the pairing is gone, or Wireless debugging didn't come up although it was switched on: no use trying again
         if (tries >= RESTART_TRIES || why.contains("paired") || why.startsWith("Wireless debugging is off")) {
             Prefs.setBackgroundRestartTries(svc, boot, RESTART_TRIES);
@@ -958,6 +1061,7 @@ final class Background {
 
     private static long gaveUp(Context c, int boot, String why) {
         restartNote = why;
+        lastStartWhy = null; // (newer than the last Start now's: this one shows)
         Prefs.setBackgroundRestartTries(c, boot, RESTART_TRIES);
         return 0;
     }
@@ -1123,6 +1227,7 @@ final class Background {
                     set(Step.FAILED, why);
                     return;
                 }
+                lastStartWhy = null; // (paired anew: the old reason is history)
                 set(Step.READY, "");
             } catch (Exception e) {
                 set(Step.FAILED, String.valueOf(e.getMessage()));

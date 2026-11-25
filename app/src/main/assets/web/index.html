@@ -77,6 +77,10 @@ nav a.wait .s{color:var(--accent-text)}
 
 /* ---------- messages */
 .mine .user{align-self:flex-end}
+.mine.editing .user{width:min(78%,620px);box-sizing:border-box;outline:2px solid var(--accent);outline-offset:2px}
+.mine.editing textarea{display:block;width:100%;box-sizing:border-box;border:0;background:transparent;color:inherit;font:inherit;line-height:inherit;resize:none;padding:0;outline:none;overflow-y:auto}
+.mine.editing .edhint{align-self:flex-end;font-size:12px;color:var(--muted);max-width:min(78%,620px);text-align:end}
+.mine.editing .edbtns{display:flex;align-self:flex-end;gap:8px}
 .user{align-self:flex-end;max-width:min(78%,620px);background:var(--bubble);color:var(--bubble-text);border-radius:20px 20px 6px 20px;padding:10px 16px;white-space:pre-wrap}
 .user .lab{display:block;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;opacity:.7;margin-bottom:2px}
 .user.fold .tx{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
@@ -233,6 +237,114 @@ h2.sec{margin:8px 0 0;font-size:13px;letter-spacing:.5px;text-transform:uppercas
 .rate{font:inherit;font-size:13px;min-height:34px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text);padding:0 8px}
 .shell.view #quote,.shell.view #atts,.shell.view .composer,.shell.view #run{display:none}
 .buddy{max-width:100%}
+.tm{--mc:var(--md)}
+.tm.lead{--md:#E89B7F;--ml:#B4502E}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .tm{--mc:var(--ml)}}
+:root[data-theme="light"] .tm{--mc:var(--ml)}
+.dotc{width:8px;height:8px;border-radius:4px;background:var(--mc);flex:none}
+.tbar{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;box-sizing:border-box;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:4px 12px 4px 8px;font:inherit;color:var(--text);cursor:pointer;text-align:start;overflow-x:auto;scrollbar-width:none}
+.tbar:hover{border-color:var(--outline,var(--accent))}
+.tbar .one{display:flex;align-items:center;gap:5px;flex:none;font-size:12px;color:var(--muted)}
+.tbar .one.on{color:var(--text);font-weight:600}
+.tbar .one .av{width:20px;height:20px;font-size:11px}
+.tbar .one.cur .av{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--mc)}
+.tbar .sp{flex:1}
+.tbar>svg:last-child{flex:none;color:var(--muted)}
+.tcard .nm .av{width:24px;height:24px;font-size:12px}
+.round{align-self:flex-start;width:min(92%,760px);box-sizing:border-box;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.round .rh{display:flex;align-items:center;gap:8px}
+.round .rh b{flex:1;font-size:13px}
+.round .avs{display:flex}
+.round .av{width:22px;height:22px;font-size:11px;box-shadow:0 0 0 2px var(--card)}
+.round .av+.av{margin-inline-start:-6px}
+.round p{margin:0;font-size:13px;color:var(--soft);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.round p b{color:var(--mc)}
+.tcard .nm b{color:var(--mc);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tcard .nm .sw{font-size:12px;font-weight:400;color:var(--muted)}
+.tcard .nm .sw.on2{color:var(--text);font-weight:600}
+.tcard .last{color:var(--soft);font-size:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tcard .shot{align-self:center;width:72px;aspect-ratio:9/19;border-radius:10px;background:var(--bg);overflow:hidden;margin-top:6px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);text-align:center}
+.tcard .shot img{width:100%;height:100%;object-fit:contain}
+button.tcard{font:inherit;color:inherit;cursor:pointer}
+button.tcard:hover{border-color:color-mix(in srgb,var(--mc) 60%,transparent)}
+.tcard.cur{border-color:var(--mc)}
+.team{display:flex;align-items:center;padding:8px 20px;border-bottom:1px solid var(--line)}
+.team .m{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:5px 12px;font-size:13px;min-width:0}
+.team .m.lead{border-color:color-mix(in srgb,var(--mc) 55%,transparent)}
+.team .m b{font-weight:600}
+.team .m small{color:var(--muted);font-size:12px}
+.team .m .st{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;color:var(--muted);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.team .m .st.on{color:var(--accent-text)}
+.team .ar{color:var(--muted)}
+.team button.m{font:inherit;color:inherit;cursor:pointer}
+.team .m.cur{border-color:var(--mc);background:color-mix(in srgb,var(--mc) 14%,var(--card))}
+.team button.m:hover{border-color:color-mix(in srgb,var(--mc) 60%,transparent)}
+.btn.memberof{align-self:flex-start;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--soft)}
+.team .shapebtn{display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:4px 10px 4px 6px;font-size:13px;font-weight:600;color:var(--text);margin-inline-end:6px}
+.team .shapebtn:hover{border-color:var(--accent)}
+.shapepic{flex:none;color:var(--soft)}
+.shapepic .a{color:#E89B7F}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .shapepic .a{color:#B4502E}}
+:root[data-theme="light"] .shapepic .a{color:#B4502E}
+.tshape{display:flex;flex-direction:column;align-items:center;gap:6px;padding:4px 6px 0}
+.tshape .ar{color:var(--muted);font-size:16px;line-height:1}
+.tshape .fan{width:min(100%,640px);height:20px;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round}
+.tshape .rowm{display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:8px;width:100%}
+.tshape .tpair{display:flex;flex-direction:row;align-items:stretch;gap:6px}
+.tshape .tpair .ar{align-self:center}
+.tcard{display:flex;flex-direction:column;gap:3px;background:var(--card2);border:2px solid transparent;border-radius:16px;padding:10px 12px;width:200px;box-sizing:border-box;text-align:start;font-size:13px}
+.tcard.lead{border-color:color-mix(in srgb,var(--mc) 70%,transparent)}
+.tcard .nm{display:flex;align-items:center;gap:6px;font-weight:600;font-size:14px}
+.tcard .on{color:var(--soft);font-size:12px}
+.tcard .goal{color:var(--muted);font-size:12px}
+.tcard .st{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tcard .st.on2{color:var(--accent-text)}
+.tsec{display:flex;align-items:baseline;gap:8px;margin:18px 6px 8px;font-weight:600;font-size:14px}
+.tsec small{margin-inline-start:auto;font-weight:400;font-size:12px;color:var(--accent-text)}
+.ttiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:0 6px}
+.ttile{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:14px;border:2px solid var(--card2);background:var(--card2);color:var(--soft);font:inherit;font-size:12px;cursor:pointer;text-align:center}
+.ttile.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--text);font-weight:600}
+.tseg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:4px;border-radius:22px;background:var(--card2);margin:0 6px}
+.tseg button{min-height:40px;border:0;border-radius:18px;background:none;color:var(--soft);font:inherit;font-size:12px;cursor:pointer;padding:4px 6px}
+.tseg button.on{background:var(--accent);color:#fff;font-weight:600}
+.tinfo{margin:6px 8px 0;color:var(--muted);font-size:13px}
+.tchoice{border:1.5px solid var(--line);margin:4px 0;padding:10px 12px}
+.tchoice.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.tchoice small{color:var(--muted)}
+.tchoice .rad{flex:none;width:16px;height:16px;border-radius:50%;border:2px solid var(--muted)}
+.tchoice.on .rad{border-color:var(--accent);background:radial-gradient(var(--accent) 45%,transparent 50%)}
+.tcard.edit{gap:6px}
+.tcard.edit input{flex:1;min-width:0;font:inherit;font-weight:600;background:transparent;border:0;border-bottom:1px solid var(--line);color:var(--text);padding:2px 0}
+.tcard.edit select{width:100%;font:inherit;font-size:13px;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:6px 8px}
+.tcard.edit label{display:flex;flex-direction:column;gap:2px}
+.tcard.edit small{color:var(--muted);font-size:11px}
+.tcard .x{flex:none;width:26px;height:26px;border-radius:13px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.tcard.addm{border:2px dashed var(--line);align-items:center;justify-content:center;min-height:90px;color:var(--soft);cursor:pointer;font:inherit}
+.tfacts{display:flex;flex-direction:column;gap:6px;background:var(--card2);border-radius:14px;padding:10px 12px;margin:14px 6px 0;font-size:13px;color:var(--soft)}
+dialog:has(.sheet.wide){width:min(720px,calc(100vw - 32px))}
+.av{flex:none;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;background:var(--mc);color:#1A1714;font-weight:700;line-height:1}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .av{color:#fff}}
+:root[data-theme="light"] .av{color:#fff}
+.tochip{flex:none;align-self:center;display:flex;align-items:center;gap:6px;height:36px;border-radius:18px;background:var(--card2);border:0;color:var(--text);font:inherit;font-size:13px;padding:0 8px 0 6px;cursor:pointer;white-space:nowrap}
+.tochip .avs{display:flex}
+.tochip .av{width:20px;height:20px;font-size:10px;box-shadow:0 0 0 2px var(--card2)}
+.tochip .av+.av{margin-inline-start:-6px}
+.tochip svg{color:var(--muted)}
+.composer:has(.tochip:not([hidden])){padding-inline-start:6px}
+.torow{display:flex;align-items:center;gap:12px;min-height:56px;border-radius:14px;padding:6px 10px;cursor:pointer}
+.torow.on{background:var(--card2)}
+.torow input{accent-color:var(--mc);width:18px;height:18px;margin:0;flex:none}
+.torow .av{width:28px;height:28px;font-size:13px}
+.torow span.t{display:flex;flex-direction:column;min-width:0}
+.torow b{font-weight:600}
+.torow small{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.from{align-self:flex-start;max-width:min(92%,760px);background:color-mix(in srgb,var(--mc) 14%,transparent);border-radius:18px 18px 18px 6px;padding:10px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.from .who{display:flex;align-items:center;gap:6px;font-size:13px}
+.from .who b{color:var(--mc)}
+.from .who small{color:var(--muted);font-size:11px}
+.from .qt{background:color-mix(in srgb,var(--bg) 55%,transparent);border-radius:10px;padding:6px 10px;font-size:12px;color:var(--soft);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap}
+.from .error{background:none;padding:0}
+.to{align-self:flex-end;font-size:11px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 .buddy>*:first-child{margin-top:0}
 .buddy>*:last-child{margin-bottom:0}
 .buddy p{margin:0 0 10px;white-space:pre-wrap}
@@ -452,6 +564,7 @@ function start() {
         el('button', {class: 'btn small', id: 'runbtn', hidden: true, onclick: () => { runOpen = !runOpen; runData = null; fetchRun(); }}, 'Running now'),
         el('button', {class: 'btn small deny', id: 'stopbtn', hidden: true, onclick: () => stopRun()}, 'Stop'),
         el('button', {class: 'icon', id: 'optbtn', hidden: true, 'aria-label': 'Chat menu', title: 'Pin, rename, archive, delete', 'aria-haspopup': 'menu', onclick: e => chatMenu(open, e.currentTarget)}, '⋯')),
+      el('div', {class: 'team', id: 'team', hidden: true, role: 'group', 'aria-label': 'This chat’s team'}),
       pane,
       el('button', {class: 'jump', id: 'jump', 'aria-label': 'Go to the end', title: 'Go to the end', onclick: () => { end(); jump(); }}, icon(I.up, 20)),
       el('div', {class: 'scrpanel', id: 'scrpanel', hidden: true, role: 'group', 'aria-label': 'This chat’s hidden screen'},
@@ -461,10 +574,12 @@ function start() {
           el('button', {'aria-label': 'Hide the screen here', title: 'Hide here (the Screen chip in the header shows it again)', onclick: () => panelHide(open, true)}, icon(I.x, 16)))),
       el('div', {class: 'col dock'}, el('div', {id: 'run'}), el('div', {id: 'cards'}),
         el('div', {id: 'quote'}), el('div', {class: 'atts', id: 'atts'}),
+        el('div', {id: 'teamwait'}),
         el('div', {class: 'composer'},
           el('button', {class: 'clip', 'aria-label': 'Attach files', title: 'Attach files (pictures, documents; over 25 MB they go to the chat’s Linux tools)',
             onclick: () => $('pick').click()}, icon(I.attach, 20)),
           el('input', {type: 'file', id: 'pick', multiple: true, hidden: true, onchange: e => { attach([...e.target.files]); e.target.value = ''; }}),
+          el('button', {class: 'tochip', id: 'tochip', hidden: true, 'aria-haspopup': 'dialog', onclick: () => pickTo()}),
           el('label', {for: 'msg', class: 'sr'}, 'Message'), ta,
           el('button', {class: 'model', id: 'model', hidden: true, title: 'Model and effort', onclick: () => pickModel()}), send),
         el('div', {class: 'said', id: 'said', role: 'alert', hidden: true})))));
@@ -611,7 +726,7 @@ function rows(d) {
   d.messages.forEach((m, i) => {
     const at = (d.first || 0) + i, last = out[out.length - 1];
     if (m.k === 'step') { if (last && last.k === 'steps') last.steps.push(m.t); else out.push({k: 'steps', at, steps: [m.t]}); }
-    else out.push({k: m.k, at, t: m.t, s: m.s, f: m.f, lx: m.lx});
+    else out.push({k: m.k, at, t: m.t, s: m.s, f: m.f, lx: m.lx, to: m.to, ne: m.ne, fn: m.fn, fo: m.fo, c: m.c, q: m.q, qf: m.qf, dr: m.dr});
   });
   return out;
 }
@@ -627,6 +742,9 @@ function drawChat() {
   drawPanel(d);
   $('devchip').hidden = !d || !d.linux;
   $('bgchip').hidden = !d || !d.canBackground;
+  if (d && d.memberOf) { // a team's member's own chat: its settings are the team's (tell the leader), as on the phone
+    $('agent').hidden = $('optbtn').hidden = $('devchip').hidden = $('bgchip').hidden = true;
+  }
   if (d) {
     $('devchip').classList.toggle('on', !!d.dev);
     $('devchip').title = d.dev ? 'Linux tools are on in this chat: the agent may run commands and edit files. Click to turn them off.' : 'Linux tools are off in this chat. Click to turn them on from the next message.';
@@ -635,14 +753,17 @@ function drawChat() {
     $('bgchip').title = d.background ? 'Background mode is on: the agent works on a hidden screen. Click to turn it off.' : 'Background mode is off: the agent works on the phone’s own screen. Click to turn it on.';
     $('bgchip').setAttribute('aria-pressed', d.background ? 'true' : 'false');
   }
-  $('model').hidden = !d || !d.model;
+  $('model').hidden = !d || !d.model || !!d.memberOf; // (a member's model is the team's: tell the leader)
   if (d && d.model) { $('model').textContent = ''; $('model').append(el('span', {}, d.model), icon(I.chev, 14)); }
   $('msg').placeholder = open ? 'Message this chat' : 'Ask Buddy something';
   document.title = d && d.title ? d.title + ' · Buddy' : 'Buddy';
-  const working = !!(d && d.running);
-  $('work').hidden = $('runbtn').hidden = $('stopbtn').hidden = !working;
-  $('worktext').textContent = working ? d.status || 'Working' : '';
-  const now = JSON.stringify([open, chatData, shown, [...unfolded], open ? null : draft]);
+  // (a team's members can work while the chat's own agent doesn't: the line and Stop are theirs then)
+  const working = !!(d && (d.running || d.busy));
+  $('work').hidden = $('stopbtn').hidden = !working;
+  $('runbtn').hidden = !(d && d.running);
+  $('worktext').textContent = working ? (d.running ? d.status || 'Working' : d.busy) : '';
+  drawTeam(d);
+  const now = JSON.stringify([open, chatData, shown, [...unfolded], open ? null : draft, editing && [editing.chat, editing.at]]);
   if (now === drawn) return; // nothing new: what is unfolded or selected stays as it is
   drawn = now;
   const stick = toBottom || atEnd(), top = pane.scrollTop;
@@ -656,15 +777,360 @@ function drawChat() {
     jump();
     return;
   }
+  if (d.memberOf) col.append(el('button', {class: 'btn memberof', onclick: () => show(d.memberOf.id)}, icon(I.back, 16),
+    'Team member in “' + d.memberOf.title + '”'));
   const all = rows(d), from = Math.max(0, all.length - shown);
   if (from > 0) col.append(el('button', {class: 'btn earlier', onclick: () => { keep = pane.scrollHeight - pane.scrollTop; shown += PAGE; drawChat(); }}, 'Show earlier messages'));
   else if (d.first > 0) col.append(el('div', {class: 'note', style: 'align-self:center'}, 'Earlier messages are on the phone.'));
-  for (let i = from; i < all.length; i++) col.append(row(all[i], d.running && i === all.length - 1));
+  // member answers that came one after another fold into one card (not errors, files or answers to you directly)
+  const foldable = r => r && r.k === 'buddy' && r.fn && r.c && !r.dr && !r.f && !r.lx && !d.memberOf;
+  for (let i = from; i < all.length; i++) {
+    let j = i;
+    while (j < all.length && foldable(all[j])) j++;
+    if (j - i >= 2 && !unfolded.has('r' + all[i].at)) { col.append(roundCard(all.slice(i, j), 'r' + all[i].at)); i = j - 1; continue; }
+    col.append(row(all[i], d.running && i === all.length - 1));
+  }
   if (d.running && (!all.length || all[all.length - 1].k !== 'steps')) col.append(el('div', {class: 'working'}, el('span', {class: 'spin'}), 'Working…'));
   if (keep != null) { pane.scrollTop = pane.scrollHeight - keep; keep = null; } // (earlier messages came in above: the view stays where it was)
   else if (stick) { end(); toBottom = false; }
   else pane.scrollTop = top;
   jump();
+}
+
+/** A round of member answers as one card: their marks, how many, each one's first lines, and Show all. */
+function roundCard(rs, key) {
+  const names = [...new Set(rs.map(r => r.fn))].slice(0, 4);
+  return el('div', {class: 'round'},
+    el('div', {class: 'rh'}, el('span', {class: 'avs'}, ...names.map(n => avatar(n, rs.find(r => r.fn === n).c))),
+      el('b', {}, 'Team round · ' + rs.length + ' answers'),
+      el('button', {class: 'btn small', onclick: () => { unfolded.add(key); drawChat(); }}, 'Show all')),
+    ...rs.map(r => tint(el('p', {}, el('b', {}, r.fn), ' ', plain(r.t)), r.c)));
+}
+
+/** The open chat is a team's member's own (its settings, edit and fork are the team's chat's business). */
+function inMember() { return !!(chatData && chatData.memberOf); }
+
+/** A member's (or the leader's) colours on an element: its dot, name and frame take them. */
+function tint(node, c) {
+  node.classList.add('tm');
+  if (c) { node.style.setProperty('--md', c[0]); node.style.setProperty('--ml', c[1]); } else node.classList.add('lead');
+  return node;
+}
+
+/** Who the next message goes to in a chat with a team: "leader" and members' ids (the leader alone unless more are ticked). */
+let sendTo = new Set(['leader']), sendToChat = null, teamDrawn = '';
+
+/** A chat with a team: its members over the chat, each with its state, and the boxes over the message box. */
+function drawTeam(d) {
+  drawTeamWait(d);
+  const t = d && d.team && !d.team.off ? d.team : null, strip = $('team'), boxes = $('tochip');
+  strip.hidden = !t;
+  boxes.hidden = !t || !!d.memberOf; // (in a member's own chat, a message goes to that member)
+  if (!t) { teamDrawn = ''; return; }
+  const L = t.leader || {agent: d.agent, running: d.running, chat: open};
+  // (another chat, or other members: the boxes start over at the leader alone, so an old tick can't land on a new member)
+  const teamKey = open + '|' + t.members.map(m => m.id + m.name).join(',');
+  if (sendToChat !== teamKey) { sendToChat = teamKey; sendTo = new Set(['leader']); }
+  const ids = new Set(['leader', ...t.members.map(m => m.id)]);
+  for (const id of [...sendTo]) if (!ids.has(id)) sendTo.delete(id);
+  if (!sendTo.size) sendTo.add('leader');
+  const now = JSON.stringify([open, t, d.running, d.status, [...sendTo]]);
+  if (now === teamDrawn) return;
+  teamDrawn = now;
+  strip.textContent = '';
+  // one bar: the shape, each one's mark and state in a word, and a tap that opens the team panel
+  const leadWord = L.running ? (L.waiting ? 'Waiting' : 'Working') : 'Ready';
+  const one = (name, c, word, on, cur) => tint(el('span', {class: 'one' + (on ? ' on' : '') + (cur ? ' cur' : '')}, avatar(name, c), word), c);
+  strip.append(el('button', {class: 'tbar', 'aria-label': t.name + ' team: Leader ' + leadWord + t.members.map(m => ', ' + m.name + ' ' + m.state).join('') + '. Opens the team',
+      title: 'The team', onclick: () => teamShape(!d.memberOf)},
+    shapePic(t.structure, 30), one('Leader', null, leadWord, L.running, L.chat === open),
+    ...t.members.map(m => one(m.name, m.c, m.state, m.running, m.chat === open)), el('span', {class: 'sp'}), icon(I.chev, 16)));
+  paintTo(t);
+}
+
+/** A member's mark: its initial on its colour. */
+function avatar(name, c) {
+  return tint(el('span', {class: 'av', 'aria-hidden': 'true'}, ([...(name || '?').trim()][0] || '?').toUpperCase()), c);
+}
+
+/** Who a team chat's message can go to: the leader first, then the members. */
+function recipients(t) {
+  return [{id: 'leader', name: 'Leader', c: null}, ...t.members];
+}
+
+/** The message box's To chip: the marks of whom the message goes to, a name or how many, and an arrow to pick. */
+function paintTo(t) {
+  const chip = $('tochip'), who = recipients(t).filter(m => sendTo.has(m.id));
+  chip.textContent = '';
+  chip.append(el('span', {class: 'avs'}, ...who.slice(0, 3).map(m => avatar(m.name, m.c))),
+    who.length === 1 ? 'To ' + who[0].name : 'To ' + who.length, icon(I.chev, 14));
+  chip.setAttribute('aria-label', 'Send to: ' + who.map(m => m.name).join(', ') + '. Change who gets it');
+  chip.title = 'Who the message goes to';
+}
+
+/** The To chip's picker: the leader and each member with its agent and what it does now; a tick counts at once. */
+function pickTo() {
+  const d = chatData, t = d && d.team && !d.team.off ? d.team : null;
+  if (!t) return;
+  sheet((box, close) => {
+    const draw = () => {
+      box.textContent = '';
+      box.append(el('h2', {}, 'Send to'));
+      const L = t.leader || {agent: d.agent, running: d.running};
+      for (const m of recipients(t)) {
+        const lead = m.id === 'leader';
+        const on = lead ? AGENTS[L.agent] || L.agent : m.on, state = lead ? (L.running ? 'Working' : 'Ready') : m.state;
+        const cb = el('input', {type: 'checkbox', onchange: () => {
+          if (!sendTo.delete(m.id)) sendTo.add(m.id);
+          if (!sendTo.size) sendTo.add('leader');
+          paintTo(t); draw();
+        }});
+        cb.checked = sendTo.has(m.id);
+        box.append(tint(el('label', {class: 'torow' + (sendTo.has(m.id) ? ' on' : '')}, cb, avatar(m.name, m.c),
+          el('span', {class: 't'}, el('b', {}, m.name), el('small', {}, on ? on + ' · ' + state : state))), m.c));
+      }
+      box.append(el('div', {class: 'line', style: 'margin-top:14px'},
+        el('button', {class: 'btn', onclick: () => { recipients(t).forEach(m => sendTo.add(m.id)); paintTo(t); draw(); }}, 'Everyone'),
+        el('button', {class: 'btn primary', onclick: close}, 'Done')));
+    };
+    draw();
+  });
+}
+
+/** A structure's shape as a small picture: the leader and what links it in its colour, the members plain. */
+function shapePic(structure, w) {
+  const ns = 'http://www.w3.org/2000/svg', svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('viewBox', '0 0 40 32'); svg.setAttribute('width', w); svg.setAttribute('height', w * 0.8);
+  svg.setAttribute('fill', 'none'); svg.setAttribute('stroke', 'currentColor'); svg.setAttribute('stroke-width', '2');
+  svg.setAttribute('stroke-linecap', 'round'); svg.setAttribute('stroke-linejoin', 'round'); svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('class', 'shapepic');
+  const box = (x, y, bw, bh, a) => { const r = document.createElementNS(ns, 'rect'); r.setAttribute('x', x); r.setAttribute('y', y); r.setAttribute('width', bw); r.setAttribute('height', bh); r.setAttribute('rx', 3); if (a) r.setAttribute('class', 'a'); svg.append(r); };
+  const line = d => { const p = document.createElementNS(ns, 'path'); p.setAttribute('d', d); p.setAttribute('class', 'a'); svg.append(p); };
+  if (structure === 'lead') { box(14, 2, 12, 8, true); line('M20 10v5M7 15h26M7 15v6M20 15v6M33 15v6'); box(2, 21, 10, 8); box(15, 21, 10, 8); box(28, 21, 10, 8); }
+  else if (structure === 'check') { box(2, 11, 12, 10); box(26, 11, 12, 10); line('M16 14h8M21 11.5l3 2.5-3 2.5M24 18.5h-8M19 16l-3 2.5 3 2.5'); }
+  else if (structure === 'doers') { box(2, 3, 16, 10); box(22, 3, 16, 10); line('M10 13v6h20v-6M20 19v4'); box(14, 23, 12, 7, true); }
+  else { box(1, 12, 10, 8); box(15, 12, 10, 8); box(29, 12, 10, 8); line('M11 16h4M25 16h4'); }
+  return svg;
+}
+
+/** The open chat's team drawn in its shape: the leader, the members where the structure puts them, and what was set. To look at. */
+function teamShape(withOff) {
+  const d = chatData, t = d && d.team;
+  if (!t || t.off) return;
+  sheet((box, close) => {
+    box.classList.add('wide');
+    box.append(el('h2', {style: 'display:flex;align-items:center;gap:10px'}, shapePic(t.structure, 40), t.name),
+      el('p', {}, t.workspace + ' · ' + t.apps));
+    const go = chat => () => { close(); show(chat); };
+    // one's card: its mark and name in its colour, its agent, goal, last answer and state; a member with an app on
+    // its hidden screen shows that screen (through /web/shot and its rules); a tap opens its own chat
+    const card = (name, on, goal, last, state, running, c, lead, chat, screen) => {
+      const here = chat === open, shot = screen ? el('span', {class: 'shot'}, 'Loading…') : null;
+      if (shot) (async () => {
+        try {
+          const x = await fetch('/web/shot?id=' + encodeURIComponent(chat) + '&w=240', {headers: {Authorization: 'Bearer ' + key}});
+          if (x.ok) { const u = URL.createObjectURL(await x.blob()); shot.textContent = ''; shot.append(el('img', {alt: name + '’s hidden screen', src: u, onload: () => URL.revokeObjectURL(u)})); }
+          else { let why = 'Nothing to show yet.'; try { why = (await x.json()).error || why; } catch (e) {} shot.textContent = why; }
+        } catch (e) { shot.textContent = ''; }
+      })();
+      return tint(el(chat && !here ? 'button' : 'div', {class: 'tcard' + (lead ? ' lead' : '') + (here ? ' cur' : ''),
+          title: chat && !here ? (lead ? 'Back to the team’s chat' : 'Open ' + name + '’s chat') : null, onclick: chat && !here ? go(chat) : null},
+        el('span', {class: 'nm'}, avatar(name, c), el('b', {}, name), el('span', {class: 'sw' + (running ? ' on2' : '')}, state)),
+        el('span', {class: 'on'}, on), goal ? el('span', {class: 'goal'}, goal) : null,
+        last ? el('span', {class: 'last'}, 'Last: ' + last) : null, shot), c);
+    };
+    const arrow = s => el('span', {class: 'ar', 'aria-hidden': 'true'}, s);
+    const shape = el('div', {class: 'tshape'});
+    const L = t.leader || {agent: d.agent, model: d.model, running: d.running, chat: open};
+    shape.append(card('Leader', (AGENTS[L.agent] || L.agent) + (L.model ? ' · ' + L.model : ''), 'this chat', '',
+      L.running ? (L.waiting ? 'Waiting' : 'Working') : 'Ready', L.running, null, true, L.chat, false));
+    const cards = t.members.map(m => card(m.name, m.on, m.goal, m.last, m.state, m.running, m.c, false, m.chat, m.screen));
+    // down to the one under it; or, to members side by side, a line that parts to them (drawn: sideways arrows come out as emoji)
+    if (cards.length && (t.structure === 'pipe' || t.structure === 'check' || cards.length === 1)) shape.append(arrow('↓'));
+    else if (cards.length) {
+      const ns = 'http://www.w3.org/2000/svg', fan = document.createElementNS(ns, 'svg'), path = document.createElementNS(ns, 'path');
+      fan.setAttribute('viewBox', '0 0 100 20'); fan.setAttribute('preserveAspectRatio', 'none'); fan.setAttribute('class', 'fan'); fan.setAttribute('aria-hidden', 'true');
+      path.setAttribute('d', 'M50 2V10M18 10H82M18 10V18M82 10V18' + (cards.length > 2 ? 'M50 10V18' : '')); path.setAttribute('vector-effect', 'non-scaling-stroke');
+      fan.append(path); shape.append(fan);
+    }
+    if (t.structure === 'pipe') cards.forEach((c, i) => { if (i) shape.append(arrow('↓')); shape.append(c); }); // one after another
+    else {
+      const line = el('div', {class: 'rowm'});
+      if (t.structure === 'check') { // a doer beside its checker, pair by pair
+        for (let i = 0; i < cards.length; i += 2) line.append(el('div', {class: 'tpair'}, cards[i], cards[i + 1] ? arrow('⇄') : null, cards[i + 1] || null));
+      } else line.append(...cards);
+      shape.append(line);
+    }
+    box.append(shape);
+    if (t.handoff || t.rules) box.append(el('div', {class: 'tfacts'},
+      t.handoff ? el('span', {}, 'Hand-off: ' + t.handoff) : null, t.rules ? el('span', {}, 'Rules: ' + t.rules) : null));
+    box.append(el('div', {class: 'line', style: 'align-items:center;margin-top:14px;gap:12px'},
+      el('p', {style: 'margin:0 6px;flex:1'}, 'To change the team, tell the leader.'),
+      withOff ? el('button', {class: 'btn deny', onclick: async () => {
+        if (!confirm('Turn the team off? The members’ chats go, with what they remember. Files they made stay.')) return;
+        try { const r = await api('/web/team', {action: 'off', chat: open}); if (r.error) { say(r.error); return; } close(); refreshChat(); } catch (e) { say(e.message); }
+      }}, 'Turn off') : null));
+  });
+}
+
+// ------------------------------------------------------------ a chat's team: set up here as on the phone
+
+let teamWaitDrawn = '';
+
+/** The setup the user asked for in the chat (the leader's team_start), waiting: a card that opens it here. */
+function drawTeamWait(d) {
+  const box = $('teamwait'), w = d && d.team && d.team.draft ? d.team.draft : null, now = JSON.stringify([open, w]);
+  if (now === teamWaitDrawn) return;
+  teamWaitDrawn = now;
+  box.textContent = '';
+  if (!w) return;
+  const names = w.team.members.map(m => m.name).join(', ');
+  box.append(el('div', {class: 'card'}, el('span', {class: 'lab'}, 'TEAM SETUP'),
+    el('div', {class: 'row', style: 'align-items:center'},
+      el('span', {style: 'flex:1 1 220px'}, 'The team you asked for is waiting to be set up' + (w.members ? ': ' + names + '.' : '.')),
+      el('button', {class: 'btn', style: 'flex:none', onclick: async () => { try { await api('/web/team', {action: 'dismiss', chat: open}); refreshChat(); } catch (e) { say(e.message); } }}, 'Not now'),
+      el('button', {class: 'btn primary', style: 'flex:none', onclick: () => teamSetup(w.team, w)}, 'Set it up'))));
+}
+
+async function refreshChat() {
+  try { chatData = await api('/web/chat?id=' + encodeURIComponent(open)); drawn = ''; render(); } catch (e) { say(e.message); }
+}
+
+/** Chat menu → Team…: the team in its shape (with Turn off), or the setup (from the chat's last team, if it had one). */
+function teamMenu() {
+  const t = chatData && chatData.team;
+  if (t && !t.off) { teamShape(true); return; }
+  if (t && t.draft) { teamSetup(t.draft.team, t.draft); return; }
+  teamSetup(t && t.last ? t.last : null, null);
+}
+
+const STRUCTS = [['lead', 'Leader + workers', 'The leader splits the task, each worker does a part, the leader checks and puts it together.'],
+  ['pipe', 'Pipeline', 'One after another, for example plan, build, check. Each step gets the reports before it.'],
+  ['check', 'Doer + checker', 'One does the work, another reviews it; back and forth until it passes.'],
+  ['doers', 'Doers with their own goals', 'Several doers at the same time, each with its own goal; the leader puts it together.']];
+const WORKSPACES = [['sep', 'Each in its own folder', 'Separate folders; the leader brings the results together.'],
+  ['same', 'All in the chat’s folder', 'Everyone works on the same files.'],
+  ['look', 'Only look things up', 'Members read and report; only the leader changes things.']];
+const APPS = [['diff', 'Each on a different app', 'At the same time; the leader keeps two members out of one app.'],
+  ['turn', 'One app at a time', 'Members can use the same app; the others wait until it’s free.'],
+  ['none', 'No phone apps', 'Only the background browser and Linux tools.']];
+
+/** A member's colours as the phone gives them (Team's palette: on dark, on light), by its colour index or its place. */
+const TEAM_DARK = ['#6FA8FF', '#5CC08A', '#B48CFF', '#E8C15A', '#F08DB5', '#5FD0D0'], TEAM_LIGHT = ['#2563C9', '#1E7F4E', '#7445C7', '#8A6A00', '#B93A76', '#0F7C7C'];
+function memberColor(m, i) {
+  const k = ((Number.isInteger(m.color) ? m.color : i) % 6 + 6) % 6;
+  return [TEAM_DARK[k], TEAM_LIGHT[k]];
+}
+
+/** The agents signed in on the phone, and each one's models, as the page's New chat screen gets them. */
+const teamModels = {};
+async function agentModels(agent) {
+  if (teamModels[agent]) return teamModels[agent];
+  try {
+    const r = await api('/web/new?agent=' + encodeURIComponent(agent));
+    if (!r.error) teamModels[agent] = r; // (an error isn't kept: asked again next time)
+    return r;
+  } catch (e) { say(e.message); return {models: []}; }
+}
+
+/**
+ * The phone's team setup, here: how it works, where members work, how they share apps (each left out when the user
+ * said it in the chat: draft), then the members with their agents and models. Start the team starts it.
+ */
+async function teamSetup(from, draft) {
+  const chat = open;
+  let pre;
+  try { pre = await api('/web/team-preset?chat=' + encodeURIComponent(chat) + '&structure=' + encodeURIComponent((from && from.structure) || 'pipe')); }
+  catch (e) { say(e.message); return; }
+  if (pre.error) { say(pre.error); return; }
+  const base = await agentModels('');
+  const agents = (base.agents || []).map(a => ({id: a.id, name: a.name}));
+  const t = JSON.parse(JSON.stringify(from || pre.team));
+  const known = draft ? [draft.structure, draft.workspace, draft.apps] : [false, false, false];
+  if (!pre.screens) t.apps = 'none';
+  // everything on one sheet: the shape, the members in it with their agents, where they work and the apps; what
+  // the user already said in the chat is filled in and marked so
+  sheet((box, close) => {
+    box.classList.add('wide');
+    const sec = (name, from) => el('div', {class: 'tsec'}, name, from ? el('small', {}, 'From your message') : null);
+    const seg = (list, cur, pick) => {
+      const o = list.find(x => x[0] === cur);
+      return [el('div', {class: 'tseg', role: 'radiogroup'}, ...list.map(x => el('button', {class: x[0] === cur ? 'on' : '', role: 'radio',
+        'aria-checked': x[0] === cur ? 'true' : 'false', onclick: () => { pick(x[0]); draw(); }}, x[1]))), o ? el('p', {class: 'tinfo'}, o[2]) : null];
+    };
+    const draw = async () => {
+      box.textContent = '';
+      box.append(el('h2', {}, 'Set up a team'));
+      box.append(sec('Shape', known[0]), el('div', {class: 'ttiles', role: 'radiogroup', 'aria-label': 'Shape'}, ...STRUCTS.map(o =>
+        el('button', {class: 'ttile' + (o[0] === t.structure ? ' on' : ''), role: 'radio', 'aria-checked': o[0] === t.structure ? 'true' : 'false', onclick: async () => {
+          if (o[0] === t.structure) return;
+          if (draft && draft.members) { // (the members the user named stay; a hand-off the user didn't say follows the shape)
+            if (!draft.handoff) { try { const p = await api('/web/team-preset?chat=' + encodeURIComponent(chat) + '&structure=' + o[0]); t.handoff = p.team.handoff; } catch (e) {} }
+            t.structure = o[0]; draw(); return;
+          }
+          try { const p = await api('/web/team-preset?chat=' + encodeURIComponent(chat) + '&structure=' + o[0]);
+            // (rules and a hand-off the user said stay)
+            Object.assign(t, {structure: o[0], members: p.team.members, handoff: draft && draft.handoff ? t.handoff : p.team.handoff}); draw(); } catch (e) { say(e.message); }
+        }}, shapePic(o[0], 40), o[1]))),
+        el('p', {class: 'tinfo'}, (STRUCTS.find(x => x[0] === t.structure) || STRUCTS[1])[2]));
+      box.append(sec('Members', draft && draft.members), el('p', {class: 'tinfo', style: 'margin-top:0'},
+        'Pick each one’s agent and model. The leader is this chat’s agent (change it with the agent chip at the top).'));
+      const shape = el('div', {class: 'tshape'});
+      shape.append(tint(el('div', {class: 'tcard lead'}, el('span', {class: 'nm'}, avatar('Leader', null), el('b', {}, 'Leader')),
+        el('span', {class: 'on'}, (AGENTS[chatData.agent] || chatData.agent) + (chatData.model ? ' · ' + chatData.model : '')), el('span', {class: 'goal'}, 'this chat')), null));
+      const cards = [];
+      for (const m of t.members) {
+        const ms = await agentModels(m.agent);
+        const name = el('input', {value: m.name, maxlength: '40', 'aria-label': 'Name', oninput: e => { m.name = e.target.value; }});
+        const ag = el('select', {'aria-label': m.name + '’s agent', onchange: e => { m.agent = e.target.value; m.model = ''; draw(); }},
+          ...agents.map(a => el('option', {value: a.id}, a.name)));
+        ag.value = m.agent;
+        const mo = el('select', {'aria-label': m.name + '’s model', onchange: e => { m.model = e.target.value; }},
+          ...(ms.models || []).map(x => x.heading ? el('option', {disabled: true}, '— ' + x.heading + ' —') : el('option', {value: x.id}, x.name)));
+        mo.value = m.model || '';
+        const c = memberColor(m, t.members.indexOf(m));
+        cards.push(tint(el('div', {class: 'tcard edit'},
+          el('span', {class: 'nm'}, avatar(m.name, c), name,
+            el('button', {class: 'x', 'aria-label': 'Remove ' + m.name, title: 'Remove', onclick: () => { t.members.splice(t.members.indexOf(m), 1); draw(); }}, icon(I.x, 14))),
+          el('label', {}, el('small', {}, 'Agent'), ag), el('label', {}, el('small', {}, 'Model'), mo),
+          m.goal ? el('span', {class: 'goal'}, m.goal) : null), c));
+      }
+      cards.push(el('button', {class: 'tcard addm', onclick: () => {
+        const n = t.structure === 'pipe' ? 'Step ' : t.structure === 'lead' ? 'Worker ' : 'Doer ';
+        let i = t.members.length + 1;
+        while (t.members.some(m => m.name.toLowerCase() === (n + i).toLowerCase())) i++;
+        t.members.push({name: n + i, agent: chatData.agent === 'claude-code' ? 'claude' : chatData.agent, model: '', goal: ''}); draw();
+      }}, '+ Add a member'));
+      shape.append(el('span', {class: 'ar', 'aria-hidden': 'true'}, '↓'));
+      if (t.structure === 'pipe') cards.forEach((c, i) => { if (i) shape.append(el('span', {class: 'ar', 'aria-hidden': 'true'}, '↓')); shape.append(c); });
+      else shape.append(el('div', {class: 'rowm'}, ...cards));
+      box.append(shape);
+      box.append(sec('Where do the members work?', known[1]), ...seg(WORKSPACES, t.workspace, k => { t.workspace = k; }));
+      box.append(sec('How do they share the phone’s apps?', known[2]));
+      if (pre.screens) box.append(...seg(APPS, t.apps, k => { t.apps = k; }));
+      else box.append(el('p', {class: 'tinfo', style: 'margin-top:0'}, 'Background mode isn’t set up on the phone, so members have no phone screen: only the background browser and Linux tools.'));
+      box.append(el('p', {style: 'margin:16px 6px 0'}, 'Then the leader asks you each member’s goal, how they hand off, and any rules.'));
+      box.append(el('div', {class: 'line', style: 'justify-content:flex-end;margin-top:14px'},
+        el('button', {class: 'btn', onclick: close}, 'Cancel'),
+        el('button', {class: 'btn primary', disabled: !t.members.length, onclick: async () => {
+          try {
+            const r = await api('/web/team', {action: 'start', chat, draft: !!draft,
+              team: {structure: t.structure, workspace: t.workspace, apps: t.apps, handoff: t.handoff, rules: t.rules,
+                members: t.members.map(m => ({name: m.name.trim(), agent: m.agent, model: m.model || '', goal: m.goal || ''}))}});
+            if (r.error) { say(r.error); return; }
+            close(); refreshChat();
+          } catch (e) { say(e.message); }
+        }}, 'Start the team')));
+    };
+    draw();
+  });
+}
+
+/** What the leader or a member said, in a team's chat: under its name, in its colour, with the message it answers. */
+function from(r, body) {
+  return tint(el('div', {class: 'from'},
+    el('div', {class: 'who'}, el('span', {class: 'dotc'}), el('b', {}, r.fn), el('small', {}, r.fo || '')),
+    r.q ? el('div', {class: 'qt'}, el('b', {}, (r.qf || 'You') + ': '), r.q) : null, body), r.c);
 }
 
 /** One step: a long one (a script in a command) shows its first lines, and all of it on a click. */
@@ -682,9 +1148,10 @@ function row(r, live) {
         el('span', {class: 'n'}, live ? r.steps[n - 1] : n + (n === 1 ? ' tool call' : ' tool calls')), el('span', {class: 'v'})),
       el('ol', {}, ...r.steps.map(step)));
     // (the phone's next update draws the chat again: it must find this row as the user left it)
-    dt.addEventListener('toggle', () => { if (dt.open) unfolded.add(r.at); else unfolded.delete(r.at); drawn = JSON.stringify([open, chatData, shown, [...unfolded], open ? null : draft]); });
+    dt.addEventListener('toggle', () => { if (dt.open) unfolded.add(r.at); else unfolded.delete(r.at); drawn = JSON.stringify([open, chatData, shown, [...unfolded], open ? null : draft, editing && [editing.chat, editing.at]]); });
     return dt;
   }
+  if (r.k === 'user' && editing && editing.chat === open && editing.at === r.at) return editor(r);
   if (r.k === 'user') {
     // a schedule's message is its whole instruction: three lines of it, the rest on a tap
     const long = r.s && r.t.length > 220, key = 'u' + r.at, fold = long && !unfolded.has(key);
@@ -698,11 +1165,11 @@ function row(r, live) {
     if (fs) b.append(fs);
     // your own message, as in the app: copy, quote, edit (it is asked again from there) and fork
     const say1 = q ? q[1] : r.t;
-    return el('div', {class: 'mine'}, b, el('div', {class: 'acts own'},
+    return el('div', {class: 'mine'}, r.to ? el('span', {class: 'to'}, '→ ' + r.to) : null, b, el('div', {class: 'acts own'},
       el('button', {'aria-label': 'Copy', title: 'Copy', onclick: e => copy(say1, e.currentTarget)}, icon(I.copy, 18)),
       el('button', {'aria-label': 'Quote', title: 'Quote in your next message', onclick: () => setQuote(r.t)}, icon(I.quote, 18)),
-      r.s ? null : el('button', {'aria-label': 'Edit', title: 'Edit and ask again from here', onclick: () => edit(r.at, say1)}, icon(I.edit, 18)),
-      el('button', {'aria-label': 'Fork from here', title: 'Fork: a new chat with the conversation up to here', onclick: () => fork(r.at)}, icon(I.fork, 18))));
+      r.s || r.ne || inMember() ? null : el('button', {'aria-label': 'Edit', title: 'Edit and ask again from here', onclick: () => edit(r.at, say1)}, icon(I.edit, 18)),
+      inMember() ? null : el('button', {'aria-label': 'Fork from here', title: 'Fork: a new chat with the conversation up to here', onclick: () => fork(r.at)}, icon(I.fork, 18))));
   }
   if (r.k === 'buddy') {
     const b = el('div', {class: 'buddy'});
@@ -710,24 +1177,30 @@ function row(r, live) {
     const fs = msgFiles(r);
     if (fs) b.append(fs);
     const f = document.createDocumentFragment();
-    f.append(b, el('div', {class: 'acts'},
+    f.append(r.fn ? from(r, b) : b, el('div', {class: 'acts'},
       el('button', {'aria-label': 'Copy', title: 'Copy', onclick: e => copy(r.t, e.currentTarget)}, icon(I.copy, 18)),
       el('button', {'aria-label': 'Quote', title: 'Quote in your next message', onclick: () => setQuote(r.t)}, icon(I.quote, 18)),
-      el('button', {'aria-label': 'Fork from here', title: 'Fork: a new chat with the conversation up to here', onclick: () => fork(r.at)}, icon(I.fork, 18))));
+      inMember() ? null : el('button', {'aria-label': 'Fork from here', title: 'Fork: a new chat with the conversation up to here', onclick: () => fork(r.at)}, icon(I.fork, 18))));
     return f;
   }
-  return el('div', {class: r.k === 'error' ? 'error' : 'note'}, r.t);
+  const line = el('div', {class: r.k === 'error' ? 'error' : 'note'}, r.t);
+  return r.fn && r.k === 'error' ? from(r, line) : line; // (a member that failed: its own error, under its name)
 }
 
 // ------------------------------------------------------------ a reply's formatting (built as elements: never as HTML text)
 
 function inline(into, s) {
-  const re = /(`[^`\n]+`)|(\*\*[^\n]+?\*\*)|(\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\))|(https?:\/\/[^\s<>()]*[^\s<>().,;:!?'"*])|(\*[^*\s](?:[^*\n]*[^*\s])?\*)/g;
+  // (a link to a file in Buddy's Linux, [answers](/root/.buddy/work/…/answers.md): its text, opening Files where it is)
+  const re = /(`[^`\n]+`)|(\*\*[^\n]+?\*\*)|(\[([^\]\n]+)\]\((https?:\/\/[^\s)]+|~?\/[^\s)]+)\))|(https?:\/\/[^\s<>()]*[^\s<>().,;:!?'"*])|(\*[^*\s](?:[^*\n]*[^*\s])?\*)/g;
   let at = 0, m;
   while ((m = re.exec(s))) {
     if (m.index > at) into.append(s.slice(at, m.index));
     if (m[1]) into.append(el('code', {}, m[1].slice(1, -1)));
     else if (m[2]) { const b = el('strong'); inline(b, m[2].slice(2, -2)); into.append(b); }
+    else if (m[3] && !/^https?:/.test(m[5])) { // in Buddy's Linux: Files at it (a file: at its folder, the phone says which)
+      const p = m[5].startsWith('~/') ? '/root' + m[5].slice(1) : m[5], dir = p;
+      into.append(el('a', {href: '#', title: p, onclick: e => { e.preventDefault(); openView('files'); setTimeout(() => goFiles(dir), 300); }}, m[4]));
+    }
     else if (m[3]) into.append(el('a', {href: m[5], target: '_blank', rel: 'noopener noreferrer'}, m[4]));
     else if (m[6]) into.append(el('a', {href: m[6], target: '_blank', rel: 'noopener noreferrer'}, m[6]));
     else { const i = el('em'); inline(i, m[7].slice(1, -1)); into.append(i); }
@@ -832,25 +1305,54 @@ function setQuote(text) {
 }
 
 /** Your own message, changed: the chat goes on from there with the new words (the phone keeps the old chat, archived). */
+/** The message being edited in place: its chat, where it is, and what is typed so far (kept over the chat's redraws). */
+let editing = null;
+
+/** The chat or one of its team's members works: no edit then (a member's answer would land in the cut chat). */
+const teamBusy = () => !!chatData && (chatData.running || !!(chatData.team && (chatData.team.members || []).some(m => m.running)));
+
 function edit(index, text) {
-  if (chatData && chatData.running) { say('The chat is working: edit the message when it’s done.'); return; }
-  sheet((box, close) => {
-    const ta = el('textarea', {'aria-label': 'Your message'});
-    ta.value = text;
-    box.append(el('h2', {}, 'Edit your message'),
-      el('p', {}, 'It’s asked again from here: what came after it goes. The chat as it was is kept in Archived.'), ta,
-      el('div', {class: 'line', style: 'justify-content:flex-end;margin-top:8px'}, el('button', {class: 'btn', onclick: close}, 'Cancel'),
-        el('button', {class: 'btn primary', onclick: async () => {
-          const t = ta.value.trim(), id = open;
-          if (!t) return;
-          close();
-          try {
-            const r = await api('/web/edit', {chat: id, index, text: t});
-            say(r.error || '');
-            if (open === id) { toBottom = true; drawn = ''; chatData = await api('/web/chat?id=' + encodeURIComponent(id)); render(); }
-          } catch (e) { say(e.message); }
-        }}, 'Ask again')));
+  if (teamBusy()) { say('The chat is working: edit the message when it’s done.'); return; }
+  editing = {chat: open, at: index, text};
+  drawn = '';
+  drawChat();
+}
+
+/** Your message, editable where it is: its own bubble becomes the field, with Cancel and Ask again under it. */
+function editor(r) {
+  // the same field over the chat's redraws (a member's state changes often): the cursor and typing stay where they are
+  if (editing.node) return editing.node;
+  const ta = el('textarea', {class: 'tx', 'aria-label': 'Edit your message', rows: '1'});
+  ta.value = editing.text;
+  const fit = () => { ta.style.height = 'auto'; ta.style.height = Math.min(360, ta.scrollHeight) + 'px'; };
+  const cancel = () => { editing = null; drawn = ''; drawChat(); };
+  const go = async () => {
+    if (!editing || editing.sending) return;
+    const t = ta.value.trim(), id = editing.chat, index = editing.at;
+    if (!t) return;
+    const was = editing;
+    was.sending = true;
+    ta.disabled = askBtn.disabled = true;
+    try {
+      const res = await api('/web/edit', {chat: id, index, text: t});
+      if (res.error) { say(res.error); return; } // (kept as typed, to try again)
+      say('');
+      if (editing === was) editing = null;
+      if (open === id) { toBottom = true; drawn = ''; chatData = await api('/web/chat?id=' + encodeURIComponent(id)); render(); }
+    } catch (e) { say(e.message); }
+    finally { was.sending = false; ta.disabled = askBtn.disabled = false; }
+  };
+  const askBtn = el('button', {class: 'btn primary', onclick: go}, 'Ask again');
+  ta.addEventListener('input', () => { if (editing) editing.text = ta.value; fit(); });
+  ta.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { e.preventDefault(); cancel(); }
+    else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); go(); }
   });
+  setTimeout(() => { fit(); ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }, 0);
+  editing.node = el('div', {class: 'mine editing'}, el('div', {class: 'user'}, ta),
+    el('div', {class: 'edhint'}, 'Asked again from here: what came after it goes, and the chat as it was is kept in Archived.'),
+    el('div', {class: 'line edbtns'}, el('button', {class: 'btn', onclick: cancel}, 'Cancel'), askBtn));
+  return editing.node;
 }
 
 async function fork(index) {
@@ -998,6 +1500,7 @@ function chatMenu(id, anchor) {
   pop.append(item('Rename', () => rename(id, title)));
   pop.append(item('Files', () => openView('files', id, title))); // (this chat's: its project folder, what was sent to it, its attachments)
   pop.append(item('Schedule…', () => editSchedule(id, title)));
+  if (id === open && chatData && !chatData.error) pop.append(item('Team…', () => teamMenu()));
   pop.append(c.archived ? item('Bring back', () => change({archived: false}, id)) : item('Archive', () => change({archived: true}, id)));
   const d = id === open && chatData && !chatData.error ? chatData : null;
   if (d && anchor.id === 'optbtn' && window.matchMedia('(max-width: 820px)').matches) {
@@ -1122,7 +1625,14 @@ function cardView(card, from) {
   const row = el('div', {class: 'row'});
   if (card.options) {
     for (const o of card.options) row.append(el('button', {class: 'btn', onclick: () => answer({option: o})}, o));
-    box.append(row);
+    // as on the phone: Skip, or an answer of your own instead of the buttons
+    const own = el('input', {placeholder: 'Your answer', 'aria-label': 'Your answer'});
+    const typed = el('div', {class: 'change', hidden: true}, own, el('button', {class: 'btn primary', onclick: () => { if (own.value.trim()) answer({change: own.value.trim()}); }}, 'Send'));
+    own.addEventListener('keydown', e => { if (e.key === 'Enter' && own.value.trim()) answer({change: own.value.trim()}); });
+    const more = el('div', {class: 'row'},
+      el('button', {class: 'btn', onclick: () => answer({approve: false})}, 'Skip'),
+      el('button', {class: 'btn', onclick: () => { typed.hidden = !typed.hidden; if (!typed.hidden) own.focus(); }}, 'Type my own answer'));
+    box.append(row, more, typed);
   } else {
     const what = el('input', {placeholder: 'What should it change?', 'aria-label': 'What should it change?'});
     const tell = el('div', {class: 'change', hidden: true}, what, el('button', {class: 'btn primary', onclick: () => { if (what.value.trim()) answer({change: what.value.trim()}); }}, 'Send'));
@@ -1146,7 +1656,7 @@ async function sendIt() {
   const files = ok.filter(a => a.id).map(a => a.id), linux = ok.filter(a => a.path).map(a => a.path);
   sending = true; $('send').disabled = true; say('');
   try {
-    const r = await api('/web/send', Object.assign(open ? {chat: open, text}
+    const r = await api('/web/send', Object.assign(open ? (chatData && chatData.team ? {chat: open, text, to: [...sendTo]} : {chat: open, text})
       : draft ? {text, agent: draft.agent, model: draft.model, dev: draft.dev, background: draft.background} : {text}, {files, linux}));
     if (r.error) { say(r.error); return; }
     ta.value = ''; grow(ta); setQuote(null); clearAtts();
@@ -1328,7 +1838,7 @@ async function loadView() {
       const asked = fsv.path; // (another folder opened meanwhile: this answer is for the one before)
       const d = fsv.path ? await api('/web/files?path=' + encodeURIComponent(fsv.path) + (fsv.chat ? '&chat=' + encodeURIComponent(fsv.chat) : '') + (fsv.hidden ? '&hidden=1' : ''))
         : await api('/web/places' + (fsv.chat ? '?chat=' + encodeURIComponent(fsv.chat) : ''));
-      if (g === viewGen && fsv.path === asked) { fsv.data = d; viewDrawn = ''; drawView(); }
+      if (g === viewGen && fsv.path === asked) { if (d.path && asked && d.path !== asked && asked.startsWith(d.path + '/')) fsv.path = d.path; /* (a file: its folder) */ fsv.data = d; viewDrawn = ''; drawView(); }
     } else if (view === 'screens') {
       const d = await api('/web/screens');
       if (g === viewGen) { scr.list = d; viewDrawn = ''; drawView(); shotLoop(g); }

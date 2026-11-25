@@ -40,7 +40,7 @@ final class Lite {
                     "browser_screenshot", "browser_tabs"},
             {"schedule", "messages to yourself at a later time, rules for incoming notifications",
                     "schedule_message", "list_scheduled", "cancel_scheduled", "add_notification_rule"},
-            {"advanced", "sub-agents, phone commands, installing an app, saving a file to Downloads, updating Buddy"},
+            {"advanced", "a team of other agents, phone commands, installing an app, saving a file to Downloads, updating Buddy"},
     };
 
     /** Set while a call loaded tools: the reply tells the agent's client the list changed (see McpServer). */

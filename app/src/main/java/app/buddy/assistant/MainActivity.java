@@ -97,13 +97,13 @@ public class MainActivity extends Screen implements ChatHub.Listener, Account.Li
         Providers.refresh(this); // fresh model lists before a picker opens (a local server's every time)
         render();
         Account.addListener(this);
-        Account.CLAUDE.refresh(this);
-        Account.CODEX.refresh(this);
-        Account.OPENCODE.refresh(this);
-        Account.AGY.refresh(this);
-        Account.GROK.refresh(this);
-        Account.COPILOT.refresh(this);
-        Account.PI.refresh(this);
+        Account.CLAUDE.refreshIfStale(this);
+        Account.CODEX.refreshIfStale(this);
+        Account.OPENCODE.refreshIfStale(this);
+        Account.AGY.refreshIfStale(this);
+        Account.GROK.refreshIfStale(this);
+        Account.COPILOT.refreshIfStale(this);
+        Account.PI.refreshIfStale(this);
     }
 
     private final Runnable waitingChanged = this::render;

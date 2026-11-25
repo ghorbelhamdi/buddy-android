@@ -28,7 +28,7 @@ final class ChatHub {
     private static ChatHub instance;
 
     final Sessions sessions;
-    private final Context app;
+    final Context app;
     private final Handler main = new Handler(Looper.getMainLooper());
     private final List<Listener> listeners = new ArrayList<>();
     private final List<Sessions.Session> viewing = new ArrayList<>();
@@ -70,6 +70,9 @@ final class ChatHub {
 
     private ChatHub(Context app) {
         this.app = app;
+        // (2.5.0: the team took over from sub-agents; switched off in Settings, its tools are off too)
+        Prefs.carryTool(app, "delegate", "team", "team_change", "team_start");
+        Prefs.carryTool(app, "subagents");
         sessions = new Sessions(app);
         // a chat still marked working when Buddy starts was cut off: Android closed Buddy (an update, low memory), and
         // its agent with it
@@ -96,6 +99,11 @@ final class ChatHub {
             }
         }
         pruneLinux(forgetting);
+        // sub-agents from before 2.5.0, when the team took over from them: nothing ends them any more, so they go
+        // now (their reports went back long ago; Buddy starts with none running)
+        main.post(() -> {
+            for (Sessions.Session s : new ArrayList<>(sessions.all)) if (!s.parent.isEmpty() && s.member.isEmpty()) delete(s);
+        });
     }
 
     /**
@@ -226,6 +234,11 @@ final class ChatHub {
 
     void delete(Sessions.Session s) {
         savedFiles.remove(s.id);
+        if (s.running) { // (stopped below; its end won't be heard of for a chat that's gone: over now, its screen with it)
+            s.running = false;
+            Prefs.setBusy(app, s.id, false);
+            Background.close(app, s.id);
+        }
         if (CodexLive.on(s)) CodexLive.end(null);
         StepLog.deleteChat(app, s.id);
         Routines.forget(s.id);
@@ -241,7 +254,9 @@ final class ChatHub {
         } catch (Exception ignored) {
         }
         viewing.remove(s);
-        if (!s.parent.isEmpty() && s.dev) { // a helper's own folder goes with it
+        Team.releaseApps(s.id);
+        // (a team member's own folder is the user's work: it stays; one that only looked things up has a helper's)
+        if (!s.parent.isEmpty() && s.dev && (s.member.isEmpty() || !s.works)) { // a helper's own folder goes with it
             final String dir = Helpers.folder(s.id);
             new Thread(() -> {
                 try {
@@ -250,7 +265,10 @@ final class ChatHub {
                 }
             }).start();
         }
-        if (s.parent.isEmpty()) for (Sessions.Session h : Helpers.of(this, s.id)) delete(h); // its helpers go with it
+        if (s.parent.isEmpty()) { // its helpers and its team's members go with it
+            for (Sessions.Session h : Helpers.of(this, s.id)) delete(h);
+            for (Sessions.Session h : Team.all(this, s.id)) delete(h);
+        }
         sessions.remove(s);
         Schedules.cancelAll(app, s);
         Events.forget(app, s.id);
@@ -316,6 +334,210 @@ final class ChatHub {
         return send(ses, shown, null, prompt, false, false);
     }
 
+    /** A team's member is told something (see Team.tell): its chat shows the words, its agent gets them with who they are from. */
+    String sendMember(Sessions.Session ses, String shown, List<String> files, String prompt) {
+        return sendMember(ses, shown, files, prompt, null);
+    }
+
+    /** linux: files in Linux tools, chips on the member's message (the prompt has their paths). */
+    String sendMember(Sessions.Session ses, String shown, List<String> files, String prompt, List<String> linux) {
+        if (ses.running) return addNote(ses, shown); // (it gets it with its next step, as any chat does)
+        if (linux == null || linux.isEmpty()) return send(ses, shown, files, prompt, false, false);
+        sendingLinux = linux;
+        try {
+            return send(ses, shown, files, prompt, false, false);
+        } finally {
+            sendingLinux = null;
+        }
+    }
+
+    /**
+     * A message in a chat with a team, to the ones the user ticked (Team.LEADER and members' ids; none: the leader).
+     * The leader gets it as any message; each member ticked gets it too, directly, and what it answers shows in the
+     * chat. Without the leader the chat's own agent doesn't run: it hears of it with its next turn (Team.digest).
+     */
+    String sendTeam(final Sessions.Session ses, String text, List<String> files, List<String> linux, java.util.Collection<String> to) {
+        Team t = ses.team;
+        if (t == null || !ses.parent.isEmpty()) return send(ses, text, files, linux);
+        List<Team.Member> members = new ArrayList<>();
+        boolean leader = to == null || to.isEmpty() || to.contains(Team.LEADER);
+        if (to != null) for (Team.Member m : t.members) if (to.contains(m.id)) members.add(m);
+        if (members.isEmpty()) leader = true;
+        StringBuilder names = new StringBuilder(leader ? app.getString(R.string.team_leader) : "");
+        for (Team.Member m : members) names.append(names.length() > 0 ? ", " : "").append(m.name);
+        boolean hasFiles = files != null && !files.isEmpty(), hasLinux = linux != null && !linux.isEmpty();
+        if (text.isEmpty() && !hasFiles && !hasLinux) return null;
+        for (Team.Member m : members) { // checked before anything is sent: all of them get it, or none
+            if (!SetupState.signedIn(app, m.agent)) return app.getString(R.string.team_not_signed_in, m.name, Account.nameOf(m.agent));
+            Sessions.Session h = Team.session(this, ses.id, m.id);
+            if (h != null && h.running && (hasFiles || hasLinux)) return app.getString(R.string.hub_still_working_attachments);
+        }
+        sendingTo = names.toString();
+        sendingToLeader = leader;
+        try {
+            if (leader) {
+                sendingAlso = members.isEmpty() ? null : names.substring(names.indexOf(", ") + 2);
+                boolean note = ses.running;
+                String err = send(ses, text, files, linux);
+                if (err != null) return err;
+                if (note && sendingAlso != null) { // (the leader works: the message is a note, which says it too)
+                    synchronized (ses.notes) {
+                        int i = ses.notes.size() - 1;
+                        if (i >= 0) ses.notes.set(i, ses.notes.get(i) + "\n[This also went to " + sendingAlso
+                                + " directly: what they answer shows in the chat, so don't pass it on to them.]");
+                    }
+                }
+            } else { // only members: the chat shows the message, its own agent doesn't run
+                if (ses.archived) ses.archived = false;
+                sessions.add(ses, Bubble.Kind.USER, text, hasFiles ? new ArrayList<>(files) : null);
+                Sessions.Msg um = ses.messages.get(ses.messages.size() - 1);
+                um.to = sendingTo;
+                um.toLeader = false;
+                if (hasLinux) um.linux.addAll(linux);
+                sessions.save(ses);
+                for (Listener l : new ArrayList<>(listeners)) l.onMessage(ses, um);
+            }
+        } finally {
+            sendingTo = null;
+            sendingAlso = null;
+        }
+        StringBuilder errors = new StringBuilder();
+        for (Team.Member m : members) {
+            String err = Team.tell(this, ses, m, null, text, hasFiles ? new ArrayList<>(files) : null, hasLinux ? new ArrayList<>(linux) : null);
+            if (err != null) errors.append(errors.length() > 0 ? "\n" : "").append(m.name).append(": ").append(err);
+        }
+        changed();
+        // (the message is in the chat by now: what didn't reach a member is said there, not as an unsent message)
+        if (errors.length() > 0) add(ses, Bubble.Kind.ERROR, errors.toString());
+        return null;
+    }
+
+    /** Turns a chat's team on, and has its agent ask the user the rest (what each member is for, the hand-off, rules). */
+    String startTeam(Sessions.Session ses, Team team) {
+        return startTeam(ses, team, Team.interview(team));
+    }
+
+    /** interview: what the leader asks the user once the team is on (null: nothing left to ask, it is just on). */
+    String startTeam(Sessions.Session ses, Team team, String interview) {
+        Team.Draft draft = ses.teamDraft; // (setTeam drops it: back on failure, with what the user had said)
+        setTeam(ses, team, null);
+        if (interview == null) return null;
+        boolean untitled = ses.title.isEmpty();
+        String err = send(ses, app.getString(R.string.team_setup_sent), null, interview, false, false);
+        if (err != null) { // the leader couldn't ask the rest: the team isn't on (the setup starts from it next time)
+            ses.team = null;
+            ses.lastTeam = team;
+            ses.teamDraft = draft;
+            Sessions.Msg last = ses.messages.isEmpty() ? null : ses.messages.get(ses.messages.size() - 1);
+            if (last != null && last.kind == Bubble.Kind.NOTE) ses.messages.remove(ses.messages.size() - 1); // ("Team on")
+            sessions.save(ses);
+            changed();
+            return err;
+        }
+        // (the chat isn't named after this line: its first own message names it, as in any chat)
+        if (untitled && !ses.title.isEmpty()) {
+            ses.title = "";
+            sessions.save(ses);
+            changed();
+        }
+        return err;
+    }
+
+    /** Members' answers a run of the leader is told of (main thread): heard once that run has started. */
+    private final List<Sessions.Msg> heardNow = new ArrayList<>();
+
+    /**
+     * A team the user set up from one they asked for in the chat: started once the leader's turn is over (it was told
+     * to end it), up to half an hour; still working then, the team is on all the same and its next turn's brief says so.
+     * Main thread.
+     */
+    void startTeamWhenFree(final Sessions.Session ses, final Team team, final String ask, final String agent, final String model) {
+        final int[] waited = {0};
+        main.post(new Runnable() {
+            @Override
+            public void run() {
+                if (ses.team != null || !sessions.all.contains(ses)) return;
+                if (Team.working(ChatHub.this, ses) && waited[0]++ < 1800) { // (up to half an hour: it was told to end its turn)
+                    main.postDelayed(this, 1000);
+                    return;
+                }
+                if (Team.working(ChatHub.this, ses)) {
+                    setTeam(ses, team, null); // still working: on all the same, its next turn's brief says so
+                    // (its questions go to it as a note; another agent or model for it can't while it works: said so)
+                    if (ask != null && ses.running) addNote(ses, ask);
+                    boolean other = !agent.equals(ses.backend) || !model.equals(ses.model == null ? "" : ses.model);
+                    note(ses, Bubble.Kind.NOTE, app.getString(other ? R.string.team_started_busy_agent : R.string.team_started_busy));
+                    return;
+                }
+                if (!agent.equals(ses.backend)) switchAgent(ses, agent);
+                if (!model.equals(ses.model == null ? "" : ses.model)) setModel(ses, model);
+                String err = startTeam(ses, team, ask);
+                if (err != null) note(ses, Bubble.Kind.ERROR, err);
+            }
+        });
+    }
+
+    /** While sendTeam sends (main thread): who the message goes to, for the message made in there. */
+    private String sendingTo, sendingAlso;
+    private boolean sendingToLeader = true;
+
+    /**
+     * A member's answer (or its error, as it came) in the team's chat: under the member's name and colour, with the
+     * message it answers. Main thread.
+     */
+    Sessions.Msg addFrom(Sessions.Session parent, Bubble.Kind kind, String text, List<String> files, Team.Member m, String quoteFrom, String quote) {
+        if (!sessions.all.contains(parent)) return null;
+        sessions.add(parent, kind, text, files);
+        Sessions.Msg msg = parent.messages.get(parent.messages.size() - 1);
+        msg.from = m.id;
+        msg.fromName = m.name;
+        msg.fromOn = m.on();
+        msg.color = m.color;
+        msg.quoteFrom = quoteFrom == null ? "" : quoteFrom;
+        msg.quote = clip(quote == null ? "" : quote, 300);
+        msg.direct = msg.quoteFrom.isEmpty();
+        sessions.save(parent);
+        if (!viewing.contains(parent)) parent.unread = true;
+        for (Listener l : new ArrayList<>(listeners)) l.onMessage(parent, msg);
+        changed();
+        return msg;
+    }
+
+    /**
+     * Turns a chat's team on, changes it or (null) turns it off. Members that left (gone, or all of them when the
+     * team is turned off) have their chats deleted; their own folders stay. A member moved to another agent or model
+     * keeps its chat: the new agent is handed what was said there. Main thread.
+     */
+    void setTeam(Sessions.Session ses, Team team, java.util.Collection<String> gone) {
+        if (!ses.parent.isEmpty()) return;
+        Team before = ses.team;
+        ses.team = team;
+        if (team != null) ses.teamDraft = null; // (a setup that waited for it is done)
+        // turned off: kept, to start from when it is turned on again. Helpers the agent added for a task don't take
+        // the place of a team the user set up, nor clear it
+        if (team == null && before != null && !(before.helpersOnly() && ses.lastTeam != null)) ses.lastTeam = before;
+        if (team != null && !team.helpersOnly()) ses.lastTeam = null;
+        for (Sessions.Session h : Team.all(this, ses.id)) {
+            Team.Member m = team == null ? null : team.byId(h.member);
+            if (m == null || (gone != null && gone.contains(h.member))) {
+                if (h.running) stop(h);
+                delete(h);
+                continue;
+            }
+            h.title = m.name;
+            if (!h.running) {
+                if (!m.agent.equals(h.backend)) switchAgent(h, m.agent); // (the new agent gets the chat so far)
+                h.model = m.model;
+            }
+            sessions.save(h);
+        }
+        if (before == null && team != null) add(ses, Bubble.Kind.NOTE, app.getString(R.string.team_note_on, app.getString(Team.structureName(team.structure)), team.names()));
+        if (before != null && team == null) add(ses, Bubble.Kind.NOTE, app.getString(R.string.team_note_off));
+        if (before == null && team != null) ses.teamAt = ses.messages.size(); // (a change keeps what the leader hasn't heard yet)
+        sessions.save(ses);
+        changed();
+    }
+
     private String send(final Sessions.Session ses, String text, List<String> files, String prompt) {
         return send(ses, text, files, prompt, false);
     }
@@ -347,6 +569,13 @@ final class ChatHub {
         // or it's a fork, or the user edited a message (issue #44): the agent starts fresh with the chat up to here
         final boolean fresh = ses.handover != null || ses.reseed;
         if (fresh) forAgent = (ses.handover != null ? handover(ses) : reseedText(ses)) + forAgent;
+        // a chat with a team: its agent leads it, and hears what was said past it since its last turn
+        final Team team = rule || !ses.parent.isEmpty() ? null : ses.team;
+        if (team != null) {
+            forAgent = Team.brief(team, ses) + Team.digest(ses, heardNow)
+                    + (sendingAlso == null ? "" : "[This message also went to " + sendingAlso + " directly: what they "
+                    + "answer shows in the chat, so don't pass it on to them.]\n\n") + forAgent;
+        }
         BuddyService svc = BuddyService.get();
         // only the user's own message lifts a Stop: a queued rule run must not undo it
         if (svc != null && prompt == null) svc.allowControl();
@@ -358,14 +587,23 @@ final class ChatHub {
                     model(ses), hasFiles ? android.text.TextUtils.join(",", files) : "", ses.effort, fresh ? "fresh" : "",
                     Lite.on(ses) ? "lite" : "", ses.folder);
         } catch (Exception e) {
+            heardNow.clear();
             return e.getMessage();
         }
+        for (Sessions.Msg m : heardNow) m.heard = true; // (the leader has them now)
+        heardNow.clear();
         ses.interrupted = false;
         // the user writing in an archived chat brings it back (not a sub-agent's: its parent's chat lists it)
         if (!scheduled && !rule && ses.parent.isEmpty()) ses.archived = false;
         sessions.add(ses, Bubble.Kind.USER, text, hasFiles ? new ArrayList<>(files) : null);
+        ses.said++; // (a message that starts its agent's run: a helper's turn, see Helpers; not a note or a member's message)
         if (!scheduled && !rule) SpeechPause.sent(app);
         Sessions.Msg um = ses.messages.get(ses.messages.size() - 1);
+        if (team != null) {
+            um.to = sendingTo != null ? sendingTo : app.getString(R.string.team_leader);
+            ses.teamAt = ses.messages.size(); // the leader has had word of everything up to here
+            sessions.save(ses);
+        }
         if (sendingLinux != null) {
             um.linux.addAll(sendingLinux);
             // (a chat that starts with only a file is named after it, as one that starts with an attachment is)
@@ -443,6 +681,7 @@ final class ChatHub {
         add(ses, Bubble.Kind.ERROR, why + (err.isEmpty() ? "" : "\n\n" + ses.brainName() + ": " + err));
         if (ses.outcome == null) ses.outcome = "failed";
         runEnded(ses);
+        if (!ses.member.isEmpty()) Team.reported(this, ses);
         changed();
     }
 
@@ -479,7 +718,8 @@ final class ChatHub {
      * defaults, as their names differ per agent.
      */
     void switchAgent(Sessions.Session ses, String backend) {
-        if (ses.running || backend == null || backend.equals(ses.backend) || !ses.parent.isEmpty()) return;
+        // (not a sub-agent's chat; a team's member may move to another agent, see setTeam)
+        if (ses.running || backend == null || backend.equals(ses.backend) || (!ses.parent.isEmpty() && ses.member.isEmpty())) return;
         if (backend.equals(ses.handover)) { // straight back, before the other agent answered: as if never switched
             ses.backend = backend; // its own conversation is still there, with its steps and files
             ses.model = ses.handoverModel;
@@ -547,7 +787,9 @@ final class ChatHub {
         for (Sessions.Msg m : new ArrayList<>(ses.messages)) {
             if (m.kind != Bubble.Kind.USER && m.kind != Bubble.Kind.BUDDY) continue;
             if (m.text == null || m.text.trim().isEmpty()) continue;
-            b.append(m.kind == Bubble.Kind.USER ? "User: " : "Assistant: ").append(m.text.trim()).append("\n\n");
+            // (in a chat with a team: who a message went to, and which member said what)
+            b.append(m.kind == Bubble.Kind.USER ? (m.to.isEmpty() || m.toLeader && !m.to.contains(",") ? "User: " : "User (to " + m.to + "): ")
+                    : m.from.isEmpty() ? "Assistant: " : m.fromName + " (team member): ").append(m.text.trim()).append("\n\n");
         }
         String all = b.toString(), end = tail(all, HANDOVER_MAX);
         return new String[]{end, end.length() < all.length() ? "cut" : ""};
@@ -585,9 +827,10 @@ final class ChatHub {
      * "… (before edit)". Returns an error to show, or null.
      */
     String edit(Sessions.Session ses, int index, String text) {
-        if (ses.running) return app.getString(R.string.chat_edit_running);
+        // (members too: an answer of one that ends later would land in the chat cut short)
+        if (Team.working(this, ses)) return app.getString(R.string.chat_edit_running);
         if (!ses.parent.isEmpty() || index < 0 || index >= ses.messages.size()
-                || ses.messages.get(index).kind != Bubble.Kind.USER || text.trim().isEmpty()) {
+                || !ses.messages.get(index).editable() || text.trim().isEmpty()) {
             return app.getString(R.string.chat_edit_failed); // (the message isn't there any more): said, not dropped
         }
         Sessions.Session before = sessions.copy(ses, ses.messages.size(),
@@ -847,7 +1090,11 @@ final class ChatHub {
      */
     String approvalsFor(String chat) {
         Sessions.Session s = byId(chat);
-        return s != null && s.parent.isEmpty() ? s.approvals : "";
+        if (s != null && !s.parent.isEmpty()) { // a working member or sub-agent: its chat's "Always ask" holds for it too
+            Sessions.Session p = s.works ? byId(s.parent) : null;
+            return p != null && "strict".equals(p.approvals) ? "strict" : "";
+        }
+        return s != null ? s.approvals : "";
     }
 
     /** The chat with this id, for a tool's thread (a copy of the list: it changes on the main thread); or null. */
@@ -904,7 +1151,10 @@ final class ChatHub {
     }
 
     void stop(Sessions.Session ses) {
-        if (ses.parent.isEmpty()) Helpers.stop(this, ses.id); // a stopped task's helpers stop with it
+        if (ses.parent.isEmpty()) { // a stopped task's helpers stop with it, and its team's members
+            Helpers.stop(this, ses.id);
+            Team.stop(this, ses.id);
+        }
         if (!ses.running) return;
         BuddyService svc = BuddyService.get();
         if (svc != null) svc.stopPaused();
@@ -1116,6 +1366,7 @@ final class ChatHub {
                     List<String> left0 = savedFiles.remove(ses.id); // saved, but no reply came to show them under
                     if (left0 != null && !left0.isEmpty()) add(ses, Bubble.Kind.BUDDY, "", left0);
                     runEnded(ses);
+                    if (!ses.member.isEmpty()) Team.reported(this, ses); // a team's member: its answer, in the team's chat
                     if (!ses.lastReply.isEmpty()) {
                         Prefs.setHadReply(app);
                         if (ses.parent.isEmpty()) flash(ses, ses.lastReply);
@@ -1211,14 +1462,31 @@ final class ChatHub {
     /** A note that arrived too late for the run: becomes the next message (already shown in the chat). */
     private void sendNoteAsMessage(Sessions.Session ses, String text) {
         final int[] run = {-1}; // this run's id, once it has started (as in send)
+        boolean team = ses.team != null && ses.parent.isEmpty();
         try {
             Helper.runFor(app, ses.id, code -> main.postDelayed(() -> helperGone(ses, run[0], code), HELPER_GONE_MS),
                     "ask", ses.id, ses.backend, devArg(ses),
-                    "(Added while you were working; if it asks something, answer it:) " + text, model(ses), "", ses.effort,
-                    "", Lite.on(ses) ? "lite" : "");
+                    (team ? Team.brief(ses.team, ses) + Team.digest(ses, heardNow) : "")
+                            + "(Added while you were working; if it asks something, answer it:) " + text, model(ses), "", ses.effort,
+                    "", Lite.on(ses) ? "lite" : "", ses.folder); // (in its project folder, as its other runs)
         } catch (Exception e) {
+            heardNow.clear();
             add(ses, Bubble.Kind.ERROR, e.getMessage());
             return;
+        }
+        for (Sessions.Msg m : heardNow) m.heard = true;
+        heardNow.clear();
+        if (team) {
+            ses.teamAt = ses.messages.size(); // (the leader has had word of everything up to here)
+            sessions.save(ses); // (so a restart doesn't tell it again)
+        }
+        if (!ses.member.isEmpty()) { // a member's late note is what this run answers
+            int at = ses.messages.size() - 1;
+            while (at > 0 && ses.messages.get(at).kind != Bubble.Kind.USER) at--; // (the note's own message)
+            ses.toldAt = Math.max(0, at);
+            boolean lead = text.startsWith("[From the leader]");
+            ses.toldBy = lead ? app.getString(R.string.team_leader) : "";
+            ses.told = lead ? text.substring(text.indexOf('\n') + 1) : text;
         }
         startRun(ses);
         run[0] = ses.runId;
@@ -1348,9 +1616,10 @@ final class ChatHub {
         Prefs.setBusy(app, ses.id, false);
         SpeechPause.runEnded();
         StepLog.runEnded(app, ses);
-        if (!ses.parent.isEmpty()) { // a sub-agent has one run: its screen closes at once
+        Team.releaseApps(ses.id);
+        if (!ses.parent.isEmpty() && ses.member.isEmpty()) { // a sub-agent has one run: its screen closes at once
             Background.close(app, ses.id);
-        } else if (ses.background) {
+        } else if (ses.background) { // (a team's member is told more later, as a chat is)
             Background.rest(app, ses.id); // its apps aren't "on screen" between runs
             // and a minute later, unless the chat works again, its screen goes and its apps with it: an app left
             // there isn't on the user's screen either, and the chat kept showing it as if it still worked there
@@ -1386,6 +1655,25 @@ final class ChatHub {
         if (kind == Bubble.Kind.BUDDY && ses.handover != null) ses.handover = null;
         if (kind == Bubble.Kind.BUDDY) ses.reseed = false; // (a fork's agent has the conversation now too)
         sessions.add(ses, kind, text, files);
+        if (ses.team != null && ses.parent.isEmpty() && (kind == Bubble.Kind.USER || kind == Bubble.Kind.BUDDY)) {
+            Sessions.Msg made = ses.messages.get(ses.messages.size() - 1);
+            if (kind == Bubble.Kind.USER) { // (a message added while the chat works: who it went to)
+                made.to = sendingTo != null ? sendingTo : app.getString(R.string.team_leader);
+                made.toLeader = sendingTo == null || sendingToLeader;
+            } else { // the leader's words; the first after a message of the user's come with that message, as a member's do
+                made.fromName = app.getString(R.string.team_leader);
+                made.fromOn = Account.nameOf(ses.backend) + (ses.model == null || ses.model.isEmpty() ? "" : " · " + Models.label(ses.backend, ses.model));
+                for (int i = ses.messages.size() - 2; i >= 0; i--) {
+                    Sessions.Msg x = ses.messages.get(i);
+                    if (x.kind == Bubble.Kind.BUDDY && x.from.isEmpty()) break;
+                    if (x.kind == Bubble.Kind.USER && x.toLeader) {
+                        made.quote = clip(x.label(), 300);
+                        break;
+                    }
+                }
+            }
+            sessions.save(ses);
+        }
         if (kind == Bubble.Kind.BUDDY && !viewing.contains(ses) && ses.parent.isEmpty()) ses.unread = true;
         // not during a live voice call: the voice tells the user itself (nor a helper's report, which is for its parent)
         if (kind == Bubble.Kind.BUDDY && !text.isEmpty() && Prefs.speakReplies(app) && !CodexLive.on() && ses.parent.isEmpty())
@@ -1595,6 +1883,16 @@ final class ChatHub {
                 return BuddyApp.str(R.string.hub_tool_delegate, names.toString());
             }
             case "subagents": return BuddyApp.str(R.string.hub_tool_helpers);
+            case "team": {
+                org.json.JSONArray to = in.optJSONArray("to");
+                StringBuilder who = new StringBuilder(to == null ? in.optString("to") : "");
+                for (int i = 0; to != null && i < to.length(); i++) who.append(i > 0 ? ", " : "").append(to.optString(i));
+                String names = who.toString();
+                return in.optString("message").isEmpty() || names.isEmpty() ? BuddyApp.str(R.string.hub_tool_team_wait)
+                        : BuddyApp.str(R.string.hub_tool_team, names);
+            }
+            case "team_change": return BuddyApp.str(R.string.hub_tool_team_change);
+            case "team_start": return BuddyApp.str(R.string.hub_tool_team_start);
             case "schedule_message": return BuddyApp.str(R.string.hub_tool_schedule_message, said(full, in.optString("message"), 40));
             case "add_notification_rule": return BuddyApp.str(R.string.hub_tool_add_rule, in.optString("app"));
             case "list_scheduled": return BuddyApp.str(R.string.hub_tool_list_scheduled);

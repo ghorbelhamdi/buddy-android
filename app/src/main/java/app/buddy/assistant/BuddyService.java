@@ -247,19 +247,22 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         if (type != AccessibilityEvent.TYPE_WINDOWS_CHANGED && type != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return;
         if (!Background.hiddenChats().isEmpty()) HiddenMute.check(this); // another app in front on a hidden screen?
         recheckLock();
-        int top = 0;
+        int top = 0, bottom = 0;
         AccessibilityWindowInfo app = null;
         for (AccessibilityWindowInfo w : getWindows()) {
             if (w.getType() == AccessibilityWindowInfo.TYPE_INPUT_METHOD) {
                 Rect r = new Rect();
                 w.getBoundsInScreen(r);
-                if (!r.isEmpty()) top = r.top;
+                if (!r.isEmpty()) {
+                    top = r.top;
+                    bottom = r.bottom;
+                }
             } else if (w.getType() == AccessibilityWindowInfo.TYPE_APPLICATION
                     && (app == null || w.getLayer() > app.getLayer())) {
                 app = w;
             }
         }
-        if (type == AccessibilityEvent.TYPE_WINDOWS_CHANGED) bubble.onKeyboardTop(top);
+        if (type == AccessibilityEvent.TYPE_WINDOWS_CHANGED) bubble.onKeyboardTop(top, bottom);
         // Opening Home or Recents folds the panel. Decided by the app actually in front changing: the home
         // screen also reports changes while it's already there (e.g. the keyboard opening or closing over it).
         android.view.accessibility.AccessibilityNodeInfo root = app == null ? null : app.getRoot();
@@ -1165,6 +1168,20 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     private static final String TIMED_OUT = "\u0000timed out";
 
     /**
+     * How many cards of a chat wait for the user now (a chat with a team has its members' too): the one notification
+     * on a locked phone goes only once none waits.
+     */
+    private static final java.util.Map<String, Integer> openCards = new java.util.HashMap<>();
+
+    private static synchronized int cardsOpen(String chat, int by) {
+        String k = String.valueOf(chat);
+        int n = Math.max(0, (openCards.containsKey(k) ? openCards.get(k) : 0) + by);
+        if (n == 0) openCards.remove(k);
+        else openCards.put(k, n);
+        return n;
+    }
+
+    /**
      * As above. canAuto: the card may approve itself when its chat is a notification rule's run with a countdown
      * (sending a message may; paying, buying or deleting never does). In a rule's run the card waits a minute at most
      * after its countdown, and not at all while the phone is locked: then the answer is NOT_NOW.
@@ -1172,7 +1189,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     String askConfirm(final String summary, boolean canAuto) throws InterruptedException {
         final String chat = McpServer.CALLER_CHAT.get();
         // a helper only looks things up: no card for it, whatever the step
-        if (Helpers.is(this, chat)) return "DENIED: " + Helpers.refuse("sending, posting, buying, deleting or changing things");
+        if (Helpers.lookOnly(this, chat)) return "DENIED: " + Helpers.refuse("sending, posting, buying, deleting or changing things");
         boolean rule = Triggers.ruleRun(chat);
         int cd = canAuto ? Triggers.countdown(chat) : 0;
         boolean now = canAuto && Triggers.instant(chat); // the rule's "Don't ask": no card when the second check agrees
@@ -1191,7 +1208,9 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
             return RULE_APPROVED;
         }
         if (rule && cd == 0 && Triggers.locked(this)) return NOT_NOW;
-        String answer = card(shown, chat, cd, rule ? (cd + 60) * 1000L : Math.max(5 * 60_000L, (cd + 60) * 1000L), null);
+        // (a team member's or a working sub-agent's: in the chat the user talks to, saying who wants it)
+        String answer = card(Helpers.cardText(this, chat, shown), Helpers.cardChat(this, chat), cd,
+                rule ? (cd + 60) * 1000L : Math.max(5 * 60_000L, (cd + 60) * 1000L), null);
         if (!TIMED_OUT.equals(answer)) return answer;
         return rule ? NOT_NOW : "DENIED: the user did not answer within 5 minutes. Do not do it.";
     }
@@ -1260,6 +1279,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         final boolean phoneOnly = WebDevices.cardShown(text); // (before it shows: a paired browser never sees it)
         main.post(() -> bubble.askConfirm(text, chat, countdown, cb, key, from));
         Triggers.approvalShown(this, chat, text, countdown, true, null);
+        cardsOpen(chat, 1);
         String ended = null;
         try {
             java.util.function.BooleanSupplier gone = McpServer.CALLER_GONE.get();
@@ -1269,7 +1289,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
                 else if (System.currentTimeMillis() >= end || gone != null && gone.getAsBoolean()) ended = TIMED_OUT;
             }
         } finally {
-            Triggers.approvalDone(this, chat);
+            if (cardsOpen(chat, -1) == 0) Triggers.approvalDone(this, chat);
         }
         if (cardTouches != touches) rereadNeeded = true; // they used the screen meanwhile: ids may be stale
         if (ended != null) {
@@ -1320,11 +1340,12 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         final String from = McpServer.CALLER_REMOTE.get();
         main.post(() -> bubble.askQuestion(question, options, chat, handsOn, cb, key, from));
         Triggers.approvalShown(this, chat, question, 0, false, handsOn ? null : options);
+        cardsOpen(chat, 1);
         boolean answered;
         try {
             answered = awaitAnswer(done, rule ? 60_000L : 5 * 60_000L, stepDone);
         } finally {
-            Triggers.approvalDone(this, chat);
+            if (cardsOpen(chat, -1) == 0) Triggers.approvalDone(this, chat);
         }
         boolean usedScreen = handsOn || cardTouches != touches;
         if (usedScreen) rereadNeeded = true;

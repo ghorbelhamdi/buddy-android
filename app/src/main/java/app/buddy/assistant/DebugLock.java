@@ -38,6 +38,12 @@ final class DebugLock {
     private static boolean tried;
     private static ContentObserver observer;
     private static ConnectivityManager.NetworkCallback wifiBack;
+    /** USB plugged in or out: on some phones (a OnePlus 12, measured) that restarts adbd, and the helper ends with it. */
+    private static android.content.BroadcastReceiver usb;
+    private static final Handler again = new Handler(Looper.getMainLooper());
+    /** When starting the helper again by itself last failed (0: it didn't): not tried again for a while after. */
+    private static long restartFailedAt;
+    private static final long RESTART_PAUSE_MS = 10 * 60_000;
     private static Network lastWifi;
 
     private DebugLock() {
@@ -62,12 +68,28 @@ final class DebugLock {
                     if (!n.equals(lastWifi)) {
                         lastWifi = n;
                         tried = false; // another network: one more try there
+                        restartFailedAt = 0;
                     }
                     later(svc); // Wi-Fi back: now it can be on again
                 }
             };
             cm.registerNetworkCallback(new NetworkRequest.Builder().addTransportType(NetworkCapabilities.TRANSPORT_WIFI).build(),
                     wifiBack);
+        } catch (Exception ignored) {
+        }
+        try {
+            usb = new android.content.BroadcastReceiver() {
+                @Override
+                public void onReceive(Context c, Intent i) {
+                    later(svc);
+                    // (and again once adbd is surely back: not cancelled by later; one pending at a time, as the
+                    // broadcast comes several times per plug)
+                    again.removeCallbacksAndMessages(null);
+                    again.postDelayed(() -> later(svc), 15000);
+                }
+            };
+            svc.registerReceiver(usb, new android.content.IntentFilter("android.hardware.usb.action.USB_STATE"),
+                    Context.RECEIVER_EXPORTED);
         } catch (Exception ignored) {
         }
         later(svc);
@@ -100,6 +122,15 @@ final class DebugLock {
             told = false;
             tried = false;
             clearNote(svc);
+            // on, but the helper may be gone (adbd restarted, as a USB change does on some phones): started again now,
+            // which needs no screen while Wireless debugging is on. Else the next time it goes off nothing could put
+            // it back, and it would wait for the user's Start now
+            // (not again and again when it fails, e.g. the pairing is gone: once per network or every ten minutes)
+            long now = android.os.SystemClock.elapsedRealtime();
+            if (Prefs.debugLock(svc) && Background.setUp(svc) && (restartFailedAt == 0 || now - restartFailedAt > RESTART_PAUSE_MS)
+                    && !Background.alive(svc)) {
+                restartFailedAt = Background.start(svc, false) == null ? 0 : android.os.SystemClock.elapsedRealtime();
+            }
             return;
         }
         if (!Prefs.debugLock(svc) || !Background.setUp(svc) || !wifi(svc) || tried) return;
@@ -174,12 +205,15 @@ final class DebugLock {
         if (!started) return;
         started = false;
         if (main != null) main.removeCallbacksAndMessages(null);
+        again.removeCallbacksAndMessages(null);
         try {
             if (observer != null) svc.getContentResolver().unregisterContentObserver(observer);
             if (wifiBack != null) svc.getSystemService(ConnectivityManager.class).unregisterNetworkCallback(wifiBack);
+            if (usb != null) svc.unregisterReceiver(usb);
         } catch (Exception ignored) {
         }
         observer = null;
         wifiBack = null;
+        usb = null;
     }
 }

@@ -532,6 +532,13 @@ final class WebDevices {
                 return json(f == null ? new JSONObject().put("error", "Buddy didn't answer") : f);
             }
             case "/web/set": return json(set(c, new JSONObject(new String(body, StandardCharsets.UTF_8))));
+            case "/web/team": return json(team(c, new JSONObject(new String(body, StandardCharsets.UTF_8))));
+            case "/web/team-preset": { // a structure's members to start from, on the agents signed in (as the phone's setup)
+                Sessions.Session s = shownChat(c, param(query, "chat"));
+                if (s == null) return json(new JSONObject().put("error", "no such chat"));
+                return json(new JSONObject().put("team", Team.preset(c, String.valueOf(param(query, "structure")), s.backend).json())
+                        .put("screens", Background.setUp(c)));
+            }
             case "/web/edit": { // a message of the user's own, edited: asked again from there (the chat as it was is kept, archived)
                 JSONObject in = new JSONObject(new String(body, StandardCharsets.UTF_8));
                 String said = onMain(() -> {
@@ -569,12 +576,12 @@ final class WebDevices {
                         : new JSONObject().put("chat", made));
             }
             case "/web/run": { // what the chat's agent runs now (the page's "Running now")
-                Sessions.Session s = shownChat(c, param(query, "id"));
+                Sessions.Session s = shownOrMember(c, param(query, "id"));
                 return s == null ? json(new JSONObject().put("error", "no such chat")) : json(CommandSheet.snapshot(c, s));
             }
             case "/web/stop": { // Stop, as on the phone: the whole run, or with a pid one process under the agent
                 JSONObject in = new JSONObject(new String(body, StandardCharsets.UTF_8));
-                Sessions.Session s = shownChat(c, in.optString("chat"));
+                Sessions.Session s = shownOrMember(c, in.optString("chat"));
                 if (s == null) return json(new JSONObject().put("error", "no such chat"));
                 String said = "";
                 if (in.has("pid")) said = CommandSheet.stop(c, s, in.optLong("pid"));
@@ -693,6 +700,22 @@ final class WebDevices {
         return err == null || !err.isEmpty() ? new JSONObject().put("error", err == null ? "Buddy didn't answer" : err) : new JSONObject();
     }
 
+    /** A team's member's chat: its team's chat (the leader's), while the member is in the team; else null. Main thread. */
+    private static Sessions.Session memberParent(Context c, Sessions.Session s) {
+        if (s.member.isEmpty()) return null;
+        Sessions.Session p = ChatHub.get(c).sessions.find(s.parent);
+        return p == null || p.incognito || p.team == null || p.team.byId(s.member) == null ? null : p;
+    }
+
+    /** As shownChat, or a team's member's chat (to look at, write to and stop, as on the phone). */
+    private static Sessions.Session shownOrMember(Context c, String id) throws Exception {
+        return onMain(() -> {
+            Sessions.Session s = id == null ? null : ChatHub.get(c).sessions.find(id);
+            if (s == null || s.incognito) return null;
+            return s.parent.isEmpty() || memberParent(c, s) != null ? s : null;
+        });
+    }
+
     /** A chat the page may show (as its list: not incognito or a sub-agent's), or null. */
     private static Sessions.Session shownChat(Context c, String id) throws Exception {
         return onMain(() -> {
@@ -762,8 +785,10 @@ final class WebDevices {
     private static JSONObject chat(Context c, String id) throws Exception {
         JSONObject out = onMain(() -> {
             Sessions.Session s = id == null ? null : ChatHub.get(c).sessions.find(id);
-            // an incognito chat stays on the phone; a sub-agent's chat isn't on the page's list either
-            if (s == null || s.incognito || !s.parent.isEmpty()) return null;
+            // an incognito chat stays on the phone; a sub-agent's chat isn't on the page's list either (a team's
+            // member's opens from its team's chat, as on the phone)
+            if (s == null || s.incognito || (!s.parent.isEmpty() && memberParent(c, s) == null)) return null;
+            Sessions.Session lead = s.parent.isEmpty() ? null : memberParent(c, s);
             JSONArray msgs = new JSONArray();
             List<Sessions.Msg> all = s.messages;
             int first = Math.max(0, all.size() - MAX_MESSAGES);
@@ -779,17 +804,101 @@ final class WebDevices {
                     o.put("f", f);
                 }
                 if (!m.linux.isEmpty()) o.put("lx", new JSONArray(m.linux));
+                // a chat with a team: who a message went to; who said this one (its colours: on dark, on light), and what it answers
+                if (!m.to.isEmpty()) o.put("to", m.to);
+                if (m.kind == Bubble.Kind.USER && !m.editable()) o.put("ne", true); // (went to members: not asked again)
+                if (!m.fromName.isEmpty()) {
+                    o.put("fn", m.fromName).put("fo", m.fromOn).put("q", m.quote).put("qf", m.quoteFrom);
+                    if (!m.from.isEmpty()) o.put("c", new JSONArray(java.util.Arrays.asList(Team.hex(m.color))));
+                    if (m.direct) o.put("dr", true); // (an answer to the user directly: never folded into a round)
+                }
                 msgs.put(o);
             }
+            JSONObject team = null;
+            String busy = "";
+            // (a member's own chat shows its team's strip too: the team's chat's, with the leader's state)
+            final Sessions.Session owner = lead != null ? lead : s;
+            if (owner.team != null) { // its members as the app's strip shows them
+                ChatHub hub = ChatHub.get(c);
+                JSONArray members = new JSONArray();
+                for (Team.Member m : owner.team.members) {
+                    Sessions.Session h = Team.session(hub, owner.id, m.id);
+                    boolean on = h != null && h.running;
+                    String state = TeamUi.state(c, h);
+                    if (on && busy.isEmpty() && lead == null) busy = c.getString(R.string.team_member_working, m.name, state);
+                    String last = h == null ? "" : Ui.linkText(ChatHub.clip(h.lastReply, 600)).replace('\n', ' ').trim();
+                    members.put(new JSONObject().put("id", m.id).put("chat", h == null ? "" : h.id).put("name", m.name).put("on", m.on()).put("goal", m.goal).put("state", state)
+                            .put("running", on).put("c", new JSONArray(java.util.Arrays.asList(Team.hex(m.color))))
+                            .put("last", last.length() > 200 ? last.substring(0, 200) + "…" : last)
+                            // (an app on its hidden screen: the panel shows it through /web/shot, with its rules)
+                            .put("screen", h != null && h.background && !h.incognito && Background.hasApp(h.id)));
+                }
+                team = new JSONObject().put("leader", new JSONObject().put("agent", Account.cliOf(owner.backend)).put("model", Models.chip(owner))
+                                .put("running", owner.running).put("waiting", Team.waits(hub, owner)).put("chat", owner.id))
+                        .put("structure", owner.team.structure).put("name", c.getString(Team.structureName(owner.team.structure)))
+                        .put("members", members)
+                        // the team in its shape (the page's own view of it): how it works, and what was set
+                        .put("how", c.getString(Team.LEAD.equals(owner.team.structure) ? R.string.team_lead_info : Team.CHECK.equals(owner.team.structure)
+                                ? R.string.team_check_info : Team.DOERS.equals(owner.team.structure) ? R.string.team_doers_info : R.string.team_pipe_info))
+                        .put("workspace", c.getString(Team.SEP.equals(owner.team.workspace) ? R.string.team_ws_sep
+                                : Team.LOOK.equals(owner.team.workspace) ? R.string.team_ws_look : R.string.team_ws_same))
+                        .put("apps", c.getString(Team.TURN.equals(owner.team.apps) ? R.string.team_apps_turn
+                                : Team.NONE.equals(owner.team.apps) ? R.string.team_apps_none : R.string.team_apps_diff))
+                        .put("handoff", owner.team.handoff).put("rules", owner.team.rules);
+            }
+            if (owner.team == null) { // none: the setup the user asked for in the chat, waiting, and the last team, to start from
+                if (s.teamDraft != null) team = new JSONObject().put("draft", s.teamDraft.json());
+                else if (s.lastTeam != null) team = new JSONObject().put("last", s.lastTeam.json());
+                if (team != null) team.put("off", true);
+            }
+            final JSONObject team0 = team;
+            final String busy0 = busy;
             // first: where these begin in the chat, so the page knows a message again when earlier ones drop off
             return new JSONObject().put("id", s.id).put("title", s.label()).put("agent", Account.cliOf(s.backend))
                     .put("running", s.running).put("status", s.running && s.status != null ? s.status : "")
                     .put("model", Models.chip(s)).put("dev", s.dev).put("background", s.background).put("archived", s.archived)
                     .put("canBackground", Prefs.backgroundPaired(c)).put("linux", Linux.installed(c))
                     .put("screen", Prefs.webScreens(c) && Background.displayOf(s.id) != android.view.Display.DEFAULT_DISPLAY)
-                    .put("first", first).put("messages", msgs);
+                    .put("first", first).put("messages", msgs).put("team", team0 == null ? JSONObject.NULL : team0).put("busy", busy0)
+                    .put("memberOf", lead == null ? JSONObject.NULL : new JSONObject().put("id", lead.id).put("title", lead.label()));
         });
         return out == null ? new JSONObject().put("error", "no such chat") : out;
+    }
+
+    /**
+     * The page's team setup (what the phone's Chat options → Team does): start, with the team as set up there
+     * (draft: the one the user asked for in the chat, whose follow-ups the leader then asks only where they left them
+     * open), off, or dismiss the waiting setup.
+     */
+    private static JSONObject team(Context c, JSONObject in) throws Exception {
+        String a = in.optString("action");
+        String err = onMain(() -> {
+            ChatHub hub = ChatHub.get(c);
+            Sessions.Session s = hub.sessions.find(in.optString("chat"));
+            if (s == null || s.incognito || !s.parent.isEmpty()) return "no such chat";
+            if ("dismiss".equals(a)) {
+                s.teamDraft = null;
+                hub.changed();
+                return "";
+            }
+            if ("off".equals(a)) {
+                if (Team.working(hub, s)) return "not while the chat or a member is working";
+                if (s.team != null) hub.setTeam(s, null, null);
+                return "";
+            }
+            if (s.team != null) return "this chat has a team already";
+            String[] why = new String[1];
+            Team t = Team.fromPage(c, s, in.optJSONObject("team") == null ? new JSONObject() : in.optJSONObject("team"), why);
+            if (t == null) return why[0];
+            Team.Draft d = in.optBoolean("draft") ? s.teamDraft : null;
+            // (kept until the team is on, as on the phone, so a start that fails gives it back; not opened on the phone)
+            if (d != null) d.shown = true;
+            String ask = d != null ? Team.interview(t, !d.goals, !d.handoff, !d.rules) : Team.interview(t);
+            // (once the leader is free, as on the phone: it may still be ending the turn that asked for this setup)
+            hub.startTeamWhenFree(s, t, ask, s.backend, s.model == null ? "" : s.model);
+            return "";
+        });
+        return err == null ? new JSONObject().put("error", "Buddy didn't answer") : err.isEmpty() ? new JSONObject() : new JSONObject().put("error", err);
     }
 
     /** A message from the page: into its chat, or a new chat with the default agent. */
@@ -821,16 +930,32 @@ final class WebDevices {
                 if (in.has("background")) s.background = in.optBoolean("background") && Prefs.backgroundPaired(c);
                 if (!model.isEmpty()) hub.setModel(s, model);
             } else s = hub.sessions.find(id);
+            Sessions.Session lead = s == null || s.parent.isEmpty() ? null : memberParent(c, s);
+            if (lead != null) { // a team's member's own chat: as a message ticked for it in the team's chat
+                if (said.trim().isEmpty() && files.isEmpty() && linux.isEmpty()) return ""; // (nothing to tell it)
+                if (!linux.isEmpty() && Lite.on(s)) return "this chat runs on a model on the phone, which has no Linux tools for files";
+                for (String p : linux) { // only what is in its own or its team's places, as for any chat
+                    java.io.File real = FilePlaces.fromLinux(c, p).getCanonicalFile();
+                    if (!FilePlaces.inside(real, FilePlaces.incoming(c, s.id).getCanonicalFile())
+                            && !FilePlaces.inside(real, FilePlaces.incoming(c, lead.id).getCanonicalFile())
+                            && !FilePlaces.inside(real, FilePlaces.work(c).getCanonicalFile())) return "that file isn't in this chat's places";
+                }
+                chat[0] = s.id;
+                String e = Team.tell(hub, lead, lead.team.byId(s.member), null, said, files, linux.isEmpty() ? null : linux);
+                return e == null ? "" : e;
+            }
             if (s == null || s.incognito || !s.parent.isEmpty()) return "no such chat";
             if (!linux.isEmpty() && Lite.on(s)) return "this chat runs on a model on the phone, which has no Linux tools for files";
-            if (s.running) return "the chat is still working: wait for it, or stop it on the phone";
+            // (a team chat takes a message while its leader works: as a note to it, and to the members ticked)
+            if (s.running && s.team == null) return "the chat is still working: wait for it, or stop it on the phone";
             chat[0] = s.id;
             for (String p : linux) { // only what is in this chat's own places, as the app's chips are
                 java.io.File real = FilePlaces.fromLinux(c, p).getCanonicalFile();
                 if (!FilePlaces.inside(real, FilePlaces.incoming(c, s.id).getCanonicalFile())
                         && !FilePlaces.inside(real, FilePlaces.work(c).getCanonicalFile())) return "that file isn't in this chat's places";
             }
-            String e = files.isEmpty() && linux.isEmpty() ? hub.send(s, said) : hub.send(s, said, files, linux);
+            String e = s.team != null ? hub.sendTeam(s, said, files, linux, WebPlaces.list(in.optJSONArray("to"))) // (who it goes to: the page's boxes)
+                    : files.isEmpty() && linux.isEmpty() ? hub.send(s, said) : hub.send(s, said, files, linux);
             return e == null ? "" : e;
         });
         JSONObject o = new JSONObject().put("chat", chat[0] == null ? JSONObject.NULL : chat[0]);

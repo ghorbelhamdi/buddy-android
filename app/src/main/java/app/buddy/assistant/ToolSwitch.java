@@ -36,7 +36,7 @@ final class ToolSwitch {
             {"browser", "browser_open", "browser_read", "browser_click", "browser_type", "browser_scroll",
                     "browser_back", "browser_screenshot", "browser_tabs"},
             {"schedule", "schedule_message", "list_scheduled", "cancel_scheduled", "add_notification_rule"},
-            {"advanced", "delegate", "subagents", "phone_shell", "run_on_computer"},
+            {"advanced", "team", "team_change", "team_start", "phone_shell", "run_on_computer"},
     };
 
     private ToolSwitch() {

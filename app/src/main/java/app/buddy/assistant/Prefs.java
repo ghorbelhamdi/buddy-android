@@ -889,6 +889,16 @@ final class Prefs {
         sp(c).edit().putBoolean("sms_codes", on).apply();
     }
 
+    /** A tool's switch carried over to the tools that took its place (from, when it was set; once). */
+    static void carryTool(Context c, String from, String... to) {
+        SharedPreferences p = sp(c);
+        if (!p.contains("tool_on:" + from)) return;
+        boolean on = p.getBoolean("tool_on:" + from, true);
+        SharedPreferences.Editor e = p.edit().remove("tool_on:" + from);
+        for (String t : to) if (!p.contains("tool_on:" + t)) e.putBoolean("tool_on:" + t, on);
+        e.apply();
+    }
+
     /** Settings → Tools and connections → Tools: one phone tool on or off (see ToolSwitch). */
     static boolean toolOn(Context c, String tool, boolean byDefault) {
         return sp(c).getBoolean("tool_on:" + tool, byDefault);

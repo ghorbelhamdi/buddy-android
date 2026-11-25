@@ -27,6 +27,13 @@ final class BackgroundPanel extends LinearLayout {
     private final Handler main = new Handler(Looper.getMainLooper());
     private boolean shown, large, loading;
     private final Runnable tick = this::load;
+    /** How long after its last step on the screen the panel stays (then it folds away until the next one). */
+    private static final long IDLE_MS = 60_000;
+    /** Closed by the user: away until the agent uses the screen again (its phoneToolAt then). */
+    private long closedAt = -1;
+    /** Opened by the user (the chat's own card in Screens): it stays while the screen is there, idle or not. */
+    private boolean always;
+    private android.widget.ImageButton close;
 
     BackgroundPanel(Activity a, Sessions.Session ses) {
         super(a);
@@ -75,8 +82,23 @@ final class BackgroundPanel extends LinearLayout {
         sp.topMargin = dp(a, 8);
         side.addView(show, sp);
         addView(side, new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1));
+        close = iconButton(a, R.drawable.ms_close, a.getString(R.string.bubble_close), MUTED);
+        close.setOnClickListener(v -> { // away until the agent works on that screen again
+            closedAt = ses.phoneToolAt;
+            refresh();
+        });
+        LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(dp(a, 36), dp(a, 36));
+        cp.gravity = Gravity.TOP;
+        addView(close, cp);
         size();
         setVisibility(GONE);
+    }
+
+    /** For a sheet the user opened: no folding when idle, no ×. */
+    void always() {
+        always = true;
+        close.setVisibility(GONE);
+        refresh();
     }
 
     private void size() {
@@ -89,20 +111,32 @@ final class BackgroundPanel extends LinearLayout {
     void setShown(boolean on) {
         shown = on;
         main.removeCallbacks(tick);
+        main.removeCallbacks(again);
         if (on) refresh();
     }
 
     /** Is there a background screen to show for this chat right now? Then the panel shows and keeps its picture fresh. */
     void refresh() {
         boolean on = ses.background && Background.displayOf(ses.id) != android.view.Display.DEFAULT_DISPLAY;
+        // only while it's in use: a step on that screen in the last minute (a leader waiting for its team, or an agent
+        // that only runs commands, kept it up for long), and not closed since its last step there
+        long at = ses.phoneToolAt;
+        if (on && !always && (at == 0 || android.os.SystemClock.elapsedRealtime() - at > IDLE_MS)) on = false;
+        if (on && !always && closedAt >= 0 && at <= closedAt) on = false;
         setVisibility(on ? VISIBLE : GONE);
         main.removeCallbacks(tick);
+        main.removeCallbacks(again);
         if (on && shown) load();
+        // folded while the screen is there: looked at again in a while (the agent may use it again)
+        else if (shown && ses.background && Background.displayOf(ses.id) != android.view.Display.DEFAULT_DISPLAY) main.postDelayed(again, 5000);
     }
+
+    private final Runnable again = this::refresh;
 
     private void load() {
         main.removeCallbacks(tick);
-        if (!shown || loading || getVisibility() != VISIBLE) return;
+        if (!shown || loading) return;
+        if (getVisibility() != VISIBLE) return;
         loading = true;
         final int width = dp(a, large ? 150 : 56) * 2;
         new Thread(() -> {
@@ -121,8 +155,9 @@ final class BackgroundPanel extends LinearLayout {
                 loading = false;
                 if (b != null) picture.setImageBitmap(b);
                 app.setText(label);
-                if (Background.displayOf(ses.id) == android.view.Display.DEFAULT_DISPLAY) {
-                    refresh(); // its screen went (idle for long, or brought to the real one)
+                if (Background.displayOf(ses.id) == android.view.Display.DEFAULT_DISPLAY
+                        || (!always && android.os.SystemClock.elapsedRealtime() - ses.phoneToolAt > IDLE_MS)) {
+                    refresh(); // its screen went (idle for long, or brought to the real one), or isn't in use now
                     return;
                 }
                 if (shown) main.postDelayed(tick, EVERY_MS);

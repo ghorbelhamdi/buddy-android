@@ -238,11 +238,22 @@ final class CommandSheet {
         List<Proc> k = kids.get(pid);
         if (k == null || depth > 30) return;
         for (Proc p : k) {
+            if (ENGINE.matcher(p.args).find()) { // the agent itself, not something it started: its children in its place
+                walk(kids, p.pid, depth, out);
+                continue;
+            }
             p.depth = depth;
             out.add(p);
             walk(kids, p.pid, depth + 1, out);
         }
     }
+
+    /**
+     * An agent's own parts that run as processes of their own (OpenCode 2's engine under its command, and the
+     * terminal service it runs commands in): the agent itself, not what it started. Not listed, and no Stop of its
+     * own (that would end the agent's run; the chat's Stop does that).
+     */
+    static final Pattern ENGINE = Pattern.compile("(^|/)opencode(\\.exe)? serve( |$)|(^|/)opencode-pty daemon( |$)");
 
     /**
      * The process that runs the chat's command: one started since the step whose command line holds the command's
