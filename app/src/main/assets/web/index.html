@@ -250,6 +250,9 @@ h2.sec{margin:8px 0 0;font-size:13px;letter-spacing:.5px;text-transform:uppercas
 .team .m .st{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;color:var(--muted);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .team .m .st.on{color:var(--accent-text)}
 .team .ar{color:var(--muted)}
+.team button.m{font:inherit;color:inherit;cursor:pointer}
+.team button.m:hover{border-color:color-mix(in srgb,var(--mc) 60%,transparent)}
+.btn.memberof{align-self:flex-start;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--soft)}
 .team .shapebtn{display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:4px 10px 4px 6px;font-size:13px;font-weight:600;color:var(--text);margin-inline-end:6px}
 .team .shapebtn:hover{border-color:var(--accent)}
 .shapepic{flex:none;color:var(--soft)}
@@ -692,6 +695,9 @@ function drawChat() {
   drawPanel(d);
   $('devchip').hidden = !d || !d.linux;
   $('bgchip').hidden = !d || !d.canBackground;
+  if (d && d.memberOf) { // a team's member's own chat: its settings are the team's (tell the leader), as on the phone
+    $('agent').hidden = $('optbtn').hidden = $('devchip').hidden = $('bgchip').hidden = true;
+  }
   if (d) {
     $('devchip').classList.toggle('on', !!d.dev);
     $('devchip').title = d.dev ? 'Linux tools are on in this chat: the agent may run commands and edit files. Click to turn them off.' : 'Linux tools are off in this chat. Click to turn them on from the next message.';
@@ -700,7 +706,7 @@ function drawChat() {
     $('bgchip').title = d.background ? 'Background mode is on: the agent works on a hidden screen. Click to turn it off.' : 'Background mode is off: the agent works on the phone’s own screen. Click to turn it on.';
     $('bgchip').setAttribute('aria-pressed', d.background ? 'true' : 'false');
   }
-  $('model').hidden = !d || !d.model;
+  $('model').hidden = !d || !d.model || !!d.memberOf; // (a member's model is the team's: tell the leader)
   if (d && d.model) { $('model').textContent = ''; $('model').append(el('span', {}, d.model), icon(I.chev, 14)); }
   $('msg').placeholder = open ? 'Message this chat' : 'Ask Buddy something';
   document.title = d && d.title ? d.title + ' · Buddy' : 'Buddy';
@@ -724,6 +730,8 @@ function drawChat() {
     jump();
     return;
   }
+  if (d.memberOf) col.append(el('button', {class: 'btn memberof', onclick: () => show(d.memberOf.id)}, icon(I.back, 16),
+    'Team member in “' + d.memberOf.title + '”'));
   const all = rows(d), from = Math.max(0, all.length - shown);
   if (from > 0) col.append(el('button', {class: 'btn earlier', onclick: () => { keep = pane.scrollHeight - pane.scrollTop; shown += PAGE; drawChat(); }}, 'Show earlier messages'));
   else if (d.first > 0) col.append(el('div', {class: 'note', style: 'align-self:center'}, 'Earlier messages are on the phone.'));
@@ -734,6 +742,9 @@ function drawChat() {
   else pane.scrollTop = top;
   jump();
 }
+
+/** The open chat is a team's member's own (its settings, edit and fork are the team's chat's business). */
+function inMember() { return !!(chatData && chatData.memberOf); }
 
 /** A member's (or the leader's) colours on an element: its dot, name and frame take them. */
 function tint(node, c) {
@@ -766,7 +777,8 @@ function drawTeam(d) {
   t.members.forEach((m, i) => {
     // (a pipeline's steps follow each other; a doer and its checker go back and forth, pair by pair)
     strip.append(el('span', {class: 'ar', 'aria-hidden': 'true'}, i === 0 || t.structure === 'pipe' ? '→' : t.structure === 'check' && i % 2 === 1 ? '⇄' : '·'),
-      tint(el('span', {class: 'm'}, el('span', {class: 'dotc'}), el('b', {}, m.name), el('small', {}, m.on),
+      tint(el(m.chat ? 'button' : 'span', {class: 'm', title: m.chat ? 'Open ' + m.name + '’s chat' : null, onclick: m.chat ? () => show(m.chat) : null},
+        el('span', {class: 'dotc'}), el('b', {}, m.name), el('small', {}, m.on),
         el('span', {class: 'st' + (m.running ? ' on' : '')}, m.state)), m.c));
   });
   boxes.textContent = '';
@@ -1027,8 +1039,8 @@ function row(r, live) {
     return el('div', {class: 'mine'}, r.to ? el('span', {class: 'to'}, '→ ' + r.to) : null, b, el('div', {class: 'acts own'},
       el('button', {'aria-label': 'Copy', title: 'Copy', onclick: e => copy(say1, e.currentTarget)}, icon(I.copy, 18)),
       el('button', {'aria-label': 'Quote', title: 'Quote in your next message', onclick: () => setQuote(r.t)}, icon(I.quote, 18)),
-      r.s ? null : el('button', {'aria-label': 'Edit', title: 'Edit and ask again from here', onclick: () => edit(r.at, say1)}, icon(I.edit, 18)),
-      el('button', {'aria-label': 'Fork from here', title: 'Fork: a new chat with the conversation up to here', onclick: () => fork(r.at)}, icon(I.fork, 18))));
+      r.s || inMember() ? null : el('button', {'aria-label': 'Edit', title: 'Edit and ask again from here', onclick: () => edit(r.at, say1)}, icon(I.edit, 18)),
+      inMember() ? null : el('button', {'aria-label': 'Fork from here', title: 'Fork: a new chat with the conversation up to here', onclick: () => fork(r.at)}, icon(I.fork, 18))));
   }
   if (r.k === 'buddy') {
     const b = el('div', {class: 'buddy'});
@@ -1039,7 +1051,7 @@ function row(r, live) {
     f.append(r.fn ? from(r, b) : b, el('div', {class: 'acts'},
       el('button', {'aria-label': 'Copy', title: 'Copy', onclick: e => copy(r.t, e.currentTarget)}, icon(I.copy, 18)),
       el('button', {'aria-label': 'Quote', title: 'Quote in your next message', onclick: () => setQuote(r.t)}, icon(I.quote, 18)),
-      el('button', {'aria-label': 'Fork from here', title: 'Fork: a new chat with the conversation up to here', onclick: () => fork(r.at)}, icon(I.fork, 18))));
+      inMember() ? null : el('button', {'aria-label': 'Fork from here', title: 'Fork: a new chat with the conversation up to here', onclick: () => fork(r.at)}, icon(I.fork, 18))));
     return f;
   }
   const line = el('div', {class: r.k === 'error' ? 'error' : 'note'}, r.t);

@@ -576,12 +576,12 @@ final class WebDevices {
                         : new JSONObject().put("chat", made));
             }
             case "/web/run": { // what the chat's agent runs now (the page's "Running now")
-                Sessions.Session s = shownChat(c, param(query, "id"));
+                Sessions.Session s = shownOrMember(c, param(query, "id"));
                 return s == null ? json(new JSONObject().put("error", "no such chat")) : json(CommandSheet.snapshot(c, s));
             }
             case "/web/stop": { // Stop, as on the phone: the whole run, or with a pid one process under the agent
                 JSONObject in = new JSONObject(new String(body, StandardCharsets.UTF_8));
-                Sessions.Session s = shownChat(c, in.optString("chat"));
+                Sessions.Session s = shownOrMember(c, in.optString("chat"));
                 if (s == null) return json(new JSONObject().put("error", "no such chat"));
                 String said = "";
                 if (in.has("pid")) said = CommandSheet.stop(c, s, in.optLong("pid"));
@@ -701,6 +701,22 @@ final class WebDevices {
     }
 
     /** A chat the page may show (as its list: not incognito or a sub-agent's), or null. */
+    /** A team's member's chat: its team's chat (the leader's), while the member is in the team; else null. Main thread. */
+    private static Sessions.Session memberParent(Context c, Sessions.Session s) {
+        if (s.member.isEmpty()) return null;
+        Sessions.Session p = ChatHub.get(c).sessions.find(s.parent);
+        return p == null || p.incognito || p.team == null || p.team.member(s.member) == null ? null : p;
+    }
+
+    /** As shownChat, or a team's member's chat (to look at, write to and stop, as on the phone). */
+    private static Sessions.Session shownOrMember(Context c, String id) throws Exception {
+        return onMain(() -> {
+            Sessions.Session s = id == null ? null : ChatHub.get(c).sessions.find(id);
+            if (s == null || s.incognito) return null;
+            return s.parent.isEmpty() || memberParent(c, s) != null ? s : null;
+        });
+    }
+
     private static Sessions.Session shownChat(Context c, String id) throws Exception {
         return onMain(() -> {
             Sessions.Session s = id == null ? null : ChatHub.get(c).sessions.find(id);
@@ -769,8 +785,10 @@ final class WebDevices {
     private static JSONObject chat(Context c, String id) throws Exception {
         JSONObject out = onMain(() -> {
             Sessions.Session s = id == null ? null : ChatHub.get(c).sessions.find(id);
-            // an incognito chat stays on the phone; a sub-agent's chat isn't on the page's list either
-            if (s == null || s.incognito || !s.parent.isEmpty()) return null;
+            // an incognito chat stays on the phone; a sub-agent's chat isn't on the page's list either (a team's
+            // member's opens from its team's chat, as on the phone)
+            if (s == null || s.incognito || (!s.parent.isEmpty() && memberParent(c, s) == null)) return null;
+            Sessions.Session lead = s.parent.isEmpty() ? null : memberParent(c, s);
             JSONArray msgs = new JSONArray();
             List<Sessions.Msg> all = s.messages;
             int first = Math.max(0, all.size() - MAX_MESSAGES);
@@ -804,7 +822,7 @@ final class WebDevices {
                     boolean on = h != null && h.running;
                     String state = TeamUi.state(c, h);
                     if (on && busy.isEmpty()) busy = c.getString(R.string.team_member_working, m.name, state);
-                    members.put(new JSONObject().put("id", m.id).put("name", m.name).put("on", m.on()).put("goal", m.goal).put("state", state)
+                    members.put(new JSONObject().put("id", m.id).put("chat", h == null ? "" : h.id).put("name", m.name).put("on", m.on()).put("goal", m.goal).put("state", state)
                             .put("running", on).put("c", new JSONArray(java.util.Arrays.asList(Team.hex(m.color)))));
                 }
                 team = new JSONObject().put("structure", s.team.structure).put("name", c.getString(Team.structureName(s.team.structure)))
@@ -831,7 +849,8 @@ final class WebDevices {
                     .put("model", Models.chip(s)).put("dev", s.dev).put("background", s.background).put("archived", s.archived)
                     .put("canBackground", Prefs.backgroundPaired(c)).put("linux", Linux.installed(c))
                     .put("screen", Prefs.webScreens(c) && Background.displayOf(s.id) != android.view.Display.DEFAULT_DISPLAY)
-                    .put("first", first).put("messages", msgs).put("team", team0 == null ? JSONObject.NULL : team0).put("busy", busy0);
+                    .put("first", first).put("messages", msgs).put("team", team0 == null ? JSONObject.NULL : team0).put("busy", busy0)
+                    .put("memberOf", lead == null ? JSONObject.NULL : new JSONObject().put("id", lead.id).put("title", lead.label()));
         });
         return out == null ? new JSONObject().put("error", "no such chat") : out;
     }
@@ -899,6 +918,13 @@ final class WebDevices {
                 if (in.has("background")) s.background = in.optBoolean("background") && Prefs.backgroundPaired(c);
                 if (!model.isEmpty()) hub.setModel(s, model);
             } else s = hub.sessions.find(id);
+            Sessions.Session lead = s == null || s.parent.isEmpty() ? null : memberParent(c, s);
+            if (lead != null) { // a team's member's own chat: as a message ticked for it in the team's chat
+                if (!linux.isEmpty()) return "send files in Linux tools from the team's chat";
+                chat[0] = s.id;
+                String e = Team.tell(hub, lead, lead.team.member(s.member), null, said, files);
+                return e == null ? "" : e;
+            }
             if (s == null || s.incognito || !s.parent.isEmpty()) return "no such chat";
             if (!linux.isEmpty() && Lite.on(s)) return "this chat runs on a model on the phone, which has no Linux tools for files";
             if (s.running) return "the chat is still working: wait for it, or stop it on the phone";
