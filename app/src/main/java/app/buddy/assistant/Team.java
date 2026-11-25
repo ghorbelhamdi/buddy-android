@@ -692,8 +692,16 @@ final class Team {
         /** What the user said: the structure, the workspace, the apps; the members (by name); every member's goal; the hand-off; the rules. */
         boolean structure, workspace, apps, members, goals, handoff, rules;
 
+        /** Shown on the phone's chat screen already (it opens there once; the page shows it until it is started or dismissed). */
+        boolean shown;
+
         boolean[] known() {
             return new boolean[]{structure, workspace, apps};
+        }
+
+        JSONObject json() throws Exception {
+            return new JSONObject().put("team", team.json()).put("structure", structure).put("workspace", workspace)
+                    .put("apps", apps).put("members", members).put("goals", goals).put("handoff", handoff).put("rules", rules);
         }
     }
 
@@ -756,9 +764,58 @@ final class Team {
         }
         parent.teamDraft = d; // the chat opens the setup with it (main thread: refresh)
         svc.runOnMain(hub::changed);
-        return "Buddy's team setup opened on the user's screen with what they said, and asks them what they left open "
-                + "(they pick each member's agent there). The team starts when they tap Start the team; then you are told "
-                + "what is still open to ask. Tell them in a line to finish it there, and end your turn.";
+        return "Buddy's team setup waits for the user with what they said, and asks them what they left open (they pick "
+                + "each member's agent there): it opens on the phone's chat screen, and Buddy on their computer shows it in "
+                + "this chat too. The team starts when they tap Start the team; then you are told what is still open to ask. "
+                + "Tell them in a line to finish it there, and end your turn.";
+    }
+
+    /**
+     * A team as Buddy on the user's computer set it up (see WebDevices): structure, workspace, apps and the members
+     * with their agents and models, checked as the phone's setup would have them. Null and why in err[0] when it can't be.
+     */
+    static Team fromPage(Context c, Sessions.Session parent, JSONObject o, String[] err) {
+        Team t = new Team();
+        String s = o.optString("structure");
+        t.structure = LEAD.equals(s) || CHECK.equals(s) || DOERS.equals(s) ? s : PIPE;
+        s = o.optString("workspace");
+        t.workspace = SEP.equals(s) || LOOK.equals(s) ? s : SAME;
+        s = o.optString("apps");
+        t.apps = !Background.setUp(c) ? NONE : TURN.equals(s) || NONE.equals(s) ? s : DIFF;
+        t.handoff = o.optString("handoff").trim();
+        if (t.handoff.isEmpty()) t.handoff = handoffs(t.structure)[0];
+        t.rules = o.optString("rules").trim();
+        JSONArray m = o.optJSONArray("members");
+        for (int i = 0; m != null && i < m.length(); i++) {
+            JSONObject x = m.optJSONObject(i);
+            String name = x == null ? "" : clipName(x.optString("name"));
+            if (name.isEmpty()) {
+                err[0] = "each member needs a name";
+                return null;
+            }
+            if (t.member(name) != null) {
+                err[0] = "two members are called " + name;
+                return null;
+            }
+            String agent = x.optString("agent");
+            if (!SetupState.signedIn(c, agent)) {
+                err[0] = name + "'s agent isn't signed in on the phone";
+                return null;
+            }
+            String model = x.optString("model");
+            boolean offered = model.isEmpty();
+            for (String[] o2 : Models.options(agent, true)) offered |= o2[0] != null && model.equals(o2[0]);
+            if (!offered) {
+                err[0] = name + "'s model isn't one its agent has";
+                return null;
+            }
+            t.add(name, agent, model, x.optString("goal").trim());
+        }
+        if (t.members.isEmpty()) {
+            err[0] = "a team needs at least one member";
+            return null;
+        }
+        return t;
     }
 
     /** A member's name as it is kept: 40 characters at most, cut before it is compared with the others'. */

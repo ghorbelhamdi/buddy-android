@@ -1008,6 +1008,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     private void teamSetup(final Team.Draft draft) {
         TeamUi.setup(this, ses, draft.team, draft.known(), draft.members, false, (team, agent, model) -> {
             if (ses.team != null) return;
+            if (ses.teamDraft == draft) ses.teamDraft = null;
             sendTo.clear();
             sendTo.add(Team.LEADER);
             final String ask = Team.interview(team, !draft.goals, !draft.handoff, !draft.rules);
@@ -2911,9 +2912,9 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         checkBackground(false);
         renderHelpers();
         renderTeam();
-        if (resumed && ses.teamDraft != null) { // a team the user asked for in the chat: the setup, with what they said
+        if (resumed && ses.teamDraft != null && !ses.teamDraft.shown) { // a team the user asked for in the chat: the setup, with what they said
             Team.Draft draft = ses.teamDraft;
-            ses.teamDraft = null;
+            draft.shown = true; // (once here; the page shows it until it is started there or here, or dismissed)
             if (ses.team == null) teamSetup(draft);
         }
         options.setImageTintList(ColorStateList.valueOf(ses.awake || ses.schedule != null || !ses.allowed.isEmpty() ? ACCENT : MUTED));

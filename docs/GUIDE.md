@@ -164,7 +164,7 @@ A chat can have a **team**: the chat's own agent leads, and the members are agen
 - **Turned off and on again:** Buddy keeps the chat's last team. Turning Team on again starts the setup from it, and "turn the team back on" opens the setup on that team, to start it again as it was. The members start with fresh memory: their chats went when the team was turned off.
 - **Changing the team later:** tell the leader ("add a tester on Pi", "have the checker use another model"). New or removed members, another agent or model and changes to how the team works come to you on a card first.
 - **Stop** stops the leader and every member. Turning Team off deletes the members' chats with what they remember; the files they made stay.
-- **Buddy on your computer** shows the same strip, the team in its shape, the Send to boxes and the coloured answers. A team is set up on the phone.
+- **Buddy on your computer** shows the same strip, the team in its shape, the Send to boxes and the coloured answers, and sets a team up too: the chat menu's **Team…** opens the same steps (or the team in its shape, with Turn the team off), and a team you asked for in the chat waits there as a **Team setup** card until you set it up or tap Not now.
 - Each member uses its own agent's plan, like a chat of its own. Not available in a notification rule's run.
 
 ### Sub-agents

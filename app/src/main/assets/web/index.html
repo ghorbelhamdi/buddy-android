@@ -265,6 +265,18 @@ h2.sec{margin:8px 0 0;font-size:13px;letter-spacing:.5px;text-transform:uppercas
 .tcard .goal{color:var(--muted);font-size:12px}
 .tcard .st{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tcard .st.on2{color:var(--accent-text)}
+.tchoice{border:1.5px solid var(--line);margin:4px 0;padding:10px 12px}
+.tchoice.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.tchoice small{color:var(--muted)}
+.tchoice .rad{flex:none;width:16px;height:16px;border-radius:50%;border:2px solid var(--muted)}
+.tchoice.on .rad{border-color:var(--accent);background:radial-gradient(var(--accent) 45%,transparent 50%)}
+.tcard.edit{gap:6px}
+.tcard.edit input{flex:1;min-width:0;font:inherit;font-weight:600;background:transparent;border:0;border-bottom:1px solid var(--line);color:var(--text);padding:2px 0}
+.tcard.edit select{width:100%;font:inherit;font-size:13px;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:6px 8px}
+.tcard.edit label{display:flex;flex-direction:column;gap:2px}
+.tcard.edit small{color:var(--muted);font-size:11px}
+.tcard .x{flex:none;width:26px;height:26px;border-radius:13px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.tcard.addm{border:2px dashed var(--line);align-items:center;justify-content:center;min-height:90px;color:var(--soft);cursor:pointer;font:inherit}
 .tfacts{display:flex;flex-direction:column;gap:6px;background:var(--card2);border-radius:14px;padding:10px 12px;margin:14px 6px 0;font-size:13px;color:var(--soft)}
 dialog:has(.sheet.wide){width:min(720px,calc(100vw - 32px))}
 .sendto{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
@@ -508,6 +520,7 @@ function start() {
           el('button', {'aria-label': 'Hide the screen here', title: 'Hide here (the Screen chip in the header shows it again)', onclick: () => panelHide(open, true)}, icon(I.x, 16)))),
       el('div', {class: 'col dock'}, el('div', {id: 'run'}), el('div', {id: 'cards'}),
         el('div', {id: 'quote'}), el('div', {class: 'atts', id: 'atts'}),
+        el('div', {id: 'teamwait'}),
         el('div', {class: 'sendto', id: 'sendto', hidden: true, role: 'group', 'aria-label': 'Who the message goes to'}),
         el('div', {class: 'composer'},
           el('button', {class: 'clip', 'aria-label': 'Attach files', title: 'Attach files (pictures, documents; over 25 MB they go to the chat’s Linux tools)',
@@ -730,7 +743,8 @@ let sendTo = new Set(['leader']), sendToChat = null, teamDrawn = '';
 
 /** A chat with a team: its members over the chat, each with its state, and the boxes over the message box. */
 function drawTeam(d) {
-  const t = d && d.team, strip = $('team'), boxes = $('sendto');
+  drawTeamWait(d);
+  const t = d && d.team && !d.team.off ? d.team : null, strip = $('team'), boxes = $('sendto');
   strip.hidden = boxes.hidden = !t;
   if (!t) { teamDrawn = ''; return; }
   if (sendToChat !== open) { sendToChat = open; sendTo = new Set(['leader']); }
@@ -777,9 +791,9 @@ function shapePic(structure, w) {
 }
 
 /** The open chat's team drawn in its shape: the leader, the members where the structure puts them, and what was set. To look at. */
-function teamShape() {
+function teamShape(withOff) {
   const d = chatData, t = d && d.team;
-  if (!t) return;
+  if (!t || t.off) return;
   sheet(box => {
     box.classList.add('wide');
     box.append(el('h2', {}, t.name), el('p', {}, t.how || ''));
@@ -810,6 +824,160 @@ function teamShape() {
     box.append(el('div', {class: 'tfacts'}, el('span', {}, 'Where members work: ' + t.workspace), el('span', {}, 'Apps: ' + t.apps),
       t.handoff ? el('span', {}, 'Hand-off: ' + t.handoff) : null, t.rules ? el('span', {}, 'Rules: ' + t.rules) : null));
     box.append(el('p', {style: 'margin:10px 6px 0'}, 'To change the team, tell the leader.'));
+    if (withOff) box.append(el('div', {class: 'line', style: 'justify-content:flex-end;margin-top:10px'},
+      el('button', {class: 'btn deny', onclick: async () => {
+        if (!confirm('Turn the team off? The members’ chats go, with what they remember. Files they made stay.')) return;
+        try { const r = await api('/web/team', {action: 'off', chat: open}); if (r.error) { say(r.error); return; } refreshChat(); } catch (e) { say(e.message); }
+      }}, 'Turn the team off')));
+  });
+}
+
+// ------------------------------------------------------------ a chat's team: set up here as on the phone
+
+let teamWaitDrawn = '';
+
+/** The setup the user asked for in the chat (the leader's team_start), waiting: a card that opens it here. */
+function drawTeamWait(d) {
+  const box = $('teamwait'), w = d && d.team && d.team.draft ? d.team.draft : null, now = JSON.stringify([open, w]);
+  if (now === teamWaitDrawn) return;
+  teamWaitDrawn = now;
+  box.textContent = '';
+  if (!w) return;
+  const names = w.team.members.map(m => m.name).join(', ');
+  box.append(el('div', {class: 'card'}, el('span', {class: 'lab'}, 'TEAM SETUP'),
+    el('div', {class: 'row', style: 'align-items:center'},
+      el('span', {style: 'flex:1 1 220px'}, 'The team you asked for is waiting to be set up' + (w.members ? ': ' + names + '.' : '.')),
+      el('button', {class: 'btn', style: 'flex:none', onclick: async () => { try { await api('/web/team', {action: 'dismiss', chat: open}); refreshChat(); } catch (e) { say(e.message); } }}, 'Not now'),
+      el('button', {class: 'btn primary', style: 'flex:none', onclick: () => teamSetup(w.team, w)}, 'Set it up'))));
+}
+
+async function refreshChat() {
+  try { chatData = await api('/web/chat?id=' + encodeURIComponent(open)); drawn = ''; render(); } catch (e) { say(e.message); }
+}
+
+/** Chat menu → Team…: the team in its shape (with Turn off), or the setup (from the chat's last team, if it had one). */
+function teamMenu() {
+  const t = chatData && chatData.team;
+  if (t && !t.off) { teamShape(true); return; }
+  if (t && t.draft) { teamSetup(t.draft.team, t.draft); return; }
+  teamSetup(t && t.last ? t.last : null, null);
+}
+
+const STRUCTS = [['lead', 'Leader + workers', 'The leader splits the task, each worker does a part, the leader checks and puts it together.'],
+  ['pipe', 'Pipeline', 'One after another, for example plan, build, check. Each step gets the reports before it.'],
+  ['check', 'Doer + checker', 'One does the work, another reviews it; back and forth until it passes.'],
+  ['doers', 'Doers with their own goals', 'Several doers at the same time, each with its own goal; the leader puts it together.']];
+const WORKSPACES = [['sep', 'Each in its own folder', 'Separate folders; the leader brings the results together.'],
+  ['same', 'All in the chat’s folder', 'Everyone works on the same files.'],
+  ['look', 'Only look things up', 'Members read and report; only the leader changes things.']];
+const APPS = [['diff', 'Each on a different app', 'At the same time; the leader keeps two members out of one app.'],
+  ['turn', 'One app at a time', 'Members can use the same app; the others wait until it’s free.'],
+  ['none', 'No phone apps', 'Only the background browser and Linux tools.']];
+
+/** A member's colours as the phone gives them (Team's palette: on dark, on light), by its colour index or its place. */
+const TEAM_DARK = ['#6FA8FF', '#5CC08A', '#B48CFF', '#E8C15A', '#F08DB5', '#5FD0D0'], TEAM_LIGHT = ['#2563C9', '#1E7F4E', '#7445C7', '#8A6A00', '#B93A76', '#0F7C7C'];
+function memberColor(m, i) {
+  const k = ((Number.isInteger(m.color) ? m.color : i) % 6 + 6) % 6;
+  return [TEAM_DARK[k], TEAM_LIGHT[k]];
+}
+
+/** The agents signed in on the phone, and each one's models, as the page's New chat screen gets them. */
+const teamModels = {};
+async function agentModels(agent) {
+  if (!teamModels[agent]) teamModels[agent] = await api('/web/new?agent=' + encodeURIComponent(agent));
+  return teamModels[agent];
+}
+
+/**
+ * The phone's team setup, here: how it works, where members work, how they share apps (each left out when the user
+ * said it in the chat: draft), then the members with their agents and models. Start the team starts it.
+ */
+async function teamSetup(from, draft) {
+  const chat = open;
+  let pre;
+  try { pre = await api('/web/team-preset?chat=' + encodeURIComponent(chat) + '&structure=' + encodeURIComponent((from && from.structure) || 'pipe')); }
+  catch (e) { say(e.message); return; }
+  if (pre.error) { say(pre.error); return; }
+  const base = await agentModels('');
+  const agents = (base.agents || []).map(a => ({id: a.id, name: a.name}));
+  const t = JSON.parse(JSON.stringify(from || pre.team));
+  const known = draft ? [draft.structure, draft.workspace, draft.apps] : [false, false, false];
+  const steps = [0, 1, 2].filter(i => !known[i]).concat([3]);
+  let at = from && !draft ? steps.length - 1 : 0;
+  if (!pre.screens) t.apps = 'none';
+  sheet((box, close) => {
+    box.classList.add('wide');
+    const radio = (list, cur, pick, pics) => list.filter(o => pre.screens || list !== APPS || o[0] === 'none').map(o =>
+      el('button', {class: 'opt tchoice' + (o[0] === cur ? ' on' : ''), onclick: () => { pick(o[0]); draw(); }},
+        pics ? shapePic(o[0], 44) : el('span', {class: 'rad'}), el('span', {class: 'n'}, el('b', {}, o[1]), el('br'), el('small', {}, o[2]))));
+    const draw = async () => {
+      box.textContent = '';
+      const step = steps[at];
+      box.append(el('p', {style: 'margin:0 6px 4px;text-align:end;font-family:ui-monospace,monospace'}, (at + 1) + ' of ' + steps.length));
+      if (step === 0) {
+        box.append(el('h2', {}, 'How should the team work?'), el('p', {}, 'This chat’s agent leads. Pick a shape; you choose the members’ agents next.'),
+          ...radio(STRUCTS, t.structure, async k => {
+            if (k === t.structure) return;
+            if (draft && draft.members) { t.structure = k; return; } // (the members the user named stay)
+            try { const p = await api('/web/team-preset?chat=' + encodeURIComponent(chat) + '&structure=' + k);
+              Object.assign(t, {structure: k, members: p.team.members, handoff: p.team.handoff}); draw(); } catch (e) { say(e.message); }
+          }, true));
+      } else if (step === 1) {
+        box.append(el('h2', {}, 'Where do the members work?'), el('p', {}, 'For the whole team. You can tell the leader to change it later.'),
+          ...radio(WORKSPACES, t.workspace, k => { t.workspace = k; }));
+      } else if (step === 2) {
+        box.append(el('h2', {}, 'How do they share the phone’s apps?'),
+          el('p', {}, pre.screens ? 'Each member gets a hidden screen of its own, but an app can only be open in one place.'
+            : 'Background mode isn’t set up on the phone, so members have no phone screen: only the background browser and Linux tools.'),
+          ...radio(APPS, t.apps, k => { t.apps = k; }));
+      } else {
+        box.append(el('h2', {}, (STRUCTS.find(x => x[0] === t.structure) || STRUCTS[1])[1]),
+          el('p', {}, 'Pick each one’s agent and model. The leader is this chat’s agent (change it with the agent chip at the top).'));
+        const shape = el('div', {class: 'tshape'});
+        shape.append(tint(el('div', {class: 'tcard lead'}, el('span', {class: 'nm'}, el('span', {class: 'dotc'}), 'Leader'),
+          el('span', {class: 'on'}, (AGENTS[chatData.agent] || chatData.agent) + (chatData.model ? ' · ' + chatData.model : '')), el('span', {class: 'goal'}, 'this chat')), null));
+        const cards = [];
+        for (const m of t.members) {
+          const ms = await agentModels(m.agent);
+          const name = el('input', {value: m.name, maxlength: '40', 'aria-label': 'Name', oninput: e => { m.name = e.target.value; }});
+          const ag = el('select', {'aria-label': m.name + '’s agent', onchange: e => { m.agent = e.target.value; m.model = ''; draw(); }},
+            ...agents.map(a => el('option', {value: a.id}, a.name)));
+          ag.value = m.agent;
+          const mo = el('select', {'aria-label': m.name + '’s model', onchange: e => { m.model = e.target.value; }},
+            ...(ms.models || []).map(x => x.heading ? el('option', {disabled: true}, '— ' + x.heading + ' —') : el('option', {value: x.id}, x.name)));
+          mo.value = m.model || '';
+          cards.push(tint(el('div', {class: 'tcard edit'},
+            el('span', {class: 'nm'}, el('span', {class: 'dotc'}), name,
+              el('button', {class: 'x', 'aria-label': 'Remove ' + m.name, title: 'Remove', onclick: () => { t.members.splice(t.members.indexOf(m), 1); draw(); }}, icon(I.x, 14))),
+            el('label', {}, el('small', {}, 'Agent'), ag), el('label', {}, el('small', {}, 'Model'), mo),
+            m.goal ? el('span', {class: 'goal'}, m.goal) : null), memberColor(m, t.members.indexOf(m))));
+        }
+        cards.push(el('button', {class: 'tcard addm', onclick: () => {
+          const n = t.structure === 'pipe' ? 'Step ' : t.structure === 'lead' ? 'Worker ' : 'Doer ';
+          let i = t.members.length + 1;
+          while (t.members.some(m => m.name.toLowerCase() === (n + i).toLowerCase())) i++;
+          t.members.push({name: n + i, agent: chatData.agent === 'claude-code' ? 'claude' : (agents[0] || {}).id, model: '', goal: ''}); draw();
+        }}, '+ Add a member'));
+        shape.append(el('span', {class: 'ar', 'aria-hidden': 'true'}, '↓'));
+        if (t.structure === 'pipe') cards.forEach((c, i) => { if (i) shape.append(el('span', {class: 'ar', 'aria-hidden': 'true'}, '↓')); shape.append(c); });
+        else shape.append(el('div', {class: 'rowm'}, ...cards));
+        box.append(shape);
+      }
+      const last = at === steps.length - 1;
+      box.append(el('div', {class: 'line', style: 'justify-content:flex-end;margin-top:14px'},
+        el('button', {class: 'btn', onclick: () => { if (at === 0) close(); else { at--; draw(); } }}, at === 0 ? 'Cancel' : 'Back'),
+        el('button', {class: 'btn primary', disabled: last && !t.members.length, onclick: async () => {
+          if (!last) { at++; draw(); return; }
+          try {
+            const r = await api('/web/team', {action: 'start', chat, draft: !!draft,
+              team: {structure: t.structure, workspace: t.workspace, apps: t.apps, handoff: t.handoff, rules: t.rules,
+                members: t.members.map(m => ({name: m.name.trim(), agent: m.agent, model: m.model || '', goal: m.goal || ''}))}});
+            if (r.error) { say(r.error); return; }
+            close(); refreshChat();
+          } catch (e) { say(e.message); }
+        }}, last ? 'Start the team' : 'Next')));
+    };
+    draw();
   });
 }
 
@@ -1152,6 +1320,7 @@ function chatMenu(id, anchor) {
   pop.append(item('Rename', () => rename(id, title)));
   pop.append(item('Files', () => openView('files', id, title))); // (this chat's: its project folder, what was sent to it, its attachments)
   pop.append(item('Schedule…', () => editSchedule(id, title)));
+  if (id === open && chatData && !chatData.error) pop.append(item('Team…', () => teamMenu()));
   pop.append(c.archived ? item('Bring back', () => change({archived: false}, id)) : item('Archive', () => change({archived: true}, id)));
   const d = id === open && chatData && !chatData.error ? chatData : null;
   if (d && anchor.id === 'optbtn' && window.matchMedia('(max-width: 820px)').matches) {

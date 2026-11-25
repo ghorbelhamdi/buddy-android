@@ -532,6 +532,13 @@ final class WebDevices {
                 return json(f == null ? new JSONObject().put("error", "Buddy didn't answer") : f);
             }
             case "/web/set": return json(set(c, new JSONObject(new String(body, StandardCharsets.UTF_8))));
+            case "/web/team": return json(team(c, new JSONObject(new String(body, StandardCharsets.UTF_8))));
+            case "/web/team-preset": { // a structure's members to start from, on the agents signed in (as the phone's setup)
+                Sessions.Session s = shownChat(c, param(query, "chat"));
+                if (s == null) return json(new JSONObject().put("error", "no such chat"));
+                return json(new JSONObject().put("team", Team.preset(c, String.valueOf(param(query, "structure")), s.backend).json())
+                        .put("screens", Background.setUp(c)));
+            }
             case "/web/edit": { // a message of the user's own, edited: asked again from there (the chat as it was is kept, archived)
                 JSONObject in = new JSONObject(new String(body, StandardCharsets.UTF_8));
                 String said = onMain(() -> {
@@ -811,6 +818,11 @@ final class WebDevices {
                                 : Team.NONE.equals(s.team.apps) ? R.string.team_apps_none : R.string.team_apps_diff))
                         .put("handoff", s.team.handoff).put("rules", s.team.rules);
             }
+            if (s.team == null) { // none: the setup the user asked for in the chat, waiting, and the last team, to start from
+                if (s.teamDraft != null) team = new JSONObject().put("draft", s.teamDraft.json());
+                else if (s.lastTeam != null) team = new JSONObject().put("last", s.lastTeam.json());
+                if (team != null) team.put("off", true);
+            }
             final JSONObject team0 = team;
             final String busy0 = busy;
             // first: where these begin in the chat, so the page knows a message again when earlier ones drop off
@@ -822,6 +834,40 @@ final class WebDevices {
                     .put("first", first).put("messages", msgs).put("team", team0 == null ? JSONObject.NULL : team0).put("busy", busy0);
         });
         return out == null ? new JSONObject().put("error", "no such chat") : out;
+    }
+
+    /**
+     * The page's team setup (what the phone's Chat options → Team does): start, with the team as set up there
+     * (draft: the one the user asked for in the chat, whose follow-ups the leader then asks only where they left them
+     * open), off, or dismiss the waiting setup.
+     */
+    private static JSONObject team(Context c, JSONObject in) throws Exception {
+        String a = in.optString("action");
+        String err = onMain(() -> {
+            ChatHub hub = ChatHub.get(c);
+            Sessions.Session s = hub.sessions.find(in.optString("chat"));
+            if (s == null || s.incognito || !s.parent.isEmpty()) return "no such chat";
+            if ("dismiss".equals(a)) {
+                s.teamDraft = null;
+                hub.changed();
+                return "";
+            }
+            if (Team.working(hub, s)) return "not while the chat or a member is working";
+            if ("off".equals(a)) {
+                if (s.team != null) hub.setTeam(s, null, null);
+                return "";
+            }
+            if (s.team != null) return "this chat has a team already";
+            String[] why = new String[1];
+            Team t = Team.fromPage(c, s, in.optJSONObject("team") == null ? new JSONObject() : in.optJSONObject("team"), why);
+            if (t == null) return why[0];
+            Team.Draft d = in.optBoolean("draft") ? s.teamDraft : null;
+            s.teamDraft = null;
+            String ask = d != null ? Team.interview(t, !d.goals, !d.handoff, !d.rules) : Team.interview(t);
+            String e = hub.startTeam(s, t, ask);
+            return e == null ? "" : e;
+        });
+        return err == null ? new JSONObject().put("error", "Buddy didn't answer") : err.isEmpty() ? new JSONObject() : new JSONObject().put("error", err);
     }
 
     /** A message from the page: into its chat, or a new chat with the default agent. */
