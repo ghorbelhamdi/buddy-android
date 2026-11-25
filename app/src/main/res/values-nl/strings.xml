@@ -2221,7 +2221,7 @@
     <string name="signin_pi_signed_in">Pi is ingelogd met %1$s</string>
     <string name="signin_pi_failed">Niet ingelogd:\n%1$s</string>
     <string name="debug_lock_ask_title">Draadloze foutopsporing op deze wifi toestaan</string>
-    <string name="debug_lock_ask_text">Je telefoon vraagt het één keer per wifi-toegangspunt (een mesh-netwerk heeft er meerdere). Tik hier, vink “Altijd toestaan op dit netwerk” aan en tik op Toestaan.</string>
+    <string name="debug_lock_ask_text">Je telefoon heeft het op dit wifi-toegangspunt weer uitgezet (een mesh-netwerk heeft er meerdere). Tik hier en zet Draadloze foutopsporing aan: dan vraagt je telefoon het. Vink ‘Altijd toestaan op dit netwerk’ aan en tik op Toestaan.</string>
 
     <!-- Services (2.4.0): a service's optional key, its models shown in pickers, Pi and the services saved in Buddy. -->
     <string name="api_keys_key_optional_hint">API-sleutel (optioneel)</string>

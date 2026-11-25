@@ -2215,7 +2215,7 @@
     <string name="signin_pi_signed_in">Pi ने %1$s से साइन इन किया</string>
     <string name="signin_pi_failed">साइन इन नहीं हुआ:\n%1$s</string>
     <string name="debug_lock_ask_title">इस Wi-Fi पर वायरलेस डीबगिंग की अनुमति दें</string>
-    <string name="debug_lock_ask_text">फ़ोन हर Wi-Fi एक्सेस पॉइंट के लिए एक बार पूछता है (मेश नेटवर्क में कई होते हैं)। यहाँ टैप करें, फिर “इस नेटवर्क पर हमेशा अनुमति दें” चुनकर अनुमति दें पर टैप करें।</string>
+    <string name="debug_lock_ask_text">आपके फ़ोन ने इस Wi-Fi एक्सेस पॉइंट पर इसे फिर बंद कर दिया (मेश नेटवर्क में कई होते हैं)। यहाँ टैप करें और वायरलेस डीबगिंग चालू करें: तब आपका फ़ोन पूछेगा। “इस नेटवर्क पर हमेशा अनुमति दें” चुनें और अनुमति दें पर टैप करें।</string>
 
     <!-- Services (2.4.0): a service's optional key, its models shown in pickers, Pi and the services saved in Buddy. -->
     <string name="api_keys_key_optional_hint">API कुंजी (वैकल्पिक)</string>

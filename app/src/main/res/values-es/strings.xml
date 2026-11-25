@@ -2654,7 +2654,7 @@
     <string name="signin_pi_signed_in">Pi ha iniciado sesión con %1$s</string>
     <string name="signin_pi_failed">Sin iniciar sesión:\n%1$s</string>
     <string name="debug_lock_ask_title">Permitir la depuración inalámbrica en este Wi-Fi</string>
-    <string name="debug_lock_ask_text">El teléfono lo pregunta una vez por cada punto de acceso Wi-Fi (una red en malla tiene varios). Toca aquí, marca «Permitir siempre en esta red» y toca Permitir.</string>
+    <string name="debug_lock_ask_text">Tu teléfono la volvió a desactivar en este punto de acceso Wi-Fi (una red mesh tiene varios). Toca aquí y activa la depuración inalámbrica: entonces tu teléfono pregunta. Marca «Permitir siempre en esta red» y toca Permitir.</string>
 
     <!-- Services (2.4.0): a service's optional key, its models shown in pickers, Pi and the services saved in Buddy. -->
     <string name="api_keys_key_optional_hint">Clave de API (opcional)</string>

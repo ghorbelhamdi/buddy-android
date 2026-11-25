@@ -2222,7 +2222,7 @@
     <string name="signin_pi_signed_in">Pi ist mit %1$s angemeldet</string>
     <string name="signin_pi_failed">Nicht angemeldet:\n%1$s</string>
     <string name="debug_lock_ask_title">WLAN-Debugging in diesem WLAN erlauben</string>
-    <string name="debug_lock_ask_text">Dein Handy fragt einmal pro WLAN-Zugangspunkt (ein Mesh-Netz hat mehrere). Tippe hier, setze dann den Haken bei „In diesem Netzwerk immer zulassen“ und tippe auf Zulassen.</string>
+    <string name="debug_lock_ask_text">Dein Handy hat es an diesem WLAN-Zugangspunkt wieder ausgeschaltet (ein Mesh-Netz hat mehrere). Tippe hier und schalte „Debugging über WLAN“ ein: Dann fragt dein Handy. Setze den Haken bei „In diesem Netzwerk immer zulassen“ und tippe auf Zulassen.</string>
 
     <!-- Services (2.4.0): a service's optional key, its models shown in pickers, Pi and the services saved in Buddy. -->
     <string name="api_keys_key_optional_hint">API-Schlüssel (optional)</string>

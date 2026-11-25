@@ -2223,7 +2223,7 @@
     <string name="signin_pi_signed_in">Pi, %1$s ile giriş yaptı</string>
     <string name="signin_pi_failed">Giriş yapılmadı:\n%1$s</string>
     <string name="debug_lock_ask_title">Bu Wi-Fi’de kablosuz hata ayıklamaya izin verin</string>
-    <string name="debug_lock_ask_text">Telefon her Wi-Fi erişim noktası için bir kez sorar (mesh ağında birkaç tane vardır). Buraya dokunun, “Bu ağda her zaman izin ver”i işaretleyip İzin ver’e dokunun.</string>
+    <string name="debug_lock_ask_text">Telefonunuz bunu bu Wi-Fi erişim noktasında yine kapattı (mesh ağda birkaç tane vardır). Buraya dokunun ve Kablosuz hata ayıklamayı açın: telefonunuz o zaman sorar. “Bu ağda her zaman izin ver”i işaretleyip İzin ver\'e dokunun.</string>
 
     <!-- Services (2.4.0): a service's optional key, its models shown in pickers, Pi and the services saved in Buddy. -->
     <string name="api_keys_key_optional_hint">API anahtarı (isteğe bağlı)</string>

@@ -2704,7 +2704,7 @@
     <string name="signin_pi_signed_in">Pi вошёл через %1$s</string>
     <string name="signin_pi_failed">Вход не выполнен:\n%1$s</string>
     <string name="debug_lock_ask_title">Разрешите отладку по Wi-Fi в этой сети</string>
-    <string name="debug_lock_ask_text">Телефон спрашивает один раз для каждой точки доступа Wi-Fi (в mesh-сети их несколько). Нажмите здесь, отметьте «Всегда разрешать в этой сети» и нажмите «Разрешить».</string>
+    <string name="debug_lock_ask_text">Телефон снова выключил её на этой точке доступа Wi-Fi (в mesh-сети их несколько). Нажмите здесь и включите отладку по Wi-Fi: тогда телефон спросит. Отметьте «Всегда разрешать в этой сети» и нажмите «Разрешить».</string>
 
     <!-- Services (2.4.0): a service's optional key, its models shown in pickers, Pi and the services saved in Buddy. -->
     <string name="api_keys_key_optional_hint">API-ключ (необязательно)</string>

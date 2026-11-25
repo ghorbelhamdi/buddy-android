@@ -2655,7 +2655,7 @@
     <string name="signin_pi_signed_in">Pi ha effettuato l’accesso con %1$s</string>
     <string name="signin_pi_failed">Accesso non effettuato:\n%1$s</string>
     <string name="debug_lock_ask_title">Consenti il debug wireless su questo Wi-Fi</string>
-    <string name="debug_lock_ask_text">Il telefono lo chiede una volta per ogni punto di accesso Wi-Fi (una rete mesh ne ha diversi). Tocca qui, spunta “Consenti sempre su questa rete” e tocca Consenti.</string>
+    <string name="debug_lock_ask_text">Il telefono l\'ha di nuovo disattivato su questo punto di accesso Wi-Fi (una rete mesh ne ha diversi). Tocca qui e attiva il debug wireless: il telefono allora chiede. Spunta «Consenti sempre su questa rete» e tocca Consenti.</string>
 
     <!-- Services (2.4.0): a service's optional key, its models shown in pickers, Pi and the services saved in Buddy. -->
     <string name="api_keys_key_optional_hint">Chiave API (facoltativa)</string>

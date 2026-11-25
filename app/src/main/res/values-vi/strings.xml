@@ -2791,7 +2791,7 @@
     <string name="signin_pi_signed_in">Pi đã đăng nhập bằng %1$s</string>
     <string name="signin_pi_failed">Chưa đăng nhập:\n%1$s</string>
     <string name="debug_lock_ask_title">Cho phép gỡ lỗi không dây trên Wi-Fi này</string>
-    <string name="debug_lock_ask_text">Điện thoại hỏi một lần cho mỗi điểm truy cập Wi-Fi (mạng mesh có nhiều điểm). Chạm vào đây, chọn “Luôn cho phép trên mạng này” rồi chạm Cho phép.</string>
+    <string name="debug_lock_ask_text">Điện thoại đã tắt lại ở điểm truy cập Wi-Fi này (mạng mesh có nhiều điểm). Chạm vào đây và bật Gỡ lỗi không dây: khi đó điện thoại sẽ hỏi. Đánh dấu “Luôn cho phép trên mạng này” và chạm Cho phép.</string>
 
     <!-- Services (2.4.0): a service's optional key, its models shown in pickers, Pi and the services saved in Buddy. -->
     <string name="api_keys_key_optional_hint">Khóa API (không bắt buộc)</string>

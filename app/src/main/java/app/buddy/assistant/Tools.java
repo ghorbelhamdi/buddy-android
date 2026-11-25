@@ -629,6 +629,13 @@ final class Tools {
         }
         // asking the user, posting a note, pointing something out and answering in a notification go on while paused;
         // operating the phone waits
+        // a phone command and a computer's don't use the screen: not "Using your phone", and the user's taps don't
+        // pause them (they waited for a resume that had nothing to do with them)
+        if ("phone_shell".equals(name) || "run_on_computer".equals(name)) {
+            String held = svc.awaitResume(name, false); // (only Stop holds them: not the phone's pause)
+            if (held != null) return text(held);
+            return text("phone_shell".equals(name) ? phoneShell(a) : runOnComputer(a));
+        }
         if (!"confirm".equals(name) && !"ask".equals(name) && !"notify".equals(name) && !"reply_notification".equals(name)
                 && !"point_out".equals(name) && !SCHEDULING.contains(name) && !background()) {
             String held = svc.awaitResume(name);

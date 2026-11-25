@@ -2704,7 +2704,7 @@
     <string name="signin_pi_signed_in">Pi увійшов через %1$s</string>
     <string name="signin_pi_failed">Вхід не виконано:\n%1$s</string>
     <string name="debug_lock_ask_title">Дозвольте налагодження через Wi-Fi у цій мережі</string>
-    <string name="debug_lock_ask_text">Телефон запитує один раз для кожної точки доступу Wi-Fi (у mesh-мережі їх кілька). Торкніться тут, позначте «Завжди дозволяти в цій мережі» й натисніть «Дозволити».</string>
+    <string name="debug_lock_ask_text">Телефон знову вимкнув її на цій точці доступу Wi-Fi (у mesh-мережі їх кілька). Торкніться тут і ввімкніть налагодження через Wi-Fi: тоді телефон запитає. Позначте «Завжди дозволяти в цій мережі» й торкніться «Дозволити».</string>
 
     <!-- Services (2.4.0): a service's optional key, its models shown in pickers, Pi and the services saved in Buddy. -->
     <string name="api_keys_key_optional_hint">API-ключ (необов\'язково)</string>

@@ -26,17 +26,9 @@ public class BackgroundActivity extends Screen {
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         // from the lock's "allow it on this Wi-Fi" notification: once more, so Android's question shows now
-        // (when Buddy can't switch it on, the helper being gone too: Settings opens on the switch, where Android asks)
-        if (getIntent().getBooleanExtra("debug_lock_again", false)) {
-            new Thread(() -> {
-                boolean can = Background.canSwitchWireless(this) || Background.alive(this);
-                runOnUiThread(() -> {
-                    if (isFinishing()) return;
-                    if (can) DebugLock.changed(BuddyService.get());
-                    else openWirelessDebugging();
-                });
-            }, "debug-lock-again").start();
-        }
+        // Android asks about an access point only when the user switches it on in Settings (switched on by Buddy, it
+        // just goes off again, measured): Settings opens on the switch
+        if (getIntent().getBooleanExtra("debug_lock_again", false)) openWirelessDebugging();
         LinearLayout root = column(this);
         root.setBackgroundColor(BG);
         LinearLayout top = row(this);

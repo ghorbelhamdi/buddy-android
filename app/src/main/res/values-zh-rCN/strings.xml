@@ -2650,7 +2650,7 @@
     <string name="signin_pi_signed_in">Pi 已使用 %1$s 登录</string>
     <string name="signin_pi_failed">未登录：\n%1$s</string>
     <string name="debug_lock_ask_title">允许在此 Wi-Fi 上使用无线调试</string>
-    <string name="debug_lock_ask_text">手机会针对每个 Wi-Fi 接入点询问一次（Mesh 网络有多个）。点按这里，勾选“始终允许在此网络上”，然后点按允许。</string>
+    <string name="debug_lock_ask_text">手机在这个 Wi-Fi 接入点上又把它关了（Mesh 网络有多个接入点）。点按这里并开启无线调试：手机随后会询问。勾选“始终允许在此网络上使用”，然后点按“允许”。</string>
 
     <!-- Services (2.4.0): a service's optional key, its models shown in pickers, Pi and the services saved in Buddy. -->
     <string name="api_keys_key_optional_hint">API 密钥（可选）</string>

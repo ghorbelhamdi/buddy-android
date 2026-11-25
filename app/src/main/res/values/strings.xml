@@ -2972,7 +2972,7 @@
     <string name="signin_pi_signed_in">Pi is signed in with %1$s</string>
     <string name="signin_pi_failed">Not signed in:\n%1$s</string>
     <string name="debug_lock_ask_title">Allow Wireless debugging on this Wi-Fi</string>
-    <string name="debug_lock_ask_text">Your phone asks once for each Wi-Fi access point (a mesh network has several). Tap here, then tick “Always allow on this network” and tap Allow.</string>
+    <string name="debug_lock_ask_text">Your phone turned it off again on this Wi-Fi access point (a mesh network has several). Tap here and switch Wireless debugging on: your phone then asks. Tick “Always allow on this network” and tap Allow.</string>
     <string name="chat_attach_files_linux_sub">PDFs, documents, anything. Over 25 MB, it goes straight to this chat’s Linux tools, at any size.</string>
     <string name="chat_attach_big_to_linux">Too big to attach: sending it to this chat’s Linux tools instead. When it’s there, see it in Files (chat options).</string>
     <string name="chat_attach_in_linux">In Linux tools</string>

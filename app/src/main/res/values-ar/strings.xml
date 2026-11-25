@@ -2287,7 +2287,7 @@
     <string name="signin_pi_signed_in">سجّل Pi الدخول باستخدام %1$s</string>
     <string name="signin_pi_failed">لم يتم تسجيل الدخول:\n%1$s</string>
     <string name="debug_lock_ask_title">اسمح بتصحيح الأخطاء اللاسلكي على هذه الشبكة</string>
-    <string name="debug_lock_ask_text">يسأل الهاتف مرة واحدة لكل نقطة وصول Wi-Fi (الشبكة المتداخلة فيها عدة نقاط). انقر هنا، ثم حدّد «السماح دائماً على هذه الشبكة» وانقر على سماح.</string>
+    <string name="debug_lock_ask_text">أوقفه هاتفك مرة أخرى على نقطة الوصول هذه (شبكة Mesh فيها عدة نقاط). اضغط هنا وشغّل «تصحيح الأخطاء اللاسلكي»: سيسألك هاتفك عندها. حدّد «السماح دائمًا على هذه الشبكة» واضغط «سماح».</string>
 
     <!-- Services (2.4.0): a service's optional key, its models shown in pickers, Pi and the services saved in Buddy. -->
     <string name="api_keys_key_optional_hint">مفتاح API (اختياري)</string>

@@ -2259,7 +2259,7 @@
     <string name="signin_pi_signed_in">Pi jest zalogowany przez %1$s</string>
     <string name="signin_pi_failed">Nie zalogowano:\n%1$s</string>
     <string name="debug_lock_ask_title">Zezwól na debugowanie bezprzewodowe w tej sieci Wi-Fi</string>
-    <string name="debug_lock_ask_text">Telefon pyta raz dla każdego punktu dostępu Wi-Fi (sieć mesh ma ich kilka). Dotknij tutaj, zaznacz „Zawsze zezwalaj w tej sieci” i dotknij Zezwól.</string>
+    <string name="debug_lock_ask_text">Telefon znów to wyłączył na tym punkcie dostępu Wi-Fi (sieć mesh ma ich kilka). Dotknij tutaj i włącz debugowanie bezprzewodowe: wtedy telefon zapyta. Zaznacz „Zawsze zezwalaj w tej sieci” i dotknij Zezwól.</string>
 
     <!-- Services (2.4.0): a service's optional key, its models shown in pickers, Pi and the services saved in Buddy. -->
     <string name="api_keys_key_optional_hint">Klucz API (opcjonalnie)</string>

@@ -2202,7 +2202,7 @@
     <string name="signin_pi_signed_in">Pi は %1$s でサインインしました</string>
     <string name="signin_pi_failed">サインインしていません:\n%1$s</string>
     <string name="debug_lock_ask_title">この Wi-Fi でワイヤレス デバッグを許可</string>
-    <string name="debug_lock_ask_text">スマホは Wi-Fi アクセスポイントごとに 1 回確認します（メッシュ Wi-Fi には複数あります）。ここをタップし、「このネットワークで常に許可する」にチェックを入れて「許可」をタップしてください。</string>
+    <string name="debug_lock_ask_text">このWi-Fiアクセスポイントで、スマホが再びオフにしました（メッシュネットワークには複数あります）。ここをタップしてワイヤレス デバッグをオンにすると、スマホが確認します。「このネットワークで常に許可」にチェックを入れて「許可」をタップしてください。</string>
 
     <!-- Services (2.4.0): a service's optional key, its models shown in pickers, Pi and the services saved in Buddy. -->
     <string name="api_keys_key_optional_hint">APIキー（任意）</string>
