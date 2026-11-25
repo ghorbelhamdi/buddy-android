@@ -3049,4 +3049,7 @@
     <string name="team_sec_members">Thành viên</string>
     <string name="team_from_message">Từ tin nhắn của bạn</string>
     <string name="team_then_asks">Sau đó trưởng nhóm hỏi mục tiêu của từng thành viên, cách bàn giao và các quy tắc.</string>
+    <string name="team_card_for">Trưởng nhóm xin bạn đồng ý, cho %1$s.</string>
+    <string name="team_card_task">Nhiệm vụ từ trưởng nhóm: %1$s</string>
+    <string name="team_card_task_you">Nhiệm vụ từ bạn: %1$s</string>
 </resources>

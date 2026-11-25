@@ -2459,4 +2459,7 @@
     <string name="team_sec_members">멤버</string>
     <string name="team_from_message">메시지에서</string>
     <string name="team_then_asks">그다음 리더가 각 멤버의 목표, 인계 방식, 규칙을 묻습니다.</string>
+    <string name="team_card_for">리더가 %1$s을(를) 위해 승인을 요청합니다.</string>
+    <string name="team_card_task">리더가 준 작업: %1$s</string>
+    <string name="team_card_task_you">내가 준 작업: %1$s</string>
 </resources>

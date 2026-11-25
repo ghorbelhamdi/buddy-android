@@ -2575,4 +2575,7 @@
     <string name="team_sec_members">الأعضاء</string>
     <string name="team_from_message">من رسالتك</string>
     <string name="team_then_asks">ثم يسألك القائد عن هدف كل عضو وطريقة التسليم وأي قواعد.</string>
+    <string name="team_card_for">يطلب القائد موافقتك، من أجل %1$s.</string>
+    <string name="team_card_task">مهمته من القائد: %1$s</string>
+    <string name="team_card_task_you">مهمته منك: %1$s</string>
 </resources>

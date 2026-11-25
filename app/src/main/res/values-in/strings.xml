@@ -2909,4 +2909,7 @@
     <string name="team_sec_members">Anggota</string>
     <string name="team_from_message">Dari pesan Anda</string>
     <string name="team_then_asks">Lalu pemimpin menanyakan tujuan tiap anggota, cara serah terima, dan aturannya.</string>
+    <string name="team_card_for">Pemimpin meminta persetujuan Anda, untuk %1$s.</string>
+    <string name="team_card_task">Tugasnya dari pemimpin: %1$s</string>
+    <string name="team_card_task_you">Tugasnya dari Anda: %1$s</string>
 </resources>

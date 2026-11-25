@@ -2919,4 +2919,7 @@
     <string name="team_sec_members">Membri</string>
     <string name="team_from_message">Dal tuo messaggio</string>
     <string name="team_then_asks">Poi il leader ti chiede l’obiettivo di ogni membro, il passaggio di consegne e le regole.</string>
+    <string name="team_card_for">Il leader chiede il tuo OK, per %1$s.</string>
+    <string name="team_card_task">Il suo compito dal leader: %1$s</string>
+    <string name="team_card_task_you">Il suo compito da te: %1$s</string>
 </resources>

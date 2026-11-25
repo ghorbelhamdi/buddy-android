@@ -2980,4 +2980,7 @@
     <string name="team_sec_members">Учасники</string>
     <string name="team_from_message">З вашого повідомлення</string>
     <string name="team_then_asks">Потім лідер запитає мету кожного учасника, як передавати роботу та правила.</string>
+    <string name="team_card_for">Лідер просить вашої згоди для: %1$s.</string>
+    <string name="team_card_task">Завдання від лідера: %1$s</string>
+    <string name="team_card_task_you">Завдання від вас: %1$s</string>
 </resources>

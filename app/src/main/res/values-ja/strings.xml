@@ -2460,4 +2460,7 @@
     <string name="team_sec_members">メンバー</string>
     <string name="team_from_message">メッセージから</string>
     <string name="team_then_asks">その後、リーダーが各メンバーの目標、引き継ぎ方法、ルールを尋ねます。</string>
+    <string name="team_card_for">リーダーが%1$sのためにあなたの許可を求めています。</string>
+    <string name="team_card_task">リーダーからの作業: %1$s</string>
+    <string name="team_card_task_you">あなたからの作業: %1$s</string>
 </resources>

@@ -2535,4 +2535,7 @@
     <string name="team_sec_members">Członkowie</string>
     <string name="team_from_message">Z twojej wiadomości</string>
     <string name="team_then_asks">Potem lider zapyta o cel każdego członka, sposób przekazywania pracy i zasady.</string>
+    <string name="team_card_for">Lider prosi o twoją zgodę dla: %1$s.</string>
+    <string name="team_card_task">Zadanie od lidera: %1$s</string>
+    <string name="team_card_task_you">Zadanie od ciebie: %1$s</string>
 </resources>

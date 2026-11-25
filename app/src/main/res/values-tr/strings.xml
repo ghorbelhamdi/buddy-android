@@ -2487,4 +2487,7 @@
     <string name="team_sec_members">Üyeler</string>
     <string name="team_from_message">Mesajınızdan</string>
     <string name="team_then_asks">Sonra lider her üyenin hedefini, işi nasıl devredeceklerini ve kuralları sorar.</string>
+    <string name="team_card_for">Lider, %1$s için onayınızı istiyor.</string>
+    <string name="team_card_task">Liderden aldığı görev: %1$s</string>
+    <string name="team_card_task_you">Sizden aldığı görev: %1$s</string>
 </resources>

@@ -2918,4 +2918,7 @@
     <string name="team_sec_members">Miembros</string>
     <string name="team_from_message">De tu mensaje</string>
     <string name="team_then_asks">Luego el líder te pregunta el objetivo de cada miembro, cómo se pasan el trabajo y las reglas.</string>
+    <string name="team_card_for">El líder pide tu OK, para %1$s.</string>
+    <string name="team_card_task">Su tarea del líder: %1$s</string>
+    <string name="team_card_task_you">Su tarea tuya: %1$s</string>
 </resources>

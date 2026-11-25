@@ -2486,4 +2486,7 @@
     <string name="team_sec_members">Mitglieder</string>
     <string name="team_from_message">Aus deiner Nachricht</string>
     <string name="team_then_asks">Danach fragt dich der Leiter nach dem Ziel jedes Mitglieds, der Übergabe und Regeln.</string>
+    <string name="team_card_for">Der Leiter bittet um dein OK, für %1$s.</string>
+    <string name="team_card_task">Seine Aufgabe vom Leiter: %1$s</string>
+    <string name="team_card_task_you">Seine Aufgabe von dir: %1$s</string>
 </resources>

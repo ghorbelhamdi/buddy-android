@@ -2485,4 +2485,7 @@
     <string name="team_sec_members">Leden</string>
     <string name="team_from_message">Uit je bericht</string>
     <string name="team_then_asks">Daarna vraagt de leider je naar het doel van elk lid, de overdracht en regels.</string>
+    <string name="team_card_for">De leider vraagt je OK, voor %1$s.</string>
+    <string name="team_card_task">Zijn taak van de leider: %1$s</string>
+    <string name="team_card_task_you">Zijn taak van jou: %1$s</string>
 </resources>

@@ -3211,4 +3211,7 @@
     <string name="team_sec_members">Members</string>
     <string name="team_from_message">From your message</string>
     <string name="team_then_asks">Then the leader asks you each member’s goal, how they hand off, and any rules.</string>
+    <string name="team_card_for">The leader asks for your OK, for %1$s.</string>
+    <string name="team_card_task">Its task from the leader: %1$s</string>
+    <string name="team_card_task_you">Its task from you: %1$s</string>
 </resources>
