@@ -236,7 +236,8 @@ final class Team {
     }
 
     /** What the user and members said to each other past the leader since its last turn, for its next one. */
-    static String digest(Sessions.Session parent) {
+    /** heard: gets the members' answers told here, to mark as heard once the leader's run has started. */
+    static String digest(Sessions.Session parent, List<Sessions.Msg> heard) {
         StringBuilder b = new StringBuilder();
         synchronized (parent.messages) {
             int from = Math.max(0, Math.min(parent.teamAt, parent.messages.size()));
@@ -248,7 +249,7 @@ final class Team {
                     // a member's answer the leader hasn't had: to the user, or to the leader after its turn had ended
                     b.append("- ").append(m.fromName).append(m.kind == Bubble.Kind.ERROR ? " failed" : " answered")
                             .append(m.direct ? " (to the user): " : " (to you): ").append(ChatHub.clip(m.text, 3000)).append('\n');
-                    m.heard = true;
+                    heard.add(m);
                 }
             }
         }
@@ -399,9 +400,10 @@ final class Team {
         // starts anew with the chat so far, which never held them)
         String brief = memberPrompt(t, m, parent, h, screen);
         boolean again = first || h.messages.isEmpty() || h.handover != null || h.reseed || brief.hashCode() != h.briefed;
-        h.briefed = brief.hashCode();
         String prompt = (again ? brief : "") + who + text;
+        h.toldAt = h.messages.size(); // (its run's messages start with this one; notes added while it works are in it)
         String err = hub.sendMember(h, text, files, prompt);
+        if (err == null) h.briefed = brief.hashCode(); // (sent: else it gets them with the next message)
         if (err != null && first) hub.delete(h);
         return err;
     }
@@ -421,16 +423,23 @@ final class Team {
         String text = null;
         List<String> files = new ArrayList<>();
         synchronized (h.messages) {
+            int from = Math.min(h.toldAt, h.messages.size());
+            if (from <= 0) { // (not known, after Buddy restarted: from its last message in)
+                from = h.messages.size() - 1;
+                while (from > 0 && h.messages.get(from).kind != Bubble.Kind.USER) from--;
+            }
             for (int i = h.messages.size() - 1; i >= 0; i--) {
                 Sessions.Msg x = h.messages.get(i);
-                if (x.kind == Bubble.Kind.USER) break;
+                if (x.kind == Bubble.Kind.USER && i <= from) break; // (a note the user added while it worked is no end)
                 if (x.kind != kind) continue;
                 if (text == null && !x.text.isEmpty()) text = x.text;
                 files.addAll(0, x.files);
             }
         }
         if (text == null && files.isEmpty()) return;
-        hub.addFrom(parent, kind, text == null ? "" : text, files, m, h.toldBy, h.told);
+        Sessions.Msg msg = hub.addFrom(parent, kind, text == null ? "" : text, files, m, h.toldBy, h.told);
+        // the leader has it if its team call is waiting for this member now; else its next turn's digest tells it
+        if (msg != null) msg.heard = !msg.direct && AWAITED.contains(h.id);
     }
 
     // ------------------------------------------------------------------ the leader's tools
@@ -514,17 +523,31 @@ final class Team {
         return false;
     }
 
+    /** The members' chats a team call waits for now: what they answer meanwhile, the leader gets from that call. */
+    private static final java.util.Set<String> AWAITED = java.util.concurrent.ConcurrentHashMap.newKeySet();
+
     private static String await(BuddyService svc, final ChatHub hub, final Sessions.Session parent, List<Sessions.Session> l,
                                 String note) throws InterruptedException {
-        long start = SystemClock.elapsedRealtime();
-        while (anyRunning(l) && SystemClock.elapsedRealtime() - start < WAIT_MS) {
-            if (!parent.running || "stopped".equals(parent.outcome)) { // the user stopped the task: its members too
-                svc.runOnMain(() -> stop(hub, parent.id));
-                break;
+        List<String> ids = new ArrayList<>();
+        for (Sessions.Session h : l) ids.add(h.id);
+        AWAITED.addAll(ids);
+        try {
+            long start = SystemClock.elapsedRealtime();
+            while (anyRunning(l) && SystemClock.elapsedRealtime() - start < WAIT_MS) {
+                if (!parent.running || "stopped".equals(parent.outcome)) { // the user stopped the task: its members too
+                    svc.runOnMain(() -> stop(hub, parent.id));
+                    break;
+                }
+                Thread.sleep(500);
             }
-            Thread.sleep(500);
+            // (a run that just ended has its answer put in the chat right after, on the main thread: let it come first)
+            CountDownLatch posted = new CountDownLatch(1);
+            svc.runOnMain(posted::countDown);
+            posted.await(5, TimeUnit.SECONDS);
+            return report(hub, parent, l, note);
+        } finally {
+            AWAITED.removeAll(ids);
         }
-        return report(hub, parent, l, note);
     }
 
     private static String report(ChatHub hub, Sessions.Session parent, List<Sessions.Session> l, String note) {
@@ -589,7 +612,8 @@ final class Team {
             if (o.has("goal")) m.goal = o.optString("goal").trim();
             String name = clipName(o.optString("name"));
             if (!name.isEmpty() && !name.equals(m.name)) {
-                if (t.member(name) != null) return "The team has a member \"" + name + "\" already.";
+                Member other = t.member(name);
+                if (other != null && other != m) return "The team has a member \"" + name + "\" already.";
                 card.add(svc.getString(R.string.team_card_rename, m.name, name));
                 m.name = name;
             }
@@ -772,12 +796,14 @@ final class Team {
         Sessions.Session parent = hub.sessions.find(h.parent);
         if (parent == null || parent.team == null || !TURN.equals(parent.team.apps)) return null;
         String key = parent.id + "|" + pkg;
-        // (one app at a time for a member too: the one it had before is free for the others once it opens another)
-        held.entrySet().removeIf(e -> e.getValue().equals(h.id) && !e.getKey().equals(key));
         long end = SystemClock.elapsedRealtime() + 4 * 60_000;
         while (true) {
             String by = held.putIfAbsent(key, h.id);
-            if (by == null || by.equals(h.id)) return null;
+            if (by == null || by.equals(h.id)) {
+                // (one app at a time for a member too: the one it had before is free for the others now it has this one)
+                held.entrySet().removeIf(e -> e.getValue().equals(h.id) && !e.getKey().equals(key));
+                return null;
+            }
             Sessions.Session other = hub.sessions.find(by);
             if (other == null || !other.running) { // it is done there: the app is free
                 held.remove(key, by);
@@ -789,6 +815,12 @@ final class Team {
             }
             Thread.sleep(1000);
         }
+    }
+
+    /** A member couldn't open the app it took (its launch failed): free for the others again. */
+    static void releaseApp(String chat, String pkg) {
+        if (chat == null || pkg == null) return;
+        held.entrySet().removeIf(e -> e.getValue().equals(chat) && e.getKey().endsWith("|" + pkg));
     }
 
     /** A member's run ended: the apps it had are free. */

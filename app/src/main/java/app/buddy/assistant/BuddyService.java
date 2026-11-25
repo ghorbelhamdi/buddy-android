@@ -1169,6 +1169,20 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
      * (sending a message may; paying, buying or deleting never does). In a rule's run the card waits a minute at most
      * after its countdown, and not at all while the phone is locked: then the answer is NOT_NOW.
      */
+    /**
+     * How many cards of a chat wait for the user now (a chat with a team has its members' too): the one notification
+     * on a locked phone goes only once none waits.
+     */
+    private static final java.util.Map<String, Integer> openCards = new java.util.HashMap<>();
+
+    private static synchronized int cardsOpen(String chat, int by) {
+        String k = String.valueOf(chat);
+        int n = Math.max(0, (openCards.containsKey(k) ? openCards.get(k) : 0) + by);
+        if (n == 0) openCards.remove(k);
+        else openCards.put(k, n);
+        return n;
+    }
+
     String askConfirm(final String summary, boolean canAuto) throws InterruptedException {
         final String chat = McpServer.CALLER_CHAT.get();
         // a helper only looks things up: no card for it, whatever the step
@@ -1262,6 +1276,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         final boolean phoneOnly = WebDevices.cardShown(text); // (before it shows: a paired browser never sees it)
         main.post(() -> bubble.askConfirm(text, chat, countdown, cb, key, from));
         Triggers.approvalShown(this, chat, text, countdown, true, null);
+        cardsOpen(chat, 1);
         String ended = null;
         try {
             java.util.function.BooleanSupplier gone = McpServer.CALLER_GONE.get();
@@ -1271,7 +1286,7 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
                 else if (System.currentTimeMillis() >= end || gone != null && gone.getAsBoolean()) ended = TIMED_OUT;
             }
         } finally {
-            Triggers.approvalDone(this, chat);
+            if (cardsOpen(chat, -1) == 0) Triggers.approvalDone(this, chat);
         }
         if (cardTouches != touches) rereadNeeded = true; // they used the screen meanwhile: ids may be stale
         if (ended != null) {
@@ -1322,11 +1337,12 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         final String from = McpServer.CALLER_REMOTE.get();
         main.post(() -> bubble.askQuestion(question, options, chat, handsOn, cb, key, from));
         Triggers.approvalShown(this, chat, question, 0, false, handsOn ? null : options);
+        cardsOpen(chat, 1);
         boolean answered;
         try {
             answered = awaitAnswer(done, rule ? 60_000L : 5 * 60_000L, stepDone);
         } finally {
-            Triggers.approvalDone(this, chat);
+            if (cardsOpen(chat, -1) == 0) Triggers.approvalDone(this, chat);
         }
         boolean usedScreen = handsOn || cardTouches != touches;
         if (usedScreen) rereadNeeded = true;

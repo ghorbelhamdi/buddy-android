@@ -846,7 +846,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
 
     /** Hand this chat to another signed-in agent (see ChatHub.switchAgent): not while it works. */
     private void chooseAgent() {
-        if (ses.running) return;
+        // (not a member's or sub-agent's chat: a member's agent is the team's to say, see Team)
+        if (ses.running || !ses.parent.isEmpty()) return;
         final Dialog[] d = new Dialog[1];
         LinearLayout c = column(this);
         c.addView(title(this, getString(R.string.rules_agent), 18));

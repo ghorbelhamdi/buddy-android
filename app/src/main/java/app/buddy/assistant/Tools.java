@@ -3095,10 +3095,14 @@ final class Tools {
         String taken = Team.takeApp(svc, McpServer.CALLER_CHAT.get(), best);
         if (taken != null) return taken;
         if (background()) {
-            if (launch.getComponent() == null) return "App " + bestLabel + " cannot be launched.";
+            if (launch.getComponent() == null) {
+                Team.releaseApp(McpServer.CALLER_CHAT.get(), best); // (not opened: free for the others)
+                return "App " + bestLabel + " cannot be launched.";
+            }
             try {
                 Background.call(svc, "start\t" + screenKey() + "\t" + launch.getComponent().flattenToString());
             } catch (java.io.IOException e) {
+                Team.releaseApp(McpServer.CALLER_CHAT.get(), best);
                 return "Could not open " + bestLabel + " in the background: " + e.getMessage();
             }
             Thread.sleep(1500);

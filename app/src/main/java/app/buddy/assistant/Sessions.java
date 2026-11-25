@@ -168,6 +168,8 @@ final class Sessions {
         int briefed;
         /** A member's chat, not saved: who told it what it works on now ("" = the user), and the words. */
         volatile String toldBy = "", told = "";
+        /** A member's chat, not saved: where its run's messages start (the message it was told). */
+        volatile int toldAt;
         /** The chat's scheduled task (see Schedules), or null. */
         Schedules.Plan schedule;
         /** Messages the agent scheduled for itself in this chat (schedule_message), soonest first. Main thread. */
@@ -373,7 +375,6 @@ final class Sessions {
 
     void add(Session s, Bubble.Kind kind, String text, List<String> files) {
         s.messages.add(new Msg(kind, text, files));
-        if (kind == Bubble.Kind.USER) s.said++;
         while (s.messages.size() > MAX_MESSAGES) {
             s.messages.remove(0);
             if (s.teamAt > 0) s.teamAt--; // (it counts messages from the start, which just lost one)
