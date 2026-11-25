@@ -985,6 +985,16 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     private android.widget.HorizontalScrollView teamStrip, sendToRow;
     private LinearLayout teamChips, sendToChips;
     private String teamShown = "", sendToShown = "";
+    /** The team the Send to boxes were set for (its identity, and its members' ids then). */
+    private int teamFor;
+    private String teamIds = "";
+
+    private static String idsOf(Team t) {
+        StringBuilder b = new StringBuilder();
+        for (Team.Member m : t.members) b.append(m.id).append(m.name).append('|');
+        return b.toString();
+    }
+
     /** The team drawn in its shape (a tap on the strip's first button), while it is open. */
     private TeamUi.Shown teamSheet;
     /** Who the next message goes to in a chat with a team: Team.LEADER and members' ids. */
@@ -998,6 +1008,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
 
     /** Chat options → Team, turned on: Buddy asks how the team works, then the chat's agent asks the rest. */
     private void teamSetup() {
+        if (ses.teamDraft != null) { // the one the user asked for in the chat, still waiting (closed here once)
+            teamSetup(ses.teamDraft);
+            return;
+        }
         teamSetup(ses.lastTeam, true); // (turned on again: the team it had last, to start from)
     }
 
@@ -1112,6 +1126,16 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         java.util.Set<String> ids = new java.util.HashSet<>();
         ids.add(Team.LEADER);
         for (Team.Member m : t.members) ids.add(m.id);
+        // another team (or other members): the boxes start over at the leader alone, so an old tick can't land on a
+        // new member with the same id
+        if (System.identityHashCode(owner.team) != teamFor) {
+            if (!t.members.isEmpty() && !idsOf(t).equals(teamIds)) {
+                sendTo.clear();
+                sendTo.add(Team.LEADER);
+            }
+            teamFor = System.identityHashCode(owner.team);
+            teamIds = idsOf(t);
+        }
         sendTo.retainAll(ids);
         if (sendTo.isEmpty()) sendTo.add(Team.LEADER);
         StringBuilder sig2 = new StringBuilder(sendTo.toString()).append(Theme.isDark(this));

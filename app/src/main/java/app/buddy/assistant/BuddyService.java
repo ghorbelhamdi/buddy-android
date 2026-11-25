@@ -1168,11 +1168,6 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
     private static final String TIMED_OUT = "\u0000timed out";
 
     /**
-     * As above. canAuto: the card may approve itself when its chat is a notification rule's run with a countdown
-     * (sending a message may; paying, buying or deleting never does). In a rule's run the card waits a minute at most
-     * after its countdown, and not at all while the phone is locked: then the answer is NOT_NOW.
-     */
-    /**
      * How many cards of a chat wait for the user now (a chat with a team has its members' too): the one notification
      * on a locked phone goes only once none waits.
      */
@@ -1186,6 +1181,11 @@ public class BuddyService extends AccessibilityService implements McpServer.Hand
         return n;
     }
 
+    /**
+     * As above. canAuto: the card may approve itself when its chat is a notification rule's run with a countdown
+     * (sending a message may; paying, buying or deleting never does). In a rule's run the card waits a minute at most
+     * after its countdown, and not at all while the phone is locked: then the answer is NOT_NOW.
+     */
     String askConfirm(final String summary, boolean canAuto) throws InterruptedException {
         final String chat = McpServer.CALLER_CHAT.get();
         // a helper only looks things up: no card for it, whatever the step

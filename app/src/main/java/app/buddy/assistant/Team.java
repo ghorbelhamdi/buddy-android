@@ -247,8 +247,10 @@ final class Team {
         return b.toString();
     }
 
-    /** What the user and members said to each other past the leader since its last turn, for its next one. */
-    /** heard: gets the members' answers told here, to mark as heard once the leader's run has started. */
+    /**
+     * What the user and members said to each other past the leader since its last turn, for its next one. heard: gets
+     * the members' answers told here, to mark as heard once the leader's run has started.
+     */
     static String digest(Sessions.Session parent, List<Sessions.Msg> heard) {
         StringBuilder b = new StringBuilder();
         synchronized (parent.messages) {
@@ -629,8 +631,8 @@ final class Team {
         // (what this returns, the leader has: its next turn's digest doesn't tell it again)
         java.util.Set<String> done = new java.util.HashSet<>();
         for (Sessions.Session h : l) if (!h.running) done.add(h.member);
-        synchronized (parent.messages) {
-            for (Sessions.Msg m : parent.messages) if (!m.from.isEmpty() && done.contains(m.from)) m.heard = true;
+        synchronized (parent.messages) { // (its answers to the leader; one to the user directly is for its digest still)
+            for (Sessions.Msg m : parent.messages) if (!m.from.isEmpty() && !m.direct && done.contains(m.from)) m.heard = true;
         }
         for (Sessions.Session h : l) {
             b.append(h.title);

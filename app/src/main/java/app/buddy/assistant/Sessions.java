@@ -315,6 +315,12 @@ final class Sessions {
             o.remove("allowed");
             o.remove("later");
             o.remove("lite_groups"); // its agent starts fresh: it loads what it needs again
+            // nor a team: its members' memory stays with this chat (the copy's messages keep who said what)
+            o.remove("team");
+            o.remove("last_team");
+            o.remove("team_at");
+            o.remove("said");
+            o.remove("briefed");
             // files sent to the first chat's Linux tools are in its own folder, which the fork can't reach (and which goes
             // with that chat): their paths stay in the messages as text
             for (int i = 0; i < kept.length(); i++) {

@@ -700,7 +700,6 @@ final class WebDevices {
         return err == null || !err.isEmpty() ? new JSONObject().put("error", err == null ? "Buddy didn't answer" : err) : new JSONObject();
     }
 
-    /** A chat the page may show (as its list: not incognito or a sub-agent's), or null. */
     /** A team's member's chat: its team's chat (the leader's), while the member is in the team; else null. Main thread. */
     private static Sessions.Session memberParent(Context c, Sessions.Session s) {
         if (s.member.isEmpty()) return null;
@@ -717,6 +716,7 @@ final class WebDevices {
         });
     }
 
+    /** A chat the page may show (as its list: not incognito or a sub-agent's), or null. */
     private static Sessions.Session shownChat(Context c, String id) throws Exception {
         return onMain(() -> {
             Sessions.Session s = id == null ? null : ChatHub.get(c).sessions.find(id);
@@ -876,8 +876,8 @@ final class WebDevices {
                 hub.changed();
                 return "";
             }
-            if (Team.working(hub, s)) return "not while the chat or a member is working";
             if ("off".equals(a)) {
+                if (Team.working(hub, s)) return "not while the chat or a member is working";
                 if (s.team != null) hub.setTeam(s, null, null);
                 return "";
             }
@@ -888,8 +888,9 @@ final class WebDevices {
             Team.Draft d = in.optBoolean("draft") ? s.teamDraft : null;
             s.teamDraft = null;
             String ask = d != null ? Team.interview(t, !d.goals, !d.handoff, !d.rules) : Team.interview(t);
-            String e = hub.startTeam(s, t, ask);
-            return e == null ? "" : e;
+            // (once the leader is free, as on the phone: it may still be ending the turn that asked for this setup)
+            hub.startTeamWhenFree(s, t, ask, s.backend, s.model == null ? "" : s.model);
+            return "";
         });
         return err == null ? new JSONObject().put("error", "Buddy didn't answer") : err.isEmpty() ? new JSONObject() : new JSONObject().put("error", err);
     }

@@ -40,6 +40,7 @@ final class DebugLock {
     private static ConnectivityManager.NetworkCallback wifiBack;
     /** USB plugged in or out: on some phones (a OnePlus 12, measured) that restarts adbd, and the helper ends with it. */
     private static android.content.BroadcastReceiver usb;
+    private static final Handler again = new Handler(Looper.getMainLooper());
     private static Network lastWifi;
 
     private DebugLock() {
@@ -77,7 +78,7 @@ final class DebugLock {
                 @Override
                 public void onReceive(Context c, Intent i) {
                     later(svc);
-                    main.postDelayed(() -> later(svc), 15000); // (and again once adbd is surely back)
+                    again.postDelayed(() -> later(svc), 15000); // (and again once adbd is surely back: not cancelled by later)
                 }
             };
             svc.registerReceiver(usb, new android.content.IntentFilter("android.hardware.usb.action.USB_STATE"),

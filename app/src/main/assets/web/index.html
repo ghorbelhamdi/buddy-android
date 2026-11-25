@@ -765,7 +765,9 @@ function drawTeam(d) {
   boxes.hidden = !t || !!d.memberOf; // (in a member's own chat, a message goes to that member)
   if (!t) { teamDrawn = ''; return; }
   const L = t.leader || {agent: d.agent, running: d.running, chat: open};
-  if (sendToChat !== open) { sendToChat = open; sendTo = new Set(['leader']); }
+  // (another chat, or other members: the boxes start over at the leader alone, so an old tick can't land on a new member)
+  const teamKey = open + '|' + t.members.map(m => m.id + m.name).join(',');
+  if (sendToChat !== teamKey) { sendToChat = teamKey; sendTo = new Set(['leader']); }
   const ids = new Set(['leader', ...t.members.map(m => m.id)]);
   for (const id of [...sendTo]) if (!ids.has(id)) sendTo.delete(id);
   if (!sendTo.size) sendTo.add('leader');
@@ -908,8 +910,12 @@ function memberColor(m, i) {
 /** The agents signed in on the phone, and each one's models, as the page's New chat screen gets them. */
 const teamModels = {};
 async function agentModels(agent) {
-  if (!teamModels[agent]) teamModels[agent] = await api('/web/new?agent=' + encodeURIComponent(agent));
-  return teamModels[agent];
+  if (teamModels[agent]) return teamModels[agent];
+  try {
+    const r = await api('/web/new?agent=' + encodeURIComponent(agent));
+    if (!r.error) teamModels[agent] = r; // (an error isn't kept: asked again next time)
+    return r;
+  } catch (e) { say(e.message); return {models: []}; }
 }
 
 /**

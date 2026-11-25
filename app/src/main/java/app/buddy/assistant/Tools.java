@@ -632,7 +632,7 @@ final class Tools {
         // a phone command and a computer's don't use the screen: not "Using your phone", and the user's taps don't
         // pause them (they waited for a resume that had nothing to do with them)
         if ("phone_shell".equals(name) || "run_on_computer".equals(name)) {
-            String held = svc.awaitResume(name, false); // (only Stop holds them: not the phone's pause)
+            String held = svc.controlRevoked(); // (only Stop holds them: not the phone's pause, nor the browser's)
             if (held != null) return text(held);
             return text("phone_shell".equals(name) ? phoneShell(a) : runOnComputer(a));
         }

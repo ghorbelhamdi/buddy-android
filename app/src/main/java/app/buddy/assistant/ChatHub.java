@@ -446,12 +446,12 @@ final class ChatHub {
             @Override
             public void run() {
                 if (ses.team != null || !sessions.all.contains(ses)) return;
-                if (Team.working(ChatHub.this, ses) && waited[0]++ < 120) {
+                if (Team.working(ChatHub.this, ses) && waited[0]++ < 1800) { // (up to half an hour: it was told to end its turn)
                     main.postDelayed(this, 1000);
                     return;
                 }
                 if (Team.working(ChatHub.this, ses)) {
-                    setTeam(ses, team, null);
+                    setTeam(ses, team, null); // still working: on all the same, its next turn's brief says so
                     return;
                 }
                 if (!agent.equals(ses.backend)) switchAgent(ses, agent);
