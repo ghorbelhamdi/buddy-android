@@ -617,7 +617,12 @@ final class Background {
             // only what adb itself says means the pairing is gone; anything else is shown as adb said it
             if (out.contains("unauthorized") || out.contains("failed to authenticate")) {
                 return "Buddy isn't paired with this phone's Wireless debugging any more (Settings → Background mode → "
-                        + "Set up). adb said: " + tried;
+                        + "Pair again). adb said: " + tried;
+            }
+            if (refusedKey(out)) { // issue #89: Settings said paired, Wireless debugging no longer listed Buddy
+                return "Buddy isn't paired with this phone's Wireless debugging any more: it refused Buddy's key, which "
+                        + "it does once it has forgotten the pairing (Buddy is then missing from Wireless debugging → "
+                        + "Paired devices). Tap Pair again (Settings → Background mode). adb said: " + tried;
             }
             return "adb couldn't connect to this phone's Wireless debugging. adb said: " + tried;
         }
@@ -629,6 +634,19 @@ final class Background {
         for (String l : out.split("\n")) if (l.startsWith("TRIED ")) b.append(b.length() == 0 ? "" : "; ").append(l.substring(6).trim());
         String s = b.length() > 0 ? b.toString() : out.trim().isEmpty() ? "nothing" : out.trim();
         return s.length() > 800 ? s.substring(0, 800) + "…" : s;
+    }
+
+    /**
+     * Did Wireless debugging turn Buddy's key away? adb then says just "failed to connect to host:port", with no
+     * reason after it (measured with a key the phone doesn't trust; a closed port adds ": Connection refused", a port
+     * that isn't adb's gives "offline").
+     */
+    private static boolean refusedKey(String out) {
+        for (String l : out.split("\n")) {
+            Matcher m = Pattern.compile("^TRIED (\\S+): failed to connect to (\\S+)\\s*/").matcher(l.trim());
+            if (m.find() && m.group(1).equals(m.group(2))) return true;
+        }
+        return false;
     }
 
     /** What the helper itself printed before it gave up (launch's output after LOG=), as ": …", or "". */
