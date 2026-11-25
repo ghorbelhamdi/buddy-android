@@ -2897,6 +2897,11 @@ final class Bubble implements ChatHub.Listener {
     private String activityChat;
     private long activityAt;
     private static final long ACTIVITY_MS = 8_000;
+    /** Working off the screen: how long the small pill shows something new (see refreshStatus). */
+    private static final long BG_PILL_MS = 4_000;
+    private String bgShown;
+    private long bgAt;
+    private final Runnable bgHide = this::refreshStatus;
     private final Runnable activityExpired = this::refreshStatus;
 
     /**
@@ -2971,22 +2976,40 @@ final class Bubble implements ChatHub.Listener {
         // working, but not on the screen (the background browser, Linux tools, thinking): the phone is the user's, so
         // the pill says so above the status and the ring is calm; on the screen (ControlIndicator) the look stays loud
         boolean background = !paused && !controlling && (running || browsing) && pendingConfirm == null;
-        if (!paused && (controlling || browsing || hub.runningCount() > 0) && pendingConfirm == null && !Prefs.menuHinted(svc)) {
+        if (!paused && !background && (controlling || browsing || hub.runningCount() > 0) && pendingConfirm == null && !Prefs.menuHinted(svc)) {
             text = text == null ? svc.getString(R.string.bubble_pill_hold_hint)
                     : svc.getString(R.string.bubble_pill_status_hold_hint, text);
         }
         if (!noteListening) { // while dictating a note the pill shows what's heard
             CharSequence shown = text;
+            boolean small = false;
             if (background && text != null) {
-                android.text.SpannableStringBuilder sb = new android.text.SpannableStringBuilder(
-                        svc.getString(R.string.bubble_pill_background));
-                sb.setSpan(new android.text.style.RelativeSizeSpan(0.85f), 0, sb.length(), 0);
-                sb.setSpan(new android.text.style.ForegroundColorSpan(Ui.MUTED), 0, sb.length(), 0);
-                shown = sb.append('\n').append(text);
-            }
-            pill.setMaxLines(background ? 3 : 2); // the note's line, then the status's two
+                // working off the screen: the phone is the user's, so the pill is small and brief, one line for a few
+                // seconds when there's something new (it stayed on the screen the whole time); the calm ring says the rest
+                String now = hub.pillText();
+                long t = android.os.SystemClock.elapsedRealtime();
+                // new is a chat starting or ending, another chat taking the latest step, or a reply: not every step
+                Sessions.Session about = hub.pillChat();
+                int n = hub.runningCount();
+                String key = n + "|" + (about == null ? "" : about.id) + (n == 0 ? "|" + now : "");
+                if (now != null && !key.equals(bgShown)) {
+                    bgShown = key;
+                    bgAt = t;
+                }
+                small = true;
+                shown = now;
+                if (now == null || t - bgAt >= BG_PILL_MS) shown = null;
+                else {
+                    root.removeCallbacks(bgHide);
+                    root.postDelayed(bgHide, BG_PILL_MS - (t - bgAt) + 50);
+                }
+            } else bgShown = null;
+            pill.setTextSize(TypedValue.COMPLEX_UNIT_SP, small ? 11 : 13);
+            pill.setPaddingRelative(dp(small ? 9 : 12), dp(small ? 4 : 8), dp(small ? 9 : 12), dp(small ? 4 : 8));
+            pill.setMaxWidth(dp(small ? 170 : 250));
+            pill.setMaxLines(small ? 1 : 2);
             pill.setText(shown == null ? "" : shown);
-            pill.setVisibility(text == null ? View.GONE : View.VISIBLE);
+            pill.setVisibility(shown == null ? View.GONE : View.VISIBLE);
         }
         ring.setCalm(background);
         // in control: a solid accent pill, so it's clear not to touch the phone
