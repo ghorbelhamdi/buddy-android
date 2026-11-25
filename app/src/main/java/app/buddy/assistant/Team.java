@@ -479,6 +479,9 @@ final class Team {
         if (text == null && files.isEmpty()) return;
         Sessions.Msg msg = hub.addFrom(parent, kind, text == null ? "" : text, files, m, h.toldBy, h.told);
         // the leader has it if its team call is waiting for this member now; else its next turn's digest tells it
+        // the leader isn't waiting for it (its turn ended, or it didn't wait): it carries on once its members are done
+        if (msg != null && !msg.direct && !parent.running) new android.os.Handler(android.os.Looper.getMainLooper())
+                .postDelayed(() -> carryOn(hub, parent), 1500);
         if (msg != null && !msg.direct && AWAITED.contains(h.id)) {
             msg.heard = true;
             hub.sessions.save(parent); // (addFrom saved it before: a restart now mustn't tell the leader again)
@@ -615,6 +618,37 @@ final class Team {
     private static boolean anyRunning(List<Sessions.Session> l) {
         for (Sessions.Session s : l) if (s.running) return true; // (a deleted one isn't: see ChatHub.delete)
         return false;
+    }
+
+    /** How often the leader carries on by itself before the user writes again: a bound for a team that loops. */
+    static final int MAX_CARRY_ON = 8;
+
+    /**
+     * A pipeline stopped when a member finished work the leader gave it after the leader's turn had ended (issue
+     * #81): its answer only reached the leader with the user's next message. Now, when the leader isn't working, none
+     * of the members it gave work to still works, and answers to it came in that it hasn't had, it carries on by
+     * itself with them (main thread). Not after the user stopped it or its own turn failed, and at most
+     * MAX_CARRY_ON times before the user writes again.
+     */
+    static void carryOn(ChatHub hub, Sessions.Session parent) {
+        if (parent.team == null || parent.running || !hub.sessions.all.contains(parent)) return;
+        if ("stopped".equals(parent.outcome) || "failed".equals(parent.outcome)) return;
+        if (parent.carriedOn >= MAX_CARRY_ON) return;
+        for (Sessions.Session h : all(hub, parent.id)) if (h.running && !h.toldBy.isEmpty()) return; // (more to come)
+        List<String> who = new ArrayList<>();
+        synchronized (parent.messages) {
+            for (int i = Math.max(0, parent.teamAt); i < parent.messages.size(); i++) {
+                Sessions.Msg m = parent.messages.get(i);
+                if (!m.from.isEmpty() && !m.direct && !m.heard && !who.contains(m.fromName)) who.add(m.fromName);
+            }
+        }
+        if (who.isEmpty()) return;
+        parent.carriedOn++;
+        String names = android.text.TextUtils.join(", ", who);
+        hub.carryOn(parent, hub.app.getString(R.string.team_carry_on, names),
+                "[Buddy: " + names + " answered the work you gave them (above, under \"Since your last turn\"). Carry on "
+                        + "with the team's task: give the next member its part, send work back, or tell the user it is done. "
+                        + "Nobody wrote this turn's message: the user didn't.]");
     }
 
     /** Whether the chat's leader waits in a team call for one of its members now (its state: Waiting). */

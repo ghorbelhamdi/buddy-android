@@ -2496,4 +2496,5 @@
     <string name="team_show_all">Alle zeigen</string>
     <string name="team_started_busy">Das Team ist an. Der Leiter arbeitete noch und bekommt seine Rückfragen mit dem nächsten Schritt.</string>
     <string name="team_started_busy_agent">Das Team ist an. Der Leiter arbeitete noch und bekommt seine Rückfragen mit dem nächsten Schritt; Agent und Modell, die du für ihn gewählt hast, wurden nicht geändert (ändere sie oben, wenn er fertig ist).</string>
+    <string name="team_carry_on">%1$s hat geantwortet: der Leiter macht weiter.</string>
 </resources>

@@ -2941,4 +2941,5 @@
     <string name="team_show_all">Mostrar tudo</string>
     <string name="team_started_busy">A equipe está ativa. O líder ainda trabalhava, então recebe as perguntas no próximo passo.</string>
     <string name="team_started_busy_agent">A equipe está ativa. O líder ainda trabalhava, então recebe as perguntas no próximo passo; o agente e o modelo escolhidos para ele não mudaram (mude no topo quando terminar).</string>
+    <string name="team_carry_on">%1$s respondeu: o líder continua.</string>
 </resources>

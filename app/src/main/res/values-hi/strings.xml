@@ -2489,4 +2489,5 @@
     <string name="team_show_all">सब दिखाएँ</string>
     <string name="team_started_busy">टीम चालू है। लीडर अभी काम कर रहा था, इसलिए उसे आगे के सवाल अगले कदम के साथ मिलेंगे।</string>
     <string name="team_started_busy_agent">टीम चालू है। लीडर अभी काम कर रहा था, इसलिए उसे आगे के सवाल अगले कदम के साथ मिलेंगे; आपके चुने एजेंट और मॉडल नहीं बदले (उसका काम पूरा होने पर ऊपर से बदलें)।</string>
+    <string name="team_carry_on">%1$s ने जवाब दिया: लीडर आगे बढ़ रहा है।</string>
 </resources>

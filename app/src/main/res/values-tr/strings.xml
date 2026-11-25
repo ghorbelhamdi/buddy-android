@@ -2497,4 +2497,5 @@
     <string name="team_show_all">Tümünü göster</string>
     <string name="team_started_busy">Ekip açık. Lider hâlâ çalışıyordu, bu yüzden sorularını bir sonraki adımda alacak.</string>
     <string name="team_started_busy_agent">Ekip açık. Lider hâlâ çalışıyordu, bu yüzden sorularını bir sonraki adımda alacak; onun için seçtiğiniz ajan ve model değişmedi (bitince üstten değiştirin).</string>
+    <string name="team_carry_on">%1$s yanıtladı: lider devam ediyor.</string>
 </resources>

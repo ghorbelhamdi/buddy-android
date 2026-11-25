@@ -2589,4 +2589,5 @@
     <string name="team_show_all">عرض الكل</string>
     <string name="team_started_busy">الفريق يعمل. كان القائد لا يزال يعمل، فستصله أسئلته التالية مع خطوته القادمة.</string>
     <string name="team_started_busy_agent">الفريق يعمل. كان القائد لا يزال يعمل، فستصله أسئلته التالية مع خطوته القادمة؛ ولم يتغير الوكيل والنموذج اللذان اخترتهما له (غيّرهما من الأعلى بعد انتهائه).</string>
+    <string name="team_carry_on">أجاب %1$s: القائد يتابع.</string>
 </resources>

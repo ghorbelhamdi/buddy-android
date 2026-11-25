@@ -479,6 +479,24 @@ final class ChatHub {
 
     /** While sendTeam sends (main thread): who the message goes to, for the message made in there. */
     private String sendingTo, sendingAlso;
+    /** The message being sent is Buddy's own line to the leader (Team.carryOn): a note in the chat, not the user's. */
+    private boolean sendingOwn;
+
+    /**
+     * The leader carries on by itself (see Team.carryOn): the chat shows line as a note, the leader gets prompt with
+     * its digest. Not when it can't start (said in the chat then, as any failed send).
+     */
+    void carryOn(Sessions.Session ses, String line, String prompt) {
+        if (ses.running) return;
+        sendingOwn = true;
+        String err;
+        try {
+            err = send(ses, line, null, prompt, false, false);
+        } finally {
+            sendingOwn = false;
+        }
+        if (err != null) note(ses, Bubble.Kind.ERROR, err);
+    }
     private boolean sendingToLeader = true;
 
     /**
@@ -579,6 +597,7 @@ final class ChatHub {
         BuddyService svc = BuddyService.get();
         // only the user's own message lifts a Stop: a queued rule run must not undo it
         if (svc != null && prompt == null) svc.allowControl();
+        if (!sendingOwn) ses.carriedOn = 0; // (the user's word: the leader may carry on by itself again)
         final int[] run = {-1}; // this run's id, once it has started
         try {
             // a rule's run works for someone else's message: no shell, files or web, even with Linux tools on
@@ -595,11 +614,11 @@ final class ChatHub {
         ses.interrupted = false;
         // the user writing in an archived chat brings it back (not a sub-agent's: its parent's chat lists it)
         if (!scheduled && !rule && ses.parent.isEmpty()) ses.archived = false;
-        sessions.add(ses, Bubble.Kind.USER, text, hasFiles ? new ArrayList<>(files) : null);
-        ses.said++; // (a message that starts its agent's run: a helper's turn, see Helpers; not a note or a member's message)
+        sessions.add(ses, sendingOwn ? Bubble.Kind.NOTE : Bubble.Kind.USER, text, hasFiles ? new ArrayList<>(files) : null);
+        if (!sendingOwn) ses.said++; // (a message that starts its agent's run: a helper's turn, see Helpers; not a note or a member's message)
         if (!scheduled && !rule) SpeechPause.sent(app);
         Sessions.Msg um = ses.messages.get(ses.messages.size() - 1);
-        if (team != null) {
+        if (team != null && !sendingOwn) {
             um.to = sendingTo != null ? sendingTo : app.getString(R.string.team_leader);
             ses.teamAt = ses.messages.size(); // the leader has had word of everything up to here
             sessions.save(ses);
@@ -1632,6 +1651,8 @@ final class ChatHub {
             }, BACKGROUND_RELEASE_MS);
         }
         if (ses.schedule == null) ses.allowed.clear(); // a scheduled chat keeps them for its next scheduled run
+        // a team's leader ended its turn while members' answers to it came in: it carries on (see Team.carryOn)
+        if (ses.team != null && ses.parent.isEmpty()) main.postDelayed(() -> Team.carryOn(this, ses), 1500);
         CodexLive.agentDone(ses, ses.outcome, !ses.lastReply.isEmpty());
         // a quiet scheduled run that found nothing new ends without a notification (a failed one always says so)
         boolean quiet = ses.quietRun && ses.quietSaid && ses.outcome == null;

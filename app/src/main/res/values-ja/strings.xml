@@ -2469,4 +2469,5 @@
     <string name="team_show_all">すべて表示</string>
     <string name="team_started_busy">チームを開始しました。リーダーはまだ作業中だったため、次のステップで質問を受け取ります。</string>
     <string name="team_started_busy_agent">チームを開始しました。リーダーはまだ作業中だったため、次のステップで質問を受け取ります。選んだエージェントとモデルは変更されていません（完了後に上部で変更してください）。</string>
+    <string name="team_carry_on">%1$s が回答しました。リーダーが続けます。</string>
 </resources>

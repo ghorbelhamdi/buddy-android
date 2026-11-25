@@ -3221,4 +3221,5 @@
     <string name="team_show_all">Show all</string>
     <string name="team_started_busy">The team is on. The leader was still working, so it gets its follow-up questions with its next step.</string>
     <string name="team_started_busy_agent">The team is on. The leader was still working, so it gets its follow-up questions with its next step; the agent and model you picked for it weren’t changed (change them in the header once it’s done).</string>
+    <string name="team_carry_on">%1$s answered: the leader carries on.</string>
 </resources>

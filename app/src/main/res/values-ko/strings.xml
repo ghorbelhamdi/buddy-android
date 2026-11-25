@@ -2468,4 +2468,5 @@
     <string name="team_show_all">모두 보기</string>
     <string name="team_started_busy">팀이 켜졌습니다. 리더가 아직 작업 중이어서 다음 단계에서 질문을 받습니다.</string>
     <string name="team_started_busy_agent">팀이 켜졌습니다. 리더가 아직 작업 중이어서 다음 단계에서 질문을 받습니다. 선택한 에이전트와 모델은 바뀌지 않았습니다(끝나면 상단에서 바꾸세요).</string>
+    <string name="team_carry_on">%1$s 답변: 리더가 이어서 진행합니다.</string>
 </resources>
