@@ -205,8 +205,9 @@ final class TeamUi {
         add.setMinimumHeight(dp(a, Team.PIPE.equals(t.structure) ? 56 : 120));
         add.addView(icon(a, R.drawable.ms_add, TEXT2, 22));
         TextView at = text(a, a.getString(R.string.team_add), 13, TEXT2);
-        at.setPaddingRelative(0, dp(a, 4), 0, 0);
-        add.addView(at);
+        at.setPaddingRelative(dp(a, 8), dp(a, 4), dp(a, 8), 0);
+        at.setGravity(Gravity.CENTER); // (a column's child is as wide as the column: its text centred in it)
+        add.addView(at, full());
         add.setOnClickListener(v -> {
             t.add(Team.nextName(a, t), leader[0], "", "");
             render.run();
