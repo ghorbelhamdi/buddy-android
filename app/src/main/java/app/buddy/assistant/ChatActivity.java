@@ -1002,6 +1002,41 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     }
 
     /**
+     * A team the user asked for in the chat: the setup asks only what they left open, then the leader asks only the
+     * follow-ups they left open (once it is done with its turn: it was told to end it).
+     */
+    private void teamSetup(final Team.Draft draft) {
+        TeamUi.setup(this, ses, draft.team, draft.known(), draft.members, false, (team, agent, model) -> {
+            if (ses.team != null) return;
+            sendTo.clear();
+            sendTo.add(Team.LEADER);
+            final String ask = Team.interview(team, !draft.goals, !draft.handoff, !draft.rules);
+            final Runnable go = new Runnable() {
+                int waited;
+
+                @Override
+                public void run() {
+                    if (ses.team != null || isFinishing() && waited > 0) return;
+                    if (Team.working(hub, ses) && waited++ < 120) { // (its turn ends in a moment)
+                        input.postDelayed(this, 1000);
+                        return;
+                    }
+                    if (Team.working(hub, ses)) {
+                        hub.setTeam(ses, team, null); // still working after 2 minutes: on, and its next turn's brief says so
+                        return;
+                    }
+                    if (!agent.equals(ses.backend)) hub.switchAgent(ses, agent);
+                    if (!model.equals(ses.model == null ? "" : ses.model)) hub.setModel(ses, model);
+                    sentAt = android.os.SystemClock.uptimeMillis();
+                    String err = hub.startTeam(ses, team, ask);
+                    if (err != null) Toast.makeText(ChatActivity.this, err, Toast.LENGTH_LONG).show();
+                }
+            };
+            go.run();
+        });
+    }
+
+    /**
      * The team setup, from a team (or none). ask: then the chat's agent asks the user the rest; not for a team the
      * leader proposed, which it set up with the user already.
      */
@@ -2876,10 +2911,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         checkBackground(false);
         renderHelpers();
         renderTeam();
-        if (resumed && ses.teamDraft != null) { // the leader's proposal, which the user wants to adjust first
-            Team draft = ses.teamDraft;
+        if (resumed && ses.teamDraft != null) { // a team the user asked for in the chat: the setup, with what they said
+            Team.Draft draft = ses.teamDraft;
             ses.teamDraft = null;
-            if (ses.team == null) teamSetup(draft, false);
+            if (ses.team == null) teamSetup(draft);
         }
         options.setImageTintList(ColorStateList.valueOf(ses.awake || ses.schedule != null || !ses.allowed.isEmpty() ? ACCENT : MUTED));
         if (hint != null) hint.setText(hintText());

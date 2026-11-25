@@ -3171,12 +3171,9 @@
     <string name="team_not_signed_in">%1$s works on %2$s, which isn\'t signed in on this phone.</string>
     <string name="team_card_from">%1$s asks for your OK:\n\n%2$s</string>
     <string name="team_card_change">Change the team?</string>
-    <string name="team_card_start">Start this team?</string>
-    <string name="team_start_adjust">Adjust it first</string>
-    <string name="team_start_no">Not now</string>
     <string name="hub_tool_team_start">Proposing a team</string>
     <string name="tool_team_start">Start a team</string>
-    <string name="tool_team_start_info">The chat\'s agent proposes a team when you ask for one; it starts only when you tap Start on its card</string>
+    <string name="tool_team_start_info">The chat\'s agent opens Buddy\'s team setup with what you asked for; the team starts when you tap Start the team there</string>
     <string name="team_card_add">Add %1$s on %2$s</string>
     <string name="team_card_remove">Remove %1$s</string>
     <string name="team_card_rename">Rename %1$s to %2$s</string>

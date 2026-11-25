@@ -334,23 +334,26 @@ final class Tools {
                                 + "can work on your own part at the same time; call team without a message afterwards."))
                         .put("stop", boolProp("End the members that still work"))));
         t.put(tool("team_start",
-                "Only when the user asks for a team in a chat without one (\"set up a team: Codex builds, Claude reviews\", "
-                        + "\"turn the team back on\"): proposes it, and the user decides on a card (start it, adjust it in "
-                        + "Buddy's setup first, or not). You lead it as this chat's agent. With restore, the team this chat "
-                        + "had last, as it was.",
+                "Only when the user asks for a team in a chat without one (\"start a team for my job hunt\", \"turn the "
+                        + "team back on\"): Buddy's team setup opens on their screen with what they said, asks them what they "
+                        + "left open (they pick the agents there), and the team starts when they tap Start the team. Pass ONLY "
+                        + "what the user said in so many words: no member, agent, model, goal or setting they didn't name, "
+                        + "and nothing you think would suit (Buddy asks them). With restore, the team this chat had last.",
                 props().put("restore", boolProp("The chat's last team again, as it was (then leave the rest out)"))
-                        .put("structure", strProp("lead (leader + workers), pipe (pipeline), check (doer + checker) or doers (doers with their own goals)"))
-                        .put("members", new JSONObject().put("type", "array").put("description", "The members, in order (a pipeline's steps; a doer then its checker)")
+                        .put("structure", strProp("Only if the user said it: lead (leader + workers), pipe (one after another), "
+                                + "check (doer + checker) or doers (doers with their own goals)"))
+                        .put("members", new JSONObject().put("type", "array").put("description", "Only the members the user named, "
+                                        + "in order (a pipeline's steps; a doer then its checker); none if they named none")
                                 .put("items", new JSONObject().put("type", "object").put("properties", new JSONObject()
-                                        .put("name", strProp("Its name in the team, e.g. Builder"))
-                                        .put("agent", strProp("A signed-in agent: claude, codex, opencode, agy, grok, copilot or pi. Default: yours"))
-                                        .put("model", strProp("Optional: one of that agent's model ids. Default: its own"))
-                                        .put("goal", strProp("What it is for, in a line")))
+                                        .put("name", strProp("Its name, as the user said it"))
+                                        .put("agent", strProp("Only if the user named one: claude, codex, opencode, agy, grok, copilot or pi"))
+                                        .put("model", strProp("Only if the user named one"))
+                                        .put("goal", strProp("Only if the user said what it is for")))
                                         .put("required", new JSONArray().put("name"))))
-                        .put("workspace", strProp("sep (each member in its own folder), same (all in this chat's folder, the default) or look (members only look things up)"))
-                        .put("apps", strProp("diff (each member in a different app, the default), turn (one app at a time) or none (no phone apps)"))
-                        .put("handoff", strProp("How work is handed on, in a sentence"))
-                        .put("rules", strProp("The whole team's rules, in a few short sentences"))));
+                        .put("workspace", strProp("Only if the user said it: sep (each in its own folder), same (all in this chat's folder) or look (only look things up)"))
+                        .put("apps", strProp("Only if the user said it: diff (each in a different app), turn (one app at a time) or none (no phone apps)"))
+                        .put("handoff", strProp("Only if the user said how work is handed on"))
+                        .put("rules", strProp("Only if the user gave rules for the team"))));
         t.put(tool("team_change",
                 "Only in a chat with a team that you lead, and only when the user asks for it: changes the team. Adding, "
                         + "removing or renaming a member, another agent or model for one, and how the team works come to "

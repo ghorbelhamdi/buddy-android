@@ -2495,12 +2495,9 @@
     <string name="team_not_signed_in">%1$s pracuje na agencie %2$s, który nie jest zalogowany na tym telefonie.</string>
     <string name="team_card_from">%1$s prosi o twoją zgodę:\n\n%2$s</string>
     <string name="team_card_change">Zmienić zespół?</string>
-    <string name="team_card_start">Uruchomić ten zespół?</string>
-    <string name="team_start_adjust">Najpierw dostosuj</string>
-    <string name="team_start_no">Nie teraz</string>
     <string name="hub_tool_team_start">Proponowanie zespołu</string>
     <string name="tool_team_start">Uruchom zespół</string>
-    <string name="tool_team_start_info">Agent czatu proponuje zespół, gdy o to poprosisz; zespół rusza dopiero, gdy na jego karcie dotkniesz „Uruchom zespół”</string>
+    <string name="tool_team_start_info">Agent czatu otwiera konfigurację zespołu w Buddy z tym, o co prosisz; zespół rusza, gdy dotkniesz tam „Uruchom zespół”</string>
     <string name="team_card_add">Dodaj: %1$s na %2$s</string>
     <string name="team_card_remove">Usuń: %1$s</string>
     <string name="team_card_rename">Zmień nazwę „%1$s” na „%2$s”</string>

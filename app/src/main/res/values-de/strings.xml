@@ -2446,12 +2446,9 @@
     <string name="team_not_signed_in">%1$s läuft mit %2$s, das auf diesem Handy nicht angemeldet ist.</string>
     <string name="team_card_from">%1$s bittet um dein OK:\n\n%2$s</string>
     <string name="team_card_change">Team ändern?</string>
-    <string name="team_card_start">Dieses Team starten?</string>
-    <string name="team_start_adjust">Erst anpassen</string>
-    <string name="team_start_no">Nicht jetzt</string>
     <string name="hub_tool_team_start">Team wird vorgeschlagen</string>
     <string name="tool_team_start">Team starten</string>
-    <string name="tool_team_start_info">Der Agent des Chats schlägt ein Team vor, wenn du darum bittest; es startet erst, wenn du auf seiner Karte auf „Team starten“ tippst</string>
+    <string name="tool_team_start_info">Der Agent des Chats öffnet Buddys Team-Einrichtung mit dem, was du verlangt hast; das Team startet, wenn du dort auf „Team starten“ tippst</string>
     <string name="team_card_add">%1$s mit %2$s hinzufügen</string>
     <string name="team_card_remove">%1$s entfernen</string>
     <string name="team_card_rename">%1$s in %2$s umbenennen</string>

@@ -35,13 +35,27 @@ final class TeamUi {
     // ------------------------------------------------------------------ setting one up
 
     /**
-     * from: a team to start from (one the leader proposed, or the chat's last one), or null for a new one; with one
-     * the sheet opens on its members, the questions a step back.
+     * from: a team to start from (the chat's last one), or null for a new one; with one the sheet opens on its
+     * members, the questions a step back.
      */
     static void setup(final Activity a, final Sessions.Session ses, Team from, final Done done) {
+        setup(a, ses, from, new boolean[3], false, from != null, done);
+    }
+
+    /**
+     * known: the structure, the workspace and the apps the user already said (a team asked for in the chat, see
+     * Team.Draft): those questions aren't asked again. keepMembers: the members are the user's (named in the chat), so
+     * another structure picked here keeps them. atEnd: opens on the members.
+     */
+    static void setup(final Activity a, final Sessions.Session ses, Team from, boolean[] known, final boolean keepMembers,
+                      boolean atEnd, final Done done) {
         final Team[] team = {from != null ? from.copy() : Team.preset(a, Team.PIPE, ses.backend)};
         final String[] leader = {ses.backend, ses.model == null ? "" : ses.model};
-        final int[] step = {from != null ? 3 : 0};
+        final List<Integer> steps = new ArrayList<>();
+        for (int i = 0; i < 3; i++) if (!known[i]) steps.add(i);
+        steps.add(3); // (the members always: their agents are picked there)
+        final int[] at = {atEnd ? steps.size() - 1 : 0};
+        final int[] step = {steps.get(at[0])};
         final LinearLayout box = protect(column(a)); // only the user sets a team up
         final Dialog d = bottomSheet(a, box); // (which scrolls what is longer than the screen)
         final Runnable[] render = new Runnable[1];
@@ -50,15 +64,16 @@ final class TeamUi {
             // where we are: a dot per step
             LinearLayout dots = row(a);
             dots.setGravity(Gravity.CENTER_VERTICAL);
-            for (int i = 0; i < 4; i++) {
+            step[0] = steps.get(at[0]);
+            for (int i = 0; i < steps.size(); i++) {
                 View dot = new View(a);
-                dot.setBackground(rounded(a, i <= step[0] ? ACCENT : OUTLINE, 3));
-                LinearLayout.LayoutParams dp = new LinearLayout.LayoutParams(dp(a, i == step[0] ? 22 : 6), dp(a, 6));
+                dot.setBackground(rounded(a, i <= at[0] ? ACCENT : OUTLINE, 3));
+                LinearLayout.LayoutParams dp = new LinearLayout.LayoutParams(dp(a, i == at[0] ? 22 : 6), dp(a, 6));
                 dp.setMarginEnd(dp(a, 6));
                 dots.addView(dot, dp);
             }
             dots.addView(new View(a), weight1());
-            dots.addView(monoText(a, a.getString(R.string.team_step, step[0] + 1, 4), 12, MUTED));
+            dots.addView(monoText(a, a.getString(R.string.team_step, at[0] + 1, steps.size()), 12, MUTED));
             box.addView(dots, full());
             final Team t = team[0];
             if (step[0] == 0) {
@@ -69,7 +84,8 @@ final class TeamUi {
                         {Team.DOERS, a.getString(R.string.team_doers), a.getString(R.string.team_doers_info)}};
                 for (final String[] x : o) {
                     choice(a, box, x[1], x[2], x[0].equals(t.structure), x[0], () -> {
-                        if (!x[0].equals(t.structure)) { // another shape: its own members to start from
+                        if (keepMembers) t.structure = x[0]; // (the members the user named stay)
+                        else if (!x[0].equals(t.structure)) { // another shape: its own members to start from
                             Team n = Team.preset(a, x[0], leader[0]);
                             n.workspace = t.workspace;
                             n.apps = t.apps;
@@ -109,20 +125,21 @@ final class TeamUi {
                 diagram(a, box, t, leader, render[0]);
             }
             LinearLayout buttons = row(a);
-            Button back = button(a, a.getString(step[0] == 0 ? R.string.team_cancel : R.string.chat_back), false);
+            Button back = button(a, a.getString(at[0] == 0 ? R.string.team_cancel : R.string.chat_back), false);
             back.setOnClickListener(v -> {
-                if (step[0] == 0) d.dismiss();
+                if (at[0] == 0) d.dismiss();
                 else {
-                    step[0]--;
+                    at[0]--;
                     render[0].run();
                 }
             });
-            Button next = button(a, a.getString(step[0] == 3 ? R.string.team_start : R.string.team_next), true);
-            next.setEnabled(step[0] < 3 || !t.members.isEmpty());
+            boolean last = at[0] == steps.size() - 1;
+            Button next = button(a, a.getString(last ? R.string.team_start : R.string.team_next), true);
+            next.setEnabled(!last || !t.members.isEmpty());
             next.setAlpha(next.isEnabled() ? 1f : 0.5f);
             next.setOnClickListener(v -> {
-                if (step[0] < 3) {
-                    step[0]++;
+                if (!last) {
+                    at[0]++;
                     render[0].run();
                     return;
                 }

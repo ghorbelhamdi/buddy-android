@@ -392,9 +392,15 @@ final class ChatHub {
 
     /** Turns a chat's team on, and has its agent ask the user the rest (what each member is for, the hand-off, rules). */
     String startTeam(Sessions.Session ses, Team team) {
+        return startTeam(ses, team, Team.interview(team));
+    }
+
+    /** interview: what the leader asks the user once the team is on (null: nothing left to ask, it is just on). */
+    String startTeam(Sessions.Session ses, Team team, String interview) {
         setTeam(ses, team, null);
+        if (interview == null) return null;
         boolean untitled = ses.title.isEmpty();
-        String err = send(ses, app.getString(R.string.team_setup_sent), null, Team.interview(team), false, false);
+        String err = send(ses, app.getString(R.string.team_setup_sent), null, interview, false, false);
         if (err != null) { // the leader couldn't ask the rest: the team isn't on (the setup starts from it next time)
             ses.team = null;
             ses.lastTeam = team;

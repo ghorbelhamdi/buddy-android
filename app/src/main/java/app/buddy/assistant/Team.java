@@ -259,20 +259,29 @@ final class Team {
 
     /** The message that has the leader ask the user the rest, right after the team was turned on. */
     static String interview(Team t) {
-        StringBuilder goals = new StringBuilder();
-        for (Member m : t.members) goals.append(m.name).append(": ").append(m.goal).append("; ");
+        return interview(t, true, true, true);
+    }
+
+    /** As above, asking only what the user left open (null when nothing is: no follow-ups then). */
+    static String interview(Team t, boolean goals, boolean handoff, boolean rules) {
+        if (!goals && !handoff && !rules) return null;
+        StringBuilder now = new StringBuilder();
+        for (Member m : t.members) now.append(m.name).append(": ").append(m.goal).append("; ");
         String[] h = handoffs(t.structure);
-        return "The user just turned on this chat's team and picked its members. Before any work, ask them three things "
-                + "with the ask tool, one call each, short:\n"
-                + "1. What each member is for. Propose one line per member, fitted to what this chat is about (now: " + goals
-                + "), with the option \"Use these\"; they can type changes.\n"
-                + "2. How work is handed on, with the options: \"" + h[0] + "\", \"" + h[1] + "\", \"" + h[2] + "\".\n"
-                + "3. Rules for the whole team, with options that fit this chat (such as \"Tests must pass\", \"Keep the "
-                + "existing style\", \"Explain every change\") and \"No rules\".\n"
-                + "(These are phone tools: where your tools carry their server's name, mcp__phone__ask and mcp__phone__team_change.)\n"
-                + "Then save what they chose with team_change (update for each member's goal, handoff, rules), and tell "
-                + "them in two or three lines that the team is ready and that the boxes over the message box say who a "
-                + "message goes to. If they skip a question, keep what is set.";
+        List<String> qs = new ArrayList<>();
+        if (goals) qs.add("What each member is for. Propose one line per member, fitted to what this chat is about (now: "
+                + now + "), with the option \"Use these\"; they can type changes.");
+        if (handoff) qs.add("How work is handed on, with the options: \"" + h[0] + "\", \"" + h[1] + "\", \"" + h[2] + "\".");
+        if (rules) qs.add("Rules for the whole team, with options that fit this chat (such as \"Tests must pass\", \"Keep the "
+                + "existing style\", \"Explain every change\") and \"No rules\".");
+        StringBuilder b = new StringBuilder("The user just turned on this chat's team and picked its members. Before any work, ask them ")
+                .append(qs.size() == 1 ? "this" : qs.size() == 2 ? "these two things" : "these three things")
+                .append(" with the ask tool, one call each, short (what they already said is set: don't ask it again):\n");
+        for (int i = 0; i < qs.size(); i++) b.append(i + 1).append(". ").append(qs.get(i)).append('\n');
+        return b.append("(These are phone tools: where your tools carry their server's name, mcp__phone__ask and mcp__phone__team_change.)\n")
+                .append("Then save what they chose with team_change, and tell them in two or three lines that the team is ready and ")
+                .append("that the boxes over the message box say who a message goes to. If they skip a question, keep what is set.")
+                .toString();
     }
 
     private static String memberPrompt(Team t, Member m, Sessions.Session parent, Sessions.Session h, boolean screen) {
@@ -675,9 +684,23 @@ final class Team {
     }
 
     /**
-     * The team_start tool: the leader proposes a team (or the chat's last one again, restore) and the user decides on a
-     * card: start it, adjust it first in Buddy's setup, or not. Nothing starts without the user's tap: a team brings in
-     * other agents, on their plans.
+     * A team the user asked for in the chat, as far as they said it (team_start): the setup opens with it and asks
+     * only what they left open, then the leader asks only the follow-ups they left open.
+     */
+    static final class Draft {
+        Team team;
+        /** What the user said: the structure, the workspace, the apps; the members (by name); every member's goal; the hand-off; the rules. */
+        boolean structure, workspace, apps, members, goals, handoff, rules;
+
+        boolean[] known() {
+            return new boolean[]{structure, workspace, apps};
+        }
+    }
+
+    /**
+     * The team_start tool: the user asked for a team in the chat. The leader passes only what they said; Buddy's setup
+     * opens on their screen with it, asks what they left open, and the team starts when they tap Start the team there.
+     * With restore, the chat's last team as it was.
      */
     static String start(final BuddyService svc, String chat, JSONObject a) throws Exception {
         final ChatHub hub = ChatHub.get(svc);
@@ -685,70 +708,57 @@ final class Team {
         if (parent == null || !parent.parent.isEmpty()) return "Only the chat's own agent leads a team.";
         if (Triggers.ruleRun(chat)) return "Not available in a notification rule's run.";
         if (parent.team != null) return "This chat has a team already. Change it with team_change.";
-        final Team t;
+        final Draft d = new Draft();
         if (a.optBoolean("restore")) {
-            if (parent.lastTeam == null) return "This chat had no team before. Propose one: structure and members.";
-            t = parent.lastTeam.copy();
+            if (parent.lastTeam == null) return "This chat had no team before. Pass what the user said about the team instead.";
+            d.team = parent.lastTeam.copy();
+            d.structure = d.workspace = d.apps = d.members = d.goals = d.handoff = d.rules = true;
         } else {
-            t = new Team();
-            String s = a.optString("structure", PIPE);
-            if (!(LEAD.equals(s) || PIPE.equals(s) || CHECK.equals(s) || DOERS.equals(s))) return "structure is lead, pipe, check or doers.";
-            t.structure = s;
-            s = a.optString("workspace", SAME);
-            if (!(SEP.equals(s) || SAME.equals(s) || LOOK.equals(s))) return "workspace is sep, same or look.";
-            t.workspace = s;
-            s = a.optString("apps", Background.setUp(svc) ? DIFF : NONE);
-            if (!(DIFF.equals(s) || TURN.equals(s) || NONE.equals(s))) return "apps is diff, turn or none.";
-            t.apps = Background.setUp(svc) ? s : NONE; // (no hidden screens on this phone: none to share)
+            String s = a.optString("structure").trim();
+            if (!s.isEmpty() && !(LEAD.equals(s) || PIPE.equals(s) || CHECK.equals(s) || DOERS.equals(s))) return "structure is lead, pipe, check or doers.";
+            d.structure = !s.isEmpty();
             JSONArray members = a.optJSONArray("members");
-            if (members == null || members.length() == 0) return "Give the members: [{\"name\": \"Builder\", \"agent\": \"codex\", \"goal\": \"…\"}].";
-            for (int i = 0; i < members.length(); i++) {
-                JSONObject o = members.optJSONObject(i);
-                String name = o == null ? "" : clipName(o.optString("name"));
-                if (name.isEmpty()) return "Each member needs a name.";
-                if (t.member(name) != null) return "Two members are called \"" + name + "\": give each its own name.";
-                Member m = t.add(name, parent.backend, "", o.optString("goal").trim());
-                String err = agentAndModel(svc, m, o, parent.backend);
-                if (err != null) return err;
+            d.members = members != null && members.length() > 0;
+            Team t = d.members ? new Team() : preset(svc, d.structure ? s : PIPE, parent.backend);
+            t.structure = d.structure ? s : PIPE;
+            s = a.optString("workspace").trim();
+            if (!s.isEmpty() && !(SEP.equals(s) || SAME.equals(s) || LOOK.equals(s))) return "workspace is sep, same or look.";
+            d.workspace = !s.isEmpty();
+            if (d.workspace) t.workspace = s;
+            s = a.optString("apps").trim();
+            if (!s.isEmpty() && !(DIFF.equals(s) || TURN.equals(s) || NONE.equals(s))) return "apps is diff, turn or none.";
+            d.apps = !s.isEmpty();
+            if (d.apps) t.apps = Background.setUp(svc) ? s : NONE; // (no hidden screens on this phone: none to share)
+            if (d.members) {
+                // an agent the user didn't name for a member: the signed-in ones in turn, as Buddy's own setup starts (they pick there)
+                List<String> agents = new ArrayList<>();
+                for (Account acc : Account.ALL) if (!acc.agent.equals(parent.backend) && SetupState.signedIn(svc, acc.agent)) agents.add(acc.agent);
+                agents.add(parent.backend);
+                d.goals = true;
+                for (int i = 0; i < members.length(); i++) {
+                    JSONObject o = members.optJSONObject(i);
+                    String name = o == null ? "" : clipName(o.optString("name"));
+                    if (name.isEmpty()) return "Each member needs a name.";
+                    if (t.member(name) != null) return "Two members are called \"" + name + "\": give each its own name.";
+                    String goal = o.optString("goal").trim();
+                    d.goals &= !goal.isEmpty();
+                    Member m = t.add(name, agents.get(i % agents.size()), "", goal);
+                    String err = agentAndModel(svc, m, o, m.agent);
+                    if (err != null) return err;
+                }
             }
             t.handoff = a.optString("handoff").trim();
-            if (t.handoff.isEmpty()) t.handoff = handoffs(t.structure)[0];
+            d.handoff = !t.handoff.isEmpty();
+            if (!d.handoff) t.handoff = handoffs(t.structure)[0];
             t.rules = a.optString("rules").trim();
+            d.rules = !t.rules.isEmpty();
+            d.team = t;
         }
-        // the card: the team as it would be, line by line
-        StringBuilder card = new StringBuilder(svc.getString(R.string.team_card_start)).append("\n\n")
-                .append(svc.getString(structureName(t.structure))).append('\n')
-                .append(svc.getString(R.string.team_card_on, svc.getString(R.string.team_leader),
-                        Account.nameOf(parent.backend) + (parent.model == null || parent.model.isEmpty() ? "" : " · " + Models.label(parent.backend, parent.model))));
-        for (Member m : t.members) card.append('\n').append(svc.getString(R.string.team_card_on, m.name, m.on()));
-        card.append("\n\n").append(svc.getString(R.string.team_card_workspace, svc.getString(SEP.equals(t.workspace) ? R.string.team_ws_sep
-                : LOOK.equals(t.workspace) ? R.string.team_ws_look : R.string.team_ws_same)))
-                .append('\n').append(svc.getString(R.string.team_card_apps, svc.getString(TURN.equals(t.apps) ? R.string.team_apps_turn
-                        : NONE.equals(t.apps) ? R.string.team_apps_none : R.string.team_apps_diff)));
-        String yes = svc.getString(R.string.team_start), adjust = svc.getString(R.string.team_start_adjust), no = svc.getString(R.string.team_start_no);
-        String answer = svc.askQuestion(card.toString(), java.util.Arrays.asList(yes, adjust, no), false, null);
-        final CountDownLatch done = new CountDownLatch(1);
-        if (answer.startsWith("ANSWER: \u201c" + yes + "\u201d")) {
-            svc.runOnMain(() -> {
-                try {
-                    if (parent.team == null) hub.setTeam(parent, t, null);
-                } finally {
-                    done.countDown();
-                }
-            });
-            done.await(30, TimeUnit.SECONDS);
-            if (parent.team != t) return "The team couldn't start: the chat has another one now.";
-            return "The user started the team. " + brief(t, parent).trim() + " If you didn't ask the user what each member "
-                    + "is for, the hand-off and rules, and they matter for the task, ask now (ask tool) and save it with team_change.";
-        }
-        if (answer.startsWith("ANSWER: \u201c" + adjust + "\u201d")) {
-            parent.teamDraft = t; // the chat opens the setup with it (main thread: refresh)
-            svc.runOnMain(hub::changed);
-            return "The user is adjusting the team in Buddy's setup, which opened on the chat screen with your proposal. "
-                    + "It starts when they finish there; your next turn's messages will say who is in it. End your turn now.";
-        }
-        if (answer.startsWith("ANSWER (typed")) return "The user didn't start the team; they wrote: " + answer.substring(answer.indexOf(':') + 1).trim();
-        return "The user didn't start the team (" + answer + "). Don't propose it again unless they ask.";
+        parent.teamDraft = d; // the chat opens the setup with it (main thread: refresh)
+        svc.runOnMain(hub::changed);
+        return "Buddy's team setup opened on the user's screen with what they said, and asks them what they left open "
+                + "(they pick each member's agent there). The team starts when they tap Start the team; then you are told "
+                + "what is still open to ask. Tell them in a line to finish it there, and end your turn.";
     }
 
     /** A member's name as it is kept: 40 characters at most, cut before it is compared with the others'. */

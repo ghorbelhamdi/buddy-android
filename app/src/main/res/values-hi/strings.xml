@@ -2439,12 +2439,9 @@
     <string name="team_not_signed_in">%1$s %2$s पर काम करता है, जिसमें इस फ़ोन पर साइन इन नहीं है।</string>
     <string name="team_card_from">%1$s आपकी मंज़ूरी चाहता है:\n\n%2$s</string>
     <string name="team_card_change">टीम बदलें?</string>
-    <string name="team_card_start">यह टीम शुरू करें?</string>
-    <string name="team_start_adjust">पहले बदलें</string>
-    <string name="team_start_no">अभी नहीं</string>
     <string name="hub_tool_team_start">टीम का प्रस्ताव दे रहा है</string>
     <string name="tool_team_start">टीम शुरू करें</string>
-    <string name="tool_team_start_info">आपके कहने पर चैट का एजेंट एक टीम का प्रस्ताव देता है; वह तभी शुरू होती है जब आप उसके कार्ड पर “टीम शुरू करें” पर टैप करते हैं</string>
+    <string name="tool_team_start_info">चैट का एजेंट आपकी माँगी बातों के साथ Buddy का टीम सेटअप खोलता है; वहाँ “टीम शुरू करें” पर टैप करने पर टीम शुरू होती है</string>
     <string name="team_card_add">%1$s को %2$s पर जोड़ें</string>
     <string name="team_card_remove">%1$s को हटाएं</string>
     <string name="team_card_rename">%1$s का नाम बदलकर %2$s करें</string>

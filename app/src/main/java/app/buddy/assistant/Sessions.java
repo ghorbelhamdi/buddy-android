@@ -156,8 +156,8 @@ final class Sessions {
         volatile Team team;
         /** The team the chat had last, kept when it is turned off: turning it on again starts from it. */
         volatile Team lastTeam;
-        /** Not saved: a team the leader proposed that the user wants to adjust first (the chat opens the setup with it). */
-        volatile Team teamDraft;
+        /** Not saved: a team the user asked for in the chat (team_start): the chat opens the setup with it. */
+        volatile Team.Draft teamDraft;
         /** A team's member's chat: the member's id in its parent's team; "" for every other chat. */
         String member = "";
         /** In a team chat: how many of its messages the leader has had word of (see Team.digest). */

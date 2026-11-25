@@ -2940,12 +2940,9 @@
     <string name="team_not_signed_in">%1$s работает на %2$s, а вход в этот агент на телефоне не выполнен.</string>
     <string name="team_card_from">%1$s просит вашего подтверждения:\n\n%2$s</string>
     <string name="team_card_change">Изменить команду?</string>
-    <string name="team_card_start">Запустить эту команду?</string>
-    <string name="team_start_adjust">Сначала настроить</string>
-    <string name="team_start_no">Не сейчас</string>
     <string name="hub_tool_team_start">Предложение команды</string>
     <string name="tool_team_start">Запуск команды</string>
-    <string name="tool_team_start_info">Агент чата предлагает команду по вашей просьбе; она запускается, только когда вы нажмёте «Запустить команду» на карточке</string>
+    <string name="tool_team_start_info">Агент чата открывает настройку команды в Buddy с тем, что вы попросили; команда запускается, когда вы нажмёте там «Запустить команду»</string>
     <string name="team_card_add">Добавить: %1$s на %2$s</string>
     <string name="team_card_remove">Удалить: %1$s</string>
     <string name="team_card_rename">Переименовать «%1$s» в «%2$s»</string>

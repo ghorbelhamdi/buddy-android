@@ -2868,12 +2868,9 @@
     <string name="team_not_signed_in">%1$s 使用 %2$s，但它在这部手机上未登录。</string>
     <string name="team_card_from">%1$s 请你确认：\n\n%2$s</string>
     <string name="team_card_change">更改团队？</string>
-    <string name="team_card_start">启动这个团队？</string>
-    <string name="team_start_adjust">先调整</string>
-    <string name="team_start_no">暂不</string>
     <string name="hub_tool_team_start">正在提议团队</string>
     <string name="tool_team_start">启动团队</string>
-    <string name="tool_team_start_info">你提出要求时，对话的智能体会提议一个团队；只有在你点按卡片上的“启动团队”后它才会启动</string>
+    <string name="tool_team_start_info">对话的智能体会按你的要求打开 Buddy 的团队设置；你在那里点按“启动团队”后团队才会启动</string>
     <string name="team_card_add">添加 %1$s（使用 %2$s）</string>
     <string name="team_card_remove">移除 %1$s</string>
     <string name="team_card_rename">将 %1$s 重命名为 %2$s</string>

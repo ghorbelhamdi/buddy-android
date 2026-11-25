@@ -2879,12 +2879,9 @@
     <string name="team_not_signed_in">%1$s travaille sur %2$s, qui n\'est pas connecté sur ce téléphone.</string>
     <string name="team_card_from">%1$s demande votre accord :\n\n%2$s</string>
     <string name="team_card_change">Modifier l\'équipe ?</string>
-    <string name="team_card_start">Démarrer cette équipe ?</string>
-    <string name="team_start_adjust">L\'ajuster d\'abord</string>
-    <string name="team_start_no">Pas maintenant</string>
     <string name="hub_tool_team_start">Proposition d\'une équipe</string>
     <string name="tool_team_start">Démarrer une équipe</string>
-    <string name="tool_team_start_info">L\'agent de la discussion propose une équipe quand vous le demandez ; elle ne démarre que lorsque vous touchez « Démarrer l\'équipe » sur sa carte</string>
+    <string name="tool_team_start_info">L\'agent de la discussion ouvre la configuration d\'équipe de Buddy avec ce que vous avez demandé ; l\'équipe démarre quand vous y touchez « Démarrer l\'équipe »</string>
     <string name="team_card_add">Ajouter %1$s sur %2$s</string>
     <string name="team_card_remove">Retirer %1$s</string>
     <string name="team_card_rename">Renommer %1$s en %2$s</string>
