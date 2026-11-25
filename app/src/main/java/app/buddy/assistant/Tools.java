@@ -282,20 +282,20 @@ final class Tools {
                         + "with it just before.",
                 props().put("text", strProp("The reply, exactly as it should be sent")), "text"));
         t.put(tool("team",
-                "Other agents that work with you in this chat, the chat's team, which you lead: tells members something "
-                        + "and waits for what they answer (up to 8 minutes). Each member is an agent of its own, on the "
-                        + "agent and model it was given, with a hidden phone screen of its own (background mode), that "
-                        + "remembers what it did in this chat before. Members named in one call work at the same time. "
-                        + "For work that splits into independent parts (compare a price in three shops, gather facts from "
-                        + "several places, write it and review it) add members for it with add: in a chat without a team "
-                        + "that starts one (the user sees it, and can keep it or turn it off). A team the user asks for "
-                        + "goes through team_start instead: add is for the parts of a task. A new member knows nothing of this "
-                        + "conversation: give it everything it needs. On another agent or model (agent, model) when the user "
-                        + "names one, or one better at that part. Each member uses its agent's plan, so don't add one for "
-                        + "what you can do quickly yourself. Give members different apps or sites (an app can only be open "
-                        + "in one place). Without a message it waits for the members still working; with stop it ends "
-                        + "them. What a member answers shows in the chat under its name, so don't repeat it to the user. "
-                        + "Remove members you added and no longer need with team_change (remove).",
+                "Work that splits into parts that can run at the same time (compare a price in three shops, gather "
+                        + "facts from several sites or apps, write it and review it): add a member per part with add and "
+                        + "a message; they all work at once, each on a screen or browser tab of its own, which is much "
+                        + "faster than doing the parts one after another yourself. In a chat without a team the first ones "
+                        + "start one (the user sees it and can keep it or turn it off). A new member knows nothing of this "
+                        + "conversation: give it everything it needs. Members are the chat's team, which you lead; each is "
+                        + "an agent of its own, on the agent and model it was given (another one when the user names it, or "
+                        + "one better at that part), that remembers what it did in this chat before. Members named in one "
+                        + "call work at the same time; the call waits for what they answer (up to 8 minutes). Without a "
+                        + "message it waits for the members still working; with stop it ends them. Give members different "
+                        + "apps or sites (an app can only be open in one place). A single quick step needs no member. What a "
+                        + "member answers shows in the chat under its name, so don't repeat it to the user. A team the user "
+                        + "asks for goes through team_start instead: add is for the parts of a task. Remove members you "
+                        + "added and no longer need with team_change (remove).",
                 props().put("to", new JSONObject().put("type", "array").put("items", new JSONObject().put("type", "string"))
                                 .put("description", "The members' names, as the chat's messages list them (members added in this call are told too)"))
                         .put("add", new JSONObject().put("type", "array").put("description", "Members to add for this task, told the message at once")
