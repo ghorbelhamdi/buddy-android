@@ -336,8 +336,19 @@ final class ChatHub {
 
     /** A team's member is told something (see Team.tell): its chat shows the words, its agent gets them with who they are from. */
     String sendMember(Sessions.Session ses, String shown, List<String> files, String prompt) {
+        return sendMember(ses, shown, files, prompt, null);
+    }
+
+    /** linux: files in Linux tools, chips on the member's message (the prompt has their paths). */
+    String sendMember(Sessions.Session ses, String shown, List<String> files, String prompt, List<String> linux) {
         if (ses.running) return addNote(ses, shown); // (it gets it with its next step, as any chat does)
-        return send(ses, shown, files, prompt, false, false);
+        if (linux == null || linux.isEmpty()) return send(ses, shown, files, prompt, false, false);
+        sendingLinux = linux;
+        try {
+            return send(ses, shown, files, prompt, false, false);
+        } finally {
+            sendingLinux = null;
+        }
     }
 
     /**
@@ -390,11 +401,9 @@ final class ChatHub {
             sendingTo = null;
             sendingAlso = null;
         }
-        String forMember = (text.isEmpty() ? "Have a look at what I attached." : text)
-                + (hasLinux ? "\n\nFiles in Linux tools:\n" + android.text.TextUtils.join("\n", linux) : "");
         StringBuilder errors = new StringBuilder();
         for (Team.Member m : members) {
-            String err = Team.tell(this, ses, m, null, forMember, hasFiles ? new ArrayList<>(files) : null);
+            String err = Team.tell(this, ses, m, null, text, hasFiles ? new ArrayList<>(files) : null, hasLinux ? new ArrayList<>(linux) : null);
             if (err != null) errors.append(errors.length() > 0 ? "\n" : "").append(m.name).append(": ").append(err);
         }
         changed();
@@ -410,6 +419,7 @@ final class ChatHub {
 
     /** interview: what the leader asks the user once the team is on (null: nothing left to ask, it is just on). */
     String startTeam(Sessions.Session ses, Team team, String interview) {
+        Team.Draft draft = ses.teamDraft; // (setTeam drops it: back on failure, with what the user had said)
         setTeam(ses, team, null);
         if (interview == null) return null;
         boolean untitled = ses.title.isEmpty();
@@ -417,6 +427,7 @@ final class ChatHub {
         if (err != null) { // the leader couldn't ask the rest: the team isn't on (the setup starts from it next time)
             ses.team = null;
             ses.lastTeam = team;
+            ses.teamDraft = draft;
             Sessions.Msg last = ses.messages.isEmpty() ? null : ses.messages.get(ses.messages.size() - 1);
             if (last != null && last.kind == Bubble.Kind.NOTE) ses.messages.remove(ses.messages.size() - 1); // ("Team on")
             sessions.save(ses);
@@ -437,7 +448,7 @@ final class ChatHub {
 
     /**
      * A team the user set up from one they asked for in the chat: started once the leader's turn is over (it was told
-     * to end it), up to two minutes; still working then, the team is on all the same and its next turn's brief says so.
+     * to end it), up to half an hour; still working then, the team is on all the same and its next turn's brief says so.
      * Main thread.
      */
     void startTeamWhenFree(final Sessions.Session ses, final Team team, final String ask, final String agent, final String model) {
@@ -498,8 +509,10 @@ final class ChatHub {
         Team before = ses.team;
         ses.team = team;
         if (team != null) ses.teamDraft = null; // (a setup that waited for it is done)
-        if (team == null && before != null) ses.lastTeam = before; // (turned off: kept, to start from when it is turned on again)
-        if (team != null) ses.lastTeam = null;
+        // turned off: kept, to start from when it is turned on again. Helpers the agent added for a task don't take
+        // the place of a team the user set up, nor clear it
+        if (team == null && before != null && !(before.helpersOnly() && ses.lastTeam != null)) ses.lastTeam = before;
+        if (team != null && !team.helpersOnly()) ses.lastTeam = null;
         for (Sessions.Session h : Team.all(this, ses.id)) {
             Team.Member m = team == null ? null : team.byId(h.member);
             if (m == null || (gone != null && gone.contains(h.member))) {
@@ -810,7 +823,8 @@ final class ChatHub {
      * "… (before edit)". Returns an error to show, or null.
      */
     String edit(Sessions.Session ses, int index, String text) {
-        if (ses.running) return app.getString(R.string.chat_edit_running);
+        // (members too: an answer of one that ends later would land in the chat cut short)
+        if (Team.working(this, ses)) return app.getString(R.string.chat_edit_running);
         if (!ses.parent.isEmpty() || index < 0 || index >= ses.messages.size()
                 || !ses.messages.get(index).editable() || text.trim().isEmpty()) {
             return app.getString(R.string.chat_edit_failed); // (the message isn't there any more): said, not dropped

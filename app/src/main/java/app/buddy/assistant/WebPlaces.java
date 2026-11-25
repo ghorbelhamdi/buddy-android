@@ -60,7 +60,9 @@ final class WebPlaces {
 
     /** What a folder holds: folders first, then by name; links as links, never followed. */
     static JSONObject list(Context c, String chat, String path, boolean hidden) throws Exception {
-        File dir = FilePlaces.folder(c, chat, FilePlaces.fromLinux(c, path));
+        File at = FilePlaces.fromLinux(c, path);
+        if (at.isFile() && at.getParentFile() != null) at = at.getParentFile(); // (a link to a file: its folder)
+        File dir = FilePlaces.folder(c, chat, at);
         String[] names = dir.list();
         List<FilePlaces.Entry> es = new ArrayList<>();
         int hiddenCount = 0;

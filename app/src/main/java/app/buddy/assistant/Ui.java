@@ -951,8 +951,9 @@ final class Ui {
             if (t.contains("://") || t.startsWith("www.") || t.contains("@")) continue;
             String host = t.split("[/?#]", 2)[0];
             String end = host.substring(host.lastIndexOf('.') + 1);
-            // (in a path, or a file's name: answers.md, /root/…/setup.py)
-            if (FILE_ENDINGS.contains(end) || (a > 0 && s.charAt(a - 1) == '/')) s.removeSpan(u);
+            // (in a path, or a file's name alone: answers.md, /root/…/setup.py; with a path after it, as docs.rs/tokio,
+            // it is a site)
+            if ((FILE_ENDINGS.contains(end) && host.equals(t)) || (a > 0 && s.charAt(a - 1) == '/')) s.removeSpan(u);
         }
     }
 
@@ -1315,12 +1316,10 @@ final class Ui {
         @Override
         public void onClick(android.view.View v) {
             if (then != null) then.run();
-            if (url.startsWith("/") || url.startsWith("~/")) { // a file in Buddy's Linux: Files, at its folder
+            if (url.startsWith("/") || url.startsWith("~/")) { // in Buddy's Linux: Files, at it (a file: at its folder)
                 String p = url.startsWith("~/") ? "/root" + url.substring(1) : url;
-                String last = p.substring(p.lastIndexOf('/') + 1);
-                String dir = last.contains(".") ? p.substring(0, Math.max(1, p.lastIndexOf('/'))) : p;
                 v.getContext().startActivity(new android.content.Intent(v.getContext(), FilesActivity.class)
-                        .putExtra(FilesActivity.EXTRA_PATH, dir).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK));
+                        .putExtra(FilesActivity.EXTRA_PATH, p).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK));
                 return;
             }
             try {

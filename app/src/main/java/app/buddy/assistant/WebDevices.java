@@ -926,9 +926,8 @@ final class WebDevices {
             } else s = hub.sessions.find(id);
             Sessions.Session lead = s == null || s.parent.isEmpty() ? null : memberParent(c, s);
             if (lead != null) { // a team's member's own chat: as a message ticked for it in the team's chat
-                if (!linux.isEmpty()) return "send files in Linux tools from the team's chat";
                 chat[0] = s.id;
-                String e = Team.tell(hub, lead, lead.team.byId(s.member), null, said, files);
+                String e = Team.tell(hub, lead, lead.team.byId(s.member), null, said, files, linux.isEmpty() ? null : linux);
                 return e == null ? "" : e;
             }
             if (s == null || s.incognito || !s.parent.isEmpty()) return "no such chat";

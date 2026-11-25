@@ -132,6 +132,12 @@ final class Team {
         return m;
     }
 
+    /** Made by the agent for a task (team with add, in a chat without a team): only helpers, none the user set up. */
+    boolean helpersOnly() {
+        for (Member m : members) if (!m.helper) return false;
+        return true;
+    }
+
     String names() {
         StringBuilder b = new StringBuilder();
         for (Member m : members) b.append(b.length() > 0 ? ", " : "").append(m.name);
@@ -382,6 +388,16 @@ final class Team {
      * null for the user. Null when it went, else why not.
      */
     static String tell(ChatHub hub, Sessions.Session parent, Member m, String from, String text, List<String> files) {
+        return tell(hub, parent, m, from, text, files, null);
+    }
+
+    /** linux: files in Linux tools, chips on the member's message; its agent gets their paths after the words. */
+    static String tell(ChatHub hub, Sessions.Session parent, Member m, String from, String text, List<String> files,
+                       List<String> linux) {
+        boolean hasLinux = linux != null && !linux.isEmpty();
+        if (hasLinux && text.isEmpty()) text = "Have a look at these files.";
+        else if (text.isEmpty() && files != null && !files.isEmpty()) text = "Have a look at what I attached.";
+        String said = text + (hasLinux ? "\n\nFiles in Linux tools:\n" + android.text.TextUtils.join("\n", linux) : "");
         Team t = parent.team;
         if (t == null) return "This chat has no team.";
         if (!SetupState.signedIn(hub.app, m.agent)) return hub.app.getString(R.string.team_not_signed_in, m.name, Account.nameOf(m.agent));
@@ -396,7 +412,7 @@ final class Team {
             h.incognito = parent.incognito;
             h.archived = true; // out of the chat list and the bubble: the parent's chat shows it
         }
-        if (h.running && files != null && !files.isEmpty()) return hub.app.getString(R.string.hub_still_working_attachments);
+        if (h.running && ((files != null && !files.isEmpty()) || hasLinux)) return hub.app.getString(R.string.hub_still_working_attachments);
         h.title = m.name;
         h.dev = parent.dev;
         if (!h.running) { // moved to another agent or model while it worked: now it takes effect
@@ -417,16 +433,16 @@ final class Team {
             if (svc != null) svc.allowControl();
         }
         String who = from == null ? "[From the user, directly]\n" : "[From the leader]\n";
-        if (h.running) return hub.sendMember(h, (from == null ? "" : who) + text, null, null); // (a note for its next step)
+        if (h.running) return hub.sendMember(h, (from == null ? "" : who) + said, null, null); // (a note for its next step)
         h.toldBy = from == null ? "" : from;
         h.told = text;
         // its instructions: the first time, and again when they changed (goal, rules, folder, another agent that
         // starts anew with the chat so far, which never held them)
         String brief = memberPrompt(t, m, parent, h, screen);
         boolean again = first || h.messages.isEmpty() || h.handover != null || h.reseed || brief.hashCode() != h.briefed;
-        String prompt = (again ? brief : "") + who + text;
+        String prompt = (again ? brief : "") + who + said;
         h.toldAt = h.messages.size(); // (its run's messages start with this one; notes added while it works are in it)
-        String err = hub.sendMember(h, text, files, prompt);
+        String err = hub.sendMember(h, text, files, prompt, hasLinux ? linux : null);
         if (err == null) h.briefed = brief.hashCode(); // (sent: else it gets them with the next message)
         if (err != null && first) hub.delete(h);
         return err;
@@ -463,7 +479,10 @@ final class Team {
         if (text == null && files.isEmpty()) return;
         Sessions.Msg msg = hub.addFrom(parent, kind, text == null ? "" : text, files, m, h.toldBy, h.told);
         // the leader has it if its team call is waiting for this member now; else its next turn's digest tells it
-        if (msg != null) msg.heard = !msg.direct && AWAITED.contains(h.id);
+        if (msg != null && !msg.direct && AWAITED.contains(h.id)) {
+            msg.heard = true;
+            hub.sessions.save(parent); // (addFrom saved it before: a restart now mustn't tell the leader again)
+        }
     }
 
     // ------------------------------------------------------------------ the leader's tools

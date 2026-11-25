@@ -166,6 +166,7 @@ public class FilesActivity extends Screen {
         if (at == null || at.isEmpty()) return null;
         try {
             File f = FilePlaces.fromLinux(this, at);
+            if (f.isFile() && f.getParentFile() != null) f = f.getParentFile(); // (a link to a file: its folder)
             if (f.equals(chatDir)) return chatDir;
             return FilePlaces.folder(this, chat, f);
         } catch (IOException e) {

@@ -2986,7 +2986,8 @@ final class Bubble implements ChatHub.Listener {
             if (background && text != null) {
                 // working off the screen: the phone is the user's, so the pill is small and brief, one line for a few
                 // seconds when there's something new (it stayed on the screen the whole time); the calm ring says the rest
-                String now = hub.pillText();
+                // (an agent outside Buddy's chats in the background browser: its own step, no chat's text)
+                String now = hub.runningCount() == 0 ? text.toString() : hub.pillText();
                 long t = android.os.SystemClock.elapsedRealtime();
                 // new is a chat starting or ending, another chat taking the latest step, or a reply: not every step
                 Sessions.Session about = hub.pillChat();

@@ -296,12 +296,23 @@ final class Background {
         return d;
     }
 
-    /** The chat's display if it has one right now, else the real screen's id. Doesn't make one. */
-    /** An app is on the chat's hidden screen now (one it opened and left, or none yet: no). */
+    /** hasApp's last answers, per chat {when, yes}: the chat screen asks on each redraw, on the main thread. */
+    private static final Map<String, long[]> hasAppSeen = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /** An app is on the chat's hidden screen now (one it opened and left, or none yet: no). Looked at once a second. */
     static boolean hasApp(String chat) {
         int d = displayOf(chat);
         BuddyService svc = BuddyService.get();
         if (d == Display.DEFAULT_DISPLAY || svc == null) return false;
+        long now = android.os.SystemClock.elapsedRealtime();
+        long[] seen = hasAppSeen.get(chat);
+        if (seen != null && now - seen[0] < 1000) return seen[1] == 1;
+        boolean yes = hasAppNow(svc, d);
+        hasAppSeen.put(chat, new long[]{now, yes ? 1 : 0});
+        return yes;
+    }
+
+    private static boolean hasAppNow(BuddyService svc, int d) {
         try {
             java.util.List<android.view.accessibility.AccessibilityWindowInfo> l = svc.getWindowsOnAllDisplays().get(d);
             if (l != null) for (android.view.accessibility.AccessibilityWindowInfo w : l) {
@@ -314,6 +325,7 @@ final class Background {
         return false;
     }
 
+    /** The chat's display if it has one right now, else the real screen's id. Doesn't make one. */
     static int displayOf(String chat) {
         Integer d = chat == null ? null : displays.get(chat);
         return d == null ? Display.DEFAULT_DISPLAY : d;

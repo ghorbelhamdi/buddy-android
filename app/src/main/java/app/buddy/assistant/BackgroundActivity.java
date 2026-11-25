@@ -28,7 +28,11 @@ public class BackgroundActivity extends Screen {
         // from the lock's "allow it on this Wi-Fi" notification: once more, so Android's question shows now
         // Android asks about an access point only when the user switches it on in Settings (switched on by Buddy, it
         // just goes off again, measured): Settings opens on the switch
-        if (getIntent().getBooleanExtra("debug_lock_again", false)) openWirelessDebugging();
+        // (once: not again when the screen is made anew, by its own recreate, a theme change or a rotation)
+        if (state == null && getIntent().getBooleanExtra("debug_lock_again", false)) {
+            getIntent().removeExtra("debug_lock_again");
+            openWirelessDebugging();
+        }
         LinearLayout root = column(this);
         root.setBackgroundColor(BG);
         LinearLayout top = row(this);

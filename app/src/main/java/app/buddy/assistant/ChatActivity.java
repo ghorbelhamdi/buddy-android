@@ -754,10 +754,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         Sessions.Session lead = ses.member.isEmpty() ? null : hub.sessions.find(ses.parent);
         Team.Member me = lead == null || lead.team == null ? null : lead.team.byId(ses.member);
         if (me != null) { // a member's own chat: as a message ticked for it in the team's chat
-            // (files in Linux tools: their paths with the message, as sendTeam gives them)
-            String told = pendingLinux.isEmpty() ? text : (text.isEmpty() ? "Have a look at these files." : text)
-                    + "\n\nFiles in Linux tools:\n" + android.text.TextUtils.join("\n", pendingLinux);
-            err = Team.tell(hub, lead, me, null, told, new java.util.ArrayList<>(pending));
+            // (files in Linux tools: chips on the message, their paths to its agent, as sendTeam gives them)
+            err = Team.tell(hub, lead, me, null, text, new java.util.ArrayList<>(pending), new java.util.ArrayList<>(pendingLinux));
         } else if (ses.team != null && ses.parent.isEmpty()) {
             err = hub.sendTeam(ses, text, pending, new java.util.ArrayList<>(pendingLinux), new java.util.ArrayList<>(sendTo));
         } else {
@@ -1078,6 +1076,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         sendToRow.setVisibility(t == null || memberChat ? View.GONE : View.VISIBLE);
         if (t == null) {
             teamShown = sendToShown = "";
+            if (teamSheet != null && teamSheet.showing()) teamSheet.refresh.run(); // (it closes: no team to show)
             return;
         }
         StringBuilder sig = new StringBuilder(t.structure).append(owner.running).append(Theme.isDark(this));
@@ -1376,6 +1375,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             LinearLayout box = column(this);
             box.addView(title(this, getString(R.string.helper_this_chat), 18));
             final BackgroundPanel big = new BackgroundPanel(this, ses);
+            big.always();
             LinearLayout.LayoutParams bp = full();
             bp.topMargin = dp(this, 10);
             box.addView(big, bp);
@@ -3797,7 +3797,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 items.add(new Object[]{R.drawable.ms_format_quote, R.string.chat_quote, (Runnable) () -> quote(m.text)});
             }
             boolean own = ses.parent.isEmpty() && ses.messages.contains(m);
-            if (own && !ses.running && m.editable()) items.add(new Object[]{R.drawable.ms_edit, R.string.chat_edit, (Runnable) () -> editMessage(m, v)});
+            if (own && !Team.working(hub, ses) && m.editable()) items.add(new Object[]{R.drawable.ms_edit, R.string.chat_edit, (Runnable) () -> editMessage(m, v)});
             if (own) items.add(new Object[]{R.drawable.ms_call_split, R.string.chat_fork, (Runnable) () -> fork(m)});
             for (Object[] it : items) {
                 LinearLayout r = row(this);
