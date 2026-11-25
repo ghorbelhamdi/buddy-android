@@ -932,6 +932,7 @@ final class WebDevices {
             } else s = hub.sessions.find(id);
             Sessions.Session lead = s == null || s.parent.isEmpty() ? null : memberParent(c, s);
             if (lead != null) { // a team's member's own chat: as a message ticked for it in the team's chat
+                if (said.trim().isEmpty() && files.isEmpty() && linux.isEmpty()) return ""; // (nothing to tell it)
                 if (!linux.isEmpty() && Lite.on(s)) return "this chat runs on a model on the phone, which has no Linux tools for files";
                 for (String p : linux) { // only what is in its own or its team's places, as for any chat
                     java.io.File real = FilePlaces.fromLinux(c, p).getCanonicalFile();

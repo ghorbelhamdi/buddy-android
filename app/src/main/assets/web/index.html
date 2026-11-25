@@ -929,7 +929,7 @@ function teamShape(withOff) {
       if (shot) (async () => {
         try {
           const x = await fetch('/web/shot?id=' + encodeURIComponent(chat) + '&w=240', {headers: {Authorization: 'Bearer ' + key}});
-          if (x.ok) { shot.textContent = ''; shot.append(el('img', {alt: name + '’s hidden screen', src: URL.createObjectURL(await x.blob())})); }
+          if (x.ok) { const u = URL.createObjectURL(await x.blob()); shot.textContent = ''; shot.append(el('img', {alt: name + '’s hidden screen', src: u, onload: () => URL.revokeObjectURL(u)})); }
           else { let why = 'Nothing to show yet.'; try { why = (await x.json()).error || why; } catch (e) {} shot.textContent = why; }
         } catch (e) { shot.textContent = ''; }
       })();

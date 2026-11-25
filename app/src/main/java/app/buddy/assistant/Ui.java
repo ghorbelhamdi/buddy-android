@@ -938,7 +938,7 @@ final class Ui {
      * finder takes a file's name for a web address. Such a "link" without http:// or www. in front isn't one.
      */
     private static final java.util.Set<String> FILE_ENDINGS = new java.util.HashSet<>(java.util.Arrays.asList(
-            "md", "py", "sh", "rs", "so", "pl", "zip", "mov", "js", "ts", "kt", "kts", "java", "json", "txt", "csv",
+            "md", "py", "sh", "rs", "zip", "mov", // (not .pl or .so: sites, allegro.pl, notion.so) "js", "ts", "kt", "kts", "java", "json", "txt", "csv",
             "pdf", "apk", "log", "xml", "yml", "yaml", "toml", "ini", "conf", "lock", "sql", "db", "gz", "tar", "png",
             "jpg", "jpeg", "gif", "webp", "mp3", "mp4", "c", "h", "cpp", "go", "rb", "gradle", "env", "cfg", "dart"));
 

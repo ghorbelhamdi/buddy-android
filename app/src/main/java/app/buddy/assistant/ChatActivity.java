@@ -1055,7 +1055,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             if (!busy && !model.equals(ses.model == null ? "" : ses.model)) hub.setModel(ses, model);
             sendTo.clear();
             sendTo.add(Team.LEADER);
-            if (!ask || busy) { // (the leader hears of it with its next turn: its brief says who is in it)
+            if (busy) { // (once its turn is over, with the leader picked here and its questions, as from the chat)
+                hub.startTeamWhenFree(ses, team, ask ? Team.interview(team) : null, agent, model);
+                return;
+            }
+            if (!ask) { // (the leader hears of it with its next turn: its brief says who is in it)
                 hub.setTeam(ses, team, null);
                 return;
             }

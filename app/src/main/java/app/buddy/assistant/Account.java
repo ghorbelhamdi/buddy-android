@@ -230,7 +230,9 @@ final class Account {
      * comes back (each look starts the agent's own program in Buddy's Linux).
      */
     void refreshIfStale(Context c) {
-        boolean settled = step == Step.SIGNED_IN || step == Step.SIGNED_OUT || step == Step.NEED_INSTALL;
+        // (only a signed-in one waits: one signed out or not installed is looked at again each time, as the user may
+        // have just signed it in or installed it in Buddy's Linux)
+        boolean settled = step == Step.SIGNED_IN;
         if (settled && refreshedAt != 0 && android.os.SystemClock.elapsedRealtime() - refreshedAt < 60_000) return;
         refresh(c);
     }

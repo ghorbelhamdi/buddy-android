@@ -991,7 +991,9 @@ final class Tools {
 
     /** What a working helper (which works like its chat, see Helpers) still may not: what belongs to the chat itself. */
     private static final java.util.Set<String> WORKER_NO = new java.util.HashSet<>(java.util.Arrays.asList(
-            "team", "team_change", "team_start", "schedule_message", "add_notification_rule", "cancel_scheduled", "update_buddy"));
+            "team", "team_change", "team_start", "schedule_message", "add_notification_rule", "cancel_scheduled", "update_buddy",
+            // (what opens on the user's own screen or reaches the user: the installer, the camera, the share sheet)
+            "install_apk", "wait_for_install", "take_photo", "share", "notify", "point_out", "reply_notification"));
 
     /** Not for a helper (see Helpers): what reaches the user, the phone's own settings or a later time. */
     private static final java.util.Set<String> HELPER_NO = new java.util.HashSet<>(java.util.Arrays.asList(

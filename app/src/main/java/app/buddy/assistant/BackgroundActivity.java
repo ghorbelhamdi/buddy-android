@@ -62,12 +62,14 @@ public class BackgroundActivity extends Screen {
     protected void onResume() {
         super.onResume();
         Background.listen(() -> runOnUiThread(this::render));
+        Background.onStartEnded(() -> runOnUiThread(this::render));
         render();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        Background.onStartEnded(null);
         // the set-up goes on while the user is in Settings: it brings this screen back itself when it's done
         Background.listen(() -> {
             Background.Step s = Background.step();

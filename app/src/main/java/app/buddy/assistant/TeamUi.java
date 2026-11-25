@@ -362,7 +362,8 @@ final class TeamUi {
             for (Team.Member m : t.members) {
                 final Sessions.Session h = Team.session(hub, ses.id, m.id);
                 boolean screen = h != null && h.background && Background.hasApp(h.id);
-                screens |= screen;
+                // (one with a hidden screen at all: hasApp answers from its last look, so the panel looks again soon)
+                screens |= h != null && h.background && Background.displayOf(h.id) != android.view.Display.DEFAULT_DISPLAY;
                 cards.add(info(a, m.name, Team.color(a, m.color), m.on(), m.goal, h == null ? null : h.lastReply, state(a, h),
                         h != null && h.running, false, h == here, screen ? h : null, h == null || h == here ? null : () -> {
                             shown.dialog.dismiss();

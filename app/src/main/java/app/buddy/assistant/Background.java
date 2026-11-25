@@ -581,28 +581,37 @@ final class Background {
      * Settings (a phone that lets Buddy's adb grant it the right needs no walk).
      */
     static String start(Context c, boolean asked) {
-        if (asked) startBusy = true;
+        if (asked) startBusy.incrementAndGet();
         String why;
         try {
             why = startNow(c, asked);
         } finally {
-            if (asked) startBusy = false;
+            if (asked) startBusy.decrementAndGet();
         }
-        if (why == null) restartNote = null; // (it runs: why it didn't after the restart is history)
+        if (why == null) { // (it runs: why it didn't before is history)
+            restartNote = null;
+            lastStartWhy = null;
+        }
         if (asked) { // the user's Start now: why it didn't work, kept for the screen that asked (issue #89)
             lastStartWhy = why;
             lastStartAt = android.os.SystemClock.elapsedRealtime();
-            Runnable l = listener; // (the screen, as it is now, shows it)
+            Runnable l = startShown; // (the Background mode screen, if open, shows it; nothing else is opened)
             if (l != null) l.run();
         }
         return why;
     }
 
-    private static volatile boolean startBusy;
+    private static final java.util.concurrent.atomic.AtomicInteger startBusy = new java.util.concurrent.atomic.AtomicInteger();
+    /** The Background mode screen while it is in front: drawn again when a Start now ends. */
+    private static volatile Runnable startShown;
 
-    /** The user's Start now is still at it (the screen may have been drawn anew meanwhile). */
+    static void onStartEnded(Runnable r) {
+        startShown = r;
+    }
+
+    /** A user's Start now is still at it (the screen may have been drawn anew meanwhile). */
     static boolean startBusy() {
-        return startBusy;
+        return startBusy.get() > 0;
     }
 
     private static volatile String lastStartWhy;
@@ -1041,6 +1050,7 @@ final class Background {
         }
         if (!was) wirelessDebugging(svc, false); // not started: as it was
         restartNote = why;
+        lastStartWhy = null; // (newer than the last Start now's: this one shows)
         // the pairing is gone, or Wireless debugging didn't come up although it was switched on: no use trying again
         if (tries >= RESTART_TRIES || why.contains("paired") || why.startsWith("Wireless debugging is off")) {
             Prefs.setBackgroundRestartTries(svc, boot, RESTART_TRIES);
@@ -1051,6 +1061,7 @@ final class Background {
 
     private static long gaveUp(Context c, int boot, String why) {
         restartNote = why;
+        lastStartWhy = null; // (newer than the last Start now's: this one shows)
         Prefs.setBackgroundRestartTries(c, boot, RESTART_TRIES);
         return 0;
     }
@@ -1216,6 +1227,7 @@ final class Background {
                     set(Step.FAILED, why);
                     return;
                 }
+                lastStartWhy = null; // (paired anew: the old reason is history)
                 set(Step.READY, "");
             } catch (Exception e) {
                 set(Step.FAILED, String.valueOf(e.getMessage()));

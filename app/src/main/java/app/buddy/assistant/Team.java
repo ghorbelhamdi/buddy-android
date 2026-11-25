@@ -680,6 +680,8 @@ final class Team {
                 m.heard = true;
             }
         }
+        // (saved at once: after a restart the leader's next digest mustn't tell it again)
+        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> hub.sessions.save(parent));
         for (Sessions.Session h : l) {
             b.append(h.title);
             if (h.running) {
