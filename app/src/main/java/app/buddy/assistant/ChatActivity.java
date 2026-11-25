@@ -1118,8 +1118,10 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                         : Team.CHECK.equals(t.structure) && i % 2 == 1 ? "⇄" : "·"));
                 int color = Team.color(this, m.color);
                 View chip = TeamUi.chip(this, m.name, color, TeamUi.state(this, h), false, h != null && h.running);
-                if (h == ses) { // this chat: marked
+                if (h == ses) { // this chat: marked, and in view (the strip scrolls to it, centred where it can be)
                     chip.setBackground(outlined(this, Theme.blend(color, CARD, 0.14f), 12, color, 2));
+                    final View me = chip;
+                    teamStrip.post(() -> teamStrip.scrollTo(Math.max(0, me.getLeft() - (teamStrip.getWidth() - me.getWidth()) / 2), 0));
                 } else if (h != null) { // its own chat: its steps, its screen
                     chip.setOnClickListener(v -> {
                         startActivity(new android.content.Intent(this, ChatActivity.class).putExtra("id", h.id));
