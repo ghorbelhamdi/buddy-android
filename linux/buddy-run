@@ -19,7 +19,7 @@
 #   buddy-run <token> transcript <claude|codex> <file>   last messages of a session (buddy_transcript)
 #   buddy-run <token> adopt <session> <claude|codex> <agent-session-id>  continue that session as a Buddy chat
 # Every event sent to the bubble carries "buddy_session" so the app can route it.
-HELPER_VERSION=39
+HELPER_VERSION=40
 set -u
 export PATH=$HOME/.local/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # The claude launcher sets BUN_OPTIONS with a path relative to its folder; never inherit a stale one.
@@ -301,6 +301,10 @@ case "$CMD" in
     A=$(chat_agent "$SID") || { echo "This chat's agent isn't running."; exit 3; }
     if [ "$P" = "$A" ] || ! subtree "$A" | cut -d' ' -f1 | grep -qx "$P"; then
       echo "That process isn't one this chat's agent started, or it has ended."; exit 3
+    fi
+    # nor a part of the agent itself (OpenCode 2's engine and the terminal service it runs commands in): Stop ends those
+    if tr '\0' ' ' < "/proc/$P/cmdline" 2>/dev/null | grep -qE '(^|/)opencode(\.exe)? serve( |$)|(^|/)opencode-pty daemon( |$)'; then
+      echo "That is part of the agent itself: Stop ends it with the run."; exit 3
     fi
     end_run "$P"
     exit 0 ;;
