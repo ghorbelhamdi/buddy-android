@@ -12,6 +12,20 @@ abstract class Screen extends Activity {
         Theme.apply(this);
         themeKey = Theme.key();
         super.onCreate(state);
+        STACK.add(this);
+    }
+
+    /** Buddy's screens that are there, in the order they were made (main thread). */
+    private static final java.util.List<Screen> STACK = new java.util.ArrayList<>();
+
+    /** The screen right under this one in its task, if it is one of Buddy's and still there; else null. */
+    Screen under() {
+        for (int i = STACK.indexOf(this) - 1; i >= 0; i--) {
+            Screen u = STACK.get(i);
+            if (u.isFinishing() || u.isDestroyed()) continue;
+            return u.getTaskId() == getTaskId() ? u : null;
+        }
+        return null;
     }
 
     @Override
@@ -57,6 +71,7 @@ abstract class Screen extends Activity {
 
     @Override
     protected void onDestroy() {
+        STACK.remove(this);
         uncount(); // (one that was kept counted over a dark screen)
         super.onDestroy();
     }

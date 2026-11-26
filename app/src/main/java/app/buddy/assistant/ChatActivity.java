@@ -88,7 +88,6 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             return;
         }
         pendingLinux = LINUX_CHIPS.computeIfAbsent(ses.id, k -> new java.util.ArrayList<>());
-        OPEN.put(ses.id, new java.lang.ref.WeakReference<>(this));
         maxBubble = (int) (getResources().getDisplayMetrics().widthPixels * 0.82f);
 
         LinearLayout root = column(this);
@@ -1091,29 +1090,22 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     static void openInTeam(android.app.Activity a, Sessions.Session owner, Sessions.Session here, Sessions.Session to) {
         if (to == here) return;
         boolean member = here != owner;
-        if (to == owner) { // (its screen is there already, however this one was opened: back to it)
-            if (!isOpen(owner.id)) a.startActivity(new android.content.Intent(a, ChatActivity.class).putExtra("id", owner.id));
+        // the team's chat is right under this member's: it was opened from there (kept in its intent, which outlives
+        // the app being put away), or it is the screen under this one now
+        boolean under = member && (owner.id.equals(a.getIntent().getStringExtra("over_chat")) || isUnder(a, owner.id));
+        if (to == owner) {
+            if (!under) a.startActivity(new android.content.Intent(a, ChatActivity.class).putExtra("id", owner.id));
             a.finish();
             return;
         }
-        a.startActivity(new android.content.Intent(a, ChatActivity.class).putExtra("id", to.id));
+        a.startActivity(new android.content.Intent(a, ChatActivity.class).putExtra("id", to.id)
+                .putExtra("over_chat", !member || under ? owner.id : null));
         if (member) a.finish();
     }
 
-    /** The chat screens that are open, by chat: openInTeam goes back to one that is there, and doesn't open it again. */
-    private static final java.util.Map<String, java.lang.ref.WeakReference<ChatActivity>> OPEN = new java.util.HashMap<>();
-
-    private static boolean isOpen(String chat) {
-        java.lang.ref.WeakReference<ChatActivity> r = OPEN.get(chat);
-        ChatActivity c = r == null ? null : r.get();
-        return c != null && !c.isFinishing() && !c.isDestroyed();
-    }
-
-    @Override
-    protected void onDestroy() {
-        java.lang.ref.WeakReference<ChatActivity> r = ses == null ? null : OPEN.get(ses.id);
-        if (r != null && r.get() == this) OPEN.remove(ses.id);
-        super.onDestroy();
+    private static boolean isUnder(android.app.Activity a, String chat) {
+        Screen u = a instanceof Screen ? ((Screen) a).under() : null;
+        return u instanceof ChatActivity && ((ChatActivity) u).ses != null && chat.equals(((ChatActivity) u).ses.id);
     }
 
     /** The team panel: the team in its shape, live; from a member's own chat too (its team's). */
@@ -1419,7 +1411,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         c.view.addView(c.state, full());
         c.view.setOnClickListener(v -> {
             if (!own) {
-                startActivity(new android.content.Intent(this, ChatActivity.class).putExtra("id", chat));
+                startActivity(new android.content.Intent(this, ChatActivity.class).putExtra("id", chat).putExtra("over_chat", ses.id));
                 return;
             }
             // this chat's own screen: a sheet with the bigger picture and Show on my screen

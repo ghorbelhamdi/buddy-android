@@ -2498,6 +2498,6 @@
     <string name="team_started_busy">Ekip açık. Lider hâlâ çalışıyordu, bu yüzden sorularını bir sonraki adımda alacak.</string>
     <string name="team_started_busy_agent">Ekip açık. Lider hâlâ çalışıyordu, bu yüzden sorularını bir sonraki adımda alacak; onun için seçtiğiniz ajan ve model değişmedi (bitince üstten değiştirin).</string>
     <string name="team_carry_on">%1$s yanıtladı: lider devam ediyor.</string>
-    <string name="background_type_code">Buddy bu telefonda eşleme kodunu okuyamıyor. Açık değilse “Cihazı eşleme koduyla eşle” ekranını açın, açık bırakın ve 6 haneli kodu buraya yazın.</string>
-    <string name="background_no_code">Kod görmüyorum</string>
+    <string name="background_type_code">Buddy eşleme kodunu alamadı. “Cihazı eşleme koduyla eşle” açıksa açık bırakın ve 6 haneli kodu buraya yazın.</string>
+    <string name="background_no_code">Henüz açık değil</string>
 </resources>

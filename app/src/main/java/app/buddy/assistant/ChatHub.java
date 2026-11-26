@@ -545,10 +545,14 @@ final class ChatHub {
         // the place of a team the user set up, nor clear it
         if (team == null && before != null && !(before.helpersOnly() && ses.lastTeam != null)) ses.lastTeam = before;
         if (team != null && !team.helpersOnly()) ses.lastTeam = null;
+        boolean wasWorking = false; // a member that worked was taken out
         for (Sessions.Session h : Team.all(this, ses.id)) {
             Team.Member m = team == null ? null : team.byId(h.member);
             if (m == null || (gone != null && gone.contains(h.member))) {
-                if (h.running) stop(h);
+                if (h.running) {
+                    stop(h);
+                    wasWorking = true;
+                }
                 delete(h);
                 continue;
             }
@@ -564,6 +568,9 @@ final class ChatHub {
         if (before == null && team != null) ses.teamAt = ses.messages.size(); // (a change keeps what the leader hasn't heard yet)
         sessions.save(ses);
         changed();
+        // (the leader isn't waiting for that member any more: it carries on with what the others answered; with the
+        // team off, a scheduled run whose end waited for the team is told now)
+        if (wasWorking || (team == null && ses.carryScheduled)) Team.carryOnSoon(this, ses);
     }
 
     private String send(final Sessions.Session ses, String text, List<String> files, String prompt) {
@@ -1568,6 +1575,17 @@ final class ChatHub {
      * when there are none.
      */
     /** chat: the calling chat, whose notes these are (null, an agent outside Buddy's chats: any working chat's). */
+    /** Whether takeNotes(chat) would hand something over. */
+    boolean hasNotes(String chat) {
+        for (Sessions.Session s : new ArrayList<>(sessions.all)) {
+            if (!s.running || (chat != null ? !s.id.equals(chat) : !s.parent.isEmpty())) continue;
+            synchronized (s.notes) {
+                if (!s.notes.isEmpty()) return true;
+            }
+        }
+        return false;
+    }
+
     String takeNotes(String chat) {
         for (Sessions.Session s : new ArrayList<>(sessions.all)) {
             if (!s.running) continue;
@@ -1681,7 +1699,7 @@ final class ChatHub {
         }
         if (ses.schedule == null) ses.allowed.clear(); // a scheduled chat keeps them for its next scheduled run
         // a team's leader ended its turn while members' answers to it came in: it carries on (see Team.carryOn)
-        if (ses.team != null && ses.parent.isEmpty()) main.postDelayed(() -> Team.carryOn(this, ses), 1500);
+        if (ses.team != null && ses.parent.isEmpty()) Team.carryOnSoon(this, ses);
         CodexLive.agentDone(ses, ses.outcome, !ses.lastReply.isEmpty());
         // a quiet scheduled run that found nothing new ends without a notification (a failed one always says so)
         boolean quiet = ses.quietRun && ses.quietSaid && ses.outcome == null;
@@ -1693,6 +1711,7 @@ final class ChatHub {
         boolean teamGoesOn = ses.scheduledRun && ses.parent.isEmpty() && Team.moreToCome(this, ses);
         ses.carryScheduled = teamGoesOn;
         ses.carryQuiet = teamGoesOn && ses.quietRun;
+        ses.carryQuietSaid = teamGoesOn && quiet; // (a quiet run that said "no news": its end isn't told later either)
         if ((ses.awake || ses.scheduledRun || away) && !quiet && ses.parent.isEmpty() && !teamGoesOn) KeepAwake.notifyEnded(app, ses);
         ses.scheduledRun = false;
         ses.quietRun = false;

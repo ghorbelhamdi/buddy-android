@@ -2930,6 +2930,6 @@
     <string name="team_started_busy">L’équipe est active. Le chef travaillait encore : il reçoit ses questions avec sa prochaine étape.</string>
     <string name="team_started_busy_agent">L’équipe est active. Le chef travaillait encore : il reçoit ses questions avec sa prochaine étape ; l’agent et le modèle choisis pour lui n’ont pas changé (changez-les en haut une fois qu’il a fini).</string>
     <string name="team_carry_on">%1$s a répondu : le chef continue.</string>
-    <string name="background_type_code">Buddy ne peut pas lire le code d’association sur ce téléphone. Ouvrez « Associer l’appareil avec un code d’association » s’il n’est pas ouvert, laissez-le ouvert et tapez ici son code à 6 chiffres.</string>
-    <string name="background_no_code">Je ne vois pas de code</string>
+    <string name="background_type_code">Buddy n’a pas récupéré le code d’association. Si « Associer l’appareil avec un code d’association » est ouvert, laissez-le ouvert et tapez ici son code à 6 chiffres.</string>
+    <string name="background_no_code">Ce n’est pas encore ouvert</string>
 </resources>

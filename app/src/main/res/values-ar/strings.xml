@@ -2590,6 +2590,6 @@
     <string name="team_started_busy">الفريق يعمل. كان القائد لا يزال يعمل، فستصله أسئلته التالية مع خطوته القادمة.</string>
     <string name="team_started_busy_agent">الفريق يعمل. كان القائد لا يزال يعمل، فستصله أسئلته التالية مع خطوته القادمة؛ ولم يتغير الوكيل والنموذج اللذان اخترتهما له (غيّرهما من الأعلى بعد انتهائه).</string>
     <string name="team_carry_on">أجاب %1$s: القائد يتابع.</string>
-    <string name="background_type_code">لا يستطيع Buddy قراءة رمز الإقران على هذا الهاتف. افتح «إقران الجهاز باستخدام رمز إقران» إن لم يكن مفتوحًا، وأبقِه مفتوحًا، ثم اكتب هنا رمزه المكوّن من 6 أرقام.</string>
-    <string name="background_no_code">لا أرى رمزًا</string>
+    <string name="background_type_code">لم يلتقط Buddy رمز الإقران. إذا كانت نافذة «إقران الجهاز باستخدام رمز إقران» مفتوحة، أبقِها مفتوحة واكتب هنا رمزها المكوّن من 6 أرقام.</string>
+    <string name="background_no_code">ليست مفتوحة بعد</string>
 </resources>

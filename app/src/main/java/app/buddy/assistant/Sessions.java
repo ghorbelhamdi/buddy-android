@@ -185,6 +185,10 @@ final class Sessions {
          * wasn't told yet; the turn it carries on with is that scheduled run still (quiet: as it was), see Team.carryOn.
          */
         boolean carryScheduled, carryQuiet;
+        /** With carryScheduled: that turn was a quiet run's and said there was no news (no notification for its end). */
+        boolean carryQuietSaid;
+        /** A team's chat, not saved: until when its leader is about to carry on by itself (Team.carryOnSoon); 0: not. */
+        long carrySoonUntil;
         /**
          * Not saved, this run's team steps (see ChatHub.ownStep): the ones Buddy showed when the call came in and the
          * agent hasn't reported yet, and the ones the agent reported whose call hasn't come in yet. A step shows once.

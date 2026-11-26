@@ -2490,6 +2490,6 @@
     <string name="team_started_busy">टीम चालू है। लीडर अभी काम कर रहा था, इसलिए उसे आगे के सवाल अगले कदम के साथ मिलेंगे।</string>
     <string name="team_started_busy_agent">टीम चालू है। लीडर अभी काम कर रहा था, इसलिए उसे आगे के सवाल अगले कदम के साथ मिलेंगे; आपके चुने एजेंट और मॉडल नहीं बदले (उसका काम पूरा होने पर ऊपर से बदलें)।</string>
     <string name="team_carry_on">%1$s ने जवाब दिया: लीडर आगे बढ़ रहा है।</string>
-    <string name="background_type_code">Buddy इस फ़ोन पर पेयरिंग कोड नहीं पढ़ पा रहा। अगर खुला नहीं है तो “पेयरिंग कोड से डिवाइस पेयर करें” खोलें, उसे खुला रखें और उसका 6 अंकों का कोड यहाँ लिखें।</string>
-    <string name="background_no_code">मुझे कोई कोड नहीं दिख रहा</string>
+    <string name="background_type_code">Buddy को पेयरिंग कोड नहीं मिला। अगर “पेयरिंग कोड से डिवाइस पेयर करें” खुला है, तो उसे खुला रखें और उसका 6 अंकों का कोड यहाँ लिखें।</string>
+    <string name="background_no_code">यह अभी खुला नहीं है</string>
 </resources>

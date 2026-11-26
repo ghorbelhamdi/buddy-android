@@ -542,8 +542,11 @@ final class Tools {
         }
         if ("confirm".equals(name) || "ask".equals(name)) return r;
         // (the agent gave up on this call: nobody reads its result, so what the user added waits for the next one)
-        java.util.function.BooleanSupplier callerGone = McpServer.CALLER_GONE.get();
-        if (callerGone != null && callerGone.getAsBoolean()) return r;
+        // (asked only where there is something to hand over: the look at the caller's connection takes a moment)
+        if (ChatHub.get(svc).hasNotes(McpServer.CALLER_CHAT.get())) {
+            java.util.function.BooleanSupplier callerGone = McpServer.CALLER_GONE.get();
+            if (callerGone != null && callerGone.getAsBoolean()) return r;
+        }
         String notes = ChatHub.get(svc).takeNotes(McpServer.CALLER_CHAT.get());
         if (notes != null) {
             r.getJSONArray("content").put(new JSONObject().put("type", "text").put("text",

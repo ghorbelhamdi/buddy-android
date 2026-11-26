@@ -1185,10 +1185,14 @@ final class Background {
                 // (this attempt's: a question left open by an earlier one counts for nothing in it, see askForCode)
                 final int mine = ++attempt;
                 typed = null;
-                noCode = false;
                 lastSeen = null;
                 settingsInFront = false;
                 frontUnread = false;
+                dialogSeen = false;
+                tappedPair = false;
+                asking = false;
+                askAgainAt = 0;
+                asks = 0;
                 waitUntil = System.currentTimeMillis() + 5 * 60_000;
                 set(Step.WAITING, "");
                 // Buddy goes there itself; wherever that stops short, the user does the step and it carries on
@@ -1203,20 +1207,23 @@ final class Background {
                 }).start();
                 String[] found = null;
                 long inSettings = 0; // since when Settings has been in front with Buddy's walk over, unread
-                boolean asked = false;
-                while (step == Step.WAITING && System.currentTimeMillis() < waitUntil && found == null && !noCode) {
+                while (step == Step.WAITING && System.currentTimeMillis() < waitUntil && found == null) {
                     sleep(700);
                     found = pairingDialog(svc);
                     if (found == null) found = typed;
                     // some phones don't let Buddy read that dialog (a Pixel on Android 17, issue #93): the user types
                     // the code into the bubble instead, over Settings, as the code only works while the dialog is open.
-                    // Only once Settings (or a window Buddy can't read at all) has been in front for a while after
-                    // Buddy's own way there ended: someone who first turns Developer options or Wi-Fi on isn't told
-                    // their phone can't be read
+                    // Asked once Settings has been in front for a while after Buddy's own way there ended: 20 s where
+                    // the dialog is likely open (Buddy tapped its row, sees its fields, or an app window it can't
+                    // read), a minute and a half otherwise (someone still turning Developer options or Wi-Fi on isn't
+                    // asked for a code they can't have yet). "It isn't open yet" asks again later; setup goes on
+                    long now = System.currentTimeMillis();
                     if (found != null || !walked.get() || !(settingsInFront || frontUnread)) inSettings = 0;
-                    else if (inSettings == 0) inSettings = System.currentTimeMillis();
-                    if (found == null && !asked && inSettings != 0 && System.currentTimeMillis() - inSettings > 20_000) {
-                        asked = true;
+                    else if (inSettings == 0) inSettings = now;
+                    long need = tappedPair || dialogSeen || frontUnread ? 20_000 : 90_000;
+                    if (found == null && !asking && asks < 3 && inSettings != 0 && now - inSettings > need && now > askAgainAt) {
+                        asking = true;
+                        asks++;
                         askForCode(svc, mine);
                     }
                 }
@@ -1419,14 +1426,21 @@ final class Background {
             if (m.matches()) port = Integer.parseInt(m.group(1));
         }
         if (port > 0) Prefs.setBackgroundAdbPort(svc, port);
-        if (pairToo) click(code);
+        if (pairToo) {
+            click(code);
+            tappedPair = true; // (the dialog is likely open now: see beginSetup's wait)
+        }
         return port;
     }
 
     /** The pairing code the user typed into the bubble (askForCode), as {code, null}, or null. */
     private static volatile String[] typed;
-    /** The user answered that question with "I don't see a code" (or closed it): setup ends, saying what Buddy saw. */
-    private static volatile boolean noCode;
+    /** That question is open; not before when it is asked again (after "It isn't open yet"); how often it was asked. */
+    private static volatile boolean asking;
+    private static volatile long askAgainAt;
+    private static volatile int asks;
+    /** Signs the dialog is open: Buddy's walk tapped its row; its own fields are on screen (pairingDialog's last look). */
+    private static volatile boolean tappedPair, dialogSeen;
     /** Settings is in front right now, or a window Buddy can't read at all (pairingDialog's last look). */
     private static volatile boolean settingsInFront, frontUnread;
     /** Which setup attempt runs: an earlier one's question, still open, is told apart by it. */
@@ -1436,7 +1450,8 @@ final class Background {
      * Asks in the bubble for the code that "Pair with device" shows, next to the bubble so the dialog stays open; it
      * closes by itself if Buddy reads the dialog meanwhile. A code goes to typed (Buddy finds the port itself, see
      * pairingPorts: a number typed beside the code is as likely the connect port, which doesn't pair); an answer
-     * without one is asked again, twice; "I don't see a code" or a closed question ends the setup (noCode).
+     * without one is asked again at once; "It isn't open yet", a closed question or none in time asks again later
+     * (see beginSetup's wait). mine: the setup attempt it belongs to; in a later one it counts for nothing.
      */
     private static void askForCode(BuddyService svc, final int mine) {
         new Thread(() -> {
@@ -1460,21 +1475,20 @@ final class Background {
                         typed = read[0];
                         return;
                     }
-                    if (over[0]) return;
-                    if (!a.startsWith("ANSWER (typed")) { // the button, closed, or no answer in time
-                        noCode = true;
-                        return;
-                    }
+                    if (over[0] || !a.startsWith("ANSWER (typed")) return; // the button, closed, or no answer in time
                     String code = codeIn(a.substring(a.indexOf(':') + 1));
                     if (code != null) {
                         typed = new String[]{code, null};
                         return;
                     }
                 }
-                if (attempt == mine && step == Step.WAITING) noCode = true;
             } catch (Exception ignored) {
             } finally {
                 McpServer.CALLER_REMOTE.remove();
+                if (attempt == mine) { // (asked again in a while, if the code still isn't there)
+                    askAgainAt = System.currentTimeMillis() + 45_000;
+                    asking = false;
+                }
             }
         }, "pair-code-ask").start();
     }
@@ -1513,6 +1527,7 @@ final class Background {
         try {
             java.util.Set<String> apps = new java.util.LinkedHashSet<>();
             boolean settings = false, unread = false;
+            sawDialogFields = false;
             java.util.Set<String> shapes = new java.util.LinkedHashSet<>();
             int[] texts = {0};
             for (AccessibilityWindowInfo w : svc.getWindows()) {
@@ -1529,6 +1544,7 @@ final class Background {
             }
             settingsInFront = settings;
             frontUnread = unread;
+            dialogSeen = sawDialogFields;
             // what Buddy could see instead, for the reason when setup gives up (issue #93): the apps in front and, in
             // Settings, how many texts and the shapes of the numbers among them (digits as #, never the numbers)
             String now = "in front: " + (apps.isEmpty() ? "no window" : android.text.TextUtils.join(", ", apps)) + (settings
@@ -1541,6 +1557,9 @@ final class Background {
         return null;
     }
 
+    /** scan's note for pairingDialog: the dialog's own fields were among what it read. */
+    private static volatile boolean sawDialogFields;
+
     /** What pairingDialog last saw in place of the dialog (see there), for the reason when setup gives up. */
     private static volatile String lastSeen;
 
@@ -1550,6 +1569,8 @@ final class Background {
         if (t != null) {
             String s = t.toString().trim(), id = String.valueOf(n.getViewIdResourceName());
             texts[0]++;
+            // (Android's own names for the dialog's fields: it is open, also where its code isn't one Buddy knows)
+            if (id.endsWith(":id/pairing_code") || id.endsWith(":id/ip_addr") || id.endsWith(":id/pairing_caption")) sawDialogFields = true;
             if (s.length() <= 30 && s.matches(".*\\d.*") && shapes.size() < 12) shapes.add(s.replaceAll("\\d", "#").replaceAll("[^#:. -]", "x"));
             if (CODE.matcher(s).matches()) found[0] = s;
             Matcher m = ADDRESS.matcher(s);

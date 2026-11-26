@@ -457,7 +457,7 @@ final class Team {
         if (parent == null || parent.team == null) return;
         // however its run ended (an answer, nothing to say, stopped, removed from the team): the leader isn't waiting
         // for it any more, and carries on with what its members answered once none of them works (see carryOn)
-        if (!parent.running) new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> carryOn(hub, parent), 1500);
+        carryOnSoon(hub, parent);
         Member m = parent.team.byId(h.member);
         if (m == null || "stopped".equals(h.outcome)) return; // (nothing of its own to tell)
         boolean failed = h.outcome != null;
@@ -630,8 +630,31 @@ final class Team {
      * itself with them (main thread). Not after the user stopped it or its own turn failed, and at most
      * MAX_CARRY_ON times before the user writes again.
      */
+    /**
+     * carryOn in a moment (a run that just ended has its last messages put in the chat first). Until then the chat
+     * counts as about to work (aboutToCarryOn): a scheduled task or a rule's run of another chat doesn't start in
+     * that gap, to find the leader starting beside it. Main thread.
+     */
+    static void carryOnSoon(final ChatHub hub, final Sessions.Session parent) {
+        if (parent.running || !parent.parent.isEmpty()) return;
+        parent.carrySoonUntil = SystemClock.elapsedRealtime() + 4000;
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> carryOn(hub, parent), 1500);
+    }
+
+    /** A team's leader is about to carry on by itself (see carryOnSoon). */
+    static boolean aboutToCarryOn(ChatHub hub) {
+        long now = SystemClock.elapsedRealtime();
+        for (Sessions.Session s : new ArrayList<>(hub.sessions.all)) if (s.carrySoonUntil > now) return true;
+        return false;
+    }
+
     static void carryOn(ChatHub hub, Sessions.Session parent) {
-        if (parent.team == null || parent.running || !hub.sessions.all.contains(parent)) return;
+        parent.carrySoonUntil = 0;
+        if (parent.running || !hub.sessions.all.contains(parent)) return;
+        if (parent.team == null) { // (turned off meanwhile: a scheduled run whose end waited for the team is over)
+            endScheduled(hub, parent);
+            return;
+        }
         BuddyService svc = BuddyService.get();
         // not after a Stop (the chat's, or the bubble's on everything: phone control is taken back then), a failed
         // turn, or too many turns of its own
@@ -650,10 +673,7 @@ final class Team {
             }
         }
         if (who.isEmpty()) { // nothing to carry on with: a scheduled run whose end waited for the team is over now
-            if (parent.carryScheduled) {
-                parent.carryScheduled = false;
-                KeepAwake.notifyEnded(hub.app, parent);
-            }
+            endScheduled(hub, parent);
             return;
         }
         parent.carriedOn++;
@@ -662,6 +682,14 @@ final class Team {
                 "[Buddy: " + names + " answered the work you gave them (above, under \"Since your last turn\"). Carry on "
                         + "with the team's task: give the next member its part, send work back, or tell the user it is done. "
                         + "Nobody wrote this turn's message: the user didn't.]");
+    }
+
+    /** A scheduled run whose end waited for the team (ChatHub.runEnded) is over: told now, unless it was quiet and said so. */
+    private static void endScheduled(ChatHub hub, Sessions.Session parent) {
+        if (!parent.carryScheduled) return;
+        parent.carryScheduled = false;
+        if (!parent.carryQuietSaid) KeepAwake.notifyEnded(hub.app, parent);
+        hub.changed(); // (Schedules lets the wake lock go)
     }
 
     /**
@@ -706,23 +734,7 @@ final class Team {
                     svc.runOnMain(() -> stop(hub, parent.id));
                     break;
                 }
-                // the agent gave up on this call (its own time limit) and works on: nobody gets what this returns, so
-                // what the members answered meanwhile isn't the leader's yet. Its next digest, or carryOn, tells it
-                if (gone != null && gone.getAsBoolean()) {
-                    AWAITED.removeAll(ids);
-                    final java.util.Set<String> members = new java.util.HashSet<>();
-                    for (Sessions.Session h : l) members.add(h.member);
-                    svc.runOnMain(() -> {
-                        synchronized (parent.messages) {
-                            for (int i = Math.min(from, parent.messages.size()); i < parent.messages.size(); i++) {
-                                Sessions.Msg m = parent.messages.get(i);
-                                if (members.contains(m.from) && !m.direct) m.heard = false;
-                            }
-                        }
-                        hub.sessions.save(parent);
-                    });
-                    return "The call was given up on.";
-                }
+                if (gone != null && gone.getAsBoolean()) return gaveUp(svc, hub, parent, l, ids, from);
                 // what the leader does meanwhile, said as that: it waits for these (not "Telling …" the whole time)
                 StringBuilder who = new StringBuilder();
                 for (Sessions.Session h : l) if (h.running) who.append(who.length() > 0 ? ", " : "").append(h.title);
@@ -741,10 +753,34 @@ final class Team {
             CountDownLatch posted = new CountDownLatch(1);
             svc.runOnMain(posted::countDown);
             posted.await(5, TimeUnit.SECONDS);
+            // (also now: it may have given up in the moment the last member ended)
+            if (gone != null && gone.getAsBoolean()) return gaveUp(svc, hub, parent, l, ids, from);
             return report(hub, parent, l, note);
         } finally {
             AWAITED.removeAll(ids);
         }
+    }
+
+    /**
+     * The agent gave up on this team call (its own time limit) and works on: nobody gets what the call returns, so
+     * what the members answered since it began isn't the leader's yet. Its next digest, or carryOn, tells it.
+     */
+    private static String gaveUp(BuddyService svc, final ChatHub hub, final Sessions.Session parent, List<Sessions.Session> l,
+                                 List<String> ids, final int from) {
+        AWAITED.removeAll(ids);
+        final java.util.Set<String> members = new java.util.HashSet<>();
+        for (Sessions.Session h : l) members.add(h.member);
+        svc.runOnMain(() -> {
+            synchronized (parent.messages) {
+                for (int i = Math.min(from, parent.messages.size()); i < parent.messages.size(); i++) {
+                    Sessions.Msg m = parent.messages.get(i);
+                    if (members.contains(m.from) && !m.direct) m.heard = false;
+                }
+            }
+            hub.sessions.save(parent);
+            carryOnSoon(hub, parent); // (if its turn is over by now)
+        });
+        return "The call was given up on.";
     }
 
     private static String report(ChatHub hub, Sessions.Session parent, List<Sessions.Session> l, String note) {

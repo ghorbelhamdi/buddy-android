@@ -2942,6 +2942,6 @@
     <string name="team_started_busy">A equipe está ativa. O líder ainda trabalhava, então recebe as perguntas no próximo passo.</string>
     <string name="team_started_busy_agent">A equipe está ativa. O líder ainda trabalhava, então recebe as perguntas no próximo passo; o agente e o modelo escolhidos para ele não mudaram (mude no topo quando terminar).</string>
     <string name="team_carry_on">%1$s respondeu: o líder continua.</string>
-    <string name="background_type_code">O Buddy não consegue ler o código de pareamento neste telefone. Abra “Parear dispositivo com código de pareamento” se não estiver aberto, mantenha aberto e digite aqui o código de 6 dígitos.</string>
-    <string name="background_no_code">Não vejo nenhum código</string>
+    <string name="background_type_code">O Buddy não captou o código de pareamento. Se “Parear dispositivo com código de pareamento” estiver aberto, mantenha aberto e digite aqui o código de 6 dígitos.</string>
+    <string name="background_no_code">Ainda não está aberto</string>
 </resources>
