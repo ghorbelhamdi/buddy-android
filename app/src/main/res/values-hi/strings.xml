@@ -2478,7 +2478,7 @@
     <string name="team_sec_shape">आकार</string>
     <string name="team_sec_members">सदस्य</string>
     <string name="team_from_message">आपके संदेश से</string>
-    <string name="team_then_asks">फिर लीडर आपसे हर सदस्य का लक्ष्य, काम आगे देने का तरीका और नियम पूछेगा।</string>
+    <string name="team_then_asks">लक्ष्य, किसी कदम के विफल होने पर क्या हो, और नियम डिफ़ॉल्ट से शुरू होते हैं। बदलने के लिए लीडर से कहें।</string>
     <string name="team_card_for">लीडर %1$s के लिए आपकी मंज़ूरी माँग रहा है।</string>
     <string name="team_card_task">लीडर से मिला काम: %1$s</string>
     <string name="team_card_task_you">आपसे मिला काम: %1$s</string>
@@ -2488,7 +2488,7 @@
     </plurals>
     <string name="team_show_all">सब दिखाएँ</string>
     <string name="team_started_busy">टीम चालू है। लीडर अभी काम कर रहा था, इसलिए उसे आगे के सवाल अगले कदम के साथ मिलेंगे।</string>
-    <string name="team_started_busy_agent">टीम चालू है। लीडर अभी काम कर रहा था, इसलिए उसे आगे के सवाल अगले कदम के साथ मिलेंगे; आपके चुने एजेंट और मॉडल नहीं बदले (उसका काम पूरा होने पर ऊपर से बदलें)।</string>
+    <string name="team_started_busy_agent">टीम चालू है। लीडर अभी काम कर रहा था, इसलिए आपके चुने एजेंट और मॉडल नहीं बदले (उसका काम पूरा होने पर ऊपर से बदलें)।</string>
     <string name="team_carry_on">%1$s ने जवाब दिया: लीडर आगे बढ़ रहा है।</string>
     <string name="background_type_code">Buddy को पेयरिंग कोड नहीं मिला। अगर “पेयरिंग कोड से डिवाइस पेयर करें” खुला है, तो उसे खुला रखें और उसका 6 अंकों का कोड यहाँ लिखें।</string>
     <string name="background_no_code">यह अभी खुला नहीं है</string>

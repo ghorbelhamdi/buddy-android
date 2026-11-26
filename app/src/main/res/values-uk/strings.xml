@@ -2979,7 +2979,7 @@
     <string name="team_sec_shape">Форма</string>
     <string name="team_sec_members">Учасники</string>
     <string name="team_from_message">З вашого повідомлення</string>
-    <string name="team_then_asks">Потім лідер запитає мету кожного учасника, як передавати роботу та правила.</string>
+    <string name="team_then_asks">Цілі, дії при збої кроку та правила починаються зі стандартних значень. Щоб змінити їх, скажіть лідеру.</string>
     <string name="team_card_for">Лідер просить вашої згоди для: %1$s.</string>
     <string name="team_card_task">Завдання від лідера: %1$s</string>
     <string name="team_card_task_you">Завдання від вас: %1$s</string>
@@ -2991,7 +2991,7 @@
     </plurals>
     <string name="team_show_all">Показати все</string>
     <string name="team_started_busy">Команду ввімкнено. Лідер ще працював, тож отримає запитання з наступним кроком.</string>
-    <string name="team_started_busy_agent">Команду ввімкнено. Лідер ще працював, тож отримає запитання з наступним кроком; обрані для нього агент і модель не змінено (змініть їх угорі, коли він закінчить).</string>
+    <string name="team_started_busy_agent">Команду ввімкнено. Лідер ще працював, тож обрані для нього агент і модель не змінено (змініть їх угорі, коли він закінчить).</string>
     <string name="team_carry_on">%1$s відповів: лідер продовжує.</string>
     <string name="background_type_code">Buddy не отримав код підключення. Якщо вікно «Підключити пристрій за допомогою коду» відкрите, не закривайте його і введіть тут 6-значний код.</string>
     <string name="background_no_code">Воно ще не відкрите</string>

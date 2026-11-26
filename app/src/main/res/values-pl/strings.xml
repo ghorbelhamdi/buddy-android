@@ -2534,7 +2534,7 @@
     <string name="team_sec_shape">Kształt</string>
     <string name="team_sec_members">Członkowie</string>
     <string name="team_from_message">Z twojej wiadomości</string>
-    <string name="team_then_asks">Potem lider zapyta o cel każdego członka, sposób przekazywania pracy i zasady.</string>
+    <string name="team_then_asks">Cele, postępowanie przy nieudanym kroku i zasady zaczynają od ustawień domyślnych. Aby je zmienić, powiedz liderowi.</string>
     <string name="team_card_for">Lider prosi o twoją zgodę dla: %1$s.</string>
     <string name="team_card_task">Zadanie od lidera: %1$s</string>
     <string name="team_card_task_you">Zadanie od ciebie: %1$s</string>
@@ -2546,7 +2546,7 @@
     </plurals>
     <string name="team_show_all">Pokaż wszystko</string>
     <string name="team_started_busy">Zespół działa. Lider jeszcze pracował, więc dostanie pytania przy następnym kroku.</string>
-    <string name="team_started_busy_agent">Zespół działa. Lider jeszcze pracował, więc dostanie pytania przy następnym kroku; wybrany dla niego agent i model się nie zmieniły (zmień je u góry, gdy skończy).</string>
+    <string name="team_started_busy_agent">Zespół działa. Lider jeszcze pracował, więc wybrany dla niego agent i model się nie zmieniły (zmień je u góry, gdy skończy).</string>
     <string name="team_carry_on">%1$s odpowiedział: lider kontynuuje.</string>
     <string name="background_type_code">Buddy nie odczytał kodu parowania. Jeśli „Sparuj urządzenie za pomocą kodu parowania” jest otwarte, zostaw je otwarte i wpisz tutaj 6-cyfrowy kod.</string>
     <string name="background_no_code">Jeszcze nie jest otwarte</string>

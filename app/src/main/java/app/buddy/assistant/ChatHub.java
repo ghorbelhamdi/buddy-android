@@ -464,10 +464,10 @@ final class ChatHub {
                 }
                 if (Team.working(ChatHub.this, ses)) {
                     setTeam(ses, team, null); // still working: on all the same, its next turn's brief says so
-                    // (its questions go to it as a note; another agent or model for it can't while it works: said so)
+                    // (another agent or model for it can't be set while it works: said so)
                     if (ask != null && ses.running) addNote(ses, ask);
                     boolean other = !agent.equals(ses.backend) || !model.equals(ses.model == null ? "" : ses.model);
-                    note(ses, Bubble.Kind.NOTE, app.getString(other ? R.string.team_started_busy_agent : R.string.team_started_busy));
+                    if (other) note(ses, Bubble.Kind.NOTE, app.getString(R.string.team_started_busy_agent));
                     return;
                 }
                 if (!agent.equals(ses.backend)) switchAgent(ses, agent);

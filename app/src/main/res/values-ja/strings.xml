@@ -2459,7 +2459,7 @@
     <string name="team_sec_shape">形</string>
     <string name="team_sec_members">メンバー</string>
     <string name="team_from_message">メッセージから</string>
-    <string name="team_then_asks">その後、リーダーが各メンバーの目標、引き継ぎ方法、ルールを尋ねます。</string>
+    <string name="team_then_asks">目標、ステップ失敗時の動き、ルールは既定値で始まります。変更するにはリーダーに伝えてください。</string>
     <string name="team_card_for">リーダーが%1$sのためにあなたの許可を求めています。</string>
     <string name="team_card_task">リーダーからの作業: %1$s</string>
     <string name="team_card_task_you">あなたからの作業: %1$s</string>
@@ -2468,7 +2468,7 @@
     </plurals>
     <string name="team_show_all">すべて表示</string>
     <string name="team_started_busy">チームを開始しました。リーダーはまだ作業中だったため、次のステップで質問を受け取ります。</string>
-    <string name="team_started_busy_agent">チームを開始しました。リーダーはまだ作業中だったため、次のステップで質問を受け取ります。選んだエージェントとモデルは変更されていません（完了後に上部で変更してください）。</string>
+    <string name="team_started_busy_agent">チームを開始しました。リーダーはまだ作業中だったため、選んだエージェントとモデルは変更されていません（完了後に上部で変更してください）。</string>
     <string name="team_carry_on">%1$s が回答しました。リーダーが続けます。</string>
     <string name="background_type_code">Buddy がペア設定コードを取得できていません。「ペア設定コードによるデバイスのペア設定」が開いている場合は、開いたままにして 6 桁のコードをここに入力してください。</string>
     <string name="background_no_code">まだ開いていません</string>

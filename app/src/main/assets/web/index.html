@@ -1118,7 +1118,7 @@ async function teamSetup(from, draft) {
       box.append(sec('How do they share the phone’s apps?', known[2]));
       if (pre.screens) box.append(...seg(APPS, t.apps, k => { t.apps = k; }));
       else box.append(el('p', {class: 'tinfo', style: 'margin-top:0'}, 'Background mode isn’t set up on the phone, so members have no phone screen: only the background browser and Linux tools.'));
-      box.append(el('p', {style: 'margin:16px 6px 0'}, 'Then the leader asks you each member’s goal, how they hand off, and any rules.'));
+      box.append(el('p', {style: 'margin:16px 6px 0'}, 'Goals, what happens when a step fails, and rules start with defaults. To change them, tell the leader.'));
       box.append(el('div', {class: 'line', style: 'justify-content:flex-end;margin-top:14px'},
         el('button', {class: 'btn', onclick: close}, 'Cancel'),
         el('button', {class: 'btn primary', disabled: !t.members.length, onclick: async () => {

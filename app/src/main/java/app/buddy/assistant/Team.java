@@ -276,31 +276,17 @@ final class Team {
         return b.length() == 0 ? "" : "[Since your last turn, past you:\n" + b + "]\n\n";
     }
 
-    /** The message that has the leader ask the user the rest, right after the team was turned on. */
+    /**
+     * The leader used to ask the user three things on cards once a team was on (each member's goal, the hand-off,
+     * rules). They were long and added little: a team now starts with its defaults (the shape's goals and hand-off, no
+     * rules, or what the user said in the chat), and the user changes them by telling the leader. Null: nothing to ask.
+     */
     static String interview(Team t) {
-        return interview(t, true, true, true);
+        return null;
     }
 
-    /** As above, asking only what the user left open (null when nothing is: no follow-ups then). */
     static String interview(Team t, boolean goals, boolean handoff, boolean rules) {
-        if (!goals && !handoff && !rules) return null;
-        StringBuilder now = new StringBuilder();
-        for (Member m : t.members) now.append(m.name).append(": ").append(m.goal).append("; ");
-        String[] h = handoffs(t.structure);
-        List<String> qs = new ArrayList<>();
-        if (goals) qs.add("What each member is for. Propose one line per member, fitted to what this chat is about (now: "
-                + now + "), with the option \"Use these\"; they can type changes.");
-        if (handoff) qs.add("How work is handed on, with the options: \"" + h[0] + "\", \"" + h[1] + "\", \"" + h[2] + "\".");
-        if (rules) qs.add("Rules for the whole team, with options that fit this chat (such as \"Tests must pass\", \"Keep the "
-                + "existing style\", \"Explain every change\") and \"No rules\".");
-        StringBuilder b = new StringBuilder("The user just turned on this chat's team and picked its members. Before any work, ask them ")
-                .append(qs.size() == 1 ? "this" : qs.size() == 2 ? "these two things" : "these three things")
-                .append(" with the ask tool, one call each, short (what they already said is set: don't ask it again):\n");
-        for (int i = 0; i < qs.size(); i++) b.append(i + 1).append(". ").append(qs.get(i)).append('\n');
-        return b.append("(These are phone tools: where your tools carry their server's name, mcp__phone__ask and mcp__phone__team_change.)\n")
-                .append("Then save what they chose with team_change, and tell them in two or three lines that the team is ready and ")
-                .append("that the boxes over the message box say who a message goes to. If they skip a question, keep what is set.")
-                .toString();
+        return null;
     }
 
     private static String memberPrompt(Team t, Member m, Sessions.Session parent, Sessions.Session h, boolean screen) {
@@ -947,8 +933,8 @@ final class Team {
     }
 
     /**
-     * A team the user asked for in the chat, as far as they said it (team_start): the setup opens with it and asks
-     * only what they left open, then the leader asks only the follow-ups they left open.
+     * A team the user asked for in the chat, as far as they said it (team_start): the setup opens with it, filled in;
+     * what they didn't say starts with its defaults (no questions after, see interview).
      */
     static final class Draft {
         Team team;
@@ -1030,8 +1016,9 @@ final class Team {
         svc.runOnMain(hub::changed);
         return "Buddy's team setup waits for the user with what they said, and asks them what they left open (they pick "
                 + "each member's agent there): it opens on the phone's chat screen, and Buddy on their computer shows it in "
-                + "this chat too. The team starts when they tap Start the team; then you are told what is still open to ask. "
-                + "Tell them in a line to finish it there, and end your turn.";
+                + "this chat too. The team starts when they tap Start the team, with defaults for what they didn't say "
+                + "(each member's goal, the hand-off, no rules): don't ask them about those, they tell you when they want "
+                + "one changed. Tell them in a line to finish it there, and end your turn.";
     }
 
     /**

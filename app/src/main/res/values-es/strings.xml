@@ -2917,7 +2917,7 @@
     <string name="team_sec_shape">Forma</string>
     <string name="team_sec_members">Miembros</string>
     <string name="team_from_message">De tu mensaje</string>
-    <string name="team_then_asks">Luego el líder te pregunta el objetivo de cada miembro, cómo se pasan el trabajo y las reglas.</string>
+    <string name="team_then_asks">Los objetivos, qué pasa cuando falla un paso y las reglas empiezan con valores por defecto. Para cambiarlos, díselo al líder.</string>
     <string name="team_card_for">El líder pide tu OK, para %1$s.</string>
     <string name="team_card_task">Su tarea del líder: %1$s</string>
     <string name="team_card_task_you">Su tarea tuya: %1$s</string>
@@ -2927,7 +2927,7 @@
     </plurals>
     <string name="team_show_all">Mostrar todo</string>
     <string name="team_started_busy">El equipo está activo. El líder seguía trabajando, así que recibe sus preguntas con su próximo paso.</string>
-    <string name="team_started_busy_agent">El equipo está activo. El líder seguía trabajando, así que recibe sus preguntas con su próximo paso; el agente y el modelo que elegiste para él no cambiaron (cámbialos arriba cuando termine).</string>
+    <string name="team_started_busy_agent">El equipo está activo. El líder seguía trabajando, así que el agente y el modelo que elegiste para él no cambiaron (cámbialos arriba cuando termine).</string>
     <string name="team_carry_on">%1$s respondió: el líder sigue.</string>
     <string name="background_type_code">Buddy no ha captado el código de vinculación. Si «Vincular dispositivo con código de vinculación» está abierto, déjalo abierto y escribe aquí su código de 6 dígitos.</string>
     <string name="background_no_code">Aún no está abierto</string>

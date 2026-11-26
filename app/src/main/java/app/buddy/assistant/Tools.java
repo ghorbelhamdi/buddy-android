@@ -315,8 +315,8 @@ final class Tools {
                         .put("stop", boolProp("End the members that still work"))));
         t.put(tool("team_start",
                 "Only when the user asks for a team in a chat without one (\"start a team for my job hunt\", \"turn the "
-                        + "team back on\"): Buddy's team setup opens on their screen with what they said, asks them what they "
-                        + "left open (they pick the agents there), and the team starts when they tap Start the team. Pass ONLY "
+                        + "team back on\"): Buddy's team setup opens on their screen with what they said filled in (they pick "
+                        + "the agents there), and the team starts when they tap Start the team, with defaults for the rest. Pass ONLY "
                         + "what the user said in so many words: no member, agent, model, goal or setting they didn't name, "
                         + "and nothing you think would suit (Buddy asks them). With restore, the team this chat had last.",
                 props().put("restore", boolProp("The chat's last team again, as it was (then leave the rest out)"))

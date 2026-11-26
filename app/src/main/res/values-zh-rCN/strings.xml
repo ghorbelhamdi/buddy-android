@@ -2907,7 +2907,7 @@
     <string name="team_sec_shape">形式</string>
     <string name="team_sec_members">成员</string>
     <string name="team_from_message">来自你的消息</string>
-    <string name="team_then_asks">然后负责人会问你每个成员的目标、如何交接以及规则。</string>
+    <string name="team_then_asks">目标、步骤失败时的处理和规则先用默认值。要更改，请告诉负责人。</string>
     <string name="team_card_for">负责人代 %1$s 请求你的同意。</string>
     <string name="team_card_task">负责人交给它的任务：%1$s</string>
     <string name="team_card_task_you">你交给它的任务：%1$s</string>
@@ -2916,7 +2916,7 @@
     </plurals>
     <string name="team_show_all">全部显示</string>
     <string name="team_started_busy">团队已开启。负责人仍在工作，会在下一步收到后续问题。</string>
-    <string name="team_started_busy_agent">团队已开启。负责人仍在工作，会在下一步收到后续问题；你为它选的智能体和模型未更改（完成后在顶部更改）。</string>
+    <string name="team_started_busy_agent">团队已开启。负责人仍在工作，所以你为它选的智能体和模型未更改（完成后在顶部更改）。</string>
     <string name="team_carry_on">%1$s 已回答：负责人继续。</string>
     <string name="background_type_code">Buddy 还没有拿到配对码。如果“使用配对码配对设备”已打开，请保持打开，并在这里输入 6 位配对码。</string>
     <string name="background_no_code">还没有打开</string>

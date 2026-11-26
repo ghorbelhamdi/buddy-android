@@ -2574,7 +2574,7 @@
     <string name="team_sec_shape">الشكل</string>
     <string name="team_sec_members">الأعضاء</string>
     <string name="team_from_message">من رسالتك</string>
-    <string name="team_then_asks">ثم يسألك القائد عن هدف كل عضو وطريقة التسليم وأي قواعد.</string>
+    <string name="team_then_asks">تبدأ الأهداف وما يحدث عند فشل خطوة والقواعد بإعدادات افتراضية. لتغييرها، أخبر القائد.</string>
     <string name="team_card_for">يطلب القائد موافقتك، من أجل %1$s.</string>
     <string name="team_card_task">مهمته من القائد: %1$s</string>
     <string name="team_card_task_you">مهمته منك: %1$s</string>
@@ -2588,7 +2588,7 @@
     </plurals>
     <string name="team_show_all">عرض الكل</string>
     <string name="team_started_busy">الفريق يعمل. كان القائد لا يزال يعمل، فستصله أسئلته التالية مع خطوته القادمة.</string>
-    <string name="team_started_busy_agent">الفريق يعمل. كان القائد لا يزال يعمل، فستصله أسئلته التالية مع خطوته القادمة؛ ولم يتغير الوكيل والنموذج اللذان اخترتهما له (غيّرهما من الأعلى بعد انتهائه).</string>
+    <string name="team_started_busy_agent">الفريق يعمل. كان القائد لا يزال يعمل، فلم يتغير الوكيل والنموذج اللذان اخترتهما له (غيّرهما من الأعلى بعد انتهائه).</string>
     <string name="team_carry_on">أجاب %1$s: القائد يتابع.</string>
     <string name="background_type_code">لم يلتقط Buddy رمز الإقران. إذا كانت نافذة «إقران الجهاز باستخدام رمز إقران» مفتوحة، أبقِها مفتوحة واكتب هنا رمزها المكوّن من 6 أرقام.</string>
     <string name="background_no_code">ليست مفتوحة بعد</string>
