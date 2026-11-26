@@ -1,0 +1,6 @@
+• Teams start without questions: defaults for goals, failed steps and rules
+• The leader carries on by itself when its members have answered (#94)
+• "Telling Builder" shows when the leader hands over, not afterwards
+• Tap a member on the team bar to open its chat
+• Pairing: type the code into the bubble when Buddy can't read it (#93)
+• A failed background-mode setup says what Buddy saw
