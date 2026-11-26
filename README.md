@@ -56,8 +56,10 @@ https://github.com/user-attachments/assets/d07936fc-4788-4ab5-a105-31b3e9aeba4f
 | **Phone tools anywhere** | The same tools as a local MCP server for your own Claude Code, Codex, OpenCode, Antigravity, Grok, Copilot or Pi sessions, or over stdio with [mcp-bridge](mcp-bridge) for clients that start servers as commands. |
 
 <p align="center">
-  <a href="https://youtube.com/shorts/wPZvwy08BTE"><img src="docs/screens/sub-agents.gif" alt="Three team members comparing a price on eBay, Amazon and AliExpress at the same time" width="320"></a><br>
-  <sub>Three team members, three shops, at the same time (<a href="https://youtube.com/shorts/wPZvwy08BTE">30 s video</a>)</sub>
+  <a href="docs/images/teams-setup.jpg"><img src="docs/images/teams-setup.jpg" alt="Setting up a team on one sheet: its shape, and each member's agent and model" width="250"></a>
+  <a href="docs/images/teams-panel.jpg"><img src="docs/images/teams-panel.jpg" alt="The team panel: a leader and four workers, each on its own agent" width="250"></a>
+  <a href="docs/images/teams-chat.jpg"><img src="docs/images/teams-chat.jpg" alt="A team chat: the team bar, four answers folded into one round, and the leader's reply" width="250"></a><br>
+  <sub>A team: set it up on one sheet, see it in its shape, and work with it in the chat</sub>
 </p>
 
 <p align="center">
@@ -65,7 +67,7 @@ https://github.com/user-attachments/assets/d07936fc-4788-4ab5-a105-31b3e9aeba4f
   <sub>The same chats on your computer (Settings → Other devices)</sub>
 </p>
 
-> **Status: 2.4, early.** It works well day to day but has rough edges. Tested most on a OnePlus 12 (Android 16). Buddy is an independent project, not made by or affiliated with Anthropic, OpenAI, Google, xAI or GitHub.
+> **Status: 2.5, early.** It works well day to day but has rough edges. Tested most on a OnePlus 12 (Android 16). Buddy is an independent project, not made by or affiliated with Anthropic, OpenAI, Google, xAI or GitHub.
 
 ## How it works
 
