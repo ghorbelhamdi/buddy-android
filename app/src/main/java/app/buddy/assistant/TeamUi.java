@@ -919,13 +919,19 @@ final class TeamUi {
             if (seen.size() > 1) p.setMarginStart(-dp(c, 3)); // (a little over the one before: its number stays readable)
             head.addView(av, p);
         }
-        TextView n = single(text(c, c.getResources().getQuantityString(R.plurals.team_round, who.size(), who.size()), 13, TEXT));
+        // (never cut short: with four marks beside it "4 answers" lost its end; a second line where it must)
+        TextView n = text(c, c.getResources().getQuantityString(R.plurals.team_round, who.size(), who.size()), 13, TEXT);
+        n.setMaxLines(2);
         n.setTypeface(sans(c, 600));
         n.setPaddingRelative(dp(c, 8), 0, dp(c, 8), 0);
         head.addView(n, weight1());
         Button all = button(c, c.getString(R.string.team_show_all), false);
         all.setMinHeight(dp(c, 36));
         all.setMinimumHeight(dp(c, 36));
+        all.setMinWidth(0);
+        all.setMinimumWidth(0);
+        all.setPaddingRelative(dp(c, 12), 0, dp(c, 12), 0);
+        all.setTextSize(13);
         all.setOnClickListener(v -> showAll.run());
         head.addView(all, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(c, 36)));
         card.addView(head, full());
