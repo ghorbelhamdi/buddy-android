@@ -2496,6 +2496,6 @@
     <string name="team_started_busy">Het team staat aan. De leider werkte nog en krijgt zijn vragen bij de volgende stap.</string>
     <string name="team_started_busy_agent">Het team staat aan. De leider werkte nog en krijgt zijn vragen bij de volgende stap; de agent en het model die je koos zijn niet gewijzigd (wijzig ze bovenaan als hij klaar is).</string>
     <string name="team_carry_on">%1$s heeft geantwoord: de leider gaat verder.</string>
-    <string name="background_type_code">Buddy kan de koppelcode op deze telefoon niet lezen. Open ‘Apparaat koppelen met koppelingscode’ als dat niet open is, en typ hier de 6-cijferige code en de poort uit ‘IP-adres en poort’ (bijvoorbeeld 123456 38135). Laat dat venster open.</string>
+    <string name="background_type_code">Buddy kan de koppelcode op deze telefoon niet lezen. Open ‘Apparaat koppelen met koppelingscode’ als dat niet open is, laat het open en typ de 6-cijferige code hier.</string>
     <string name="background_no_code">Ik zie geen code</string>
 </resources>

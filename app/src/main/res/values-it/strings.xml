@@ -2930,6 +2930,6 @@
     <string name="team_started_busy">Il team è attivo. Il leader stava ancora lavorando: riceve le sue domande con il prossimo passo.</string>
     <string name="team_started_busy_agent">Il team è attivo. Il leader stava ancora lavorando: riceve le sue domande con il prossimo passo; agente e modello scelti per lui non sono cambiati (cambiali in alto quando ha finito).</string>
     <string name="team_carry_on">%1$s ha risposto: il leader continua.</string>
-    <string name="background_type_code">Buddy non riesce a leggere il codice di accoppiamento su questo telefono. Apri “Accoppia dispositivo con codice di accoppiamento” se non è aperto, poi scrivi qui il codice a 6 cifre e la porta da “Indirizzo IP e porta” (per esempio 123456 38135). Lascia aperta quella finestra.</string>
+    <string name="background_type_code">Buddy non riesce a leggere il codice di accoppiamento su questo telefono. Apri “Accoppia dispositivo con codice di accoppiamento” se non è aperto, lascialo aperto e scrivi qui il suo codice a 6 cifre.</string>
     <string name="background_no_code">Non vedo nessun codice</string>
 </resources>

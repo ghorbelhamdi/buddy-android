@@ -1193,6 +1193,7 @@ final class Background {
                 }).start();
                 String[] found = null;
                 typed = null;
+                lastSeen = null;
                 long askAt = System.currentTimeMillis() + 20_000;
                 boolean asked = false;
                 while (step == Step.WAITING && System.currentTimeMillis() < waitUntil && found == null) {
@@ -1209,7 +1210,8 @@ final class Background {
                 if (step != Step.WAITING) return; // cancelled
                 if (found == null) { // the likeliest reason comes along when the phone says Developer options are off
                     set(Step.FAILED, svc.getString(R.string.background_no_dialog)
-                            + (walkStopped.isEmpty() ? "" : "\n(" + walkStopped + ")"));
+                            + (walkStopped.isEmpty() ? "" : "\n(" + walkStopped + ")")
+                            + (lastSeen == null ? "" : "\n(Buddy saw " + lastSeen + ")"));
                     return;
                 }
                 set(Step.PAIRING, "");
@@ -1452,23 +1454,41 @@ final class Background {
      */
     private static String[] pairingDialog(BuddyService svc) {
         try {
+            StringBuilder apps = new StringBuilder();
+            boolean settings = false;
+            java.util.Set<String> shapes = new java.util.LinkedHashSet<>();
+            int[] texts = {0};
             for (AccessibilityWindowInfo w : svc.getWindows()) {
                 AccessibilityNodeInfo root = w.getRoot();
-                if (root == null || !"com.android.settings".contentEquals(String.valueOf(root.getPackageName()))) continue;
+                String pkg = root == null ? "(a window Buddy can't read)" : String.valueOf(root.getPackageName());
+                if (apps.indexOf(pkg) < 0) apps.append(apps.length() > 0 ? ", " : "").append(pkg);
+                if (root == null || !"com.android.settings".contentEquals(pkg)) continue;
+                settings = true;
                 String[] found = new String[2];
-                scan(root, found, 0);
+                scan(root, found, 0, shapes, texts);
                 if (found[0] != null) return found;
             }
-        } catch (Exception ignored) {
+            // what Buddy could see instead, for the reason when setup gives up (issue #93): the apps in front and, in
+            // Settings, how many texts and the shapes of the numbers among them (digits as #, never the numbers)
+            String now = "in front: " + (apps.length() == 0 ? "no window" : apps) + (settings
+                    ? "; in Settings " + texts[0] + " texts, numbers shaped: " + (shapes.isEmpty() ? "none" : shapes) : "");
+            if (settings || lastSeen == null || !lastSeen.contains("in Settings")) lastSeen = now; // (Settings' last look stays)
+        } catch (Exception e) {
+            lastSeen = "reading the screen failed: " + e;
         }
         return null;
     }
 
-    private static void scan(AccessibilityNodeInfo n, String[] found, int depth) {
+    /** What pairingDialog last saw in place of the dialog (see there), for the reason when setup gives up. */
+    private static volatile String lastSeen;
+
+    private static void scan(AccessibilityNodeInfo n, String[] found, int depth, java.util.Set<String> shapes, int[] texts) {
         if (n == null || depth > 30) return;
         CharSequence t = n.getText();
         if (t != null) {
             String s = t.toString().trim(), id = String.valueOf(n.getViewIdResourceName());
+            texts[0]++;
+            if (s.length() <= 30 && s.matches(".*\\d.*") && shapes.size() < 12) shapes.add(s.replaceAll("\\d", "#").replaceAll("[^#:. -]", "x"));
             if (CODE.matcher(s).matches()) found[0] = s;
             Matcher m = ADDRESS.matcher(s);
             if (m.matches()) found[1] = m.group(1);
@@ -1477,7 +1497,7 @@ final class Background {
                 if (last.find()) found[1] = last.group(1);
             }
         }
-        for (int i = 0; i < n.getChildCount(); i++) scan(n.getChild(i), found, depth + 1);
+        for (int i = 0; i < n.getChildCount(); i++) scan(n.getChild(i), found, depth + 1, shapes, texts);
     }
 
     /**

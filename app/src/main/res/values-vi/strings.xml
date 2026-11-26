@@ -3059,6 +3059,6 @@
     <string name="team_started_busy">Nhóm đã bật. Trưởng nhóm vẫn đang làm, nên sẽ nhận câu hỏi ở bước tiếp theo.</string>
     <string name="team_started_busy_agent">Nhóm đã bật. Trưởng nhóm vẫn đang làm, nên sẽ nhận câu hỏi ở bước tiếp theo; tác tử và mô hình bạn chọn chưa được đổi (đổi ở phía trên khi xong).</string>
     <string name="team_carry_on">%1$s đã trả lời: trưởng nhóm tiếp tục.</string>
-    <string name="background_type_code">Buddy không đọc được mã ghép nối trên điện thoại này. Mở “Ghép nối thiết bị bằng mã ghép nối” nếu chưa mở, rồi nhập vào đây mã 6 chữ số và cổng trong “Địa chỉ IP và cổng” (ví dụ 123456 38135). Giữ hộp thoại đó mở.</string>
+    <string name="background_type_code">Buddy không đọc được mã ghép nối trên điện thoại này. Mở “Ghép nối thiết bị bằng mã ghép nối” nếu chưa mở, giữ nó mở và nhập mã 6 chữ số vào đây.</string>
     <string name="background_no_code">Tôi không thấy mã</string>
 </resources>

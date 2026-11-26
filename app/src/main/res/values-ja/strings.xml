@@ -2470,6 +2470,6 @@
     <string name="team_started_busy">チームを開始しました。リーダーはまだ作業中だったため、次のステップで質問を受け取ります。</string>
     <string name="team_started_busy_agent">チームを開始しました。リーダーはまだ作業中だったため、次のステップで質問を受け取ります。選んだエージェントとモデルは変更されていません（完了後に上部で変更してください）。</string>
     <string name="team_carry_on">%1$s が回答しました。リーダーが続けます。</string>
-    <string name="background_type_code">このスマホでは Buddy がペア設定コードを読めません。「ペア設定コードによるデバイスのペア設定」が開いていなければ開き、6 桁のコードと「IP アドレスとポート」のポートをここに入力してください（例: 123456 38135）。そのダイアログは開いたままにしてください。</string>
+    <string name="background_type_code">このスマホでは Buddy がペア設定コードを読めません。「ペア設定コードによるデバイスのペア設定」が開いていなければ開き、開いたままにして、その 6 桁のコードをここに入力してください。</string>
     <string name="background_no_code">コードが表示されません</string>
 </resources>

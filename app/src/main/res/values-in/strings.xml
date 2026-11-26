@@ -2919,6 +2919,6 @@
     <string name="team_started_busy">Tim aktif. Pemimpin masih bekerja, jadi ia mendapat pertanyaan lanjutannya pada langkah berikutnya.</string>
     <string name="team_started_busy_agent">Tim aktif. Pemimpin masih bekerja, jadi ia mendapat pertanyaan lanjutannya pada langkah berikutnya; agen dan model yang Anda pilih untuknya tidak diubah (ubah di atas setelah selesai).</string>
     <string name="team_carry_on">%1$s menjawab: pemimpin melanjutkan.</string>
-    <string name="background_type_code">Buddy tidak bisa membaca kode penyambungan di ponsel ini. Buka “Sambungkan perangkat dengan kode penyambungan” jika belum terbuka, lalu ketik di sini kode 6 digit dan port dari “Alamat IP &amp; Port” (misalnya 123456 38135). Biarkan dialog itu terbuka.</string>
+    <string name="background_type_code">Buddy tidak bisa membaca kode penyambungan di ponsel ini. Buka “Sambungkan perangkat dengan kode penyambungan” jika belum terbuka, biarkan terbuka, lalu ketik kode 6 digitnya di sini.</string>
     <string name="background_no_code">Saya tidak melihat kode</string>
 </resources>
