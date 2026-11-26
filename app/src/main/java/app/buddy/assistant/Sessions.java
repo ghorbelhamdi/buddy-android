@@ -49,6 +49,8 @@ final class Sessions {
         boolean direct;
         /** A member's answer the leader has had: from the team tool while it waited, or in its next turn's digest. */
         boolean heard;
+        /** Not saved: Buddy's own line that started a turn of the leader (Team.carryOn): a turn begins here, as at a user's message. */
+        boolean turn;
 
         /**
          * Can be edited and asked again (issue #44): the user's own message, to the chat's agent alone (in a team chat, a
@@ -176,6 +178,22 @@ final class Sessions {
         int briefed;
         /** A member's chat, not saved: who told it what it works on now ("" = the user), and the words. */
         volatile String toldBy = "", told = "";
+        /** A team's chat, not saved: how often its leader carried on by itself since the user last wrote (Team.carryOn). */
+        int carriedOn;
+        /**
+         * A team's chat, not saved: its leader's scheduled turn ended while its team wasn't done, so that run's end
+         * wasn't told yet; the turn it carries on with is that scheduled run still (quiet: as it was), see Team.carryOn.
+         */
+        boolean carryScheduled, carryQuiet;
+        /** With carryScheduled: that turn was a quiet run's and said there was no news (no notification for its end). */
+        boolean carryQuietSaid;
+        /** A team's chat, not saved: until when its leader is about to carry on by itself (Team.carryOnSoon); 0: not. */
+        long carrySoonUntil;
+        /**
+         * Not saved, this run's team steps (see ChatHub.ownStep): the ones Buddy showed when the call came in and the
+         * agent hasn't reported yet, and the ones the agent reported whose call hasn't come in yet. A step shows once.
+         */
+        final List<String> stepsShown = new ArrayList<>(), stepsReported = new ArrayList<>();
         /** A member's chat, not saved: where its run's messages start (the message it was told); -1: not known. */
         volatile int toldAt = -1;
         /** The chat's scheduled task (see Schedules), or null. */

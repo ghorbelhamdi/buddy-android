@@ -389,6 +389,7 @@ final class ChatHub {
                 }
             } else { // only members: the chat shows the message, its own agent doesn't run
                 if (ses.archived) ses.archived = false;
+                ses.carriedOn = 0; // (the user's word: the leader may carry on by itself again)
                 sessions.add(ses, Bubble.Kind.USER, text, hasFiles ? new ArrayList<>(files) : null);
                 Sessions.Msg um = ses.messages.get(ses.messages.size() - 1);
                 um.to = sendingTo;
@@ -463,10 +464,10 @@ final class ChatHub {
                 }
                 if (Team.working(ChatHub.this, ses)) {
                     setTeam(ses, team, null); // still working: on all the same, its next turn's brief says so
-                    // (its questions go to it as a note; another agent or model for it can't while it works: said so)
+                    // (another agent or model for it can't be set while it works: said so)
                     if (ask != null && ses.running) addNote(ses, ask);
                     boolean other = !agent.equals(ses.backend) || !model.equals(ses.model == null ? "" : ses.model);
-                    note(ses, Bubble.Kind.NOTE, app.getString(other ? R.string.team_started_busy_agent : R.string.team_started_busy));
+                    if (other) note(ses, Bubble.Kind.NOTE, app.getString(R.string.team_started_busy_agent));
                     return;
                 }
                 if (!agent.equals(ses.backend)) switchAgent(ses, agent);
@@ -479,6 +480,33 @@ final class ChatHub {
 
     /** While sendTeam sends (main thread): who the message goes to, for the message made in there. */
     private String sendingTo, sendingAlso;
+    /** The message being sent is Buddy's own line to the leader (Team.carryOn): a note in the chat, not the user's. */
+    private boolean sendingOwn;
+
+    /**
+     * The leader carries on by itself (see Team.carryOn): the chat shows line as a note, the leader gets prompt with
+     * its digest. Not when it can't start (said in the chat then, as any failed send).
+     */
+    void carryOn(Sessions.Session ses, String line, String prompt) {
+        if (ses.running) return;
+        // (a scheduled run's turn: scheduled still, with its wait for an unlock and its end told when it is over)
+        boolean scheduled = ses.carryScheduled, quiet = ses.carryQuiet;
+        ses.carryScheduled = false;
+        sendingOwn = true;
+        String err;
+        try {
+            err = send(ses, line, null, prompt, scheduled, false);
+        } finally {
+            sendingOwn = false;
+        }
+        if (err != null) {
+            note(ses, Bubble.Kind.ERROR, err);
+            if (scheduled) KeepAwake.notifyEnded(app, ses);
+        } else if (scheduled) {
+            ses.quietRun = quiet;
+            Schedules.carriedOn(app, ses);
+        }
+    }
     private boolean sendingToLeader = true;
 
     /**
@@ -517,10 +545,14 @@ final class ChatHub {
         // the place of a team the user set up, nor clear it
         if (team == null && before != null && !(before.helpersOnly() && ses.lastTeam != null)) ses.lastTeam = before;
         if (team != null && !team.helpersOnly()) ses.lastTeam = null;
+        boolean wasWorking = false; // a member that worked was taken out
         for (Sessions.Session h : Team.all(this, ses.id)) {
             Team.Member m = team == null ? null : team.byId(h.member);
             if (m == null || (gone != null && gone.contains(h.member))) {
-                if (h.running) stop(h);
+                if (h.running) {
+                    stop(h);
+                    wasWorking = true;
+                }
                 delete(h);
                 continue;
             }
@@ -536,6 +568,9 @@ final class ChatHub {
         if (before == null && team != null) ses.teamAt = ses.messages.size(); // (a change keeps what the leader hasn't heard yet)
         sessions.save(ses);
         changed();
+        // (the leader isn't waiting for that member any more: it carries on with what the others answered; with the
+        // team off, a scheduled run whose end waited for the team is told now)
+        if (wasWorking || (team == null && ses.carryScheduled)) Team.carryOnSoon(this, ses);
     }
 
     private String send(final Sessions.Session ses, String text, List<String> files, String prompt) {
@@ -579,6 +614,7 @@ final class ChatHub {
         BuddyService svc = BuddyService.get();
         // only the user's own message lifts a Stop: a queued rule run must not undo it
         if (svc != null && prompt == null) svc.allowControl();
+        if (!sendingOwn) ses.carriedOn = 0; // (the user's word: the leader may carry on by itself again)
         final int[] run = {-1}; // this run's id, once it has started
         try {
             // a rule's run works for someone else's message: no shell, files or web, even with Linux tools on
@@ -594,13 +630,14 @@ final class ChatHub {
         heardNow.clear();
         ses.interrupted = false;
         // the user writing in an archived chat brings it back (not a sub-agent's: its parent's chat lists it)
-        if (!scheduled && !rule && ses.parent.isEmpty()) ses.archived = false;
-        sessions.add(ses, Bubble.Kind.USER, text, hasFiles ? new ArrayList<>(files) : null);
-        ses.said++; // (a message that starts its agent's run: a helper's turn, see Helpers; not a note or a member's message)
-        if (!scheduled && !rule) SpeechPause.sent(app);
+        if (!scheduled && !rule && !sendingOwn && ses.parent.isEmpty()) ses.archived = false;
+        sessions.add(ses, sendingOwn ? Bubble.Kind.NOTE : Bubble.Kind.USER, text, hasFiles ? new ArrayList<>(files) : null);
+        if (!sendingOwn) ses.said++; // (a message that starts its agent's run: a helper's turn, see Helpers; not a note or a member's message)
+        if (!scheduled && !rule && !sendingOwn) SpeechPause.sent(app);
         Sessions.Msg um = ses.messages.get(ses.messages.size() - 1);
+        if (sendingOwn) um.turn = true;
         if (team != null) {
-            um.to = sendingTo != null ? sendingTo : app.getString(R.string.team_leader);
+            if (!sendingOwn) um.to = sendingTo != null ? sendingTo : app.getString(R.string.team_leader);
             ses.teamAt = ses.messages.size(); // the leader has had word of everything up to here
             sessions.save(ses);
         }
@@ -610,7 +647,7 @@ final class ChatHub {
             if (ses.title.isEmpty()) ses.title = Sessions.autoTitle(sendingLinux.get(0).substring(sendingLinux.get(0).lastIndexOf('/') + 1), null);
             sessions.save(ses);
         }
-        if (scheduled) {
+        if (scheduled && !sendingOwn) {
             um.scheduled = true;
             sessions.save(ses);
         }
@@ -1147,13 +1184,22 @@ final class ChatHub {
 
     /** Stop every chat that is working (the bubble's stop button). */
     void stopAll() {
-        for (Sessions.Session s : new java.util.ArrayList<>(sessions.all)) if (s.running) stop(s);
+        for (Sessions.Session s : new java.util.ArrayList<>(sessions.all)) {
+            if (!s.running) continue;
+            if (!s.member.isEmpty()) { // (its team's leader doesn't carry on by itself after it: until the user writes)
+                Sessions.Session lead = sessions.find(s.parent);
+                if (lead != null) lead.carriedOn = Team.MAX_CARRY_ON;
+            }
+            stop(s);
+        }
     }
 
     void stop(Sessions.Session ses) {
         if (ses.parent.isEmpty()) { // a stopped task's helpers stop with it, and its team's members
             Helpers.stop(this, ses.id);
             Team.stop(this, ses.id);
+            // (and its leader doesn't carry on by itself, also when it wasn't working: until the user writes again)
+            if (ses.team != null) ses.carriedOn = Team.MAX_CARRY_ON;
         }
         if (!ses.running) return;
         BuddyService svc = BuddyService.get();
@@ -1175,6 +1221,7 @@ final class ChatHub {
                 Sessions.Msg last = ses.messages.isEmpty() ? null : ses.messages.get(ses.messages.size() - 1);
                 if (last == null || !stopped.equals(last.text)) add(ses, Bubble.Kind.STEP, stopped);
                 runEnded(ses);
+                if (!ses.member.isEmpty()) Team.reported(this, ses); // (its team's leader isn't waiting for it any more)
                 changed();
             }, STOP_GIVE_UP_MS);
         } catch (Exception e) {
@@ -1269,8 +1316,13 @@ final class ChatHub {
                         } else if (step != null) {
                             ses.cmd = null;
                         }
-                        if (step != null) {
-                            add(ses, Bubble.Kind.STEP, describeTool(c.optString("name"), c.optJSONObject("input"), true));
+                        String full = step == null ? null : describeTool(c.optString("name"), c.optJSONObject("input"), true);
+                        boolean teamStep = tn.equals(TOOL_PREFIX + "team") || tn.equals(TOOL_PREFIX + "team_change");
+                        if (full != null && teamStep && ses.stepsShown.remove(full)) {
+                            // (Buddy showed it when the call came in: not twice)
+                        } else if (step != null) {
+                            if (teamStep) ses.stepsReported.add(full); // (its call comes in after: not shown again then)
+                            add(ses, Bubble.Kind.STEP, full);
                             ses.status = step;
                             String n = c.optString("name");
                             if (n.equals(TOOL_PREFIX + "confirm") || n.equals(TOOL_PREFIX + "ask")) CodexLive.agentWaiting(ses, step, c.optJSONObject("input"));
@@ -1319,7 +1371,7 @@ final class ChatHub {
                 boolean shown = false;
                 for (int i = ses.messages.size() - 1; i >= 0 && !shown; i--) {
                     Sessions.Msg m = ses.messages.get(i);
-                    if (m.kind == Bubble.Kind.USER) break;
+                    if (m.kind == Bubble.Kind.USER || m.turn) break;
                     if (m.kind != Bubble.Kind.BUDDY) continue;
                     for (String f : m.files) if (Attachments.isImage(f)) shown = true; // (a saved PDF's chip isn't one)
                 }
@@ -1429,6 +1481,7 @@ final class ChatHub {
         text = text == null ? "" : text.trim();
         if (text.isEmpty()) return null;
         if (!ses.running) return send(ses, text, null);
+        ses.carriedOn = 0; // (the user's word, while it works: its leader may carry on by itself again)
         // writing to the agent while paused in the browser's live view: the user is done there
         BuddyService svc = BuddyService.get();
         if (svc != null && svc.pausedForBrowser()) svc.resume();
@@ -1522,6 +1575,17 @@ final class ChatHub {
      * when there are none.
      */
     /** chat: the calling chat, whose notes these are (null, an agent outside Buddy's chats: any working chat's). */
+    /** Whether takeNotes(chat) would hand something over. */
+    boolean hasNotes(String chat) {
+        for (Sessions.Session s : new ArrayList<>(sessions.all)) {
+            if (!s.running || (chat != null ? !s.id.equals(chat) : !s.parent.isEmpty())) continue;
+            synchronized (s.notes) {
+                if (!s.notes.isEmpty()) return true;
+            }
+        }
+        return false;
+    }
+
     String takeNotes(String chat) {
         for (Sessions.Session s : new ArrayList<>(sessions.all)) {
             if (!s.running) continue;
@@ -1595,6 +1659,8 @@ final class ChatHub {
 
     private void startRun(Sessions.Session ses) {
         ses.running = true;
+        ses.stepsShown.clear();
+        ses.stepsReported.clear();
         ses.phoneToolAt = 0; // (what its earlier run did says nothing about this one)
         ses.cmd = null;
         ses.otherToolAt = 0;
@@ -1632,6 +1698,8 @@ final class ChatHub {
             }, BACKGROUND_RELEASE_MS);
         }
         if (ses.schedule == null) ses.allowed.clear(); // a scheduled chat keeps them for its next scheduled run
+        // a team's leader ended its turn while members' answers to it came in: it carries on (see Team.carryOn)
+        if (ses.team != null && ses.parent.isEmpty()) Team.carryOnSoon(this, ses);
         CodexLive.agentDone(ses, ses.outcome, !ses.lastReply.isEmpty());
         // a quiet scheduled run that found nothing new ends without a notification (a failed one always says so)
         boolean quiet = ses.quietRun && ses.quietSaid && ses.outcome == null;
@@ -1639,7 +1707,12 @@ final class ChatHub {
         // Then its end is a notification too, as for a long task's or a scheduled one's
         boolean away = Triggers.locked(app) || (ses.background && !viewing.contains(ses));
         // (a helper's end is its parent's business: no notification)
-        if ((ses.awake || ses.scheduledRun || away) && !quiet && ses.parent.isEmpty()) KeepAwake.notifyEnded(app, ses);
+        // (a scheduled turn of a team's leader whose team isn't done: its end is told when the team is, see Team.carryOn)
+        boolean teamGoesOn = ses.scheduledRun && ses.parent.isEmpty() && Team.moreToCome(this, ses);
+        ses.carryScheduled = teamGoesOn;
+        ses.carryQuiet = teamGoesOn && ses.quietRun;
+        ses.carryQuietSaid = teamGoesOn && quiet; // (a quiet run that said "no news": its end isn't told later either)
+        if ((ses.awake || ses.scheduledRun || away) && !quiet && ses.parent.isEmpty() && !teamGoesOn) KeepAwake.notifyEnded(app, ses);
         ses.scheduledRun = false;
         ses.quietRun = false;
         ses.quietSaid = false;
@@ -1665,7 +1738,7 @@ final class ChatHub {
                 made.fromOn = Account.nameOf(ses.backend) + (ses.model == null || ses.model.isEmpty() ? "" : " · " + Models.label(ses.backend, ses.model));
                 for (int i = ses.messages.size() - 2; i >= 0; i--) {
                     Sessions.Msg x = ses.messages.get(i);
-                    if (x.kind == Bubble.Kind.BUDDY && x.from.isEmpty()) break;
+                    if ((x.kind == Bubble.Kind.BUDDY && x.from.isEmpty()) || x.turn) break; // (a turn it began itself answers no message)
                     if (x.kind == Bubble.Kind.USER && x.toLeader) {
                         made.quote = clip(x.label(), 300);
                         break;
@@ -1786,6 +1859,22 @@ final class ChatHub {
         BuddyService svc = BuddyService.get();
         if (svc != null) svc.keepAwake().update(); // a long-task chat started, ended or changed its switch
         for (Listener l : new ArrayList<>(listeners)) l.onChatsChanged();
+    }
+
+    /**
+     * A team call came in from a chat's agent: its step shows now (main thread). Some agents (OpenCode) report a tool
+     * only once it has ended, so "Telling Auditor" came after the Auditor had answered (issue #94).
+     */
+    void ownStep(String chat, String tool, JSONObject in) {
+        Sessions.Session s = chat == null ? null : sessions.find(chat);
+        if (s == null || !s.running) return;
+        String full = describeTool(TOOL_PREFIX + tool, in, true);
+        if (full == null) return;
+        if (s.stepsReported.remove(full)) return; // (the agent said it already)
+        add(s, Bubble.Kind.STEP, full);
+        s.status = describeTool(TOOL_PREFIX + tool, in);
+        s.stepsShown.add(full);
+        changed();
     }
 
     static String describeTool(String name, JSONObject in) {

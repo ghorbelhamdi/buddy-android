@@ -2458,7 +2458,7 @@
     <string name="team_sec_shape">형태</string>
     <string name="team_sec_members">멤버</string>
     <string name="team_from_message">메시지에서</string>
-    <string name="team_then_asks">그다음 리더가 각 멤버의 목표, 인계 방식, 규칙을 묻습니다.</string>
+    <string name="team_then_asks">목표, 단계 실패 시 처리, 규칙은 기본값으로 시작합니다. 바꾸려면 리더에게 말하세요.</string>
     <string name="team_card_for">리더가 %1$s을(를) 위해 승인을 요청합니다.</string>
     <string name="team_card_task">리더가 준 작업: %1$s</string>
     <string name="team_card_task_you">내가 준 작업: %1$s</string>
@@ -2467,5 +2467,8 @@
     </plurals>
     <string name="team_show_all">모두 보기</string>
     <string name="team_started_busy">팀이 켜졌습니다. 리더가 아직 작업 중이어서 다음 단계에서 질문을 받습니다.</string>
-    <string name="team_started_busy_agent">팀이 켜졌습니다. 리더가 아직 작업 중이어서 다음 단계에서 질문을 받습니다. 선택한 에이전트와 모델은 바뀌지 않았습니다(끝나면 상단에서 바꾸세요).</string>
+    <string name="team_started_busy_agent">팀이 켜졌습니다. 리더가 아직 작업 중이어서 선택한 에이전트와 모델은 바뀌지 않았습니다(끝나면 상단에서 바꾸세요).</string>
+    <string name="team_carry_on">%1$s 답변: 리더가 이어서 진행합니다.</string>
+    <string name="background_type_code">Buddy가 페어링 코드를 가져오지 못했습니다. 「페어링 코드로 기기 페어링」이 열려 있으면 연 채로 두고 6자리 코드를 여기에 입력하세요.</string>
+    <string name="background_no_code">아직 열지 않았어요</string>
 </resources>

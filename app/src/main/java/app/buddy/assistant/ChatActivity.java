@@ -1069,6 +1069,45 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         });
     }
 
+    /** One of the bar's marks, as tall as the bar (a finger's height to tap). */
+    private LinearLayout.LayoutParams barItemParams() {
+        return new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
+    }
+
+    /** A tap on this mark of the bar opens that chat of the team (see openInTeam). */
+    private void barOpens(View item, final Sessions.Session owner, final Sessions.Session to, String says) {
+        item.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
+        item.setContentDescription(says);
+        item.setBackgroundResource(ripple(this, true));
+        item.setOnClickListener(v -> openInTeam(this, owner, ses, to));
+    }
+
+    /**
+     * From one chat of a team to another (the bar's marks, the panel's cards), without a pile of screens: a member's
+     * chat opens over the team's chat; from one member's to another's, the first closes; and back to the team's chat
+     * is closing the member's, where the team's chat is under it (it is when the member's was opened from it).
+     */
+    static void openInTeam(android.app.Activity a, Sessions.Session owner, Sessions.Session here, Sessions.Session to) {
+        if (to == here) return;
+        boolean member = here != owner;
+        // the team's chat is right under this member's: it was opened from there (kept in its intent, which outlives
+        // the app being put away), or it is the screen under this one now
+        boolean under = member && (owner.id.equals(a.getIntent().getStringExtra("over_chat")) || isUnder(a, owner.id));
+        if (to == owner) {
+            if (!under) a.startActivity(new android.content.Intent(a, ChatActivity.class).putExtra("id", owner.id));
+            a.finish();
+            return;
+        }
+        a.startActivity(new android.content.Intent(a, ChatActivity.class).putExtra("id", to.id)
+                .putExtra("over_chat", !member || under ? owner.id : null));
+        if (member) a.finish();
+    }
+
+    private static boolean isUnder(android.app.Activity a, String chat) {
+        Screen u = a instanceof Screen ? ((Screen) a).under() : null;
+        return u instanceof ChatActivity && ((ChatActivity) u).ses != null && chat.equals(((ChatActivity) u).ses.id);
+    }
+
     /** The team panel: the team in its shape, live; from a member's own chat too (its team's). */
     private void openTeamPanel() {
         Sessions.Session owner = ses.parent.isEmpty() ? ses : ses.member.isEmpty() ? null : hub.sessions.find(ses.parent);
@@ -1124,7 +1163,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             teamChips.addView(gap, new LinearLayout.LayoutParams(dp(this, 6), 1));
             StringBuilder said = new StringBuilder();
             String word = getString(owner.running ? (waits ? R.string.team_waiting : R.string.helper_working) : R.string.team_ready);
-            teamChips.addView(TeamUi.barItem(this, getString(R.string.team_leader), Team.leaderColor(this), word, owner.running, owner == ses));
+            // a tap on one opens its own chat (the leader's: back to the team's chat); the shape and the arrow, and the
+            // one whose chat this is, open the team panel
+            View leadItem = TeamUi.barItem(this, getString(R.string.team_leader), Team.leaderColor(this), word, owner.running, owner == ses);
+            if (memberChat) barOpens(leadItem, owner, owner, getString(R.string.team_back_to_team) + ", " + word);
+            teamChips.addView(leadItem, barItemParams());
             said.append(getString(R.string.team_leader)).append(' ').append(word);
             for (int i = 0; i < t.members.size(); i++) {
                 Team.Member m = t.members.get(i);
@@ -1132,7 +1175,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 String st = TeamUi.state(this, h);
                 // (its state in a word: a command is too long for the bar; the line under the header has it whole)
                 View item = TeamUi.barItem(this, m.name, Team.color(this, m.color), st, h != null && h.running, h == ses);
-                teamChips.addView(item);
+                if (h != null && h != ses) barOpens(item, owner, h, getString(R.string.team_open_chat_of, m.name) + ", " + st);
+                teamChips.addView(item, barItemParams());
                 if (h == ses) // (a member's own chat: the bar scrolls to it, centred where it can be)
                     teamStrip.post(() -> teamStrip.scrollTo(Math.max(0, item.getLeft() - (teamStrip.getWidth() - item.getWidth()) / 2), 0));
                 said.append(", ").append(m.name).append(' ').append(st);
@@ -1367,7 +1411,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         c.view.addView(c.state, full());
         c.view.setOnClickListener(v -> {
             if (!own) {
-                startActivity(new android.content.Intent(this, ChatActivity.class).putExtra("id", chat));
+                startActivity(new android.content.Intent(this, ChatActivity.class).putExtra("id", chat).putExtra("over_chat", ses.id));
                 return;
             }
             // this chat's own screen: a sheet with the bigger picture and Show on my screen

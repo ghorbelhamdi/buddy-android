@@ -2930,7 +2930,7 @@
     <string name="team_sec_shape">Forma</string>
     <string name="team_sec_members">Membros</string>
     <string name="team_from_message">Da sua mensagem</string>
-    <string name="team_then_asks">Depois o líder pergunta o objetivo de cada membro, como passam o trabalho e as regras.</string>
+    <string name="team_then_asks">Objetivos, o que acontece quando um passo falha e regras começam com os padrões. Para mudar, diga ao líder.</string>
     <string name="team_card_for">O líder pede o seu OK, para %1$s.</string>
     <string name="team_card_task">A tarefa dada pelo líder: %1$s</string>
     <string name="team_card_task_you">A tarefa dada por você: %1$s</string>
@@ -2940,5 +2940,8 @@
     </plurals>
     <string name="team_show_all">Mostrar tudo</string>
     <string name="team_started_busy">A equipe está ativa. O líder ainda trabalhava, então recebe as perguntas no próximo passo.</string>
-    <string name="team_started_busy_agent">A equipe está ativa. O líder ainda trabalhava, então recebe as perguntas no próximo passo; o agente e o modelo escolhidos para ele não mudaram (mude no topo quando terminar).</string>
+    <string name="team_started_busy_agent">A equipe está ativa. O líder ainda trabalhava, então o agente e o modelo escolhidos para ele não mudaram (mude no topo quando terminar).</string>
+    <string name="team_carry_on">%1$s respondeu: o líder continua.</string>
+    <string name="background_type_code">O Buddy não captou o código de pareamento. Se “Parear dispositivo com código de pareamento” estiver aberto, mantenha aberto e digite aqui o código de 6 dígitos.</string>
+    <string name="background_no_code">Ainda não está aberto</string>
 </resources>

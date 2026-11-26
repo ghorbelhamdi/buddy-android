@@ -152,7 +152,9 @@ public class BackgroundActivity extends Screen {
             }
         } else {
             if (s == Background.Step.FAILED) {
-                body.addView(text(this, getString(R.string.background_failed, Background.detail()), 14, ERR), gap(16));
+                TextView why = text(this, getString(R.string.background_failed, Background.detail()), 14, ERR);
+                why.setTextIsSelectable(true); // (to copy into a report)
+                body.addView(why, gap(16));
             }
             Button go = button(this, getString(R.string.background_setup), true);
             go.setOnClickListener(v -> {

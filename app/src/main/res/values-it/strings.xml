@@ -2918,7 +2918,7 @@
     <string name="team_sec_shape">Forma</string>
     <string name="team_sec_members">Membri</string>
     <string name="team_from_message">Dal tuo messaggio</string>
-    <string name="team_then_asks">Poi il leader ti chiede l’obiettivo di ogni membro, il passaggio di consegne e le regole.</string>
+    <string name="team_then_asks">Obiettivi, cosa succede quando un passo fallisce e regole partono con valori predefiniti. Per cambiarli, dillo al leader.</string>
     <string name="team_card_for">Il leader chiede il tuo OK, per %1$s.</string>
     <string name="team_card_task">Il suo compito dal leader: %1$s</string>
     <string name="team_card_task_you">Il suo compito da te: %1$s</string>
@@ -2928,5 +2928,8 @@
     </plurals>
     <string name="team_show_all">Mostra tutto</string>
     <string name="team_started_busy">Il team è attivo. Il leader stava ancora lavorando: riceve le sue domande con il prossimo passo.</string>
-    <string name="team_started_busy_agent">Il team è attivo. Il leader stava ancora lavorando: riceve le sue domande con il prossimo passo; agente e modello scelti per lui non sono cambiati (cambiali in alto quando ha finito).</string>
+    <string name="team_started_busy_agent">Il team è attivo. Il leader stava ancora lavorando: agente e modello scelti per lui non sono cambiati (cambiali in alto quando ha finito).</string>
+    <string name="team_carry_on">%1$s ha risposto: il leader continua.</string>
+    <string name="background_type_code">Buddy non ha rilevato il codice di accoppiamento. Se “Accoppia dispositivo con codice di accoppiamento” è aperto, lascialo aperto e scrivi qui il suo codice a 6 cifre.</string>
+    <string name="background_no_code">Non è ancora aperto</string>
 </resources>

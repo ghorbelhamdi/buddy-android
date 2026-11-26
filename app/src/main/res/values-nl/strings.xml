@@ -2484,7 +2484,7 @@
     <string name="team_sec_shape">Vorm</string>
     <string name="team_sec_members">Leden</string>
     <string name="team_from_message">Uit je bericht</string>
-    <string name="team_then_asks">Daarna vraagt de leider je naar het doel van elk lid, de overdracht en regels.</string>
+    <string name="team_then_asks">Doelen, wat er gebeurt als een stap mislukt, en regels starten met standaardwaarden. Zeg het tegen de leider om ze te wijzigen.</string>
     <string name="team_card_for">De leider vraagt je OK, voor %1$s.</string>
     <string name="team_card_task">Zijn taak van de leider: %1$s</string>
     <string name="team_card_task_you">Zijn taak van jou: %1$s</string>
@@ -2494,5 +2494,8 @@
     </plurals>
     <string name="team_show_all">Alles tonen</string>
     <string name="team_started_busy">Het team staat aan. De leider werkte nog en krijgt zijn vragen bij de volgende stap.</string>
-    <string name="team_started_busy_agent">Het team staat aan. De leider werkte nog en krijgt zijn vragen bij de volgende stap; de agent en het model die je koos zijn niet gewijzigd (wijzig ze bovenaan als hij klaar is).</string>
+    <string name="team_started_busy_agent">Het team staat aan. De leider werkte nog, dus de agent en het model die je koos zijn niet gewijzigd (wijzig ze bovenaan als hij klaar is).</string>
+    <string name="team_carry_on">%1$s heeft geantwoord: de leider gaat verder.</string>
+    <string name="background_type_code">Buddy heeft de koppelcode niet opgepikt. Als ‘Apparaat koppelen met koppelingscode’ open is, laat het open en typ de 6-cijferige code hier.</string>
+    <string name="background_no_code">Het is nog niet open</string>
 </resources>

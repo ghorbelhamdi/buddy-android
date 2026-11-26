@@ -2908,7 +2908,7 @@
     <string name="team_sec_shape">Bentuk</string>
     <string name="team_sec_members">Anggota</string>
     <string name="team_from_message">Dari pesan Anda</string>
-    <string name="team_then_asks">Lalu pemimpin menanyakan tujuan tiap anggota, cara serah terima, dan aturannya.</string>
+    <string name="team_then_asks">Tujuan, apa yang terjadi saat langkah gagal, dan aturan dimulai dengan bawaan. Untuk mengubahnya, beri tahu pemimpin.</string>
     <string name="team_card_for">Pemimpin meminta persetujuan Anda, untuk %1$s.</string>
     <string name="team_card_task">Tugasnya dari pemimpin: %1$s</string>
     <string name="team_card_task_you">Tugasnya dari Anda: %1$s</string>
@@ -2917,5 +2917,8 @@
     </plurals>
     <string name="team_show_all">Tampilkan semua</string>
     <string name="team_started_busy">Tim aktif. Pemimpin masih bekerja, jadi ia mendapat pertanyaan lanjutannya pada langkah berikutnya.</string>
-    <string name="team_started_busy_agent">Tim aktif. Pemimpin masih bekerja, jadi ia mendapat pertanyaan lanjutannya pada langkah berikutnya; agen dan model yang Anda pilih untuknya tidak diubah (ubah di atas setelah selesai).</string>
+    <string name="team_started_busy_agent">Tim aktif. Pemimpin masih bekerja, jadi agen dan model yang Anda pilih untuknya tidak diubah (ubah di atas setelah selesai).</string>
+    <string name="team_carry_on">%1$s menjawab: pemimpin melanjutkan.</string>
+    <string name="background_type_code">Buddy belum mendapatkan kode penyambungan. Jika “Sambungkan perangkat dengan kode penyambungan” terbuka, biarkan terbuka dan ketik kode 6 digitnya di sini.</string>
+    <string name="background_no_code">Belum terbuka</string>
 </resources>

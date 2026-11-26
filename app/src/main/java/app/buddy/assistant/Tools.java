@@ -315,8 +315,8 @@ final class Tools {
                         .put("stop", boolProp("End the members that still work"))));
         t.put(tool("team_start",
                 "Only when the user asks for a team in a chat without one (\"start a team for my job hunt\", \"turn the "
-                        + "team back on\"): Buddy's team setup opens on their screen with what they said, asks them what they "
-                        + "left open (they pick the agents there), and the team starts when they tap Start the team. Pass ONLY "
+                        + "team back on\"): Buddy's team setup opens on their screen with what they said filled in (they pick "
+                        + "the agents there), and the team starts when they tap Start the team, with defaults for the rest. Pass ONLY "
                         + "what the user said in so many words: no member, agent, model, goal or setting they didn't name, "
                         + "and nothing you think would suit (Buddy asks them). With restore, the team this chat had last.",
                 props().put("restore", boolProp("The chat's last team again, as it was (then leave the rest out)"))
@@ -487,6 +487,13 @@ final class Tools {
             "reply_notification", "schedule_message", "clipboard_write", "phone_shell", "add_notification_rule", "run_on_computer"));
 
     JSONObject call(String name, JSONObject a) throws Exception {
+        // a team call's step shows as it comes in, whatever becomes of the call (also one that is refused): each
+        // call is then one arrival and one report by its agent, and the two are told apart (see ChatHub.ownStep)
+        if ("team".equals(name) || "team_change".equals(name)) {
+            final String chat = McpServer.CALLER_CHAT.get();
+            final JSONObject in = a == null ? new JSONObject() : a;
+            svc.runOnMain(() -> ChatHub.get(svc).ownStep(chat, name, in));
+        }
         // a session from outside Buddy counts as working for as long as its call goes (Sessions tab, Stop)
         final String outside = Background.outside(screenKey()) ? screenKey() : null;
         JSONObject r;
@@ -534,6 +541,12 @@ final class Tools {
             StepLog.record(svc, McpServer.CALLER_CHAT.get(), name, kept, said, !UNSEEN.contains(name));
         }
         if ("confirm".equals(name) || "ask".equals(name)) return r;
+        // (the agent gave up on this call: nobody reads its result, so what the user added waits for the next one)
+        // (asked only where there is something to hand over: the look at the caller's connection takes a moment)
+        if (ChatHub.get(svc).hasNotes(McpServer.CALLER_CHAT.get())) {
+            java.util.function.BooleanSupplier callerGone = McpServer.CALLER_GONE.get();
+            if (callerGone != null && callerGone.getAsBoolean()) return r;
+        }
         String notes = ChatHub.get(svc).takeNotes(McpServer.CALLER_CHAT.get());
         if (notes != null) {
             r.getJSONArray("content").put(new JSONObject().put("type", "text").put("text",

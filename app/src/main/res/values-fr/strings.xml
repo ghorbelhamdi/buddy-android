@@ -2918,7 +2918,7 @@
     <string name="team_sec_shape">Forme</string>
     <string name="team_sec_members">Membres</string>
     <string name="team_from_message">D’après votre message</string>
-    <string name="team_then_asks">Ensuite, le chef vous demande l’objectif de chaque membre, le passage de relais et les règles.</string>
+    <string name="team_then_asks">Les objectifs, ce qui se passe quand une étape échoue et les règles démarrent avec des valeurs par défaut. Pour les changer, dites-le au chef.</string>
     <string name="team_card_for">Le chef demande votre accord, pour %1$s.</string>
     <string name="team_card_task">Sa tâche donnée par le chef : %1$s</string>
     <string name="team_card_task_you">Sa tâche donnée par vous : %1$s</string>
@@ -2928,5 +2928,8 @@
     </plurals>
     <string name="team_show_all">Tout afficher</string>
     <string name="team_started_busy">L’équipe est active. Le chef travaillait encore : il reçoit ses questions avec sa prochaine étape.</string>
-    <string name="team_started_busy_agent">L’équipe est active. Le chef travaillait encore : il reçoit ses questions avec sa prochaine étape ; l’agent et le modèle choisis pour lui n’ont pas changé (changez-les en haut une fois qu’il a fini).</string>
+    <string name="team_started_busy_agent">L’équipe est active. Le chef travaillait encore : l’agent et le modèle choisis pour lui n’ont pas changé (changez-les en haut une fois qu’il a fini).</string>
+    <string name="team_carry_on">%1$s a répondu : le chef continue.</string>
+    <string name="background_type_code">Buddy n’a pas récupéré le code d’association. Si « Associer l’appareil avec un code d’association » est ouvert, laissez-le ouvert et tapez ici son code à 6 chiffres.</string>
+    <string name="background_no_code">Ce n’est pas encore ouvert</string>
 </resources>

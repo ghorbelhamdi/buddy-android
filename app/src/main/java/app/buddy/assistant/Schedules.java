@@ -514,7 +514,7 @@ public final class Schedules extends BroadcastReceiver {
      * internet: the task waits, as notification rules' runs do.
      */
     private static boolean busy(ChatHub hub, BuddyService svc) {
-        return hub.runningCount() > 0 || svc.paused() || (svc.bubble() != null && svc.bubble().confirming())
+        return hub.runningCount() > 0 || Team.aboutToCarryOn(hub) || svc.paused() || (svc.bubble() != null && svc.bubble().confirming())
                 || svc.controlRevoked() != null || !online();
     }
 
@@ -581,7 +581,8 @@ public final class Schedules extends BroadcastReceiver {
                 ChatHub hub = ChatHub.get(app);
                 for (String id : new ArrayList<>(running)) {
                     Sessions.Session s = hub.sessions.find(id);
-                    if (s != null && s.running && s.scheduledRun) continue;
+                    // (or its leader's turn is over and its team isn't done: the run goes on, see Team.carryOn)
+                    if (s != null && ((s.running && s.scheduledRun) || s.carryScheduled)) continue;
                     running.remove(id);
                     if (needScreen.remove(id) != null) clearNotice(app, id);
                 }
@@ -799,6 +800,15 @@ public final class Schedules extends BroadcastReceiver {
                     | Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS));
         } catch (Exception ignored) { // the notification still asks the user to unlock
         }
+    }
+
+    /**
+     * A scheduled run goes on in a turn its team's leader began by itself (see Team.carryOn): running still, as after
+     * the task was sent, so it waits for an unlock where it needs the screen and holds the phone awake.
+     */
+    static void carriedOn(Context c, Sessions.Session s) {
+        running.add(s.id);
+        holdWake();
     }
 
     /** The run keeps working with the screen off; an hour's wait for the user fits in, with time to finish. */

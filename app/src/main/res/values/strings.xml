@@ -3210,7 +3210,7 @@
     <string name="team_sec_shape">Shape</string>
     <string name="team_sec_members">Members</string>
     <string name="team_from_message">From your message</string>
-    <string name="team_then_asks">Then the leader asks you each member’s goal, how they hand off, and any rules.</string>
+    <string name="team_then_asks">Goals, what happens when a step fails, and rules start with defaults. To change them, tell the leader.</string>
     <string name="team_card_for">The leader asks for your OK, for %1$s.</string>
     <string name="team_card_task">Its task from the leader: %1$s</string>
     <string name="team_card_task_you">Its task from you: %1$s</string>
@@ -3220,5 +3220,8 @@
     </plurals>
     <string name="team_show_all">Show all</string>
     <string name="team_started_busy">The team is on. The leader was still working, so it gets its follow-up questions with its next step.</string>
-    <string name="team_started_busy_agent">The team is on. The leader was still working, so it gets its follow-up questions with its next step; the agent and model you picked for it weren’t changed (change them in the header once it’s done).</string>
+    <string name="team_started_busy_agent">The team is on. The leader was still working, so the agent and model you picked for it weren’t changed (change them in the header once it’s done).</string>
+    <string name="team_carry_on">%1$s answered: the leader carries on.</string>
+    <string name="background_type_code">Buddy hasn’t picked up the pairing code. If “Pair device with pairing code” is open, keep it open and type its 6-digit code here.</string>
+    <string name="background_no_code">It isn’t open yet</string>
 </resources>

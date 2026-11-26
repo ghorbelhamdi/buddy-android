@@ -2485,7 +2485,7 @@
     <string name="team_sec_shape">Form</string>
     <string name="team_sec_members">Mitglieder</string>
     <string name="team_from_message">Aus deiner Nachricht</string>
-    <string name="team_then_asks">Danach fragt dich der Leiter nach dem Ziel jedes Mitglieds, der Übergabe und Regeln.</string>
+    <string name="team_then_asks">Ziele, was bei einem fehlgeschlagenen Schritt passiert, und Regeln starten mit Standardwerten. Zum Ändern sag es dem Leiter.</string>
     <string name="team_card_for">Der Leiter bittet um dein OK, für %1$s.</string>
     <string name="team_card_task">Seine Aufgabe vom Leiter: %1$s</string>
     <string name="team_card_task_you">Seine Aufgabe von dir: %1$s</string>
@@ -2495,5 +2495,8 @@
     </plurals>
     <string name="team_show_all">Alle zeigen</string>
     <string name="team_started_busy">Das Team ist an. Der Leiter arbeitete noch und bekommt seine Rückfragen mit dem nächsten Schritt.</string>
-    <string name="team_started_busy_agent">Das Team ist an. Der Leiter arbeitete noch und bekommt seine Rückfragen mit dem nächsten Schritt; Agent und Modell, die du für ihn gewählt hast, wurden nicht geändert (ändere sie oben, wenn er fertig ist).</string>
+    <string name="team_started_busy_agent">Das Team ist an. Der Leiter arbeitete noch, daher wurden Agent und Modell, die du für ihn gewählt hast, nicht geändert (ändere sie oben, wenn er fertig ist).</string>
+    <string name="team_carry_on">%1$s hat geantwortet: der Leiter macht weiter.</string>
+    <string name="background_type_code">Buddy hat den Kopplungscode nicht erfasst. Wenn „Gerät über einen Kopplungscode koppeln“ offen ist, lass es offen und tippe den 6-stelligen Code hier ein.</string>
+    <string name="background_no_code">Es ist noch nicht offen</string>
 </resources>

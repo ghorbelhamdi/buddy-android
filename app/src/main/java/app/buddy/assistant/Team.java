@@ -276,31 +276,17 @@ final class Team {
         return b.length() == 0 ? "" : "[Since your last turn, past you:\n" + b + "]\n\n";
     }
 
-    /** The message that has the leader ask the user the rest, right after the team was turned on. */
+    /**
+     * The leader used to ask the user three things on cards once a team was on (each member's goal, the hand-off,
+     * rules). They were long and added little: a team now starts with its defaults (the shape's goals and hand-off, no
+     * rules, or what the user said in the chat), and the user changes them by telling the leader. Null: nothing to ask.
+     */
     static String interview(Team t) {
-        return interview(t, true, true, true);
+        return null;
     }
 
-    /** As above, asking only what the user left open (null when nothing is: no follow-ups then). */
     static String interview(Team t, boolean goals, boolean handoff, boolean rules) {
-        if (!goals && !handoff && !rules) return null;
-        StringBuilder now = new StringBuilder();
-        for (Member m : t.members) now.append(m.name).append(": ").append(m.goal).append("; ");
-        String[] h = handoffs(t.structure);
-        List<String> qs = new ArrayList<>();
-        if (goals) qs.add("What each member is for. Propose one line per member, fitted to what this chat is about (now: "
-                + now + "), with the option \"Use these\"; they can type changes.");
-        if (handoff) qs.add("How work is handed on, with the options: \"" + h[0] + "\", \"" + h[1] + "\", \"" + h[2] + "\".");
-        if (rules) qs.add("Rules for the whole team, with options that fit this chat (such as \"Tests must pass\", \"Keep the "
-                + "existing style\", \"Explain every change\") and \"No rules\".");
-        StringBuilder b = new StringBuilder("The user just turned on this chat's team and picked its members. Before any work, ask them ")
-                .append(qs.size() == 1 ? "this" : qs.size() == 2 ? "these two things" : "these three things")
-                .append(" with the ask tool, one call each, short (what they already said is set: don't ask it again):\n");
-        for (int i = 0; i < qs.size(); i++) b.append(i + 1).append(". ").append(qs.get(i)).append('\n');
-        return b.append("(These are phone tools: where your tools carry their server's name, mcp__phone__ask and mcp__phone__team_change.)\n")
-                .append("Then save what they chose with team_change, and tell them in two or three lines that the team is ready and ")
-                .append("that the boxes over the message box say who a message goes to. If they skip a question, keep what is set.")
-                .toString();
+        return null;
     }
 
     private static String memberPrompt(Team t, Member m, Sessions.Session parent, Sessions.Session h, boolean screen) {
@@ -455,8 +441,11 @@ final class Team {
     static void reported(ChatHub hub, Sessions.Session h) {
         Sessions.Session parent = hub.sessions.find(h.parent);
         if (parent == null || parent.team == null) return;
+        // however its run ended (an answer, nothing to say, stopped, removed from the team): the leader isn't waiting
+        // for it any more, and carries on with what its members answered once none of them works (see carryOn)
+        carryOnSoon(hub, parent);
         Member m = parent.team.byId(h.member);
-        if (m == null || "stopped".equals(h.outcome)) return;
+        if (m == null || "stopped".equals(h.outcome)) return; // (nothing of its own to tell)
         boolean failed = h.outcome != null;
         Bubble.Kind kind = failed ? Bubble.Kind.ERROR : Bubble.Kind.BUDDY;
         // its last words, and every file it gave since it was told (a saved file or a picture comes as a message of its own)
@@ -617,6 +606,95 @@ final class Team {
         return false;
     }
 
+    /** How often the leader carries on by itself before the user writes again: a bound for a team that loops. */
+    static final int MAX_CARRY_ON = 8;
+
+    /**
+     * A pipeline stopped when a member finished work the leader gave it after the leader's turn had ended (issue
+     * #81): its answer only reached the leader with the user's next message. Now, when the leader isn't working, none
+     * of the members it gave work to still works, and answers to it came in that it hasn't had, it carries on by
+     * itself with them (main thread). Not after the user stopped it or its own turn failed, and at most
+     * MAX_CARRY_ON times before the user writes again.
+     */
+    /**
+     * carryOn in a moment (a run that just ended has its last messages put in the chat first). Until then the chat
+     * counts as about to work (aboutToCarryOn): a scheduled task or a rule's run of another chat doesn't start in
+     * that gap, to find the leader starting beside it. Main thread.
+     */
+    static void carryOnSoon(final ChatHub hub, final Sessions.Session parent) {
+        if (parent.running || !parent.parent.isEmpty()) return;
+        parent.carrySoonUntil = SystemClock.elapsedRealtime() + 4000;
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> carryOn(hub, parent), 1500);
+    }
+
+    /** A team's leader is about to carry on by itself (see carryOnSoon). */
+    static boolean aboutToCarryOn(ChatHub hub) {
+        long now = SystemClock.elapsedRealtime();
+        for (Sessions.Session s : new ArrayList<>(hub.sessions.all)) if (s.carrySoonUntil > now) return true;
+        return false;
+    }
+
+    static void carryOn(ChatHub hub, Sessions.Session parent) {
+        parent.carrySoonUntil = 0;
+        if (parent.running || !hub.sessions.all.contains(parent)) return;
+        if (parent.team == null) { // (turned off meanwhile: a scheduled run whose end waited for the team is over)
+            endScheduled(hub, parent);
+            return;
+        }
+        BuddyService svc = BuddyService.get();
+        // not after a Stop (the chat's, or the bubble's on everything: phone control is taken back then), a failed
+        // turn, or too many turns of its own
+        boolean held = "stopped".equals(parent.outcome) || "failed".equals(parent.outcome) || parent.carriedOn >= MAX_CARRY_ON
+                || (svc != null && svc.controlRevoked() != null);
+        List<String> who = new ArrayList<>();
+        if (!held) {
+            for (Sessions.Session h : all(hub, parent.id)) if (h.running && !h.toldBy.isEmpty()) return; // (more to come)
+            synchronized (parent.messages) {
+                for (int i = Math.max(0, parent.teamAt); i < parent.messages.size(); i++) {
+                    Sessions.Msg m = parent.messages.get(i);
+                    // (answers: a member that only failed doesn't set the leader off by itself, turn after turn; its
+                    // error is in the chat for the user, and in the leader's next digest)
+                    if (m.kind == Bubble.Kind.BUDDY && !m.from.isEmpty() && !m.direct && !m.heard && !who.contains(m.fromName)) who.add(m.fromName);
+                }
+            }
+        }
+        if (who.isEmpty()) { // nothing to carry on with: a scheduled run whose end waited for the team is over now
+            endScheduled(hub, parent);
+            return;
+        }
+        parent.carriedOn++;
+        String names = android.text.TextUtils.join(", ", who);
+        hub.carryOn(parent, hub.app.getString(R.string.team_carry_on, names),
+                "[Buddy: " + names + " answered the work you gave them (above, under \"Since your last turn\"). Carry on "
+                        + "with the team's task: give the next member its part, send work back, or tell the user it is done. "
+                        + "Nobody wrote this turn's message: the user didn't.]");
+    }
+
+    /** A scheduled run whose end waited for the team (ChatHub.runEnded) is over: told now, unless it was quiet and said so. */
+    private static void endScheduled(ChatHub hub, Sessions.Session parent) {
+        if (!parent.carryScheduled) return;
+        parent.carryScheduled = false;
+        if (!parent.carryQuietSaid) KeepAwake.notifyEnded(hub.app, parent);
+        hub.changed(); // (Schedules lets the wake lock go)
+    }
+
+    /**
+     * The leader's turn ended, but its team isn't done: members it gave work to still work, or answered since. (Then a
+     * scheduled run's end is told when the team is, see ChatHub.runEnded.) Not when it won't carry on anyway.
+     */
+    static boolean moreToCome(ChatHub hub, Sessions.Session parent) {
+        if (parent.team == null || "stopped".equals(parent.outcome) || "failed".equals(parent.outcome)
+                || parent.carriedOn >= MAX_CARRY_ON) return false;
+        for (Sessions.Session h : all(hub, parent.id)) if (h.running && !h.toldBy.isEmpty()) return true;
+        synchronized (parent.messages) {
+            for (int i = Math.max(0, parent.teamAt); i < parent.messages.size(); i++) {
+                Sessions.Msg m = parent.messages.get(i);
+                if (m.kind == Bubble.Kind.BUDDY && !m.from.isEmpty() && !m.direct && !m.heard) return true;
+            }
+        }
+        return false;
+    }
+
     /** Whether the chat's leader waits in a team call for one of its members now (its state: Waiting). */
     static boolean waits(ChatHub hub, Sessions.Session parent) {
         if (!parent.running || AWAITED.isEmpty()) return false;
@@ -632,6 +710,8 @@ final class Team {
         List<String> ids = new ArrayList<>();
         for (Sessions.Session h : l) ids.add(h.id);
         AWAITED.addAll(ids);
+        final java.util.function.BooleanSupplier gone = McpServer.CALLER_GONE.get();
+        final int from = parent.messages.size();
         try {
             long start = SystemClock.elapsedRealtime();
             String said = null;
@@ -640,6 +720,7 @@ final class Team {
                     svc.runOnMain(() -> stop(hub, parent.id));
                     break;
                 }
+                if (gone != null && gone.getAsBoolean()) return gaveUp(svc, hub, parent, l, ids, from);
                 // what the leader does meanwhile, said as that: it waits for these (not "Telling …" the whole time)
                 StringBuilder who = new StringBuilder();
                 for (Sessions.Session h : l) if (h.running) who.append(who.length() > 0 ? ", " : "").append(h.title);
@@ -658,10 +739,34 @@ final class Team {
             CountDownLatch posted = new CountDownLatch(1);
             svc.runOnMain(posted::countDown);
             posted.await(5, TimeUnit.SECONDS);
+            // (also now: it may have given up in the moment the last member ended)
+            if (gone != null && gone.getAsBoolean()) return gaveUp(svc, hub, parent, l, ids, from);
             return report(hub, parent, l, note);
         } finally {
             AWAITED.removeAll(ids);
         }
+    }
+
+    /**
+     * The agent gave up on this team call (its own time limit) and works on: nobody gets what the call returns, so
+     * what the members answered since it began isn't the leader's yet. Its next digest, or carryOn, tells it.
+     */
+    private static String gaveUp(BuddyService svc, final ChatHub hub, final Sessions.Session parent, List<Sessions.Session> l,
+                                 List<String> ids, final int from) {
+        AWAITED.removeAll(ids);
+        final java.util.Set<String> members = new java.util.HashSet<>();
+        for (Sessions.Session h : l) members.add(h.member);
+        svc.runOnMain(() -> {
+            synchronized (parent.messages) {
+                for (int i = Math.min(from, parent.messages.size()); i < parent.messages.size(); i++) {
+                    Sessions.Msg m = parent.messages.get(i);
+                    if (members.contains(m.from) && !m.direct) m.heard = false;
+                }
+            }
+            hub.sessions.save(parent);
+            carryOnSoon(hub, parent); // (if its turn is over by now)
+        });
+        return "The call was given up on.";
     }
 
     private static String report(ChatHub hub, Sessions.Session parent, List<Sessions.Session> l, String note) {
@@ -828,8 +933,8 @@ final class Team {
     }
 
     /**
-     * A team the user asked for in the chat, as far as they said it (team_start): the setup opens with it and asks
-     * only what they left open, then the leader asks only the follow-ups they left open.
+     * A team the user asked for in the chat, as far as they said it (team_start): the setup opens with it, filled in;
+     * what they didn't say starts with its defaults (no questions after, see interview).
      */
     static final class Draft {
         Team team;
@@ -911,8 +1016,9 @@ final class Team {
         svc.runOnMain(hub::changed);
         return "Buddy's team setup waits for the user with what they said, and asks them what they left open (they pick "
                 + "each member's agent there): it opens on the phone's chat screen, and Buddy on their computer shows it in "
-                + "this chat too. The team starts when they tap Start the team; then you are told what is still open to ask. "
-                + "Tell them in a line to finish it there, and end your turn.";
+                + "this chat too. The team starts when they tap Start the team, with defaults for what they didn't say "
+                + "(each member's goal, the hand-off, no rules): don't ask them about those, they tell you when they want "
+                + "one changed. Tell them in a line to finish it there, and end your turn.";
     }
 
     /**

@@ -76,7 +76,7 @@ final class TeamUi {
                 tile.addView(pic, new LinearLayout.LayoutParams(dp(a, 40), dp(a, 32)));
                 TextView n = text(a, x[1], 11, on ? TEXT : TEXT2);
                 n.setGravity(Gravity.CENTER);
-                n.setMaxLines(2);
+                n.setMaxLines(3); // ("Doers with their own goals" lost its last word on two)
                 if (on) n.setTypeface(sans(a, 600));
                 n.setPaddingRelative(0, dp(a, 4), 0, 0);
                 tile.addView(n, full());
@@ -353,10 +353,9 @@ final class TeamUi {
             String leadState = ses.running ? a.getString(Team.waits(hub, ses) ? R.string.team_waiting : R.string.helper_working)
                     : a.getString(R.string.team_ready);
             View lead = info(a, a.getString(R.string.team_leader), Team.leaderColor(a), on, a.getString(R.string.team_this_chat),
-                    null, leadState, ses.running, true, here == ses, null, here == ses ? null : () -> {
+                    null, leadState, ses.running, true, here == ses, null, here == ses ? () -> shown.dialog.dismiss() : () -> {
                         shown.dialog.dismiss();
-                        a.startActivity(new android.content.Intent(a, ChatActivity.class).putExtra("id", ses.id));
-                        a.finish(); // (from a member's chat back to the team's: not a stack of them)
+                        ChatActivity.openInTeam(a, ses, here, ses); // (from a member's chat back to the team's)
                     });
             List<View> cards = new ArrayList<>();
             for (Team.Member m : t.members) {
@@ -365,10 +364,11 @@ final class TeamUi {
                 // (one with a hidden screen at all: hasApp answers from its last look, so the panel looks again soon)
                 screens |= h != null && h.background && Background.displayOf(h.id) != android.view.Display.DEFAULT_DISPLAY;
                 cards.add(info(a, m.name, Team.color(a, m.color), m.on(), m.goal, h == null ? null : h.lastReply, state(a, h),
-                        h != null && h.running, false, h == here, screen ? h : null, h == null || h == here ? null : () -> {
+                        h != null && h.running, false, h == here, screen ? h : null,
+                        // (the one whose chat this is: the panel closes, back to it)
+                        h == null ? null : h == here ? () -> shown.dialog.dismiss() : () -> {
                             shown.dialog.dismiss();
-                            a.startActivity(new android.content.Intent(a, ChatActivity.class).putExtra("id", h.id));
-                            if (here != ses) a.finish(); // (from one member's chat to another's)
+                            ChatActivity.openInTeam(a, ses, here, h);
                         }));
             }
             place(a, box, t.structure, lead, cards, cards.size());
@@ -523,7 +523,8 @@ final class TeamUi {
         if (open != null) {
             card.setForeground(c.getDrawable(ripple(c, false)));
             card.setOnClickListener(v -> open.run());
-            card.setContentDescription(c.getString(leader ? R.string.team_back_to_team : R.string.team_open_chat_of, name) + ", " + state);
+            card.setContentDescription((here ? name : c.getString(leader ? R.string.team_back_to_team : R.string.team_open_chat_of, name)) + ", " + state
+                    + (here ? ", " + c.getString(R.string.bubble_close) : ""));
         }
         return card;
     }
@@ -744,14 +745,27 @@ final class TeamUi {
 
     // ------------------------------------------------------------------ in the chat
 
+    /**
+     * What a member's mark says: its initial, with its number where its name ends in one ("Worker 2": W2; a number of
+     * two digits alone), so a team of Worker 1 to 4 isn't four times W.
+     */
+    static String mark(String name) {
+        String n = name == null ? "" : name.trim();
+        if (n.isEmpty()) return "?";
+        String first = n.substring(0, n.offsetByCodePoints(0, 1)).toUpperCase(java.util.Locale.getDefault());
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d{1,2})$").matcher(n);
+        if (!m.find() || m.start() == 0) return first;
+        return m.group(1).length() == 1 ? first + m.group(1) : m.group(1);
+    }
+
     /** A member's mark: its initial on its colour, in the ink (dark or light) that reads on it. */
     static TextView avatar(Context c, String name, int color, int sizeDp) {
         TextView t = new TextView(c);
-        String n = name == null ? "" : name.trim();
-        t.setText(n.isEmpty() ? "?" : n.substring(0, n.offsetByCodePoints(0, 1)).toUpperCase(java.util.Locale.getDefault()));
+        String mark = mark(name);
+        t.setText(mark);
         t.setGravity(Gravity.CENTER);
         t.setIncludeFontPadding(false);
-        t.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, sizeDp * 0.5f);
+        t.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, sizeDp * (mark.length() > 1 ? 0.42f : 0.5f));
         t.setTypeface(sans(c, 700));
         t.setTextColor(Theme.luminance(color) > 0.5 ? 0xFF1A1714 : 0xFFFFFFFF);
         t.setBackground(oval(color));
@@ -785,7 +799,7 @@ final class TeamUi {
             TextView av = avatar(c, (String) r[1], (Integer) r[2], 18);
             av.setBackground(outlinedOval(c, (Integer) r[2], CARD2, 2));
             LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) av.getLayoutParams();
-            if (shown > 1) p.setMarginStart(-dp(c, 6));
+            if (shown > 1) p.setMarginStart(-dp(c, 3)); // (a little over the one before: its number stays readable)
             chip.addView(av, p);
         }
         String label = names.size() == 1 ? c.getString(R.string.team_to, names.get(0)) : c.getString(R.string.team_to_n, names.size());
@@ -902,16 +916,22 @@ final class TeamUi {
             TextView av = avatar(c, (String) w[0], (Integer) w[1], 22);
             av.setBackground(outlinedOval(c, (Integer) w[1], CARD, 2));
             LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) av.getLayoutParams();
-            if (seen.size() > 1) p.setMarginStart(-dp(c, 6));
+            if (seen.size() > 1) p.setMarginStart(-dp(c, 3)); // (a little over the one before: its number stays readable)
             head.addView(av, p);
         }
-        TextView n = single(text(c, c.getResources().getQuantityString(R.plurals.team_round, who.size(), who.size()), 13, TEXT));
+        // (never cut short: with four marks beside it "4 answers" lost its end; a second line where it must)
+        TextView n = text(c, c.getResources().getQuantityString(R.plurals.team_round, who.size(), who.size()), 13, TEXT);
+        n.setMaxLines(2);
         n.setTypeface(sans(c, 600));
         n.setPaddingRelative(dp(c, 8), 0, dp(c, 8), 0);
         head.addView(n, weight1());
         Button all = button(c, c.getString(R.string.team_show_all), false);
         all.setMinHeight(dp(c, 36));
         all.setMinimumHeight(dp(c, 36));
+        all.setMinWidth(0);
+        all.setMinimumWidth(0);
+        all.setPaddingRelative(dp(c, 12), 0, dp(c, 12), 0);
+        all.setTextSize(13);
         all.setOnClickListener(v -> showAll.run());
         head.addView(all, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(c, 36)));
         card.addView(head, full());
