@@ -355,8 +355,7 @@ final class TeamUi {
             View lead = info(a, a.getString(R.string.team_leader), Team.leaderColor(a), on, a.getString(R.string.team_this_chat),
                     null, leadState, ses.running, true, here == ses, null, here == ses ? () -> shown.dialog.dismiss() : () -> {
                         shown.dialog.dismiss();
-                        a.startActivity(new android.content.Intent(a, ChatActivity.class).putExtra("id", ses.id));
-                        a.finish(); // (from a member's chat back to the team's: not a stack of them)
+                        ChatActivity.openInTeam(a, ses, here, ses); // (from a member's chat back to the team's)
                     });
             List<View> cards = new ArrayList<>();
             for (Team.Member m : t.members) {
@@ -369,8 +368,7 @@ final class TeamUi {
                         // (the one whose chat this is: the panel closes, back to it)
                         h == null ? null : h == here ? () -> shown.dialog.dismiss() : () -> {
                             shown.dialog.dismiss();
-                            a.startActivity(new android.content.Intent(a, ChatActivity.class).putExtra("id", h.id));
-                            if (here != ses) a.finish(); // (from one member's chat to another's)
+                            ChatActivity.openInTeam(a, ses, here, h);
                         }));
             }
             place(a, box, t.structure, lead, cards, cards.size());
@@ -525,7 +523,8 @@ final class TeamUi {
         if (open != null) {
             card.setForeground(c.getDrawable(ripple(c, false)));
             card.setOnClickListener(v -> open.run());
-            card.setContentDescription((here ? name : c.getString(leader ? R.string.team_back_to_team : R.string.team_open_chat_of, name)) + ", " + state);
+            card.setContentDescription((here ? name : c.getString(leader ? R.string.team_back_to_team : R.string.team_open_chat_of, name)) + ", " + state
+                    + (here ? ", " + c.getString(R.string.bubble_close) : ""));
         }
         return card;
     }

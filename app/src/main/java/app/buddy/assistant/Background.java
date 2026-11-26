@@ -1185,24 +1185,34 @@ final class Background {
                 waitUntil = System.currentTimeMillis() + 5 * 60_000;
                 set(Step.WAITING, "");
                 // Buddy goes there itself; wherever that stops short, the user does the step and it carries on
+                final boolean[] walked = {false};
                 new Thread(() -> {
                     try {
                         openWireless(svc, true);
                     } catch (Exception ignored) {
+                    } finally {
+                        walked[0] = true;
                     }
                 }).start();
                 String[] found = null;
                 typed = null;
+                noCode = false;
                 lastSeen = null;
-                long askAt = System.currentTimeMillis() + 20_000;
+                long inSettings = 0; // since when Settings has been in front with Buddy's walk over, unread
                 boolean asked = false;
-                while (step == Step.WAITING && System.currentTimeMillis() < waitUntil && found == null) {
+                while (step == Step.WAITING && System.currentTimeMillis() < waitUntil && found == null && !noCode) {
                     sleep(700);
                     found = pairingDialog(svc);
                     if (found == null) found = typed;
                     // some phones don't let Buddy read that dialog (a Pixel on Android 17, issue #93): the user types
-                    // the code into the bubble instead, over Settings, as the code only works while the dialog is open
-                    if (found == null && !asked && System.currentTimeMillis() > askAt) {
+                    // the code into the bubble instead, over Settings, as the code only works while the dialog is open.
+                    // Only once Settings has been in front for a while after Buddy's own way there ended: someone who
+                    // first turns Developer options or Wi-Fi on isn't told their phone can't be read
+                    String seen = lastSeen;
+                    if (found != null || !walked[0] || seen == null || !seen.startsWith("in front") || !seen.contains("in Settings")
+                            || !settingsInFront) inSettings = 0;
+                    else if (inSettings == 0) inSettings = System.currentTimeMillis();
+                    if (found == null && !asked && inSettings != 0 && System.currentTimeMillis() - inSettings > 20_000) {
                         asked = true;
                         askForCode(svc);
                     }
@@ -1410,33 +1420,61 @@ final class Background {
         return port;
     }
 
-    /** The pairing code and port the user typed into the bubble (askForCode), or null. */
+    /** The pairing code the user typed into the bubble (askForCode), as {code, null}, or null. */
     private static volatile String[] typed;
+    /** The user answered that question with "I don't see a code" (or closed it): setup ends, saying what Buddy saw. */
+    private static volatile boolean noCode;
+    /** Settings is in front right now (pairingDialog's last look). */
+    private static volatile boolean settingsInFront;
 
     /**
-     * Asks in the bubble for the code and the port that "Pair with device" shows, next to the bubble so the dialog
-     * stays open; it closes by itself if Buddy reads the dialog meanwhile. What the user types goes to typed.
+     * Asks in the bubble for the code that "Pair with device" shows, next to the bubble so the dialog stays open; it
+     * closes by itself if Buddy reads the dialog meanwhile. A code goes to typed (Buddy finds the port itself, see
+     * pairingPorts: a number typed beside the code is as likely the connect port, which doesn't pair); an answer
+     * without one is asked again, twice; "I don't see a code" or a closed question ends the setup (noCode).
      */
     private static void askForCode(BuddyService svc) {
         new Thread(() -> {
+            McpServer.CALLER_REMOTE.set("Buddy"); // (the card's label: Buddy's own question, of no chat or session)
             try {
-                String a = svc.askQuestion(svc.getString(R.string.background_type_code),
-                        java.util.Collections.singletonList(svc.getString(R.string.background_no_code)), true,
-                        () -> pairingDialog(svc) != null || step != Step.WAITING ? "read" : null);
-                if (!a.startsWith("ANSWER (typed")) return;
-                Matcher code = Pattern.compile("(?<!\\d)(\\d{6})(?!\\d)").matcher(a);
-                if (!code.find()) return;
-                String port = null;
-                Matcher p = Pattern.compile(":\\s*(\\d{4,5})(?!\\d)").matcher(a);
-                if (p.find()) port = p.group(1);
-                else { // a second number: the port written on its own
-                    Matcher any = Pattern.compile("(?<!\\d)(\\d{4,5})(?!\\d)").matcher(a);
-                    while (any.find()) if (!any.group(1).equals(code.group(1))) port = any.group(1);
+                for (int i = 0; i < 3 && step == Step.WAITING; i++) {
+                    String a = svc.askQuestion(svc.getString(R.string.background_type_code),
+                            java.util.Collections.singletonList(svc.getString(R.string.background_no_code)), true,
+                            () -> pairingDialog(svc) != null || step != Step.WAITING ? "read" : null);
+                    if (step != Step.WAITING || a.startsWith("read")) return; // (read after all, or over)
+                    if (!a.startsWith("ANSWER (typed")) { // the button, closed, or no answer in time
+                        noCode = true;
+                        return;
+                    }
+                    String code = codeIn(a.substring(a.indexOf(':') + 1));
+                    if (code != null) {
+                        typed = new String[]{code, null};
+                        return;
+                    }
                 }
-                typed = new String[]{code.group(1), port};
+                noCode = true;
             } catch (Exception ignored) {
+            } finally {
+                McpServer.CALLER_REMOTE.remove();
             }
         }, "pair-code-ask").start();
+    }
+
+    /**
+     * The 6-digit pairing code in what the user typed, or null: digits of any script, written in one piece or as
+     * "482 913" (with spaces or dashes inside it).
+     */
+    static String codeIn(String said) {
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < said.length(); ) {
+            int cp = said.codePointAt(i), d = Character.digit(cp, 10);
+            b.append(d >= 0 ? String.valueOf(d) : new String(Character.toChars(cp)));
+            i += Character.charCount(cp);
+        }
+        Matcher whole = Pattern.compile("(?<!\\d)(\\d{6})(?!\\d)").matcher(b);
+        if (whole.find()) return whole.group(1);
+        Matcher parts = Pattern.compile("(?<!\\d)(\\d{3})[ \\-\u00a0](\\d{3})(?!\\d)").matcher(b);
+        return parts.find() ? parts.group(1) + parts.group(2) : null;
     }
 
     private static boolean isList(AccessibilityNodeInfo n) {
@@ -1454,23 +1492,24 @@ final class Background {
      */
     private static String[] pairingDialog(BuddyService svc) {
         try {
-            StringBuilder apps = new StringBuilder();
+            java.util.Set<String> apps = new java.util.LinkedHashSet<>();
             boolean settings = false;
             java.util.Set<String> shapes = new java.util.LinkedHashSet<>();
             int[] texts = {0};
             for (AccessibilityWindowInfo w : svc.getWindows()) {
                 AccessibilityNodeInfo root = w.getRoot();
                 String pkg = root == null ? "(a window Buddy can't read)" : String.valueOf(root.getPackageName());
-                if (apps.indexOf(pkg) < 0) apps.append(apps.length() > 0 ? ", " : "").append(pkg);
+                apps.add(pkg);
                 if (root == null || !"com.android.settings".contentEquals(pkg)) continue;
                 settings = true;
                 String[] found = new String[2];
                 scan(root, found, 0, shapes, texts);
                 if (found[0] != null) return found;
             }
+            settingsInFront = settings;
             // what Buddy could see instead, for the reason when setup gives up (issue #93): the apps in front and, in
             // Settings, how many texts and the shapes of the numbers among them (digits as #, never the numbers)
-            String now = "in front: " + (apps.length() == 0 ? "no window" : apps) + (settings
+            String now = "in front: " + (apps.isEmpty() ? "no window" : android.text.TextUtils.join(", ", apps)) + (settings
                     ? "; in Settings " + texts[0] + " texts, numbers shaped: " + (shapes.isEmpty() ? "none" : shapes) : "");
             if (settings || lastSeen == null || !lastSeen.contains("in Settings")) lastSeen = now; // (Settings' last look stays)
         } catch (Exception e) {

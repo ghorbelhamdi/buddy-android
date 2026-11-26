@@ -389,6 +389,7 @@ final class ChatHub {
                 }
             } else { // only members: the chat shows the message, its own agent doesn't run
                 if (ses.archived) ses.archived = false;
+                ses.carriedOn = 0; // (the user's word: the leader may carry on by itself again)
                 sessions.add(ses, Bubble.Kind.USER, text, hasFiles ? new ArrayList<>(files) : null);
                 Sessions.Msg um = ses.messages.get(ses.messages.size() - 1);
                 um.to = sendingTo;
@@ -613,13 +614,14 @@ final class ChatHub {
         heardNow.clear();
         ses.interrupted = false;
         // the user writing in an archived chat brings it back (not a sub-agent's: its parent's chat lists it)
-        if (!scheduled && !rule && ses.parent.isEmpty()) ses.archived = false;
+        if (!scheduled && !rule && !sendingOwn && ses.parent.isEmpty()) ses.archived = false;
         sessions.add(ses, sendingOwn ? Bubble.Kind.NOTE : Bubble.Kind.USER, text, hasFiles ? new ArrayList<>(files) : null);
         if (!sendingOwn) ses.said++; // (a message that starts its agent's run: a helper's turn, see Helpers; not a note or a member's message)
-        if (!scheduled && !rule) SpeechPause.sent(app);
+        if (!scheduled && !rule && !sendingOwn) SpeechPause.sent(app);
         Sessions.Msg um = ses.messages.get(ses.messages.size() - 1);
-        if (team != null && !sendingOwn) {
-            um.to = sendingTo != null ? sendingTo : app.getString(R.string.team_leader);
+        if (sendingOwn) um.turn = true;
+        if (team != null) {
+            if (!sendingOwn) um.to = sendingTo != null ? sendingTo : app.getString(R.string.team_leader);
             ses.teamAt = ses.messages.size(); // the leader has had word of everything up to here
             sessions.save(ses);
         }
@@ -1173,6 +1175,8 @@ final class ChatHub {
         if (ses.parent.isEmpty()) { // a stopped task's helpers stop with it, and its team's members
             Helpers.stop(this, ses.id);
             Team.stop(this, ses.id);
+            // (and its leader doesn't carry on by itself, also when it wasn't working: until the user writes again)
+            if (ses.team != null) ses.carriedOn = Team.MAX_CARRY_ON;
         }
         if (!ses.running) return;
         BuddyService svc = BuddyService.get();
@@ -1289,9 +1293,11 @@ final class ChatHub {
                             ses.cmd = null;
                         }
                         String full = step == null ? null : describeTool(c.optString("name"), c.optJSONObject("input"), true);
-                        if (full != null && full.equals(ses.ownStep)) { // (Buddy showed it when the call came in)
-                            ses.ownStep = null;
+                        boolean teamStep = tn.equals(TOOL_PREFIX + "team") || tn.equals(TOOL_PREFIX + "team_change");
+                        if (full != null && teamStep && ses.stepsShown.remove(full)) {
+                            // (Buddy showed it when the call came in: not twice)
                         } else if (step != null) {
+                            if (teamStep) ses.stepsReported.add(full); // (its call comes in after: not shown again then)
                             add(ses, Bubble.Kind.STEP, full);
                             ses.status = step;
                             String n = c.optString("name");
@@ -1341,7 +1347,7 @@ final class ChatHub {
                 boolean shown = false;
                 for (int i = ses.messages.size() - 1; i >= 0 && !shown; i--) {
                     Sessions.Msg m = ses.messages.get(i);
-                    if (m.kind == Bubble.Kind.USER) break;
+                    if (m.kind == Bubble.Kind.USER || m.turn) break;
                     if (m.kind != Bubble.Kind.BUDDY) continue;
                     for (String f : m.files) if (Attachments.isImage(f)) shown = true; // (a saved PDF's chip isn't one)
                 }
@@ -1451,6 +1457,7 @@ final class ChatHub {
         text = text == null ? "" : text.trim();
         if (text.isEmpty()) return null;
         if (!ses.running) return send(ses, text, null);
+        ses.carriedOn = 0; // (the user's word, while it works: its leader may carry on by itself again)
         // writing to the agent while paused in the browser's live view: the user is done there
         BuddyService svc = BuddyService.get();
         if (svc != null && svc.pausedForBrowser()) svc.resume();
@@ -1617,6 +1624,8 @@ final class ChatHub {
 
     private void startRun(Sessions.Session ses) {
         ses.running = true;
+        ses.stepsShown.clear();
+        ses.stepsReported.clear();
         ses.phoneToolAt = 0; // (what its earlier run did says nothing about this one)
         ses.cmd = null;
         ses.otherToolAt = 0;
@@ -1689,7 +1698,7 @@ final class ChatHub {
                 made.fromOn = Account.nameOf(ses.backend) + (ses.model == null || ses.model.isEmpty() ? "" : " · " + Models.label(ses.backend, ses.model));
                 for (int i = ses.messages.size() - 2; i >= 0; i--) {
                     Sessions.Msg x = ses.messages.get(i);
-                    if (x.kind == Bubble.Kind.BUDDY && x.from.isEmpty()) break;
+                    if ((x.kind == Bubble.Kind.BUDDY && x.from.isEmpty()) || x.turn) break; // (a turn it began itself answers no message)
                     if (x.kind == Bubble.Kind.USER && x.toLeader) {
                         made.quote = clip(x.label(), 300);
                         break;
@@ -1821,11 +1830,10 @@ final class ChatHub {
         if (s == null || !s.running) return;
         String full = describeTool(TOOL_PREFIX + tool, in, true);
         if (full == null) return;
-        Sessions.Msg last = s.messages.isEmpty() ? null : s.messages.get(s.messages.size() - 1);
-        if (last != null && last.kind == Bubble.Kind.STEP && full.equals(last.text)) return; // (the agent said it already)
+        if (s.stepsReported.remove(full)) return; // (the agent said it already)
         add(s, Bubble.Kind.STEP, full);
         s.status = describeTool(TOOL_PREFIX + tool, in);
-        s.ownStep = full;
+        s.stepsShown.add(full);
         changed();
     }
 

@@ -456,7 +456,11 @@ final class Team {
         Sessions.Session parent = hub.sessions.find(h.parent);
         if (parent == null || parent.team == null) return;
         Member m = parent.team.byId(h.member);
-        if (m == null || "stopped".equals(h.outcome)) return;
+        if (m == null) return;
+        if ("stopped".equals(h.outcome)) { // (nothing of its own to tell; what the others answered meanwhile goes on)
+            if (!parent.running) new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> carryOn(hub, parent), 1500);
+            return;
+        }
         boolean failed = h.outcome != null;
         Bubble.Kind kind = failed ? Bubble.Kind.ERROR : Bubble.Kind.BUDDY;
         // its last words, and every file it gave since it was told (a saved file or a picture comes as a message of its own)
@@ -639,7 +643,9 @@ final class Team {
         synchronized (parent.messages) {
             for (int i = Math.max(0, parent.teamAt); i < parent.messages.size(); i++) {
                 Sessions.Msg m = parent.messages.get(i);
-                if (!m.from.isEmpty() && !m.direct && !m.heard && !who.contains(m.fromName)) who.add(m.fromName);
+                // (answers: a member that only failed doesn't set the leader off by itself, turn after turn; its
+                // error is in the chat for the user, and in the leader's next digest)
+                if (m.kind == Bubble.Kind.BUDDY && !m.from.isEmpty() && !m.direct && !m.heard && !who.contains(m.fromName)) who.add(m.fromName);
             }
         }
         if (who.isEmpty()) return;
@@ -666,6 +672,8 @@ final class Team {
         List<String> ids = new ArrayList<>();
         for (Sessions.Session h : l) ids.add(h.id);
         AWAITED.addAll(ids);
+        final java.util.function.BooleanSupplier gone = McpServer.CALLER_GONE.get();
+        final int from = parent.messages.size();
         try {
             long start = SystemClock.elapsedRealtime();
             String said = null;
@@ -673,6 +681,23 @@ final class Team {
                 if (!parent.running || "stopped".equals(parent.outcome)) { // the user stopped the task: its members too
                     svc.runOnMain(() -> stop(hub, parent.id));
                     break;
+                }
+                // the agent gave up on this call (its own time limit) and works on: nobody gets what this returns, so
+                // what the members answered meanwhile isn't the leader's yet. Its next digest, or carryOn, tells it
+                if (gone != null && gone.getAsBoolean()) {
+                    AWAITED.removeAll(ids);
+                    final java.util.Set<String> members = new java.util.HashSet<>();
+                    for (Sessions.Session h : l) members.add(h.member);
+                    svc.runOnMain(() -> {
+                        synchronized (parent.messages) {
+                            for (int i = Math.min(from, parent.messages.size()); i < parent.messages.size(); i++) {
+                                Sessions.Msg m = parent.messages.get(i);
+                                if (members.contains(m.from) && !m.direct) m.heard = false;
+                            }
+                        }
+                        hub.sessions.save(parent);
+                    });
+                    return "The call was given up on.";
                 }
                 // what the leader does meanwhile, said as that: it waits for these (not "Telling …" the whole time)
                 StringBuilder who = new StringBuilder();
