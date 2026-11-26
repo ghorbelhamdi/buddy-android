@@ -88,6 +88,7 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             return;
         }
         pendingLinux = LINUX_CHIPS.computeIfAbsent(ses.id, k -> new java.util.ArrayList<>());
+        OPEN.put(ses.id, new java.lang.ref.WeakReference<>(this));
         maxBubble = (int) (getResources().getDisplayMetrics().widthPixels * 0.82f);
 
         LinearLayout root = column(this);
@@ -1090,14 +1091,29 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
     static void openInTeam(android.app.Activity a, Sessions.Session owner, Sessions.Session here, Sessions.Session to) {
         if (to == here) return;
         boolean member = here != owner;
-        boolean under = member && a.getIntent().getBooleanExtra("under_team", false);
-        if (to == owner) {
-            if (!under) a.startActivity(new android.content.Intent(a, ChatActivity.class).putExtra("id", owner.id));
+        if (to == owner) { // (its screen is there already, however this one was opened: back to it)
+            if (!isOpen(owner.id)) a.startActivity(new android.content.Intent(a, ChatActivity.class).putExtra("id", owner.id));
             a.finish();
             return;
         }
-        a.startActivity(new android.content.Intent(a, ChatActivity.class).putExtra("id", to.id).putExtra("under_team", !member || under));
+        a.startActivity(new android.content.Intent(a, ChatActivity.class).putExtra("id", to.id));
         if (member) a.finish();
+    }
+
+    /** The chat screens that are open, by chat: openInTeam goes back to one that is there, and doesn't open it again. */
+    private static final java.util.Map<String, java.lang.ref.WeakReference<ChatActivity>> OPEN = new java.util.HashMap<>();
+
+    private static boolean isOpen(String chat) {
+        java.lang.ref.WeakReference<ChatActivity> r = OPEN.get(chat);
+        ChatActivity c = r == null ? null : r.get();
+        return c != null && !c.isFinishing() && !c.isDestroyed();
+    }
+
+    @Override
+    protected void onDestroy() {
+        java.lang.ref.WeakReference<ChatActivity> r = ses == null ? null : OPEN.get(ses.id);
+        if (r != null && r.get() == this) OPEN.remove(ses.id);
+        super.onDestroy();
     }
 
     /** The team panel: the team in its shape, live; from a member's own chat too (its team's). */

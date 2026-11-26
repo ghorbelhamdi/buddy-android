@@ -802,6 +802,15 @@ public final class Schedules extends BroadcastReceiver {
     }
 
     /** The run keeps working with the screen off; an hour's wait for the user fits in, with time to finish. */
+    /**
+     * A scheduled run goes on in a turn its team's leader began by itself (see Team.carryOn): running still, as after
+     * the task was sent, so it waits for an unlock where it needs the screen and holds the phone awake.
+     */
+    static void carriedOn(Context c, Sessions.Session s) {
+        running.add(s.id);
+        holdWake();
+    }
+
     private static void holdWake() {
         if (wake == null) {
             wake = app.getSystemService(PowerManager.class).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "buddy:schedule");

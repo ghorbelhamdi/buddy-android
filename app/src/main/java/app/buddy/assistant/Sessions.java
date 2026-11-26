@@ -181,6 +181,11 @@ final class Sessions {
         /** A team's chat, not saved: how often its leader carried on by itself since the user last wrote (Team.carryOn). */
         int carriedOn;
         /**
+         * A team's chat, not saved: its leader's scheduled turn ended while its team wasn't done, so that run's end
+         * wasn't told yet; the turn it carries on with is that scheduled run still (quiet: as it was), see Team.carryOn.
+         */
+        boolean carryScheduled, carryQuiet;
+        /**
          * Not saved, this run's team steps (see ChatHub.ownStep): the ones Buddy showed when the call came in and the
          * agent hasn't reported yet, and the ones the agent reported whose call hasn't come in yet. A step shows once.
          */

@@ -1182,22 +1182,26 @@ final class Background {
                 }
                 // (Settings.Global.DEVELOPMENT_SETTINGS_ENABLED isn't asked: a Pixel on Android 17 answers 0 with
                 // Developer options on, issue #29. Whether they're on shows when Buddy opens them.)
+                // (this attempt's: a question left open by an earlier one counts for nothing in it, see askForCode)
+                final int mine = ++attempt;
+                typed = null;
+                noCode = false;
+                lastSeen = null;
+                settingsInFront = false;
+                frontUnread = false;
                 waitUntil = System.currentTimeMillis() + 5 * 60_000;
                 set(Step.WAITING, "");
                 // Buddy goes there itself; wherever that stops short, the user does the step and it carries on
-                final boolean[] walked = {false};
+                final java.util.concurrent.atomic.AtomicBoolean walked = new java.util.concurrent.atomic.AtomicBoolean();
                 new Thread(() -> {
                     try {
                         openWireless(svc, true);
                     } catch (Exception ignored) {
                     } finally {
-                        walked[0] = true;
+                        walked.set(true);
                     }
                 }).start();
                 String[] found = null;
-                typed = null;
-                noCode = false;
-                lastSeen = null;
                 long inSettings = 0; // since when Settings has been in front with Buddy's walk over, unread
                 boolean asked = false;
                 while (step == Step.WAITING && System.currentTimeMillis() < waitUntil && found == null && !noCode) {
@@ -1206,15 +1210,14 @@ final class Background {
                     if (found == null) found = typed;
                     // some phones don't let Buddy read that dialog (a Pixel on Android 17, issue #93): the user types
                     // the code into the bubble instead, over Settings, as the code only works while the dialog is open.
-                    // Only once Settings has been in front for a while after Buddy's own way there ended: someone who
-                    // first turns Developer options or Wi-Fi on isn't told their phone can't be read
-                    String seen = lastSeen;
-                    if (found != null || !walked[0] || seen == null || !seen.startsWith("in front") || !seen.contains("in Settings")
-                            || !settingsInFront) inSettings = 0;
+                    // Only once Settings (or a window Buddy can't read at all) has been in front for a while after
+                    // Buddy's own way there ended: someone who first turns Developer options or Wi-Fi on isn't told
+                    // their phone can't be read
+                    if (found != null || !walked.get() || !(settingsInFront || frontUnread)) inSettings = 0;
                     else if (inSettings == 0) inSettings = System.currentTimeMillis();
                     if (found == null && !asked && inSettings != 0 && System.currentTimeMillis() - inSettings > 20_000) {
                         asked = true;
-                        askForCode(svc);
+                        askForCode(svc, mine);
                     }
                 }
                 if (step != Step.WAITING) return; // cancelled
@@ -1424,8 +1427,10 @@ final class Background {
     private static volatile String[] typed;
     /** The user answered that question with "I don't see a code" (or closed it): setup ends, saying what Buddy saw. */
     private static volatile boolean noCode;
-    /** Settings is in front right now (pairingDialog's last look). */
-    private static volatile boolean settingsInFront;
+    /** Settings is in front right now, or a window Buddy can't read at all (pairingDialog's last look). */
+    private static volatile boolean settingsInFront, frontUnread;
+    /** Which setup attempt runs: an earlier one's question, still open, is told apart by it. */
+    private static volatile int attempt;
 
     /**
      * Asks in the bubble for the code that "Pair with device" shows, next to the bubble so the dialog stays open; it
@@ -1433,15 +1438,29 @@ final class Background {
      * pairingPorts: a number typed beside the code is as likely the connect port, which doesn't pair); an answer
      * without one is asked again, twice; "I don't see a code" or a closed question ends the setup (noCode).
      */
-    private static void askForCode(BuddyService svc) {
+    private static void askForCode(BuddyService svc, final int mine) {
         new Thread(() -> {
             McpServer.CALLER_REMOTE.set("Buddy"); // (the card's label: Buddy's own question, of no chat or session)
             try {
-                for (int i = 0; i < 3 && step == Step.WAITING; i++) {
+                for (int i = 0; i < 3 && step == Step.WAITING && attempt == mine; i++) {
+                    // what closes the question by itself: Buddy read the dialog after all (kept: the question looks
+                    // twice, and a second look that finds nothing must not undo the first), or this setup is over
+                    final String[][] read = {null};
+                    final boolean[] over = {false};
                     String a = svc.askQuestion(svc.getString(R.string.background_type_code),
-                            java.util.Collections.singletonList(svc.getString(R.string.background_no_code)), true,
-                            () -> pairingDialog(svc) != null || step != Step.WAITING ? "read" : null);
-                    if (step != Step.WAITING || a.startsWith("read")) return; // (read after all, or over)
+                            java.util.Collections.singletonList(svc.getString(R.string.background_no_code)), true, () -> {
+                                if (read[0] == null && !over[0]) {
+                                    if (step != Step.WAITING || attempt != mine) over[0] = true;
+                                    else read[0] = pairingDialog(svc);
+                                }
+                                return read[0] != null || over[0] ? "read" : null;
+                            });
+                    if (attempt != mine || step != Step.WAITING) return; // (another attempt's by now, or over)
+                    if (read[0] != null) {
+                        typed = read[0];
+                        return;
+                    }
+                    if (over[0]) return;
                     if (!a.startsWith("ANSWER (typed")) { // the button, closed, or no answer in time
                         noCode = true;
                         return;
@@ -1452,7 +1471,7 @@ final class Background {
                         return;
                     }
                 }
-                noCode = true;
+                if (attempt == mine && step == Step.WAITING) noCode = true;
             } catch (Exception ignored) {
             } finally {
                 McpServer.CALLER_REMOTE.remove();
@@ -1493,12 +1512,14 @@ final class Background {
     private static String[] pairingDialog(BuddyService svc) {
         try {
             java.util.Set<String> apps = new java.util.LinkedHashSet<>();
-            boolean settings = false;
+            boolean settings = false, unread = false;
             java.util.Set<String> shapes = new java.util.LinkedHashSet<>();
             int[] texts = {0};
             for (AccessibilityWindowInfo w : svc.getWindows()) {
                 AccessibilityNodeInfo root = w.getRoot();
                 String pkg = root == null ? "(a window Buddy can't read)" : String.valueOf(root.getPackageName());
+                // (an app's window, as the dialog would be: bars and overlays that give nothing don't count)
+                if (root == null && w.getType() == AccessibilityWindowInfo.TYPE_APPLICATION) unread = true;
                 apps.add(pkg);
                 if (root == null || !"com.android.settings".contentEquals(pkg)) continue;
                 settings = true;
@@ -1507,6 +1528,7 @@ final class Background {
                 if (found[0] != null) return found;
             }
             settingsInFront = settings;
+            frontUnread = unread;
             // what Buddy could see instead, for the reason when setup gives up (issue #93): the apps in front and, in
             // Settings, how many texts and the shapes of the numbers among them (digits as #, never the numbers)
             String now = "in front: " + (apps.isEmpty() ? "no window" : android.text.TextUtils.join(", ", apps)) + (settings
@@ -1514,6 +1536,7 @@ final class Background {
             if (settings || lastSeen == null || !lastSeen.contains("in Settings")) lastSeen = now; // (Settings' last look stays)
         } catch (Exception e) {
             lastSeen = "reading the screen failed: " + e;
+            frontUnread = true;
         }
         return null;
     }

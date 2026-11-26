@@ -487,6 +487,13 @@ final class Tools {
             "reply_notification", "schedule_message", "clipboard_write", "phone_shell", "add_notification_rule", "run_on_computer"));
 
     JSONObject call(String name, JSONObject a) throws Exception {
+        // a team call's step shows as it comes in, whatever becomes of the call (also one that is refused): each
+        // call is then one arrival and one report by its agent, and the two are told apart (see ChatHub.ownStep)
+        if ("team".equals(name) || "team_change".equals(name)) {
+            final String chat = McpServer.CALLER_CHAT.get();
+            final JSONObject in = a == null ? new JSONObject() : a;
+            svc.runOnMain(() -> ChatHub.get(svc).ownStep(chat, name, in));
+        }
         // a session from outside Buddy counts as working for as long as its call goes (Sessions tab, Stop)
         final String outside = Background.outside(screenKey()) ? screenKey() : null;
         JSONObject r;
@@ -534,6 +541,9 @@ final class Tools {
             StepLog.record(svc, McpServer.CALLER_CHAT.get(), name, kept, said, !UNSEEN.contains(name));
         }
         if ("confirm".equals(name) || "ask".equals(name)) return r;
+        // (the agent gave up on this call: nobody reads its result, so what the user added waits for the next one)
+        java.util.function.BooleanSupplier callerGone = McpServer.CALLER_GONE.get();
+        if (callerGone != null && callerGone.getAsBoolean()) return r;
         String notes = ChatHub.get(svc).takeNotes(McpServer.CALLER_CHAT.get());
         if (notes != null) {
             r.getJSONArray("content").put(new JSONObject().put("type", "text").put("text",
@@ -580,11 +590,6 @@ final class Tools {
         }
         if (Lite.MORE.equals(name)) return text(Lite.more(svc, a)); // lite mode loads a group of tools
         // starting helpers or waiting for them isn't using the phone: no "Using your phone", no wait for a pause to end
-        if ("team".equals(name) || "team_change".equals(name)) { // (its step at once: see ChatHub.ownStep)
-            final String chat = McpServer.CALLER_CHAT.get();
-            final JSONObject in = a;
-            svc.runOnMain(() -> ChatHub.get(svc).ownStep(chat, name, in));
-        }
         if ("team".equals(name)) return text(Team.tool(svc, McpServer.CALLER_CHAT.get(), a));
         if ("team_change".equals(name)) return text(Team.change(svc, McpServer.CALLER_CHAT.get(), a));
         if ("team_start".equals(name)) return text(Team.start(svc, McpServer.CALLER_CHAT.get(), a));

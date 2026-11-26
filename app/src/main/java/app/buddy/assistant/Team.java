@@ -455,12 +455,11 @@ final class Team {
     static void reported(ChatHub hub, Sessions.Session h) {
         Sessions.Session parent = hub.sessions.find(h.parent);
         if (parent == null || parent.team == null) return;
+        // however its run ended (an answer, nothing to say, stopped, removed from the team): the leader isn't waiting
+        // for it any more, and carries on with what its members answered once none of them works (see carryOn)
+        if (!parent.running) new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> carryOn(hub, parent), 1500);
         Member m = parent.team.byId(h.member);
-        if (m == null) return;
-        if ("stopped".equals(h.outcome)) { // (nothing of its own to tell; what the others answered meanwhile goes on)
-            if (!parent.running) new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> carryOn(hub, parent), 1500);
-            return;
-        }
+        if (m == null || "stopped".equals(h.outcome)) return; // (nothing of its own to tell)
         boolean failed = h.outcome != null;
         Bubble.Kind kind = failed ? Bubble.Kind.ERROR : Bubble.Kind.BUDDY;
         // its last words, and every file it gave since it was told (a saved file or a picture comes as a message of its own)
@@ -483,9 +482,6 @@ final class Team {
         if (text == null && files.isEmpty()) return;
         Sessions.Msg msg = hub.addFrom(parent, kind, text == null ? "" : text, files, m, h.toldBy, h.told);
         // the leader has it if its team call is waiting for this member now; else its next turn's digest tells it
-        // the leader isn't waiting for it (its turn ended, or it didn't wait): it carries on once its members are done
-        if (msg != null && !msg.direct && !parent.running) new android.os.Handler(android.os.Looper.getMainLooper())
-                .postDelayed(() -> carryOn(hub, parent), 1500);
         if (msg != null && !msg.direct && AWAITED.contains(h.id)) {
             msg.heard = true;
             hub.sessions.save(parent); // (addFrom saved it before: a restart now mustn't tell the leader again)
@@ -636,25 +632,53 @@ final class Team {
      */
     static void carryOn(ChatHub hub, Sessions.Session parent) {
         if (parent.team == null || parent.running || !hub.sessions.all.contains(parent)) return;
-        if ("stopped".equals(parent.outcome) || "failed".equals(parent.outcome)) return;
-        if (parent.carriedOn >= MAX_CARRY_ON) return;
-        for (Sessions.Session h : all(hub, parent.id)) if (h.running && !h.toldBy.isEmpty()) return; // (more to come)
+        BuddyService svc = BuddyService.get();
+        // not after a Stop (the chat's, or the bubble's on everything: phone control is taken back then), a failed
+        // turn, or too many turns of its own
+        boolean held = "stopped".equals(parent.outcome) || "failed".equals(parent.outcome) || parent.carriedOn >= MAX_CARRY_ON
+                || (svc != null && svc.controlRevoked() != null);
         List<String> who = new ArrayList<>();
-        synchronized (parent.messages) {
-            for (int i = Math.max(0, parent.teamAt); i < parent.messages.size(); i++) {
-                Sessions.Msg m = parent.messages.get(i);
-                // (answers: a member that only failed doesn't set the leader off by itself, turn after turn; its
-                // error is in the chat for the user, and in the leader's next digest)
-                if (m.kind == Bubble.Kind.BUDDY && !m.from.isEmpty() && !m.direct && !m.heard && !who.contains(m.fromName)) who.add(m.fromName);
+        if (!held) {
+            for (Sessions.Session h : all(hub, parent.id)) if (h.running && !h.toldBy.isEmpty()) return; // (more to come)
+            synchronized (parent.messages) {
+                for (int i = Math.max(0, parent.teamAt); i < parent.messages.size(); i++) {
+                    Sessions.Msg m = parent.messages.get(i);
+                    // (answers: a member that only failed doesn't set the leader off by itself, turn after turn; its
+                    // error is in the chat for the user, and in the leader's next digest)
+                    if (m.kind == Bubble.Kind.BUDDY && !m.from.isEmpty() && !m.direct && !m.heard && !who.contains(m.fromName)) who.add(m.fromName);
+                }
             }
         }
-        if (who.isEmpty()) return;
+        if (who.isEmpty()) { // nothing to carry on with: a scheduled run whose end waited for the team is over now
+            if (parent.carryScheduled) {
+                parent.carryScheduled = false;
+                KeepAwake.notifyEnded(hub.app, parent);
+            }
+            return;
+        }
         parent.carriedOn++;
         String names = android.text.TextUtils.join(", ", who);
         hub.carryOn(parent, hub.app.getString(R.string.team_carry_on, names),
                 "[Buddy: " + names + " answered the work you gave them (above, under \"Since your last turn\"). Carry on "
                         + "with the team's task: give the next member its part, send work back, or tell the user it is done. "
                         + "Nobody wrote this turn's message: the user didn't.]");
+    }
+
+    /**
+     * The leader's turn ended, but its team isn't done: members it gave work to still work, or answered since. (Then a
+     * scheduled run's end is told when the team is, see ChatHub.runEnded.) Not when it won't carry on anyway.
+     */
+    static boolean moreToCome(ChatHub hub, Sessions.Session parent) {
+        if (parent.team == null || "stopped".equals(parent.outcome) || "failed".equals(parent.outcome)
+                || parent.carriedOn >= MAX_CARRY_ON) return false;
+        for (Sessions.Session h : all(hub, parent.id)) if (h.running && !h.toldBy.isEmpty()) return true;
+        synchronized (parent.messages) {
+            for (int i = Math.max(0, parent.teamAt); i < parent.messages.size(); i++) {
+                Sessions.Msg m = parent.messages.get(i);
+                if (m.kind == Bubble.Kind.BUDDY && !m.from.isEmpty() && !m.direct && !m.heard) return true;
+            }
+        }
+        return false;
     }
 
     /** Whether the chat's leader waits in a team call for one of its members now (its state: Waiting). */

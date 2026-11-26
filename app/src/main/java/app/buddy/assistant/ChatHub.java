@@ -489,14 +489,23 @@ final class ChatHub {
      */
     void carryOn(Sessions.Session ses, String line, String prompt) {
         if (ses.running) return;
+        // (a scheduled run's turn: scheduled still, with its wait for an unlock and its end told when it is over)
+        boolean scheduled = ses.carryScheduled, quiet = ses.carryQuiet;
+        ses.carryScheduled = false;
         sendingOwn = true;
         String err;
         try {
-            err = send(ses, line, null, prompt, false, false);
+            err = send(ses, line, null, prompt, scheduled, false);
         } finally {
             sendingOwn = false;
         }
-        if (err != null) note(ses, Bubble.Kind.ERROR, err);
+        if (err != null) {
+            note(ses, Bubble.Kind.ERROR, err);
+            if (scheduled) KeepAwake.notifyEnded(app, ses);
+        } else if (scheduled) {
+            ses.quietRun = quiet;
+            Schedules.carriedOn(app, ses);
+        }
     }
     private boolean sendingToLeader = true;
 
@@ -631,7 +640,7 @@ final class ChatHub {
             if (ses.title.isEmpty()) ses.title = Sessions.autoTitle(sendingLinux.get(0).substring(sendingLinux.get(0).lastIndexOf('/') + 1), null);
             sessions.save(ses);
         }
-        if (scheduled) {
+        if (scheduled && !sendingOwn) {
             um.scheduled = true;
             sessions.save(ses);
         }
@@ -1168,7 +1177,14 @@ final class ChatHub {
 
     /** Stop every chat that is working (the bubble's stop button). */
     void stopAll() {
-        for (Sessions.Session s : new java.util.ArrayList<>(sessions.all)) if (s.running) stop(s);
+        for (Sessions.Session s : new java.util.ArrayList<>(sessions.all)) {
+            if (!s.running) continue;
+            if (!s.member.isEmpty()) { // (its team's leader doesn't carry on by itself after it: until the user writes)
+                Sessions.Session lead = sessions.find(s.parent);
+                if (lead != null) lead.carriedOn = Team.MAX_CARRY_ON;
+            }
+            stop(s);
+        }
     }
 
     void stop(Sessions.Session ses) {
@@ -1198,6 +1214,7 @@ final class ChatHub {
                 Sessions.Msg last = ses.messages.isEmpty() ? null : ses.messages.get(ses.messages.size() - 1);
                 if (last == null || !stopped.equals(last.text)) add(ses, Bubble.Kind.STEP, stopped);
                 runEnded(ses);
+                if (!ses.member.isEmpty()) Team.reported(this, ses); // (its team's leader isn't waiting for it any more)
                 changed();
             }, STOP_GIVE_UP_MS);
         } catch (Exception e) {
@@ -1672,7 +1689,11 @@ final class ChatHub {
         // Then its end is a notification too, as for a long task's or a scheduled one's
         boolean away = Triggers.locked(app) || (ses.background && !viewing.contains(ses));
         // (a helper's end is its parent's business: no notification)
-        if ((ses.awake || ses.scheduledRun || away) && !quiet && ses.parent.isEmpty()) KeepAwake.notifyEnded(app, ses);
+        // (a scheduled turn of a team's leader whose team isn't done: its end is told when the team is, see Team.carryOn)
+        boolean teamGoesOn = ses.scheduledRun && ses.parent.isEmpty() && Team.moreToCome(this, ses);
+        ses.carryScheduled = teamGoesOn;
+        ses.carryQuiet = teamGoesOn && ses.quietRun;
+        if ((ses.awake || ses.scheduledRun || away) && !quiet && ses.parent.isEmpty() && !teamGoesOn) KeepAwake.notifyEnded(app, ses);
         ses.scheduledRun = false;
         ses.quietRun = false;
         ses.quietSaid = false;
