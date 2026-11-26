@@ -353,7 +353,7 @@ final class TeamUi {
             String leadState = ses.running ? a.getString(Team.waits(hub, ses) ? R.string.team_waiting : R.string.helper_working)
                     : a.getString(R.string.team_ready);
             View lead = info(a, a.getString(R.string.team_leader), Team.leaderColor(a), on, a.getString(R.string.team_this_chat),
-                    null, leadState, ses.running, true, here == ses, null, here == ses ? null : () -> {
+                    null, leadState, ses.running, true, here == ses, null, here == ses ? () -> shown.dialog.dismiss() : () -> {
                         shown.dialog.dismiss();
                         a.startActivity(new android.content.Intent(a, ChatActivity.class).putExtra("id", ses.id));
                         a.finish(); // (from a member's chat back to the team's: not a stack of them)
@@ -365,7 +365,9 @@ final class TeamUi {
                 // (one with a hidden screen at all: hasApp answers from its last look, so the panel looks again soon)
                 screens |= h != null && h.background && Background.displayOf(h.id) != android.view.Display.DEFAULT_DISPLAY;
                 cards.add(info(a, m.name, Team.color(a, m.color), m.on(), m.goal, h == null ? null : h.lastReply, state(a, h),
-                        h != null && h.running, false, h == here, screen ? h : null, h == null || h == here ? null : () -> {
+                        h != null && h.running, false, h == here, screen ? h : null,
+                        // (the one whose chat this is: the panel closes, back to it)
+                        h == null ? null : h == here ? () -> shown.dialog.dismiss() : () -> {
                             shown.dialog.dismiss();
                             a.startActivity(new android.content.Intent(a, ChatActivity.class).putExtra("id", h.id));
                             if (here != ses) a.finish(); // (from one member's chat to another's)
@@ -523,7 +525,7 @@ final class TeamUi {
         if (open != null) {
             card.setForeground(c.getDrawable(ripple(c, false)));
             card.setOnClickListener(v -> open.run());
-            card.setContentDescription(c.getString(leader ? R.string.team_back_to_team : R.string.team_open_chat_of, name) + ", " + state);
+            card.setContentDescription((here ? name : c.getString(leader ? R.string.team_back_to_team : R.string.team_open_chat_of, name)) + ", " + state);
         }
         return card;
     }

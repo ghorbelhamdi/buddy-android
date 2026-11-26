@@ -242,13 +242,14 @@ h2.sec{margin:8px 0 0;font-size:13px;letter-spacing:.5px;text-transform:uppercas
 @media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .tm{--mc:var(--ml)}}
 :root[data-theme="light"] .tm{--mc:var(--ml)}
 .dotc{width:8px;height:8px;border-radius:4px;background:var(--mc);flex:none}
-.tbar{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;box-sizing:border-box;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:4px 12px 4px 8px;font:inherit;color:var(--text);cursor:pointer;text-align:start;overflow-x:auto;scrollbar-width:none}
-.tbar:hover{border-color:var(--outline,var(--accent))}
-.tbar .one{display:flex;align-items:center;gap:5px;flex:none;font-size:12px;color:var(--muted)}
+.tbar{display:flex;align-items:center;gap:4px;width:100%;min-height:44px;box-sizing:border-box;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:4px 8px;color:var(--text);overflow-x:auto;scrollbar-width:none}
+.tbar .one{display:flex;align-items:center;gap:5px;flex:none;font:inherit;font-size:12px;color:var(--muted);background:none;border:0;border-radius:16px;padding:6px 6px 6px 4px;cursor:pointer}
+.tbar .one:hover,.tbar .shp:hover{background:var(--card2)}
+.tbar .shp{flex:none;display:flex;align-items:center;background:none;border:0;border-radius:12px;padding:4px;color:var(--muted);cursor:pointer}
 .tbar .one.on{color:var(--text);font-weight:600}
 .tbar .one .av{width:20px;height:20px;font-size:11px}
 .tbar .one.cur .av{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--mc)}
-.tbar .sp{flex:1}
+.tbar .sp{flex:1;align-self:stretch;cursor:pointer}
 .tbar>svg:last-child{flex:none;color:var(--muted)}
 .tcard .nm .av{width:24px;height:24px;font-size:12px}
 .round{align-self:flex-start;width:min(92%,760px);box-sizing:border-box;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
@@ -838,13 +839,21 @@ function drawTeam(d) {
   if (now === teamDrawn) return;
   teamDrawn = now;
   strip.textContent = '';
-  // one bar: the shape, each one's mark and state in a word, and a tap that opens the team panel
+  // one bar: the shape, then each one's mark and state in a word. A mark opens that one's own chat (the leader's:
+  // back to the team's chat); the shape and the arrow, and the one whose chat this is, open the team panel
   const leadWord = L.running ? (L.waiting ? 'Waiting' : 'Working') : 'Ready';
-  const one = (name, c, word, on, cur) => tint(el('span', {class: 'one' + (on ? ' on' : '') + (cur ? ' cur' : '')}, avatar(name, c), word), c);
-  strip.append(el('button', {class: 'tbar', 'aria-label': t.name + ' team: Leader ' + leadWord + t.members.map(m => ', ' + m.name + ' ' + m.state).join('') + '. Opens the team',
-      title: 'The team', onclick: () => teamShape(!d.memberOf)},
-    shapePic(t.structure, 30), one('Leader', null, leadWord, L.running, L.chat === open),
-    ...t.members.map(m => one(m.name, m.c, m.state, m.running, m.chat === open)), el('span', {class: 'sp'}), icon(I.chev, 16)));
+  const panel = () => teamShape(!d.memberOf);
+  const one = (name, c, word, on, chat, lead) => {
+    const cur = chat === open, to = chat && !cur ? () => show(chat) : panel;
+    return tint(el('button', {class: 'one' + (on ? ' on' : '') + (cur ? ' cur' : ''), onclick: to,
+      title: chat && !cur ? (lead ? 'Back to the team’s chat' : 'Open ' + name + '’s chat') : 'The team',
+      'aria-label': name + ' ' + word + (chat && !cur ? (lead ? ': back to the team’s chat' : ': open its chat') : ': the team')}, avatar(name, c), word), c);
+  };
+  strip.append(el('div', {class: 'tbar', role: 'group', 'aria-label': t.name + ' team'},
+    el('button', {class: 'shp', 'aria-label': t.name + ': show the team', title: 'The team', onclick: panel}, shapePic(t.structure, 30)),
+    one('Leader', null, leadWord, L.running, L.chat, true),
+    ...t.members.map(m => one(m.name, m.c, m.state, m.running, m.chat, false)), el('span', {class: 'sp', onclick: panel}),
+    el('button', {class: 'shp', 'aria-label': 'Show the team', title: 'The team', onclick: panel}, icon(I.chev, 16))));
   paintTo(t);
 }
 
@@ -933,8 +942,9 @@ function teamShape(withOff) {
           else { let why = 'Nothing to show yet.'; try { why = (await x.json()).error || why; } catch (e) {} shot.textContent = why; }
         } catch (e) { shot.textContent = ''; }
       })();
-      return tint(el(chat && !here ? 'button' : 'div', {class: 'tcard' + (lead ? ' lead' : '') + (here ? ' cur' : ''),
-          title: chat && !here ? (lead ? 'Back to the team’s chat' : 'Open ' + name + '’s chat') : null, onclick: chat && !here ? go(chat) : null},
+      return tint(el(chat ? 'button' : 'div', {class: 'tcard' + (lead ? ' lead' : '') + (here ? ' cur' : ''),
+          title: chat && !here ? (lead ? 'Back to the team’s chat' : 'Open ' + name + '’s chat') : null,
+          onclick: chat ? (here ? close : go(chat)) : null}, // (the one whose chat this is: the panel closes, back to it)
         el('span', {class: 'nm'}, avatar(name, c), el('b', {}, name), el('span', {class: 'sw' + (running ? ' on2' : '')}, state)),
         el('span', {class: 'on'}, on), goal ? el('span', {class: 'goal'}, goal) : null,
         last ? el('span', {class: 'last'}, 'Last: ' + last) : null, shot), c);

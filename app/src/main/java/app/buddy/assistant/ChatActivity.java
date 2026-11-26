@@ -1069,6 +1069,22 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
         });
     }
 
+    /** One of the bar's marks, as tall as the bar (a finger's height to tap). */
+    private LinearLayout.LayoutParams barItemParams() {
+        return new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
+    }
+
+    /** A tap on this mark of the bar opens that chat; leave: this screen closes (from a member's chat: not a stack of them). */
+    private void barOpens(View item, final Sessions.Session to, String says, final boolean leave) {
+        item.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
+        item.setContentDescription(says);
+        item.setBackgroundResource(ripple(this, true));
+        item.setOnClickListener(v -> {
+            startActivity(new android.content.Intent(this, ChatActivity.class).putExtra("id", to.id));
+            if (leave) finish();
+        });
+    }
+
     /** The team panel: the team in its shape, live; from a member's own chat too (its team's). */
     private void openTeamPanel() {
         Sessions.Session owner = ses.parent.isEmpty() ? ses : ses.member.isEmpty() ? null : hub.sessions.find(ses.parent);
@@ -1124,7 +1140,11 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
             teamChips.addView(gap, new LinearLayout.LayoutParams(dp(this, 6), 1));
             StringBuilder said = new StringBuilder();
             String word = getString(owner.running ? (waits ? R.string.team_waiting : R.string.helper_working) : R.string.team_ready);
-            teamChips.addView(TeamUi.barItem(this, getString(R.string.team_leader), Team.leaderColor(this), word, owner.running, owner == ses));
+            // a tap on one opens its own chat (the leader's: back to the team's chat); the shape and the arrow, and the
+            // one whose chat this is, open the team panel
+            View leadItem = TeamUi.barItem(this, getString(R.string.team_leader), Team.leaderColor(this), word, owner.running, owner == ses);
+            if (memberChat) barOpens(leadItem, owner, getString(R.string.team_back_to_team) + ", " + word, true);
+            teamChips.addView(leadItem, barItemParams());
             said.append(getString(R.string.team_leader)).append(' ').append(word);
             for (int i = 0; i < t.members.size(); i++) {
                 Team.Member m = t.members.get(i);
@@ -1132,7 +1152,8 @@ public class ChatActivity extends Screen implements ChatHub.Listener, Browser.Li
                 String st = TeamUi.state(this, h);
                 // (its state in a word: a command is too long for the bar; the line under the header has it whole)
                 View item = TeamUi.barItem(this, m.name, Team.color(this, m.color), st, h != null && h.running, h == ses);
-                teamChips.addView(item);
+                if (h != null && h != ses) barOpens(item, h, getString(R.string.team_open_chat_of, m.name) + ", " + st, memberChat);
+                teamChips.addView(item, barItemParams());
                 if (h == ses) // (a member's own chat: the bar scrolls to it, centred where it can be)
                     teamStrip.post(() -> teamStrip.scrollTo(Math.max(0, item.getLeft() - (teamStrip.getWidth() - item.getWidth()) / 2), 0));
                 said.append(", ").append(m.name).append(' ').append(st);
