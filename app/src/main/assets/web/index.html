@@ -858,7 +858,10 @@ function drawTeam(d) {
 
 /** A member's mark: its initial on its colour. */
 function avatar(name, c) {
-  return tint(el('span', {class: 'av', 'aria-hidden': 'true'}, ([...(name || '?').trim()][0] || '?').toUpperCase()), c);
+  // its initial, with its number where its name ends in one ("Worker 2": W2), so Worker 1 to 4 aren't four times W
+  const s = (name || '').trim(), first = ([...s][0] || '?').toUpperCase(), m = /(\d{1,2})$/.exec(s);
+  const mark = !m || m.index === 0 ? first : m[1].length === 1 ? first + m[1] : m[1];
+  return tint(el('span', {class: 'av', 'aria-hidden': 'true'}, mark.length > 1 ? el('span', {style: 'font-size:.84em'}, mark) : mark), c);
 }
 
 /** Who a team chat's message can go to: the leader first, then the members. */

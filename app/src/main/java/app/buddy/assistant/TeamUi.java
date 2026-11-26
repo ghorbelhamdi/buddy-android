@@ -76,7 +76,7 @@ final class TeamUi {
                 tile.addView(pic, new LinearLayout.LayoutParams(dp(a, 40), dp(a, 32)));
                 TextView n = text(a, x[1], 11, on ? TEXT : TEXT2);
                 n.setGravity(Gravity.CENTER);
-                n.setMaxLines(2);
+                n.setMaxLines(3); // ("Doers with their own goals" lost its last word on two)
                 if (on) n.setTypeface(sans(a, 600));
                 n.setPaddingRelative(0, dp(a, 4), 0, 0);
                 tile.addView(n, full());
@@ -745,14 +745,27 @@ final class TeamUi {
 
     // ------------------------------------------------------------------ in the chat
 
+    /**
+     * What a member's mark says: its initial, with its number where its name ends in one ("Worker 2": W2; a number of
+     * two digits alone), so a team of Worker 1 to 4 isn't four times W.
+     */
+    static String mark(String name) {
+        String n = name == null ? "" : name.trim();
+        if (n.isEmpty()) return "?";
+        String first = n.substring(0, n.offsetByCodePoints(0, 1)).toUpperCase(java.util.Locale.getDefault());
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d{1,2})$").matcher(n);
+        if (!m.find() || m.start() == 0) return first;
+        return m.group(1).length() == 1 ? first + m.group(1) : m.group(1);
+    }
+
     /** A member's mark: its initial on its colour, in the ink (dark or light) that reads on it. */
     static TextView avatar(Context c, String name, int color, int sizeDp) {
         TextView t = new TextView(c);
-        String n = name == null ? "" : name.trim();
-        t.setText(n.isEmpty() ? "?" : n.substring(0, n.offsetByCodePoints(0, 1)).toUpperCase(java.util.Locale.getDefault()));
+        String mark = mark(name);
+        t.setText(mark);
         t.setGravity(Gravity.CENTER);
         t.setIncludeFontPadding(false);
-        t.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, sizeDp * 0.5f);
+        t.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, sizeDp * (mark.length() > 1 ? 0.42f : 0.5f));
         t.setTypeface(sans(c, 700));
         t.setTextColor(Theme.luminance(color) > 0.5 ? 0xFF1A1714 : 0xFFFFFFFF);
         t.setBackground(oval(color));
