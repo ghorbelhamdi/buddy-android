@@ -580,6 +580,11 @@ final class Tools {
         }
         if (Lite.MORE.equals(name)) return text(Lite.more(svc, a)); // lite mode loads a group of tools
         // starting helpers or waiting for them isn't using the phone: no "Using your phone", no wait for a pause to end
+        if ("team".equals(name) || "team_change".equals(name)) { // (its step at once: see ChatHub.ownStep)
+            final String chat = McpServer.CALLER_CHAT.get();
+            final JSONObject in = a;
+            svc.runOnMain(() -> ChatHub.get(svc).ownStep(chat, name, in));
+        }
         if ("team".equals(name)) return text(Team.tool(svc, McpServer.CALLER_CHAT.get(), a));
         if ("team_change".equals(name)) return text(Team.change(svc, McpServer.CALLER_CHAT.get(), a));
         if ("team_start".equals(name)) return text(Team.start(svc, McpServer.CALLER_CHAT.get(), a));

@@ -178,6 +178,8 @@ final class Sessions {
         volatile String toldBy = "", told = "";
         /** A team's chat, not saved: how often its leader carried on by itself since the user last wrote (Team.carryOn). */
         int carriedOn;
+        /** Not saved: the step Buddy showed itself when a team call came in (ChatHub.ownStep), so the agent's own isn't doubled. */
+        String ownStep;
         /** A member's chat, not saved: where its run's messages start (the message it was told); -1: not known. */
         volatile int toldAt = -1;
         /** The chat's scheduled task (see Schedules), or null. */

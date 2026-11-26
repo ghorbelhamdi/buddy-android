@@ -1288,8 +1288,11 @@ final class ChatHub {
                         } else if (step != null) {
                             ses.cmd = null;
                         }
-                        if (step != null) {
-                            add(ses, Bubble.Kind.STEP, describeTool(c.optString("name"), c.optJSONObject("input"), true));
+                        String full = step == null ? null : describeTool(c.optString("name"), c.optJSONObject("input"), true);
+                        if (full != null && full.equals(ses.ownStep)) { // (Buddy showed it when the call came in)
+                            ses.ownStep = null;
+                        } else if (step != null) {
+                            add(ses, Bubble.Kind.STEP, full);
                             ses.status = step;
                             String n = c.optString("name");
                             if (n.equals(TOOL_PREFIX + "confirm") || n.equals(TOOL_PREFIX + "ask")) CodexLive.agentWaiting(ses, step, c.optJSONObject("input"));
@@ -1807,6 +1810,23 @@ final class ChatHub {
         BuddyService svc = BuddyService.get();
         if (svc != null) svc.keepAwake().update(); // a long-task chat started, ended or changed its switch
         for (Listener l : new ArrayList<>(listeners)) l.onChatsChanged();
+    }
+
+    /**
+     * A team call came in from a chat's agent: its step shows now (main thread). Some agents (OpenCode) report a tool
+     * only once it has ended, so "Telling Auditor" came after the Auditor had answered (issue #94).
+     */
+    void ownStep(String chat, String tool, JSONObject in) {
+        Sessions.Session s = chat == null ? null : sessions.find(chat);
+        if (s == null || !s.running) return;
+        String full = describeTool(TOOL_PREFIX + tool, in, true);
+        if (full == null) return;
+        Sessions.Msg last = s.messages.isEmpty() ? null : s.messages.get(s.messages.size() - 1);
+        if (last != null && last.kind == Bubble.Kind.STEP && full.equals(last.text)) return; // (the agent said it already)
+        add(s, Bubble.Kind.STEP, full);
+        s.status = describeTool(TOOL_PREFIX + tool, in);
+        s.ownStep = full;
+        changed();
     }
 
     static String describeTool(String name, JSONObject in) {
