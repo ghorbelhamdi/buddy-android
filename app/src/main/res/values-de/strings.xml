@@ -2497,4 +2497,6 @@
     <string name="team_started_busy">Das Team ist an. Der Leiter arbeitete noch und bekommt seine Rückfragen mit dem nächsten Schritt.</string>
     <string name="team_started_busy_agent">Das Team ist an. Der Leiter arbeitete noch und bekommt seine Rückfragen mit dem nächsten Schritt; Agent und Modell, die du für ihn gewählt hast, wurden nicht geändert (ändere sie oben, wenn er fertig ist).</string>
     <string name="team_carry_on">%1$s hat geantwortet: der Leiter macht weiter.</string>
+    <string name="background_type_code">Buddy kann den Kopplungscode auf diesem Handy nicht lesen. Öffne „Gerät über einen Kopplungscode koppeln“, falls es nicht offen ist, und tippe hier den 6-stelligen Code und den Port aus „IP-Adresse und Port“ ein (zum Beispiel 123456 38135). Lass das Fenster offen.</string>
+    <string name="background_no_code">Ich sehe keinen Code</string>
 </resources>

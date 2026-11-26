@@ -3222,4 +3222,6 @@
     <string name="team_started_busy">The team is on. The leader was still working, so it gets its follow-up questions with its next step.</string>
     <string name="team_started_busy_agent">The team is on. The leader was still working, so it gets its follow-up questions with its next step; the agent and model you picked for it weren’t changed (change them in the header once it’s done).</string>
     <string name="team_carry_on">%1$s answered: the leader carries on.</string>
+    <string name="background_type_code">Buddy can’t read the pairing code on this phone. Open “Pair device with pairing code” if it isn’t open, then type the 6-digit code and the port from “IP address &amp; Port” here (for example 123456 38135). Keep that dialog open.</string>
+    <string name="background_no_code">I don’t see a code</string>
 </resources>

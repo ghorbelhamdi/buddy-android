@@ -1192,9 +1192,19 @@ final class Background {
                     }
                 }).start();
                 String[] found = null;
+                typed = null;
+                long askAt = System.currentTimeMillis() + 20_000;
+                boolean asked = false;
                 while (step == Step.WAITING && System.currentTimeMillis() < waitUntil && found == null) {
                     sleep(700);
                     found = pairingDialog(svc);
+                    if (found == null) found = typed;
+                    // some phones don't let Buddy read that dialog (a Pixel on Android 17, issue #93): the user types
+                    // the code into the bubble instead, over Settings, as the code only works while the dialog is open
+                    if (found == null && !asked && System.currentTimeMillis() > askAt) {
+                        asked = true;
+                        askForCode(svc);
+                    }
                 }
                 if (step != Step.WAITING) return; // cancelled
                 if (found == null) { // the likeliest reason comes along when the phone says Developer options are off
@@ -1396,6 +1406,35 @@ final class Background {
         if (port > 0) Prefs.setBackgroundAdbPort(svc, port);
         if (pairToo) click(code);
         return port;
+    }
+
+    /** The pairing code and port the user typed into the bubble (askForCode), or null. */
+    private static volatile String[] typed;
+
+    /**
+     * Asks in the bubble for the code and the port that "Pair with device" shows, next to the bubble so the dialog
+     * stays open; it closes by itself if Buddy reads the dialog meanwhile. What the user types goes to typed.
+     */
+    private static void askForCode(BuddyService svc) {
+        new Thread(() -> {
+            try {
+                String a = svc.askQuestion(svc.getString(R.string.background_type_code),
+                        java.util.Collections.singletonList(svc.getString(R.string.background_no_code)), true,
+                        () -> pairingDialog(svc) != null || step != Step.WAITING ? "read" : null);
+                if (!a.startsWith("ANSWER (typed")) return;
+                Matcher code = Pattern.compile("(?<!\\d)(\\d{6})(?!\\d)").matcher(a);
+                if (!code.find()) return;
+                String port = null;
+                Matcher p = Pattern.compile(":\\s*(\\d{4,5})(?!\\d)").matcher(a);
+                if (p.find()) port = p.group(1);
+                else { // a second number: the port written on its own
+                    Matcher any = Pattern.compile("(?<!\\d)(\\d{4,5})(?!\\d)").matcher(a);
+                    while (any.find()) if (!any.group(1).equals(code.group(1))) port = any.group(1);
+                }
+                typed = new String[]{code.group(1), port};
+            } catch (Exception ignored) {
+            }
+        }, "pair-code-ask").start();
     }
 
     private static boolean isList(AccessibilityNodeInfo n) {

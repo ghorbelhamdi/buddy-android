@@ -2918,4 +2918,6 @@
     <string name="team_started_busy">团队已开启。负责人仍在工作，会在下一步收到后续问题。</string>
     <string name="team_started_busy_agent">团队已开启。负责人仍在工作，会在下一步收到后续问题；你为它选的智能体和模型未更改（完成后在顶部更改）。</string>
     <string name="team_carry_on">%1$s 已回答：负责人继续。</string>
+    <string name="background_type_code">Buddy 无法读取这台手机上的配对码。如果“使用配对码配对设备”没有打开，请先打开，然后在这里输入 6 位配对码和“IP 地址和端口”中的端口（例如 123456 38135）。请保持该对话框打开。</string>
+    <string name="background_no_code">我没看到配对码</string>
 </resources>

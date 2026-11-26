@@ -2548,4 +2548,6 @@
     <string name="team_started_busy">Zespół działa. Lider jeszcze pracował, więc dostanie pytania przy następnym kroku.</string>
     <string name="team_started_busy_agent">Zespół działa. Lider jeszcze pracował, więc dostanie pytania przy następnym kroku; wybrany dla niego agent i model się nie zmieniły (zmień je u góry, gdy skończy).</string>
     <string name="team_carry_on">%1$s odpowiedział: lider kontynuuje.</string>
+    <string name="background_type_code">Buddy nie może odczytać kodu parowania na tym telefonie. Otwórz „Sparuj urządzenie za pomocą kodu parowania”, jeśli nie jest otwarte, i wpisz tutaj 6-cyfrowy kod oraz port z „Adres IP i port” (np. 123456 38135). Nie zamykaj tego okna.</string>
+    <string name="background_no_code">Nie widzę kodu</string>
 </resources>
