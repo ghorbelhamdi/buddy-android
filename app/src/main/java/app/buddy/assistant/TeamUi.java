@@ -799,7 +799,7 @@ final class TeamUi {
             TextView av = avatar(c, (String) r[1], (Integer) r[2], 18);
             av.setBackground(outlinedOval(c, (Integer) r[2], CARD2, 2));
             LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) av.getLayoutParams();
-            if (shown > 1) p.setMarginStart(-dp(c, 6));
+            if (shown > 1) p.setMarginStart(-dp(c, 3)); // (a little over the one before: its number stays readable)
             chip.addView(av, p);
         }
         String label = names.size() == 1 ? c.getString(R.string.team_to, names.get(0)) : c.getString(R.string.team_to_n, names.size());
@@ -916,7 +916,7 @@ final class TeamUi {
             TextView av = avatar(c, (String) w[0], (Integer) w[1], 22);
             av.setBackground(outlinedOval(c, (Integer) w[1], CARD, 2));
             LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) av.getLayoutParams();
-            if (seen.size() > 1) p.setMarginStart(-dp(c, 6));
+            if (seen.size() > 1) p.setMarginStart(-dp(c, 3)); // (a little over the one before: its number stays readable)
             head.addView(av, p);
         }
         TextView n = single(text(c, c.getResources().getQuantityString(R.plurals.team_round, who.size(), who.size()), 13, TEXT));
